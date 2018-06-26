@@ -1,0 +1,49 @@
+key,en,fr
+project,Project,Projet
+projects,Projects,Projets
+storage,Storage,Stockage
+help,Help,Aide
+hotkeys,Hot keys,Raccourcis
+about,About,À propos
+account,Account,Compte
+logout,Logout,Se déconnecter
+dashboard,Dashboard,Tableau de bord
+image,Image,Image
+images,Images,Images
+annotation,Annotation,Annotation
+annotations,Annotations,Annotations
+job,Job,Algorithme
+jobs,Jobs,Algorithmes
+activity,Activity,Activité
+parameters,Parameters,Paramètres
+title-global-dashboard,Global Dashboard,Tableau de bord général
+quick-access,Quick Access,Accès rapide
+no-project,No project found,
+no-image,No image found,
+statistics,Statistics,Statistiques
+user-annotations,User Annotations,
+job-annotations,Job Annotations,
+reviewed-annotations,Reviewed Annotations,
+recent-projects,Recent Projects,
+recent-images,Recent Images,
+profile,Profile,Profil
+username,User name,Nom d'utilisateur
+firstname,First name,Prénom
+lastname,Last name,Nom
+email,Email address,Adresse mail
+button-go,Go,Go
+button-save,Save,Sauvegarder
+notif-success-user-details-saved,User details correctly updated,
+notif-error-user-details-not-saved,Error during update of user details,
+password,Password,Mot de passe
+password-current,Current password,Mot de passe actuel
+password-new,New password,Nouveau mot de passe
+password-confirm,New password (confirm),Nouveau mot de passe (confirmation)
+notif-success-password-saved,Password correctly updated,
+notif-error-password-not-saved,Error during update of password,
+api-keys,API keys,Clés API
+public-key,Public key,Clé publique
+private-key,Private key,Clé privée
+regenerate-api-keys,Regenerate,Regénérer
+login,Login,Authentification
+remember-me,Remember me,
