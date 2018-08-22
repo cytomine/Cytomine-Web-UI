@@ -45,5 +45,9 @@ api-keys,API keys,Clés API
 public-key,Public key,Clé publique
 private-key,Private key,Clé privée
 regenerate-api-keys,Regenerate,Regénérer
+notif-success-keys-regenerated,API keys correctly updated,
+notif-error-keys-not-regenerated,Error during the regeneration of API keys,
 login,Login,Authentification
 remember-me,Remember me,
+notif-success-login,Welcome on Cytomine,Bienvenue sur Cytomine
+notif-error-login,Invalid credentials,Identifiants invalides
