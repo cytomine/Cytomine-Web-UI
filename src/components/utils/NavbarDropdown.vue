@@ -1,8 +1,8 @@
 <template>
 	<div class="navbar-item has-dropdown"
 		:class="{'is-active': opened}"
-		 @mouseover="opened = true;"
-		 @mouseout="opened = false;">
+        @mouseover="opened = true;"
+        @mouseout="opened = false;">
 		<a class="navbar-link" :class="{'is-active': isActive}">
 			<i v-if="icon != null" :class="['fa', icon]"></i>
 			{{title}}
@@ -24,9 +24,9 @@ export default {
 			isActive: false
 		}
 	},
-	/* TODO: rework the way the background color is set when child element active */
+	// TODO: rework the way the background color is set when child element active
 	watch: {
-		'$route.path': function(newPath) {
+		"$route.path": function(newPath) {
 			if(this.listPathes) {
 				this.isActive = this.listPathes.includes(newPath);
 			}

@@ -1,62 +1,62 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import axios from 'axios';
+import Vue from "vue";
+import Vuex from "vuex";
+import {Cytomine, User} from "cytomine-client";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
-	state: {
-		authenticated: false,
-		currentUser: null
-	},
-	mutations: {
-		setAuthenticated(state, authenticated) {
-			state.authenticated = authenticated;
-		},
-		setUser(state, user) {
-			state.currentUser = user;
-		},
-		logout(state) {
-			state.authenticated = false;
-			state.currentUser = null;
-			// TODO: clean other variables
-		}
-	},
-	actions: {
+    state: {
+        authenticated: false,
+        currentUser: null
+    },
+    mutations: {
+        setAuthenticated(state, authenticated) {
+            state.authenticated = authenticated;
+        },
+        setUser(state, user) {
+            state.currentUser = user.clone();
+        },
+        logout(state) {
+            state.authenticated = false;
+            state.currentUser = null;
+            // TODO: clean other variables
+        }
+    },
+    actions: {
 
-		async fetchUser({commit}) {
-			let {data} = await axios.get("/server/ping.json");
-			commit('setAuthenticated', data.authenticated);
-			if(data.authenticated) {
-				({data} = await axios.get("/api/user/current.json"));
-				commit('setUser', data);
-			}
-		},
+        async fetchUser({commit}) {
+            let {authenticated} = await Cytomine.instance.ping();
+            commit("setAuthenticated", authenticated);
+            if(authenticated) {
+                let currentUser = await User.fetchCurrent();
+                commit("setUser", currentUser);
+            }
+        },
 
-		async updateUser({commit, state}, user) {
-			let {data} = await axios.put(`/api/user/${state.currentUser.id}.json`, user);
-			commit('setUser', data.user);
-		},
+        async updateUser({commit}, user) {
+            await user.update();
+            commit("setUser", user);
+        },
 
-		async login({state, dispatch}, payload) {
-			var params = new URLSearchParams();
-			params.append('j_username', payload.username);
-			params.append('j_password', payload.password);
-			params.append('j_email', '');
-			params.append('remember_me', payload.remember_me ? "on" : "off");
-			await axios.post("j_spring_security_check", params, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-				.catch(() => {}); // TODO: remove catch (temporary patch for CORS)
-			await dispatch("fetchUser");
-			if(!state.authenticated) {
-				throw Error("Invalid credentials"); // TODO: custom error
-			}
-		},
+        async regenerateKeys({state, commit}) {
+            let user = state.currentUser.clone();
+            await user.regenerateKeys();
+            commit("setUser", user);
+        },
 
-		async logout({commit}) {
-			await axios.put(`j_spring_security_logout`);
-			commit('logout');
-		}
-	}
+        async login({state, dispatch}, payload) {
+            await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+            await dispatch("fetchUser");
+            if(!state.authenticated) {
+                throw new Error("Invalid credentials");
+            }
+        },
+
+        async logout({commit}) {
+            await Cytomine.instance.logout();
+            commit("logout");
+        }
+    }
 });
 
 export default store;

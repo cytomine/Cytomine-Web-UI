@@ -9,7 +9,7 @@ import i18n from './lang.js';
 
 import store from './store.js';
 
-import axios from 'axios';
+import {Cytomine} from "cytomine-client";
 
 import Buefy from 'buefy'
 import 'buefy/lib/buefy.css'
@@ -21,11 +21,11 @@ Vue.use(Notifications);
 Vue.use(Buefy);
 Vue.config.productionTip = false;
 
-window.axios = axios;
+new Cytomine("localhost-core");
 
 new Vue({
-  render: h => h(App),
-  router,
-  store,
-  i18n
+    render: h => h(App),
+    router,
+    store,
+    i18n
 }).$mount('#app');
