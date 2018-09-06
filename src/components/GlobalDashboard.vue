@@ -141,7 +141,7 @@ export default {
         filteredImages() {
             return this.images.filter((image) => {
                 return image.originalFilename.toString().toLowerCase().indexOf(this.searchImage.toLowerCase()) >= 0;
-            })
+            });
         },
         recentProjects() {
             return this.projects.array.filter(project => this.recentProjectsId.includes(project.id));
@@ -178,7 +178,7 @@ export default {
 
         this.initialized = true;
     }
-}
+};
 </script>
 
 <style scoped>

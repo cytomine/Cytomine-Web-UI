@@ -37,20 +37,21 @@ export default {
             username: "",
             password: "",
             rememberMe: true
-        }
+        };
     },
     methods: {
         async login() {
             try {
+                let successMessage = this.$t("notif-success-login");
                 await this.$store.dispatch("login", {username: this.username, password: this.password, rememberMe: this.rememberMe});
-                this.$notify({type: "success", text: this.$t("notif-success-login")});
+                this.$notify({type: "success", text: successMessage});
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-login")});
             }
         }
     }
-}
+};
 </script>
 
 <style>
