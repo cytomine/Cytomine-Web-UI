@@ -1,9 +1,9 @@
-import VueRouter from "vue-router"
+import VueRouter from "vue-router";
 
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import Account from "./components/Account.vue";
-import CytomineImage from "./components/CytomineImage.vue";
+import CytomineImage from "./components/viewer/CytomineImage.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
 // Define routes

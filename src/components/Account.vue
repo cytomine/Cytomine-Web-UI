@@ -105,7 +105,7 @@ export default {
             correctPassword: false,
             newPassword: "",
             confirmPassword: ""
-        }
+        };
     },
     computed: {
         savePasswordDisabled() {
@@ -176,7 +176,7 @@ export default {
             }
         }
     }
-}
+};
 </script>
 
 <style scoped>

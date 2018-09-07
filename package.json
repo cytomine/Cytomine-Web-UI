@@ -11,14 +11,19 @@
     "dependencies": {
         "buefy": "^0.6.6",
         "bulma": "^0.7.1",
-        "cytomine-client": "0.0.1",
+        "bulma-slider": "^2.0.0",
+        "cytomine-client": "file:../cytomine-js-client/cytomine-client-0.1.0.tgz",
         "font-awesome": "^4.7.0",
         "i18n-csv2json-cli": "^1.0.2",
         "lodash": "^4.17.10",
+        "ol": "^5.1.3",
+        "ol-rotate-feature": "^2.0.0",
         "vue": "^2.5.16",
         "vue-i18n": "^7.8.1",
+        "vue-moment": "^4.0.0",
         "vue-notification": "^1.3.10",
         "vue-router": "^3.0.1",
+        "vue-shortkey": "^3.1.6",
         "vuex": "^3.0.1"
     },
     "devDependencies": {
@@ -26,20 +31,6 @@
         "@vue/cli-plugin-eslint": "^3.0.0-beta.15",
         "@vue/cli-service": "^3.0.0-beta.15",
         "vue-template-compiler": "^2.5.16"
-    },
-    "eslintConfig": {
-        "root": true,
-        "env": {
-            "node": true
-        },
-        "extends": [
-            "plugin:vue/essential",
-            "eslint:recommended"
-        ],
-        "rules": {},
-        "parserOptions": {
-            "parser": "babel-eslint"
-        }
     },
     "postcss": {
         "plugins": {
