@@ -79,7 +79,7 @@ export default {
                 return `${this.currentUser.firstname} ${this.currentUser.lastname} (${this.currentUser.username})`;
             }
         },
-        ...mapState(["currentUser"])
+        ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
         changeLanguage(newLanguage) {

@@ -4,10 +4,7 @@
     <h1>{{ $t("annotation-layers") }}</h1>
     <b-field>
         <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
-            <option
-                v-for="layer in unselectedLayers"
-                :value="layer"
-                :key="layer.id">
+            <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
                 {{ layerName(layer) }}
             </option>
         </b-select>
@@ -25,10 +22,18 @@
         </thead>
         <tbody>
             <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
-                <td class="checkbox-column"><input type="checkbox" v-model="layer.displayed" @change="updateLayerVisibility(layer)"></td>
-                <td class="checkbox-column"><input type="checkbox" v-model="layer.drawOn"></td>
-                <td class="checkbox-column"><input type="checkbox" v-model="layer.locked"></td>
-                <td class="name-column">{{ layerName(layer) }}</td>
+                <td class="checkbox-column">
+                    <input type="checkbox" v-model="layer.displayed" @change="updateLayerVisibility(layer)">
+                </td>
+                <td class="checkbox-column">
+                    <input type="checkbox" v-model="layer.drawOn">
+                </td>
+                <td class="checkbox-column">
+                    <input type="checkbox" v-model="layer.locked">
+                </td>
+                <td class="name-column">
+                    {{ layerName(layer) }}
+                </td>
                 <td class="checkbox-column">
                     <button class="button is-small" @click="removeLayer(index)">
                         <span class="fa fa-times"></span>
@@ -56,15 +61,27 @@
         </thead>
         <tbody>
             <tr v-for="term in terms" :key="term.id">
-                <td class="checkbox-column"><input type="checkbox" v-model="term.displayed"></td>
-                <td class="checkbox-column"><div class="color-preview" :style="{background: term.color}"></div></td>
-                <td class="name-column">{{term.name}}</td>
+                <td class="checkbox-column">
+                    <input type="checkbox" v-model="term.displayed">
+                </td>
+                <td class="checkbox-column">
+                    <div class="color-preview" :style="{background: term.color}"></div>
+                </td>
+                <td class="name-column">
+                    {{term.name}}
+                </td>
             </tr>
-            <tr><td colspan="3"></td></tr>
             <tr>
-                <td class="checkbox-column"><input type="checkbox" v-model="displayNoTerm"></td>
+                <td colspan="3"></td>
+            </tr>
+            <tr>
+                <td class="checkbox-column">
+                    <input type="checkbox" v-model="displayNoTerm">
+                </td>
                 <td class="checkbox-column"></td>
-                <td class="name-column">{{ $t("no-term") }}</td>
+                <td class="name-column">
+                    {{ $t("no-term") }}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -122,7 +139,7 @@ export default {
                 return idTerms;
             }, []);
         },
-        ...mapState(["currentUser"])
+        ...mapState({currentUser: state => state.currentUser.user})
     },
     watch: {
         layersOpacity() {
@@ -216,7 +233,7 @@ export default {
 
             let isCluster = this.isCluster(feature);
 
-            // QUESTION: decide whether it is better to filter with this methode, or to force source refresh and query only appropriate annotations
+            // QUESTION: decide whether it is better to filter with this method, or to force source refresh and query only appropriate annotations
             // QUESTION: what to do with clusters (returned count does not take into account the selected terms) ?
             // Possible solutions:
             // 1. in backend, for clusters, send array with composition of cluster (x for term 1, y for term 2, z for term1-2)
@@ -270,7 +287,9 @@ export default {
                 if(this.resolution && this.clustered != null && // if some features have already been loaded
                 ((resolution != this.resolution && this.clustered) // zoom modification while clustering is performed
                 || (resolution > this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
-                    this.clear(); // TODO: handle selectedElement ; otherwise, it remains displayed and selected even though it should no longer be displayed
+                    this.clear();
+                    // TODO: handle selectedElement ; otherwise, it remains displayed and selected even though it should no longer be displayed
+                    // TODO: reselect correct element based on ID ?
                 }
                 return [extent];
             };

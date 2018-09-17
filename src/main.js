@@ -7,7 +7,7 @@ import Notifications from "vue-notification";
 
 import i18n from "./lang.js";
 
-import store from "./store.js";
+import store from "./store/store.js";
 
 import {Cytomine} from "cytomine-client";
 

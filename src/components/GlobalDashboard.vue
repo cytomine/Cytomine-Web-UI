@@ -146,7 +146,7 @@ export default {
         recentProjects() {
             return this.projects.array.filter(project => this.recentProjectsId.includes(project.id));
         },
-        ...mapState(["currentUser"])
+        ...mapState({currentUser: state => state.currentUser.user})
     },
 
     async created() {

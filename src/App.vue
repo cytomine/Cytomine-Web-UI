@@ -49,7 +49,10 @@ import Login from "./components/Login.vue";
 export default {
     name: "app",
     components: {CytomineNavbar, CytomineSidebar, Login},
-    computed: mapState(["currentUser", "authenticated"]),
+    computed: mapState({
+        currentUser: state => state.currentUser.user,
+        authenticated: state => state.currentUser.authenticated
+    }),
     created() {
         this.$store.dispatch("fetchUser").catch(() => {});
     }

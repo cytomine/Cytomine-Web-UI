@@ -100,7 +100,7 @@ export default {
     name: "Account",
     data() {
         return {
-            updatedUser: this.$store.state.currentUser.clone(),
+            updatedUser: this.$store.state.currentUser.user.clone(),
             currentPassword: "",
             correctPassword: false,
             newPassword: "",
@@ -111,7 +111,7 @@ export default {
         savePasswordDisabled() {
             return !(this.newPassword == this.confirmPassword && this.newPassword != "");
         },
-        ...mapState(["currentUser"])
+        ...mapState({currentUser: state => state.currentUser.user})
     },
     watch: {
         currentPassword() {

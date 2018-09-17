@@ -1,35 +1,34 @@
-import Vue from "vue";
-import Vuex from "vuex";
 import {Cytomine, User} from "cytomine-client";
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store({
+export default {
     state: {
         authenticated: false,
-        currentUser: null
+        user: null
     },
+
     mutations: {
         setAuthenticated(state, authenticated) {
             state.authenticated = authenticated;
         },
+
         setUser(state, user) {
-            state.currentUser = user.clone();
+            state.user = user.clone();
         },
+
         logout(state) {
             state.authenticated = false;
-            state.currentUser = null;
+            state.user = null;
             // TODO: clean other variables
         }
     },
-    actions: {
 
+    actions: {
         async fetchUser({commit}) {
             let {authenticated} = await Cytomine.instance.ping();
             commit("setAuthenticated", authenticated);
             if(authenticated) {
-                let currentUser = await User.fetchCurrent();
-                commit("setUser", currentUser);
+                let user = await User.fetchCurrent();
+                commit("setUser", user);
             }
         },
 
@@ -39,7 +38,7 @@ const store = new Vuex.Store({
         },
 
         async regenerateKeys({state, commit}) {
-            let user = state.currentUser.clone();
+            let user = state.user.clone();
             await user.regenerateKeys();
             commit("setUser", user);
         },
@@ -57,6 +56,4 @@ const store = new Vuex.Store({
             commit("logout");
         }
     }
-});
-
-export default store;
+};
