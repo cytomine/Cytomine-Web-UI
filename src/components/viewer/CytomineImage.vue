@@ -1,6 +1,5 @@
 <!-- TODO: re-render map when size of div changes (i.e. side panel toggled) > map.updateSize()-->
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
-<!-- TODO: use VueX to restore state after page left -->
 <!-- TODO: properties -->
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
@@ -9,63 +8,68 @@
 <template>
     <div class="map-container">
         <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div>
-        <div class="draw-tools" v-if="map != null">
-            <draw-tools :map="map" :image="imageInstance"></draw-tools>
+        <div class="draw-tools" v-if="imageInstance != null">
+            <draw-tools :image="imageInstance"></draw-tools>
         </div>
-        <div class="tools">
+        <div class="panels">
             <ul>
                 <li><a @click="close()" class="close">
                     <i class="fa fa-times-circle"></i>
                 </a></li>
-                <li><a @click="toggleTool('info')" :class="{active: activeTool == 'info'}">
+                <li><a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                         <i class="fa fa-info"></i>
                 </a></li>
-                <li><a @click="toggleTool('link')" :class="{active: activeTool == 'link'}">
+                <li><a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
                         <i class="fa fa-link"></i>
                 </a></li>
-                <li><a @click="toggleTool('colors')" :class="{active: activeTool == 'colors'}">
+                <li><a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
                         <i class="fa fa-sliders"></i>
                 </a></li>
-                <li><a @click="toggleTool('layers')" :class="{active: activeTool == 'layers'}">
+                <li><a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
                         <i class="fa fa-files-o"></i>
                 </a></li>
-                <li><a @click="toggleTool('guided-tour')" :class="{active: activeTool == 'guided-tour'}">
+                <li><a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                         <i class="fa fa-map-signs"></i>
                 </a></li>
             </ul>
         </div>
 
-        <image-information class="tool-options tool-info" v-if="imageInstance != null" v-show="activeTool == 'info'"
+        <image-information class="panel-options panel-info" v-if="imageInstance != null" v-show="activePanel == 'info'"
             :image="imageInstance"></image-information>
 
-        <div class="tool-options tool-link" v-show="activeTool == 'link'">
+        <div class="panel-options panel-link" v-show="activePanel == 'link'">
             Not yet implemented
         </div>
 
-        <div class="tool-options tool-colors" v-show="activeTool == 'colors'">
+        <div class="panel-options panel-colors" v-show="activePanel == 'colors'">
             Not yet implemented
         </div>
-        <!-- <color-manipulation class="tool-options tool-colors" v-if="map != null" v-show="activeTool == 'colors'"
+        <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
             :map="map" :imageLayer="layer"></color-manipulation> -->
 
-        <annotations-panel class="tool-options tool-layers" v-if="map != null" v-show="activeTool == 'layers'"
-            :image="imageInstance" :map="map"></annotations-panel>
+        <annotations-panel class="panel-options panel-layers" v-if="imageInstance != null" v-show="activePanel == 'layers'"
+            :image="imageInstance"></annotations-panel>
 
-        <guided-tour class="tool-options tool-guided-tour" v-if="view != null" v-show="activeTool == 'guided-tour'"
+        <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
             :view="view"></guided-tour>
 
         <scale-line v-if="zoom != null"
             :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
+
+        <!--<annotation-details v-if="imageInstance != null" :image="imageInstance"></annotation-details>-->
     </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import ImageInformation from "./ImageInformation";
-import ColorManipulation from "./ColorManipulation";
+//import ColorManipulation from "./ColorManipulation";
 import AnnotationsPanel from "./AnnotationsPanel";
 import GuidedTour from "./GuidedTour";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
+//import AnnotationDetails from "./AnnotationDetails";
 
 import {Map, View} from "ol";
 import {Zoomify} from "ol/source";
@@ -79,18 +83,15 @@ export default {
     name: "cytomine-image",
     components: {
         ImageInformation,
-        ColorManipulation,
+        //ColorManipulation,
         AnnotationsPanel,
         GuidedTour,
         ScaleLine,
-        DrawTools
+        DrawTools,
+        //AnnotationDetails
     },
     data() {
         return {
-            imageInstance: null,
-            map: null,
-            layer: null,
-            activeTool: null,
             projectedMousePosition: [0, 0]
         };
     },
@@ -104,16 +105,30 @@ export default {
             if(this.view != null) {
                 return this.view.getZoom();
             }
-        }
+        },
+        idImage() {
+            return this.$route.params.id;
+        },
+        imageWrapper() {
+            return this.images[this.idImage] || {};
+        },
+        imageInstance() {
+            return this.imageWrapper.imageInstance;
+        },
+        layer() {
+            return this.imageWrapper.layer;
+        },
+        map() {
+            return this.imageWrapper.map;
+        },
+        activePanel() {
+            return this.imageWrapper.activePanel;
+        },
+        ...mapState({images: state => state.images.images})
     },
     methods: {
-        toggleTool(tool) {
-            if(this.activeTool === tool) {
-                this.activeTool = null;
-            }
-            else {
-                this.activeTool = tool;
-            }
+        togglePanel(panel) {
+            this.$store.commit("togglePanel", {idImage: this.idImage, panel});
         },
 
         updateMousePosition(event) {
@@ -125,52 +140,61 @@ export default {
         },
 
         close() {
-            this.$destroy();
-            this.$router.push("/");
+            this.$store.commit("removeImage", this.imageInstance.id);
+            this.$router.push("/"); // TODO: change
         }
 
     },
-    async created() {
-        this.imageInstance = await ImageInstance.fetch(this.$route.params.id);
-        let imageServerURLs = await new AbstractImage({id: this.imageInstance.baseImage}).fetchImageServers();
-        let imageServerURL = imageServerURLs[0];
+    async mounted() {
+        if(this.imageInstance == null) {
+            let imageInstance = await ImageInstance.fetch(this.idImage);
 
-        let extent = [0, 0, this.imageInstance.width, this.imageInstance.height];
-        let projection = new Projection({code: "CYTO", extent});
+            let imageServerURLs = await new AbstractImage({id: imageInstance.baseImage}).fetchImageServers();
+            let imageServerURL = imageServerURLs[0];
 
-        let view = new View({
-            center: [this.imageInstance.width/2, this.imageInstance.height/2],
-            minZoom: 2,
-            maxZoom: this.imageInstance.depth,
-            projection,
-            zoom: 2,
-            extent: extent
-        });
+            let extent = [0, 0, imageInstance.width, imageInstance.height];
+            let projection = new Projection({code: "CYTO", extent});
 
-        this.layer = new TileLayer({
-            title: "Image",
-            source: new Zoomify({
-                url: `${imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                    &channels=0&layer=0&timeframe=0&mimeType=${this.imageInstance.mime}`,
-                size: [this.imageInstance.width, this.imageInstance.height],
-                extent
-            })
-        });
+            let view = new View({
+                center: [imageInstance.width/2, imageInstance.height/2],
+                minZoom: 2,
+                maxZoom: imageInstance.depth,
+                projection,
+                zoom: 2,
+                extent: extent
+            });
 
-        let overview = new OverviewMap({
-            layers: [this.layer],
-            collapsed: false,
-            view: new View({projection})
-        });
+            let layer = new TileLayer({
+                title: "Image",
+                source: new Zoomify({
+                    url: `${imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
+                        &channels=0&layer=0&timeframe=0&mimeType=${imageInstance.mime}`,
+                    size: [imageInstance.width, imageInstance.height],
+                    extent
+                })
+            });
+
+            let overview = new OverviewMap({
+                layers: [layer],
+                collapsed: false,
+                view: new View({projection})
+            });
 
 
-        this.map = new Map({
-            target: "map",
-            controls: defaultControls().extend([overview]),
-            loadTilesWhileInteracting: true,
-            layers: [this.layer],
-            view
-        });
+            let map = new Map({
+                target: "map",
+                controls: defaultControls().extend([overview]),
+                loadTilesWhileInteracting: true,
+                layers: [layer],
+                view
+            });
+
+            this.$store.dispatch("addImage", {image: imageInstance, imageLayer: layer, map});
+        }
+        else {
+            this.map.setTarget(null);
+            this.map.setTarget("map");
+        }
     }
 };
 </script>
@@ -192,23 +216,23 @@ export default {
     position: absolute;
     top: 10px;
     left: 50px;
-    /*background: #555;
+    /*background: #eee;
     padding: 2px;
     border-radius: 3px;*/
 }
 
-.tools {
+.panels {
     background: #555;
     width: 40px;
     display: flex;
 }
 
-.tools ul {
+.panels ul {
     padding: 0;
     margin: 0;
 }
 
-.tools li a {
+.panels li a {
     position: relative;
     display: block;
     padding: 10px;
@@ -219,40 +243,40 @@ export default {
     text-align:center;
 }
 
-.tools a:hover {
+.panels a:hover {
     color: #fff;
 }
 
-.tools a.close {
+.panels a.close {
     color: #ffc4c4;
 }
 
-.tools a.close:hover {
+.panels a.close:hover {
     color: #ff7070;
 }
 
-.tool-guided-tour .buttons {
+.panel-guided-tour .buttons {
     margin-top: 10px;
     text-align: center;
 }
 
-.tool-options table {
+.panel-options table {
     background: none;
     width: 100%;
 }
 
 /* ----- LIGHT ----- */
 
-/* .tools {
+/* .panels {
     padding-top: 0px;
 } */
 
-.tools li a.active {
+.panels li a.active {
     background: #f2f2f2;
     color: #6c95c8;
 }
 
-.tool-options {
+.panel-options {
     position: absolute;
     right: 40px;
     width: 300px;
@@ -263,45 +287,45 @@ export default {
     z-index: 100;
 }
 
-.tool-info {
+.panel-info {
     top: 20px;
 }
 
-.tool-link {
+.panel-link {
     top: 40px;
 }
 
-.tool-colors {
+.panel-colors {
     top: 80px;
 }
 
-.tool-layers {
+.panel-layers {
     top: 100px;
     font-size: 0.9em;
 }
 
-.tool-guided-tour {
+.panel-guided-tour {
     top: 150px;
 }
 
-.tool-guided-tour .buttons {
+.panel-guided-tour .buttons {
     margin-top: 10px;
     text-align: center;
 }
 
-.tool-options h1 {
+.panel-options h1 {
     padding-top: 5px !important;
     padding-bottom: 15px !important;
 }
 
 /* ----- DARK ----- */
 
-/* .tools li a.active {
+/* .panels li a.active {
     background: #444;
     color: #a0c0e5;
 }
 
-.tool-options {
+.panel-options {
     position: absolute;
     right: 40px;
     width: 300px;
@@ -312,58 +336,58 @@ export default {
     color: #dedede;
 }
 
-.tool-options .table {
+.panel-options .table {
     color: #dedede !important;
 }
 
-.tool-options .table th {
+.panel-options .table th {
     color: #dedede !important;
 }
 
-.tool-options .table td, .tool-options .table th {
+.panel-options .table td, .panel-options .table th {
     border-bottom: 1px solid #888;
 }
 
-.tool-options .table strong {
+.panel-options .table strong {
     color: #dedede !important;
 }
 
-.tool-options a {
+.panel-options a {
     color: #a0c0e5;
 }
 
-.tool-options a:hover {
+.panel-options a:hover {
     color: #e9f2f3;
 }
 
-.tool-options select, .tool-options button {
+.panel-options select, .panel-options button {
     background-color: #5f5f5f !important;
     border: 1px solid #888 !important;
     color: #dedede !important;
 }
 
-.tool-info {
+.panel-info {
     top: 0px;
 }
 
-.tool-link {
+.panel-link {
     top: 20px;
 }
 
-.tool-sliders {
+.panel-sliders {
     top: 60px;
 }
 
-.tool-layers {
+.panel-layers {
     top: 70px;
     font-size: 0.9em;
 }
 
-.tool-guided-tour {
+.panel-guided-tour {
     top: 130px;
 }
 
-.tool-options h1 {
+.panel-options h1 {
     padding-top: 5px !important;
     padding-bottom: 15px !important;
     font-weight: bold;

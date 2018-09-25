@@ -8,37 +8,47 @@
             Test_Telemis_TMA
         </div>
         <ul>
-            <router-link tag="li" to="/project-dashboard">
+            <router-link tag="li" to="/project-dashboard" class="dashboard">
                 <a>
                     <i class="fa fa-dashboard"></i>
                     {{ $t("dashboard") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/images">
+            <router-link tag="li" to="/images" class="images">
                 <a>
                     <i class="fa fa-image"></i>
                     {{ $t("images") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/annotations">
+            <router-link tag="li" class="image-link" v-for="image in images" :key="image.imageInstance.id"
+            :to="{ name: 'image', params: {id: image.imageInstance.id} }">
+                <a>
+                    {{ image.imageInstance.instanceFilename }}
+                </a>
+                <!-- TODO
+                <a class="close">
+                    <i class="fa fa-times"></i>
+                </a>-->
+            </router-link>
+            <router-link tag="li" to="/annotations" class="annotations">
                 <a>
                     <i class="fa fa-pencil-square-o"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/jobs">
+            <router-link tag="li" to="/jobs" class="jobs">
                 <a>
                     <i class="fa fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/activity">
+            <router-link tag="li" to="/activity" class="activity">
                 <a>
                     <i class="fa fa-bar-chart"></i>
                     {{ $t("activity") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/parameters">
+            <router-link tag="li" to="/parameters" class="parameters">
                 <a>
                     <i class="fa fa-cogs"></i>
                     {{ $t("parameters") }}
@@ -53,13 +63,16 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
     name: "cytomine-sidebar",
     data() {
         return {
             visibleSideBar: true,
         };
-    }
+    },
+    computed: mapState({images: state => state.images.images})
 };
 </script>
 
@@ -99,7 +112,7 @@ export default {
     font-weight: bold;
 }
 
-.sidebar li a {
+.sidebar li:not(.image-link) a {
     position: relative;
     display: block;
     padding: 20px;
@@ -110,31 +123,50 @@ export default {
     text-decoration: none;
 }
 
-.sidebar.large li a {
+.sidebar.large li:not(.image-link) a {
     text-align: center;
 }
 
-.sidebar:not(.large) .fa {
+.sidebar:not(.large) li:not(.image-link) .fa {
     font-size: 16px;
     margin-right: 12px;
 }
 
-.sidebar.large .fa {
+.sidebar.large li:not(.image-link) .fa {
     display: block;
     font-size: 3vh;
     margin-bottom: 10px;
 }
 
-.sidebar li a:hover, .sidebar li.is-active a {
-    background: #444;
+.sidebar li:not(.image-link) a:hover, .sidebar li:not(.image-link).is-active a, .sidebar li.is-active {
+    background: #444 !important;
 }
 
-.sidebar li:nth-child(1).is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
-.sidebar li:nth-child(2).is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
-.sidebar li:nth-child(3).is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
-.sidebar li:nth-child(4).is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
-.sidebar li:nth-child(5).is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
-.sidebar li:nth-child(6).is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
+.sidebar li.dashboard.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
+.sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
+.sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
+.sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
+.sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
+.sidebar li.parameters.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
+
+.sidebar li.image-link {
+    position: relative;
+    display: block;
+    padding: 12px;
+    font-size: 12px;
+    background-color: #3a3a3a;
+    border-bottom: 1px solid #222;
+    text-align: left;
+    color: #eee;
+}
+
+.sidebar li.image-link a {
+    color: #eee;
+}
+
+ .sidebar li.image-link a.close {
+    float: right;
+}
 
 .arrow-sidebar {
     width: 20px;

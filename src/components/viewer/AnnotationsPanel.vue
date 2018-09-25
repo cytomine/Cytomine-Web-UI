@@ -23,13 +23,13 @@
         <tbody>
             <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
                 <td class="checkbox-column">
-                    <input type="checkbox" v-model="layer.displayed" @change="updateLayerVisibility(layer)">
+                    <input type="checkbox" :checked="layer.displayed" @change="toggleLayerVisibility(index)">
                 </td>
                 <td class="checkbox-column">
-                    <input type="checkbox" v-model="layer.drawOn">
+                    <input type="checkbox" :checked="layer.drawOn"> <!-- TODO -->
                 </td>
                 <td class="checkbox-column">
-                    <input type="checkbox" v-model="layer.locked">
+                    <input type="checkbox" :checked="layer.locked"> <!-- TODO -->
                 </td>
                 <td class="name-column">
                     {{ layerName(layer) }}
@@ -60,9 +60,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="term in terms" :key="term.id">
+            <tr v-for="(term, index) in terms" :key="term.id">
                 <td class="checkbox-column">
-                    <input type="checkbox" v-model="term.displayed">
+                    <input type="checkbox" :checked="term.displayed" @change="toggleTermVisibility(index)">
                 </td>
                 <td class="checkbox-column">
                     <div class="color-preview" :style="{background: term.color}"></div>
@@ -95,73 +95,56 @@ import { mapState } from "vuex";
 import WKT from "ol/format/WKT";
 import {Vector as VectorSource} from "ol/source";
 import VectorLayer from "ol/layer/Vector";
-import {Style, Fill, Stroke, Circle, Text} from "ol/style";
-import {asArray as hexToRgb} from "ol/color";
 
-import {Project, AnnotationCollection, TermCollection} from "cytomine-client";
+import {Project, AnnotationCollection} from "cytomine-client";
 
 export default {
     name: "annotations-panel",
-    props: [
-        "map",
-        "image"
-    ],
+    props: ["image"],
     data() {
         return {
             layers: [], // Array<User> (representing user layers)
-            layersOpacity: 0.5,
-            defaultStyle: new Style(),
-            editStyles: [],
-            defaultStroke: new Stroke(),
-            terms: [], // Array<Term>
-            displayNoTerm: true,
-            selectedLayers: [], // Array<User> (representing user layers)
-            selectedLayer: null,
+            selectedLayer: null
         };
     },
     computed: {
-        unselectedLayers() {
-            return this.layers.filter(layer => !this.selectedLayers.includes(layer));
+        imageWrapper() {
+            return this.$store.state.images.images[this.image.id];
         },
-        currentUserLayer() {
-            if(this.layers != null) {
-                return this.layers.find(layer => layer.id == this.currentUser.id);
+        layersOpacity: {
+            get() {
+                return this.imageWrapper.layersOpacity;
+            },
+            set(value) {
+                this.$store.dispatch("setLayersOpacity", {idImage: this.image.id, opacity: Number(value)});
             }
         },
-        view() {
-            return this.map.getView();
+        terms() {
+            return this.imageWrapper.terms;
         },
-        termsToDisplay() {
-            return this.terms.reduce(function(idTerms, term) {
-                if(term.displayed) {
-                    idTerms.push(term.id);
-                }
-                return idTerms;
-            }, []);
+        displayNoTerm: {
+            get() {
+                return this.imageWrapper.displayNoTerm;
+            },
+            set(value) {
+                this.$store.dispatch("setDisplayNoTerm", {idImage: this.image.id, value});
+            }
+        },
+        selectedLayers() { // Array<User> (representing user layers)
+            return this.imageWrapper.selectedLayers || [];
+        },
+        selectedLayersIds() {
+            return this.selectedLayers.map(layer => layer.id);
+        },
+        unselectedLayers() {
+            return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+        },
+        annotsIdsToSelect() {
+            return this.imageWrapper.annotsToSelect.map(annot => annot.id);
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
-    watch: {
-        layersOpacity() {
-            this.terms.forEach(term => this.changeOpacity(term.olStyle, Number(this.layersOpacity)));
-            this.changeOpacity(this.defaultStyle, Number(this.layersOpacity));
-            let colorStroke = this.defaultStroke.getColor();
-            colorStroke[3] = this.layersOpacity;
-
-            this.forceRefresh();
-        },
-        termsToDisplay() {
-            this.forceRefresh();
-        },
-        displayNoTerm() {
-            this.forceRefresh();
-        }
-    },
     methods: {
-        forceRefresh() { // force rerendering of the layers following a style update
-            this.selectedLayers.forEach(layer => layer.olLayer.changed());
-        },
-
         layerName(layer) {
             let name = "";
             if(layer.algo) {
@@ -181,6 +164,11 @@ export default {
                 let feature = format.readFeature(annot.location);
                 feature.setId(annot.id); // TODO: solve backend issue with kmeans generated ID (the same ID is used for different clusters when bbox changes)
                 feature.set("annot", annot);
+
+                if(this.annotsIdsToSelect.includes(annot.id)) {
+                    this.$store.commit("reselectFeature", {idImage: this.image.id, feature});
+                }
+
                 return feature;
             });
             return features;
@@ -197,18 +185,16 @@ export default {
                     bbox = extent.join();
                 }
                 let annots = await new AnnotationCollection({
-                    user: layer.id, image: image.id, bbox, showWKT: true, showTerm: true, kmeans: true
+                    user: layer.id, image: image.id, bbox, showWKT: true, showTerm: true, showGIS:true, kmeans: true
                 }).fetch();
 
                 if(annots.length > 0) {
-                    if(annots.get(0).count) { // if a result has a count property, it means the annotations were clustered
+                    if(annots.get(0).count) { // if a result has a count property, it means the annotations are clustered
                         this.clustered = true;
-                        if(this.minResolutionClusters == null || resolution < this.minResolutionClusters) {
-                            this.minResolutionClusters = resolution; // TODO: add function in backend returning the resolution at which clustering stops ?
-                        }
                     }
                     else {
                         this.clustered = false;
+                        // TODO: add function in backend returning the maxResolutionNoClusters?
                         if(this.maxResolutionNoClusters == null || resolution > this.maxResolutionNoClusters) {
                             this.maxResolutionNoClusters = resolution;
                         }
@@ -220,82 +206,33 @@ export default {
             };
         },
 
-        isCluster(feature) { // is the feature a cluster?
-            let annot = feature.get("annot");
-            return annot.count != null;
-        },
+        genStrategy(layer) {
+            let idImage = this.image.id;
+            let store = this.$store;
 
-        styleFunction(feature) {
-            let annot = feature.get("annot");
-            if(annot == null) {
-                return;
-            }
-
-            let isCluster = this.isCluster(feature);
-
-            // QUESTION: decide whether it is better to filter with this method, or to force source refresh and query only appropriate annotations
-            // QUESTION: what to do with clusters (returned count does not take into account the selected terms) ?
-            // Possible solutions:
-            // 1. in backend, for clusters, send array with composition of cluster (x for term 1, y for term 2, z for term1-2)
-            // 2. force source refresh every time the list of terms to display is updated
-            // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
-            if(!isCluster) {
-                let hasTerms = (annot.term.length > 0);
-                let hasTermsToDisplay = annot.term.some(term => this.termsToDisplay.includes(term));
-
-                if((hasTerms && !hasTermsToDisplay) || (!hasTerms && !this.displayNoTerm)) {
-                    return null; // do not display annotation
-                }
-            }
-
-            let styles = [];
-
-            // Style based on term
-            if(annot.term.length == 1) {
-                let termToFind = annot.term[0];
-                styles.push(this.terms.find(term => term.id == termToFind).olStyle);
-            }
-            else {
-                styles.push(this.defaultStyle);
-            }
-
-            // Style for clusters
-            if(isCluster) {
-                styles.push(this.createTextStyle(annot.count.toString()));
-            }
-
-            // Styles for selected elements // TODO: manage selectedFeature in vueX?
-            /*if(this.selectedFeatures.getArray().includes(feature)) {
-                styles.push(...this.editStyles);
-            }*/
-
-            return styles;
-        },
-
-        filterFunction(feature) {
-            return !this.isCluster(feature);
-        },
-
-        addLayer(layer = this.selectedLayer) {
-            layer.displayed = true;
-            layer.drawOn = (layer.id == this.currentUser.id);
-            layer.locked = false;
-            this.selectedLayers.push(layer);
-            this.selectedLayer = null;
-
-            let strategy = function(extent, resolution) {
+            return function(extent, resolution) {
                 if(this.resolution && this.clustered != null && // if some features have already been loaded
                 ((resolution != this.resolution && this.clustered) // zoom modification while clustering is performed
                 || (resolution > this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
+                    // following clear(), selected feature is removed => need to cache it and reselect it based on ID
+                    store.commit("removeLayerFromSelectedFeatures", {idImage, idLayer: layer.id, cache: true});
                     this.clear();
-                    // TODO: handle selectedElement ; otherwise, it remains displayed and selected even though it should no longer be displayed
-                    // TODO: reselect correct element based on ID ?
                 }
                 return [extent];
             };
+        },
+
+        addLayer(layer = this.selectedLayer) {
+            if(this.selectedLayersIds.includes(layer.id)) {
+                return;
+            }
+
+            layer.displayed = true;
+            layer.drawOn = (layer.id == this.currentUser.id);
+            layer.locked = false;
 
             let source = new VectorSource({
-                strategy,
+                strategy: this.genStrategy(layer),
                 loader: this.genLoader(layer)
             });
 
@@ -304,23 +241,27 @@ export default {
                 source,
                 extent: [0, 0, this.image.width, this.image.height],
                 visible: layer.displayed,
-                style: this.styleFunction,
+                style: this.$store.getters.genStyleFunction(this.image.id),
                 updateWhileInteracting: true,
                 drawOn: layer.drawOn
             });
-            this.map.addLayer(vectorLayer);
 
             layer.olLayer = vectorLayer;
+            this.$store.commit("addLayer", {idImage: this.image.id, layer});
+
+            this.selectedLayer = null;
         },
 
-        removeLayer(index) {
-            this.map.removeLayer(this.selectedLayers[index].olLayer);
-            this.selectedLayers[index].olLayer = null;
-            this.selectedLayers.splice(index, 1);
+        removeLayer(index, cacheSelectedFeatures=false) {
+            this.$store.dispatch("removeLayer", {idImage: this.image.id, indexLayer: index, cacheSelectedFeatures});
         },
 
-        updateLayerVisibility(layer) {
-            layer.olLayer.setVisible(layer.displayed);
+        toggleLayerVisibility(index) {
+            this.$store.dispatch("toggleLayerVisibility", {idImage: this.image.id, indexLayer: index});
+        },
+
+        toggleTermVisibility(index) {
+            this.$store.dispatch("toggleTermVisibility", {idImage: this.image.id, indexTerm: index});
         },
 
         async loadLayers() {
@@ -341,72 +282,24 @@ export default {
                     layer.countReviewedAnnotation = indexLayer.countReviewedAnnotation;
                 }
             });
-        },
-
-        async loadTerms() {
-            let terms = await TermCollection.fetchWithFilter("project", this.image.project);
-            terms.array.forEach(term => {
-                term.olStyle = this.createColorStyle(term.color);
-                term.displayed = true;
-            });
-            this.terms.push(...terms.array); // cannot use this.terms = terms.array because we want vue to track the changes afterwards
-        },
-
-        createColorStyle(color) {
-            let colorArray = hexToRgb(color);
-            colorArray[3] = this.layersOpacity;
-            let fill = new Fill({color: colorArray});
-            return new Style({
-                fill,
-                stroke: this.defaultStroke,
-                image: new Circle({
-                    radius: 5,
-                    fill,
-                    stroke: this.defaultStroke
-                }),
-            });
-        },
-
-        createTextStyle(text) {
-            return new Style({
-                text: new Text({
-                    text,
-                    overflow: true,
-                    fill: new Fill({color: "#fff"}),
-                    stroke: new Stroke({color: "#000", width: 3})
-                })
-            });
-        },
-
-        changeOpacity(style, opacity) {
-            let color = style.getFill().getColor();
-            style.getImage().setOpacity(opacity);
-            color[3] = this.layersOpacity;
-        },
-
-        initializeStyles() {
-            this.defaultStroke = new Stroke({color: [0, 0, 0, this.layersOpacity], width: 2});
-            this.defaultStyle = this.createColorStyle("#fff");
-
-            let width = 2;
-
-            let blueStroke = new Stroke({color: [0, 153, 255, 1], width: width});
-            let whiteStroke = new Stroke({color: [255, 255, 255, 1], width: width + 2});
-
-            this.editStyles = [
-                new Style({ stroke: whiteStroke }),
-                new Style({ stroke: blueStroke }),
-                new Style({ image: new Circle({radius: 6, stroke: blueStroke}) })
-            ];
         }
     },
     async created() {
-        this.initializeStyles();
-
-        this.loadTerms();
         await this.loadLayers();
-
-        this.addLayer(this.currentUserLayer);
+        if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+            let currentUserLayer = this.layers.find(layer => layer.id == this.currentUser.id);
+            if(currentUserLayer != null) {
+                this.addLayer(currentUserLayer);
+            }
+        }
+        else {
+            // force creation of new OL layers so that callbacks are correclty associated with this component
+            let i = 0;
+            this.selectedLayers.forEach(layer => {
+                this.removeLayer(i++, true);
+                this.addLayer(layer);
+            });
+        }
     }
 };
 </script>
@@ -451,7 +344,7 @@ th.name-column, td.name-column {
     width: 200px;
 }
 
-.checkbox .control-label {
+.layers .checkbox .control-label {
     padding: 0px !important;
 }
 
