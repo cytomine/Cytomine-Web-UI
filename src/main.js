@@ -22,7 +22,7 @@ import App from "./App.vue";
 
 Vue.use(VueRouter);
 Vue.use(Notifications);
-Vue.use(Buefy);
+Vue.use(Buefy, {defaultIconPack: "fa"});
 Vue.use(VueMoment);
 Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
 Vue.config.productionTip = false;

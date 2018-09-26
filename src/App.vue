@@ -105,7 +105,6 @@ body {
 .app-content {
     flex: 1;
     background: #d4d4d4;
-    word-break: break-all;
     overflow-y: auto;
     position: relative;
 }

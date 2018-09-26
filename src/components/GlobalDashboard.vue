@@ -79,21 +79,7 @@
         <div class="tile is-parent">
             <div class="tile is-child box">
                 <h2> {{$t("recent-images")}} </h2>
-                <div class="columns">
-                    <div class="column" v-for="image in recentImages" :key="image.id">
-                        <div class="card">
-                            <div class="card-image recent-image" :style="'background-image: url(' + image.thumb + ')'">
-                            </div>
-                            <div class="card-content">
-                                <div class="content">
-                                    <router-link :to="{ name: 'image', params: {id: image.id} }">
-                                        {{ image.instanceFilename }}
-                                    </router-link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <images-preview :images="recentImages"></images-preview>
             </div>
         </div>
     </div>
@@ -104,10 +90,14 @@
 
 <script>
 import {mapState} from "vuex";
+
+import ImagesPreview from "@/components/utils/ImagesPreview";
+
 import {ImageInstanceCollection, ProjectCollection} from "cytomine-client";
 
 export default {
     name: "global-dashboard",
+    components: {ImagesPreview},
     props: {
         nbRecent: {
             type: Number,
@@ -186,23 +176,8 @@ export default {
     padding: 10px 40px 20px 40px;
 }
 
-
 .db-quick-access {
     display: flex;
     justify-content: space-around;
-}
-
-.recent-image {
-    width: 100%;
-    min-height: 15vh;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    position: relative;
-    border-bottom: 1px solid #ddd;
-}
-
-.card-content a {
-    font-weight: bold;
 }
 </style>

@@ -2,6 +2,7 @@ import VueRouter from "vue-router";
 
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
+import ListProjects from "./components/project/ListProjects.vue";
 import Account from "./components/Account.vue";
 import CytomineImage from "./components/viewer/CytomineImage.vue";
 import PageNotFound from "./components/PageNotFound.vue";
@@ -13,6 +14,13 @@ const routes = [
         component: GlobalDashboard, // Alternative: component: require("./components/GlobalDashboard.vue").default
         meta: {
             title: "Cytomine, your virtual microscope"
+        }
+    },
+    {
+        path: "/projects",
+        component: ListProjects,
+        meta: {
+            title: "Cytomine - Projects"
         }
     },
     {
