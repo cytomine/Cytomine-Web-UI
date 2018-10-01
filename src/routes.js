@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
+import ListImages from "./components/project/images/ListImages.vue";
 import Account from "./components/Account.vue";
 import CytomineImage from "./components/viewer/CytomineImage.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
@@ -41,6 +42,10 @@ const routes = [
             {
                 path: "",
                 component: PageNotFound
+            },
+            {
+                path: "images",
+                component: ListImages
             },
             {
                 path: "image/:idImage",
