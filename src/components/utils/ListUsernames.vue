@@ -3,7 +3,7 @@
     <span v-for="(user, index) in usersToDisplay" v-if="user != null" :key="user.id">
             <username :user="user" :online="isOnline(user.id)"></username><template v-if="index < usersToDisplay.length - 1">, </template>
     </span>
-    <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">{{ expanded ? " Less" : "More"}}</button>
+    <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">{{ expanded ? $t("button-less") : $t("button-more")}}</button>
 </p>
 <p v-else>
     -

@@ -18,8 +18,8 @@ activity,Activity,Activité
 parameters,Parameters,Paramètres
 title-global-dashboard,Global Dashboard,Tableau de bord général
 quick-access,Quick Access,Accès rapide
-no-project,No project found,
-no-image,No image found,
+no-project,No project to display,
+no-image,No image to display,
 statistics,Statistics,Statistiques
 user-annotations,User Annotations,
 job-annotations,Job Annotations,
@@ -94,7 +94,6 @@ magnification,Magnification,
 resolution,Resolution,
 unknown,Unknown,
 information,Information,
-no-projects,No project to display,
 name,Name,
 button-open,Open,
 description,Description,
@@ -114,3 +113,5 @@ some-images,Some images,
 manager,Manager,
 role,Role,
 contributor,Contributor,
+button-less,Less,
+button-more,More,
