@@ -1,0 +1,146 @@
+<template>
+<div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
+    <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
+    icon="search" @click.native="activate()" :loading="isLoading"></b-input>
+    <div class="navbar-dropdown search-results" v-show="true">
+        <h2>Projects ({{filteredProjects.length}})</h2>
+        <template v-if="filteredProjects.length > 0">
+            <router-link v-for="project in subsetProjects" :key="project.id" :to="`/project/${project.id}`"
+            class="navbar-item" v-html="highlightedName(project.name)" @click.native="deactivate"></router-link>
+            <a v-if="moreProjects" class="navbar-item">...</a>
+        </template>
+        <span v-else class="navbar-item no-result">{{$t("no-project")}}</span>
+
+        <h2>Images ({{filteredImages.length}})</h2>
+        <template v-if="filteredImages.length > 0">
+            <router-link v-for="img in subsetImages" :key="img.id" :to="`/project/${img.project}/image/${img.id}`"
+            class="navbar-item" @click.native="deactivate"
+            v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(in ${img.projectName})</span>`">
+            </router-link> <!-- TODO style for in project label -->
+            <a v-if="moreImages" class="navbar-item">...</a>
+        </template>
+        <span v-else class="navbar-item no-result">{{$t("no-image")}}</span>
+
+        <div v-if="moreImages || moreProjects" class="search-view-all">
+            <a class="button is-small">
+                View all ({{totalNbResults}})
+            </a>
+        </div>
+    </div>
+</div>
+</template>
+
+<script>
+import { mapState } from "vuex";
+import {ImageInstanceCollection, ProjectCollection} from "cytomine-client";
+
+export default {
+    name: "cytomine-searcher",
+    data() {
+        return {
+            isActive: false,
+            isLoading: false,
+            searchString: "",
+            projects: [],
+            images: [],
+            maxNbDisplayed: 5
+        };
+    },
+    computed: {
+        displayResults() {
+            return this.isActive && this.searchString.length > 0;
+        },
+        lowCaseSearchString() {
+            return this.searchString.toLowerCase();
+        },
+        filteredProjects() {
+            return this.projects.filter(project => {
+                return project.name.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+            });
+        },
+        subsetProjects() {
+            return this.filteredProjects.slice(0, this.maxNbDisplayed);
+        },
+        moreProjects() {
+            return this.filteredProjects > this.subsetProjects;
+        },
+        filteredImages() {
+            return this.images.filter(image => {
+                return image.originalFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+            });
+        },
+        subsetImages() {
+            return this.filteredImages.slice(0, this.maxNbDisplayed);
+        },
+        moreImages() {
+            return this.filteredImages > this.subsetImages;
+        },
+        totalNbResults() {
+            return this.filteredImages.length + this.filteredProjects.length;
+        },
+        ...mapState({currentUser: state => state.currentUser.user})
+    },
+    methods: {
+        async activate() {
+            if(!this.isActive) {
+                this.isLoading = true;
+                let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
+                this.projects = (await new ProjectCollection({light: true, admin: true}, 0, "user", this.currentUser.id).fetch()).array;
+                this.images = await imagesPromise;
+                this.isLoading = false;
+                this.isActive = true;
+            }
+        },
+        deactivate() {
+            this.isActive = false;
+        },
+        highlightedName(value) {
+            let regex = new RegExp(`(${this.lowCaseSearchString})`, "gi");
+            return value.replace(regex, "<strong>$1</strong>");
+        },
+    }
+};
+</script>
+
+<style scoped>
+.navbar-item.search {
+    height: 100%;
+}
+
+.navbar-dropdown.search-results h2 {
+    background: #f1f1f1;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 0px 3px 30px;
+    border-top: 1px solid #e3e3e3;
+    /* border-bottom: 1px solid #e3e3e3; */
+}
+
+.navbar-dropdown.search-results .navbar-item {
+    font-weight: normal;
+    padding: 3px 10px 3px 20px;
+}
+
+.search-view-all {
+    border-top: 1px solid #e3e3e3;
+    padding-top: 5px;
+    text-align: center;
+}
+
+.no-result {
+    color: grey;
+}
+</style>
+
+<style>
+.global-search {
+    max-width: 250px;
+}
+
+.in-project {
+    color: grey;
+    font-size: 11px;
+    margin-left: 5px;
+}
+</style>

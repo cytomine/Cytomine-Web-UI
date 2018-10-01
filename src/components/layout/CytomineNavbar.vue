@@ -21,6 +21,8 @@
         </div>
 
         <div class="navbar-end">
+            <cytomine-searcher></cytomine-searcher>
+
             <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
                 <a href="#" class="navbar-item">{{$t("hotkeys")}}</a>
                 <a href="#" class="navbar-item">{{$t("about")}}</a>
@@ -52,10 +54,14 @@
 import { mapState } from "vuex";
 
 import NavbarDropdown from "./NavbarDropdown.vue";
+import CytomineSearcher from "./CytomineSearcher.vue";
 
 export default {
     name: "cytomine-navbar",
-    components: {NavbarDropdown},
+    components: {
+        NavbarDropdown,
+        CytomineSearcher
+    },
     data() {
         return {
             openedTopMenu: false,

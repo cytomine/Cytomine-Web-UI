@@ -12,11 +12,13 @@ import store from "./store/store.js";
 import {Cytomine} from "cytomine-client";
 
 import Buefy from "buefy";
-import "buefy/lib/buefy.css";
+import "buefy/dist/buefy.css";
 
 import VueMoment from "vue-moment";
 
 import VueShortKey from "vue-shortkey";
+
+import * as vClickOutside from "v-click-outside-x";
 
 import App from "./App.vue";
 
@@ -25,6 +27,7 @@ Vue.use(Notifications);
 Vue.use(Buefy, {defaultIconPack: "fa"});
 Vue.use(VueMoment);
 Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
+Vue.use(vClickOutside);
 Vue.config.productionTip = false;
 
 new Cytomine("localhost-core");
