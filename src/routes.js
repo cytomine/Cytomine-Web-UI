@@ -5,6 +5,7 @@ import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import Account from "./components/Account.vue";
 import CytomineImage from "./components/viewer/CytomineImage.vue";
+import CytomineProject from "./components/project/CytomineProject.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
 // Define routes
@@ -31,12 +32,25 @@ const routes = [
         }
     },
     {
-        path: "/image/:id",
-        name: "image",
-        component: CytomineImage,
+        path: "/project/:idProject",
+        component: CytomineProject,
         meta: {
-            title: "Cytomine - Image"
-        }
+            title: "Cytomine - Project"
+        },
+        children: [
+            {
+                path: "",
+                component: PageNotFound
+            },
+            {
+                path: "image/:idImage",
+                component: CytomineImage
+            },
+            {
+                path: "*",
+                component: PageNotFound
+            }
+        ]
     },
     {
         path: "*",

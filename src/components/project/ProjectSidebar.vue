@@ -4,24 +4,23 @@
 <div class="sidebar-wrapper">
     <nav class="sidebar large" v-show="visibleSideBar">
         <div class="title-nav">
-            <h1>{{ $t("project") }}</h1>
-            Test_Telemis_TMA
+            <h1>{{`${$t("project")}: ${project.name}`}}</h1>
         </div>
         <ul>
-            <router-link tag="li" to="/project-dashboard" class="dashboard">
+            <router-link tag="li" :to="`/project/${project.id}`" class="dashboard" exact>
                 <a>
                     <i class="fa fa-dashboard"></i>
                     {{ $t("dashboard") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/images" class="images">
+            <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
                 <a>
                     <i class="fa fa-image"></i>
                     {{ $t("images") }}
                 </a>
             </router-link>
             <router-link tag="li" class="image-link" v-for="image in images" :key="image.imageInstance.id"
-            :to="{ name: 'image', params: {id: image.imageInstance.id} }">
+            :to="`/project/${image.imageInstance.project}/image/${image.imageInstance.id}`">
                 <a>
                     {{ image.imageInstance.instanceFilename }}
                 </a>
@@ -30,25 +29,25 @@
                     <i class="fa fa-times"></i>
                 </a>-->
             </router-link>
-            <router-link tag="li" to="/annotations" class="annotations">
+            <router-link tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
                     <i class="fa fa-pencil-square-o"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/jobs" class="jobs">
+            <router-link tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
                 <a>
                     <i class="fa fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/activity" class="activity">
+            <router-link tag="li" :to="`/project/${project.id}/activity`" class="activity">
                 <a>
                     <i class="fa fa-bar-chart"></i>
                     {{ $t("activity") }}
                 </a>
             </router-link>
-            <router-link tag="li" to="/parameters" class="parameters">
+            <router-link tag="li" :to="`/project/${project.id}/parameters`" class="parameters">
                 <a>
                     <i class="fa fa-cogs"></i>
                     {{ $t("parameters") }}
@@ -66,7 +65,8 @@
 import { mapState } from "vuex";
 
 export default {
-    name: "cytomine-sidebar",
+    name: "project-sidebar",
+    props: ["project"],
     data() {
         return {
             visibleSideBar: true,
@@ -79,6 +79,8 @@ export default {
 <style scoped>
 .sidebar-wrapper {
     display: flex;
+    height: 100%;
+    background: #333;
 }
 
 .sidebar {
@@ -102,10 +104,9 @@ export default {
 }
 
 .title-nav h1 {
-    letter-spacing: 5px;
+    letter-spacing: 2px;
     padding: 10px;
     text-transform: uppercase;
-    letter-spacing: 5px;
     font-size: 16px;
     text-align: center;
     padding: 10px;

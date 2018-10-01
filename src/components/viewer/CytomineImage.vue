@@ -107,7 +107,7 @@ export default {
             }
         },
         idImage() {
-            return this.$route.params.id;
+            return this.$route.params.idImage;
         },
         imageWrapper() {
             return this.images[this.idImage] || {};
