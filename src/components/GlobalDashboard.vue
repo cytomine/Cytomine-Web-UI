@@ -1,90 +1,88 @@
 <template>
-    <div id="global-dashboard" v-if="initialized">
+<div id="global-dashboard" class="columns is-gapless">
+    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
 
-        <h1 class="page-title">{{ $t("title-global-dashboard") }}</h1>
+    <template v-if="!loading">
+        <div class="column is-two-thirds">
+            <div class="box">
+                <h2> {{ $t("recently-opened") }} </h2>
+                <b-table :data="recentProjects">
 
-        <div class="tile is-ancestor">
-            <div class="tile">
-                <div class="tile is-parent is-7">
-                    <div class="tile is-child box">
-                        <h2>{{$t("quick-access")}}</h2>
-                        <div class="columns">
-                            <div class="column">
-                                <form>
-                                    <b-field>
-                                        <b-autocomplete
-                                        expanded
-                                        v-model="searchProject"
-                                        :data="filteredProjects"
-                                        field="name"
-                                        :placeholder="$t('project')"
-                                        @select="option => selectedProject = option">
-                                        <template slot="empty">{{$t("no-project")}}</template>
-                                    </b-autocomplete>
-                                    <p class="control">
-                                        <button class="button">{{$t("button-go")}}</button>
-                                    </p>
-                                </b-field>
-                            </form>
+                    <template slot-scope="props">
+                        <b-table-column :label="$t('project')" width="100" centered>
+                            <router-link class="project-name" :to="`/project/${props.row.id}`">
+                                {{ props.row.name }}
+                            </router-link>
+                        </b-table-column>
+
+                        <b-table-column :label="$t('images')" width="400">
+                            <images-preview :idProject="props.row.id"></images-preview>
+                        </b-table-column>
+                    </template>
+
+                    <template slot="empty">
+                        <div class="content has-text-grey has-text-centered">
+                            <p>{{$t("no-recent-project")}}</p>
                         </div>
+                    </template>
+                </b-table>
 
-                        <div class="column">
-                            <form>
-                                <b-field>
-                                    <b-autocomplete
-                                    expanded
-                                    v-model="searchImage"
-                                    :data="filteredImages"
-                                    field="originalFilename"
-                                    :placeholder="$t('image')"
-                                    @select="option => selectedImage = option">
-                                    <template slot="empty">{{$t("no-image")}}</template>
-                                </b-autocomplete>
-                                <p class="control">
-                                    <button class="button">{{$t("button-go")}}</button>
-                                </p>
-                            </b-field>
-                        </form>
+                <p class="has-text-centered all-projects">
+                    <router-link class="button is-link" to="/projects">{{$t("view-all-projects")}}</router-link>
+                </p>
+            </div>
+        </div>
+
+        <div class="column right-column">
+            <div class="box stats">
+                <h2> {{ $t("statistics") }} </h2>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td class="stat-value">{{projects.length}}</td>
+                            <td>{{$t("projects")}}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-value">{{images.length}}</td>
+                            <td>{{$t("images")}}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-value">{{nbUserAnnots}}</td>
+                            <td>{{$t("user-annotations")}}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-value">{{nbJobAnnots}}</td>
+                            <td>{{$t("job-annotations")}}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-value">{{nbReviewed}}</td>
+                            <td>{{$t("reviewed-annotations")}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="box last-image">
+                <h2> {{ $t("last-opened-image") }} </h2>
+                <div v-if="lastOpenedImage" class="card">
+                    <router-link :to="`project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
+                    class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
+                    </router-link>
+                    <div class="card-content">
+                        <div class="content">
+                            <router-link :to="`project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
+                                {{ lastOpenedImage.instanceFilename }}
+                            </router-link>
+                            <span class='in-project'>(in {{lastOpenedImage.projectName}})</span>
+                        </div>
                     </div>
+                </div>
+                <div class="has-text-grey has-text-centered" v-else>
+                    {{$t("no-recent-image")}}
                 </div>
             </div>
         </div>
-        <div class="tile is-parent">
-            <div class="tile is-child box">
-                <h2> {{ $t("statistics") }} </h2>
-                <ul>
-                    <li><strong>{{projects.length}}</strong> {{$t("projects")}}</li>
-                    <li><strong>{{images.length}}</strong> {{$t("images")}}</li>
-                    <li><strong>{{nbUserAnnots}}</strong> {{$t("user-annotations")}}</li>
-                    <li><strong>{{nbJobAnnots}}</strong> {{$t("job-annotations")}}</li>
-                    <li><strong>{{nbReviewed}}</strong> {{$t("reviewed-annotations")}}</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="tile is-ancestor">
-    <div class="tile">
-        <div class="tile is-parent is-3">
-            <div class="tile is-child box">
-                <h2>{{$t("recent-projects")}}</h2>
-                <ul>
-                    <li v-for="project in recentProjects" :key="project.id">
-                        <a :href="project.id">{{project.name}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="tile is-parent">
-            <div class="tile is-child box">
-                <h2> {{$t("recent-images")}} </h2>
-                <images-preview :images="recentImages"></images-preview>
-            </div>
-        </div>
-    </div>
-</div>
-
+    </template>
 </div>
 </template>
 
@@ -101,7 +99,7 @@ export default {
     props: {
         nbRecent: {
             type: Number,
-            default: 5
+            default: 3
         }
     },
     data() {
@@ -110,31 +108,31 @@ export default {
             recentProjectsId: [],
             images: [],
             recentImages: [],
-            searchProject: "",
-            selectedProject: null,
-            searchImage: "",
-            selectedImage: null,
             nbProjects: 0,
-            nbImages: 0,
             nbUserAnnots: 0,
             nbJobAnnots: 0,
             nbReviewed: 0,
-            initialized: false
+            loading: true
         };
     },
     computed: {
-        filteredProjects() {
-            return this.projects.array.filter((project) => {
-                return project.name.toString().toLowerCase().indexOf(this.searchProject.toLowerCase()) >= 0;
-            });
-        },
-        filteredImages() {
-            return this.images.filter((image) => {
-                return image.originalFilename.toString().toLowerCase().indexOf(this.searchImage.toLowerCase()) >= 0;
-            });
-        },
         recentProjects() {
-            return this.projects.array.filter(project => this.recentProjectsId.includes(project.id));
+            let array = [];
+            this.recentProjectsId.forEach(id => {
+                let project = this.projects.find(project => project.id == id);
+                if(project != null) {
+                    array.push(project);
+                }
+            });
+            return array;
+        },
+        lastOpenedImage() {
+            if(this.recentImages && this.recentImages.length > 0) {
+                let lastOpened = this.recentImages[0];
+                let project = this.projects.find(project => project.id == lastOpened.project);
+                lastOpened.projectName = project.name;
+                return lastOpened;
+            }
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
@@ -156,24 +154,83 @@ export default {
         }
 
         let recentProjetsPromise = fetchRecentProjectsId(this.nbRecent);
-        let recentImagesPromise = ImageInstanceCollection.fetchLastOpened(this.nbRecent);
+        let recentImagesPromise = ImageInstanceCollection.fetchLastOpened(1);
 
         // Retrieve the results of the requests
         this.images = await lightImagesPromise;
         this.nbUserAnnots = await nbUserAnnotsPromise;
         this.nbReviewed = await nbReviewedPromise;
-        this.projects = await projectsPromise;
+        this.projects = (await projectsPromise).array;
         this.recentImages = await recentImagesPromise;
         this.recentProjectsId = await recentProjetsPromise;
 
-        this.initialized = true;
+        this.loading = false;
     }
 };
 </script>
 
 <style scoped>
 #global-dashboard {
-    padding: 10px 40px 20px 40px;
+    padding: 20px 50px 20px 50px;
+}
+
+.box {
+    margin: 10px !important;
+}
+
+td {
+    vertical-align: middle !important;
+}
+
+a.project-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.all-projects {
+    margin-top: 10px;
+}
+
+.right-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.stats {
+    padding-bottom: 40px;
+}
+
+.stats .table {
+    width: 100%;
+}
+
+.stat-value {
+    font-weight: bold;
+    text-align: right;
+    width: 25%;
+}
+
+.last-image {
+    flex: 1;
+}
+
+.card-image {
+    width: 100%;
+    height: 40vh;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-content {
+    padding: 20px;
+    word-break: break-all;
+}
+
+.card-content a {
+    font-weight: bold;
 }
 
 .db-quick-access {

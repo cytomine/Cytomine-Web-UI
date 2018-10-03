@@ -53,7 +53,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("some-images")}}</strong></td>
             <td class="prop-content">
-                <images-preview :images="images"></images-preview>
+                <images-preview :idProject="project.id"></images-preview>
             </td>
         </tr>
     </tbody>
@@ -62,14 +62,13 @@
 
 <script>
 import ImagesPreview from "@/components/utils/ImagesPreview";
-import Username from "@/components/utils/Username";
 import ListUsernames from "@/components/utils/ListUsernames";
 
 import {Description, ImageInstanceCollection} from "cytomine-client";
 
 export default {
     name: "project-details",
-    components: {ImagesPreview, Username, ListUsernames},
+    components: {ImagesPreview, ListUsernames},
     props: ["project"],
     data() {
         return {

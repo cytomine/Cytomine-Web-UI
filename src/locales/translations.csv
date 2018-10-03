@@ -16,16 +16,12 @@ job,Job,Algorithme
 jobs,Jobs,Algorithmes
 activity,Activity,Activité
 parameters,Parameters,Paramètres
-title-global-dashboard,Global Dashboard,Tableau de bord général
-quick-access,Quick Access,Accès rapide
 no-project,No project to display,
 no-image,No image to display,
 statistics,Statistics,Statistiques
 user-annotations,Manual Annotations,
 job-annotations,AI Annotations,
 reviewed-annotations,Reviewed Annotations,
-recent-projects,Recent Projects,
-recent-images,Recent Images,
 profile,Profile,Profil
 username,User name,Nom d'utilisateur
 firstname,First name,Prénom
@@ -131,3 +127,8 @@ button-rename,Rename,
 button-properties,Properties,
 button-download,Download,
 button-delete,Delete,
+recently-opened,Recently opened,
+last-opened-image,Last opened image,
+view-all-projects,View all projects,
+no-recent-project,No project recently opened,
+no-recent-image,No image recently opened,
