@@ -5,6 +5,7 @@ import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import ListImages from "./components/project/images/ListImages.vue";
 import Account from "./components/Account.vue";
+import AdvancedSearch from "./components/AdvancedSearch.vue";
 import CytomineImage from "./components/viewer/CytomineImage.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
 import PageNotFound from "./components/PageNotFound.vue";
@@ -24,6 +25,10 @@ const routes = [
         meta: {
             title: "Cytomine - Projects"
         }
+    },
+    {
+        path: "/advanced-search/:searchString?",
+        component: AdvancedSearch
     },
     {
         path: "/account",

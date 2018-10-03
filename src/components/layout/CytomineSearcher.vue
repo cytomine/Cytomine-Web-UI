@@ -1,7 +1,13 @@
 <template>
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
-    <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
-    icon="search" @click.native="activate()" :loading="isLoading"></b-input>
+    <b-field class="no-margin">
+        <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
+        icon="search" @click.native="activate()" :loading="isLoading"></b-input>
+        <p class="control">
+            <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
+        </p>
+    </b-field>
+
     <div class="navbar-dropdown search-results" v-show="true">
         <h2>Projects ({{filteredProjects.length}})</h2>
         <template v-if="filteredProjects.length > 0">
@@ -16,15 +22,15 @@
             <router-link v-for="img in subsetImages" :key="img.id" :to="`/project/${img.project}/image/${img.id}`"
             class="navbar-item" @click.native="deactivate"
             v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(in ${img.projectName})</span>`">
-            </router-link> <!-- TODO style for in project label -->
+            </router-link>
             <a v-if="moreImages" class="navbar-item">...</a>
         </template>
         <span v-else class="navbar-item no-result">{{$t("no-image")}}</span>
 
         <div v-if="moreImages || moreProjects" class="search-view-all">
-            <a class="button is-small">
+            <router-link class="button is-small" :to="`/advanced-search/${searchString}`" @click.native="deactivate">
                 View all ({{totalNbResults}})
-            </a>
+            </router-link>
         </div>
     </div>
 </div>
@@ -85,7 +91,7 @@ export default {
             if(!this.isActive) {
                 this.isLoading = true;
                 let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-                this.projects = (await new ProjectCollection({light: true, admin: true}, 0, "user", this.currentUser.id).fetch()).array;
+                this.projects = (await new ProjectCollection({light: true}, 0, "user", this.currentUser.id).fetch()).array;
                 this.images = await imagesPromise;
                 this.isLoading = false;
                 this.isActive = true;
@@ -114,6 +120,7 @@ export default {
     font-weight: bold;
     padding: 2px 0px 3px 30px;
     border-top: 1px solid #e3e3e3;
+    margin-bottom: 0px;
     /* border-bottom: 1px solid #e3e3e3; */
 }
 
@@ -135,12 +142,10 @@ export default {
 
 <style>
 .global-search {
-    max-width: 250px;
+    max-width: 200px;
 }
 
-.in-project {
-    color: grey;
-    font-size: 11px;
-    margin-left: 5px;
+.no-margin {
+    margin: 0px !important;
 }
 </style>
