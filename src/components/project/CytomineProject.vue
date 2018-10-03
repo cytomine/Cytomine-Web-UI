@@ -62,4 +62,10 @@ export default {
     overflow-y: auto;
     position: relative;
 }
+
+.app-content {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+}
 </style>

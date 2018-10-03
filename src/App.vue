@@ -16,8 +16,9 @@
 
     <template v-else>
         <cytomine-navbar></cytomine-navbar>
-
-        <router-view class="app-content" v-if="currentUser"></router-view>
+        <div class="bottom">
+            <router-view v-if="currentUser"></router-view>
+        </div>
     </template>
 </div>
 </template>
@@ -78,14 +79,13 @@ body {
     margin-top: 10px;
 }
 
-.app-content {
+.bottom {
     flex: 1;
-    background: #d4d4d4;
     overflow-y: auto;
     position: relative;
 }
 
-.app-content h1 {
+h1 {
     text-transform: uppercase;
     letter-spacing: 2px;
     font-size: 16px;
@@ -93,7 +93,7 @@ body {
     padding: 10px;
 }
 
-.app-content h2 {
+h2 {
     font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
@@ -106,6 +106,12 @@ h1.page-title {
     padding: 20px;
     font-size: 20px;
     margin-bottom: 20px;
+}
+
+.in-project {
+    color: grey;
+    font-size: 11px;
+    margin-left: 5px;
 }
 
 .input[readonly] {
