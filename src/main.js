@@ -15,6 +15,7 @@ import Buefy from "buefy";
 import "buefy/dist/buefy.css";
 
 import VueMoment from "vue-moment";
+const moment = require("moment");
 
 import VueShortKey from "vue-shortkey";
 
@@ -25,7 +26,7 @@ import App from "./App.vue";
 Vue.use(VueRouter);
 Vue.use(Notifications);
 Vue.use(Buefy, {defaultIconPack: "fa"});
-Vue.use(VueMoment);
+Vue.use(VueMoment, {moment});
 Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
 Vue.use(vClickOutside);
 Vue.config.productionTip = false;

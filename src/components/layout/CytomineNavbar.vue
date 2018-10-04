@@ -88,8 +88,9 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
-        changeLanguage(newLanguage) {
-            this.$i18n.locale = newLanguage;
+        changeLanguage(newLocale) {
+            this.$i18n.locale = newLocale;
+            this.$moment.locale(newLocale);
         },
         async logout() {
             try {
