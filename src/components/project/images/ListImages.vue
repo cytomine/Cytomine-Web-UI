@@ -1,6 +1,7 @@
 <template>
 <div class="list-images-wrapper">
     <div class="panel">
+        <b-loading :is-full-page="false" :active="loading"></b-loading>
         <p class="panel-heading">
             {{$t("images")}}
             <a class="button is-link">{{$t('button-add-image')}}</a>
@@ -8,7 +9,7 @@
         <div class="panel-block">
             <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
 
-            <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
+            <b-table v-if="!loading" :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
 
                 <template slot-scope="props">
@@ -88,7 +89,8 @@ export default {
         return {
             images: [],
             searchString: "",
-            perPage: 10
+            perPage: 10,
+            loading: true
         };
     },
     computed: {
@@ -102,6 +104,7 @@ export default {
     },
     async created() {
         this.images = (await ImageInstanceCollection.fetchWithFilter("project", this.project.id)).array;
+        this.loading = false;
     }
 };
 </script>
