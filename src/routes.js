@@ -46,7 +46,7 @@ const routes = [
         children: [
             {
                 path: "",
-                component: PageNotFound
+                redirect: "images"
             },
             {
                 path: "images",

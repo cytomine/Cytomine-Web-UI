@@ -1,4 +1,5 @@
 <!-- Source sidebar: https://codepen.io/oknoblich/pen/klnjw -->
+<!-- TODO: animation for the closing/opening of the bar -->
 
 <template>
 <div class="sidebar-wrapper">
@@ -7,12 +8,6 @@
             <h1>{{`${$t("project")}: ${project.name}`}}</h1>
         </div>
         <ul>
-            <router-link tag="li" :to="`/project/${project.id}`" class="dashboard" exact>
-                <a>
-                    <i class="fa fa-dashboard"></i>
-                    {{ $t("dashboard") }}
-                </a>
-            </router-link>
             <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
                 <a>
                     <i class="fa fa-image"></i>
@@ -41,10 +36,16 @@
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/activity`" class="activity">
+            <router-link tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
                 <a>
-                    <i class="fa fa-bar-chart"></i>
-                    {{ $t("activity") }}
+                    <i class="fa fa-dashboard"></i>
+                    {{ $t("metrics") }}
+                </a>
+            </router-link>
+            <router-link tag="li" :to="`/project/${project.id}/information`" class="information">
+                <a>
+                    <i class="fa fa-info-circle"></i>
+                    {{ $t("information") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/parameters`" class="parameters">
@@ -85,11 +86,8 @@ export default {
 
 .sidebar {
     width: 220px;
-}
-
-.sidebar ul {
-    padding: 0;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .title-nav {
@@ -113,19 +111,36 @@ export default {
     font-weight: bold;
 }
 
+.sidebar ul {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.sidebar li:not(.image-link) {
+    flex: 1;
+}
+
 .sidebar li:not(.image-link) a {
     position: relative;
     display: block;
-    padding: 20px;
     font-size: 14px;
+    height: 100%;
     font-weight: bold;
     color: #eee;
     border-bottom: 1px solid #222;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .sidebar.large li:not(.image-link) a {
-    text-align: center;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .sidebar:not(.large) li:not(.image-link) .fa {
@@ -143,11 +158,11 @@ export default {
     background: #444 !important;
 }
 
-.sidebar li.dashboard.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
-.sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
-.sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
-.sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
-.sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
+.sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
+.sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
+.sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
+.sidebar li.metrics.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
+.sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
 .sidebar li.parameters.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
 
 .sidebar li.image-link {
