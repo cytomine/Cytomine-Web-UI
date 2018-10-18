@@ -1,40 +1,159 @@
 <template>
 <div class="list-projects-wrapper">
     <div class="panel">
-        <p class="panel-heading"></p>
+        <p class="panel-heading">
+            {{$t("projects")}}
+            <a class="button is-link">{{$t('new-project')}}</a>
+        </p>
         <div class="panel-block">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+            <div class="search-block">
+                <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')"
+                    type="search" icon="search"></b-input>
+                <button class="button" @click="toggleFilterDisplay()">
+                    <b-icon icon="filter" size="is-small"></b-icon>
+                    <span>{{filtersOpened ? $t("button-hide-filters") : $t("button-show-filters")}}</span>
+                </button>
+            </div>
 
-            <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="10" pagination-size="is-small" detailed detail-key="id">
+            <b-collapse :open="filtersOpened">
+                <div class="filters">
+                    <div class="columns">
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("tags")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                                    label="name" track-by="id" :multiple="true">
+                                </cytomine-multiselect>
+                            </div>
+                        </div>
+
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("ontology")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-multiselect v-model="selectedOntologies" :options="ontologies"
+                                    label="name" track-by="id" :multiple="true">
+                                </cytomine-multiselect>
+                            </div>
+                        </div>
+
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("my-role")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+                                    label="label" track-by="role" :searchable="false">
+                                </cytomine-multiselect>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("members")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-slider v-model="boundsMembers" :max="maxNbMembers"
+                                :show="initSliders"></cytomine-slider>
+                            </div>
+                        </div>
+
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("images")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-slider v-model="boundsImages" :max="maxNbImages"
+                                :show="initSliders"></cytomine-slider>
+                            </div>
+                        </div>
+
+                        <div class="column">
+
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("user-annotations")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations"
+                                :show="initSliders"></cytomine-slider>
+                            </div>
+                        </div>
+
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("job-annotations")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
+                                :show="initSliders"></cytomine-slider>
+                            </div>
+                        </div>
+
+                        <div class="column filter">
+                            <div class="filter-label">
+                                {{$t("reviewed-annotations")}}
+                            </div>
+                            <div class="filter-body">
+                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations"
+                                :show="initSliders"></cytomine-slider>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+
+
+            <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
+            pagination-size="is-small" detailed detail-key="id">
                 <template slot-scope="props">
-                    <b-table-column field="name" :label="$t('name')" sortable>
-                        {{ props.row.name }}
+                    <b-table-column :visible="atLeastOneManaged" field="isManaged" label="" centered width="1" sortable>
+                        <b-icon v-if="props.row.isManaged" icon="cog" size="is-small" :title="$t('manager-icon-label')"></b-icon>
                     </b-table-column>
 
-                    <b-table-column field="first_name" label="Users" centered sortable>
-                        0 <!-- TODO in backend -->
+                    <b-table-column field="name" :label="$t('name')" sortable width="250">
+                        <router-link :to="`/project/${props.row.id}`">
+                            {{ props.row.name }}
+                        </router-link>
                     </b-table-column>
 
-                    <b-table-column field="numberOfImages" :label="$t('images')" centered sortable>
-                        <router-link to="images">{{ props.row.numberOfImages }}</router-link>
+                    <b-table-column field="first_name" :label="$t('members')" centered sortable width="150">
+                        <a>0</a> <!-- TODO retrieve from backend (https://github.com/cytomine/Cytomine-core/issues/1127) -->
                     </b-table-column>
 
-                    <b-table-column field="numberOfAnnotations" :label="$t('annotations')" centered sortable>
-                        {{ props.row.numberOfAnnotations }}
+                    <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
+                        <router-link :to="`/project/${props.row.id}/images`">{{ props.row.numberOfImages }}</router-link>
                     </b-table-column>
 
-                    <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable>
-                        {{ props.row.numberOfJobAnnotations }}
+                    <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+                        <a>{{ props.row.numberOfAnnotations }}</a> <!-- TODO router link -->
                     </b-table-column>
 
-                    <b-table-column field="isManaged" :label="$t('role')" centered sortable>
-                        <span :class="['tag', 'is-rounded', props.row.isManaged ? 'manager' : 'contributor']">
-                            {{$t(props.row.isManaged ? "manager" : 'contributor')}}
-                        </span>
+                    <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="150">
+                        <a>{{ props.row.numberOfJobAnnotations }}</a> <!-- TODO router link -->
                     </b-table-column>
 
-                    <b-table-column label="" centered>
-                        <router-link to="/project/" class="button is-small">{{$t("button-open")}}</router-link>
+                    <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+                        <a>{{ props.row.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                    </b-table-column>
+
+                    <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
+                        {{ new Date() | moment("ll") }} <!-- TODO retrieve from backend (https://github.com/cytomine/Cytomine-core/issues/1128) -->
+                    </b-table-column>
+
+                    <b-table-column label=" " centered width="150">
+                        <router-link :to="`/project/${props.row.id}`" class="button is-small is-link">
+                            {{$t("button-open")}}
+                        </router-link>
                     </b-table-column>
                 </template>
 
@@ -44,10 +163,23 @@
 
                 <template slot="empty">
                     <div class="content has-text-grey has-text-centered">
-                        <p>{{$t("no-projects")}}</p>
+                        <p>{{$t("no-project")}}</p>
                     </div>
                 </template>
+
+                <template slot="bottom-left">
+                    <b-select v-model="perPage" size="is-small">
+                        <option value="10">10 {{$t("per-page")}}</option>
+                        <option value="25">25 {{$t("per-page")}}</option>
+                        <option value="50">50 {{$t("per-page")}}</option>
+                        <option value="100">100 {{$t("per-page")}}</option>
+                    </b-select>
+                </template>
             </b-table>
+            <div class="legend" v-if="atLeastOneManaged">
+                <h2>{{$t("legend")}}</h2>
+                <b-icon icon="cog" size="is-small"></b-icon> : {{$t('manager-icon-label')}}
+            </div>
         </div>
     </div>
 </div>
@@ -56,27 +188,120 @@
 <script>
 import { mapState } from "vuex";
 
+import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
+import CytomineSlider from "@/components/utils/CytomineSlider";
+
 import ProjectDetails from "./ProjectDetails";
 
 import {ProjectCollection} from "cytomine-client";
 
 export default {
     name: "list-projects",
-    components: {ProjectDetails},
+    components: {ProjectDetails, CytomineMultiselect, CytomineSlider},
     data() {
         return {
             projects: [],
-            searchString: ""
+            searchString: "",
+            perPage: 10,
+            // filters
+            filtersOpened: false,
+            initSliders: false,
+            selectedOntologies: [],
+            availableTags: [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}], // TODO
+            tagString: "",
+            selectedTags: [],
+            availableRoles: [],
+            contributorRole: null,
+            managerRole: null,
+            selectedRoles: [],
+            boundsMembers: [0, 0],
+            boundsImages: [0, 0],
+            boundsUserAnnotations: [0, 0],
+            boundsJobAnnotations: [0, 0],
+            boundsReviewedAnnotations: [0, 0]
         };
     },
     computed: {
         filteredProjects() {
-            let str = this.searchString.toLowerCase();
-            return this.projects.filter(project => {
-                return project.name.toLowerCase().indexOf(str) >= 0;
+            let filtered = this.projects;
+
+            if(this.searchString != "") {
+                let str = this.searchString.toLowerCase();
+                filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
+            }
+
+            // TODO tags
+
+            filtered = filtered.filter(project => this.selectedOntologiesIds.includes(project.ontology));
+
+            let includeContributor = this.selectedRoles.includes(this.contributorRole);
+            let includeManager = this.selectedRoles.includes(this.managerRole);
+            filtered = filtered.filter(project => {
+                return (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
+            });
+
+            filtered = filtered.filter(project =>
+                this.isBetweenBounds(project.numberOfImages, this.boundsImages));
+            // filtered.filter(project => this.isBetweenBounds(project.nbOfMembers, this.boundsMembers)); //TODO
+            filtered = filtered.filter(project =>
+                this.isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations));
+            filtered = filtered.filter(project =>
+                this.isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations));
+            filtered = filtered.filter(project =>
+                this.isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
+
+            return filtered;
+        },
+        maxNbMembers() {
+            return 150; // TODO
+        },
+        maxNbImages() {
+            return Math.max(0, ...this.projects.map(project => project.numberOfImages));
+        },
+        maxNbUserAnnotations() {
+            return Math.max(0, ...this.projects.map(project => project.numberOfAnnotations));
+        },
+        maxNbJobAnnotations() {
+            return Math.max(0, ...this.projects.map(project => project.numberOfJobAnnotations));
+        },
+        maxNbReviewedAnnotations() {
+            return Math.max(0, ...this.projects.map(project => project.numberOfReviewedAnnotations));
+        },
+        atLeastOneManaged() {
+            return this.projects.some(project => project.isManaged);
+        },
+        ontologies() {
+            let seenIds = [];
+            let ontologies = [];
+            this.projects.forEach(project => {
+                if(!seenIds.includes(project.ontology)) {
+                    ontologies.push({id: project.ontology, name: project.ontologyName});
+                }
+            });
+            return ontologies;
+        },
+        selectedOntologiesIds() {
+            return this.selectedOntologies.map(ontology => ontology.id);
+        },
+        filteredTags() {
+            let str = this.tagString.toLowerCase();
+            return this.availableTags.filter(tag => {
+                return !this.selectedTags.includes(tag) && tag.toLowerCase().indexOf(str) >= 0;
             });
         },
         ...mapState({currentUser: state => state.currentUser.user})
+    },
+    methods: {
+        toggleFilterDisplay() {
+            this.filtersOpened = !this.filtersOpened;
+            this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
+        },
+        updateTagString(text) {
+            this.tagString = text;
+        },
+        isBetweenBounds(val, bounds) {
+            return val >= bounds[0] && val <= bounds[1];
+        }
     },
     async created() {
         let managedProjectsPromise = new ProjectCollection({light: true, admin: true}, 0, "user", this.currentUser.id).fetch();
@@ -86,9 +311,22 @@ export default {
         let idManagedProjects = managedProjects.array.map(project => project.id);
 
         this.projects = projects.array.map(project => {
-            project.isManaged = idManagedProjects.includes(project.id);
+            project.isManaged = Number(idManagedProjects.includes(project.id)); // cast to number to allow sorting
             return project;
         });
+
+        this.selectedOntologies = this.ontologies;
+
+        this.boundsMembers = [0, this.maxNbMembers];
+        this.boundsImages = [0, this.maxNbImages];
+        this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
+        this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
+        this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+
+        this.contributorRole = {role: "contributor", label: this.$t("contributor")};
+        this.managerRole = {role: "manager", label: this.$t("manager")};
+        this.availableRoles = [this.contributorRole, this.managerRole];
+        this.selectedRoles = this.availableRoles;
     }
 };
 </script>
@@ -98,24 +336,43 @@ export default {
     padding: 30px 50px 30px 50px;
 }
 
-.tag.manager, .tag.contributor {
-    width: 100px;
-    color: white;
-    font-weight: bold;
+.panel-block {
+    padding-top: 10px;
 }
 
-.tag.manager {
-    background: steelblue;
+.panel-heading {
+    display: flex;
+    justify-content: space-between;
 }
 
-.tag.contributor {
-    background: skyblue;
+.filter-label {
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-bottom: 5px;
+    margin-left: 15px;
+}
+
+.search-block {
+    display: flex;
+}
+
+.legend {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    padding: 20px;
+    background: #f8f8f8;
 }
 </style>
 
 <style>
+.search-projects {
+    max-width: 300px;
+    margin-right: 10px;
+}
+
 .table-projects {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .detail-container {
@@ -125,5 +382,12 @@ export default {
 
 .list-projects-wrapper td, .list-projects-wrapper th {
     vertical-align: middle !important;
+}
+
+.filters {
+    background: #f8f8f8;
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 20px;
 }
 </style>

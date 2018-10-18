@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="column vertical-center">
-        <router-link class="button" :to="`project/${idProject}/images`">{{$t("button-more")}}</router-link>
+        <router-link class="button" :to="`project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
     </div>
 </div>
 <div v-else>
@@ -50,6 +50,7 @@ export default {
 </script>
 
 <style scoped>
+
 .column {
     max-width: 200px;
 }

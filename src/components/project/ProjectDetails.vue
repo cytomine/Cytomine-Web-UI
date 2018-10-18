@@ -23,6 +23,12 @@
             <td class="prop-content"><router-link to="">{{project.ontologyName}}</router-link></td>
         </tr>
         <tr>
+            <td class="prop-label"><strong>{{$t("created-on")}}</strong></td>
+            <td class="prop-content">
+                {{ Number(project.created) | moment("ll") }}
+            </td>
+        </tr>
+        <tr>
             <td class="prop-label"><strong>{{$t("creator")}}</strong></td>
             <td class="prop-content">
                 <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
@@ -47,13 +53,15 @@
             </td>
         </tr>
         <tr>
-            <td class="prop-label"><strong>{{$t("number-reviewed-annotations")}}</strong></td>
-            <td class="prop-content">{{project.numberOfReviewedAnnotations}}</td>
-        </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("some-images")}}</strong></td>
+            <td class="prop-label"><strong>{{$t("images")}}</strong></td>
             <td class="prop-content">
                 <images-preview :idProject="project.id"></images-preview>
+            </td>
+        </tr>
+        <tr>
+            <td class="prop-label"><strong>{{$t("actions")}}</strong></td>
+            <td class="prop-content">
+                <button class="button is-danger is-small">{{$t("button-delete")}}</button> <!-- TODO -->
             </td>
         </tr>
     </tbody>
@@ -104,7 +112,7 @@ export default {
         this.creator = await creatorPromise;
         this.managers = await managersPromise;
         this.contacts = await contactsPromise;
-        this.contributors = await contributorsPromise;
+        this.contributors = await contributorsPromise; // TODO: exclude managers from contributors list (change in backend?)
         this.onlines = await onlinesPromise;
 
         this.isLoading = false;

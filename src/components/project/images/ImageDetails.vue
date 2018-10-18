@@ -39,7 +39,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("vendor")}}</strong></td>
             <td class="prop-content">
-                <img v-if="vendor" :src="vendor.filePath" :alt="vendor.altText" class="vendor-img">
+                <img v-if="vendor" :src="vendor.filePath" :alt="vendor.altText" :title="vendor.altText" class="vendor-img">
                 <template v-else>{{$t("Unknown")}}</template>
             </td>
         </tr>
