@@ -118,6 +118,8 @@ h1.page-title {
     background-color: whitesmoke;
 }
 
+/* Panel */
+
 .panel-heading {
     border-radius: 8px 8px 0px 0px;
 }
@@ -125,6 +127,34 @@ h1.page-title {
 .panel-block {
     background: #fff;
     display: block;
+}
+
+/* Modal */
+
+.modal-background {
+    background-color: rgba(10, 10, 10, 0.7);
+}
+
+.dialog.modal .modal-card-head {
+    padding: 15px !important;
+}
+
+.dialog.modal .modal-card-title {
+    font-size: 1.2rem !important;
+    font-weight: normal !important;
+}
+
+.dialog.modal .modal-card-body {
+    line-height: 1.5;
+}
+
+.dialog.modal .modal-card-foot {
+    padding: 10px !important;
+}
+
+.dialog.modal .modal-card-foot button {
+    font-size: 14px;
+    font-weight: normal !important;
 }
 
 </style>

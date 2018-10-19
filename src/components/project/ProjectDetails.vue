@@ -61,7 +61,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("actions")}}</strong></td>
             <td class="prop-content">
-                <button class="button is-danger is-small">{{$t("button-delete")}}</button> <!-- TODO -->
+                <button class="button is-danger is-small" @click="deleteProject()">{{$t("button-delete")}}</button>
             </td>
         </tr>
     </tbody>
@@ -89,6 +89,18 @@ export default {
             images: [],
             isLoading: true
         };
+    },
+    methods: {
+        deleteProject() {
+            this.$dialog.confirm({
+                title: this.$t("delete-project"),
+                message: this.$t("delete-project-confirmation-message", {projectName: this.project.name}),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.$emit("delete")
+            });
+        }
     },
     async created() {
         // create all promises, but do not await for them as we want requests to be parallellized

@@ -158,7 +158,7 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <project-details :project="props.row"></project-details>
+                    <project-details :project="props.row" @delete="deleteProject(props.row)"></project-details>
                 </template>
 
                 <template slot="empty">
@@ -176,6 +176,7 @@
                     </b-select>
                 </template>
             </b-table>
+
             <div class="legend" v-if="atLeastOneManaged">
                 <h2>{{$t("legend")}}</h2>
                 <b-icon icon="cog" size="is-small"></b-icon> : {{$t('manager-icon-label')}}
@@ -301,6 +302,22 @@ export default {
         },
         isBetweenBounds(val, bounds) {
             return val >= bounds[0] && val <= bounds[1];
+        },
+        async deleteProject(projectToDelete) {
+            try {
+                await projectToDelete.delete();
+                this.projects = this.projects.filter(project => project.id != projectToDelete.id);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-project-deletion", {projectName: projectToDelete.name})
+                });
+            }
+            catch(error) {
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-project-deletion", {projectName: projectToDelete.name})
+                });
+            }
         }
     },
     async created() {
