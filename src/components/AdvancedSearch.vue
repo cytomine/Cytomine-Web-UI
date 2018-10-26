@@ -122,7 +122,11 @@ export default {
         this.isLoading = true;
         this.searchString = this.pathSearchString || "";
         let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-        this.projects = (await new ProjectCollection({light: true}, 0, "user", this.currentUser.id).fetch()).array;
+        this.projects = (await new ProjectCollection({
+            light: true,
+            filterKey: "user",
+            filterValue: this.currentUser.id
+        }).fetchAll()).array;
         this.images = await imagesPromise;
         this.isLoading = false;
     }

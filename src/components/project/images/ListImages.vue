@@ -332,7 +332,7 @@ export default {
         },
     },
     async created() {
-        this.images = (await ImageInstanceCollection.fetchWithFilter("project", this.project.id)).array;
+        this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
         this.loading = false;
 
         this.images.forEach(image => {

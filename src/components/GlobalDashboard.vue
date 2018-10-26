@@ -146,7 +146,7 @@ export default {
         let nbReviewedPromise = this.currentUser.fetchNbAnnotations(true);
         // TODO: job annots
 
-        let projectsPromise = ProjectCollection.fetch();
+        let projectsPromise = ProjectCollection.fetchAll();
 
         async function fetchRecentProjectsId(nbRecent) {
             let listRecent = await ProjectCollection.fetchLastOpened(nbRecent);
@@ -154,7 +154,7 @@ export default {
         }
 
         let recentProjetsPromise = fetchRecentProjectsId(this.nbRecent);
-        let recentImagesPromise = ImageInstanceCollection.fetchLastOpened(1);
+        let recentImagesPromise = ImageInstanceCollection.fetchLastOpened({max: 1});
 
         // Retrieve the results of the requests
         this.images = await lightImagesPromise;

@@ -44,7 +44,7 @@ export default {
     },
     async created() {
         // TODO: fetch last opened ? waiting for https://github.com/cytomine/Cytomine-core/issues/1126
-        this.images = await new ImageInstanceCollection(this.nbRecent, "project", this.idProject).fetchPage();
+        this.images = await new ImageInstanceCollection({max: this.nbRecent, filterKey:"project", filterValue: this.idProject}).fetchPage();
     }
 };
 </script>

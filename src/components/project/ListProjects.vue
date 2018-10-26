@@ -309,9 +309,14 @@ export default {
         }
     },
     async created() {
-        let managedProjectsPromise = new ProjectCollection({light: true, admin: true}, 0, "user", this.currentUser.id).fetch();
+        let managedProjectsPromise = new ProjectCollection({
+            light: true,
+            admin: true,
+            filterKey: "user",
+            filterUser: this.currentUser.id
+        }).fetchAll();
 
-        let projects = await ProjectCollection.fetch();
+        let projects = await ProjectCollection.fetchAll();
         let managedProjects = await managedProjectsPromise;
         let idManagedProjects = managedProjects.array.map(project => project.id);
 

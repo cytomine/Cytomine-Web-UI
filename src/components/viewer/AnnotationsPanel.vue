@@ -186,7 +186,7 @@ export default {
                 }
                 let annots = await new AnnotationCollection({
                     user: layer.id, image: image.id, bbox, showWKT: true, showTerm: true, showGIS:true, kmeans: true
-                }).fetch();
+                }).fetchAll();
 
                 if(annots.length > 0) {
                     if(annots.get(0).count) { // if a result has a count property, it means the annotations are clustered

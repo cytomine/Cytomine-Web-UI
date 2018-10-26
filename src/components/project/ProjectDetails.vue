@@ -86,7 +86,6 @@ export default {
             contributors: [],
             onlines: [],
             contacts: [],
-            images: [],
             isLoading: true
         };
     },
@@ -105,7 +104,6 @@ export default {
     async created() {
         // create all promises, but do not await for them as we want requests to be parallellized
         let descriptionPromise = Description.fetch(this.project);
-        let imagesPromise = new ImageInstanceCollection(3, "project", this.project.id).fetchPage();
         let creatorPromise = this.project.fetchCreator();
         let managersPromise = this.project.fetchAdministrators();
         let contactsPromise = this.project.fetchRepresentatives();
@@ -120,7 +118,6 @@ export default {
             // QUESTION: change behaviour in backend ?
         }
 
-        this.images = (await imagesPromise).array;
         this.creator = await creatorPromise;
         this.managers = await managersPromise;
         this.contacts = await contactsPromise;

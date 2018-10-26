@@ -180,7 +180,7 @@ export default {
             let initialOpacity = 0.5;
             let defaultStroke = createDefaultStroke(initialOpacity);
 
-            let terms = await TermCollection.fetchWithFilter("project", image.project); // TODO: decide how API calls are handled (here or in component?)
+            let terms = await TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
             terms.array.forEach(term => {
                 term.olStyle = createColorStyle(term.color, defaultStroke); // should be handled in image ! (can change opacity in one particular viewer)
                 term.displayed = true;
