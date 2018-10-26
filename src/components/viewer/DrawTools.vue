@@ -95,7 +95,7 @@ import {never, shiftKeyOnly} from "ol/events/condition";
 
 import {Annotation} from "cytomine-client";
 
-import {isCluster} from "@/utils/utils.js";
+import {isCluster} from "@/utils/style-utils.js";
 
 export default {
     name: "draw-tools",

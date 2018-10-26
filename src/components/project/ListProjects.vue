@@ -191,8 +191,9 @@ import { mapState } from "vuex";
 
 import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
 import CytomineSlider from "@/components/utils/CytomineSlider";
-
 import ProjectDetails from "./ProjectDetails";
+
+import isBetweenBounds from "@/utils/is-between-bounds.js";
 
 import {ProjectCollection} from "cytomine-client";
 
@@ -209,7 +210,6 @@ export default {
             initSliders: false,
             selectedOntologies: [],
             availableTags: [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}], // TODO
-            tagString: "",
             selectedTags: [],
             availableRoles: [],
             contributorRole: null,
@@ -242,14 +242,14 @@ export default {
             });
 
             filtered = filtered.filter(project =>
-                this.isBetweenBounds(project.numberOfImages, this.boundsImages));
-            // filtered.filter(project => this.isBetweenBounds(project.nbOfMembers, this.boundsMembers)); //TODO
+                isBetweenBounds(project.numberOfImages, this.boundsImages));
+            // filtered.filter(project => isBetweenBounds(project.nbOfMembers, this.boundsMembers)); //TODO
             filtered = filtered.filter(project =>
-                this.isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations));
+                isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations));
             filtered = filtered.filter(project =>
-                this.isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations));
+                isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations));
             filtered = filtered.filter(project =>
-                this.isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
+                isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
 
             return filtered;
         },
@@ -257,16 +257,16 @@ export default {
             return 150; // TODO
         },
         maxNbImages() {
-            return Math.max(0, ...this.projects.map(project => project.numberOfImages));
+            return Math.max(10, ...this.projects.map(project => project.numberOfImages));
         },
         maxNbUserAnnotations() {
-            return Math.max(0, ...this.projects.map(project => project.numberOfAnnotations));
+            return Math.max(100, ...this.projects.map(project => project.numberOfAnnotations));
         },
         maxNbJobAnnotations() {
-            return Math.max(0, ...this.projects.map(project => project.numberOfJobAnnotations));
+            return Math.max(100, ...this.projects.map(project => project.numberOfJobAnnotations));
         },
         maxNbReviewedAnnotations() {
-            return Math.max(0, ...this.projects.map(project => project.numberOfReviewedAnnotations));
+            return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
         },
         atLeastOneManaged() {
             return this.projects.some(project => project.isManaged);
@@ -284,24 +284,12 @@ export default {
         selectedOntologiesIds() {
             return this.selectedOntologies.map(ontology => ontology.id);
         },
-        filteredTags() {
-            let str = this.tagString.toLowerCase();
-            return this.availableTags.filter(tag => {
-                return !this.selectedTags.includes(tag) && tag.toLowerCase().indexOf(str) >= 0;
-            });
-        },
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
         toggleFilterDisplay() {
             this.filtersOpened = !this.filtersOpened;
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
-        },
-        updateTagString(text) {
-            this.tagString = text;
-        },
-        isBetweenBounds(val, bounds) {
-            return val >= bounds[0] && val <= bounds[1];
         },
         async deleteProject(projectToDelete) {
             try {
@@ -362,13 +350,6 @@ export default {
     justify-content: space-between;
 }
 
-.filter-label {
-    text-transform: uppercase;
-    font-size: 12px;
-    margin-bottom: 5px;
-    margin-left: 15px;
-}
-
 .search-block {
     display: flex;
 }
@@ -399,12 +380,5 @@ export default {
 
 .list-projects-wrapper td, .list-projects-wrapper th {
     vertical-align: middle !important;
-}
-
-.filters {
-    background: #f8f8f8;
-    margin-top: 20px;
-    border-radius: 10px;
-    padding: 20px;
 }
 </style>

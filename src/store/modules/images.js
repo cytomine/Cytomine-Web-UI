@@ -5,7 +5,7 @@ import Collection from "ol/Collection";
 import {TermCollection} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle} from "@/utils/utils.js";
+    verticesStyle} from "@/utils/style-utils.js";
 
 export default {
     state: {

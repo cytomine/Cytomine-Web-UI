@@ -157,4 +157,20 @@ h1.page-title {
     font-weight: normal !important;
 }
 
+/* Filters */
+
+.filters {
+    background: #f8f8f8;
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.filter-label {
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-bottom: 5px;
+    margin-left: 15px;
+}
+
 </style>

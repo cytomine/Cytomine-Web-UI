@@ -39,8 +39,10 @@
         <tr>
             <td class="prop-label"><strong>{{$t("vendor")}}</strong></td>
             <td class="prop-content">
-                <img v-if="vendor" :src="vendor.filePath" :alt="vendor.altText" :title="vendor.altText" class="vendor-img">
-                <template v-else>{{$t("Unknown")}}</template>
+                <!-- vendor defined in parent component -->
+                <img v-if="image.vendor" :src="image.vendor.imgPath" :alt="image.vendor.name"
+                    :title="image.vendor.name" class="vendor-img">
+                <template v-else>{{$t("unknown")}}</template>
             </td>
         </tr>
         <tr>
@@ -52,7 +54,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("resolution")}}</strong></td>
             <td class="prop-content">
-                {{image.resolution ? `${image.resolution.toFixed(3)} ${$t("um-per-pixel")}` : $t("unknown")}}
+                {{image.resolutionFormatted}}
             </td>
         </tr>
         <tr>
@@ -81,50 +83,6 @@ export default {
             description: null,
             isLoading: true
         };
-    },
-    computed: {
-        vendor() {
-            let filename;
-            let altText;
-
-            switch(this.image.mime) {
-                case "openslide/ndpi":
-                case "openslide/vms":
-                    filename = "hamamatsu.jpg";
-                    altText = "Hamamatsu Photonics";
-                    break;
-                case "openslide/mrxs":
-                    filename = "3dh.png";
-                    altText = "3DHISTECH Ltd.";
-                    break;
-                case "openslide/svs":
-                    filename = "aperio.jpg";
-                    altText = "Aperio";
-                    break;
-                case "openslide/scn":
-                    filename = "leica.png";
-                    altText = "Leica Biosystems";
-                    break;
-                case "ventana/tif":
-                case "ventana/bif":
-                    filename = "roche.gif";
-                    altText = "La Roche Ltd.";
-                    break;
-                case "philips/tif":
-                    filename = "philips.svg";
-                    altText = "Philips";
-                    break;
-                default:
-                    return null;
-            }
-
-            if(filename != null) {
-                return {filePath: require("@/assets/brands/" + filename), altText};
-            }
-            else {
-                return null;
-            }
-        }
     },
     async created() {
         try {

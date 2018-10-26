@@ -14,7 +14,7 @@
     :placeholder="$t('select-options')"
 >
 
-    <template slot="beforeList" v-if="multiple && selectAllAvailable">
+    <template slot="beforeList" v-if="multiple && options.length > 0 && selectAllAvailable">
         <li class="multiselect__element multiselect__select-all" @click="selectAll()">
             <span :class="['multiselect__option', allSelected ? 'multiselect__option--selected' : '']">
                 {{$t("select-all")}}
@@ -22,15 +22,15 @@
         </li>
     </template>
 
-    <template slot="selection" slot-scope="{isOpen}" v-if="multiple">
+    <template slot="selection" slot-scope="{isOpen}" v-if="multiple && options.length > 0">
         <div class="multiselect__tags-wrap" v-if="!isOpen">
             <strong v-if="allSelected"> {{$t("all")}} </strong>
             <template v-else>
                 <span v-for="(option, index) in displayedOptions" :key="option[trackBy]">
-                    {{option[label]}}<template v-if="index < displayedOptions.length - 1">,</template> 
+                    {{label ? option[label] : option}}<template v-if="index < displayedOptions.length - 1">,</template>
                 </span>
                 <strong v-if="countNotDisplayed > 0"> 
-                    {{ $tc("and-count-others", countNotDisplayed) }} 
+                    {{ $tc("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
                 </strong>
             </template>
         </div>
