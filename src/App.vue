@@ -173,4 +173,14 @@ h1.page-title {
     margin-left: 15px;
 }
 
+/* Loading */
+.loading-overlay .loading-icon::after {
+    width: 5em;
+    height: 5em;
+    border-left-color: #bbb;
+    border-bottom-color: #bbb;
+}
+
+
+
 </style>

@@ -72,7 +72,7 @@
 import ImagesPreview from "@/components/utils/ImagesPreview";
 import ListUsernames from "@/components/utils/ListUsernames";
 
-import {Description, ImageInstanceCollection} from "cytomine-client";
+import {Description} from "cytomine-client";
 
 export default {
     name: "project-details",

@@ -1,6 +1,7 @@
 <template>
 <div class="list-projects-wrapper">
-    <div class="panel">
+    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("projects")}}
             <a class="button is-link">{{$t('new-project')}}</a>
@@ -127,7 +128,7 @@
                     </b-table-column>
 
                     <b-table-column field="first_name" :label="$t('members')" centered sortable width="150">
-                        <a>0</a> <!-- TODO retrieve from backend (https://github.com/cytomine/Cytomine-core/issues/1127) -->
+                        <a>{{ props.row.membersCount }}</a> <!-- TODO router link -->
                     </b-table-column>
 
                     <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
@@ -147,7 +148,7 @@
                     </b-table-column>
 
                     <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-                        {{ new Date() | moment("ll") }} <!-- TODO retrieve from backend (https://github.com/cytomine/Cytomine-core/issues/1128) -->
+                        {{ Number(props.row.lastActivity) | moment("ll") }}
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
@@ -205,6 +206,7 @@ export default {
             projects: [],
             searchString: "",
             perPage: 10,
+            loading: true,
             // filters
             filtersOpened: false,
             initSliders: false,
@@ -241,9 +243,8 @@ export default {
                 return (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
             });
 
-            filtered = filtered.filter(project =>
-                isBetweenBounds(project.numberOfImages, this.boundsImages));
-            // filtered.filter(project => isBetweenBounds(project.nbOfMembers, this.boundsMembers)); //TODO
+            filtered = filtered.filter(project => isBetweenBounds(project.numberOfImages, this.boundsImages));
+            filtered = filtered.filter(project => isBetweenBounds(project.membersCount, this.boundsMembers));
             filtered = filtered.filter(project =>
                 isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations));
             filtered = filtered.filter(project =>
@@ -254,7 +255,7 @@ export default {
             return filtered;
         },
         maxNbMembers() {
-            return 150; // TODO
+            return Math.max(10, ...this.projects.map(project => project.membersCount));
         },
         maxNbImages() {
             return Math.max(10, ...this.projects.map(project => project.numberOfImages));
@@ -316,7 +317,10 @@ export default {
             filterUser: this.currentUser.id
         }).fetchAll();
 
-        let projects = await ProjectCollection.fetchAll();
+        let projects = await ProjectCollection.fetchAll({
+            withMembersCount: true,
+            withLastActivity: true
+        });
         let managedProjects = await managedProjectsPromise;
         let idManagedProjects = managedProjects.array.map(project => project.id);
 
@@ -337,6 +341,8 @@ export default {
         this.managerRole = {role: "manager", label: this.$t("manager")};
         this.availableRoles = [this.contributorRole, this.managerRole];
         this.selectedRoles = this.availableRoles;
+
+        this.loading = false;
     }
 };
 </script>
