@@ -73,7 +73,7 @@
                             <router-link :to="`project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
                                 {{ lastOpenedImage.instanceFilename }}
                             </router-link>
-                            <span class='in-project'>(in {{lastOpenedImage.projectName}})</span>
+                            <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>
                         </div>
                     </div>
                 </div>

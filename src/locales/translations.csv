@@ -19,9 +19,9 @@ parameters,Parameters,Paramètres
 no-project,No project to display,
 no-image,No image to display,
 statistics,Statistics,Statistiques
-user-annotations,Manual Annotations,
-job-annotations,AI Annotations,
-reviewed-annotations,Reviewed Annotations,
+user-annotations,Manual Annotations,Annotations manuelles
+job-annotations,AI Annotations,Annotations IA
+reviewed-annotations,Reviewed Annotations,Annotations revues
 profile,Profile,Profil
 username,User name,Nom d'utilisateur
 firstname,First name,Prénom
@@ -99,7 +99,7 @@ number-user-annotations,Number of user annotations,
 number-job-annotations,Number of job annotations,
 number-reviewed-annotations,Number of reviewed annotations,
 no-description,No description,
-search-placeholder,Search,
+search-placeholder,Search,Recherche
 creator,Creator,
 managers,Managers,
 contributors,Contributors,
@@ -126,13 +126,13 @@ button-rename,Rename,
 button-properties,Properties,
 button-download,Download,
 button-delete,Delete,
-recently-opened,Recently opened,
-last-opened-image,Last opened image,
-view-all-projects,View all projects,
+recently-opened,Recently opened,Ouverts récemment
+last-opened-image,Last opened image,Dernière image ouverte
+view-all-projects,View all projects,Voir tous les projets
 no-recent-project,No project recently opened,
 no-recent-image,No image recently opened,
 advanced-search,Advanced search,
-button-view-all,View all,
+button-view-all,View all,Tout voir
 members,Members,
 new-project,New project,
 last-activity,Last activity,
@@ -150,3 +150,4 @@ delete-project,Delete project,
 delete-project-confirmation-message,Do you really want to delete project {projectName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,
 notif-success-project-deletion,Project {projectName} was successfully deleted,
 notif-error-project-deletion,Failed to delete project {projectName},
+in,in,dans
