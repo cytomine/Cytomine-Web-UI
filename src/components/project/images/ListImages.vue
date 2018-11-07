@@ -1,7 +1,7 @@
 <template>
 <div class="list-images-wrapper">
-    <div class="panel">
-        <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
             <a class="button is-link">{{$t('button-add-image')}}</a>

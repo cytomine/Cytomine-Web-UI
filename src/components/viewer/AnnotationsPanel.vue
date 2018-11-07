@@ -8,7 +8,7 @@
                 {{ layerName(layer) }}
             </option>
         </b-select>
-        <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("add") }}</button>
+        <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("button-add") }}</button>
     </b-field>
     <table class="table layers-table">
         <thead>

@@ -5,7 +5,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("description")}}</strong></td>
             <td class="prop-content">
-                <div v-if="description" v-html="description"></div> <!-- WARNING can lead to js injection -->
+                <div v-if="description" v-html="description.data"></div> <!-- WARNING can lead to js injection -->
                 <template v-else><em>{{$t("no-description")}}</em></template>
             </td>
         </tr>
@@ -89,7 +89,7 @@ export default {
             this.description = await Description.fetch(this.image);
         }
         catch(err) {
-            // nothing to do as the error may make sense if the project as no description
+            // nothing to do as the error may make sense if the image has no description
             // QUESTION: change behaviour in backend ?
         }
         this.isLoading = false;

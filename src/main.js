@@ -14,6 +14,8 @@ import {Cytomine} from "cytomine-client";
 import Buefy from "buefy";
 import "buefy/dist/buefy.css";
 
+import VTooltip from "v-tooltip";
+
 import VueMoment from "vue-moment";
 const moment = require("moment");
 
@@ -29,6 +31,7 @@ Vue.use(Buefy, {defaultIconPack: "fa"});
 Vue.use(VueMoment, {moment});
 Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
 Vue.use(vClickOutside);
+Vue.use(VTooltip);
 Vue.config.productionTip = false;
 
 new Cytomine("localhost-core");

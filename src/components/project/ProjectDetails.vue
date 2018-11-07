@@ -114,7 +114,7 @@ export default {
             this.description = (await descriptionPromise).data;
         }
         catch(err) {
-            // nothing to do as the error may make sense if the project as no description
+            // nothing to do as the error may make sense if the project has no description
             // QUESTION: change behaviour in backend ?
         }
 

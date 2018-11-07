@@ -3,13 +3,16 @@
     :value="value" @input="$emit('input', $event)"
     :label="label" 
     :track-by="trackBy"
+    :group-label="groupLabel"
+    :group-values="groupValues"
+    :group-select="true"
     :options="options" 
     :optionHeight="30"
     :showLabels="false"
     :multiple="multiple"
-    :close-on-select="false"
+    :close-on-select="multiple ? false : true"
     :searchable="searchable"
-    :clear-on-select="false"
+    :clear-on-select="multiple ? false : true"
     :showPointer="false"
     :placeholder="$t('select-options')"
 >
@@ -50,6 +53,8 @@ export default {
         options: {type: null},
         label: {type: String},
         trackBy: {type: String},
+        groupLabel: {type: String},
+        groupValues: {type: String},
         multiple: {type: Boolean, default: false},
         selectAllAvailable: {type: Boolean, default: true},
         searchable: {type: Boolean, default: true}
@@ -116,10 +121,11 @@ export default {
     height:100%;
 }
 
-.multiselect__tags-wrap {
+.multiselect__tags-wrap, .multiselect__single {
     margin-bottom: 8px;
     line-height: 20px;
     vertical-align: top;
+    font-size: 14px;
 }
 
 .multiselect__input {
