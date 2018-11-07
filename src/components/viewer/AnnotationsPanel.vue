@@ -98,6 +98,8 @@ import VectorLayer from "ol/layer/Vector";
 
 import {Project, AnnotationCollection} from "cytomine-client";
 
+import {fullName} from "@/utils/user-utils.js";
+
 export default {
     name: "annotations-panel",
     props: ["image"],
@@ -152,7 +154,7 @@ export default {
                 name = `${layer.softwareName} - ${date}`;
             }
             else {
-                name = `${layer.firstname} ${layer.lastname} (${layer.username})`;
+                name = fullName(layer);
             }
 
             return `${name} (${layer.countAnnotation})`;

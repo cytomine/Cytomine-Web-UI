@@ -1,12 +1,19 @@
 <template>
 <span v-if="user">
     <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online != null"></span>
-    {{user.firstname}} {{user.lastname}} ({{user.username}})</span></template>
+    {{fullName}}</span></template>
 
 <script>
+import {fullName} from "@/utils/user-utils.js";
+
 export default {
     name: "username",
-    props: ["user", "online"]
+    props: ["user", "online"],
+    computed: {
+        fullName() {
+            return fullName(this.user);
+        }
+    }
 };
 </script>
 

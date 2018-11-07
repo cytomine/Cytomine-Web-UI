@@ -56,6 +56,8 @@ import { mapState } from "vuex";
 import NavbarDropdown from "./NavbarDropdown.vue";
 import CytomineSearcher from "./CytomineSearcher.vue";
 
+import {fullName} from "@/utils/user-utils.js";
+
 export default {
     name: "cytomine-navbar",
     components: {
@@ -78,12 +80,7 @@ export default {
             return this.$i18n.locale;
         },
         currentUserFullInfo() {
-            if(this.currentUser == null) {
-                return "";
-            }
-            else {
-                return `${this.currentUser.firstname} ${this.currentUser.lastname} (${this.currentUser.username})`;
-            }
+            return fullName(this.currentUser);
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
