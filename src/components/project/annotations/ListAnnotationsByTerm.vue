@@ -16,13 +16,14 @@
                 </b-icon></button>    
             </div>
 
-            <annotation-details slot="popover" v-click-outside="() => close(annot.id)"
+            <annotation-details slot="popover" v-click-outside="(event) => close(event, annot.id)"
                 :annotation="annot"
                 :terms="allTerms"
                 :users="allUsers"
                 :images="allImages"
                 @update="$emit('update', annot.id)"
-                v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation -->
+                v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
+                (prevents fetching unnecessary information) -->
             </annotation-details>
         </v-popover>
         
@@ -127,8 +128,14 @@ export default {
                 });
             }
         },
-        close(id) {
-            if(this.openedAnnot == id) {
+        close(event, id) {
+            // do not close the popover if click was performed in modal or in notification
+            let el = event.target;
+            let isModal = false;
+            while(!(isModal = el.classList.contains("modal") || el.classList.contains("notifications"))
+                && (el = el.parentElement));
+
+            if(!isModal && this.openedAnnot == id) {
                 this.openedAnnot = 0;
             }
         }

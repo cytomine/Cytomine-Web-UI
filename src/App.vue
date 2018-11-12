@@ -49,6 +49,9 @@ export default {
 @import "~font-awesome/css/font-awesome.min.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600'); /* TODO: download */
 
+@import "~quill/dist/quill.core.css";
+@import "~quill/dist/quill.snow.css";
+
 @font-face {
     font-family: 'cytomine';
     src: url('assets/cytomine-font.woff') format('woff');
@@ -132,28 +135,37 @@ h1.page-title {
 
 /* Modal */
 
+.modal {
+    z-index: 2000;
+}
+
 .modal-background {
     background-color: rgba(10, 10, 10, 0.7);
 }
 
-.dialog.modal .modal-card-head {
+.modal-card {
+    max-height: 80vh;
+}
+
+.modal .modal-card-head {
     padding: 15px !important;
 }
 
-.dialog.modal .modal-card-title {
+.modal .modal-card-title {
     font-size: 1.2rem !important;
     font-weight: normal !important;
 }
 
-.dialog.modal .modal-card-body {
+.modal .modal-card-body {
     line-height: 1.5;
 }
 
-.dialog.modal .modal-card-foot {
+.modal .modal-card-foot {
     padding: 10px !important;
+    justify-content: flex-end;
 }
 
-.dialog.modal .modal-card-foot button {
+.modal .modal-card-foot button {
     font-size: 14px;
     font-weight: normal !important;
 }
@@ -178,6 +190,13 @@ h1.page-title {
 .loading-overlay .loading-icon::after {
     width: 5em;
     height: 5em;
+    border-left-color: #bbb;
+    border-bottom-color: #bbb;
+}
+
+.loading-overlay.small .loading-icon::after {
+    width: 2em;
+    height: 2em;
     border-left-color: #bbb;
     border-bottom-color: #bbb;
 }

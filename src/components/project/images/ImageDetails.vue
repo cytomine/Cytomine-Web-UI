@@ -1,12 +1,10 @@
 <template>
 <table class="table">
-    <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
     <tbody>
         <tr>
             <td class="prop-label"><strong>{{$t("description")}}</strong></td>
             <td class="prop-content">
-                <div v-if="description" v-html="description.data"></div> <!-- WARNING can lead to js injection -->
-                <template v-else><em>{{$t("no-description")}}</em></template>
+                <cytomine-description :object="image"></cytomine-description>
             </td>
         </tr>
         <tr>
@@ -73,27 +71,12 @@
 </template>
 
 <script>
-import {Description} from "cytomine-client";
+import CytomineDescription from "@/components/utils/CytomineDescription";
 
 export default {
     name: "image-details",
-    props: ["image"],
-    data() {
-        return {
-            description: null,
-            isLoading: true
-        };
-    },
-    async created() {
-        try {
-            this.description = await Description.fetch(this.image);
-        }
-        catch(err) {
-            // nothing to do as the error may make sense if the image has no description
-            // QUESTION: change behaviour in backend ?
-        }
-        this.isLoading = false;
-    }
+    components: {CytomineDescription},
+    props: ["image"]
 };
 </script>
 

@@ -5,8 +5,7 @@
         <tr>
             <td class="prop-label"><strong>{{$t("description")}}</strong></td>
             <td class="prop-content">
-                <div v-if="description" v-html="description"></div> <!-- WARNING can lead to js injection -->
-                <template v-else><em>{{$t("no-description")}}</em></template>
+                <cytomine-description :object="project"></cytomine-description>
             </td>
         </tr>
         <tr>
@@ -72,15 +71,14 @@
 import ImagesPreview from "@/components/utils/ImagesPreview";
 import ListUsernames from "@/components/utils/ListUsernames";
 
-import {Description} from "cytomine-client";
+import CytomineDescription from "@/components/utils/CytomineDescription";
 
 export default {
     name: "project-details",
-    components: {ImagesPreview, ListUsernames},
+    components: {ImagesPreview, ListUsernames, CytomineDescription},
     props: ["project"],
     data() {
         return {
-            description: null,
             creator: null,
             managers: [],
             contributors: [],
@@ -103,20 +101,11 @@ export default {
     },
     async created() {
         // create all promises, but do not await for them as we want requests to be parallellized
-        let descriptionPromise = Description.fetch(this.project);
         let creatorPromise = this.project.fetchCreator();
         let managersPromise = this.project.fetchAdministrators();
         let contactsPromise = this.project.fetchRepresentatives();
         let contributorsPromise = this.project.fetchUsers();
         let onlinesPromise = this.project.fetchConnectedUsers();
-
-        try {
-            this.description = (await descriptionPromise).data;
-        }
-        catch(err) {
-            // nothing to do as the error may make sense if the project has no description
-            // QUESTION: change behaviour in backend ?
-        }
 
         this.creator = await creatorPromise;
         this.managers = await managersPromise;

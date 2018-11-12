@@ -25,8 +25,7 @@
                 <tr>
                     <td><strong>{{$t("description")}}</strong></td>
                     <td>
-                        <div v-if="description" v-html="description.data"></div> <!-- WARNING can lead to js injection -->
-                        <em v-else>{{$t("no-description")}}</em>
+                        <cytomine-description :object="annotation"></cytomine-description>
                     </td>
                 </tr>
 
@@ -81,6 +80,10 @@
                                     </b-tag>
                                 </b-taglist>
                             </div>
+
+                            <button class="button is-small" @click="addNewProp()" key="showForm">
+                                {{$t("button-add")}}
+                            </button>
                         </b-field>
 
                         <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
@@ -93,10 +96,6 @@
                                 {{$t("button-cancel")}}
                             </button>
                         </form>
-
-                        <button class="button is-small" @click="addNewProp()" key="showForm">
-                            {{$t("button-add")}}
-                        </button>
                     </td>
                 </tr>
 
@@ -129,16 +128,17 @@
 </template>
 
 <script>
-import {Description, Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
+import {Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
+import CytomineDescription from "@/components/utils/CytomineDescription";
 
 export default {
     name: "annotations-details",
+    components: {CytomineDescription},
     props: ["annotation", "terms", "users", "images"],
     data() {
         return {
             loading: true,
-            description: null,
 
             addTermString: "",
 
@@ -251,18 +251,7 @@ export default {
         }
     },
     async created() {
-
-        let propertiesPromise = PropertyCollection.fetchAll({object: this.annotation});
-        
-        try {
-            this.description = await Description.fetch(this.annotation);
-        }
-        catch(err) {
-            // nothing to do as the error may make sense if the annotation has no description
-            // QUESTION: change behaviour in backend ?
-        }
-
-        this.properties = (await propertiesPromise).array;
+        this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
         this.loading = false;
     }
 };
