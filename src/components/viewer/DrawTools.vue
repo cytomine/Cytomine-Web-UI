@@ -53,7 +53,7 @@
         <button class="button is-small" :disabled="!isNotPointSelected" :title="$t('rotate')" @click="activateEditTool('rotate')" :class="{'is-selected': activeEditTool == 'rotate'}">
             <span class="icon is-small"><i class="fa fa-refresh"></i></span>
         </button>
-        <button class="button is-small" :disabled="selectedFeature == null" :title="$t('delete')" @click="confirmModalActive = true" v-shortkey.once="['d']" @shortkey="confirmModalActive = true">
+        <button class="button is-small" :disabled="selectedFeature == null" :title="$t('delete')" @click="confirmDeletion()" v-shortkey.once="['d']" @shortkey="confirmDeletion()">
             <span class="icon is-small"><i class="fa fa-trash-o"></i></span>
         </button>
     </div>
@@ -66,21 +66,6 @@
             <span class="icon is-small"><i class="fa fa-repeat"></i></span>
         </button>
     </div>
-
-    <b-modal :active.sync="confirmModalActive" :has-modal-card="true"> <!-- TODO: rework design ; + use vuejs-dialog? -->
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">{{ $t("confirm-deletion") }}</p>
-            </header>
-            <section class="modal-card-body">
-                {{ $t("confirm-deletion-annotation") }}
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" @click="deleteAnnot()">{{ $t("button-confirm") }}</button>
-                <button class="button" @click="confirmModalActive = false">{{ $t("button-cancel") }}</button>
-            </footer>
-        </div>
-    </b-modal>
 </div>
 </template>
 
@@ -100,11 +85,6 @@ import {isCluster} from "@/utils/style-utils.js";
 export default {
     name: "draw-tools",
     props: ["image"],
-    data() {
-        return {
-            confirmModalActive: false
-        };
-    },
     computed: {
         imageWrapper() {
             return this.$store.state.images.images[this.image.id];
@@ -376,9 +356,17 @@ export default {
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
             }
-            finally {
-                this.confirmModalActive = false;
-            }
+        },
+
+        confirmDeletion() {
+            this.$dialog.confirm({
+                title: this.$t("confirm-deletion"),
+                message: this.$t("confirm-deletion-annotation"),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.deleteAnnot()
+            });
         },
 
         findSource(annot) {
