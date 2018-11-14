@@ -1,4 +1,4 @@
-import {Style, Stroke, Fill, Circle, Text} from "ol/style";
+import {Style, Stroke, Fill, Circle, Text} from "ol/style"; // TODO: use vuelayers functions?
 import {MultiPoint} from "ol/geom";
 import {asArray as hexToRgb} from "ol/color";
 
@@ -48,6 +48,7 @@ export function createTextStyle(text) {
     return new Style({
         text: new Text({
             text,
+            font: "20px Arial, sans-serif",
             overflow: true,
             fill: new Fill({color: "#fff"}),
             stroke: new Stroke({color: "#000", width: 3})

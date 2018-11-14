@@ -23,6 +23,9 @@ import VueShortKey from "vue-shortkey";
 
 import * as vClickOutside from "v-click-outside-x";
 
+import VueLayers from "vuelayers";
+import ZoomifySource from "./vuelayers-suppl/zoomify-source";
+
 import App from "./App.vue";
 
 Vue.use(VueRouter);
@@ -32,6 +35,10 @@ Vue.use(VueMoment, {moment});
 Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
 Vue.use(vClickOutside);
 Vue.use(VTooltip);
+
+Vue.use(VueLayers);
+Vue.use(ZoomifySource);
+
 Vue.config.productionTip = false;
 
 new Cytomine("localhost-core");

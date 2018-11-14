@@ -7,10 +7,46 @@
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
     <div class="map-container">
-        <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div>
-        <div class="draw-tools" v-if="imageInstance != null">
+
+        <vl-map :data-projection="projectionName"
+                :load-tiles-while-animating="true"
+                :load-tiles-while-interacting="true"
+                @pointermove="projectedMousePosition = $event.coordinate"
+                v-if="!loading"
+                ref="olMap"
+                @mounted="associateMap"> <!-- TODO remove map association -->
+
+            <vl-view :center.sync="center"
+                     :zoom.sync="zoom"
+                     :rotation.sync="rotation"
+                     :max-zoom="maxZoom"
+                     :min-zoom="minZoom"
+                     :extent="extent"
+                     :projection="projectionName">
+            </vl-view>
+
+            <vl-layer-tile :extent="extent">
+                <vl-source-zoomify :projection="projectionName"
+                                   :url="baseLayerURL"
+                                   :size="imageSize"
+                                   :extent="extent"
+                                   :key="baseLayerURL">
+                </vl-source-zoomify>
+            </vl-layer-tile>
+
+            <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
+                              :image="imageInstance" 
+                              :user-layer="layer">
+            </annotation-layer>
+
+        </vl-map>
+
+        <!-- <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div> -->
+        
+        <div class="draw-tools" v-if="mapMounted">
             <draw-tools :image="imageInstance"></draw-tools>
         </div>
+
         <div class="panels">
             <ul>
                 <li><a @click="close()" class="close">
@@ -50,11 +86,11 @@
         <annotations-panel class="panel-options panel-layers" v-if="imageInstance != null" v-show="activePanel == 'layers'"
             :image="imageInstance"></annotations-panel>
 
-        <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
-            :view="view"></guided-tour>
+        <!-- <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
+            :view="view"></guided-tour> -->
 
-        <scale-line v-if="zoom != null"
-            :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
+        <!-- <scale-line v-if="zoom != null"
+            :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line> -->
 
         <!--<annotation-details v-if="imageInstance != null" :image="imageInstance"></annotation-details>-->
     </div>
@@ -62,6 +98,8 @@
 
 <script>
 import { mapState } from "vuex";
+
+import AnnotationLayer from "./AnnotationLayer";
 
 import ImageInformation from "./ImageInformation";
 //import ColorManipulation from "./ColorManipulation";
@@ -71,17 +109,14 @@ import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
 //import AnnotationDetails from "./AnnotationDetails";
 
-import {Map, View} from "ol";
-import {Zoomify} from "ol/source";
-import {Tile as TileLayer} from "ol/layer";
-import Projection from "ol/proj/Projection";
-import {defaults as defaultControls, OverviewMap} from "ol/control";
+import {addProj, createProj} from "vuelayers/lib/ol-ext";
 
 import {ImageInstance, AbstractImage} from "cytomine-client";
 
 export default {
     name: "cytomine-image",
     components: {
+        AnnotationLayer,
         ImageInformation,
         //ColorManipulation,
         AnnotationsPanel,
@@ -92,20 +127,16 @@ export default {
     },
     data() {
         return {
-            projectedMousePosition: [0, 0]
+            minZoom: 2, // compute in smarter way?
+            
+            projectionName: "CYTO",
+            projectedMousePosition: [0, 0],
+
+            loading: true,
+            mapMounted: false
         };
     },
     computed: {
-        view() {
-            if(this.map != null) {
-                return this.map.getView();
-            }
-        },
-        zoom() {
-            if(this.view != null) {
-                return this.view.getZoom();
-            }
-        },
         idImage() {
             return this.$route.params.idImage;
         },
@@ -115,15 +146,60 @@ export default {
         imageInstance() {
             return this.imageWrapper.imageInstance;
         },
-        layer() {
-            return this.imageWrapper.layer;
-        },
-        map() {
-            return this.imageWrapper.map;
+        selectedLayers() {
+            return this.imageWrapper.selectedLayers;
         },
         activePanel() {
             return this.imageWrapper.activePanel;
         },
+
+        center: {
+            get() {
+                return this.imageWrapper.center;
+            },
+            set(value) {
+                this.$store.commit("setCenter", {idImage: this.idImage, center: value});
+            }
+        },
+        zoom: {
+            get() {
+                return this.imageWrapper.zoom;
+            },
+            set(value) {
+                this.$store.commit("setZoom", {idImage: this.idImage, zoom: Number(value)});
+            }
+        },
+        rotation: {
+            get() {
+                return this.imageWrapper.rotation;
+            },
+            set(value) {
+                this.$store.commit("setRotation", {idImage: this.idImage, rotation: Number(value)});
+            }
+        },
+
+        extent() {
+            if(this.imageInstance != null) {
+                return [0, 0, this.imageInstance.width, this.imageInstance.height];
+            }
+        },
+        imageSize() {
+            if(this.imageInstance != null) {
+                return [this.imageInstance.width, this.imageInstance.height];
+            }
+        },
+        baseLayerURL() { // TODO: randomize + filter (see ULiege repo)
+            if(this.imageInstance != null) {
+                return `${this.imageInstance.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
+                    &channels=0&layer=0&timeframe=0&mimeType=${this.imageInstance.mime}`;
+            }
+        },
+        maxZoom() {
+            if(this.imageInstance != null) {
+                return this.imageInstance.depth;
+            }
+        },
+
         ...mapState({images: state => state.images.images})
     },
     methods: {
@@ -131,76 +207,39 @@ export default {
             this.$store.commit("togglePanel", {idImage: this.idImage, panel});
         },
 
-        updateMousePosition(event) {
-            if(this.map != null) {
-                let rect = this.$refs.map.getBoundingClientRect();
-                let mousePosition = [event.clientX - rect.left, event.clientY - rect.top];
-                this.projectedMousePosition = this.map.getCoordinateFromPixel(mousePosition);
-            }
-        },
-
         close() {
             this.$store.commit("removeImage", this.imageInstance.id);
             this.$router.push("/"); // TODO: change
-        }
+        },
 
+        associateMap() { // TODO: remove
+            this.imageWrapper.map = this.$refs.olMap.$map;
+            this.mapMounted = true;
+        }
     },
     async mounted() {
-        if(this.imageInstance == null) {
+        if(this.imageInstance == null) { // if image not in store
             let imageInstance = await ImageInstance.fetch(this.idImage);
 
             let imageServerURLs = await new AbstractImage({id: imageInstance.baseImage}).fetchImageServers();
-            let imageServerURL = imageServerURLs[0];
+            imageInstance.imageServerURL = imageServerURLs[0];
 
-            let extent = [0, 0, imageInstance.width, imageInstance.height];
-            let projection = new Projection({code: "CYTO", extent});
-
-            let view = new View({
-                center: [imageInstance.width/2, imageInstance.height/2],
-                minZoom: 2,
-                maxZoom: imageInstance.depth,
-                projection,
-                zoom: 2,
-                extent: extent
+            let cytoProjection = createProj({
+                code: this.projectionName, 
+                extent: [0, 0, imageInstance.width, imageInstance.height]
             });
+            addProj(cytoProjection);
 
-            let layer = new TileLayer({
-                title: "Image",
-                source: new Zoomify({
-                    url: `${imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                        &channels=0&layer=0&timeframe=0&mimeType=${imageInstance.mime}`,
-                    size: [imageInstance.width, imageInstance.height],
-                    extent
-                })
-            });
-
-            let overview = new OverviewMap({
-                layers: [layer],
-                collapsed: false,
-                view: new View({projection})
-            });
-
-
-            let map = new Map({
-                target: "map",
-                controls: defaultControls().extend([overview]),
-                loadTilesWhileInteracting: true,
-                layers: [layer],
-                view
-            });
-
-            this.$store.dispatch("addImage", {image: imageInstance, imageLayer: layer, map});
+            await this.$store.dispatch("addImage", {image: imageInstance});
         }
-        else {
-            this.map.setTarget(null);
-            this.map.setTarget("map");
-        }
+        this.loading = false;
     }
 };
 </script>
 
 <style>
-@import "~ol/ol.css";
+@import "~vuelayers/lib/style.css";
+/* @import "~ol/ol.css"; */
 
 .map-container {
     width: 100%;

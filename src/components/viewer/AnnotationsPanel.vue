@@ -23,7 +23,7 @@
         <tbody>
             <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
                 <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.displayed" @change="toggleLayerVisibility(index)">
+                    <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
                 </td>
                 <td class="checkbox-column">
                     <input type="checkbox" :checked="layer.drawOn"> <!-- TODO -->
@@ -62,7 +62,7 @@
         <tbody>
             <tr v-for="(term, index) in terms" :key="term.id">
                 <td class="checkbox-column">
-                    <input type="checkbox" :checked="term.displayed" @change="toggleTermVisibility(index)">
+                    <input type="checkbox" :checked="term.visible" @change="toggleTermVisibility(index)">
                 </td>
                 <td class="checkbox-column">
                     <div class="color-preview" :style="{background: term.color}"></div>
@@ -92,11 +92,7 @@
 <script>
 import { mapState } from "vuex";
 
-import WKT from "ol/format/WKT";
-import {Vector as VectorSource} from "ol/source";
-import VectorLayer from "ol/layer/Vector";
-
-import {Project, AnnotationCollection} from "cytomine-client";
+import {Project} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
 
@@ -118,7 +114,7 @@ export default {
                 return this.imageWrapper.layersOpacity;
             },
             set(value) {
-                this.$store.dispatch("setLayersOpacity", {idImage: this.image.id, opacity: Number(value)});
+                this.$store.commit("setLayersOpacity", {idImage: this.image.id, opacity: Number(value)});
             }
         },
         terms() {
@@ -129,7 +125,7 @@ export default {
                 return this.imageWrapper.displayNoTerm;
             },
             set(value) {
-                this.$store.dispatch("setDisplayNoTerm", {idImage: this.image.id, value});
+                this.$store.commit("setDisplayNoTerm", {idImage: this.image.id, value});
             }
         },
         selectedLayers() { // Array<User> (representing user layers)
@@ -140,9 +136,6 @@ export default {
         },
         unselectedLayers() {
             return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
-        },
-        annotsIdsToSelect() {
-            return this.imageWrapper.annotsToSelect.map(annot => annot.id);
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
@@ -160,95 +153,14 @@ export default {
             return `${name} (${layer.countAnnotation})`;
         },
 
-        createFeatures(annotations) {
-            let format = new WKT();
-            let features = annotations.map(annot => {
-                let feature = format.readFeature(annot.location);
-                feature.setId(annot.id); // TODO: solve backend issue with kmeans generated ID (the same ID is used for different clusters when bbox changes)
-                feature.set("annot", annot);
-
-                if(this.annotsIdsToSelect.includes(annot.id)) {
-                    this.$store.commit("reselectFeature", {idImage: this.image.id, feature});
-                }
-
-                return feature;
-            });
-            return features;
-        },
-
-        genLoader(layer) {
-            let image = this.image;
-            let createFeatures = this.createFeatures;
-
-            return async function(extent, resolution) {
-                this.resolution = resolution;
-                let bbox = [0, 0, image.width, image.height];
-                if(isFinite(extent[0])) {
-                    bbox = extent.join();
-                }
-                let annots = await new AnnotationCollection({
-                    user: layer.id, image: image.id, bbox, showWKT: true, showTerm: true, showGIS:true, kmeans: true
-                }).fetchAll();
-
-                if(annots.length > 0) {
-                    if(annots.get(0).count) { // if a result has a count property, it means the annotations are clustered
-                        this.clustered = true;
-                    }
-                    else {
-                        this.clustered = false;
-                        // TODO: add function in backend returning the maxResolutionNoClusters?
-                        if(this.maxResolutionNoClusters == null || resolution > this.maxResolutionNoClusters) {
-                            this.maxResolutionNoClusters = resolution;
-                        }
-                    }
-                }
-
-                let features = createFeatures(annots.array);
-                this.addFeatures(features);
-            };
-        },
-
-        genStrategy(layer) {
-            let idImage = this.image.id;
-            let store = this.$store;
-
-            return function(extent, resolution) {
-                if(this.resolution && this.clustered != null && // if some features have already been loaded
-                ((resolution != this.resolution && this.clustered) // zoom modification while clustering is performed
-                || (resolution > this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
-                    // following clear(), selected feature is removed => need to cache it and reselect it based on ID
-                    store.commit("removeLayerFromSelectedFeatures", {idImage, idLayer: layer.id, cache: true});
-                    this.clear();
-                }
-                return [extent];
-            };
-        },
-
         addLayer(layer = this.selectedLayer) {
             if(this.selectedLayersIds.includes(layer.id)) {
                 return;
             }
 
-            layer.displayed = true;
+            layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
             layer.locked = false;
-
-            let source = new VectorSource({
-                strategy: this.genStrategy(layer),
-                loader: this.genLoader(layer)
-            });
-
-            let vectorLayer = new VectorLayer({
-                id: layer.id,
-                source,
-                extent: [0, 0, this.image.width, this.image.height],
-                visible: layer.displayed,
-                style: this.$store.getters.genStyleFunction(this.image.id),
-                updateWhileInteracting: true,
-                drawOn: layer.drawOn
-            });
-
-            layer.olLayer = vectorLayer;
             this.$store.commit("addLayer", {idImage: this.image.id, layer});
 
             this.selectedLayer = null;
@@ -263,7 +175,7 @@ export default {
         },
 
         toggleTermVisibility(index) {
-            this.$store.dispatch("toggleTermVisibility", {idImage: this.image.id, indexTerm: index});
+            this.$store.commit("toggleTermVisibility", {idImage: this.image.id, indexTerm: index});
         },
 
         async loadLayers() {
@@ -289,18 +201,11 @@ export default {
     async created() {
         await this.loadLayers();
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+            // TODO: move in store?
             let currentUserLayer = this.layers.find(layer => layer.id == this.currentUser.id);
             if(currentUserLayer != null) {
                 this.addLayer(currentUserLayer);
             }
-        }
-        else {
-            // force creation of new OL layers so that callbacks are correclty associated with this component
-            let i = 0;
-            this.selectedLayers.forEach(layer => {
-                this.removeLayer(i++, true);
-                this.addLayer(layer);
-            });
         }
     }
 };

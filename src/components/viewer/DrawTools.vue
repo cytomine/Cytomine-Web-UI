@@ -121,15 +121,15 @@ export default {
             return false;
         },
         layers() {
-            return this.imageWrapper.map.getLayers().getArray();
+            return this.imageWrapper.selectedLayers || [];
         },
         activeLayer() {
             // QUESTION: treat multiple active layers ? I don't think it's a good idea, discuss with team
-            return this.layers.find(layer => layer.get("drawOn"));
+            return this.layers.find(layer => layer.drawOn);
         },
         activeSource() {
             if(this.activeLayer) {
-                return this.activeLayer.getSource();
+                return this.activeLayer.olSource;
             }
         },
         actions() {
@@ -230,7 +230,7 @@ export default {
             if(this.activeLayer == null) {
                 return;
             }
-            let user = this.activeLayer.get("id");
+            let user = this.activeLayer.id;
             let annot = new Annotation({location: this.getWktLocation(feature), image: this.image.id, user});
             try {
                 await annot.save();
@@ -264,7 +264,7 @@ export default {
             let remove = (this.activeTool == "correct-remove");
             let review = false; // TODO: handle
             let geom = this.getWktLocation(feature);
-            let idLayer = this.activeLayer.get("id");
+            let idLayer = this.activeLayer.id;
             try {
                 let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, [idLayer]);
                 if(correctedAnnot != null) {
@@ -370,11 +370,11 @@ export default {
         },
 
         findSource(annot) {
-            let layer = this.layers.find(layer => layer.get("id") == annot.user);
+            let layer = this.layers.find(layer => layer.id == annot.user);
             if(layer == null) {
                 return null;
             }
-            return layer.getSource();
+            return layer.olSource;
         },
 
         storeAction(feature, oldAnnot) {

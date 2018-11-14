@@ -34,11 +34,34 @@ export default {
             }
         },
 
+        // ----- View properties
+
+        setCenter(state, {idImage, center}) {
+            let imageWrapper = state.images[idImage];
+            if(imageWrapper != null) {
+                imageWrapper.center = center;
+            }
+        },
+
+        setZoom(state, {idImage, zoom}) {
+            let imageWrapper = state.images[idImage];
+            if(imageWrapper != null) {
+                imageWrapper.zoom = zoom;
+            }
+        },
+
+        setRotation(state, {idImage, rotation}) {
+            let imageWrapper = state.images[idImage];
+            if(imageWrapper != null) {
+                imageWrapper.rotation = rotation;
+            }
+        },
+
         // ----- Terms visibility
 
         toggleTermVisibility(state, {idImage, indexTerm}) {
             let term = state.images[idImage].terms[indexTerm];
-            term.displayed = !term.displayed;
+            term.visible = !term.visible;
         },
 
         setDisplayNoTerm(state, {idImage, value}) { // TODO: change name
@@ -52,21 +75,18 @@ export default {
             if(wrapper.selectedLayers == null) {
                 wrapper.selectedLayers = [];
             }
-            wrapper.selectedLayers.push(layer);
-            wrapper.map.addLayer(layer.olLayer);
+
+            wrapper.selectedLayers.push({...layer});
         },
 
         removeLayer(state, {idImage, indexLayer}) {
             let wrapper = state.images[idImage];
-            wrapper.map.removeLayer(wrapper.selectedLayers[indexLayer].olLayer);
-            wrapper.selectedLayers[indexLayer].olLayer = null;
             wrapper.selectedLayers.splice(indexLayer, 1);
         },
 
         toggleLayerVisibility(state, {idImage, indexLayer}) {
             let layer = state.images[idImage].selectedLayers[indexLayer];
-            layer.displayed = !layer.displayed;
-            layer.olLayer.setVisible(layer.displayed);
+            layer.visible = !layer.visible;
         },
 
         setLayersOpacity(state, {idImage, opacity}) {
@@ -76,12 +96,6 @@ export default {
             changeOpacity(wrapper.defaultStyle, opacity);
             let colorStroke = wrapper.defaultStroke.getColor();
             colorStroke[3] = opacity;
-        },
-
-        refreshSelectedLayers(state, idImage) {
-            let wrapper = state.images[idImage];
-            wrapper.selectedLayers.forEach(layer => layer.olLayer.changed());
-            wrapper.selectedFeatures.forEach(feature => feature.changed());
         },
 
         // ----- Selected features
@@ -94,7 +108,7 @@ export default {
 
         reselectFeature(state, {idImage, feature}) {
             let wrapper = state.images[idImage];
-            let index = wrapper.annotsToSelect.findIndex(annot => annot.id == feature.get("annot").id);
+            let index = wrapper.annotsToSelect.findIndex(annot => annot.id == feature.getId());
             wrapper.annotsToSelect.splice(index, 1);
             wrapper.selectedFeatures.push(feature);
         },
@@ -174,7 +188,7 @@ export default {
     },
 
     actions: {
-        async addImage({commit}, {image, map, imageLayer}) {
+        async addImage({commit}, {image}) {
             let id = image.id;
 
             let initialOpacity = 0.5;
@@ -182,14 +196,17 @@ export default {
 
             let terms = await TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
             terms.array.forEach(term => {
-                term.olStyle = createColorStyle(term.color, defaultStroke); // should be handled in image ! (can change opacity in one particular viewer)
-                term.displayed = true;
+                term.olStyle = createColorStyle(term.color, defaultStroke); // must be handled in image (can change opacity in one particular viewer)
+                term.visible = true;
             });
 
             let wrapper = {
                 imageInstance: image,
-                map,
-                imageLayer,
+
+                zoom: 2, // TODO
+                center: [image.width/2, image.height/2],
+                rotation: 0,
+        
                 activePanel: null,
 
                 selectedLayers: null,
@@ -215,21 +232,6 @@ export default {
             commit("addImage", {id, wrapper});
         },
 
-        toggleTermVisibility({commit}, payload) {
-            commit("toggleTermVisibility", payload);
-            commit("refreshSelectedLayers", payload.idImage);
-        },
-
-        setDisplayNoTerm({commit}, payload) {
-            commit("setDisplayNoTerm", payload);
-            commit("refreshSelectedLayers", payload.idImage);
-        },
-
-        setLayersOpacity({commit}, payload) {
-            commit("setLayersOpacity", payload);
-            commit("refreshSelectedLayers", payload.idImage);
-        },
-
         removeLayer({state, commit}, {idImage, indexLayer, cacheSelectedFeatures}) {
             let idLayer = state.images[idImage].selectedLayers[indexLayer].id;
             commit("removeLayer", {idImage, indexLayer});
@@ -239,7 +241,7 @@ export default {
         toggleLayerVisibility({state, commit}, {idImage, indexLayer}) {
             commit("toggleLayerVisibility", {idImage, indexLayer});
             let layer = state.images[idImage].selectedLayers[indexLayer];
-            if(!layer.displayed) {
+            if(!layer.visible) {
                 commit("removeLayerFromSelectedFeatures", {idImage, idLayer: layer.id});
             }
         }
@@ -264,7 +266,7 @@ export default {
             // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
             if(!cluster) {
                 let hasTerms = (annot.term.length > 0);
-                let hasTermsToDisplay = imageWrapper.terms.some(term => term.displayed && annot.term.includes(term.id));
+                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
 
                 if((hasTerms && !hasTermsToDisplay) || (!hasTerms && !imageWrapper.displayNoTerm)) {
                     return null; // do not display annotation
