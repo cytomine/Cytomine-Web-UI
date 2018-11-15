@@ -107,14 +107,12 @@
 import { mapState } from "vuex";
 
 import AnnotationLayer from "./AnnotationLayer";
-
-import ImageInformation from "./ImageInformation";
-//import ColorManipulation from "./ColorManipulation";
-import AnnotationsPanel from "./AnnotationsPanel";
-import GuidedTour from "./GuidedTour";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
-//import AnnotationDetails from "./AnnotationDetails";
+
+import ImageInformation from "./panels/ImageInformation";
+import AnnotationsPanel from "./panels/AnnotationsPanel";
+import GuidedTour from "./panels/GuidedTour";
 
 import SelectInteraction from "./interactions/SelectInteraction";
 import DrawInteraction from "./interactions/DrawInteraction";
@@ -128,13 +126,12 @@ export default {
     name: "cytomine-image",
     components: {
         AnnotationLayer,
-        ImageInformation,
-        //ColorManipulation,
-        AnnotationsPanel,
-        GuidedTour,
         ScaleLine,
         DrawTools,
-        //AnnotationDetails
+
+        ImageInformation,
+        AnnotationsPanel,
+        GuidedTour,
 
         SelectInteraction,
         DrawInteraction,

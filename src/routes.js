@@ -3,8 +3,8 @@ import VueRouter from "vue-router";
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
-import ListImages from "./components/project/images/ListImages.vue";
-import ListAnnotations from "./components/project/annotations/ListAnnotations.vue";
+import ListImages from "./components/images/ListImages.vue";
+import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import Account from "./components/Account.vue";
 import AdvancedSearch from "./components/AdvancedSearch.vue";
 import CytomineImage from "./components/viewer/CytomineImage.vue";
