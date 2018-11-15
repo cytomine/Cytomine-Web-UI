@@ -247,6 +247,11 @@ export default {
 
             await this.$store.dispatch("addImage", {image: imageInstance});
         }
+        else {
+            this.selectedLayers.forEach(layer => {
+                this.$store.commit("removeLayerFromSelectedFeatures", {idImage: this.idImage, idLayer: layer.id, cache: true});
+            });
+        }
         this.loading = false;
     }
 };

@@ -88,7 +88,6 @@ export default {
             set(tool) {
                 this.$store.commit("activateTool", {idImage: this.image.id, tool});
             }
-
         },
         activeEditTool: {
             get() {

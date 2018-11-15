@@ -75,7 +75,9 @@ export default {
                     // following clear(), selected feature is removed => need to cache it and reselect it based on ID
                     this.$store.commit("removeLayerFromSelectedFeatures",
                         {idImage: this.image.id, idLayer: this.userLayer.id, cache: true});
-                    this.$refs.olSource.clear();
+                    if(this.$refs.olSource) {
+                        this.$refs.olSource.clear();
+                    }
                 }
 
                 [0, 1].forEach(index => {
@@ -119,7 +121,9 @@ export default {
                     }
                 }
 
-                this.$refs.olSource.addFeatures(this.createFeatures(annots.array));
+                if(this.$refs.olSource) {
+                    this.$refs.olSource.addFeatures(this.createFeatures(annots.array));
+                }
             };
         },
 
