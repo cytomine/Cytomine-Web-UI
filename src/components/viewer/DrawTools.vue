@@ -70,17 +70,9 @@
 </template>
 
 <script>
-import {click} from "ol/events/condition";
-import {Select, Draw, Modify, Translate} from "ol/interaction";
-import Rotate from "ol-rotate-feature";
-import {createBox} from "ol/interaction/Draw";
 import WKT from "ol/format/WKT";
-import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
-import {never, shiftKeyOnly} from "ol/events/condition";
 
 import {Annotation} from "cytomine-client";
-
-import {isCluster} from "@/utils/style-utils.js";
 
 export default {
     name: "draw-tools",
@@ -110,13 +102,13 @@ export default {
             return this.imageWrapper.selectedFeatures;
         },
         selectedFeature() {
-            if(this.selectedFeatures.getLength() == 1) {
-                return this.selectedFeatures.item(0);
+            if(this.selectedFeatures.length == 1) {
+                return this.selectedFeatures[0];
             }
         },
         isNotPointSelected() { // true iff there is a feature selected that is not a point
             if(this.selectedFeature != null) {
-                return this.selectedFeature.getGeometry().getType() != "Point";
+                return this.selectedFeature.geometry.type != "Point";
             }
             return false;
         },
@@ -127,11 +119,6 @@ export default {
             // QUESTION: treat multiple active layers ? I don't think it's a good idea, discuss with team
             return this.layers.find(layer => layer.drawOn);
         },
-        activeSource() {
-            if(this.activeLayer) {
-                return this.activeLayer.olSource;
-            }
-        },
         actions() {
             return this.imageWrapper.actions;
         },
@@ -140,195 +127,33 @@ export default {
         }
     },
     watch: {
-        selectedFeature(newFeature, oldFeature) {
-            if(oldFeature != null) {
-                oldFeature.changed(); // force rerendering of the previously selected feature
-            }
-        },
-
-        activeEditTool(newTool, oldTool) {
-            if((oldTool == "modify" || newTool == "modify") && this.selectedFeature != null) {
-                // trigger a refresh of the feature, because the style is different in edit mode (vertices displayed)
-                this.selectedFeature.changed();
-            }
-        },
-
         activeLayer(layer) {
             if(layer == null) {
-                this.activateTool("select");
+                this.activeTool = "select";
             }
         }
     },
     methods: {
-        activateTool(tool, forceRefresh=false) {
-            if(this.activeTool == tool && !forceRefresh) {
-                return;
-            }
-
+        activateTool(tool) {
             if(this.activeTool == "select" && tool != "select") {
                 this.$store.commit("clearSelectedFeatures", this.image.id);
-                this.activateEditTool(null);
+                this.activeEditTool = null;
             }
 
             this.activeTool = tool;
-            let interaction = (tool == "select") ? this.getSelector() : this.getDrawer();
-            this.$store.commit("setInteraction", {idImage: this.image.id, interaction});
-        },
-
-        getSelector() {
-            let selector = new Select({ // TODO: make it possible to select a feature not in first plan
-                condition: click,
-                toggleCondition: never, // QUESTION: handle selection of multiple elements?
-                removeCondition: shiftKeyOnly,
-                features: this.selectedFeatures,
-                style: this.$store.getters.genStyleFunction(this.image.id),
-                filter: feature => !isCluster(feature) // prevent the clusters from being selected
-            });
-
-            return selector;
-        },
-
-        getDrawer() {
-            if(this.activeSource == null) {
-                return;
-            }
-
-            let tool = this.activeTool;
-            let correction = (tool == "correct-add" || tool == "correct-remove");
-            let freehand = (tool == "freehand" || correction);
-            let geometryFunction = (tool == "rectangle") ? createBox() : null;
-
-            let drawer = new Draw({
-                type: this.getDrawType(),
-                source: this.activeSource,
-                freehand,
-                geometryFunction
-            });
-
-            let endHandler = (correction) ? this.endCorrection : this.endDraw;
-            drawer.on("drawend", endHandler);
-
-            return drawer;
-        },
-
-        getDrawType() {
-            switch(this.activeTool) {
-                case "point":
-                    return "Point";
-                case "line":
-                    return "LineString";
-                case "rectangle": case "circle":
-                    return "Circle";
-                case "polygon": case "freehand": case "correct-add": case "correct-remove":
-                    return "Polygon";
-                default:
-                    this.$notify({type: "error", text: this.activeTool + " not implemented"}); // TODO: remove
-            }
-        },
-
-        async endDraw({feature}) {
-            if(this.activeLayer == null) {
-                return;
-            }
-            let user = this.activeLayer.id;
-            let annot = new Annotation({location: this.getWktLocation(feature), image: this.image.id, user});
-            try {
-                await annot.save();
-                feature.set("annot", annot);
-                feature.setId(annot.id);
-                this.$store.commit("clearSelectedFeatures", this.image.id);
-                this.selectedFeatures.push(feature);
-                this.storeAction(feature, null);
-                // TODO this.$store.commit("incrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
-            }
-            catch(err) {
-                this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
-                // drawn feature will not be displayed because annot property not set
-            }
-        },
-
-        getWktLocation(feature) {
-            let format = new WKT();
-            // transform circle to circular polygon
-            let geometry = feature.getGeometry();
-            if (geometry.getType() == "Circle") {
-                feature.setGeometry(polygonFromCircle(geometry));
-            }
-            return format.writeFeature(feature);
-        },
-
-        async endCorrection({feature}) {
-            if(this.activeLayer == null) {
-                return;
-            }
-            let remove = (this.activeTool == "correct-remove");
-            let review = false; // TODO: handle
-            let geom = this.getWktLocation(feature);
-            let idLayer = this.activeLayer.id;
-            try {
-                let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, [idLayer]);
-                if(correctedAnnot != null) {
-                    let correctedFeature = this.activeSource.getFeatureById(correctedAnnot.id);
-                    if(correctedFeature == null) {
-                        return;
-                    }
-                    this.storeAction(correctedFeature, correctedFeature.get("annot"));
-                    correctedFeature.set("annot", correctedAnnot);
-                    correctedFeature.setId(correctedAnnot.id);
-                    correctedFeature.setGeometry(new WKT().readGeometry(correctedAnnot.location));
-
-                    this.$store.commit("clearSelectedFeatures", this.image.id);
-                    this.selectedFeatures.push(correctedFeature);
-                }
-            }
-            catch(err) {
-                this.$notify({type: "error", text: this.$t("notif-error-annotation-correction")});
-            }
         },
 
         activateEditTool(tool) {
+            this.activeTool = "select";
             this.activeEditTool = (this.activeEditTool == tool) ? null : tool; // toggle behaviour
-            let interaction = null;
-
-            switch(tool) {
-                case "modify":
-                    interaction = new Modify({features: this.selectedFeatures});
-                    interaction.on("modifyend", this.endEdit);
-                    break;
-
-                case "rotate":
-                    interaction = new Rotate({features: this.selectedFeatures});
-                    interaction.on("rotateend", this.endEdit);
-                    break;
-
-                case "translate":
-                    interaction = new Translate({features: this.selectedFeatures});
-                    interaction.on("translateend", this.endEdit);
-                    break;
-            }
-
-            this.$store.commit("setEditInteraction", {idImage: this.image.id, interaction});
         },
 
-        async endEdit({features}) {
-            features.forEach(async feature => {
-                let annot = feature.get("annot");
-                if(annot == null) {
-                    return;
-                }
-
-                let previousAnnot = annot.clone();
-                try {
-                    annot.location = this.getWktLocation(feature);
-                    await annot.save();
-                    this.storeAction(feature, previousAnnot);
-                }
-                catch(err) {
-                    this.$notify({type: "error", text: this.$t("notif-error-annotation-update")});
-                    annot.location = previousAnnot.location;
-                    feature.setGeometry(new WKT().readGeometry(annot.location));
-                }
-            });
+        findSource(annot) {
+            let layer = this.layers.find(layer => layer.id == annot.user);
+            if(layer == null) {
+                return null;
+            }
+            return layer.olSource;
         },
 
         async deleteAnnot() {
@@ -340,18 +165,18 @@ export default {
             this.activateEditTool(null);
 
             try {
-                let annot = feature.get("annot");
+                let annot = feature.properties.annot;
                 await Annotation.delete(annot.id);
-                feature.set("deleted", true);
 
                 let source = this.findSource(annot);
-                if(source != null) {
-                    source.removeFeature(feature);
-                }
+                let olFeature = source.getFeatureById(annot.id);
+                olFeature.set("deleted", true);
 
-                this.storeAction(feature, annot);
+                this.$store.commit("addAction", {idImage: this.image.id, feature: olFeature, oldAnnot: annot});
                 this.$store.commit("clearSelectedFeatures", this.image.id);
                 // TODO this.$store.commit("decrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
+
+                source.removeFeature(feature);
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
@@ -367,19 +192,6 @@ export default {
                 cancelText: this.$t("button-cancel"),
                 onConfirm: () => this.deleteAnnot()
             });
-        },
-
-        findSource(annot) {
-            let layer = this.layers.find(layer => layer.id == annot.user);
-            if(layer == null) {
-                return null;
-            }
-            return layer.olSource;
-        },
-
-        storeAction(feature, oldAnnot) {
-            let action = {feature, oldAnnot};
-            this.$store.commit("addAction", {idImage: this.image.id, action});
         },
 
         // BUG correction actions not treated correctly (backend does not return all corrected annots => cannot cancel all changes)
@@ -416,7 +228,7 @@ export default {
                 await Annotation.delete(annot.id);
                 if(currentFeature != null) {
                     source.removeFeature(currentFeature);
-                    if(this.selectedFeatures.getArray().includes(currentFeature)) {
+                    if(this.selectedFeatures.map(ftr => ftr.id).includes(currentFeature.getId())) {
                         this.$store.commit("clearSelectedFeatures", this.image.id);
                     }
                 }
@@ -444,11 +256,6 @@ export default {
             feature.set("annot", annot);
             return {feature, oldAnnot: oldAnnotReversedAction};
         }
-    },
-    created() {
-        // force creation of a new interaction so that handlers are reinitialized (otherwise, reference to destroyed
-        // object attributes in callbacks)
-        this.activateTool(this.activeTool, true);
     }
 };
 </script>

@@ -12,9 +12,7 @@
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
                 @pointermove="projectedMousePosition = $event.coordinate"
-                v-if="!loading"
-                ref="olMap"
-                @mounted="associateMap"> <!-- TODO remove map association -->
+                v-if="!loading">
 
             <vl-view :center.sync="center"
                      :zoom.sync="zoom"
@@ -39,11 +37,20 @@
                               :user-layer="layer">
             </annotation-layer>
 
+            <select-interaction v-if="activeTool == 'select'" :image="imageInstance">
+            </select-interaction>
+
+            <draw-interaction v-if="activeTool != 'select'" :image="imageInstance">
+            </draw-interaction>
+
+            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null" :image="imageInstance">
+            </modify-interaction>
+
         </vl-map>
 
         <!-- <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div> -->
         
-        <div class="draw-tools" v-if="mapMounted">
+        <div class="draw-tools" v-if="imageInstance">
             <draw-tools :image="imageInstance"></draw-tools>
         </div>
 
@@ -109,6 +116,10 @@ import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
 //import AnnotationDetails from "./AnnotationDetails";
 
+import SelectInteraction from "./interactions/SelectInteraction";
+import DrawInteraction from "./interactions/DrawInteraction";
+import ModifyInteraction from "./interactions/ModifyInteraction";
+
 import {addProj, createProj} from "vuelayers/lib/ol-ext";
 
 import {ImageInstance, AbstractImage} from "cytomine-client";
@@ -124,6 +135,10 @@ export default {
         ScaleLine,
         DrawTools,
         //AnnotationDetails
+
+        SelectInteraction,
+        DrawInteraction,
+        ModifyInteraction
     },
     data() {
         return {
@@ -132,8 +147,7 @@ export default {
             projectionName: "CYTO",
             projectedMousePosition: [0, 0],
 
-            loading: true,
-            mapMounted: false
+            loading: true
         };
     },
     computed: {
@@ -151,6 +165,12 @@ export default {
         },
         activePanel() {
             return this.imageWrapper.activePanel;
+        },
+        activeTool() {
+            return this.imageWrapper.activeTool;
+        },
+        activeEditTool() {
+            return this.imageWrapper.activeEditTool;
         },
 
         center: {
@@ -211,11 +231,6 @@ export default {
             this.$store.commit("removeImage", this.imageInstance.id);
             this.$router.push("/"); // TODO: change
         },
-
-        associateMap() { // TODO: remove
-            this.imageWrapper.map = this.$refs.olMap.$map;
-            this.mapMounted = true;
-        }
     },
     async mounted() {
         if(this.imageInstance == null) { // if image not in store

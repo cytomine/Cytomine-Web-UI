@@ -1,6 +1,8 @@
 <!-- TODO: properties -->
 <template>
-<vl-layer-vector :id="`layer${userLayer.id}`" :visible="userLayer.visible" :update-while-interacting="true">
+<vl-layer-vector :visible="userLayer.visible"
+                 :extent="imageExtent"
+                 :update-while-interacting="false"> <!-- TODO: set to true to compare perfs -->
 
     <vl-source-vector ref="olSource"
                       @mounted="associateSource()"
@@ -44,12 +46,18 @@ export default {
             return this.imageWrapper.annotsToSelect.map(annot => annot.id);
         },
 
+        imageExtent() {
+            return [0, 0, this.image.width, this.image.height];
+        },
+
         styleFunctionFactory() {
             // Force computed property update when one of those properties change (leading to new style function =>
             // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
+            this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
             this.imageWrapper.terms.forEach(term => term.visible);
             this.imageWrapper.displayNoTerm;
+            this.imageWrapper.activeEditTool; // style is different in edit mode (vertices displayed)
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.image.id);
@@ -63,12 +71,24 @@ export default {
             return (extent, resolution) => {
                 if(this.resolution && this.clustered != null && // if some features have already been loaded
                 ((resolution != this.resolution && this.clustered) // zoom modification while clustering is performed
-                || (resolution > this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
+                || (resolution >= this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
                     // following clear(), selected feature is removed => need to cache it and reselect it based on ID
                     this.$store.commit("removeLayerFromSelectedFeatures",
                         {idImage: this.image.id, idLayer: this.userLayer.id, cache: true});
                     this.$refs.olSource.clear();
                 }
+
+                [0, 1].forEach(index => {
+                    if(extent[index] < 0) {
+                        extent[index] = 0;
+                    }
+                });
+                [2, 3].forEach(index => {
+                    if(this.imageExtent[index] < extent[index]) {
+                        extent[index] = this.imageExtent[index];
+                    }
+                });
+
                 return [extent];
             };
         },
@@ -83,7 +103,6 @@ export default {
                     bbox,
                     showWKT: true,
                     showTerm: true,
-                    showGIS:true,
                     kmeans: true
                 }).fetchAll();
 
@@ -118,7 +137,7 @@ export default {
         },
 
         associateSource() {
-            this.userLayer.olSource = this.$refs.olSource.$source; // TODO store mutation?
+            this.userLayer.olSource = this.$refs.olSource;
         }
     }
 };

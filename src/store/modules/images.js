@@ -1,11 +1,11 @@
 import Vue from "vue";
 
-import Collection from "ol/Collection";
-
 import {TermCollection} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
     verticesStyle} from "@/utils/style-utils.js";
+
+import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
 export default {
     state: {
@@ -100,29 +100,41 @@ export default {
 
         // ----- Selected features
 
+        setSelectedFeatures(state, {idImage, selectedFeatures}) {
+            let imageWrapper = state.images[idImage];
+            if(imageWrapper != null) {
+                imageWrapper.selectedFeatures = selectedFeatures;
+            }
+        },
+
         clearSelectedFeatures(state, idImage) {
             let wrapper = state.images[idImage];
-            wrapper.selectedFeatures.clear();
+            wrapper.selectedFeatures = [];
             wrapper.annotsToSelect = [];
+        },
+
+        selectFeature(state, {idImage, feature}) {
+            state.images[idImage].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
         },
 
         reselectFeature(state, {idImage, feature}) {
             let wrapper = state.images[idImage];
             let index = wrapper.annotsToSelect.findIndex(annot => annot.id == feature.getId());
             wrapper.annotsToSelect.splice(index, 1);
-            wrapper.selectedFeatures.push(feature);
+            wrapper.selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature)); // TODO: combine with selectFeature mutation?
         },
 
         removeLayerFromSelectedFeatures(state, {idImage, idLayer, cache=false}) {
             let wrapper = state.images[idImage];
 
             let selectedFeatures = wrapper.selectedFeatures;
-            for(let index = selectedFeatures.getLength() - 1; index >= 0; index--) {
-                let feature = selectedFeatures.item(index);
-                if(feature.get("annot").user == idLayer) {
-                    selectedFeatures.removeAt(index);
+            for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+                let feature = selectedFeatures[index];
+                let annot = feature.properties.annot;
+                if(annot.user == idLayer) {
+                    selectedFeatures.splice(index, 1);
                     if(cache) {
-                        wrapper.annotsToSelect.push(feature.get("annot"));
+                        wrapper.annotsToSelect.push(annot);
                     }
                 }
             }
@@ -142,31 +154,10 @@ export default {
             state.images[idImage].activeEditTool = tool;
         },
 
-        setInteraction(state, {idImage, interaction}) {
-            let wrapper = state.images[idImage];
-            if(wrapper.currentInteraction != null) {
-                wrapper.map.removeInteraction(wrapper.currentInteraction);
-            }
-            wrapper.currentInteraction = interaction;
-            if(interaction != null) {
-                wrapper.map.addInteraction(interaction);
-            }
-        },
-
-        setEditInteraction(state, {idImage, interaction}) {
-            let wrapper = state.images[idImage];
-            if(wrapper.currentEditInteraction != null) {
-                wrapper.map.removeInteraction(wrapper.currentEditInteraction);
-            }
-            wrapper.currentEditInteraction = interaction;
-            if(interaction != null) {
-                wrapper.map.addInteraction(interaction);
-            }
-        },
-
         // ----- Undo/Redo
 
-        addAction(state, {idImage, action}) {
+        addAction(state, {idImage, feature, oldAnnot}) {
+            let action = {feature, oldAnnot};
             let wrapper = state.images[idImage];
             wrapper.actions.push(action);
             wrapper.undoneActions = [];
@@ -218,13 +209,11 @@ export default {
                 defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
                 layersOpacity: initialOpacity,
 
-                selectedFeatures: new Collection(),
+                selectedFeatures: [], // old value: new Collection()
                 annotsToSelect: [],
 
                 activeTool: "select",
-                currentInteraction: null,
                 activeEditTool: null,
-                currentEditInteraction: null,
 
                 actions: [],
                 undoneActions: []
@@ -290,7 +279,7 @@ export default {
             }
 
             // Styles for selected elements
-            if(imageWrapper.selectedFeatures.getArray().includes(feature)) {
+            if(imageWrapper.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
                 styles.push(...selectStyles);
 
                 // if in modify mode, display vertices

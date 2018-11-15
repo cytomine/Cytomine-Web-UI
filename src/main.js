@@ -25,6 +25,8 @@ import * as vClickOutside from "v-click-outside-x";
 
 import VueLayers from "vuelayers";
 import ZoomifySource from "./vuelayers-suppl/zoomify-source";
+import TranslateInteraction from "./vuelayers-suppl/translate-interaction";
+import RotateInteraction from "./vuelayers-suppl/rotate-interaction";
 
 import App from "./App.vue";
 
@@ -38,6 +40,8 @@ Vue.use(VTooltip);
 
 Vue.use(VueLayers);
 Vue.use(ZoomifySource);
+Vue.use(TranslateInteraction);
+Vue.use(RotateInteraction);
 
 Vue.config.productionTip = false;
 
