@@ -3,8 +3,10 @@
 <!-- TODO: properties -->
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
-<!-- TODO annotation details -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
+<!-- TODO digital zoom -->
+<!-- TODO: overview map -->
+<!-- TODO: rotations - allow user to enter value -->
 <template>
     <div class="map-container">
 
@@ -48,8 +50,6 @@
 
         </vl-map>
 
-        <!-- <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div> -->
-        
         <div class="draw-tools" v-if="imageInstance">
             <draw-tools :image="imageInstance"></draw-tools>
         </div>
@@ -96,8 +96,8 @@
         <!-- <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
             :view="view"></guided-tour> -->
 
-        <!-- <scale-line v-if="zoom != null"
-            :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line> -->
+        <scale-line v-if="imageInstance != null" :image="imageInstance" :mousePosition="projectedMousePosition">
+        </scale-line>
 
         <annotation-details-container v-if="imageInstance != null" :image="imageInstance">
         </annotation-details-container>

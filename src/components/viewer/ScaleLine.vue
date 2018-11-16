@@ -18,8 +18,6 @@ export default {
     name: "scale-line",
     props: [
         "image",
-        "map",
-        "currentZoom",
         "mousePosition"
     ],
     data() {
@@ -28,13 +26,19 @@ export default {
         };
     },
     computed: {
+        imageWrapper() {
+            return this.$store.state.images.images[this.image.id];
+        },
+        zoom() {
+            return this.imageWrapper.zoom;
+        },
         magnification() {
-            let magnification = Math.pow(2, this.currentZoom - this.image.depth) * this.image.magnification;
+            let magnification = Math.pow(2, this.zoom - this.image.depth) * this.image.magnification;
             return Math.round(magnification * 100) / 100;
         },
         resolution() {
             if(this.image.resolution != null) {
-                return Math.pow(2, this.currentZoom - this.image.depth) * this.image.resolution;
+                return Math.pow(2, this.zoom - this.image.depth) * this.image.resolution;
             }
         },
         scaleLength() {
