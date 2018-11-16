@@ -4,7 +4,7 @@
     <div v-if="!loading">
         <table class="table">
             <tbody>
-                <tr>
+                <tr v-if="showImageInfo">
                     <td><strong>{{$t("image")}}</strong></td>
                     <td> 
                         <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
@@ -81,7 +81,7 @@
                                 </b-taglist>
                             </div>
 
-                            <button class="button is-small" @click="addNewProp()" key="showForm">
+                            <button class="button is-small add-prop" @click="addNewProp()" key="showForm">
                                 {{$t("button-add")}}
                             </button>
                         </b-field>
@@ -113,6 +113,7 @@
         </table>
         <div class="actions">
             <router-link 
+                v-if="showImageInfo"
                 :to="annotationURL"
                 class="button is-link is-small is-fullwidth">
                 {{ $t("button-view-in-image") }}
@@ -135,7 +136,13 @@ import CytomineDescription from "@/components/utils/CytomineDescription";
 export default {
     name: "annotations-details",
     components: {CytomineDescription},
-    props: ["annotation", "terms", "users", "images"],
+    props: {
+        annotation: {type: Object},
+        terms: {type: Array},
+        users: {type: Array},
+        images: {type: Array},
+        showImageInfo: {type: Boolean, default: true}
+    },
     data() {
         return {
             loading: true,
@@ -151,10 +158,10 @@ export default {
     },
     computed: {
         creator() {
-            return this.users.find(user => user.id == this.annotation.user);
+            return this.users.find(user => user.id == this.annotation.user) || {};
         },
         image() {
-            return this.images.find(image => image.id == this.annotation.image);
+            return this.images.find(image => image.id == this.annotation.image) || {};
         },
         annotationURL() {
             return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -162,7 +169,7 @@ export default {
         associatedTerms() {
             return this.annotation.userByTerm.map(ubt => {
                 let term = this.terms.find(term => ubt.term == term.id);
-                let user = this.users.find(user => user.id == ubt.user[0]); // QUESTION: can we have several users?  
+                let user = this.users.find(user => user.id == ubt.user[0]) || {}; // QUESTION: can we have several users? 
                 return {term, user};
             });
         },
@@ -258,13 +265,23 @@ export default {
 </script>
 
 <style scoped>
+.annotation-details {
+    position: relative;
+}
+
 .table {
     width: 100%;
     margin-bottom: 10px !important;
+    background: unset;
 }
 .table th, .table td {
     vertical-align: middle;
 }
+
+.actions {
+    margin-bottom: 5px;
+}
+
 .annotation-details .actions .button {
     margin: 3px;
     box-sizing: border-box;
@@ -314,6 +331,25 @@ export default {
 .tag button.edit:hover {
     background-color: rgba(10, 10, 10, 0.3);
 }
+
+.add-prop {
+    height: 24px;
+}
+
+.new-prop-form {
+    margin-bottom: 5px;
+}
+
+.new-prop-form .button {
+    margin: 0px;
+    margin-right: 5px;
+}
+
+.new-prop-form .control {
+    margin-right: 10px;
+    display: inline-block;
+}
+
 </style>
 
 <style>
@@ -321,32 +357,22 @@ export default {
     margin-bottom: 0px !important;
 }
 
+.annotation-details .tags {
+    margin-bottom: unset !important;
+}
+
 .annotation-details .tag {
     margin-right: 5px;
     margin-bottom: 5px !important;
+    background-color: rgba(0, 0, 0, 0.04);
 }
 
 .annotation-details .tag.is-dark {
-    background-color: #e5e5e5;
+    background-color: rgba(0, 0, 0, 0.1);
     color: black;
 }
 
 .annotation-details .field.is-grouped.is-grouped-multiline {
-    margin-bottom: 5px !important;
+    margin-bottom: 0px !important;
 }
-
-.annotation-details .new-prop-form {
-    margin-bottom: 5px;
-}
-
-.annotation-details .new-prop-form .button {
-    margin: 0px;
-    margin-right: 5px;
-}
-
-.annotation-details .new-prop-form .control {
-    margin-right: 10px;
-    display: inline-block;
-}
-
 </style>

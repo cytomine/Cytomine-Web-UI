@@ -2,11 +2,10 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <div>
     <div class="buttons has-addons">
-        <!--<b-tooltip label="Select" type="is-light" position="is-bottom">-->
-            <button class="button is-small" :title="$t('select')" @click="activateTool('select')" :class="{'is-selected': activeTool == 'select'}" v-shortkey.once="['s']" @shortkey="activateTool('select')">
-                <span class="icon is-small"><i class="fa fa-mouse-pointer"></i></span>
-            </button>
-        <!--</b-tooltip>-->
+        <!-- QUESTION use js tooltip instead of title? replace :title by v-tooltip for test-->
+        <button :title="$t('select')" class="button is-small" @click="activateTool('select')" :class="{'is-selected': activeTool == 'select'}" v-shortkey.once="['s']" @shortkey="activateTool('select')">
+            <span class="icon is-small"><i class="fa fa-mouse-pointer"></i></span>
+        </button>
     </div>
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" :title="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}">
@@ -40,6 +39,11 @@
         </button>
         <button class="button is-small" :disabled="activeLayer == null" :title="$t('freehand-correct-remove')" @click="activateTool('correct-remove')" :class="{'is-selected': activeTool == 'correct-remove'}">
             <span class="icon is-small"><i class="suberscript fa fa-minus"></i><i class="fa fa-pencil"></i></span>
+        </button>
+    </div>
+    <div class="buttons has-addons">
+        <button class="button is-small" :disabled="selectedFeature == null" :title="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
+            <span class="icon is-small"><i class="fa fa-info"></i></span>
         </button>
     </div>
     <div class="buttons has-addons">
@@ -87,6 +91,14 @@ export default {
             },
             set(tool) {
                 this.$store.commit("activateTool", {idImage: this.image.id, tool});
+            }
+        },
+        displayAnnotDetails: {
+            get() {
+                return this.imageWrapper.displayAnnotDetails;
+            },
+            set(value) {
+                this.$store.commit("setDisplayAnnotDetails", {idImage: this.image.id, value});
             }
         },
         activeEditTool: {

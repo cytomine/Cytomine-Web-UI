@@ -232,8 +232,11 @@ h1.page-title {
   border-radius: 5px;
   font-size: 13px;
   max-width: 50vw; /* TODO: special design for mobile ; modal? */
-  min-height: 50px;
-  min-width: 50px;
+}
+
+.popover .popover-inner {
+    min-width: 50px;
+    min-height: 50px;
 }
 
 .tooltip .tooltip-arrow {

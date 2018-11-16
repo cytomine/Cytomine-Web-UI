@@ -34,7 +34,7 @@ Vue.use(VueRouter);
 Vue.use(Notifications);
 Vue.use(Buefy, {defaultIconPack: "fa"});
 Vue.use(VueMoment, {moment});
-Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
+Vue.use(VueShortKey, { prevent: ["input", "textarea", ".ql-editor"] });
 Vue.use(vClickOutside);
 Vue.use(VTooltip);
 

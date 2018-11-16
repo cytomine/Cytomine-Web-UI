@@ -154,6 +154,16 @@ export default {
             state.images[idImage].activeEditTool = tool;
         },
 
+        // ----- Annotation details
+
+        setDisplayAnnotDetails(state, {idImage, value}) {
+            state.images[idImage].displayAnnotDetails = value;
+        },
+
+        setPositionAnnotDetails(state, {idImage, value}) {
+            state.images[idImage].positionAnnotDetails = value;
+        },
+
         // ----- Undo/Redo
 
         addAction(state, {idImage, feature, oldAnnot}) {
@@ -214,6 +224,9 @@ export default {
 
                 activeTool: "select",
                 activeEditTool: null,
+
+                displayAnnotDetails: true,
+                positionAnnotDetails: {x: 0, y: 0},
 
                 actions: [],
                 undoneActions: []

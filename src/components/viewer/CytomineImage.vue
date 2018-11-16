@@ -99,7 +99,8 @@
         <!-- <scale-line v-if="zoom != null"
             :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line> -->
 
-        <!--<annotation-details v-if="imageInstance != null" :image="imageInstance"></annotation-details>-->
+        <annotation-details-container v-if="imageInstance != null" :image="imageInstance">
+        </annotation-details-container>
     </div>
 </template>
 
@@ -113,6 +114,8 @@ import DrawTools from "./DrawTools";
 import ImageInformation from "./panels/ImageInformation";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import GuidedTour from "./panels/GuidedTour";
+
+import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
 
 import SelectInteraction from "./interactions/SelectInteraction";
 import DrawInteraction from "./interactions/DrawInteraction";
@@ -128,6 +131,8 @@ export default {
         AnnotationLayer,
         ScaleLine,
         DrawTools,
+
+        AnnotationDetailsContainer,
 
         ImageInformation,
         AnnotationsPanel,
