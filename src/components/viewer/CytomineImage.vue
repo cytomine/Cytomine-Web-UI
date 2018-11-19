@@ -5,12 +5,10 @@
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <!-- TODO: rotations - allow user to enter value -->
 <!-- TODO: allow to select term to associate to newly created annotations -->
-<!-- TODO: go to annot if specified in URL -->
 <template>
-    <div class="map-container">
+    <div class="map-container" v-if="!loading">
 
-        <vl-map v-if="!loading"
-                :data-projection="projectionName"
+        <vl-map :data-projection="projectionName"
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
                 @pointermove="projectedMousePosition = $event.coordinate"
@@ -22,7 +20,9 @@
                      :max-zoom="maxZoom"
                      :min-zoom="minZoom"
                      :extent="extent"
-                     :projection="projectionName">
+                     :projection="projectionName"
+                     @mounted="viewMounted = true"
+                     ref="view">
             </vl-view>
 
             <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
@@ -50,7 +50,7 @@
 
         </vl-map>
 
-        <div class="draw-tools" v-if="imageInstance">
+        <div class="draw-tools">
             <draw-tools :image="imageInstance"></draw-tools>
         </div>
 
@@ -81,10 +81,10 @@
             </ul>
         </div>
 
-        <image-information class="panel-options panel-info" v-if="imageInstance != null" v-show="activePanel == 'info'"
+        <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
             :image="imageInstance"></image-information>
 
-        <digital-zoom class="panel-options panel-digital-zoom" v-if="imageInstance != null"
+        <digital-zoom class="panel-options panel-digital-zoom"
             v-show="activePanel == 'digital-zoom'" :image="imageInstance"></digital-zoom>
 
         <div class="panel-options panel-link" v-show="activePanel == 'link'">
@@ -97,17 +97,16 @@
         <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
             :map="map" :imageLayer="layer"></color-manipulation> -->
 
-        <annotations-panel class="panel-options panel-layers" v-if="imageInstance != null" v-show="activePanel == 'layers'"
-            :image="imageInstance"></annotations-panel>
+        <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
+            :image="imageInstance" :layers-to-preload="layersToPreload" @hook:mounted="layersMounted = true">
+        </annotations-panel>
 
         <!-- <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
             :view="view"></guided-tour> -->
 
-        <scale-line v-if="imageInstance != null" :image="imageInstance" :mousePosition="projectedMousePosition">
-        </scale-line>
+        <scale-line :image="imageInstance" :mousePosition="projectedMousePosition"></scale-line>
 
-        <annotation-details-container v-if="imageInstance != null" :image="imageInstance">
-        </annotation-details-container>
+        <annotation-details-container :image="imageInstance"></annotation-details-container>
     </div>
 </template>
 
@@ -133,8 +132,9 @@ import {addProj, createProj} from "vuelayers/lib/ol-ext";
 
 import View from "ol/View";
 import OverviewMap from "ol/control/OverviewMap";
+import WKT from "ol/format/WKT";
 
-import {ImageInstance, AbstractImage} from "cytomine-client";
+import {ImageInstance, AbstractImage, Annotation} from "cytomine-client";
 
 export default {
     name: "cytomine-image",
@@ -161,6 +161,10 @@ export default {
             projectionName: "CYTO",
             projectedMousePosition: [0, 0],
 
+            layersMounted: false,
+            viewMounted: false,
+            routedAnnotation: null,
+
             loading: true
         };
     },
@@ -175,7 +179,7 @@ export default {
             return this.imageWrapper.imageInstance;
         },
         selectedLayers() {
-            return this.imageWrapper.selectedLayers;
+            return this.imageWrapper.selectedLayers || [];
         },
         activePanel() {
             return this.imageWrapper.activePanel;
@@ -235,11 +239,28 @@ export default {
             }
         },
 
+        layersToPreload() {
+            if(this.routedAnnotation != null) {
+                return [this.routedAnnotation.user];
+            }
+        },
+
+        goToAnnotationTrigger() {
+            return (this.routedAnnotation != null) && this.layersMounted && this.viewMounted;
+        },
+
         ...mapState({images: state => state.images.images})
     },
     watch: {
         triggerUpdateSize() {
             this.$refs.map.updateSize();
+        },
+
+        async goToAnnotationTrigger(val) {
+            if(val) {
+                await this.$refs.view.$createPromise; // wait for ol.View to be created
+                this.goToAnnotation();
+            }
         }
     },
     methods: {
@@ -252,6 +273,45 @@ export default {
                 view: new View({projection: this.projectionName}),
                 layers: [this.$refs.baseLayer.$layer]
             }));
+        },
+
+        async goToAnnotation() {
+            // QUESTION: how to handle clustered annotations (e.g. http://localhost:8080/#/project/807237/image/809515/annotation/8986582)
+            // force to display non-clustered annots? may lead to perf problems but otherwise, not possible to select annot
+            // TODO: load appropriate layer
+            let annot = this.routedAnnotation;
+            let geometry = new WKT().readGeometry(annot.location);
+            this.$refs.view.fit(geometry);
+
+            // HACK: center set by view.fit() is incorrect => reset it manually
+            if(geometry.getType() == "Point") {
+                annot.centroid = {};
+                annot.centroid.x = geometry.getFirstCoordinate()[0];
+                annot.centroid.y = geometry.getFirstCoordinate()[1];
+            }
+            this.center = [annot.centroid.x, annot.centroid.y];
+            // ---
+
+            let retries = 0;
+            let layer = null;
+            let interval = setInterval(() => {
+                if(layer == null) {
+                    layer = this.selectedLayers.find(layer => layer.id == annot.user);
+                }
+                if(layer == null || layer.olSource == null) {
+                    return;
+                }
+
+                let feature = layer.olSource.getFeatureById(annot.id);
+                if(feature) {
+                    clearInterval(interval);
+                    this.$store.dispatch("selectFeature", {idImage: this.idImage, feature});
+                }
+                else if(retries == 5) {
+                    clearInterval(interval);
+                }
+                retries++;
+            }, 500);
         },
 
         togglePanel(panel) {
@@ -279,10 +339,22 @@ export default {
             await this.$store.dispatch("addImage", {image: imageInstance});
         }
         else {
+            // remove all selected features in order to reselect them when they will be added to the map (otherwise,
+            // issue with the select interaction)
             this.selectedLayers.forEach(layer => {
-                this.$store.commit("removeLayerFromSelectedFeatures", {idImage: this.idImage, idLayer: layer.id, cache: true});
+                this.$store.commit("removeLayerFromSelectedFeatures", {
+                    idImage: this.idImage,
+                    idLayer: layer.id,
+                    cache: true
+                });
             });
         }
+
+        let idRoutedAnnot = this.$route.params.idAnnotation;
+        if(idRoutedAnnot != null) {
+            this.routedAnnotation = await Annotation.fetch(idRoutedAnnot);
+        }
+
         this.loading = false;
     }
 };

@@ -140,13 +140,6 @@ export default {
             state.images[idImage].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
         },
 
-        reselectFeature(state, {idImage, feature}) {
-            let wrapper = state.images[idImage];
-            let index = wrapper.annotsToSelect.findIndex(annot => annot.id == feature.getId());
-            wrapper.annotsToSelect.splice(index, 1);
-            wrapper.selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature)); // TODO: combine with selectFeature mutation?
-        },
-
         removeLayerFromSelectedFeatures(state, {idImage, idLayer, cache=false}) {
             let wrapper = state.images[idImage];
 
@@ -272,7 +265,12 @@ export default {
             if(!layer.visible) {
                 commit("removeLayerFromSelectedFeatures", {idImage, idLayer: layer.id});
             }
-        }
+        },
+
+        selectFeature({commit}, {idImage, feature}) {
+            commit("clearSelectedFeatures", idImage);
+            commit("selectFeature", {idImage, feature});
+        },
     },
 
     getters: {

@@ -98,7 +98,7 @@ import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "annotations-panel",
-    props: ["image"],
+    props: ["image", "layersToPreload"],
     data() {
         return {
             layers: [], // Array<User> (representing user layers)
@@ -153,6 +153,13 @@ export default {
             return `${name} (${layer.countAnnotation})`;
         },
 
+        addLayerById(id) {
+            let layer = this.layers.find(layer => layer.id == id);
+            if(layer != null) {
+                this.addLayer(layer);
+            }
+        },
+
         addLayer(layer = this.selectedLayer) {
             if(this.selectedLayersIds.includes(layer.id)) {
                 return;
@@ -201,11 +208,11 @@ export default {
     async created() {
         await this.loadLayers();
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-            // TODO: move in store?
-            let currentUserLayer = this.layers.find(layer => layer.id == this.currentUser.id);
-            if(currentUserLayer != null) {
-                this.addLayer(currentUserLayer);
-            }
+            this.addLayerById(this.currentUser.id); // TODO: move in store?
+        }
+
+        if(this.layersToPreload != null) {
+            this.layersToPreload.forEach(id => this.addLayerById(id));
         }
     }
 };

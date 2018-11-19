@@ -134,7 +134,7 @@ export default {
                 feature.set("annot", annot);
 
                 if(this.annotsIdsToSelect.includes(annot.id)) {
-                    this.$store.commit("reselectFeature", {idImage: this.image.id, feature});
+                    this.$store.dispatch("selectFeature", {idImage: this.image.id, feature});
                 }
                 return feature;
             });

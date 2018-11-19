@@ -109,8 +109,7 @@ export default {
                 feature.set("annot", annot);
                 feature.setId(annot.id);
                 this.activeSource.addFeature(feature);
-                this.$store.commit("clearSelectedFeatures", this.image.id);
-                this.$store.commit("selectFeature", {idImage: this.image.id, feature});
+                this.$store.dispatch("selectFeature", {idImage: this.image.id, feature});
 
                 this.$store.commit("addAction", {idImage: this.image.id, feature, oldAnnot: null});
                 // TODO this.$store.commit("incrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
@@ -146,8 +145,7 @@ export default {
                     correctedFeature.setId(correctedAnnot.id);
                     correctedFeature.setGeometry(new WKT().readGeometry(correctedAnnot.location));
 
-                    this.$store.commit("clearSelectedFeatures", this.image.id);
-                    this.$store.commit("selectFeature", {idImage: this.image.id, feature: correctedFeature});
+                    this.$store.dispatch("selectFeature", {idImage: this.image.id, feature: correctedFeature});
 
                     // refresh the source because several annotations might have been modified
                     this.activeSource.clear();
