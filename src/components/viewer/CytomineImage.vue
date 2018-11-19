@@ -1,4 +1,3 @@
-<!-- TODO: re-render map when size of div changes (i.e. side panel toggled) > map.updateSize()-->
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO: properties -->
 <!-- TODO job templates -->
@@ -14,7 +13,8 @@
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
                 @pointermove="projectedMousePosition = $event.coordinate"
-                v-if="!loading">
+                v-if="!loading"
+                ref="map">
 
             <vl-view :center.sync="center"
                      :zoom.sync="zoom"
@@ -186,6 +186,9 @@ export default {
         maxZoom() {
             return this.imageWrapper.maxZoom;
         },
+        triggerUpdateSize() {
+            return this.$store.state.images.triggerMapUpdateSize;
+        },
 
         center: {
             get() {
@@ -230,6 +233,11 @@ export default {
         },
 
         ...mapState({images: state => state.images.images})
+    },
+    watch: {
+        triggerUpdateSize() {
+            this.$refs.map.updateSize();
+        }
     },
     methods: {
         togglePanel(panel) {

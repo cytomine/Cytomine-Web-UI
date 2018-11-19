@@ -9,10 +9,20 @@ import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
 export default {
     state: {
+        triggerMapUpdateSize: [], // change of this property should trigger a size update of all visible maps
         images: {}
     },
 
     mutations: {
+
+        // --- Mutations common to all images
+
+        triggerMapUpdateSize(state) {
+            state.triggerMapUpdateSize = []; // new array will be considered as a new value
+        },
+
+        // --- Image-specific mutations
+
         addImage(state, {id, wrapper}) {
             Vue.set(state.images, id, wrapper);
         },

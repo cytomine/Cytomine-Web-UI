@@ -56,7 +56,7 @@
             </router-link>
         </ul>
     </nav>
-    <div class="arrow-sidebar" @click="visibleSideBar = !visibleSideBar">
+    <div class="arrow-sidebar" @click="toggleSideBar">
         <i :class="{'sidebar-opened': visibleSideBar}"></i>
     </div>
 </div>
@@ -73,7 +73,13 @@ export default {
             visibleSideBar: true,
         };
     },
-    computed: mapState({images: state => state.images.images})
+    computed: mapState({images: state => state.images.images}),
+    methods: {
+        toggleSideBar() {
+            this.visibleSideBar = !this.visibleSideBar;
+            this.$store.commit("triggerMapUpdateSize");
+        }
+    }
 };
 </script>
 
