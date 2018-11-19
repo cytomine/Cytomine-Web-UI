@@ -101,8 +101,8 @@
             :image="imageInstance" :layers-to-preload="layersToPreload" @hook:mounted="layersMounted = true">
         </annotations-panel>
 
-        <!-- <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
-            :view="view"></guided-tour> -->
+        <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
+            :view="$refs.view"></guided-tour>
 
         <scale-line :image="imageInstance" :mousePosition="projectedMousePosition"></scale-line>
 
@@ -471,7 +471,7 @@ export default {
 }
 
 .panel-guided-tour {
-    top: 150px;
+    top: 200px;
 }
 
 .panel-guided-tour .buttons {

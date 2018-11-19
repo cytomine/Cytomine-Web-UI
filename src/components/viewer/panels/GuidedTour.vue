@@ -49,7 +49,12 @@ export default {
         },
 
         flyTo(location, targetZoom, duration=2000) {
-            let interZoom = Math.min(targetZoom, this.view.getZoom()) - 1;
+            let interZoom = Math.min(targetZoom, this.view.zoom) - 1;
+            let zoomOut = this.view.zoom - interZoom;
+            let zoomIn = targetZoom - interZoom;
+            let totalZoom = zoomOut + zoomIn;
+            let durationZoomOut = Math.round(zoomOut*duration/totalZoom);
+            let durationZoomIn = Math.round(zoomIn*duration/totalZoom);
 
             this.view.animate({
                 center: location,
@@ -59,11 +64,11 @@ export default {
             this.view.animate(
                 {
                     zoom: interZoom,
-                    duration: duration / 2
+                    duration: durationZoomOut
                 },
                 {
                     zoom: targetZoom,
-                    duration: duration / 2
+                    duration: durationZoomIn
                 }
             );
         },
