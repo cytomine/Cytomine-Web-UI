@@ -3,17 +3,17 @@
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO: overview map -->
 <!-- TODO: rotations - allow user to enter value -->
 <!-- TODO: allow to select term to associate to newly created annotations -->
+<!-- TODO: go to annot if specified in URL -->
 <template>
     <div class="map-container">
 
-        <vl-map :data-projection="projectionName"
+        <vl-map v-if="!loading"
+                :data-projection="projectionName"
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
                 @pointermove="projectedMousePosition = $event.coordinate"
-                v-if="!loading"
                 ref="map">
 
             <vl-view :center.sync="center"
@@ -25,7 +25,7 @@
                      :projection="projectionName">
             </vl-view>
 
-            <vl-layer-tile :extent="extent">
+            <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
                 <vl-source-zoomify :projection="projectionName"
                                    :url="baseLayerURL"
                                    :size="imageSize"
@@ -130,6 +130,9 @@ import DrawInteraction from "./interactions/DrawInteraction";
 import ModifyInteraction from "./interactions/ModifyInteraction";
 
 import {addProj, createProj} from "vuelayers/lib/ol-ext";
+
+import View from "ol/View";
+import OverviewMap from "ol/control/OverviewMap";
 
 import {ImageInstance, AbstractImage} from "cytomine-client";
 
@@ -240,6 +243,17 @@ export default {
         }
     },
     methods: {
+        async addOverviewMap() {
+            await this.$refs.map.$createPromise; // wait for ol.Map to be created
+            await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
+
+            this.$refs.map.$map.addControl(new OverviewMap({
+                collapsed: false,
+                view: new View({projection: this.projectionName}),
+                layers: [this.$refs.baseLayer.$layer]
+            }));
+        },
+
         togglePanel(panel) {
             this.$store.commit("togglePanel", {idImage: this.idImage, panel});
         },
