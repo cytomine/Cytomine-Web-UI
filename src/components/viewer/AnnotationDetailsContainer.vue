@@ -1,6 +1,6 @@
 <template>
 <div class="annotation-details-playground">
-    <vue-draggable-resizable v-if="selectedFeature && displayAnnotDetails" 
+    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && displayAnnotDetails"
                             class="draggable"
                             :parent="true" 
                             :resizable="false" 
@@ -112,7 +112,7 @@ export default {
         },
         
         async update() {
-            let annot = this.selectedFeature.properties.annot
+            let annot = this.selectedFeature.properties.annot;
             let source = this.layers.find(layer => layer.id == annot.user).olSource;
 
             // TODO in backend: include userByTerm in annotation fetch() response

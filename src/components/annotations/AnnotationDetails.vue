@@ -167,11 +167,16 @@ export default {
             return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
         },
         associatedTerms() {
-            return this.annotation.userByTerm.map(ubt => {
-                let term = this.terms.find(term => ubt.term == term.id);
-                let user = this.users.find(user => user.id == ubt.user[0]) || {}; // QUESTION: can we have several users? 
-                return {term, user};
-            });
+            if(this.annotation.userByTerm != null) {
+                return this.annotation.userByTerm.map(ubt => {
+                    let term = this.terms.find(term => ubt.term == term.id);
+                    let user = this.users.find(user => user.id == ubt.user[0]) || {}; // QUESTION: can we have several users?
+                    return {term, user};
+                });
+            }
+            else {
+                return [];
+            }
         },
         filteredTerms() {
             return this.terms.filter(({id, name}) => {
