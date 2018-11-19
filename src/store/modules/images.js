@@ -57,6 +57,19 @@ export default {
             }
         },
 
+        // ----- Digital zoom
+
+        setMaxZoom(state, {idImage, maxZoom}) {
+            let imageWrapper = state.images[idImage];
+            if(imageWrapper != null) {
+                imageWrapper.maxZoom = maxZoom;
+            }
+        },
+
+        setDigitalZoom(state, {idImage, digitalZoom}) {
+            state.images[idImage].digitalZoom = digitalZoom;
+        },
+
         // ----- Terms visibility
 
         toggleTermVisibility(state, {idImage, indexTerm}) {
@@ -203,6 +216,9 @@ export default {
 
             let wrapper = {
                 imageInstance: image,
+
+                maxZoom: image.depth,
+                digitalZoom: false,
 
                 zoom: 2, // TODO
                 center: [image.width/2, image.height/2],

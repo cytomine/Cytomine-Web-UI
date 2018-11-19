@@ -4,9 +4,9 @@
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO digital zoom -->
 <!-- TODO: overview map -->
 <!-- TODO: rotations - allow user to enter value -->
+<!-- TODO: allow to select term to associate to newly created annotations -->
 <template>
     <div class="map-container">
 
@@ -59,8 +59,12 @@
                 <li><a @click="close()" class="close">
                     <i class="fa fa-times-circle"></i>
                 </a></li>
+
                 <li><a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                         <i class="fa fa-info"></i>
+                </a></li>
+                <li><a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                        <i class="fa fa-search"></i>
                 </a></li>
                 <li><a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
                         <i class="fa fa-link"></i>
@@ -79,6 +83,9 @@
 
         <image-information class="panel-options panel-info" v-if="imageInstance != null" v-show="activePanel == 'info'"
             :image="imageInstance"></image-information>
+
+        <digital-zoom class="panel-options panel-digital-zoom" v-if="imageInstance != null"
+            v-show="activePanel == 'digital-zoom'" :image="imageInstance"></digital-zoom>
 
         <div class="panel-options panel-link" v-show="activePanel == 'link'">
             Not yet implemented
@@ -112,6 +119,7 @@ import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
 
 import ImageInformation from "./panels/ImageInformation";
+import DigitalZoom from "./panels/DigitalZoom";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import GuidedTour from "./panels/GuidedTour";
 
@@ -135,6 +143,7 @@ export default {
         AnnotationDetailsContainer,
 
         ImageInformation,
+        DigitalZoom,
         AnnotationsPanel,
         GuidedTour,
 
@@ -173,6 +182,9 @@ export default {
         },
         activeEditTool() {
             return this.imageWrapper.activeEditTool;
+        },
+        maxZoom() {
+            return this.imageWrapper.maxZoom;
         },
 
         center: {
@@ -214,11 +226,6 @@ export default {
             if(this.imageInstance != null) {
                 return `${this.imageInstance.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
                     &channels=0&layer=0&timeframe=0&mimeType=${this.imageInstance.mime}`;
-            }
-        },
-        maxZoom() {
-            if(this.imageInstance != null) {
-                return this.imageInstance.depth;
             }
         },
 
@@ -352,12 +359,16 @@ export default {
     top: 20px;
 }
 
+.panel-digital-zoom {
+    top: 60px;
+}
+
 .panel-link {
-    top: 40px;
+    top: 120px;
 }
 
 .panel-colors {
-    top: 80px;
+    top: 160px;
 }
 
 .panel-layers {
