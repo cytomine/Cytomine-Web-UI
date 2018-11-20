@@ -248,6 +248,7 @@ h1.page-title {
   border-color: hsla(0,0%,4%,.25);
   z-index: 1;
   border-width: 8px;
+  pointer-events: none; /* tooltip arrow may overlap target element, leading to flickering if pointer-events not set to none */
 }
 
 .tooltip .tooltip-arrow::after {
