@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import constants from "@/utils/constants";
+
 export default {
     name: "digital-zoom",
     props: ["image"],
@@ -37,7 +39,7 @@ export default {
     },
     watch: {
         digitalZoom() {
-            let increment = this.digitalZoom ? 4 : 0;
+            let increment = this.digitalZoom ? constants.DIGITAL_ZOOM_INCREMENT : 0;
             this.maxZoom = this.image.depth + increment;
         }
     }

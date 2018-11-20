@@ -4,6 +4,7 @@ import {TermCollection} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
     verticesStyle} from "@/utils/style-utils.js";
+import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
@@ -220,8 +221,8 @@ export default {
             let wrapper = {
                 imageInstance: image,
 
-                maxZoom: image.depth,
-                digitalZoom: false,
+                maxZoom: image.depth + constants.DIGITAL_ZOOM_INCREMENT,
+                digitalZoom: true,
 
                 zoom: 2, // TODO
                 center: [image.width/2, image.height/2],
