@@ -15,6 +15,7 @@
     :clear-on-select="multiple ? false : true"
     :showPointer="false"
     :placeholder="$t('select-options')"
+    :allow-empty="allowEmpty"
 >
 
     <template slot="beforeList" v-if="multiple && options.length > 0 && selectAllAvailable">
@@ -57,7 +58,8 @@ export default {
         groupValues: {type: String},
         multiple: {type: Boolean, default: false},
         selectAllAvailable: {type: Boolean, default: true},
-        searchable: {type: Boolean, default: true}
+        searchable: {type: Boolean, default: true},
+        allowEmpty: {type: Boolean, default: true}
     },
     data() {
         return {

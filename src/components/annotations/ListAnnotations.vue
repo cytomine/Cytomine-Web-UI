@@ -11,7 +11,8 @@
                                 {{$t("annotation-type")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes">
+                                <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
+                                    :allow-empty="false">
                                 </cytomine-multiselect>
                             </div>
                         </div>
@@ -180,26 +181,6 @@ export default {
                 }
                 return arr;
             }, []);
-
-            // ----- Multiselect with group -----
-            // let softwareMappings = [];
-            // this.userJobs = this.userJobs.reduce((tree, userJob) => {
-            //     if(userJob.id == null) {
-            //         return tree;
-            //     }
-
-            //     userJob.date = this.$options.filters.moment(Number(userJob.created), "DD/MM/YYYY, HH:mm");
-            //     let softwareName = userJob.softwareName
-            //     if(softwareMappings[softwareName] == null) {
-            //         softwareMappings[softwareName] = tree.length;
-            //         tree.push({softwareName, jobs: [userJob]});
-            //     }
-            //     else {
-            //         tree[softwareMappings[softwareName]].jobs.push(userJob);
-            //     }
-            //     return tree;
-            // }, []);
-            // ---------------------------------
 
             this.selectedUserJobs = this.userJobs;
         }
