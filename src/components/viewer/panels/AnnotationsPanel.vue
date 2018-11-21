@@ -47,45 +47,6 @@
         <label>{{ $t("layers-opacity") }}</label>
         <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
     </div>
-
-    <template v-if="terms.length > 0">
-    <h3>{{ $t("terms") }}</h3>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="checkbox-column"><span class="fa fa-eye"></span></th>
-                <th class="checkbox-column"></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(term, index) in terms" :key="term.id">
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="term.visible" @change="toggleTermVisibility(index)">
-                </td>
-                <td class="checkbox-column">
-                    <div class="color-preview" :style="{background: term.color}"></div>
-                </td>
-                <td class="name-column">
-                    {{term.name}}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3"></td>
-            </tr>
-            <tr>
-                <td class="checkbox-column">
-                    <input type="checkbox" v-model="displayNoTerm">
-                </td>
-                <td class="checkbox-column"></td>
-                <td class="name-column">
-                    {{ $t("no-term") }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    </template>
 </div>
 </template>
 
@@ -115,17 +76,6 @@ export default {
             },
             set(value) {
                 this.$store.commit("setLayersOpacity", {idImage: this.image.id, opacity: Number(value)});
-            }
-        },
-        terms() {
-            return this.imageWrapper.terms;
-        },
-        displayNoTerm: {
-            get() {
-                return this.imageWrapper.displayNoTerm;
-            },
-            set(value) {
-                this.$store.commit("setDisplayNoTerm", {idImage: this.image.id, value});
             }
         },
         selectedLayers() { // Array<User> (representing user layers)
@@ -181,10 +131,6 @@ export default {
             this.$store.dispatch("toggleLayerVisibility", {idImage: this.image.id, indexLayer: index});
         },
 
-        toggleTermVisibility(index) {
-            this.$store.commit("toggleTermVisibility", {idImage: this.image.id, indexTerm: index});
-        },
-
         async loadLayers() {
             let layersPromise = new Project({id: this.image.project}).fetchUserLayers(this.image.id);
             let indexLayersPromise = this.image.fetchAnnotationsIndex();
@@ -226,6 +172,7 @@ export default {
 
 .layers-table {
     margin-bottom: 10px !important;
+    font-size: 0.9em;
 }
 
 .layers-table tbody {
@@ -260,24 +207,6 @@ th.name-column, td.name-column {
 
 .layers .checkbox .control-label {
     padding: 0px !important;
-}
-
-.layers h3 {
-    font-size: 14px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding-bottom: 2px;
-    margin-bottom: 5px;
-    margin-top: 10px;
-    border-bottom: 2px solid #ddd;
-}
-
-.color-preview {
-    width: 15px;
-    height: 15px;
-    margin-top: 2px;
-    border-radius: 3px;
-    box-shadow: 0px 0px 1px #777;
 }
 
 .layers input[type="range"].slider {

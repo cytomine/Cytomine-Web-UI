@@ -56,53 +56,74 @@
 
         <div class="panels">
             <ul>
-                <li><a @click="close()" class="close">
-                    <i class="fa fa-times-circle"></i>
-                </a></li>
+                <li>
+                    <a @click="close()" class="close">
+                        <i class="fa fa-times-circle"></i>
+                    </a>
+                </li>
 
-                <li><a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
+                <li>
+                    <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                         <i class="fa fa-info"></i>
-                </a></li>
-                <li><a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                    </a>
+                    <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
+                        :image="imageInstance"></image-information>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
                         <i class="fa fa-search"></i>
-                </a></li>
-                <li><a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
+                    </a>
+                    <digital-zoom class="panel-options panel-digital-zoom"
+                        v-show="activePanel == 'digital-zoom'" :image="imageInstance"></digital-zoom>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
                         <i class="fa fa-link"></i>
-                </a></li>
-                <li><a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
+                    </a>
+                    <div class="panel-options panel-link" v-show="activePanel == 'link'">
+                        Not yet implemented
+                    </div>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
                         <i class="fa fa-sliders"></i>
-                </a></li>
-                <li><a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
+                    </a>
+                    <div class="panel-options panel-colors" v-show="activePanel == 'colors'">
+                        Not yet implemented
+                    </div>
+                    <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
+                        :map="map" :imageLayer="layer"></color-manipulation> -->
+                </li>
+
+                <li>
+                    <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
                         <i class="fa fa-files-o"></i>
-                </a></li>
-                <li><a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
+                    </a>
+                    <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
+                        :image="imageInstance" :layers-to-preload="layersToPreload" @hook:mounted="layersMounted = true">
+                    </annotations-panel>
+                </li>
+
+                <li v-if="terms.length > 0">
+                    <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
+                        <i class="fa fa-binoculars"></i>
+                    </a>
+                    <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
+                        :image="imageInstance"></ontology-panel>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                         <i class="fa fa-map-signs"></i>
-                </a></li>
+                    </a>
+                    <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
+                        :view="$refs.view"></guided-tour>
+                </li>
             </ul>
         </div>
-
-        <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
-            :image="imageInstance"></image-information>
-
-        <digital-zoom class="panel-options panel-digital-zoom"
-            v-show="activePanel == 'digital-zoom'" :image="imageInstance"></digital-zoom>
-
-        <div class="panel-options panel-link" v-show="activePanel == 'link'">
-            Not yet implemented
-        </div>
-
-        <div class="panel-options panel-colors" v-show="activePanel == 'colors'">
-            Not yet implemented
-        </div>
-        <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
-            :map="map" :imageLayer="layer"></color-manipulation> -->
-
-        <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
-            :image="imageInstance" :layers-to-preload="layersToPreload" @hook:mounted="layersMounted = true">
-        </annotations-panel>
-
-        <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
-            :view="$refs.view"></guided-tour>
 
         <scale-line :image="imageInstance" :mousePosition="projectedMousePosition"></scale-line>
 
@@ -120,6 +141,7 @@ import DrawTools from "./DrawTools";
 import ImageInformation from "./panels/ImageInformation";
 import DigitalZoom from "./panels/DigitalZoom";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
+import OntologyPanel from "./panels/OntologyPanel";
 import GuidedTour from "./panels/GuidedTour";
 
 import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
@@ -148,6 +170,7 @@ export default {
         ImageInformation,
         DigitalZoom,
         AnnotationsPanel,
+        OntologyPanel,
         GuidedTour,
 
         SelectInteraction,
@@ -177,6 +200,9 @@ export default {
         },
         imageInstance() {
             return this.imageWrapper.imageInstance;
+        },
+        terms() {
+            return this.imageWrapper.terms;
         },
         selectedLayers() {
             return this.imageWrapper.selectedLayers || [];
@@ -275,10 +301,7 @@ export default {
             }));
         },
 
-        async goToAnnotation() {
-            // QUESTION: how to handle clustered annotations (e.g. http://localhost:8080/#/project/807237/image/809515/annotation/8986582)
-            // force to display non-clustered annots? may lead to perf problems but otherwise, not possible to select annot
-            // TODO: load appropriate layer
+        async goToAnnotation() { // WARNING: will not work if annotation to display belongs to cluster after the view.fit
             let annot = this.routedAnnotation;
             let geometry = new WKT().readGeometry(annot.location);
             this.$refs.view.fit(geometry);
@@ -394,7 +417,11 @@ export default {
     margin: 0;
 }
 
-.panels li a {
+.panels li {
+    position: relative;
+}
+
+.panels > ul > li > a {
     position: relative;
     display: block;
     padding: 10px;
@@ -405,7 +432,7 @@ export default {
     text-align:center;
 }
 
-.panels a:hover {
+.panels > ul > li > a:hover {
     color: #fff;
 }
 
@@ -433,7 +460,7 @@ export default {
     padding-top: 0px;
 } */
 
-.panels li a.active {
+.panels > ul > li > a.active {
     background: #f2f2f2;
     color: #6c95c8;
 }
@@ -441,6 +468,7 @@ export default {
 .panel-options {
     position: absolute;
     right: 40px;
+    top: -20px;
     width: 300px;
     min-height: 100px;
     background: #f2f2f2;
@@ -449,34 +477,14 @@ export default {
     z-index: 100;
 }
 
-.panel-info {
-    top: 20px;
-}
-
-.panel-digital-zoom {
-    top: 60px;
-}
-
-.panel-link {
-    top: 120px;
-}
-
-.panel-colors {
-    top: 160px;
-}
-
 .panel-layers {
-    top: 100px;
-    font-size: 0.9em;
+    top: unset;
+    bottom: -40px;
 }
 
-.panel-guided-tour {
-    top: 200px;
-}
-
-.panel-guided-tour .buttons {
-    margin-top: 10px;
-    text-align: center;
+.panel-ontology, .panel-guided-tour {
+    top: unset;
+    bottom: -20px;
 }
 
 .panel-options h1 {

@@ -84,8 +84,27 @@ export default {
         // ----- Terms visibility
 
         toggleTermVisibility(state, {idImage, indexTerm}) {
-            let term = state.images[idImage].terms[indexTerm];
+            let wrapper = state.images[idImage];
+            let term = wrapper.terms[indexTerm];
             term.visible = !term.visible;
+
+            if(!term.visible) { // unselect annotation if it is no longer displayed
+                let selectedFeatures = wrapper.selectedFeatures;
+                for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+
+                    let feature = selectedFeatures[index];
+                    let annot = feature.properties.annot;
+
+                    if(!annot.term.includes(term.id)) {
+                        return;
+                    }
+
+                    let hasTermsToDisplay = wrapper.terms.some(term => term.visible && annot.term.includes(term.id));
+                    if(!hasTermsToDisplay) {
+                        selectedFeatures.splice(index, 1);
+                    }
+                }
+            }
         },
 
         setDisplayNoTerm(state, {idImage, value}) { // TODO: change name

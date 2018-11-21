@@ -75,3 +75,10 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.panel-guided-tour .buttons {
+    margin-top: 10px;
+    text-align: center;
+}
+</style>
