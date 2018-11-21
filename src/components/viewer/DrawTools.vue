@@ -7,7 +7,7 @@
         </button>
     </div>
     <div class="buttons has-addons">
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}">
+        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
         </button>
         <!-- QUESTION: add handling of lines? need to add in backend
