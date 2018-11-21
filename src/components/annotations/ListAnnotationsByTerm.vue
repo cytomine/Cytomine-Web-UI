@@ -22,6 +22,7 @@
                 :users="allUsers"
                 :images="allImages"
                 @update="$emit('update', annot.id)"
+                @deletion="$emit('update', annot.id)"
                 v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
                 (prevents fetching unnecessary information) -->
             </annotation-details>

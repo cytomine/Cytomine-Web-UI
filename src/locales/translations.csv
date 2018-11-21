@@ -211,3 +211,4 @@ info-keyword-stop-preview-description,Add the keyword {keyword} where you want t
 current-selection,Current selection,
 digital-zoom,Digital zoom,
 digital-zoom-checkbox-label,Enable digital zoom (interpolation),
+notif-success-annot-URL-copied,Annotation URL copied to clipboard,

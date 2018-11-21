@@ -24,7 +24,8 @@
                                 :users="allUsers"
                                 :showImageInfo="false"
                                 :key="selectedFeature.id"
-                                @update="update">
+                                @update="update()"
+                                @deletion="handleDeletion()">
             </annotation-details>
         </div>
     </vue-draggable-resizable>
@@ -82,6 +83,18 @@ export default {
         layers() {
             return this.imageWrapper.selectedLayers || [];
         },
+        annot() {
+            return this.selectedFeature ? this.selectedFeature.properties.annot : {};
+        },
+        olSource() {
+            let layer = this.layers.find(layer => layer.id == this.annot.user);
+            return layer != null ? layer.olSource : null;
+        },
+        olFeature() {
+            if(this.olSource != null) {
+                return this.olSource.getFeatureById(this.annot.id);
+            }
+        }
     },
     watch: {
         selectedFeature() {
@@ -112,19 +125,28 @@ export default {
         },
         
         async update() {
-            let annot = this.selectedFeature.properties.annot;
-            let source = this.layers.find(layer => layer.id == annot.user).olSource;
-
             // TODO in backend: include userByTerm in annotation fetch() response
-            let updatedAnnot = await annot.clone().fetch();
-            let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: annot.id});
+            let updatedAnnot = await this.annot.clone().fetch();
+            let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});
             updatedAnnot.userByTerm = annotTerms.array.map(({term, user}) => {
                 return {term, user: [user]};
             });
 
-            let olFeature = source.getFeatureById(annot.id);
-            olFeature.set("annot", updatedAnnot);
+            if(this.olFeature != null) {
+                this.olFeature.set("annot", updatedAnnot);
+            }
             this.selectedFeature.properties.annot = updatedAnnot;
+        },
+
+        handleDeletion() {
+            if(this.olFeature != null) {
+                this.olFeature.set("deleted", true);
+                this.olSource.removeFeature(this.olFeature);
+            }
+
+            this.$store.commit("addAction", {idImage: this.image.id, feature: this.olFeature, oldAnnot: this.annot});
+            this.$store.commit("clearSelectedFeatures", this.image.id);
+            // TODO this.$store.commit("decrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
         },
 
         dragStop(x, y) {
@@ -146,6 +168,8 @@ export default {
     right: 70px;
     bottom: 20px;
     pointer-events: none; /* to allow selection of elements below it */
+    /* background: rgba(255, 255, 255, 0.2);
+    border: 2px dashed rgba(0, 0, 0, 0.5); */
 }
 
 .draggable {
@@ -183,6 +207,7 @@ h1 {
     padding: 10px;
     overflow: auto;
     border-radius: 5px;
+    height: 100%;
 }
 </style>
 

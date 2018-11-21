@@ -23,16 +23,16 @@
                     <td> {{ Number(annotation.created) | moment("ll") }} </td>
                 </tr>
                 <tr>
-                    <td><strong>{{$t("description")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("description")}}</h5>
                         <cytomine-description :object="annotation"></cytomine-description>
                     </td>
                 </tr>
 
                 <!-- TERMS -->
                 <tr>
-                    <td><strong>{{$t("terms")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("terms")}}</h5>
                         <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                         :title="`${$t('associated-by')} ${user.fullName}`">
                             <div class="color-preview" :style="{background: term.color}"></div>
@@ -62,8 +62,8 @@
 
                 <!-- PROPERTIES -->
                 <tr>
-                    <td><strong>{{$t("properties")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("properties")}}</h5>
                         <b-field grouped group-multiline>
                             <div class="control" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
                                 <b-taglist attached>
@@ -112,6 +112,7 @@
             </tbody>
         </table>
         <div class="actions">
+            <!-- QUESTION do we leave this button here? too far according to Christopher -->
             <router-link 
                 v-if="showImageInfo"
                 :to="annotationURL"
@@ -122,6 +123,9 @@
                 <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
                 <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
                 <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
+                <button class="level-item button is-small is-danger" @click="confirmDeletion()">
+                    {{ $t("button-delete") }}
+                </button>
             </div>
         </div>
     </div>
@@ -192,6 +196,7 @@ export default {
     methods: {
         copyURL() {
             copyToClipboard(window.location.origin + "/#" + this.annotationURL);
+            this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
         async addTerm(term) {
@@ -260,7 +265,28 @@ export default {
             prop.key = prop.oldKey;
             prop.value = prop.oldValue;
             this.editedProperties.splice(idx, 1);
-        }
+        },
+
+        confirmDeletion() {
+            this.$dialog.confirm({
+                title: this.$t("confirm-deletion"),
+                message: this.$t("confirm-deletion-annotation"),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.deleteAnnot()
+            });
+        },
+
+        async deleteAnnot() {
+            try {
+                await this.annotation.delete();
+                this.$emit("deletion");
+            }
+            catch(err) {
+                this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
+            }
+        },
     },
     async created() {
         this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
@@ -281,6 +307,11 @@ export default {
 }
 .table th, .table td {
     vertical-align: middle;
+}
+
+h5 {
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
 .actions {

@@ -105,6 +105,7 @@ export default {
                     bbox,
                     showWKT: true,
                     showTerm: true,
+                    showGIS: true,
                     kmeans: true
                 }).fetchAll();
 
