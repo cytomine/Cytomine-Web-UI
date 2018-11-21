@@ -118,7 +118,7 @@ export default {
             layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
             layer.locked = false;
-            this.$store.commit("addLayer", {idImage: this.image.id, layer});
+            this.$store.dispatch("addLayer", {idImage: this.image.id, layer});
 
             this.selectedLayer = null;
         },

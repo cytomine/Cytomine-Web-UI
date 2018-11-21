@@ -1,4 +1,3 @@
-<!-- TODO: properties -->
 <template>
 <vl-layer-vector :visible="userLayer.visible"
                  :extent="imageExtent"
@@ -9,9 +8,9 @@
                       :loader-factory="loaderFactory" 
                       :strategy-factory="strategyFactory"
                       url="-"> <!-- loader factory not used if URL not specified -->
+        <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
     </vl-source-vector>
 
-    <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
 </vl-layer-vector>
 </template>
 
@@ -57,7 +56,8 @@ export default {
             this.imageWrapper.layersOpacity;
             this.imageWrapper.terms.forEach(term => term.visible);
             this.imageWrapper.displayNoTerm;
-            this.imageWrapper.activeEditTool; // style is different in edit mode (vertices displayed)
+            this.imageWrapper.selectedPropertyKey;
+            this.imageWrapper.selectedPropertyColor;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.image.id);

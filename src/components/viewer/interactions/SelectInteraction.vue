@@ -38,6 +38,8 @@ export default {
             this.imageWrapper.terms.forEach(term => term.visible);
             this.imageWrapper.displayNoTerm;
             this.imageWrapper.activeEditTool; // style is different in edit mode (vertices displayed)
+            this.imageWrapper.selectedPropertyValues;
+            this.imageWrapper.selectedPropertyColor;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.image.id);

@@ -24,7 +24,8 @@
                                 :users="allUsers"
                                 :showImageInfo="false"
                                 :key="selectedFeature.id"
-                                @update="update()"
+                                @updateTerms="updateTerms()"
+                                @updateProperties="updateProperties()"
                                 @deletion="handleDeletion()">
             </annotation-details>
         </div>
@@ -124,7 +125,7 @@ export default {
             this.selectedUserJobs = this.userJobs;
         },
         
-        async update() {
+        async updateTerms() {
             // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
             let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});
@@ -136,6 +137,10 @@ export default {
                 this.olFeature.set("annot", updatedAnnot);
             }
             this.selectedFeature.properties.annot = updatedAnnot;
+        },
+
+        updateProperties() {
+            this.$store.dispatch("refreshProperties", this.image.id);
         },
 
         handleDeletion() {

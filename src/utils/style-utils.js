@@ -44,14 +44,17 @@ export function createColorStyle(color, defaultStroke, opacity=0.5) {
 
 // -----
 
-export function createTextStyle(text) {
+let textFill = new Fill({color: "#fff"});
+let textStroke = new Stroke({color: "#000", width: 3});
+
+export function createTextStyle(text, fontSize="22px", fill=textFill, stroke=textStroke) {
     return new Style({
         text: new Text({
             text,
-            font: "20px Arial, sans-serif",
+            font: `${fontSize} Arial, sans-serif`,
             overflow: true,
-            fill: new Fill({color: "#fff"}),
-            stroke: new Stroke({color: "#000", width: 3})
+            fill,
+            stroke
         })
     });
 }
@@ -88,3 +91,16 @@ export function changeOpacity(style, opacity) {
     color[3] = opacity;
     style.getImage().setOpacity(opacity);
 }
+
+// -----
+
+export const defaultColors = Object.freeze([
+    {name: "black", fill: new Fill({color: "#000"})},
+    {name: "white", fill: textFill},
+    {name: "red", fill: new Fill({color: "#ff0000"})},
+    {name: "orange", fill: new Fill({color: "#ff6600"})},
+    {name: "yellow", fill: new Fill({color: "#ffff00"})},
+    {name: "green", fill: new Fill({color: "#008000"})},
+    {name: "blue", fill: new Fill({color: "#0000ff"})},
+    {name: "purple", fill: new Fill({color: "#800080"})},
+]);

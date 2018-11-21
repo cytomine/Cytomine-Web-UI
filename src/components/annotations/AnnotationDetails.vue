@@ -204,7 +204,7 @@ export default {
                 try {
                     // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
                     await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save(); 
-                    this.$emit("update");
+                    this.$emit("updateTerms");
                 }
                 catch(error) {
                     this.$notify({type: "error", text: this.$t("notif-error-add-term")});
@@ -219,7 +219,7 @@ export default {
                 // TODO decide who can delete what, and adapt accordingly
                 // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
                 await AnnotationTerm.delete(this.annotation.id, term.id);
-                this.$emit("update");
+                this.$emit("updateTerms");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-term")});
@@ -235,6 +235,7 @@ export default {
             try {
                 await Property.delete(prop.id, this.annotation);
                 this.properties.splice(idx, 1);
+                this.$emit("updateProperties");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-prop")});
@@ -255,6 +256,7 @@ export default {
                 if(newProp) {
                     this.properties.push(prop);
                 }
+                this.$emit("updateProperties");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-save-prop")});

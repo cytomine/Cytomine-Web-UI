@@ -1,5 +1,4 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
-<!-- TODO: properties -->
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
@@ -116,6 +115,14 @@
                 </li>
 
                 <li>
+                    <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
+                        <i class="fa fa-tag"></i>
+                    </a>
+                    <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
+                        :image="imageInstance"></properties-panel>
+                </li>
+
+                <li>
                     <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                         <i class="fa fa-map-signs"></i>
                     </a>
@@ -142,6 +149,7 @@ import ImageInformation from "./panels/ImageInformation";
 import DigitalZoom from "./panels/DigitalZoom";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
+import PropertiesPanel from "./panels/PropertiesPanel";
 import GuidedTour from "./panels/GuidedTour";
 
 import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
@@ -171,6 +179,7 @@ export default {
         DigitalZoom,
         AnnotationsPanel,
         OntologyPanel,
+        PropertiesPanel,
         GuidedTour,
 
         SelectInteraction,
@@ -482,7 +491,7 @@ export default {
     bottom: -40px;
 }
 
-.panel-ontology, .panel-guided-tour {
+.panel-ontology, .panel-properties, .panel-guided-tour {
     top: unset;
     bottom: -20px;
 }

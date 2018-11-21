@@ -1,9 +1,9 @@
 import Vue from "vue";
 
-import {TermCollection} from "cytomine-client";
+import {TermCollection, PropertyCollection} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle} from "@/utils/style-utils.js";
+    verticesStyle, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
@@ -113,12 +113,13 @@ export default {
 
         // ----- Selected layers
 
-        addLayer(state, {idImage, layer}) {
+        addLayer(state, {idImage, layer, propValues}) {
             let wrapper = state.images[idImage];
             if(wrapper.selectedLayers == null) {
                 wrapper.selectedLayers = [];
             }
 
+            wrapper.selectedPropertyValues = {...wrapper.selectedPropertyValues, ...propValues};
             wrapper.selectedLayers.push({...layer});
         },
 
@@ -139,6 +140,24 @@ export default {
             changeOpacity(wrapper.defaultStyle, opacity);
             let colorStroke = wrapper.defaultStroke.getColor();
             colorStroke[3] = opacity;
+        },
+
+        // ----- Properties
+
+        setPropertiesKeys(state, {idImage, keys}) {
+            state.images[idImage].propertiesKeys = keys;
+        },
+
+        setSelectedPropertyKey(state, {idImage, value}) {
+            state.images[idImage].selectedPropertyKey = value;
+        },
+
+        setSelectedPropertyValues(state, {idImage, properties}) {
+            state.images[idImage].selectedPropertyValues = properties;
+        },
+
+        setSelectedPropertyColor(state, {idImage, value}) {
+            state.images[idImage].selectedPropertyColor = value;
         },
 
         // ----- Selected features
@@ -231,11 +250,15 @@ export default {
             let initialOpacity = 0.5;
             let defaultStroke = createDefaultStroke(initialOpacity);
 
-            let terms = await TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
+            let termsPromise = TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
+            let propertiesKeys = await PropertyCollection.fetchKeysAnnotationProperties(null, id);
+
+            let terms = await termsPromise;
             terms.array.forEach(term => {
                 term.olStyle = createColorStyle(term.color, defaultStroke); // must be handled in image (can change opacity in one particular viewer)
                 term.visible = true;
             });
+
 
             let wrapper = {
                 imageInstance: image,
@@ -253,6 +276,11 @@ export default {
 
                 terms: terms.array,
                 displayNoTerm: true,
+
+                propertiesKeys,
+                selectedPropertyKey: null, // TODO: allow to select default property (https://github.com/cytomine/Cytomine-core/issues/1142)
+                selectedPropertyColor: defaultColors[0],
+                selectedPropertyValues: {},
 
                 defaultStroke,
                 defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
@@ -291,6 +319,37 @@ export default {
             commit("clearSelectedFeatures", idImage);
             commit("selectFeature", {idImage, feature});
         },
+
+        async setSelectedPropertyKey({state, commit}, {idImage, value}) {
+            let properties = {};
+            if(value != null) {
+                for(let layer of state.images[idImage].selectedLayers) {
+                    let layerValues = await fetchLayerPropertiesValues(layer.id, idImage, value);
+                    properties = {...properties, ...layerValues};
+                }
+            }
+
+            commit("setSelectedPropertyValues", {idImage, properties});
+            commit("setSelectedPropertyKey", {idImage, value});
+        },
+
+        async addLayer({state, commit}, {idImage, layer}) {
+            let key = state.images[idImage].selectedPropertyKey;
+            let propValues = {};
+            if(key != null) {
+                propValues = await fetchLayerPropertiesValues(layer.id, idImage, key);
+            }
+            commit("addLayer", {idImage, layer, propValues});
+        },
+
+        async refreshProperties({state, commit, dispatch}, idImage) {
+            let keys = await PropertyCollection.fetchKeysAnnotationProperties(null, idImage);
+            commit("setPropertiesKeys", {idImage, keys});
+
+            let currentKey = state.images[idImage].selectedPropertyKey;
+            let newKey = keys.includes(currentKey) ? currentKey : null;
+            dispatch("setSelectedPropertyKey", {idImage, value: newKey});
+        }
     },
 
     getters: {
@@ -345,7 +404,46 @@ export default {
                 }
             }
 
+            // Properties
+            let propValue = imageWrapper.selectedPropertyValues[annot.id];
+            if (propValue != null) {
+                let color = imageWrapper.selectedPropertyColor;
+                let fontSize = "34px";
+                if(imageWrapper.zoom <= 3) {
+                    fontSize = "12px";
+                }
+                else if(imageWrapper.zoom <= 6) {
+                    fontSize = "19px";
+                }
+                else if(imageWrapper.zoom <= 8) {
+                    fontSize = "26px";
+                }
+                styles.push(createTextStyle(propValue, fontSize, color.fill, null));
+            }
+
             return styles;
         }
     }
 };
+
+// Helper functions
+
+async function fetchLayerPropertiesValues(idLayer, idImage, key) {
+    let propertiesValues = await PropertyCollection.fetchPropertiesValuesAndPositions(
+        idLayer,
+        idImage,
+        key
+    );
+
+    let properties = {};
+    propertiesValues.forEach(propVal => {
+        if(properties[propVal.idAnnotation] == null) {
+            properties[propVal.idAnnotation] = propVal.value;
+        }
+        else {
+            properties[propVal.idAnnotation] += "; " + propVal.value;
+        }
+    });
+
+    return properties;
+}
