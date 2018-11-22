@@ -2,7 +2,6 @@
 <!-- TODO job templates -->
 <!-- TODO: multi images -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO: rotations - allow user to enter value -->
 <!-- TODO: allow to select term to associate to newly created annotations -->
 <template>
     <div class="map-container" v-if="!loading">
@@ -132,6 +131,8 @@
             </ul>
         </div>
 
+        <rotation-selector class="rotation-selector-wrapper" :image="imageInstance"></rotation-selector>
+
         <scale-line :image="imageInstance" :mousePosition="projectedMousePosition"></scale-line>
 
         <annotation-details-container :image="imageInstance"></annotation-details-container>
@@ -142,6 +143,7 @@
 import { mapState } from "vuex";
 
 import AnnotationLayer from "./AnnotationLayer";
+import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
 
@@ -170,6 +172,8 @@ export default {
     name: "cytomine-image",
     components: {
         AnnotationLayer,
+
+        RotationSelector,
         ScaleLine,
         DrawTools,
 
@@ -583,25 +587,31 @@ export default {
     background: none !important;
 }
 
-.ol-rotate {
-    top: 70px;
-    left: .5em;
+.ol-rotate:not(.custom) {
+    display: none;
 }
 
-.ol-viewport button {
+.ol-control button {
     background: white !important;
     color: black !important;
     border-radius: 2px !important;
     box-shadow: 0px 0px 1px #777;
 }
 
-.ol-viewport button:hover {
+.ol-control button:hover {
     box-shadow: 0px 0px 1px black;
     cursor: pointer;
 }
 
 .ol-zoom-in {
     margin-bottom: 5px !important;
+}
+
+/* ----- Rotation selector ----- */
+.rotation-selector-wrapper {
+    position: absolute;
+    left: .5em;
+    top: 70px;
 }
 
 </style>

@@ -221,4 +221,8 @@ h1 {
     background-color: #6899d0;
     color: #fff;
 }
+
+.annotation-details-playground .draggable {
+    z-index: 10 !important;
+}
 </style>
