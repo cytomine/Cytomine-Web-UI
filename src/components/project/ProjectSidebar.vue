@@ -14,10 +14,12 @@
                     {{ $t("images") }}
                 </a>
             </router-link>
-            <router-link tag="li" class="image-link" v-for="image in images" :key="image.imageInstance.id"
-            :to="`/project/${image.imageInstance.project}/image/${image.imageInstance.id}`">
+            <!-- TODO: change the way opened viewers are displayed -->
+            <router-link tag="li" class="image-link" v-for="(viewer, id) in viewers" :key="id"
+            v-if="viewer.idProject == project.id"
+            :to="`/project/${project.id}/image/${id}`">
                 <a>
-                    {{ image.imageInstance.instanceFilename }}
+                    {{ viewer.name }}
                 </a>
                 <!-- TODO
                 <a class="close">
@@ -63,8 +65,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
     name: "project-sidebar",
     props: ["project"],
@@ -73,7 +73,11 @@ export default {
             visibleSideBar: true,
         };
     },
-    computed: mapState({images: state => state.images.images}),
+    computed: {
+        viewers() {
+            return this.$store.state.images.viewers;
+        }
+    },
     methods: {
         toggleSideBar() {
             this.visibleSideBar = !this.visibleSideBar;

@@ -1,5 +1,5 @@
 <template>
-<vl-interaction-select ident="select-target"
+<vl-interaction-select :ident="`select-target-${idViewer}-${index}`"
                        :filter="filterFunction" 
                        :features.sync="selectedFeatures"
                        :toggle-condition="never"
@@ -19,17 +19,24 @@ import {never, shiftKeyOnly} from "ol/events/condition";
 
 export default {
     name: "select-interaction",
-    props: ["image"],
+    props: [
+        "idViewer",
+        "index"
+    ],
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
         selectedFeatures: {
             get() {
                 return this.imageWrapper.selectedFeatures;
             },
             set(value) {
-                this.$store.commit("setSelectedFeatures", {idImage: this.image.id, selectedFeatures: value});
+                this.$store.commit("setSelectedFeatures", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    selectedFeatures: value
+                });
             }
         },
         styleFunctionFactory() {
@@ -42,7 +49,7 @@ export default {
             this.imageWrapper.selectedPropertyColor;
 
             return () => {
-                return this.$store.getters.genStyleFunction(this.image.id);
+                return this.$store.getters.genStyleFunction(this.idViewer, this.index);
             };
         },
         filterFunction() {

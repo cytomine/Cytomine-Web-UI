@@ -43,7 +43,10 @@ import {fullName} from "@/utils/user-utils.js";
 export default {
     name: "annotations-details-container",
     components: {VueDraggableResizable, AnnotationDetails},
-    props: ["image"],
+    props: [
+        "idViewer",
+        "index"
+    ],
     data() {
         return {
             users: [],
@@ -52,14 +55,17 @@ export default {
     },
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        image() {
+            return this.imageWrapper.imageInstance;
         },
         displayAnnotDetails: {
             get() {
                 return this.imageWrapper.displayAnnotDetails;
             },
             set(value) {
-                this.$store.commit("setDisplayAnnotDetails", {idImage: this.image.id, value});
+                this.$store.commit("setDisplayAnnotDetails", {idViewer: this.idViewer, index: this.index, value});
             }
         },
         positionAnnotDetails: {
@@ -67,7 +73,7 @@ export default {
                 return this.imageWrapper.positionAnnotDetails;
             },
             set(value) {
-                this.$store.commit("setPositionAnnotDetails", {idImage: this.image.id, value});
+                this.$store.commit("setPositionAnnotDetails", {idViewer: this.idViewer, index: this.index, value});
             }
         },
         selectedFeatures() {
@@ -140,7 +146,7 @@ export default {
         },
 
         updateProperties() {
-            this.$store.dispatch("refreshProperties", this.image.id);
+            this.$store.dispatch("refreshProperties", {idViewer: this.idViewer, index: this.index});
         },
 
         handleDeletion() {
@@ -149,9 +155,14 @@ export default {
                 this.olSource.removeFeature(this.olFeature);
             }
 
-            this.$store.commit("addAction", {idImage: this.image.id, feature: this.olFeature, oldAnnot: this.annot});
-            this.$store.commit("clearSelectedFeatures", this.image.id);
-            // TODO this.$store.commit("decrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
+            this.$store.commit("addAction", {
+                idViewer: this.idViewer,
+                index: this.index,
+                feature: this.olFeature,
+                oldAnnot: this.annot
+            });
+            this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
+            // TODO this.$store.commit("decrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
         },
 
         dragStop(x, y) {

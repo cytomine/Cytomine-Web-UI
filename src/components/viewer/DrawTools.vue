@@ -80,17 +80,20 @@ import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-tools",
-    props: ["image"],
+    props: [
+        "idViewer",
+        "index"
+    ],
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
         activeTool: {
             get() {
                 return this.imageWrapper.activeTool;
             },
             set(tool) {
-                this.$store.commit("activateTool", {idImage: this.image.id, tool});
+                this.$store.commit("activateTool", {idViewer: this.idViewer, index: this.index, tool});
             }
         },
         displayAnnotDetails: {
@@ -98,7 +101,7 @@ export default {
                 return this.imageWrapper.displayAnnotDetails;
             },
             set(value) {
-                this.$store.commit("setDisplayAnnotDetails", {idImage: this.image.id, value});
+                this.$store.commit("setDisplayAnnotDetails", {idViewer: this.idViewer, index: this.index, value});
             }
         },
         activeEditTool: {
@@ -106,7 +109,7 @@ export default {
                 return this.imageWrapper.activeEditTool;
             },
             set(tool) {
-                this.$store.commit("activateEditTool", {idImage: this.image.id, tool});
+                this.$store.commit("activateEditTool", {idViewer: this.idViewer, index: this.index, tool});
             }
         },
         selectedFeatures() {
@@ -146,7 +149,7 @@ export default {
     methods: {
         activateTool(tool) {
             if(this.activeTool == "select" && tool != "select") {
-                this.$store.commit("clearSelectedFeatures", this.image.id);
+                this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                 this.activeEditTool = null;
             }
 
@@ -182,9 +185,9 @@ export default {
                 let olFeature = source.getFeatureById(annot.id);
                 olFeature.set("deleted", true);
 
-                this.$store.commit("addAction", {idImage: this.image.id, feature: olFeature, oldAnnot: annot});
-                this.$store.commit("clearSelectedFeatures", this.image.id);
-                // TODO this.$store.commit("decrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
+                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature: olFeature, oldAnnot: annot});
+                this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
+                // TODO this.$store.commit("decrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
 
                 source.removeFeature(feature);
             }
@@ -209,7 +212,7 @@ export default {
             let action = this.actions[this.actions.length - 1];
             try {
                 let opposedAction = await this.reverseAction(action);
-                this.$store.commit("undoAction", {idImage: this.image.id, opposedAction});
+                this.$store.commit("undoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-undo")});
@@ -220,7 +223,7 @@ export default {
             let action = this.undoneActions[this.undoneActions.length - 1];
             try {
                 let opposedAction = await this.reverseAction(action);
-                this.$store.commit("redoAction", {idImage: this.image.id, opposedAction});
+                this.$store.commit("redoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-redo")});
@@ -239,7 +242,7 @@ export default {
                 if(currentFeature != null) {
                     source.removeFeature(currentFeature);
                     if(this.selectedFeatures.map(ftr => ftr.id).includes(currentFeature.getId())) {
-                        this.$store.commit("clearSelectedFeatures", this.image.id);
+                        this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                     }
                 }
                 feature.set("deleted", true); // so that reverse action is correctly handled

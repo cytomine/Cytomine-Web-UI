@@ -7,7 +7,7 @@ import ListImages from "./components/images/ListImages.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import Account from "./components/Account.vue";
 import AdvancedSearch from "./components/AdvancedSearch.vue";
-import CytomineImage from "./components/viewer/CytomineImage.vue";
+import CytomineViewer from "./components/viewer/CytomineViewer.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
@@ -55,11 +55,11 @@ const routes = [
             },
             {
                 path: "image/:idImage",
-                component: CytomineImage
+                component: CytomineViewer
             },
             {
                 path: "image/:idImage/annotation/:idAnnotation",
-                component: CytomineImage
+                component: CytomineViewer
             },
             {
                 path: "annotations",

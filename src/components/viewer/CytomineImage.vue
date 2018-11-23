@@ -1,6 +1,6 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO job templates -->
-<!-- TODO: multi images -->
+<!-- TODO link images together -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <!-- TODO: allow to select term to associate to newly created annotations -->
 <template>
@@ -33,29 +33,31 @@
             </vl-layer-tile>
 
             <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
-                              :image="imageInstance" 
+                              :idViewer="idViewer"
+                              :index="index"
                               :user-layer="layer">
             </annotation-layer>
 
-            <select-interaction v-if="activeTool == 'select'" :image="imageInstance">
+            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
             </select-interaction>
 
-            <draw-interaction v-if="activeTool != 'select'" :image="imageInstance">
+            <draw-interaction v-if="activeTool != 'select'" :idViewer="idViewer" :index="index">
             </draw-interaction>
 
-            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null" :image="imageInstance">
+            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null"
+                :idViewer="idViewer" :index="index">
             </modify-interaction>
 
         </vl-map>
 
         <div class="draw-tools">
-            <draw-tools :image="imageInstance"></draw-tools>
+            <draw-tools :idViewer="idViewer" :index="index"></draw-tools>
         </div>
 
         <div class="panels">
             <ul>
                 <li>
-                    <a @click="close()" class="close">
+                    <a @click="$emit('close')" class="close">
                         <i class="fa fa-times-circle"></i>
                     </a>
                 </li>
@@ -65,7 +67,7 @@
                         <i class="fa fa-info"></i>
                     </a>
                     <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
-                        :image="imageInstance"></image-information>
+                        :image="image"></image-information>
                 </li>
 
                 <li>
@@ -73,7 +75,7 @@
                         <i class="fa fa-search"></i>
                     </a>
                     <digital-zoom class="panel-options panel-digital-zoom"
-                        v-show="activePanel == 'digital-zoom'" :image="imageInstance"></digital-zoom>
+                        v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
                 </li>
 
                 <li>
@@ -101,7 +103,8 @@
                         <i class="fa fa-files-o"></i>
                     </a>
                     <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
-                        :image="imageInstance" :layers-to-preload="layersToPreload" @hook:mounted="layersMounted = true">
+                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
+                        @hook:mounted="layersMounted = true">
                     </annotations-panel>
                 </li>
 
@@ -110,7 +113,7 @@
                         <i class="fa fa-binoculars"></i>
                     </a>
                     <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
-                        :image="imageInstance"></ontology-panel>
+                        :idViewer="idViewer" :index="index"></ontology-panel>
                 </li>
 
                 <li>
@@ -118,7 +121,7 @@
                         <i class="fa fa-tag"></i>
                     </a>
                     <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
-                        :image="imageInstance"></properties-panel>
+                        :idViewer="idViewer" :index="index"></properties-panel>
                 </li>
 
                 <li>
@@ -131,17 +134,15 @@
             </ul>
         </div>
 
-        <rotation-selector class="rotation-selector-wrapper" :image="imageInstance"></rotation-selector>
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
 
-        <scale-line :image="imageInstance" :mousePosition="projectedMousePosition"></scale-line>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
 
-        <annotation-details-container :image="imageInstance"></annotation-details-container>
+        <annotation-details-container :idViewer="idViewer" :index="index"></annotation-details-container>
     </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
@@ -160,16 +161,20 @@ import SelectInteraction from "./interactions/SelectInteraction";
 import DrawInteraction from "./interactions/DrawInteraction";
 import ModifyInteraction from "./interactions/ModifyInteraction";
 
-import {addProj, createProj} from "vuelayers/lib/ol-ext";
+import {addProj, createProj, getProj} from "vuelayers/lib/ol-ext";
 
 import View from "ol/View";
 import OverviewMap from "ol/control/OverviewMap";
 import WKT from "ol/format/WKT";
 
-import {ImageInstance, AbstractImage, Annotation} from "cytomine-client";
+import {Annotation} from "cytomine-client";
 
 export default {
     name: "cytomine-image",
+    props: [
+        "idViewer",
+        "index"
+    ],
     components: {
         AnnotationLayer,
 
@@ -192,9 +197,8 @@ export default {
     },
     data() {
         return {
-            minZoom: 2, // compute in smarter way?
+            minZoom: 0, // TODO: compute in smarter way?
             
-            projectionName: "CYTO",
             projectedMousePosition: [0, 0],
 
             layersMounted: false,
@@ -205,14 +209,14 @@ export default {
         };
     },
     computed: {
-        idImage() {
-            return this.$route.params.idImage;
-        },
         imageWrapper() {
-            return this.images[this.idImage] || {};
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
-        imageInstance() {
+        image() {
             return this.imageWrapper.imageInstance;
+        },
+        projectionName() {
+            return `CYTO-${this.image.id}`;
         },
         terms() {
             return this.imageWrapper.terms;
@@ -241,7 +245,7 @@ export default {
                 return this.imageWrapper.center;
             },
             set(value) {
-                this.$store.commit("setCenter", {idImage: this.idImage, center: value});
+                this.$store.commit("setCenter", {idViewer: this.idViewer, index: this.index, center: value});
             }
         },
         zoom: {
@@ -249,7 +253,7 @@ export default {
                 return this.imageWrapper.zoom;
             },
             set(value) {
-                this.$store.commit("setZoom", {idImage: this.idImage, zoom: Number(value)});
+                this.$store.commit("setZoom", {idViewer: this.idViewer, index: this.index, zoom: Number(value)});
             }
         },
         rotation: {
@@ -257,25 +261,19 @@ export default {
                 return this.imageWrapper.rotation;
             },
             set(value) {
-                this.$store.commit("setRotation", {idImage: this.idImage, rotation: Number(value)});
+                this.$store.commit("setRotation", {idViewer: this.idViewer, index: this.index, rotation: Number(value)});
             }
         },
 
         extent() {
-            if(this.imageInstance != null) {
-                return [0, 0, this.imageInstance.width, this.imageInstance.height];
-            }
+            return [0, 0, this.image.width, this.image.height];
         },
         imageSize() {
-            if(this.imageInstance != null) {
-                return [this.imageInstance.width, this.imageInstance.height];
-            }
+            return [this.image.width, this.image.height];
         },
         baseLayerURL() { // TODO: randomize + filter (see ULiege repo)
-            if(this.imageInstance != null) {
-                return `${this.imageInstance.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                    &channels=0&layer=0&timeframe=0&mimeType=${this.imageInstance.mime}`;
-            }
+            return `${this.image.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
+                &channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
         },
 
         layersToPreload() {
@@ -286,17 +284,15 @@ export default {
 
         goToAnnotationTrigger() {
             return (this.routedAnnotation != null) && this.layersMounted && this.viewMounted;
-        },
-
-        ...mapState({images: state => state.images.images})
+        }
     },
     watch: {
         triggerUpdateSize() {
             this.$refs.map.updateSize();
         },
 
-        async goToAnnotationTrigger(val) {
-            if(val) {
+        async goToAnnotationTrigger(validTrigger) {
+            if(validTrigger) {
                 await this.$refs.view.$createPromise; // wait for ol.View to be created
                 this.goToAnnotation();
             }
@@ -341,7 +337,7 @@ export default {
                 let feature = layer.olSource.getFeatureById(annot.id);
                 if(feature) {
                     clearInterval(interval);
-                    this.$store.dispatch("selectFeature", {idImage: this.idImage, feature});
+                    this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
                 }
                 else if(retries == 5) {
                     clearInterval(interval);
@@ -351,44 +347,33 @@ export default {
         },
 
         togglePanel(panel) {
-            this.$store.commit("togglePanel", {idImage: this.idImage, panel});
-        },
-
-        close() {
-            this.$store.commit("removeImage", this.imageInstance.id);
-            this.$router.push("/"); // TODO: change
-        },
+            this.$store.commit("togglePanel", {idViewer: this.idViewer, index: this.index, panel});
+        }
     },
     async mounted() {
-        if(this.imageInstance == null) { // if image not in store
-            let imageInstance = await ImageInstance.fetch(this.idImage);
-
-            let imageServerURLs = await new AbstractImage({id: imageInstance.baseImage}).fetchImageServers();
-            imageInstance.imageServerURL = imageServerURLs[0];
-
-            let cytoProjection = createProj({
-                code: this.projectionName, 
-                extent: [0, 0, imageInstance.width, imageInstance.height]
-            });
-            addProj(cytoProjection);
-
-            await this.$store.dispatch("addImage", {image: imageInstance});
-        }
-        else {
-            // remove all selected features in order to reselect them when they will be added to the map (otherwise,
-            // issue with the select interaction)
-            this.selectedLayers.forEach(layer => {
-                this.$store.commit("removeLayerFromSelectedFeatures", {
-                    idImage: this.idImage,
-                    idLayer: layer.id,
-                    cache: true
-                });
-            });
+        if(getProj(this.projectionName) == null) { // if image opened for the first time
+            let projection = createProj({code: this.projectionName, extent: this.extent});
+            addProj(projection);
         }
 
+        // remove all selected features in order to reselect them when they will be added to the map (otherwise,
+        // issue with the select interaction)
+        this.selectedLayers.forEach(layer => {
+            this.$store.commit("removeLayerFromSelectedFeatures", {
+                idViewer: this.idViewer,
+                index: this.index,
+                idLayer: layer.id,
+                cache: true
+            });
+        });
+
+        // TODO: this should be executed only once, for first image of viewer
         let idRoutedAnnot = this.$route.params.idAnnotation;
         if(idRoutedAnnot != null) {
-            this.routedAnnotation = await Annotation.fetch(idRoutedAnnot);
+            let annot = await Annotation.fetch(idRoutedAnnot);
+            if(annot.image == this.image.id) {
+                this.routedAnnotation = annot;
+            }
         }
 
         this.loading = false;
@@ -401,9 +386,10 @@ export default {
 /* @import "~ol/ol.css"; */
 
 .map-container {
+    display:flex;
+    position: relative;
     width: 100%;
     height: 100%;
-    display:flex;
 }
 
 .map {
@@ -438,7 +424,9 @@ export default {
     position: relative;
     display: block;
     padding: 10px;
-    font-size: 20px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-size: 18px;
     color: #eee;
     border-bottom: 1px solid #222;
     text-decoration: none;
@@ -480,7 +468,7 @@ export default {
 
 .panel-options {
     position: absolute;
-    right: 40px;
+    right: 38px;
     top: -20px;
     width: 300px;
     min-height: 100px;

@@ -1,12 +1,12 @@
 <template>
 <div>
     <vl-layer-vector>
-        <vl-source-vector ident="draw-target" ref="olSourceDrawTarget"></vl-source-vector>
+        <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget"></vl-source-vector>
     </vl-layer-vector>
 
     <vl-interaction-draw v-if="activeLayer"
                         ref="olDrawInteraction" 
-                        :source="targetSource" 
+                        :source="drawSourceName"
                         :type="objectDrawType"
                         :freehand="drawFreehand" 
                         :freehand-condition="undefined"
@@ -25,17 +25,22 @@ import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-interaction",
+    props: [
+        "idViewer",
+        "index"
+    ],
     data() {
         return {
             features: [],
-            format: new WKT(),
-            targetSource: "draw-target"
+            format: new WKT()
         };
     },
-    props: ["image"],
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        idImage() {
+            return this.imageWrapper.imageInstance.id;
         },
         activeTool() {
             return this.imageWrapper.activeTool;
@@ -76,13 +81,16 @@ export default {
             return this.imageWrapper.selectedLayers || [];
         },
         activeLayer() {
-            // QUESTION: treat multiple active layers ? I don't think it's a good idea, discuss with team
+            // TODO: treat multiple active layers
             return this.layers.find(layer => layer.drawOn);
         },
         activeSource() {
             if(this.activeLayer) {
                 return this.activeLayer.olSource;
             }
+        },
+        drawSourceName() {
+            return `draw-target-${this.idViewer}-${this.index}`;
         }
     },
 
@@ -103,16 +111,16 @@ export default {
                 return;
             }
             let user = this.activeLayer.id;
-            let annot = new Annotation({location: this.getWktLocation(feature), image: this.image.id, user});
+            let annot = new Annotation({location: this.getWktLocation(feature), image: this.idImage, user});
             try {
                 await annot.save();
                 feature.set("annot", annot);
                 feature.setId(annot.id);
                 this.activeSource.addFeature(feature);
-                this.$store.dispatch("selectFeature", {idImage: this.image.id, feature});
+                this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
 
-                this.$store.commit("addAction", {idImage: this.image.id, feature, oldAnnot: null});
-                // TODO this.$store.commit("incrementAnnotCount", {idImage: this.image.id, idLayer: annot.user});
+                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot: null});
+                // TODO this.$store.commit("incrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
@@ -128,7 +136,7 @@ export default {
             let geom = this.getWktLocation(feature);
             let idLayer = this.activeLayer.id;
             try {
-                let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, [idLayer]);
+                let correctedAnnot = await Annotation.correctAnnotations(this.idImage, geom, review, remove, [idLayer]);
                 if(correctedAnnot != null) {
                     let correctedFeature = this.activeSource.getFeatureById(correctedAnnot.id);
                     if(correctedFeature == null) {
@@ -136,7 +144,8 @@ export default {
                     }
                     
                     this.$store.commit("addAction", {
-                        idImage: this.image.id, 
+                        idViewer: this.idViewer,
+                        index: this.index,
                         feature: correctedFeature, 
                         oldAnnot: correctedFeature.get("annot")
                     });
@@ -145,7 +154,11 @@ export default {
                     correctedFeature.setId(correctedAnnot.id);
                     correctedFeature.setGeometry(new WKT().readGeometry(correctedAnnot.location));
 
-                    this.$store.dispatch("selectFeature", {idImage: this.image.id, feature: correctedFeature});
+                    this.$store.dispatch("selectFeature", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        feature: correctedFeature
+                    });
 
                     // refresh the source because several annotations might have been modified
                     this.activeSource.clear();

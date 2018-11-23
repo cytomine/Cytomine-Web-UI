@@ -59,7 +59,11 @@ import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "annotations-panel",
-    props: ["image", "layersToPreload"],
+    props: [
+        "idViewer",
+        "index",
+        "layersToPreload"
+    ],
     data() {
         return {
             layers: [], // Array<User> (representing user layers)
@@ -68,14 +72,21 @@ export default {
     },
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        image() {
+            return this.imageWrapper.imageInstance;
         },
         layersOpacity: {
             get() {
                 return this.imageWrapper.layersOpacity;
             },
             set(value) {
-                this.$store.commit("setLayersOpacity", {idImage: this.image.id, opacity: Number(value)});
+                this.$store.commit("setLayersOpacity", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    opacity: Number(value)
+                });
             }
         },
         selectedLayers() { // Array<User> (representing user layers)
@@ -118,17 +129,26 @@ export default {
             layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
             layer.locked = false;
-            this.$store.dispatch("addLayer", {idImage: this.image.id, layer});
+            this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
         },
 
         removeLayer(index, cacheSelectedFeatures=false) {
-            this.$store.dispatch("removeLayer", {idImage: this.image.id, indexLayer: index, cacheSelectedFeatures});
+            this.$store.dispatch("removeLayer", {
+                idViewer: this.idViewer,
+                index: this.index,
+                indexLayer: index,
+                cacheSelectedFeatures
+            });
         },
 
         toggleLayerVisibility(index) {
-            this.$store.dispatch("toggleLayerVisibility", {idImage: this.image.id, indexLayer: index});
+            this.$store.dispatch("toggleLayerVisibility", {
+                idViewer: this.idViewer,
+                index: this.index,
+                indexLayer: index
+            });
         },
 
         async loadLayers() {

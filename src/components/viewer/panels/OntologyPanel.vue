@@ -42,10 +42,13 @@
 <script>
 export default {
     name: "ontology-panel",
-    props: ["image"],
+    props: [
+        "idViewer",
+        "index"
+    ],
     computed: {
         imageWrapper() {
-            return this.$store.state.images.images[this.image.id];
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
         terms() {
             return this.imageWrapper.terms;
@@ -55,13 +58,13 @@ export default {
                 return this.imageWrapper.displayNoTerm;
             },
             set(value) {
-                this.$store.commit("setDisplayNoTerm", {idImage: this.image.id, value});
+                this.$store.commit("setDisplayNoTerm", {idViewer: this.idViewer, index: this.index, value});
             }
         }
     },
     methods: {
         toggleTermVisibility(index) {
-            this.$store.commit("toggleTermVisibility", {idImage: this.image.id, indexTerm: index});
+            this.$store.commit("toggleTermVisibility", {idViewer: this.idViewer, index: this.index, indexTerm: index});
         }
     }
 };

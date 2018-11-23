@@ -15,14 +15,17 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 import WKT from "ol/format/WKT";
 
 import {AnnotationCollection} from "cytomine-client";
 
 export default {
     name: "annotation-layer",
+    props: [
+        "idViewer",
+        "index",
+        "userLayer"
+    ],
     data() {
         return {
             format: new WKT(),
@@ -32,19 +35,16 @@ export default {
             maxResolutionNoClusters: null,
         };
     },
-    props: [
-        "image",
-        "userLayer"
-    ],
     computed: {
         imageWrapper() {
-            return this.images[this.image.id] || {};
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
-
+        image() {
+            return this.imageWrapper.imageInstance;
+        },
         annotsIdsToSelect() {
             return this.imageWrapper.annotsToSelect.map(annot => annot.id);
         },
-
         imageExtent() {
             return [0, 0, this.image.width, this.image.height];
         },
@@ -60,11 +60,9 @@ export default {
             this.imageWrapper.selectedPropertyColor;
 
             return () => {
-                return this.$store.getters.genStyleFunction(this.image.id);
+                return this.$store.getters.genStyleFunction(this.idViewer, this.index);
             };
-        },
-
-        ...mapState({images: state => state.images.images})
+        }
     },
     methods: {
         strategyFactory() {
@@ -73,8 +71,13 @@ export default {
                 ((resolution != this.resolution && this.clustered) // zoom modification while clustering is performed
                 || (resolution >= this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters))) { // re-cluster
                     // following clear(), selected feature is removed => need to cache it and reselect it based on ID
-                    this.$store.commit("removeLayerFromSelectedFeatures",
-                        {idImage: this.image.id, idLayer: this.userLayer.id, cache: true});
+                    this.$store.commit("removeLayerFromSelectedFeatures", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        idLayer: this.userLayer.id,
+                        cache: true
+                    });
+
                     if(this.$refs.olSource) {
                         this.$refs.olSource.clear();
                     }
@@ -135,7 +138,7 @@ export default {
                 feature.set("annot", annot);
 
                 if(this.annotsIdsToSelect.includes(annot.id)) {
-                    this.$store.dispatch("selectFeature", {idImage: this.image.id, feature});
+                    this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
                 }
                 return feature;
             });
