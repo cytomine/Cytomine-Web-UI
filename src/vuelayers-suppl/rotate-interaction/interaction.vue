@@ -123,8 +123,8 @@ const methods = {
     },
 };
 
-const watch = makeWatchers(["source"], function () {
-    this.recreate();
+const watch = makeWatchers(["source"], () => function () {
+    this.scheduleRecreate();
 });
 
 /**
