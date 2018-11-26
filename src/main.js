@@ -10,6 +10,7 @@ import i18n from "./lang.js";
 import store from "./store/store.js";
 
 import {Cytomine} from "cytomine-client";
+import constants from "./utils/constants.js";
 
 import Buefy from "buefy";
 import "buefy/dist/buefy.css";
@@ -34,7 +35,7 @@ Vue.use(vClickOutside);
 Vue.use(VTooltip);
 Vue.config.productionTip = false;
 
-new Cytomine("localhost-core");
+new Cytomine(constants.CYTOMINE_CORE_HOST);
 
 new Vue({
     render: h => h(App),
