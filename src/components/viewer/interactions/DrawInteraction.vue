@@ -7,7 +7,7 @@
     <vl-interaction-draw v-if="activeLayer"
                         ref="olDrawInteraction" 
                         :source="drawSourceName"
-                        :type="objectDrawType"
+                        :type="drawType"
                         :freehand="drawFreehand" 
                         :freehand-condition="undefined"
                         :geometry-function="drawGeometryFunction" 
@@ -61,13 +61,6 @@ export default {
                     return "Polygon";
             }
         },
-        objectDrawType() {
-            // HACK: vuelayers triggers recreate() only for changes of type or source; but it needs to be triggered at 
-            // each change of the active tool (required also for freeHand or geometryFunction changes) 
-            // => return a String object, which will trigger the change even if the string value remains the same
-            // Remark: calling the recreate() method manually leads to duplicate interactions
-            return new String(this.drawType);
-        },
         drawCorrection() {
             return this.activeTool == "correct-add" || this.activeTool == "correct-remove";
         },
@@ -91,6 +84,12 @@ export default {
         },
         drawSourceName() {
             return `draw-target-${this.idViewer}-${this.index}`;
+        }
+    },
+
+    watch: {
+        activeTool() {
+            this.$refs.olDrawInteraction.scheduleRecreate();
         }
     },
 
