@@ -6,7 +6,6 @@
         <thead>
             <tr>
                 <th class="checkbox-column"><span class="fa fa-eye"></span></th>
-                <th class="checkbox-column"></th>
                 <th></th>
             </tr>
         </thead>
@@ -15,11 +14,8 @@
                 <td class="checkbox-column">
                     <input type="checkbox" :checked="term.visible" @change="toggleTermVisibility(index)">
                 </td>
-                <td class="checkbox-column">
-                    <div class="color-preview" :style="{background: term.color}"></div>
-                </td>
-                <td class="name-column">
-                    {{term.name}}
+                <td>
+                    <cytomine-term :term="term"></cytomine-term>
                 </td>
             </tr>
             <tr>
@@ -29,8 +25,7 @@
                 <td class="checkbox-column">
                     <input type="checkbox" v-model="displayNoTerm">
                 </td>
-                <td class="checkbox-column"></td>
-                <td class="name-column">
+                <td>
                     {{ $t("no-term") }}
                 </td>
             </tr>
@@ -40,8 +35,11 @@
 </template>
 
 <script>
+import CytomineTerm from "@/components/utils/CytomineTerm";
+
 export default {
     name: "ontology-panel",
+    components: {CytomineTerm},
     props: [
         "idViewer",
         "index"
@@ -79,18 +77,6 @@ td, th {
 th.checkbox-column, td.checkbox-column {
     width: 25px;
     text-align: center !important;
-}
-
-th.name-column, td.name-column {
-    width: 200px;
-}
-
-.color-preview {
-    width: 15px;
-    height: 15px;
-    margin-top: 2px;
-    border-radius: 3px;
-    box-shadow: 0px 0px 1px #777;
 }
 </style>
 

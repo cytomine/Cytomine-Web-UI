@@ -35,8 +35,7 @@
                         <h5>{{$t("terms")}}</h5>
                         <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                         :title="`${$t('associated-by')} ${user.fullName}`">
-                            <div class="color-preview" :style="{background: term.color}"></div>
-                            {{term.name}}
+                            <cytomine-term :term="term"></cytomine-term>
                             <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
                         </b-tag> 
                         <b-field>
@@ -49,8 +48,7 @@
                                 size="is-small"
                                 @select="addTerm">
                                 <div slot-scope="{option: term}" class="autocomplete-term-option">
-                                    <div class="color-preview" :style="{background: term.color}"></div>
-                                    {{term.name}}
+                                    <cytomine-term :term="term"></cytomine-term>
                                 </div>
                                 <div slot="empty" class="autocomplete-term-option">
                                     {{$t("no-term-to-add")}}
@@ -136,10 +134,11 @@
 import {Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/utils/CytomineDescription";
+import CytomineTerm from "@/components/utils/CytomineTerm";
 
 export default {
     name: "annotations-details",
-    components: {CytomineDescription},
+    components: {CytomineDescription, CytomineTerm},
     props: {
         annotation: {type: Object},
         terms: {type: Array},
@@ -323,16 +322,6 @@ h5 {
 .annotation-details .actions .button {
     margin: 3px;
     box-sizing: border-box;
-}
-.color-preview {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    margin-right: 3px;
-    border-radius: 3px;
-    box-shadow: 0px 0px 1px #777;
-    position: relative;
-    top: 2px;
 }
 
 .annotation-details button.is-fullwidth {
