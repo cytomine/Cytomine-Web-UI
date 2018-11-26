@@ -28,7 +28,8 @@ export default {
             Vue.set(state.viewers, id, {
                 maps: [],
                 name,
-                idProject
+                idProject,
+                links: []
             });
         },
 
@@ -54,18 +55,89 @@ export default {
             }
         },
 
+        // ----- View links
+
+        linkMaps(state, {idViewer, indexes}) {
+            let links = state.viewers[idViewer].links;
+            let groups = indexes.map(index => links.findIndex(group => group.includes(index)));
+
+            if(groups[0] != -1) {
+                if(groups[1] == -1) {
+                    links[groups[0]].push(indexes[1]);
+                }
+                else if(groups[0] != groups[1]) { // merge the groups
+                    links[groups[0]].push(...links[groups[1]]);
+                    links.splice(groups[1], 1);
+                }
+            }
+            else if(groups[1] != -1) {
+                links[groups[1]].push(indexes[0]);
+            }
+            else { // create new group linking the maps
+                links.push(indexes);
+            }
+        },
+
+        unlinkMap(state, {idViewer, index, deletion=false}) {
+            let links = state.viewers[idViewer].links;
+            for(let i = links.length - 1; i >= 0; i--) {
+                let group = links[i];
+                for(let j = group.length - 1; j >= 0; j--) {
+                    if(group[j] == index) {
+                        group.splice(j, 1);
+                        if(group.length == 1) { // if group no longer contains several maps, delete it
+                            links.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    if(deletion && group[j] > index) { // if a map is about to be deleted, higher indexes should be updated
+                        group[j] = group[j] - 1;
+                    }
+                }
+            }
+        },
+
         // ----- View properties
 
         setCenter(state, {idViewer, index, center}) {
-            state.viewers[idViewer].maps[index].center = center;
+            let viewerWrapper = state.viewers[idViewer];
+            let refImageWrapper = viewerWrapper.maps[index];
+            let increments = refImageWrapper.center.map((val, i) => center[i] - val);
+            let refZoom = refImageWrapper.imageInstance.depth - refImageWrapper.zoom;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                let imageWrapper = viewerWrapper.maps[idx];
+                let diffZoom = imageWrapper.imageInstance.depth - imageWrapper.zoom - refZoom;
+                let zoomFactor = Math.pow(2, diffZoom);
+                viewerWrapper.maps[idx].center = viewerWrapper.maps[idx].center.map((val, i) => {
+                    return val + increments[i]*zoomFactor;
+                });
+            });
         },
 
         setZoom(state, {idViewer, index, zoom}) {
-            state.viewers[idViewer].maps[index].zoom = zoom;
+            let viewerWrapper = state.viewers[idViewer];
+            let zoomIncrement = zoom - viewerWrapper.maps[index].zoom;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                viewerWrapper.maps[idx].zoom += zoomIncrement;
+            });
         },
 
         setRotation(state, {idViewer, index, rotation}) {
-            state.viewers[idViewer].maps[index].rotation = rotation;
+            let viewerWrapper = state.viewers[idViewer];
+            let rotationInc = rotation - viewerWrapper.maps[index].rotation + 2*Math.PI;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                viewerWrapper.maps[idx].rotation = (viewerWrapper.maps[idx].rotation + rotationInc) % (2*Math.PI);
+            });
         },
 
         // ----- Digital zoom
@@ -303,6 +375,11 @@ export default {
                 undoneActions: []
             };
             commit("addMap", {idViewer, wrapper});
+        },
+
+        removeMap({commit}, {idViewer, index}) {
+            commit("unlinkMap", {idViewer, index, deletion: true});
+            commit("removeMap", {idViewer, index});
         },
 
         removeLayer({state, commit}, {idViewer, index, indexLayer, cacheSelectedFeatures}) {

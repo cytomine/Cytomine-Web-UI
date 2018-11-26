@@ -78,13 +78,12 @@
                         v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
                 </li>
 
-                <li>
+                <li v-if="viewerWrapper.maps.length > 1">
                     <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
                         <i class="fa fa-link"></i>
                     </a>
-                    <div class="panel-options panel-link" v-show="activePanel == 'link'">
-                        Not yet implemented
-                    </div>
+                    <link-panel class="panel-options panel-link"
+                        v-show="activePanel == 'link'" :idViewer="idViewer" :index="index"></link-panel>
                 </li>
 
                 <li>
@@ -150,6 +149,7 @@ import DrawTools from "./DrawTools";
 
 import ImageInformation from "./panels/ImageInformation";
 import DigitalZoom from "./panels/DigitalZoom";
+import LinkPanel from "./panels/LinkPanel";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
 import PropertiesPanel from "./panels/PropertiesPanel";
@@ -186,6 +186,7 @@ export default {
 
         ImageInformation,
         DigitalZoom,
+        LinkPanel,
         AnnotationsPanel,
         OntologyPanel,
         PropertiesPanel,
@@ -209,8 +210,11 @@ export default {
         };
     },
     computed: {
+        viewerWrapper() {
+            return this.$store.state.images.viewers[this.idViewer];
+        },
         imageWrapper() {
-            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+            return this.viewerWrapper.maps[this.index];
         },
         image() {
             return this.imageWrapper.imageInstance;

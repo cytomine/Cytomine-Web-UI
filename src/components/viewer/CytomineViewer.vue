@@ -4,7 +4,7 @@
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <template v-if="!loading">
         <div class="viewer-header">
-            <b-select :placeholder="$t('select-image-to-add')" v-model="imageToAdd">
+            <b-select :placeholder="$t('select-image-to-add')" v-model="imageToAdd" class="add-image">
                 <option v-for="image in images" :key="image.id" :value="image">{{image.instanceFilename}}</option>
             </b-select>
             <button class="button" @click="addMap()">{{$t("button-add-viewer")}}</button>
@@ -85,7 +85,7 @@ export default {
                 this.$router.push("/"); // TODO: change
             }
             else {
-                this.$store.commit("removeMap", {idViewer: this.idBaseImage, index});
+                this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
             }
         }
     },
@@ -139,7 +139,7 @@ export default {
 </style>
 
 <style>
-.cytomine-viewer select {
+.add-image select {
     width: 250px;
 }
 </style>
