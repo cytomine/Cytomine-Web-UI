@@ -6,6 +6,24 @@
             <span class="icon is-small"><i class="fa fa-mouse-pointer"></i></span>
         </button>
     </div>
+    <div class="buttons has-addons term-selection" @mouseleave="showTermSelector = false">
+            <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
+                <span class="icon is-small"><i class="fa fa-hashtag"></i></span>
+            </button>
+            <div class="color-preview" :style="{background: backgroundTermsNewAnnot}"></div>
+            <div class="dropdown-menu" v-show="showTermSelector">
+                <div class="dropdown-content">
+                    <a class="dropdown-item" v-for="(term, idx) in terms" :key="term.id" @click="toggleTerm(idx)" :class="{'is-selected': term.associateToNewAnnot}">
+                        <div class="autocomplete-term-option">
+                            <span class="selection"><i class="fa fa-check"></i></span>
+                            <span>
+                                <cytomine-term :term="term"></cytomine-term>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+    </div>
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
@@ -74,19 +92,45 @@
 </template>
 
 <script>
+import CytomineTerm from "@/components/utils/CytomineTerm";
+
 import WKT from "ol/format/WKT";
 
 import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-tools",
+    components: {CytomineTerm},
     props: [
         "idViewer",
         "index"
     ],
+    data() {
+        return {
+            showTermSelector: false
+        };
+    },
     computed: {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        terms() {
+            return this.imageWrapper.terms;
+        },
+        termsToAssociate() {
+            return this.terms.filter(term => term.associateToNewAnnot);
+        },
+        backgroundTermsNewAnnot() {
+            if(this.termsToAssociate.length == 0) {
+                return "white";
+            }
+            else if(this.termsToAssociate.length == 1) {
+                return this.termsToAssociate[0].color;
+            }
+            else {
+                let colors = this.termsToAssociate.map(term => term.color);
+                return `-webkit-linear-gradient(${colors.join()})`;
+            }
         },
         activeTool: {
             get() {
@@ -159,6 +203,14 @@ export default {
         activateEditTool(tool) {
             this.activeTool = "select";
             this.activeEditTool = (this.activeEditTool == tool) ? null : tool; // toggle behaviour
+        },
+
+        toggleTerm(indexTerm) {
+            this.$store.commit("toggleAssociateTermToNewAnnot", {
+                idViewer: this.idViewer,
+                index: this.index,
+                indexTerm: indexTerm
+            });
         },
 
         findSource(annot) {
@@ -299,4 +351,43 @@ export default {
 
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
+
+.term-selection {
+    position: relative;
+}
+
+.term-selection .dropdown-menu {
+    display: block;
+    z-index: 500;
+    left: -20px;
+}
+
+.term-selection .dropdown-menu a.is-selected {
+    background: #f5f5f5;
+}
+
+.term-selection .dropdown-menu a:not(.is-selected) i.fa {
+    display: none;
+}
+
+.term-selection .selection {
+    width: 15px;
+    display: inline-block;
+    position: relative;
+    right: 6px;
+}
+
+.color-preview {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 2px;
+    box-shadow: 0px 0px 1px #777;
+    position: absolute;
+    bottom: 3px;
+    right: 2px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
 </style>

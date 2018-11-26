@@ -36,8 +36,19 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        termsToAssociate() {
+            return this.imageWrapper.terms.reduce((ids, term) => {
+                if(term.associateToNewAnnot) {
+                    ids.push(term.id);
+                }
+                return ids;
+            }, []);
         },
         idImage() {
             return this.imageWrapper.imageInstance.id;
@@ -109,10 +120,23 @@ export default {
             if(this.activeLayer == null) {
                 return;
             }
+
             let user = this.activeLayer.id;
-            let annot = new Annotation({location: this.getWktLocation(feature), image: this.idImage, user});
+            let annot = new Annotation({
+                location: this.getWktLocation(feature),
+                image: this.idImage,
+                user,
+                term: this.termsToAssociate
+            });
+
             try {
                 await annot.save();
+                // TODO in backend: response should include userByTerm and correct value for term
+                annot.term = this.termsToAssociate.slice();
+                annot.userByTerm = this.termsToAssociate.map(term => {
+                    return {term, user: [this.currentUser.id]}
+                });
+                // ----
                 feature.set("annot", annot);
                 feature.setId(annot.id);
                 this.activeSource.addFeature(feature);

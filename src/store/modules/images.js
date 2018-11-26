@@ -150,7 +150,13 @@ export default {
             state.viewers[idViewer].maps[index].digitalZoom = digitalZoom;
         },
 
-        // ----- Terms visibility
+        // ----- Terms
+
+        toggleAssociateTermToNewAnnot(state, {idViewer, index, indexTerm}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let term = wrapper.terms[indexTerm];
+            term.associateToNewAnnot = !term.associateToNewAnnot;
+        },
 
         toggleTermVisibility(state, {idViewer, index, indexTerm}) {
             let wrapper = state.viewers[idViewer].maps[index];
@@ -178,6 +184,7 @@ export default {
 
         setDisplayNoTerm(state, {idViewer, index, value}) { // TODO: change name
             state.viewers[idViewer].maps[index].displayNoTerm = value;
+            // TODO: unselect annot if no longer displayed
         },
 
         // ----- Selected layers
@@ -332,6 +339,7 @@ export default {
             terms.array.forEach(term => {
                 term.olStyle = createColorStyle(term.color, defaultStroke); // must be handled in image (can change opacity in one particular viewer)
                 term.visible = true;
+                term.associateToNewAnnot = false;
             });
 
             let propertiesKeys = await propertiesKeysPromise;

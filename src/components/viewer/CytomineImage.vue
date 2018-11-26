@@ -1,8 +1,8 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO job templates -->
-<!-- TODO link images together -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO: allow to select term to associate to newly created annotations -->
+<!-- TODO color manipulation -->
+<!-- TODO proper handling of annotation count -->
 <template>
     <div class="map-container" v-if="!loading">
 
@@ -109,7 +109,7 @@
 
                 <li v-if="terms.length > 0">
                     <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
-                        <i class="fa fa-binoculars"></i>
+                        <i class="fa fa-hashtag"></i>
                     </a>
                     <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
                         :idViewer="idViewer" :index="index"></ontology-panel>
@@ -482,12 +482,12 @@ export default {
     z-index: 100;
 }
 
-.panel-layers {
+.panel-layers, .panel-ontology {
     top: unset;
     bottom: -40px;
 }
 
-.panel-ontology, .panel-properties, .panel-guided-tour {
+.panel-properties, .panel-guided-tour {
     top: unset;
     bottom: -20px;
 }
