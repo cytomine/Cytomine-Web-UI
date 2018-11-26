@@ -31,7 +31,7 @@ export default {
             format: new WKT(),
 
             resolution: null,
-            clustered: false,
+            clustered: null,
             maxResolutionNoClusters: null,
         };
     },
@@ -123,10 +123,10 @@ export default {
                             this.maxResolutionNoClusters = resolution;
                         }
                     }
-                }
 
-                if(this.$refs.olSource) {
-                    this.$refs.olSource.addFeatures(this.createFeatures(annots.array));
+                    if(this.$refs.olSource) {
+                        this.$refs.olSource.addFeatures(this.createFeatures(annots.array));
+                    }
                 }
             };
         },
