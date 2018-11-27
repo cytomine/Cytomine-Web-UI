@@ -26,7 +26,7 @@
                     <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
                 </td>
                 <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.drawOn"> <!-- TODO -->
+                    <input type="checkbox" :checked="layer.drawOn" @change="toggleLayerDrawOn(index)">
                 </td>
                 <td class="checkbox-column">
                     <input type="checkbox" :checked="layer.locked"> <!-- TODO -->
@@ -129,6 +129,7 @@ export default {
             layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
             layer.locked = false;
+            layer.olSource = null;
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -145,6 +146,14 @@ export default {
 
         toggleLayerVisibility(index) {
             this.$store.dispatch("toggleLayerVisibility", {
+                idViewer: this.idViewer,
+                index: this.index,
+                indexLayer: index
+            });
+        },
+
+        toggleLayerDrawOn(index) {
+            this.$store.commit("toggleLayerDrawOn", {
                 idViewer: this.idViewer,
                 index: this.index,
                 indexLayer: index

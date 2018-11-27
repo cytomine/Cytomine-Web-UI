@@ -221,6 +221,11 @@ export default {
             layer.visible = !layer.visible;
         },
 
+        toggleLayerDrawOn(state, {idViewer, index, indexLayer}) {
+            let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+            layer.drawOn = !layer.drawOn;
+        },
+
         setLayersOpacity(state, {idViewer, index, opacity}) {
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.layersOpacity = opacity;

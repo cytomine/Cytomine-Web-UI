@@ -145,7 +145,7 @@ export default {
         },
 
         associateSource() {
-            this.userLayer.olSource = this.$refs.olSource;
+            this.userLayer.olSource = this.$refs.olSource; // TODO in store
         }
     }
 };

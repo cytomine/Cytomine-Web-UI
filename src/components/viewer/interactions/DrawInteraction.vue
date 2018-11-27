@@ -4,7 +4,7 @@
         <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget"></vl-source-vector>
     </vl-layer-vector>
 
-    <vl-interaction-draw v-if="activeLayer"
+    <vl-interaction-draw v-if="nbActiveLayers > 0"
                         ref="olDrawInteraction" 
                         :source="drawSourceName"
                         :type="drawType"
@@ -84,14 +84,11 @@ export default {
         layers() {
             return this.imageWrapper.selectedLayers || [];
         },
-        activeLayer() {
-            // TODO: treat multiple active layers
-            return this.layers.find(layer => layer.drawOn);
+        activeLayers() {
+            return this.layers.filter(layer => layer.drawOn);
         },
-        activeSource() {
-            if(this.activeLayer) {
-                return this.activeLayer.olSource;
-            }
+        nbActiveLayers() {
+            return this.activeLayers.length;
         },
         drawSourceName() {
             return `draw-target-${this.idViewer}-${this.index}`;
@@ -106,85 +103,74 @@ export default {
 
     methods: {
         async drawEndHandler({feature}) {
-            if(this.drawCorrection) {
-                await this.endCorrection(feature);
-            }
-            else {
-                await this.endDraw(feature);
+            if(this.nbActiveLayers > 0) {
+                if(this.drawCorrection) {
+                    await this.endCorrection(feature);
+                }
+                else {
+                    await this.endDraw(feature);
+                }
             }
 
             this.$refs.olSourceDrawTarget.clear(true);
         },
 
-        async endDraw(feature) {
-            if(this.activeLayer == null) {
-                return;
-            }
-
-            let user = this.activeLayer.id;
-            let annot = new Annotation({
-                location: this.getWktLocation(feature),
-                image: this.idImage,
-                user,
-                term: this.termsToAssociate
-            });
-
-            try {
-                await annot.save();
-                // TODO in backend: response should include userByTerm and correct value for term
-                annot.term = this.termsToAssociate.slice();
-                annot.userByTerm = this.termsToAssociate.map(term => {
-                    return {term, user: [this.currentUser.id]};
+        async endDraw(drawnFeature) {
+            this.activeLayers.forEach(async (layer, idx) => {
+                let annot = new Annotation({
+                    location: this.getWktLocation(drawnFeature),
+                    image: this.idImage,
+                    user: layer.id,
+                    term: this.termsToAssociate
                 });
-                // ----
-                feature.set("annot", annot);
-                feature.setId(annot.id);
-                this.activeSource.addFeature(feature);
-                this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
 
-                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot: null});
-                // TODO this.$store.commit("incrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
-            }
-            catch(err) {
-                this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
-            }
+                try {
+                    await annot.save();
+                    // TODO in backend: response should include userByTerm and correct value for term
+                    annot.term = this.termsToAssociate.slice();
+                    annot.userByTerm = this.termsToAssociate.map(term => {
+                        return {term, user: [this.currentUser.id]};
+                    });
+                    // ----
+                    let feature = this.format.readFeature(annot.location);
+                    feature.set("annot", annot);
+                    feature.setId(annot.id);
+                    layer.olSource.addFeature(feature);
+
+                    if(idx == this.nbActiveLayers - 1) {
+                        this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
+                    }
+
+                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot: null});
+                    // TODO this.$store.commit("incrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
+                }
+                catch(err) {
+                    this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
+                }
+            });
         },
 
         async endCorrection(feature) {
-            if(this.activeLayer == null) {
-                return;
-            }
             let remove = (this.activeTool == "correct-remove");
             let review = false; // TODO: handle
             let geom = this.getWktLocation(feature);
-            let idLayer = this.activeLayer.id;
+            let idLayers = this.activeLayers.map(layer => layer.id);
             try {
-                let correctedAnnot = await Annotation.correctAnnotations(this.idImage, geom, review, remove, [idLayer]);
+                let correctedAnnot = await Annotation.correctAnnotations(this.idImage, geom, review, remove, idLayers);
                 if(correctedAnnot != null) {
-                    let correctedFeature = this.activeSource.getFeatureById(correctedAnnot.id);
-                    if(correctedFeature == null) {
-                        return;
+                    let layer = this.activeLayers.find(layer => layer.id == correctedAnnot.user);
+                    let correctedFeature = layer.olSource.getFeatureById(correctedAnnot.id);
+                    if(correctedFeature != null) {
+                        this.$store.commit("addAction", {
+                            idViewer: this.idViewer,
+                            index: this.index,
+                            feature: correctedFeature,
+                            oldAnnot: correctedFeature.get("annot")
+                        });
                     }
-                    
-                    this.$store.commit("addAction", {
-                        idViewer: this.idViewer,
-                        index: this.index,
-                        feature: correctedFeature, 
-                        oldAnnot: correctedFeature.get("annot")
-                    });
 
-                    correctedFeature.set("annot", correctedAnnot);
-                    correctedFeature.setId(correctedAnnot.id);
-                    correctedFeature.setGeometry(new WKT().readGeometry(correctedAnnot.location));
-
-                    this.$store.dispatch("selectFeature", {
-                        idViewer: this.idViewer,
-                        index: this.index,
-                        feature: correctedFeature
-                    });
-
-                    // refresh the source because several annotations might have been modified
-                    this.activeSource.clear();
+                    // refresh the sources because several annotations might have been modified
+                    this.activeLayers.map(layer => layer.olSource.clear());
                 }
             }
             catch(err) {
