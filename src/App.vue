@@ -12,13 +12,24 @@
         </template>
     </notifications>
 
-    <login v-if="!authenticated"></login>
-
-    <template v-else>
-        <cytomine-navbar></cytomine-navbar>
-        <div class="bottom">
-            <router-view v-if="currentUser"></router-view>
+    <template v-if="!loading">
+        <div class="panel communication-error-panel" v-if="communicationError">
+            <p class="panel-heading">
+                {{$t("communication-error")}}
+            </p>
+            <div class="panel-block">
+                {{$t("core-cannot-be-reached")}}
+            </div>
         </div>
+
+        <login v-else-if="!authenticated"></login>
+
+        <template v-else>
+            <cytomine-navbar></cytomine-navbar>
+            <div class="bottom">
+                <router-view v-if="currentUser"></router-view>
+            </div>
+        </template>
     </template>
 </div>
 </template>
@@ -32,12 +43,24 @@ import Login from "./components/Login.vue";
 export default {
     name: "app",
     components: {CytomineNavbar, Login},
+    data() {
+        return {
+            communicationError: false,
+            loading: true
+        };
+    },
     computed: mapState({
         currentUser: state => state.currentUser.user,
         authenticated: state => state.currentUser.authenticated
     }),
-    created() {
-        this.$store.dispatch("fetchUser").catch(() => {});
+    async created() {
+        try {
+            await this.$store.dispatch("fetchUser");
+        }
+        catch(err) {
+            this.communicationError = true;
+        }
+        this.loading = false;
     }
 };
 </script>
@@ -77,6 +100,12 @@ body {
     width: 100%;
     flex-direction: column;
     background: #d4d4d4;
+}
+
+.communication-error-panel {
+    width: 30%;
+    margin: auto;
+    margin-top: 50px;
 }
 
 .notifications {
