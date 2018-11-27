@@ -1,0 +1,135 @@
+<!-- TODO: prevent from tracking on a map linked to another map already in tracking mode -->
+<template>
+<div class="follow-panel">
+    <h1>{{$t("follow-user")}}</h1>
+
+    <div class="radio">
+        <b-radio v-model="trackedUser" :native-value="null" type="is-info">
+            {{$t("no-tracking")}}
+        </b-radio>
+    </div>
+    <template v-if="onlineManagers.length > 0">
+        <h2>{{$t("online-managers")}}</h2>
+        <div class="radio">
+
+            <div v-for="user in onlineManagers" :key="user.id">
+                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
+                    <username :user="user"></username>
+                </b-radio>
+            </div>
+        </div>
+    </template>
+    <template v-if="onlineContributors.length > 0">
+        <h2>{{$t("online-contributors")}}</h2>
+        <div class="radio">
+            <div v-for="user in onlineContributors" :key="user.id">
+                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
+                    <username :user="user"></username>
+                </b-radio>
+            </div>
+        </div>
+    </template>
+</div>
+</template>
+
+<script>
+import Username from "@/components/utils/Username";
+
+import {UserPosition} from "cytomine-client";
+
+export default {
+    name: "follow-panel",
+    components: {Username},
+    props: [
+        "idViewer",
+        "index",
+        "project",
+        "view"
+    ],
+    data() {
+        return {
+            onlineUsers: [],
+
+            intervalOnlineUsers: null,
+            intervalTracking: null
+        };
+    },
+    computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        imageWrapper() {
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        image() {
+            return this.imageWrapper.imageInstance;
+        },
+        activePanel() {
+            return this.imageWrapper.activePanel;
+        },
+        trackedUser: {
+            get() {
+                return this.imageWrapper.trackedUser;
+            },
+            set(value) {
+                this.$store.commit("setTrackedUser", {idViewer: this.idViewer, index: this.index, idUser: value});
+            }
+        },
+        onlineManagers() {
+            return this.project.managers.filter(({id}) => this.onlineUsers.includes(id));
+        },
+        onlineContributors() {
+            return this.project.contributors.filter(({id}) => this.onlineUsers.includes(id));
+        }
+    },
+    watch: {
+        activePanel(panel) {
+            clearInterval(this.intervalOnlineUsers);
+
+            if(panel == "follow") {
+                this.fetchOnline();
+                this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
+            }
+        },
+
+        trackedUser(id) {
+            clearInterval(this.intervalTracking);
+
+            if(id != null) {
+                this.intervalTracking = setInterval(() => this.track(), 500);
+            }
+        }
+    },
+    methods: {
+        async track() {
+            if(this.trackedUser == null) {
+                return;
+            }
+            let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
+            this.view.animate({
+                center: [pos.x, pos.y],
+                zoom: pos.zoom,
+                // rotation: pos.rotation, // TODO in core
+                duration: 500
+            });
+        },
+
+        async fetchOnline() {
+            // TODO: replace by fetchOnline on imageInstance
+            let onlines = await this.project.fetchConnectedUsers();
+            this.onlineUsers = onlines.map(o => o.id).filter(id => id != this.currentUser.id);
+        }
+    },
+    beforeDestroy() {
+        clearInterval(this.intervalOnlineUser);
+        clearInterval(this.intervalTracking);
+    }
+};
+</script>
+
+<style scoped>
+h2 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+</style>

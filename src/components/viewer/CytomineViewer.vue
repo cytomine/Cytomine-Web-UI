@@ -14,6 +14,7 @@
             <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
                  :style="`height:${elementHeight}%; width:${elementWidth}%;`">
                 <cytomine-image v-if="idx <= nbMaps"
+                    :project="project"
                     :idViewer="idBaseImage"
                     :index="idx-1"
                     :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`" 
@@ -87,13 +88,34 @@ export default {
             else {
                 this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
             }
+        },
+
+        async fetchImages() {
+            this.images = (await ImageInstanceCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.project.id
+            })).array;
+        },
+
+        async fetchProjetMembers() {
+            let managersPromise = this.project.fetchAdministrators();
+            let membersPromise = this.project.fetchUsers();
+
+            let managers = (await managersPromise).array;
+            let members = (await membersPromise).array;
+
+            let idsManagers = managers.map(user => user.id);
+            let contributors = members.filter(user => !idsManagers.includes(user.id));
+
+            this.project.managers = managers;
+            this.project.contributors = contributors;
         }
     },
     async created() {
-        this.images = (await ImageInstanceCollection.fetchAll({
-            filterKey: "project", 
-            filterValue: this.project.id
-        })).array;
+        await Promise.all([
+            this.fetchImages(),
+            this.fetchProjetMembers()
+        ]);
 
         if(this.viewer == null) {
             let baseImage = this.images.find(image => image.id == this.idBaseImage);

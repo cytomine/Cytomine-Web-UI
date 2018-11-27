@@ -98,6 +98,11 @@ export default {
             }
         },
 
+        // ----- Tracking
+        setTrackedUser(state, {idViewer, index, idUser}) {
+            state.viewers[idViewer].maps[index].trackedUser = idUser;
+        },
+
         // ----- View properties
 
         setCenter(state, {idViewer, index, center}) {
@@ -370,6 +375,8 @@ export default {
                 zoom: 0, // TODO
                 center: [image.width/2, image.height/2],
                 rotation: 0,
+
+                trackedUser: null,
         
                 activePanel: null,
 

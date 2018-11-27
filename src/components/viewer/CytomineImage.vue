@@ -3,7 +3,6 @@
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <!-- TODO color manipulation -->
 <!-- TODO proper handling of annotation count -->
-<!-- TODO follow user -->
 <template>
     <div class="map-container" v-if="!loading">
 
@@ -125,6 +124,14 @@
                 </li>
 
                 <li>
+                    <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
+                        <i class="fa fa-street-view"></i>
+                    </a>
+                    <follow-panel class="panel-options panel-follow" v-show="activePanel == 'follow'"
+                        :idViewer="idViewer" :index="index" :project="project" :view="$refs.view"></follow-panel>
+                </li>
+
+                <li>
                     <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                         <i class="fa fa-map-signs"></i>
                     </a>
@@ -156,6 +163,7 @@ import LinkPanel from "./panels/LinkPanel";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
 import PropertiesPanel from "./panels/PropertiesPanel";
+import FollowPanel from "./panels/FollowPanel";
 import GuidedTour from "./panels/GuidedTour";
 
 import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
@@ -176,7 +184,8 @@ export default {
     name: "cytomine-image",
     props: [
         "idViewer",
-        "index"
+        "index",
+        "project"
     ],
     components: {
         AnnotationLayer,
@@ -193,6 +202,7 @@ export default {
         AnnotationsPanel,
         OntologyPanel,
         PropertiesPanel,
+        FollowPanel,
         GuidedTour,
 
         SelectInteraction,
@@ -377,6 +387,7 @@ export default {
                 await UserPosition.create({
                     image: this.image.id,
                     zoom: this.zoom,
+                    // rotation: this.rotation, // TODO in core
                     bottomLeftX: Math.round(extent[0]),
                     bottomLeftY: Math.round(extent[1]),
                     bottomRightX: Math.round(extent[2]),
@@ -518,7 +529,7 @@ export default {
     bottom: -50px;
 }
 
-.panel-properties, .panel-guided-tour {
+.panel-properties, .panel-guided-tour, .panel-follow {
     top: unset;
     bottom: -20px;
 }

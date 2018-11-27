@@ -15,7 +15,6 @@
             <tr>
                 <th class="checkbox-column"><span class="fa fa-eye"></span></th>
                 <th class="checkbox-column"><span class="fa fa-pencil"></span></th>
-                <th class="checkbox-column"><span class="fa fa-lock"></span></th>
                 <th class="name-column"></th>
                 <th class="checkbox-column"></th>
             </tr>
@@ -28,9 +27,7 @@
                 <td class="checkbox-column">
                     <input type="checkbox" :checked="layer.drawOn" @change="toggleLayerDrawOn(index)">
                 </td>
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.locked"> <!-- TODO -->
-                </td>
+
                 <td class="name-column">
                     {{ layerName(layer) }}
                 </td>
@@ -128,7 +125,6 @@ export default {
 
             layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
-            layer.locked = false;
             layer.olSource = null;
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
