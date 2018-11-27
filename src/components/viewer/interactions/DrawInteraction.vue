@@ -134,7 +134,7 @@ export default {
                 // TODO in backend: response should include userByTerm and correct value for term
                 annot.term = this.termsToAssociate.slice();
                 annot.userByTerm = this.termsToAssociate.map(term => {
-                    return {term, user: [this.currentUser.id]}
+                    return {term, user: [this.currentUser.id]};
                 });
                 // ----
                 feature.set("annot", annot);

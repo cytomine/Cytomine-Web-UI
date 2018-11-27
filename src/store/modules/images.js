@@ -182,9 +182,21 @@ export default {
             }
         },
 
-        setDisplayNoTerm(state, {idViewer, index, value}) { // TODO: change name
-            state.viewers[idViewer].maps[index].displayNoTerm = value;
-            // TODO: unselect annot if no longer displayed
+        setDisplayNoTerm(state, {idViewer, index, value}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.displayNoTerm = value;
+
+            if(!value) { // unselect annotation if it is no longer displayed
+                let selectedFeatures = wrapper.selectedFeatures;
+                for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+                    let feature = selectedFeatures[index];
+                    let annot = feature.properties.annot;
+
+                    if(annot.term.length == 0) {
+                        selectedFeatures.splice(index, 1);
+                    }
+                }
+            }
         },
 
         // ----- Selected layers
@@ -370,7 +382,7 @@ export default {
                 defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
                 layersOpacity: initialOpacity,
 
-                selectedFeatures: [], // old value: new Collection()
+                selectedFeatures: [],
                 annotsToSelect: [],
 
                 activeTool: "select",
