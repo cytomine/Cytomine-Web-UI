@@ -3,6 +3,7 @@
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <!-- TODO color manipulation -->
 <!-- TODO proper handling of annotation count -->
+<!-- TODO follow user -->
 <template>
     <div class="map-container" v-if="!loading">
 
@@ -19,7 +20,7 @@
                      :min-zoom="minZoom"
                      :extent="extent"
                      :projection="projectionName"
-                     @mounted="viewMounted = true"
+                     @mounted="setViewMounted()"
                      ref="view">
             </vl-view>
 
@@ -142,6 +143,8 @@
 </template>
 
 <script>
+import _ from "lodash";
+
 import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
@@ -167,7 +170,7 @@ import View from "ol/View";
 import OverviewMap from "ol/control/OverviewMap";
 import WKT from "ol/format/WKT";
 
-import {Annotation} from "cytomine-client";
+import {Annotation, UserPosition} from "cytomine-client";
 
 export default {
     name: "cytomine-image",
@@ -198,13 +201,15 @@ export default {
     },
     data() {
         return {
-            minZoom: 0, // TODO: compute in smarter way?
+            minZoom: 0,
             
             projectedMousePosition: [0, 0],
 
             layersMounted: false,
             viewMounted: false,
             routedAnnotation: null,
+
+            intervalSavePosition: null,
 
             loading: true
         };
@@ -269,6 +274,10 @@ export default {
             }
         },
 
+        viewState() {
+            return {center: this.center, zoom: this.zoom, rotation: this.rotation};
+        },
+
         extent() {
             return [0, 0, this.image.width, this.image.height];
         },
@@ -297,12 +306,20 @@ export default {
 
         async goToAnnotationTrigger(validTrigger) {
             if(validTrigger) {
-                await this.$refs.view.$createPromise; // wait for ol.View to be created
                 this.goToAnnotation();
             }
-        }
+        },
+
+        viewState() {
+            this.debouncedSavePosition();
+        },
     },
     methods: {
+        async setViewMounted() {
+            await this.$refs.view.$createPromise; // wait for ol.View to be created
+            this.viewMounted = true;
+        },
+
         async addOverviewMap() {
             await this.$refs.map.$createPromise; // wait for ol.Map to be created
             await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
@@ -352,9 +369,27 @@ export default {
 
         togglePanel(panel) {
             this.$store.commit("togglePanel", {idViewer: this.idViewer, index: this.index, panel});
+        },
+
+        async savePosition() {
+            if(this.viewMounted) {
+                let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
+                await UserPosition.create({
+                    image: this.image.id,
+                    zoom: this.zoom,
+                    bottomLeftX: Math.round(extent[0]),
+                    bottomLeftY: Math.round(extent[1]),
+                    bottomRightX: Math.round(extent[2]),
+                    bottomRightY: Math.round(extent[1]),
+                    topLeftX: Math.round(extent[0]),
+                    topLeftY: Math.round(extent[3]),
+                    topRightX: Math.round(extent[2]),
+                    topRightY: Math.round(extent[3])
+                });
+            }
         }
     },
-    async mounted() {
+    async created() {
         if(getProj(this.projectionName) == null) { // if image opened for the first time
             let projection = createProj({code: this.projectionName, extent: this.extent});
             addProj(projection);
@@ -380,7 +415,14 @@ export default {
             }
         }
 
+        this.debouncedSavePosition = _.debounce(this.savePosition, 500);
+        this.intervalSavePosition = setInterval(() => this.savePosition(), 5000);
+
+        this.image.recordConsultation();
         this.loading = false;
+    },
+    beforeDestroy() {
+        clearInterval(this.intervalSavePosition);
     }
 };
 </script>

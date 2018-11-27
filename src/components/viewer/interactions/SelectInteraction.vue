@@ -71,8 +71,9 @@ export default {
         }
     },
     methods: {
-        select() {
-            // TODO: save select action
+        select({feature}) {
+            let annot = feature.get("annot");
+            // annot.recordAction(); TODO: uncomment once implemented in js-client
         }
     }
 };

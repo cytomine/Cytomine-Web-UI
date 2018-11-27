@@ -34,6 +34,7 @@ export default {
     methods: {
         async loadProject() {
             this.project = await Project.fetch(this.idProject);
+            await this.project.recordUserConnection();
         }
     },
     created() {
