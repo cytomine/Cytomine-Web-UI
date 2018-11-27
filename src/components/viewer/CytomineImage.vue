@@ -449,25 +449,9 @@ export default {
     color: #ff7070;
 }
 
-.panel-guided-tour .buttons {
-    margin-top: 10px;
-    text-align: center;
-}
-
 .panel-options table {
     background: none;
     width: 100%;
-}
-
-/* ----- LIGHT ----- */
-
-/* .panels {
-    padding-top: 0px;
-} */
-
-.panels > ul > li > a.active {
-    background: #f2f2f2;
-    color: #6c95c8;
 }
 
 .panel-options {
@@ -482,9 +466,14 @@ export default {
     z-index: 100;
 }
 
-.panel-layers, .panel-ontology {
+.panel-layers {
     top: unset;
-    bottom: -40px;
+    bottom: -70px;
+}
+
+.panel-ontology {
+    top: unset;
+    bottom: -50px;
 }
 
 .panel-properties, .panel-guided-tour {
@@ -497,38 +486,30 @@ export default {
     padding-bottom: 15px !important;
 }
 
+/* ----- LIGHT ----- */
+
+.panels > ul > li > a.active {
+    background: #f2f2f2;
+    color: #6c95c8;
+}
+
 /* ----- DARK ----- */
 
-/* .panels li a.active {
+/* .panels > ul > li > a.active {
     background: #444;
     color: #a0c0e5;
 }
 
 .panel-options {
-    position: absolute;
-    right: 40px;
-    width: 300px;
-    min-height: 100px;
     background: #444;
-    padding: 10px;
-    border-radius: 5px 0px 0px 5px;
-    color: #dedede;
 }
 
-.panel-options .table {
-    color: #dedede !important;
-}
-
-.panel-options .table th {
+.panel-options, .panel-options .label, .panel-options .table, .panel-options .table th, .panel-options .table strong {
     color: #dedede !important;
 }
 
 .panel-options .table td, .panel-options .table th {
-    border-bottom: 1px solid #888;
-}
-
-.panel-options .table strong {
-    color: #dedede !important;
+    border-bottom: 1px solid #666;
 }
 
 .panel-options a {
@@ -545,30 +526,7 @@ export default {
     color: #dedede !important;
 }
 
-.panel-info {
-    top: 0px;
-}
-
-.panel-link {
-    top: 20px;
-}
-
-.panel-sliders {
-    top: 60px;
-}
-
-.panel-layers {
-    top: 70px;
-    font-size: 0.9em;
-}
-
-.panel-guided-tour {
-    top: 130px;
-}
-
 .panel-options h1 {
-    padding-top: 5px !important;
-    padding-bottom: 15px !important;
     font-weight: bold;
     color: #e9f2f3;
 } */
