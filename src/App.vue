@@ -112,6 +112,10 @@ body {
     margin-top: 10px;
 }
 
+.notification.info {
+    background: #77b1ea;
+}
+
 .bottom {
     flex: 1;
     overflow-y: auto;

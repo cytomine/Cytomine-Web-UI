@@ -32,6 +32,7 @@
 
 <script>
 import Username from "@/components/utils/Username";
+import {fullName} from "@/utils/user-utils.js";
 
 import {UserPosition} from "cytomine-client";
 
@@ -78,15 +79,24 @@ export default {
         },
         onlineContributors() {
             return this.project.contributors.filter(({id}) => this.onlineUsers.includes(id));
+        },
+        trackedUserFullName() {
+            let allUsers = this.project.managers.concat(this.project.contributors);
+            let trackedUser = allUsers.find(user => user.id == this.trackedUser);
+            if(trackedUser != null) {
+                return fullName(trackedUser);
+            }
         }
     },
     watch: {
         activePanel(panel) {
-            clearInterval(this.intervalOnlineUsers);
-
             if(panel == "follow") {
                 this.fetchOnline();
+                clearInterval(this.intervalOnlineUsers);
                 this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
+            }
+            else if(this.trackedUser == null) {
+                clearInterval(this.intervalOnlineUsers);
             }
         },
 
@@ -94,9 +104,29 @@ export default {
             clearInterval(this.intervalTracking);
 
             if(id != null) {
+                this.track();
                 this.intervalTracking = setInterval(() => this.track(), 500);
+                clearInterval(this.intervalOnlineUsers);
+                this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
+            }
+            else if(this.activePanel != "follow") {
+                clearInterval(this.intervalOnlineUsers);
+            }
+        },
+
+        onlineUsers(onlines) {
+            if(this.trackedUser != null && !onlines.includes(this.trackedUser)) {
+                this.$notify({
+                    type: "info",
+                    text: this.$t("end-tracking-user-disconnected", {
+                        username: this.trackedUserFullName,
+                        imageName: this.image.instanceFilename
+                    })
+                });
+                this.trackedUser = null;
             }
         }
+
     },
     methods: {
         async track() {
@@ -118,8 +148,19 @@ export default {
             this.onlineUsers = onlines.map(o => o.id).filter(id => id != this.currentUser.id);
         }
     },
+    created() {
+        if(this.activePanel == "follow" || this.trackedUser != null) {
+            this.fetchOnline();
+            this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
+        }
+
+        if(this.trackedUser != null) {
+            this.track();
+            this.intervalTracking = setInterval(() => this.track(), 500);
+        }
+    },
     beforeDestroy() {
-        clearInterval(this.intervalOnlineUser);
+        clearInterval(this.intervalOnlineUsers);
         clearInterval(this.intervalTracking);
     }
 };
