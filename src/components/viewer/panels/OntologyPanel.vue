@@ -74,10 +74,25 @@ td, th {
     font-size: 0.9em;
 }
 
+th, td {
+    width: 250px;
+}
+
 th.checkbox-column, td.checkbox-column {
     width: 25px;
     text-align: center !important;
 }
+
+table thead tr {
+   display: block;
+}
+
+table tbody {
+    display:block;
+    overflow:auto;
+    max-height: 180px;
+}
+
 </style>
 
 <style>

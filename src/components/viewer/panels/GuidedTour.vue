@@ -4,7 +4,9 @@
 <div>
     <h1>{{ $t("guided-tour") }}</h1>
     <ul>
-        <li v-for="(pos, index) in positions" :key="pos.name"><a @click="goToPosition(index)">{{pos.name}}</a></li>
+        <li v-for="(pos, index) in positions" :key="pos.name" :class="{selected: index==curPosition}">
+            <a @click="goToPosition(index)">{{pos.name}}</a>
+        </li>
     </ul>
     <div class="buttons has-addons">
         <button class="button" @click="previousPosition()" :disabled="curPosition <= 0"> {{ $t("button-previous") }} </button>
@@ -80,5 +82,14 @@ export default {
 .panel-guided-tour .buttons {
     margin-top: 10px;
     text-align: center;
+}
+
+ul {
+    max-height: 250px;
+    overflow: auto;
+}
+
+li.selected {
+    font-weight: bold;
 }
 </style>

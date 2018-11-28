@@ -2,33 +2,31 @@
 <template>
 <div class="follow-panel">
     <h1>{{$t("follow-user")}}</h1>
+    <div class="follow-panel-content">
+        <div>
+            <b-radio v-model="trackedUser" :native-value="null" type="is-info">
+                {{$t("no-tracking")}}
+            </b-radio>
+        </div>
 
-    <div class="radio">
-        <b-radio v-model="trackedUser" :native-value="null" type="is-info">
-            {{$t("no-tracking")}}
-        </b-radio>
-    </div>
-    <template v-if="onlineManagers.length > 0">
-        <h2>{{$t("online-managers")}}</h2>
-        <div class="radio">
-
+        <template v-if="onlineManagers.length > 0">
+            <h2>{{$t("online-managers")}}</h2>
             <div v-for="user in onlineManagers" :key="user.id">
                 <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
                     <username :user="user"></username>
                 </b-radio>
             </div>
-        </div>
-    </template>
-    <template v-if="onlineContributors.length > 0">
-        <h2>{{$t("online-contributors")}}</h2>
-        <div class="radio">
+        </template>
+
+        <template v-if="onlineContributors.length > 0">
+            <h2>{{$t("online-contributors")}}</h2>
             <div v-for="user in onlineContributors" :key="user.id">
                 <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
                     <username :user="user"></username>
                 </b-radio>
             </div>
-        </div>
-    </template>
+        </template>
+    </div>
 </div>
 </template>
 
@@ -131,5 +129,10 @@ export default {
 h2 {
     margin-top: 10px;
     margin-bottom: 5px;
+}
+
+.follow-panel-content {
+    max-height: 250px;
+    overflow: auto;
 }
 </style>
