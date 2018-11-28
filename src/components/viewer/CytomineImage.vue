@@ -1,7 +1,6 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO job templates -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO color manipulation -->
 <!-- TODO proper handling of annotation count -->
 <template>
     <div class="map-container" v-if="!loading">
@@ -28,9 +27,20 @@
                                    :url="baseLayerURL"
                                    :size="imageSize"
                                    :extent="extent"
-                                   :key="baseLayerURL">
+                                   :key="baseLayerURL"
+                                   crossOrigin="Anonymous"
+                                   ref="baseSource"
+                                   @mounted="setBaseSource()">
                 </vl-source-zoomify>
             </vl-layer-tile>
+
+            <vl-layer-image>
+                <vl-source-raster v-if="baseSource != null && colorManipulationOn"
+                                  :sources="[baseSource]"
+                                  :operation="operation"
+                                  :lib="lib">
+                </vl-source-raster>
+            </vl-layer-image>
 
             <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
                               :idViewer="idViewer"
@@ -90,11 +100,8 @@
                     <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
                         <i class="fa fa-sliders"></i>
                     </a>
-                    <div class="panel-options panel-colors" v-show="activePanel == 'colors'">
-                        Not yet implemented
-                    </div>
-                    <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
-                        :map="map" :imageLayer="layer"></color-manipulation> -->
+                    <color-manipulation class="panel-options panel-colors" v-show="activePanel == 'colors'"
+                        :idViewer="idViewer" :index="index"></color-manipulation>
                 </li>
 
                 <li>
@@ -159,6 +166,7 @@ import DrawTools from "./DrawTools";
 
 import ImageInformation from "./panels/ImageInformation";
 import DigitalZoom from "./panels/DigitalZoom";
+import ColorManipulation from "./panels/ColorManipulation";
 import LinkPanel from "./panels/LinkPanel";
 import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
@@ -180,6 +188,8 @@ import WKT from "ol/format/WKT";
 
 import {Annotation, UserPosition} from "cytomine-client";
 
+import {constants, utilFunctions, operation} from "@/utils/color-manipulation.js";
+
 export default {
     name: "cytomine-image",
     props: [
@@ -198,6 +208,7 @@ export default {
 
         ImageInformation,
         DigitalZoom,
+        ColorManipulation,
         LinkPanel,
         AnnotationsPanel,
         OntologyPanel,
@@ -214,6 +225,8 @@ export default {
             minZoom: 0,
             
             projectedMousePosition: [0, 0],
+
+            baseSource: null,
 
             layersMounted: false,
             viewMounted: false,
@@ -299,6 +312,22 @@ export default {
                 &channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
         },
 
+        colorManipulationOn() {
+            return this.imageWrapper.hue != 0 || this.imageWrapper.lightness != 100 || this.imageWrapper.chroma != 100;
+        },
+        operation() {
+            return operation;
+        },
+        lib() {
+            return {
+                ...constants,
+                ...utilFunctions,
+                hue: this.imageWrapper.hue,
+                lightness: this.imageWrapper.lightness,
+                chroma: this.imageWrapper.chroma
+            };
+        },
+
         layersToPreload() {
             if(this.routedAnnotation != null) {
                 return [this.routedAnnotation.user];
@@ -321,13 +350,18 @@ export default {
         },
 
         viewState() {
-            this.debouncedSavePosition();
+            this.savePosition();
         },
     },
     methods: {
         async setViewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
             this.viewMounted = true;
+        },
+
+        async setBaseSource() {
+            await this.$refs.baseSource.$creationPromise;
+            this.baseSource = this.$refs.baseSource.$source;
         },
 
         async addOverviewMap() {
@@ -381,7 +415,7 @@ export default {
             this.$store.commit("togglePanel", {idViewer: this.idViewer, index: this.index, panel});
         },
 
-        async savePosition() {
+        savePosition: _.debounce(async function() {
             if(this.viewMounted) {
                 let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
                 await UserPosition.create({
@@ -398,7 +432,7 @@ export default {
                     topRightY: Math.round(extent[3])
                 });
             }
-        }
+        }, 500)
     },
     async created() {
         if(getProj(this.projectionName) == null) { // if image opened for the first time
@@ -426,7 +460,6 @@ export default {
             }
         }
 
-        this.debouncedSavePosition = _.debounce(this.savePosition, 500);
         this.intervalSavePosition = setInterval(() => this.savePosition(), 5000);
 
         this.image.recordConsultation();

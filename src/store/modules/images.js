@@ -145,6 +145,20 @@ export default {
             });
         },
 
+        // ----- Color manipulation
+
+        setHue(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].hue = value;
+        },
+
+        setChroma(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].chroma = value;
+        },
+
+        setLightness(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].lightness = value;
+        },
+
         // ----- Digital zoom
 
         setMaxZoom(state, {idViewer, index, maxZoom}) {
@@ -399,6 +413,10 @@ export default {
 
                 activeTool: "select",
                 activeEditTool: null,
+
+                hue: 0,
+                lightness: 100,
+                chroma: 100,
 
                 displayAnnotDetails: true,
                 positionAnnotDetails: {x: 0, y: 0},
