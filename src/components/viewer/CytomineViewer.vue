@@ -1,4 +1,3 @@
-<!-- TODO: synchronisation of annotations if several maps of the same image -->
 <template>
 <div class="cytomine-viewer">
     <b-loading :is-full-page="false" :active="loading"></b-loading>

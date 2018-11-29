@@ -360,7 +360,7 @@ export default {
         },
 
         async setBaseSource() {
-            await this.$refs.baseSource.$creationPromise;
+            await this.$refs.baseSource.$createPromise;
             this.baseSource = this.$refs.baseSource.$source;
         },
 
@@ -416,12 +416,12 @@ export default {
         },
 
         savePosition: _.debounce(async function() {
-            if(this.viewMounted) {
+            if(this.$refs.view && this.viewMounted) {
                 let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
                 await UserPosition.create({
                     image: this.image.id,
                     zoom: this.zoom,
-                    // rotation: this.rotation, // TODO in core
+                    // rotation: this.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
                     bottomLeftX: Math.round(extent[0]),
                     bottomLeftY: Math.round(extent[1]),
                     bottomRightX: Math.round(extent[2]),
