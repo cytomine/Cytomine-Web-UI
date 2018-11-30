@@ -68,13 +68,13 @@
             <ul>
                 <li>
                     <a @click="$emit('close')" class="close">
-                        <i class="fa fa-times-circle"></i>
+                        <i class="fas fa-times-circle"></i>
                     </a>
                 </li>
 
                 <li>
                     <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
-                        <i class="fa fa-info"></i>
+                        <i class="fas fa-info"></i>
                     </a>
                     <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
                         :image="image"></image-information>
@@ -82,7 +82,7 @@
 
                 <li>
                     <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
-                        <i class="fa fa-search"></i>
+                        <i class="fas fa-search"></i>
                     </a>
                     <digital-zoom class="panel-options panel-digital-zoom"
                         v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
@@ -90,7 +90,7 @@
 
                 <li v-if="viewerWrapper.maps.length > 1">
                     <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
-                        <i class="fa fa-link"></i>
+                        <i class="fas fa-link"></i>
                     </a>
                     <link-panel class="panel-options panel-link"
                         v-show="activePanel == 'link'" :idViewer="idViewer" :index="index"></link-panel>
@@ -98,7 +98,7 @@
 
                 <li>
                     <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
-                        <i class="fa fa-sliders"></i>
+                        <i class="fas fa-sliders-h"></i>
                     </a>
                     <color-manipulation class="panel-options panel-colors" v-show="activePanel == 'colors'"
                         :idViewer="idViewer" :index="index"></color-manipulation>
@@ -106,7 +106,7 @@
 
                 <li>
                     <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
-                        <i class="fa fa-files-o"></i>
+                        <i class="fas fa-copy"></i>
                     </a>
                     <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
                         :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
@@ -116,7 +116,7 @@
 
                 <li v-if="terms.length > 0">
                     <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
-                        <i class="fa fa-hashtag"></i>
+                        <i class="fas fa-hashtag"></i>
                     </a>
                     <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
                         :idViewer="idViewer" :index="index"></ontology-panel>
@@ -124,7 +124,7 @@
 
                 <li>
                     <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
-                        <i class="fa fa-tag"></i>
+                        <i class="fas fa-tag"></i>
                     </a>
                     <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
                         :idViewer="idViewer" :index="index"></properties-panel>
@@ -132,7 +132,7 @@
 
                 <li>
                     <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
-                        <i class="fa fa-street-view"></i>
+                        <i class="fas fa-street-view"></i>
                     </a>
                     <follow-panel class="panel-options panel-follow" v-show="activePanel == 'follow'"
                         :idViewer="idViewer" :index="index" :project="project" :view="$refs.view"></follow-panel>
@@ -140,7 +140,7 @@
 
                 <li>
                     <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
-                        <i class="fa fa-map-signs"></i>
+                        <i class="fas fa-map-signs"></i>
                     </a>
                     <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
                         :view="$refs.view"></guided-tour>

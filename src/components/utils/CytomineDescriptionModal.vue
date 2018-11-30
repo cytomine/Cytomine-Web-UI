@@ -13,7 +13,7 @@
             <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
 
             <div class="keyword-info">
-                <b-icon icon="info-circle" size="is-small" />
+                <i class="fas fa-info-circle"></i>
                 <i18n path="info-keyword-stop-preview-description">
                     <span place="keyword" class="keyword"> {{ stopPreviewKeyword }} </span>
                 </i18n>
@@ -214,7 +214,7 @@ export default {
     margin-bottom: 15px;
 }
 
-.description-modal .keyword-info .icon {
+.description-modal .keyword-info .fas {
     margin-right: 6px;
 }
 

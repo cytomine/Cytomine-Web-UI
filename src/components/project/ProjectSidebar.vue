@@ -10,7 +10,7 @@
         <ul>
             <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
                 <a>
-                    <i class="fa fa-image"></i>
+                    <i class="far fa-images"></i>
                     {{ $t("images") }}
                 </a>
             </router-link>
@@ -23,36 +23,36 @@
                 </a>
                 <!-- TODO
                 <a class="close">
-                    <i class="fa fa-times"></i>
+                    <i class="fas fa-times"></i>
                 </a>-->
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
-                    <i class="fa fa-pencil-square-o"></i>
+                    <i class="far fa-edit"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
                 <a>
-                    <i class="fa fa-tasks"></i>
+                    <i class="fas fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
                 <a>
-                    <i class="fa fa-dashboard"></i>
+                    <i class="fas fa-tachometer-alt"></i>
                     {{ $t("metrics") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/information`" class="information">
                 <a>
-                    <i class="fa fa-info-circle"></i>
+                    <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/parameters`" class="parameters">
                 <a>
-                    <i class="fa fa-cogs"></i>
+                    <i class="fas fa-cogs"></i>
                     {{ $t("parameters") }}
                 </a>
             </router-link>
@@ -153,15 +153,18 @@ export default {
     justify-content: center;
 }
 
-.sidebar:not(.large) li:not(.image-link) .fa {
+.sidebar:not(.large) li:not(.image-link) .fas, .sidebar:not(.large) li:not(.image-link) .far {
     font-size: 16px;
-    margin-right: 12px;
+    margin-right: 8px;
+    position: relative;
+    top: 5px;
 }
 
-.sidebar.large li:not(.image-link) .fa {
+.sidebar.large li:not(.image-link) .fas, .sidebar.large li:not(.image-link) .far {
     display: block;
     font-size: 3vh;
-    margin-bottom: 10px;
+    margin-bottom: 1.5vh;
+    text-align: center;
 }
 
 .sidebar li:not(.image-link) a:hover, .sidebar li:not(.image-link).is-active a, .sidebar li.is-active {

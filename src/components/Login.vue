@@ -1,7 +1,7 @@
 <template>
     <div class="panel login-panel">
         <p class="panel-heading">
-            <i class="fa fa-user" aria-hidden="true"></i>
+            <i class="fas fa-user" aria-hidden="true"></i>
             {{$t("login")}}
         </p>
         <div class="panel-block">

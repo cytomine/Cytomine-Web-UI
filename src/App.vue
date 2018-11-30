@@ -69,7 +69,7 @@ export default {
 <style>
 @import "~bulma/css/bulma.css";
 @import "~bulma-slider/dist/css/bulma-slider.min.css";
-@import "~font-awesome/css/font-awesome.min.css";
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600'); /* TODO: download */
 
 @import "~quill/dist/quill.core.css";

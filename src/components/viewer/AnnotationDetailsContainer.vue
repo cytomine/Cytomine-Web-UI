@@ -11,10 +11,10 @@
         <div class="actions">
             <h1>{{$t("current-selection")}}</h1>
             <button class="drag button is-small close">
-                <b-icon icon="arrows" size="is-small"></b-icon>
+                <i class="fas fa-arrows-alt"></i>
             </button>
             <button class="button is-small close" @click="displayAnnotDetails = false">
-                <b-icon icon="times" size="is-small"></b-icon>
+                <i class="fas fa-times"></i>
             </button>
         </div>
 
@@ -217,6 +217,7 @@ h1 {
 
 .actions .button {
     margin-left: 3px;
+    width: 27px;
 }
 
 .annotation-details-container {

@@ -11,7 +11,9 @@
                 <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
                     type="search" icon="search"></b-input>
                 <button class="button" @click="toggleFilterDisplay()">
-                    <b-icon icon="filter" size="is-small"></b-icon>
+                    <span class="icon">
+                        <i class="fas fa-filter"></i>
+                    </span>
                     <span>{{filtersOpened ? $t("button-hide-filters") : $t("button-show-filters")}}</span>
                 </button>
             </div>

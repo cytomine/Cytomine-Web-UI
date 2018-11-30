@@ -4,7 +4,7 @@
     @mouseover="opened = true;"
     @mouseout="opened = false;">
     <a class="navbar-link" :class="{'is-active': isActive}">
-        <i v-if="icon != null" :class="['fa', icon]"></i>
+        <i v-if="icon != null" :class="['fas', icon]"></i>
         {{title}}
     </a>
     <div class="navbar-dropdown" :class="classes" @click="opened = false;">

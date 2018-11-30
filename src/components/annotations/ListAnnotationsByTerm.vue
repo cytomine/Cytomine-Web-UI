@@ -12,8 +12,8 @@
             <div class="annot-preview" :style="'background-image: url(' + annot.smallCropURL + ')'" 
             @click="openedAnnot = annot.id">
                 <button class="button is-small">
-                    <b-icon :icon="openedAnnot == annot.id ? 'minus' : 'plus'" size="is-small">
-                </b-icon></button>    
+                    <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
+                </button>
             </div>
 
             <annotation-details slot="popover" v-click-outside="(event) => close(event, annot.id)"

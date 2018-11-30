@@ -13,8 +13,8 @@
     <table class="table layers-table">
         <thead>
             <tr>
-                <th class="checkbox-column"><span class="fa fa-eye"></span></th>
-                <th class="checkbox-column"><span class="fa fa-pencil"></span></th>
+                <th class="checkbox-column"><span class="far fa-eye"></span></th>
+                <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
                 <th class="name-column"></th>
                 <th class="checkbox-column"></th>
             </tr>
@@ -33,7 +33,7 @@
                 </td>
                 <td class="checkbox-column">
                     <button class="button is-small" @click="removeLayer(index)">
-                        <span class="fa fa-times"></span>
+                        <span class="fas fa-times"></span>
                     </button>
                 </td>
             </tr>

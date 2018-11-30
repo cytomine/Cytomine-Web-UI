@@ -3,19 +3,19 @@
 <div>
     <div class="buttons has-addons">
         <button v-tooltip="$t('select')" class="button is-small" @click="activateTool('select')" :class="{'is-selected': activeTool == 'select'}" v-shortkey.once="['s']" @shortkey="activateTool('select')">
-            <span class="icon is-small"><i class="fa fa-mouse-pointer"></i></span>
+            <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
     </div>
     <div class="buttons has-addons term-selection" @mouseleave="showTermSelector = false">
             <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
-                <span class="icon is-small"><i class="fa fa-hashtag"></i></span>
+                <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
             </button>
             <div class="color-preview" :style="{background: backgroundTermsNewAnnot}"></div>
             <div class="dropdown-menu" v-show="showTermSelector">
                 <div class="dropdown-content">
                     <a class="dropdown-item" v-for="(term, idx) in terms" :key="term.id" @click="toggleTerm(idx)" :class="{'is-selected': term.associateToNewAnnot}">
                         <div class="autocomplete-term-option">
-                            <span class="selection"><i class="fa fa-check"></i></span>
+                            <span class="selection"><i class="fas fa-check"></i></span>
                             <span>
                                 <cytomine-term :term="term"></cytomine-term>
                             </span>
@@ -26,66 +26,66 @@
     </div>
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
-            <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
+            <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
         <!-- QUESTION: add handling of lines? need to add in backend
         <button class="button is-small" :disabled="activeLayer == null" title="Line" @click="activateTool('line')" :class="{'is-selected': activeTool == 'line'}">
-            <span class="icon is-small"><i class="fa fa-minus"></i></span>
+            <span class="icon is-small"><i class="fas fa-minus"></i></span>
         </button> -->
         <!-- QUESTION: redefine expected behaviour
         <button class="button is-small" :disabled="activeLayer == null" title="Arrow" @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
-            <span class="icon is-small"><i class="fa fa-long-arrow-right"></i></span>
+            <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
         </button> -->
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('rectangle')" @click="activateTool('rectangle')" :class="{'is-selected': activeTool == 'rectangle'}">
-            <span class="icon is-small"><i class="fa fa-stop"></i></span>
+            <span class="icon is-small"><i class="far fa-square"></i></span>
         </button>
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('circle')" @click="activateTool('circle')" :class="{'is-selected': activeTool == 'circle'}">
-            <span class="icon is-small"><i class="fa fa-circle"></i></span>
+            <span class="icon is-small"><i class="far fa-circle"></i></span>
         </button>
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('polygon')" @click="activateTool('polygon')" :class="{'is-selected': activeTool == 'polygon'}">
-            <span class="icon is-small"><i class="fa fa-industry"></i></span>
+            <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
     </div>
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand')" @click="activateTool('freehand')" :class="{'is-selected': activeTool == 'freehand'}" v-shortkey.once="['f']" @shortkey="activateTool('freehand')">
-            <span class="icon is-small"><i class="fa fa-pencil"></i></span>
+            <span class="icon is-small"><i class="fas fa-pencil-alt"></i></span>
         </button>
         <!-- TODO: would be better if correct add and correct remove were targeted on a previously selected annot
         backend modif required (https://github.com/cytomine/Cytomine-core/issues/1141) -->
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand-correct-add')" @click="activateTool('correct-add')" :class="{'is-selected': activeTool == 'correct-add'}">
-            <span class="icon is-small"><i class="suberscript fa fa-plus"></i><i class="fa fa-pencil"></i></span>
+            <span class="icon is-small"><i class="suberscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand-correct-remove')" @click="activateTool('correct-remove')" :class="{'is-selected': activeTool == 'correct-remove'}">
-            <span class="icon is-small"><i class="suberscript fa fa-minus"></i><i class="fa fa-pencil"></i></span>
+            <span class="icon is-small"><i class="suberscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
     </div>
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
-            <span class="icon is-small"><i class="fa fa-info"></i></span>
+            <span class="icon is-small"><i class="fas fa-info"></i></span>
         </button>
     </div>
     <div class="buttons has-addons">
         <!-- TODO: fill tool -->
         <button class="button is-small" :disabled="!isNotPointSelected" v-tooltip="$t('modify')" @click="activateEditTool('modify')" :class="{'is-selected': activeEditTool == 'modify'}">
-            <span class="icon is-small"><i class="fa fa-pencil-square-o"></i></span>
+            <span class="icon is-small"><i class="fas fa-edit"></i></span>
         </button>
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('move')" @click="activateEditTool('translate')" :class="{'is-selected': activeEditTool == 'translate'}">
-            <span class="icon is-small"><i class="fa fa-arrows"></i></span>
+            <span class="icon is-small"><i class="fas fa-arrows-alt"></i></span>
         </button>
         <button class="button is-small" :disabled="!isNotPointSelected" v-tooltip="$t('rotate')" @click="activateEditTool('rotate')" :class="{'is-selected': activeEditTool == 'rotate'}">
-            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+            <span class="icon is-small"><i class="fas fa-sync-alt"></i></span>
         </button>
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('delete')" @click="confirmDeletion()" v-shortkey.once="['d']" @shortkey="confirmDeletion()">
-            <span class="icon is-small"><i class="fa fa-trash-o"></i></span>
+            <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
         </button>
     </div>
 
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="actions.length == 0" v-tooltip="$t('undo')" @click="undo()" v-shortkey.once="['ctrl', 'z']" @shortkey="undo()">
-            <span class="icon is-small"><i class="fa fa-undo"></i></span>
+            <span class="icon is-small"><i class="fas fa-undo"></i></span>
         </button>
         <button class="button is-small" :disabled="undoneActions.length == 0" v-tooltip="$t('redo')" @click="redo()" v-shortkey.once="['ctrl', 'y']" @shortkey="redo()">
-            <span class="icon is-small"><i class="fa fa-repeat"></i></span>
+            <span class="icon is-small"><i class="fas fa-redo"></i></span>
         </button>
     </div>
 </div>
@@ -366,7 +366,7 @@ export default {
     background: #f5f5f5;
 }
 
-.term-selection .dropdown-menu a:not(.is-selected) i.fa {
+.term-selection .dropdown-menu a:not(.is-selected) i.fas {
     display: none;
 }
 

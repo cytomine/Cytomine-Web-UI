@@ -11,11 +11,11 @@
     <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
         <div class="navbar-start">
             <router-link to="/projects" class="navbar-item">
-                <i class="fa fa-list-alt"></i>
+                <i class="fas fa-list-alt"></i>
                 {{ $t("projects") }}
             </router-link>
             <router-link to="/storage" class="navbar-item">
-                <i class="fa fa-download"></i>
+                <i class="fas fa-download"></i>
                 {{ $t("storage") }}
             </router-link>
         </div>
@@ -134,7 +134,7 @@ font-weight: lighter;
     font-weight: lighter;
 }
 
-.navbar .fa {
+.navbar .fas {
     padding-right: 7px;
 }
 

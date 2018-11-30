@@ -34,7 +34,7 @@ import App from "./App.vue";
 
 Vue.use(VueRouter);
 Vue.use(Notifications);
-Vue.use(Buefy, {defaultIconPack: "fa"});
+Vue.use(Buefy, {defaultIconPack: "fas"});
 Vue.use(VueMoment, {moment});
 Vue.use(VueShortKey, { prevent: ["input", "textarea", ".ql-editor"] });
 Vue.use(vClickOutside);

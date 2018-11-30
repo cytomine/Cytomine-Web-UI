@@ -10,12 +10,12 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.5.0",
         "buefy": "^0.7.1",
         "bulma": "^0.7.2",
         "bulma-slider": "^2.0.0",
         "copy-to-clipboard": "^3.0.8",
         "cytomine-client": "^0.1.0",
-        "font-awesome": "^4.7.0",
         "lodash": "^4.17.11",
         "ol": "^5.3.0",
         "ol-rotate-feature": "^2.0.1",

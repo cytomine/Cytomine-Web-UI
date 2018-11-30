@@ -11,7 +11,9 @@
                 <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')"
                     type="search" icon="search"></b-input>
                 <button class="button" @click="toggleFilterDisplay()">
-                    <b-icon icon="filter" size="is-small"></b-icon>
+                    <span class="icon">
+                        <i class="fas fa-filter"></i>
+                    </span>
                     <span>{{filtersOpened ? $t("button-hide-filters") : $t("button-show-filters")}}</span>
                 </button>
             </div>
@@ -118,7 +120,7 @@
             pagination-size="is-small" detailed detail-key="id">
                 <template slot-scope="props">
                     <b-table-column :visible="atLeastOneManaged" field="isManaged" label="" centered width="1" sortable>
-                        <b-icon v-if="props.row.isManaged" icon="cog" size="is-small" :title="$t('manager-icon-label')"></b-icon>
+                        <i v-if="props.row.isManaged" class="fas fa-cog" :title="$t('manager-icon-label')"></i>
                     </b-table-column>
 
                     <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -180,7 +182,7 @@
 
             <div class="legend" v-if="atLeastOneManaged">
                 <h2>{{$t("legend")}}</h2>
-                <b-icon icon="cog" size="is-small"></b-icon> : {{$t('manager-icon-label')}}
+                <i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}
             </div>
         </div>
     </div>

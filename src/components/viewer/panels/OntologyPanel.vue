@@ -5,7 +5,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th class="checkbox-column"><span class="fa fa-eye"></span></th>
+                <th class="checkbox-column"><span class="far fa-eye"></span></th>
                 <th></th>
             </tr>
         </thead>

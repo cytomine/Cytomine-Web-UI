@@ -70,7 +70,7 @@
                                         {{prop.value}}
                                         <button class="edit is-small" :title="$t('button-edit')" 
                                         @click="startPropEdition(prop)">
-                                            <b-icon size="is-small" icon="pencil"></b-icon>
+                                            <i class="fas fa-pencil-alt"></i>
                                         </button>
                                         <button class="delete is-small" :title="$t('button-delete')" 
                                         @click="removeProp(idx)">
@@ -346,7 +346,7 @@ h5 {
     cursor: pointer;
     pointer-events: auto;
     display: inline-block;
-    font-size: 9px;
+    font-size: 8px;
     padding: 0px;
     outline: none;
     position: relative;
