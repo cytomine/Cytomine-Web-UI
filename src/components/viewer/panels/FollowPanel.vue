@@ -137,15 +137,14 @@ export default {
             this.view.animate({
                 center: [pos.x, pos.y],
                 zoom: pos.zoom,
-                // rotation: pos.rotation, // TODO in core
+                // rotation: pos.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
                 duration: 500
             });
         },
 
         async fetchOnline() {
-            // TODO: replace by fetchOnline on imageInstance
-            let onlines = await this.project.fetchConnectedUsers();
-            this.onlineUsers = onlines.map(o => o.id).filter(id => id != this.currentUser.id);
+            let onlines = await this.image.fetchConnectedUsers();
+            this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
         }
     },
     created() {

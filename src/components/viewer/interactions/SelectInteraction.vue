@@ -73,7 +73,7 @@ export default {
     methods: {
         select({feature}) {
             let annot = feature.get("annot");
-            // annot.recordAction(); TODO: uncomment once implemented in js-client
+            annot.recordAction();
         }
     }
 };
