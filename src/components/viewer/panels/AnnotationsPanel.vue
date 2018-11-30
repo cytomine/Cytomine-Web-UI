@@ -64,7 +64,10 @@ export default {
     data() {
         return {
             layers: [], // Array<User> (representing user layers)
-            selectedLayer: null
+            indexLayers: [],
+            selectedLayer: null,
+
+            timeoutIndex: null
         };
     },
     computed: {
@@ -73,6 +76,12 @@ export default {
         },
         image() {
             return this.imageWrapper.imageInstance;
+        },
+        activePanel() {
+            return this.imageWrapper.activePanel;
+        },
+        triggerIndexLayersUpdate() {
+            return this.imageWrapper.triggerIndexLayersUpdate;
         },
         layersOpacity: {
             get() {
@@ -86,6 +95,7 @@ export default {
                 });
             }
         },
+
         selectedLayers() { // Array<User> (representing user layers)
             return this.imageWrapper.selectedLayers || [];
         },
@@ -95,7 +105,17 @@ export default {
         unselectedLayers() {
             return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
         },
+
         ...mapState({currentUser: state => state.currentUser.user})
+    },
+    watch: {
+        activePanel(panel) {
+            this.fetchIndexLayers();
+        },
+
+        triggerIndexLayersUpdate() {
+            this.fetchIndexLayers();
+        }
     },
     methods: {
         layerName(layer) {
@@ -108,7 +128,8 @@ export default {
                 name = fullName(layer);
             }
 
-            return `${name} (${layer.countAnnotation})`;
+            let indexLayer = this.indexLayers.find(index => index.user == layer.id) || {};
+            return `${name} (${indexLayer.countAnnotation || 0})`;
         },
 
         addLayerById(id) {
@@ -156,35 +177,32 @@ export default {
             });
         },
 
-        async loadLayers() {
-            let layersPromise = new Project({id: this.image.project}).fetchUserLayers(this.image.id);
-            let indexLayersPromise = this.image.fetchAnnotationsIndex();
+        async fetchLayers() {
+            this.layers = (await new Project({id: this.image.project}).fetchUserLayers(this.image.id)).array;
+        },
 
-            let collectionLayers = await layersPromise;
-            let indexLayers = await indexLayersPromise;
-            this.layers = collectionLayers.array;
-            this.layers.forEach(layer => { // TODO: externalize that in client ?
-                let indexLayer = indexLayers.find(index => index.user == layer.id);
-                if(indexLayer == null) {
-                    layer.countAnnotation = 0;
-                    layer.countReviewedAnnotation = 0;
-                }
-                else {
-                    layer.countAnnotation = indexLayer.countAnnotation;
-                    layer.countReviewedAnnotation = indexLayer.countReviewedAnnotation;
-                }
-            });
+        async fetchIndexLayers(force=false) {
+            if(!force && this.activePanel != "layers") {
+                return;
+            }
+
+            this.indexLayers = await this.image.fetchAnnotationsIndex();
+            clearTimeout(this.timeoutIndex);
+            this.timeoutIndex = setTimeout(() => this.fetchIndexLayers(), 10000); // schedule a refresh
         }
     },
     async created() {
-        await this.loadLayers();
+        await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-            this.addLayerById(this.currentUser.id); // TODO: move in store?
+            this.addLayerById(this.currentUser.id);
         }
 
         if(this.layersToPreload != null) {
             this.layersToPreload.forEach(id => this.addLayerById(id));
         }
+    },
+    beforeDestroy() {
+        clearTimeout(this.timeoutIndex);
     }
 };
 </script>

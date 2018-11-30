@@ -162,7 +162,7 @@ export default {
                 oldAnnot: this.annot
             });
             this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-            // TODO this.$store.commit("decrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
+            this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
         },
 
         dragStop(x, y) {

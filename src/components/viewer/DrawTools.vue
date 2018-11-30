@@ -263,7 +263,7 @@ export default {
 
                 this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature: olFeature, oldAnnot: annot});
                 this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-                // TODO this.$store.commit("decrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
+                this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
 
                 source.removeFeature(feature);
             }
@@ -341,6 +341,8 @@ export default {
                     currentFeature.setGeometry(new WKT().readGeometry(annot.location));
                 }
             }
+
+            this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
 
             feature.set("annot", annot);
             return {feature, oldAnnot: oldAnnotReversedAction};

@@ -99,6 +99,7 @@ export default {
         },
 
         // ----- Tracking
+
         setTrackedUser(state, {idViewer, index, idUser}) {
             state.viewers[idViewer].maps[index].trackedUser = idUser;
         },
@@ -252,6 +253,10 @@ export default {
             changeOpacity(wrapper.defaultStyle, opacity);
             let colorStroke = wrapper.defaultStroke.getColor();
             colorStroke[3] = opacity;
+        },
+
+        triggerIndexLayersUpdate(state, {idViewer, index}) {
+            state.viewers[idViewer].maps[index].triggerIndexLayersUpdate = []; // new array will be considered as a new value
         },
 
         // ----- Properties
@@ -422,7 +427,9 @@ export default {
                 positionAnnotDetails: {x: 0, y: 0},
 
                 actions: [],
-                undoneActions: []
+                undoneActions: [],
+
+                triggerIndexLayersUpdate: []
             };
             commit("addMap", {idViewer, wrapper});
         },

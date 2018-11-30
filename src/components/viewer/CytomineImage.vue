@@ -1,7 +1,6 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO job templates -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
-<!-- TODO proper handling of annotation count -->
 <template>
     <div class="map-container" v-if="!loading">
 

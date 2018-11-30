@@ -127,6 +127,7 @@ export default {
                 try {
                     await annot.save();
                     // TODO in backend: response should include userByTerm and correct value for term
+                    // (https://github.com/cytomine/Cytomine-core/issues/1143)
                     annot.term = this.termsToAssociate.slice();
                     annot.userByTerm = this.termsToAssociate.map(term => {
                         return {term, user: [this.currentUser.id]};
@@ -142,7 +143,7 @@ export default {
                     }
 
                     this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot: null});
-                    // TODO this.$store.commit("incrementAnnotCount", {idViewer: this.idViewer, index: this.index, idLayer: annot.user});
+                    this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
                 }
                 catch(err) {
                     this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
@@ -171,6 +172,7 @@ export default {
 
                     // refresh the sources because several annotations might have been modified
                     this.activeLayers.map(layer => layer.olSource.clear());
+                    this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
                 }
             }
             catch(err) {
