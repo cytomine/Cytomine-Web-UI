@@ -17,8 +17,6 @@
 </template>
 
 <script>
-import {createBox} from "ol/interaction/Draw";
-import {boundingExtent, getBottomLeft, getBottomRight, getTopLeft, getTopRight} from "ol/extent";
 import Polygon, {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import WKT from "ol/format/WKT";
 
@@ -96,7 +94,8 @@ export default {
 
                     if(geometry) {
                         geometry.setCoordinates(boxCoordinates);
-                    } else {
+                    }
+                    else {
                         geometry = new Polygon(boxCoordinates);
                     }
                     return geometry;
@@ -128,7 +127,6 @@ export default {
 
     methods: {
         rotateCoords(coords, theta) {
-            let [x, y] = coords;
             let cosTheta = Math.cos(theta);
             let sinTheta = Math.sin(theta);
             return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);

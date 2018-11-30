@@ -109,7 +109,7 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     watch: {
-        activePanel(panel) {
+        activePanel() {
             this.fetchIndexLayers();
         },
 
