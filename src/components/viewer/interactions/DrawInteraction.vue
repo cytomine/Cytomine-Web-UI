@@ -18,7 +18,8 @@
 
 <script>
 import {createBox} from "ol/interaction/Draw";
-import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
+import {boundingExtent, getBottomLeft, getBottomRight, getTopLeft, getTopRight} from "ol/extent";
+import Polygon, {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import WKT from "ol/format/WKT";
 
 import {Annotation} from "cytomine-client";
@@ -41,6 +42,9 @@ export default {
         },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        rotation() {
+            return this.imageWrapper.rotation;
         },
         termsToAssociate() {
             return this.imageWrapper.terms.reduce((ids, term) => {
@@ -79,7 +83,28 @@ export default {
             return this.activeTool == "freehand" || this.drawCorrection;
         },
         drawGeometryFunction() {
-            return this.activeTool == "rectangle" ? createBox() : null;
+            if(this.activeTool == "rectangle") {
+                return (coordinates, geometry) => {
+                    let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+
+                    let [firstCorner, thirdCorner] = rotatedCoords;
+                    let secondCorner = [thirdCorner[0], firstCorner[1]];
+                    let fourthCorner = [firstCorner[0], thirdCorner[1]];
+
+                    let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
+                    let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
+
+                    if(geometry) {
+                        geometry.setCoordinates(boxCoordinates);
+                    } else {
+                        geometry = new Polygon(boxCoordinates);
+                    }
+                    return geometry;
+                };
+            }
+            else {
+                return null;
+            }
         },
         layers() {
             return this.imageWrapper.selectedLayers || [];
@@ -102,6 +127,13 @@ export default {
     },
 
     methods: {
+        rotateCoords(coords, theta) {
+            let [x, y] = coords;
+            let cosTheta = Math.cos(theta);
+            let sinTheta = Math.sin(theta);
+            return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
+        },
+
         async drawEndHandler({feature}) {
             if(this.nbActiveLayers > 0) {
                 if(this.drawCorrection) {
