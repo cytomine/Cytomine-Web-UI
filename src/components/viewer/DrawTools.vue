@@ -65,7 +65,9 @@
         </button>
     </div>
     <div class="buttons has-addons">
-        <!-- TODO: fill tool -->
+        <button class="button is-small" :disabled="!isNotPointSelected" v-tooltip="$t('fill')" @click="fill()">
+            <span class="icon is-small"><i class="fas fa-fill"></i></span>
+        </button>
         <button class="button is-small" :disabled="!isNotPointSelected" v-tooltip="$t('modify')" @click="activateEditTool('modify')" :class="{'is-selected': activeEditTool == 'modify'}">
             <span class="icon is-small"><i class="fas fa-edit"></i></span>
         </button>
@@ -107,7 +109,8 @@ export default {
     ],
     data() {
         return {
-            showTermSelector: false
+            showTermSelector: false,
+            format: new WKT()
         };
     },
     computed: {
@@ -219,6 +222,27 @@ export default {
                 return null;
             }
             return layer.olSource;
+        },
+
+        async fill() {
+            let feature = this.selectedFeature;
+            if(feature == null) {
+                return;
+            }
+
+            this.activateEditTool(null);
+            let annot = feature.properties.annot;
+            let oldAnnot = annot.clone();
+
+            try {
+                await annot.fill();
+                let olFeature = this.findSource(annot).getFeatureById(annot.id);
+                olFeature.setGeometry(this.format.readGeometry(annot.location));
+                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature: olFeature, oldAnnot});
+            }
+            catch(err) {
+                this.$notify({type: "error", text: this.$t("notif-error-annotation-fill")});
+            }
         },
 
         async deleteAnnot() {
