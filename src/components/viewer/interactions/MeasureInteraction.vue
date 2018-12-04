@@ -15,6 +15,10 @@
         <vl-style-box>
             <vl-style-stroke color="rgba(0, 0, 0, 0.5)" :width="2" :line-dash="[10, 10]"></vl-style-stroke>
             <vl-style-fill color="rgba(255, 255, 255, 0.2)"></vl-style-fill>
+            <vl-style-circle :radius="6">
+              <vl-style-fill color="#ffcc33"></vl-style-fill>
+              <vl-style-stroke color="#fff" :width="1.5"></vl-style-stroke>
+            </vl-style-circle>
         </vl-style-box>
     </vl-interaction-draw>
 
