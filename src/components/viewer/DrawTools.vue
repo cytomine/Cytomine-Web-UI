@@ -7,23 +7,26 @@
         </button>
     </div>
 
-    <div class="buttons has-addons term-selection" @mouseleave="showTermSelector = false">
-            <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
-                <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
-            </button>
-            <div class="color-preview" :style="{background: backgroundTermsNewAnnot}"></div>
-            <div class="dropdown-menu" v-show="showTermSelector">
-                <div class="dropdown-content">
-                    <a class="dropdown-item" v-for="(term, idx) in terms" :key="term.id" @click="toggleTerm(idx)" :class="{'is-selected': term.associateToNewAnnot}">
-                        <div class="autocomplete-term-option">
-                            <span class="selection"><i class="fas fa-check"></i></span>
-                            <span>
-                                <cytomine-term :term="term"></cytomine-term>
-                            </span>
-                        </div>
-                    </a>
-                </div>
+    <div class="buttons has-addons term-selection" :class="{'has-preview': termsToAssociate.length > 0}"
+        @mouseleave="showTermSelector = false">
+        <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
+            <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
+        </button>
+        <div class="color-preview" :style="{background: backgroundTermsNewAnnot}">
+            <span v-if="termsToAssociate.length > 1">{{termsToAssociate.length}}</span>
+        </div>
+        <div class="dropdown-menu" v-show="showTermSelector">
+            <div class="dropdown-content">
+                <a class="dropdown-item" v-for="(term, idx) in terms" :key="term.id" @click="toggleTerm(idx)" :class="{'is-selected': term.associateToNewAnnot}">
+                    <div class="autocomplete-term-option">
+                        <span class="selection"><i class="fas fa-check"></i></span>
+                        <span>
+                            <cytomine-term :term="term"></cytomine-term>
+                        </span>
+                    </div>
+                </a>
             </div>
+        </div>
     </div>
 
     <div class="buttons has-addons">
@@ -141,15 +144,11 @@ export default {
             return this.terms.filter(term => term.associateToNewAnnot);
         },
         backgroundTermsNewAnnot() {
-            if(this.termsToAssociate.length == 0) {
-                return "white";
-            }
-            else if(this.termsToAssociate.length == 1) {
+            if(this.termsToAssociate.length == 1) {
                 return this.termsToAssociate[0].color;
             }
             else {
-                let colors = this.termsToAssociate.map(term => term.color);
-                return `-webkit-linear-gradient(${colors.join()})`;
+                return "#e2e2e2";
             }
         },
         activeTool: {
@@ -399,6 +398,13 @@ export default {
     position: relative;
 }
 
+.term-selection.has-preview i.fas {
+    font-size: 11px;
+    position: relative;
+    right: 3px;
+    top: 2px;
+}
+
 .term-selection .dropdown-menu {
     display: block;
     z-index: 500;
@@ -420,17 +426,25 @@ export default {
     right: 6px;
 }
 
+.term-selection:not(.has-preview) .color-preview {
+    display:none;
+}
+
 .color-preview {
-    width: 8px;
-    height: 8px;
+    width: 11px;
+    height: 11px;
     display: inline-block;
-    border-radius: 2px;
-    box-shadow: 0px 0px 1px #777;
+    border-radius: 5px;
     position: absolute;
-    bottom: 3px;
-    right: 2px;
+    top: 3px;
+    right: 3px;
     z-index: 1000;
     pointer-events: none;
+    font-size: 10px;
+    font-weight: bold;
+    text-align:center;
+    line-height: 10px;
+    font-family: Arial;
 }
 
 </style>
