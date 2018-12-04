@@ -99,7 +99,7 @@ export default {
 
 .multiselect__option--selected::before {
     content: "\f00c";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-size: 10px;
     position: absolute;
     left: 10px;
