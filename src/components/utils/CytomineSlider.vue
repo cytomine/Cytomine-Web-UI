@@ -1,6 +1,7 @@
 <template>
 <vue-slider 
     :value="value" @input="$emit('input', $event)"
+    :min="min"
     :max="max" 
     :show="internalShow"
     :tooltip-dir="isArray ? ['left', 'right'] : 'right'"
@@ -25,6 +26,7 @@ export default {
     components: {vueSlider},
     props: {
         value: {type: null},
+        min: {type: Number},
         max: {type: Number},
         show: {type: Boolean},
         integerOnly: {type: Boolean, default: true}

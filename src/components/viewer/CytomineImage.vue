@@ -192,7 +192,7 @@ import WKT from "ol/format/WKT";
 
 import {Annotation, UserPosition} from "cytomine-client";
 
-import {constants, utilFunctions, operation} from "@/utils/color-manipulation.js";
+import {constLib, operation} from "@/utils/color-manipulation.js";
 
 export default {
     name: "cytomine-image",
@@ -318,18 +318,19 @@ export default {
         },
 
         colorManipulationOn() {
-            return this.imageWrapper.hue != 0 || this.imageWrapper.lightness != 100 || this.imageWrapper.chroma != 100;
+            return this.imageWrapper.brightness != 0 || this.imageWrapper.contrast != 0
+                || this.imageWrapper.hue != 0 || this.imageWrapper.saturation != 0;
         },
         operation() {
             return operation;
         },
         lib() {
             return {
-                ...constants,
-                ...utilFunctions,
-                hue: this.imageWrapper.hue,
-                lightness: this.imageWrapper.lightness,
-                chroma: this.imageWrapper.chroma
+                ...constLib,
+                brightness: this.imageWrapper.brightness,
+                contrast: this.imageWrapper.contrast,
+                saturation: this.imageWrapper.saturation,
+                hue: this.imageWrapper.hue
             };
         },
 

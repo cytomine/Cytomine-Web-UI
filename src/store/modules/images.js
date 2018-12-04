@@ -148,16 +148,27 @@ export default {
 
         // ----- Color manipulation
 
+        setBrightness(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].brightness = value;
+        },
+
+        setContrast(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].contrast = value;
+        },
+
         setHue(state, {idViewer, index, value}) {
             state.viewers[idViewer].maps[index].hue = value;
         },
 
-        setChroma(state, {idViewer, index, value}) {
-            state.viewers[idViewer].maps[index].chroma = value;
+        setSaturation(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].saturation = value;
         },
 
-        setLightness(state, {idViewer, index, value}) {
-            state.viewers[idViewer].maps[index].lightness = value;
+        resetColorManipulation(state, {idViewer, index}) {
+            state.viewers[idViewer].maps[index].brightness = 0;
+            state.viewers[idViewer].maps[index].contrast = 0;
+            state.viewers[idViewer].maps[index].hue = 0;
+            state.viewers[idViewer].maps[index].saturation = 0;
         },
 
         // ----- Digital zoom
@@ -431,9 +442,10 @@ export default {
                 activeTool: "select",
                 activeEditTool: null,
 
+                brightness: 0,
+                contrast: 0,
                 hue: 0,
-                lightness: 100,
-                chroma: 100,
+                saturation: 0,
 
                 displayAnnotDetails: true,
                 positionAnnotDetails: {x: 0, y: 0},

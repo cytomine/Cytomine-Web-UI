@@ -1,40 +1,78 @@
 
 <template>
-<div>
+<div class="color-manipulation">
     <table>
         <tr>
-            <td>{{ $t("hue") }}</td>
-            <td class="metrics">{{hue}} °</td>
-            <td><input class="slider is-fullwidth is-small" v-model="hue" type="range" min="-180" max="180"></td>
+            <td class="name">{{ $t("brightness") }}</td>
+            <td>
+                <cytomine-slider v-model="brightness" :min="-255" :max="255" :show="showSliders"></cytomine-slider>
+            </td>
         </tr>
         <tr>
-            <td>{{ $t("chroma") }}</td>
-            <td>{{chroma}}</td>
-            <td><input class="slider is-fullwidth is-small" v-model="chroma" type="range" min="-100" max="100"></td>
+            <td class="name">{{ $t("contrast") }}</td>
+            <td>
+                <cytomine-slider v-model="contrast" :min="-255" :max="255" :show="showSliders"></cytomine-slider>
+            </td>
         </tr>
         <tr>
-            <td>{{ $t("lightness") }}</td>
-            <td>{{lightness}}</td>
-            <td><input class="slider is-fullwidth is-small" v-model="lightness" type="range" min="-100" max="100"></td>
+            <td class="name">{{ $t("saturation") }}</td>
+            <td>
+                <cytomine-slider v-model="saturation" :min="-100" :max="100" :show="showSliders"></cytomine-slider>
+            </td>
+        </tr>
+        <tr>
+            <td class="name">{{ $t("hue") }}</td>
+            <td>
+                <cytomine-slider v-model="hue" :min="-180" :max="180" :show="showSliders"></cytomine-slider>
+            </td>
         </tr>
     </table>
+    <div class="actions">
+        <button class="button is-small" @click="reset()">{{$t("button-reset")}}</button>
+    </div>
 </div>
 </template>
 
 <script>
 import _ from "lodash";
+import CytomineSlider from "@/components/utils/CytomineSlider";
 
 const debounceDelay = 500;
 
 export default {
     name: "color-manipulation",
+    components: {CytomineSlider},
     props: [
         "idViewer",
         "index",
     ],
+    data() {
+        return {
+            showSliders: false
+        };
+    },
     computed: {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+        },
+        activePanel() {
+            return this.imageWrapper.activePanel;
+        },
+        brightness: {
+            get() {
+                return this.imageWrapper.brightness;
+            },
+            set(value) {
+                this.setBrightness(value);
+            }
+        },
+        contrast: {
+            get() {
+                return this.imageWrapper.contrast;
+            },
+            set(value) {
+                this.setContrast(value);
+            }
         },
         hue: {
             get() {
@@ -44,35 +82,45 @@ export default {
                 this.setHue(value);
             }
         },
-        lightness: {
+        saturation: {
             get() {
-                return this.imageWrapper.lightness - 100;
+                return this.imageWrapper.saturation;
             },
             set(value) {
-                this.setLightness(100 + Number(value));
-            }
-        },
-        chroma: {
-            get() {
-                return this.imageWrapper.chroma - 100;
-            },
-            set(value) {
-                this.setChroma(100 + Number(value));
+                this.setSaturation(value);
             }
         },
     },
+    watch: {
+        activePanel(panel) {
+            if(panel == "colors") {
+                this.showSliders = true;
+            }
+        }
+    },
     methods: {
+        reset() {
+            this.$store.commit("resetColorManipulation", {idViewer: this.idViewer, index: this.index});
+        },
+
+        setBrightness: _.debounce(function(value) {
+            this.$store.commit("setBrightness", {idViewer: this.idViewer, index: this.index, value});
+        }, debounceDelay),
+
+        setContrast: _.debounce(function(value) {
+            this.$store.commit("setContrast", {idViewer: this.idViewer, index: this.index, value});
+        }, debounceDelay),
+
         setHue: _.debounce(function(value) {
             this.$store.commit("setHue", {idViewer: this.idViewer, index: this.index, value});
         }, debounceDelay),
 
-        setLightness: _.debounce(function(value) {
-            this.$store.commit("setLightness", {idViewer: this.idViewer, index: this.index, value});
+        setSaturation: _.debounce(function(value) {
+            this.$store.commit("setSaturation", {idViewer: this.idViewer, index: this.index, value});
         }, debounceDelay),
-
-        setChroma: _.debounce(function(value) {
-            this.$store.commit("setChroma", {idViewer: this.idViewer, index: this.index, value});
-        }, debounceDelay),
+    },
+    created() {
+        this.showSliders = this.activePanel == "colors";
     }
 };
 </script>
@@ -82,6 +130,16 @@ td, tr {
     vertical-align: middle !important;
 }
 
+td.name {
+    font-weight: bold;
+    text-align: right;
+    padding: 4px;
+}
+
+td:not(.name) {
+    width: 100%;
+}
+
 .metrics {
     width: 48px;
 }
@@ -89,5 +147,17 @@ td, tr {
 input[type="range"].slider {
     margin-top: 3px;
     margin-bottom: 3px;
+}
+
+.actions {
+    margin-top: 10px;
+    text-align: right;
+}
+</style>
+
+<style>
+.color-manipulation .vue-slider {
+    margin-left: 5px;
+    margin-right: 50px;
 }
 </style>
