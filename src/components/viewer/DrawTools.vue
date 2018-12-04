@@ -6,6 +6,7 @@
             <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
     </div>
+
     <div class="buttons has-addons term-selection" @mouseleave="showTermSelector = false">
             <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
                 <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
@@ -24,6 +25,7 @@
                 </div>
             </div>
     </div>
+
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
@@ -46,6 +48,7 @@
             <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
     </div>
+
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand')" @click="activateTool('freehand')" :class="{'is-selected': activeTool == 'freehand'}" v-shortkey.once="['f']" @shortkey="activateTool('freehand')">
             <span class="icon is-small"><i class="fas fa-pencil-alt"></i></span>
@@ -59,11 +62,25 @@
             <span class="icon is-small"><i class="suberscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
     </div>
+
+    <div class="buttons has-addons">
+        <button class="button is-small" v-tooltip="$t('measure-length')" @click="activateTool('ruler')" :class="{'is-selected': activeTool == 'ruler'}">
+            <span class="icon is-small"><i class="fas fa-ruler"></i></span>
+        </button>
+        <button class="button is-small" v-tooltip="$t('measure-angle')" @click="activateTool('angle')" :class="{'is-selected': activeTool == 'angle'}">
+            <span class="icon is-small"><i class="fas fa-less-than"></i><i class="fas fa-long-arrow-alt"></i></span>
+        </button>
+        <button class="button is-small" v-tooltip="$t('measure-area')" @click="activateTool('area')" :class="{'is-selected': activeTool == 'area'}">
+            <span class="icon is-small"><i class="fas fa-ruler-combined"></i></span>
+        </button>
+    </div>
+
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
             <span class="icon is-small"><i class="fas fa-info"></i></span>
         </button>
     </div>
+
     <div class="buttons has-addons">
         <button class="button is-small" :disabled="!isNotPointSelected" v-tooltip="$t('fill')" @click="fill()">
             <span class="icon is-small"><i class="fas fa-fill"></i></span>

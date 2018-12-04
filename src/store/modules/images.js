@@ -277,6 +277,16 @@ export default {
             state.viewers[idViewer].maps[index].selectedPropertyColor = value;
         },
 
+        // ----- Measure features
+
+        setMeasureFeatures(state, {idViewer, index, measureFeatures}) {
+            state.viewers[idViewer].maps[index].measureFeatures = measureFeatures;
+        },
+
+        removeMeasureFeature(state, {idViewer, index, indexFeature}) {
+            state.viewers[idViewer].maps[index].measureFeatures.splice(indexFeature, 1);
+        },
+
         // ----- Selected features
 
         setSelectedFeatures(state, {idViewer, index, selectedFeatures}) {
@@ -415,6 +425,8 @@ export default {
 
                 selectedFeatures: [],
                 annotsToSelect: [],
+
+                measureFeatures: [],
 
                 activeTool: "select",
                 activeEditTool: null,
