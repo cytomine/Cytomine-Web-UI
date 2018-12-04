@@ -12,16 +12,18 @@
                         </router-link>
                     </td>
                 </tr>
-                <tr>
-                    <td><strong>{{$t("created-by")}}</strong></td>
-                    <td> 
-                        {{ creator.fullName }}
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>{{$t("created-on")}}</strong></td>
-                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
-                </tr>
+
+                <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
+                    <tr>
+                        <td><strong>{{$t("area")}}</strong></td>
+                        <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>{{$t("perimeter")}}</strong></td>
+                        <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
+                    </tr>
+                </template>
+
                 <tr>
                     <td colspan="2">
                         <h5>{{$t("description")}}</h5>
@@ -97,20 +99,20 @@
                     </td>
                 </tr>
 
-                <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
-                    <tr>
-                        <td><strong>{{$t("area")}}</strong></td>
-                        <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>{{$t("perimeter")}}</strong></td>
-                        <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
-                    </tr>
-                </template>
+                <tr>
+                    <td><strong>{{$t("created-by")}}</strong></td>
+                    <td>
+                        {{ creator.fullName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{$t("created-on")}}</strong></td>
+                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
+                </tr>
             </tbody>
         </table>
+
         <div class="actions">
-            <!-- QUESTION do we leave this button here? too far according to Christopher -->
             <router-link 
                 v-if="showImageInfo"
                 :to="annotationURL"
