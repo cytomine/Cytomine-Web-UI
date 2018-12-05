@@ -1,12 +1,12 @@
 <template>
-<div class="annotation-details-playground">
-    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && displayAnnotDetails"
+<div class="annotation-details-playground" ref="playground">
+    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && displayAnnotDetails && reload"
                             class="draggable"
                             :parent="true" 
                             :resizable="false" 
                             drag-handle=".drag"
                             @dragstop="dragStop"
-                            :w="350" :h="500" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y">
+                            :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y">
 
         <div class="actions">
             <h1>{{$t("current-selection")}}</h1>
@@ -49,8 +49,11 @@ export default {
     ],
     data() {
         return {
+            width: 350,
+            height: 500,
             users: [],
-            userJobs: []
+            userJobs: [],
+            reload: true
         };
     },
     computed: {
@@ -101,17 +104,25 @@ export default {
             if(this.olSource != null) {
                 return this.olSource.getFeatureById(this.annot.id);
             }
-        }
+        },
+
+        triggerUpdateSize() {
+            return this.$store.state.images.triggerMapUpdateSize;
+        },
     },
     watch: {
         selectedFeature() {
             if(this.selectedFeature != null) {
                 this.displayAnnotDetails = true;
             }
+        },
+
+        triggerUpdateSize() {
+            this.handleResize();
         }
     },
     methods: {
-        async fetchUsers() {
+        async fetchUsers() { // TODO in CytomineViewer
             this.users = (await UserCollection.fetchAll()).array;
             this.users.forEach(user => {
                 user.fullName = fullName(user);
@@ -131,7 +142,7 @@ export default {
             this.selectedUserJobs = this.userJobs;
         },
         
-        async updateTerms() {
+        async updateTerms() { // TODO in CytomineViewer
             // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
             let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});
@@ -167,11 +178,28 @@ export default {
 
         dragStop(x, y) {
             this.positionAnnotDetails = {x, y};
+        },
+
+        handleResize() {
+            if(this.$refs.playground) {
+                let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
+                let maxY = Math.max(this.$refs.playground.clientHeight - this.height, 0);
+                let x = Math.min(this.positionAnnotDetails.x, maxX);
+                let y = Math.min(this.positionAnnotDetails.y, maxY);
+                this.positionAnnotDetails = {x, y};
+
+                // HACK to force the component to recreate and take into account new (x,y) ; should no longer be
+                // necessary with version 2 of vue-draggable-resizable
+                this.reload = false;
+                this.$nextTick(() => this.reload = true);
+            }
         }
     },
     created() {
         this.fetchUsers();
-        this.fetchUserJobs();  
+        this.fetchUserJobs();
+
+        window.addEventListener("resize", this.handleResize);
     }
 };
 </script>
