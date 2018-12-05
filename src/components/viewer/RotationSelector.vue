@@ -22,7 +22,7 @@
             </div>
             <button class="delete is-small" @click="expanded=false"></button>
         </div>
-        <cytomine-slider v-model="degreesRotation" :max="360" :show="expanded"></cytomine-slider>
+        <cytomine-slider v-model="degreesRotation" :max="360" :show="expanded" :revision="revisionSlider"></cytomine-slider>
     </div>
 </div>
 </template>
@@ -39,7 +39,8 @@ export default {
     ],
     data() {
         return {
-            expanded: false
+            expanded: false,
+            revisionSlider: 0
         };
     },
     computed: {
@@ -60,6 +61,14 @@ export default {
                     rotation: Number(value) / 180 * Math.PI
                 });
             }
+        },
+        triggerUpdateSize() {
+            return this.$store.state.images.triggerMapUpdateSize;
+        },
+    },
+    watch: {
+        triggerUpdateSize() {
+            this.revisionSlider++;
         },
     },
     methods: {

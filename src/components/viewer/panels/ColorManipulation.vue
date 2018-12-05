@@ -5,25 +5,25 @@
         <tr>
             <td class="name">{{ $t("brightness") }}</td>
             <td>
-                <cytomine-slider v-model="brightness" :min="-255" :max="255" :show="showSliders"></cytomine-slider>
+                <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders"></cytomine-slider>
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("contrast") }}</td>
             <td>
-                <cytomine-slider v-model="contrast" :min="-255" :max="255" :show="showSliders"></cytomine-slider>
+                <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders"></cytomine-slider>
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("saturation") }}</td>
             <td>
-                <cytomine-slider v-model="saturation" :min="-100" :max="100" :show="showSliders"></cytomine-slider>
+                <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders"></cytomine-slider>
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("hue") }}</td>
             <td>
-                <cytomine-slider v-model="hue" :min="-180" :max="180" :show="showSliders"></cytomine-slider>
+                <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders"></cytomine-slider>
             </td>
         </tr>
     </table>
@@ -48,7 +48,7 @@ export default {
     ],
     data() {
         return {
-            showSliders: false
+            revisionSliders: 0
         };
     },
     computed: {
@@ -58,6 +58,7 @@ export default {
         activePanel() {
             return this.imageWrapper.activePanel;
         },
+
         brightness: {
             get() {
                 return this.imageWrapper.brightness;
@@ -90,13 +91,20 @@ export default {
                 this.setSaturation(value);
             }
         },
+
+        triggerUpdateSize() {
+            return this.$store.state.images.triggerMapUpdateSize;
+        },
     },
     watch: {
         activePanel(panel) {
             if(panel == "colors") {
-                this.showSliders = true;
+                this.revisionSliders++;
             }
-        }
+        },
+        triggerUpdateSize() {
+            this.revisionSliders++;
+        },
     },
     methods: {
         reset() {
@@ -118,9 +126,6 @@ export default {
         setSaturation: _.debounce(function(value) {
             this.$store.commit("setSaturation", {idViewer: this.idViewer, index: this.index, value});
         }, debounceDelay),
-    },
-    created() {
-        this.showSliders = this.activePanel == "colors";
     }
 };
 </script>

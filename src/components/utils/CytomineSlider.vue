@@ -28,8 +28,9 @@ export default {
         value: {type: null},
         min: {type: Number},
         max: {type: Number},
-        show: {type: Boolean},
-        integerOnly: {type: Boolean, default: true}
+        show: {type: Boolean, default: true},
+        integerOnly: {type: Boolean, default: true},
+        revision: {type: Number} // change of this value will trigger a refresh
     },
     data() {
         return {
@@ -44,8 +45,11 @@ export default {
         }
     },
     watch: {
-        show() {
-            this.internalShow = this.show;
+        show(show) {
+            this.internalShow = show;
+        },
+        revision() {
+            this.$refs.slider.refresh();
         }
     },
     methods: {
@@ -96,6 +100,9 @@ export default {
         focus() {
             this.$refs.inputSlider.focus();
         }
+    },
+    created() {
+        this.internalShow = this.show;
     }
 };
 </script>
