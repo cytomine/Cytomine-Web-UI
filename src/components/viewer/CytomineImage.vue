@@ -157,6 +157,10 @@
             </ul>
         </div>
 
+        <div class="broadcast" v-if="imageWrapper.broadcast">
+            <i class="fas fa-circle"></i> {{$t("live")}}
+        </div>
+
         <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
 
         <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
@@ -445,7 +449,8 @@ export default {
                     topLeftX: Math.round(extent[0]),
                     topLeftY: Math.round(extent[3]),
                     topRightX: Math.round(extent[2]),
-                    topRightY: Math.round(extent[3])
+                    topRightY: Math.round(extent[3]),
+                    // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
                 });
             }
         }, 500)
@@ -509,6 +514,23 @@ export default {
     /*background: #eee;
     padding: 2px;
     border-radius: 3px;*/
+}
+
+.broadcast {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    background-color: #EE4242;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid white;
+}
+
+.broadcast i.fas {
+    margin-right: 5px;
 }
 
 .panels {

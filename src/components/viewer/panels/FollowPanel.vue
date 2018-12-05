@@ -1,27 +1,36 @@
 <!-- TODO: prevent from tracking on a map linked to another map already in tracking mode -->
 <template>
 <div class="follow-panel">
-    <h1>{{$t("follow-user")}}</h1>
-    <div class="follow-panel-content">
+    <h1>{{$t("broadcast")}}</h1>
+
+    <div>
+        <b-checkbox v-model="broadcast" :native-value="null" type="is-info">
+            {{$t("broadcast-my-position")}}
+        </b-checkbox>
+    </div>
+
+    <h2 :class="{disabled: broadcast}">{{$t("follow-user")}}</h2>
+
+    <div class="follow-panel-content" :class="{disabled: broadcast}">
         <div>
-            <b-radio v-model="trackedUser" :native-value="null" type="is-info">
+            <b-radio v-model="trackedUser" :native-value="null" type="is-info" :disabled="broadcast">
                 {{$t("no-tracking")}}
             </b-radio>
         </div>
 
         <template v-if="onlineManagers.length > 0">
-            <h2>{{$t("online-managers")}}</h2>
+            <h3>{{$t("online-managers")}}</h3>
             <div v-for="user in onlineManagers" :key="user.id">
-                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
+                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info" :disabled="broadcast">
                     <username :user="user"></username>
                 </b-radio>
             </div>
         </template>
 
         <template v-if="onlineContributors.length > 0">
-            <h2>{{$t("online-contributors")}}</h2>
+            <h3>{{$t("online-contributors")}}</h3>
             <div v-for="user in onlineContributors" :key="user.id">
-                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info">
+                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info" :disabled="broadcast">
                     <username :user="user"></username>
                 </b-radio>
             </div>
@@ -66,6 +75,15 @@ export default {
         activePanel() {
             return this.imageWrapper.activePanel;
         },
+        broadcast: {
+            get() {
+                return this.imageWrapper.broadcast;
+            },
+            set(value) {
+                // QUESTION: forbid user to broadcast several times the same image?
+                this.$store.commit("setBroadcast", {idViewer: this.idViewer, index: this.index, value});
+            }
+        },
         trackedUser: {
             get() {
                 return this.imageWrapper.trackedUser;
@@ -97,6 +115,12 @@ export default {
             }
             else if(this.trackedUser == null) {
                 clearInterval(this.intervalOnlineUsers);
+            }
+        },
+
+        broadcast() {
+            if(this.broadcast) {
+                this.trackedUser = null;
             }
         },
 
@@ -133,6 +157,7 @@ export default {
             if(this.trackedUser == null) {
                 return;
             }
+            // TODO in backend: fetchLastPosition() allowed only if targetted user is broadcasting
             let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
             this.view.animate({
                 center: [pos.x, pos.y],
@@ -142,7 +167,7 @@ export default {
             });
         },
 
-        async fetchOnline() {
+        async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting
             let onlines = await this.image.fetchConnectedUsers();
             this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
         }
@@ -171,8 +196,24 @@ h2 {
     margin-bottom: 5px;
 }
 
+h3 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.disabled {
+    color: #7a7a7a;
+}
+
 .follow-panel-content {
     max-height: 250px;
     overflow: auto;
+}
+</style>
+
+<style>
+.follow-panel .b-checkbox {
+    align-items: flex-start !important;
 }
 </style>

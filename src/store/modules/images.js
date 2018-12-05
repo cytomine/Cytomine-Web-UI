@@ -106,6 +106,10 @@ export default {
 
         // ----- Tracking
 
+        setBroadcast(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].broadcast = value;
+        },
+
         setTrackedUser(state, {idViewer, index, idUser}) {
             state.viewers[idViewer].maps[index].trackedUser = idUser;
         },
@@ -422,6 +426,7 @@ export default {
                 center: [image.width/2, image.height/2],
                 rotation: 0,
 
+                broadcast: false,
                 trackedUser: null,
         
                 activePanel: null,
