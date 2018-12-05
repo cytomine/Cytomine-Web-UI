@@ -2,16 +2,13 @@
 <div class="cytomine-viewer">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <template v-if="!loading">
-        <div class="viewer-header">
-            <b-select :placeholder="$t('select-image-to-add')" v-model="imageToAdd" class="add-image">
-                <option v-for="image in images" :key="image.id" :value="image">{{image.instanceFilename}}</option>
-            </b-select>
-            <button class="button" @click="addMap()">{{$t("button-add-viewer")}}</button>
+        <div v-if="error" class="box">
+            <h2> {{ $t("error") }} </h2>
+            <p>{{ $t("error-loading-image") }}</p>
         </div>
-
-        <div class="maps-wrapper">
+        <div v-else class="maps-wrapper">
             <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-                 :style="`height:${elementHeight}%; width:${elementWidth}%;`">
+                    :style="`height:${elementHeight}%; width:${elementWidth}%;`">
                 <cytomine-image v-if="idx <= nbMaps"
                     :project="project"
                     :idViewer="idBaseImage"
@@ -20,6 +17,10 @@
                     @close="closeMap(idx-1)">
                 </cytomine-image>
             </div>
+
+            <image-selector v-show="imageSelector" class="image-selector-wrapper"
+                :project="project" :idViewer="idBaseImage">
+            </image-selector>
         </div>
     </template>
 </div>
@@ -27,19 +28,21 @@
 
 <script>
 import CytomineImage from "./CytomineImage";
+import ImageSelector from "./ImageSelector";
 
-import {ImageInstanceCollection} from "cytomine-client";
+import {ImageInstance} from "cytomine-client";
 
 export default {
     name: "cytomine-viewer",
-    components: {CytomineImage},
+    components: {
+        CytomineImage,
+        ImageSelector
+    },
     props: ["project"],
     data() {
         return {
+            error: false,
             loading: true,
-
-            images: [],
-            imageToAdd: null
         };
     },
     computed: {
@@ -51,6 +54,9 @@ export default {
         },
         nbMaps() {
             return this.viewer ? this.viewer.maps.length : 0;
+        },
+        imageSelector() {
+            return this.viewer ? this.viewer.imageSelector : false;
         },
         nbHorizontalCells() {
             return Math.ceil(Math.sqrt(this.nbMaps));
@@ -71,14 +77,6 @@ export default {
         }
     },
     methods: {
-        async addMap(image=this.imageToAdd) {
-            if(image == null) {
-                return;
-            }
-
-            await this.$store.dispatch("addMap", {idViewer: this.idBaseImage, image});
-            this.imageToAdd = null;
-        },
         closeMap(index) {
             if(this.nbMaps == 1) {
                 this.$store.commit("removeViewer", this.idBaseImage);
@@ -87,13 +85,6 @@ export default {
             else {
                 this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
             }
-        },
-
-        async fetchImages() {
-            this.images = (await ImageInstanceCollection.fetchAll({
-                filterKey: "project",
-                filterValue: this.project.id
-            })).array;
         },
 
         async fetchProjetMembers() {
@@ -108,20 +99,22 @@ export default {
 
             this.project.managers = managers;
             this.project.contributors = contributors;
+        },
+
+        async addBaseImage() {
+            if(this.viewer == null) {
+                try {
+                    let baseImage = await ImageInstance.fetch(this.idBaseImage);
+                    await this.$store.dispatch("addViewer", baseImage);
+                }
+                catch(err) {
+                    this.error = true;
+                }
+            }
         }
     },
     async created() {
-        await Promise.all([
-            this.fetchImages(),
-            this.fetchProjetMembers()
-        ]);
-
-        if(this.viewer == null) {
-            let baseImage = this.images.find(image => image.id == this.idBaseImage);
-            if(baseImage != null) {
-                await this.$store.dispatch("addViewer", baseImage);
-            }
-        }
+        await Promise.all([this.fetchProjetMembers(), this.addBaseImage()]);
 
         this.loading = false;
     }
@@ -130,23 +123,11 @@ export default {
 
 <style scoped>
 .cytomine-viewer {
-    display: flex;
-    flex-direction: column;
-    height: 100% !important;
-    position: relative;
-}
-
-.viewer-header {
-    padding: 5px;
-    display: flex;
-}
-
-.viewer-header button {
-    margin-left: 10px;
+    height: 100%;
 }
 
 .maps-wrapper {
-    flex: 1;
+    height: 100%;
     display: flex;
     flex-wrap: wrap;
     position: relative;
@@ -157,10 +138,16 @@ export default {
     border-top: 3px solid #222;
     overflow: hidden;
 }
-</style>
 
-<style>
-.add-image select {
-    width: 250px;
+.image-selector-wrapper {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+}
+
+.box {
+    width: 50%;
+    margin: auto;
+    margin-top: 50px;
 }
 </style>

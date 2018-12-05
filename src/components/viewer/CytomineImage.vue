@@ -148,6 +148,12 @@
                     <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
                         :view="$refs.view"></guided-tour>
                 </li>
+
+                <li class="bottom" v-if="index == viewerWrapper.maps.length - 1 && !viewerWrapper.imageSelector">
+                    <a @click="addMap()">
+                        <i class="fas fa-plus-circle"></i>
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -360,6 +366,10 @@ export default {
         },
     },
     methods: {
+        addMap() {
+            this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
+        },
+
         async setViewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
             this.viewMounted = true;
@@ -514,6 +524,11 @@ export default {
 
 .panels li {
     position: relative;
+}
+
+.panels li.bottom {
+    position: absolute;
+    bottom: 0px;
 }
 
 .panels > ul > li > a {

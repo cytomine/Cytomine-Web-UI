@@ -29,7 +29,8 @@ export default {
                 maps: [],
                 name,
                 idProject,
-                links: []
+                links: [],
+                imageSelector: false
             });
         },
 
@@ -37,8 +38,13 @@ export default {
             Vue.delete(state.viewers, idViewer);
         },
 
+        setImageSelector(state, {idViewer, value}) {
+            state.viewers[idViewer].imageSelector = value;
+        },
+
         addMap(state, {idViewer, wrapper}) {
             state.viewers[idViewer].maps.push(wrapper);
+            state.viewers[idViewer].imageSelector = false;
         },
 
         removeMap(state, {idViewer, index}) {
