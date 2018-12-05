@@ -1,6 +1,7 @@
 <template>
 <div class="annotation-details-playground" ref="playground">
-    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && displayAnnotDetails && reload"
+    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && reload"
+                            v-show="displayAnnotDetails"
                             class="draggable"
                             :parent="true" 
                             :resizable="false" 
@@ -26,6 +27,7 @@
                                 :key="selectedFeature.id"
                                 @updateTerms="updateTerms()"
                                 @updateProperties="updateProperties()"
+                                @centerView="centerViewOnAnnot()"
                                 @deletion="handleDeletion()">
             </annotation-details>
         </div>
@@ -45,7 +47,8 @@ export default {
     components: {VueDraggableResizable, AnnotationDetails},
     props: [
         "idViewer",
-        "index"
+        "index",
+        "view"
     ],
     data() {
         return {
@@ -128,7 +131,7 @@ export default {
                 user.fullName = fullName(user);
             });
         },
-        async fetchUserJobs() {
+        async fetchUserJobs() { // TODO in CytomineViewer
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.image.project})).array;
             this.userJobs = this.userJobs.reduce((arr, userJob) => {
                 if(userJob.id != null) {
@@ -141,8 +144,13 @@ export default {
 
             this.selectedUserJobs = this.userJobs;
         },
+
+        centerViewOnAnnot() {
+            let geometry = this.olFeature.getGeometry();
+            this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+        },
         
-        async updateTerms() { // TODO in CytomineViewer
+        async updateTerms() {
             // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
             let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});

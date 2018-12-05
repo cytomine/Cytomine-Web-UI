@@ -119,6 +119,9 @@
                 class="button is-link is-small is-fullwidth">
                 {{ $t("button-view-in-image") }}
             </router-link>
+            <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
+                {{ $t("button-center-view-on-annot") }}
+            </a>
             <div class="level">
                 <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
                 <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>

@@ -165,7 +165,8 @@
 
         <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
 
-        <annotation-details-container :idViewer="idViewer" :index="index"></annotation-details-container>
+        <annotation-details-container :idViewer="idViewer" :index="index" :view="$refs.view">
+        </annotation-details-container>
     </div>
 </template>
 
@@ -398,15 +399,11 @@ export default {
         async goToAnnotation() { // WARNING: will not work if annotation to display belongs to cluster after the view.fit
             let annot = this.routedAnnotation;
             let geometry = new WKT().readGeometry(annot.location);
-            this.$refs.view.fit(geometry);
+            this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
 
             // HACK: center set by view.fit() is incorrect => reset it manually
-            if(geometry.getType() == "Point") {
-                annot.centroid = {};
-                annot.centroid.x = geometry.getFirstCoordinate()[0];
-                annot.centroid.y = geometry.getFirstCoordinate()[1];
-            }
-            this.center = [annot.centroid.x, annot.centroid.y];
+            this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
+                : [annot.centroid.x, annot.centroid.y];
             // ---
 
             let retries = 0;
