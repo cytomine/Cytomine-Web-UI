@@ -58,8 +58,8 @@ export default {
         return {
             onlineUsers: [],
 
-            intervalOnlineUsers: null,
-            intervalTracking: null
+            timeoutOnlineUsers: null,
+            timeoutTracking: null
         };
     },
     computed: {
@@ -110,11 +110,6 @@ export default {
         activePanel(panel) {
             if(panel == "follow") {
                 this.fetchOnline();
-                clearInterval(this.intervalOnlineUsers);
-                this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
-            }
-            else if(this.trackedUser == null) {
-                clearInterval(this.intervalOnlineUsers);
             }
         },
 
@@ -125,16 +120,9 @@ export default {
         },
 
         trackedUser(id) {
-            clearInterval(this.intervalTracking);
-
             if(id != null) {
                 this.track();
-                this.intervalTracking = setInterval(() => this.track(), 500);
-                clearInterval(this.intervalOnlineUsers);
-                this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
-            }
-            else if(this.activePanel != "follow") {
-                clearInterval(this.intervalOnlineUsers);
+                this.fetchOnline();
             }
         },
 
@@ -165,27 +153,30 @@ export default {
                 // rotation: pos.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
                 duration: 500
             });
+
+            clearTimeout(this.timeoutTracking);
+            this.timeoutTracking = setTimeout(this.track, 500);
         },
 
         async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting
+            if(this.trackedUser == null && this.activePanel != "follow") {
+                return;
+            }
+
             let onlines = await this.image.fetchConnectedUsers();
             this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
+
+            clearTimeout(this.timeoutOnlineUsers);
+            this.timeoutOnlineUsers = setTimeout(this.fetchOnline, 10000);
         }
     },
     created() {
-        if(this.activePanel == "follow" || this.trackedUser != null) {
-            this.fetchOnline();
-            this.intervalOnlineUsers = setInterval(() => this.fetchOnline(), 10000);
-        }
-
-        if(this.trackedUser != null) {
-            this.track();
-            this.intervalTracking = setInterval(() => this.track(), 500);
-        }
+        this.fetchOnline();
+        this.track();
     },
     beforeDestroy() {
-        clearInterval(this.intervalOnlineUsers);
-        clearInterval(this.intervalTracking);
+        clearTimeout(this.timeoutTracking);
+        clearTimeout(this.timeoutOnlineUsers);
     }
 };
 </script>

@@ -248,7 +248,7 @@ export default {
             viewMounted: false,
             routedAnnotation: null,
 
-            intervalSavePosition: null,
+            timeoutSavePosition: null,
 
             loading: true
         };
@@ -378,6 +378,7 @@ export default {
         async setViewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
             this.viewMounted = true;
+            this.savePosition();
         },
 
         async setBaseSource() {
@@ -412,16 +413,17 @@ export default {
                 if(layer == null) {
                     layer = this.selectedLayers.find(layer => layer.id == annot.user);
                 }
-                if(layer == null || layer.olSource == null) {
-                    return;
+
+                if(layer != null && layer.olSource != null) {
+                    let feature = layer.olSource.getFeatureById(annot.id);
+                    if(feature) {
+                        clearInterval(interval);
+                        this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
+                        return;
+                    }
                 }
 
-                let feature = layer.olSource.getFeatureById(annot.id);
-                if(feature) {
-                    clearInterval(interval);
-                    this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
-                }
-                else if(retries == 5) {
+                if(retries == 10) {
                     clearInterval(interval);
                 }
                 retries++;
@@ -433,7 +435,7 @@ export default {
         },
 
         savePosition: _.debounce(async function() {
-            if(this.$refs.view && this.viewMounted) {
+            if(this.$refs.view) {
                 let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
                 await UserPosition.create({
                     image: this.image.id,
@@ -449,6 +451,9 @@ export default {
                     topRightY: Math.round(extent[3]),
                     // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
                 });
+
+                clearTimeout(this.timeoutSavePosition);
+                this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
             }
         }, 500)
     },
@@ -478,13 +483,11 @@ export default {
             }
         }
 
-        this.intervalSavePosition = setInterval(() => this.savePosition(), 5000);
-
         this.image.recordConsultation();
         this.loading = false;
     },
     beforeDestroy() {
-        clearInterval(this.intervalSavePosition);
+        clearTimeout(this.timeoutSavePosition);
     }
 };
 </script>
