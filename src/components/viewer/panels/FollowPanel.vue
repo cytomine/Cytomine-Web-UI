@@ -1,4 +1,3 @@
-<!-- TODO: prevent from tracking on a map linked to another map already in tracking mode -->
 <template>
 <div class="follow-panel">
     <h1>{{$t("broadcast")}}</h1>
@@ -13,7 +12,7 @@
 
     <div class="follow-panel-content" :class="{disabled: broadcast}">
         <div>
-            <b-radio v-model="trackedUser" :native-value="null" type="is-info" :disabled="broadcast">
+            <b-radio v-model="trackedUserModel" :native-value="null" type="is-info" :disabled="broadcast">
                 {{$t("no-tracking")}}
             </b-radio>
         </div>
@@ -21,7 +20,7 @@
         <template v-if="onlineManagers.length > 0">
             <h3>{{$t("online-managers")}}</h3>
             <div v-for="user in onlineManagers" :key="user.id">
-                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info" :disabled="broadcast">
+                <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
                     <username :user="user"></username>
                 </b-radio>
             </div>
@@ -30,7 +29,7 @@
         <template v-if="onlineContributors.length > 0">
             <h3>{{$t("online-contributors")}}</h3>
             <div v-for="user in onlineContributors" :key="user.id">
-                <b-radio v-model="trackedUser" :native-value="user.id" type="is-info" :disabled="broadcast">
+                <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
                     <username :user="user"></username>
                 </b-radio>
             </div>
@@ -58,6 +57,8 @@ export default {
         return {
             onlineUsers: [],
 
+            trackedUserModel: null,
+
             timeoutOnlineUsers: null,
             timeoutTracking: null
         };
@@ -66,8 +67,20 @@ export default {
         currentUser() {
             return this.$store.state.currentUser.user;
         },
+        viewerWrapper() {
+            return this.$store.state.images.viewers[this.idViewer];
+        },
+        maps() {
+            return this.viewerWrapper.maps;
+        },
+        linkedIndexes() {
+            return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
+        },
+        linkedIndexTracking() { // true if current view is linked with another view with tracking enabled
+            return this.linkedIndexes.any(idx => idx != this.index && this.maps[idx].trackedUser != null);
+        },
         imageWrapper() {
-            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+            return this.viewerWrapper.maps[this.index];
         },
         image() {
             return this.imageWrapper.imageInstance;
@@ -80,7 +93,7 @@ export default {
                 return this.imageWrapper.broadcast;
             },
             set(value) {
-                // QUESTION: forbid user to broadcast several times the same image?
+                // QUESTION: forbid user to broadcast several times the same image
                 this.$store.commit("setBroadcast", {idViewer: this.idViewer, index: this.index, value});
             }
         },
@@ -119,7 +132,29 @@ export default {
             }
         },
 
+        trackedUserModel(value) {
+            // if map is linked to another map on which tracking is already enabled, possible conflict
+            if(value && this.linkedIndexes.some(idx => idx != this.index && this.maps[idx].trackedUser != null)) {
+                this.$dialog.confirm({
+                    title: this.$t("possible-conflict"),
+                    message: this.$t("confirm-unlink-view-to-track"),
+                    confirmText: this.$t("button-confirm"),
+                    cancelText: this.$t("button-cancel"),
+                    onConfirm: () => {
+                        this.$store.commit("unlinkMap", {idViewer: this.idViewer, index: this.index});
+                        this.trackedUser = value;
+                    },
+                    onCancel: () => this.trackedUserModel = null
+                });
+            }
+            else {
+                this.trackedUser = value;
+            }
+        },
+
         trackedUser(id) {
+            this.trackedUserModel = id;
+
             if(id != null) {
                 this.track();
                 this.fetchOnline();
@@ -168,9 +203,11 @@ export default {
 
             clearTimeout(this.timeoutOnlineUsers);
             this.timeoutOnlineUsers = setTimeout(this.fetchOnline, 10000);
-        }
+        },
     },
     created() {
+        this.trackedUserModel = this.trackedUser;
+
         this.fetchOnline();
         this.track();
     },
