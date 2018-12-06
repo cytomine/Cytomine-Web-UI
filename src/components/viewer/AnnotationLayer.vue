@@ -81,28 +81,12 @@ export default {
             return (extent, resolution) => {
                 this.lastExtent = extent;
 
-                // if some features have already been loaded
-                if(this.$refs.olSource && this.resolution && this.clustered != null) {
+                if(this.$refs.olSource && this.resolution && this.clustered != null && ( // some features have already been loaded
+                    !this.clustered && resolution > this.maxResolutionNoClusters // recluster
+                    || resolution != this.resolution && this.clustered)) { // change of resolution while clustering
 
-                    // if it is needed to recluster features
-                    if(resolution > this.resolution && !this.clustered && resolution > this.maxResolutionNoClusters) {
-                        // re-cluster => remove all features
-                        // following clear(), selected feature is removed => need to cache it and reselect it based on ID
-                        this.$store.commit("removeLayerFromSelectedFeatures", {
-                            idViewer: this.idViewer,
-                            index: this.index,
-                            idLayer: this.userLayer.id,
-                            cache: true
-                        });
-
-                        this.$refs.olSource.clear();
-                    }
-
-                    // if clustering is ongoing and there is a change of resolution
-                    else if(resolution != this.resolution && this.clustered) {
-                        // clear loaded extents to force reloading features
-                        this.$refs.olSource.$source.loadedExtentsRtree_.clear();
-                    }
+                    // clear loaded extents to force reloading features
+                    this.$refs.olSource.$source.loadedExtentsRtree_.clear();
                 }
 
                 return [extent];
@@ -110,7 +94,6 @@ export default {
         },
 
         async fetchAnnots(extent) {
-
             [0, 1].forEach(index => {
                 if(extent[index] < 0) {
                     extent[index] = 0;
@@ -178,6 +161,7 @@ export default {
                 return;
             }
 
+            let wasClustered = this.clustered;
             this.clustered = (arrayAnnots[0].count != null);
             if(!this.clustered && resolution > this.maxResolutionNoClusters) {
                 this.maxResolutionNoClusters = resolution;
@@ -189,13 +173,25 @@ export default {
             }, {});
             let seenAnnots = [];
 
-            let features = this.clustered ? this.$refs.olSource.$source.getFeatures()
-                : this.$refs.olSource.$source.getFeaturesInExtent(extent);
+            if(wasClustered != this.clustered) {
+                this.$store.commit("removeLayerFromSelectedFeatures", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    idLayer: this.userLayer.id,
+                    cache: true
+                });
 
-            features.forEach(feature => {
-                this.updateFeature(feature, annots[feature.getId()]);
-                seenAnnots.push(feature.getId());
-            });
+                this.$refs.olSource.clearFeatures();
+            }
+            else {
+                let features = this.clustered ? this.$refs.olSource.$source.getFeatures()
+                    : this.$refs.olSource.$source.getFeaturesInExtent(extent);
+
+                features.forEach(feature => {
+                    this.updateFeature(feature, annots[feature.getId()]);
+                    seenAnnots.push(feature.getId());
+                });
+            }
 
             arrayAnnots.forEach(annot => {
                 if(!seenAnnots.includes(annot.id)) {
