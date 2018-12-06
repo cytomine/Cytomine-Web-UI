@@ -344,6 +344,10 @@ export default {
             }
         },
 
+        setAnnotToSelect(state, {idViewer, index, annot}) {
+            state.viewers[idViewer].maps[index].annotsToSelect = [annot];
+        },
+
         // ----- Draw tools and associated interactions
 
         activateTool(state, {idViewer, index, tool}) {

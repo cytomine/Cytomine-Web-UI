@@ -17,7 +17,7 @@
                      :min-zoom="minZoom"
                      :extent="extent"
                      :projection="projectionName"
-                     @mounted="setViewMounted()"
+                     @mounted="viewMounted()"
                      ref="view">
             </vl-view>
 
@@ -112,8 +112,7 @@
                         <i class="fas fa-copy"></i>
                     </a>
                     <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
-                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
-                        @hook:mounted="layersMounted = true">
+                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
                     </annotations-panel>
                 </li>
 
@@ -243,9 +242,6 @@ export default {
             projectedMousePosition: [0, 0],
 
             baseSource: null,
-
-            layersMounted: false,
-            viewMounted: false,
             routedAnnotation: null,
 
             timeoutSavePosition: null,
@@ -349,21 +345,11 @@ export default {
             if(this.routedAnnotation != null) {
                 return [this.routedAnnotation.user];
             }
-        },
-
-        goToAnnotationTrigger() {
-            return (this.routedAnnotation != null) && this.layersMounted && this.viewMounted;
         }
     },
     watch: {
         triggerUpdateSize() {
             this.$refs.map.updateSize();
-        },
-
-        async goToAnnotationTrigger(validTrigger) {
-            if(validTrigger) {
-                this.goToAnnotation();
-            }
         },
 
         viewState() {
@@ -375,9 +361,20 @@ export default {
             this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
         },
 
-        async setViewMounted() {
+        async viewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
-            this.viewMounted = true;
+
+            if(this.routedAnnotation != null) { // center view on annotation
+                let annot = this.routedAnnotation;
+                let geometry = new WKT().readGeometry(annot.location);
+                this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+
+                // HACK: center set by view.fit() is incorrect => reset it manually
+                this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
+                    : [annot.centroid.x, annot.centroid.y];
+                // ---
+            }
+
             this.savePosition();
         },
 
@@ -395,39 +392,6 @@ export default {
                 view: new View({projection: this.projectionName}),
                 layers: [this.$refs.baseLayer.$layer]
             }));
-        },
-
-        async goToAnnotation() { // WARNING: will not work if annotation to display belongs to cluster after the view.fit
-            let annot = this.routedAnnotation;
-            let geometry = new WKT().readGeometry(annot.location);
-            this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
-
-            // HACK: center set by view.fit() is incorrect => reset it manually
-            this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
-                : [annot.centroid.x, annot.centroid.y];
-            // ---
-
-            let retries = 0;
-            let layer = null;
-            let interval = setInterval(() => {
-                if(layer == null) {
-                    layer = this.selectedLayers.find(layer => layer.id == annot.user);
-                }
-
-                if(layer != null && layer.olSource != null) {
-                    let feature = layer.olSource.getFeatureById(annot.id);
-                    if(feature) {
-                        clearInterval(interval);
-                        this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
-                        return;
-                    }
-                }
-
-                if(retries == 10) {
-                    clearInterval(interval);
-                }
-                retries++;
-            }, 500);
         },
 
         togglePanel(panel) {
@@ -480,6 +444,7 @@ export default {
             let annot = await Annotation.fetch(idRoutedAnnot);
             if(annot.image == this.image.id) {
                 this.routedAnnotation = annot;
+                this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
             }
         }
 
