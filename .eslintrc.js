@@ -13,7 +13,8 @@ module.exports = {
         "brace-style": ["error", "stroustrup"],
         "array-bracket-spacing": ["error", "never"],
         "camelcase": ["error", {"properties": "always"}],
-        "semi": ["error", "always"]
+        "semi": ["error", "always"],
+        "no-console": ["off"]
     },
     "parserOptions": {
         "parser": "babel-eslint"
