@@ -36,22 +36,22 @@
         <tr>
             <td class="prop-label"><strong>{{$t("managers")}} ({{managers.length}})</strong></td>
             <td class="prop-content">
-                <list-usernames :users="managers.array" :onlines="onlines"></list-usernames>
+                <list-usernames :users="managers" :onlines="onlines"></list-usernames>
             </td>
         </tr>
         <tr>
             <td class="prop-label"><strong>{{$t("contributors")}} ({{contributors.length}})</strong></td>
             <td class="prop-content">
-                <list-usernames :users="contributors.array" :onlines="onlines"></list-usernames>
+                <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
             </td>
         </tr>
         <tr>
             <td class="prop-label"><strong>{{$t("contacts")}} ({{contacts.length}})</strong></td>
             <td class="prop-content">
-                <list-usernames :users="contacts.array" :onlines="onlines"></list-usernames>
+                <list-usernames :users="contacts" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr>
+        <tr v-if="showImages">
             <td class="prop-label"><strong>{{$t("images")}}</strong></td>
             <td class="prop-content">
                 <images-preview :idProject="project.id"></images-preview>
@@ -76,18 +76,45 @@ import CytomineDescription from "@/components/utils/CytomineDescription";
 export default {
     name: "project-details",
     components: {ImagesPreview, ListUsernames, CytomineDescription},
-    props: ["project"],
+    props: {
+        project: {type: Object},
+        showImages: {type: Boolean, default: true}
+    },
     data() {
         return {
             creator: null,
             managers: [],
-            contributors: [],
+            members: [],
             onlines: [],
             contacts: [],
             isLoading: true
         };
     },
+    computed: {
+        managersIds() {
+            return this.managers.map(manager => manager.id);
+        },
+        contributors() {
+            return this.members.filter(member => !this.managersIds.includes(member.id));
+        }
+    },
     methods: {
+        async fetchCreator() {
+            this.creator = await this.project.fetchCreator();
+        },
+        async fetchManagers() {
+            this.managers = (await this.project.fetchAdministrators()).array;
+        },
+        async fetchContacts() {
+            this.contacts = (await this.project.fetchRepresentatives()).array;
+        },
+        async fetchMembers() {
+            this.members = (await this.project.fetchUsers()).array;
+        },
+        async fetchOnlines() {
+            this.onlines = await this.project.fetchConnectedUsers();
+        },
+
         deleteProject() {
             this.$dialog.confirm({
                 title: this.$t("delete-project"),
@@ -100,18 +127,13 @@ export default {
         }
     },
     async created() {
-        // create all promises, but do not await for them as we want requests to be parallellized
-        let creatorPromise = this.project.fetchCreator();
-        let managersPromise = this.project.fetchAdministrators();
-        let contactsPromise = this.project.fetchRepresentatives();
-        let contributorsPromise = this.project.fetchUsers();
-        let onlinesPromise = this.project.fetchConnectedUsers();
-
-        this.creator = await creatorPromise;
-        this.managers = await managersPromise;
-        this.contacts = await contactsPromise;
-        this.contributors = await contributorsPromise; // TODO: exclude managers from contributors list (change in backend?)
-        this.onlines = await onlinesPromise;
+        await Promise.all([
+            this.fetchCreator(),
+            this.fetchManagers(),
+            this.fetchContacts(),
+            this.fetchMembers(),
+            this.fetchOnlines()
+        ]);
 
         this.isLoading = false;
     }

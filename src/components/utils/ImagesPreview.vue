@@ -2,12 +2,12 @@
 <div class="columns" v-if="images && images.length">
     <div class="column" v-for="image in images" :key="image.image">
         <div class="card">
-            <router-link class="card-image recent-image" :to="`project/${image.project}/image/${image.image}`"
+            <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${image.image}`"
                 :style="'background-image: url(' + image.imageThumb + ')'">
             </router-link>
             <div class="card-content">
                 <div class="content">
-                    <router-link :to="`project/${image.project}/image/${image.image}`">
+                    <router-link :to="`/project/${image.project}/image/${image.image}`">
                         {{ image.imageName }}
                     </router-link>
                 </div>
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="column vertical-center">
-        <router-link class="button" :to="`project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
+        <router-link class="button" :to="`/project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
     </div>
 </div>
 <div v-else>

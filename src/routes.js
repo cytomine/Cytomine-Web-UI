@@ -5,6 +5,7 @@ import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import ListImages from "./components/images/ListImages.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
+import ProjectInformation from "./components/project/ProjectInformation.vue";
 import Account from "./components/Account.vue";
 import AdvancedSearch from "./components/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
@@ -64,6 +65,10 @@ const routes = [
             {
                 path: "annotations",
                 component: ListAnnotations
+            },
+            {
+                path: "information",
+                component: ProjectInformation
             },
             {
                 path: "*",
