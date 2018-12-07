@@ -4,7 +4,7 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
-            <a class="button is-link">{{$t('button-add-image')}}</a>
+            <button class="button is-link" @click="addImageModal = true">{{$t('button-add-image')}}</button>
         </p>
         <div class="panel-block">
             <div class="search-block">
@@ -175,7 +175,7 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <image-details :image="props.row"></image-details>
+                    <image-details :image="props.row" @delete="deleteImage(props.row)"></image-details>
                 </template>
 
                 <template slot="empty">
@@ -195,6 +195,9 @@
             </b-table>
         </div>
     </div>
+
+    <add-image-modal :active.sync="addImageModal" :project="project" :imageInstances="images" @addImage="addImage">
+    </add-image-modal>
 </div>
 </template>
 
@@ -202,6 +205,7 @@
 import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
 import CytomineSlider from "@/components/utils/CytomineSlider";
 import ImageDetails from "./ImageDetails";
+import AddImageModal from "./AddImageModal";
 
 import isBetweenBounds from "@/utils/is-between-bounds.js";
 import vendorFromMime from "@/utils/vendor";
@@ -210,7 +214,12 @@ import {ImageInstanceCollection} from "cytomine-client";
 
 export default {
     name: "list-images",
-    components: {ImageDetails, CytomineMultiselect, CytomineSlider},
+    components: {
+        ImageDetails,
+        CytomineMultiselect,
+        CytomineSlider,
+        AddImageModal
+    },
     props: ["project"],
     data() {
         return {
@@ -233,7 +242,9 @@ export default {
             boundsHeight: [0, 0],
             boundsUserAnnotations: [0, 0],
             boundsJobAnnotations: [0, 0],
-            boundsReviewedAnnotations: [0, 0]
+            boundsReviewedAnnotations: [0, 0],
+
+            addImageModal: false
         };
     },
     computed: {
@@ -242,7 +253,7 @@ export default {
 
             if(this.searchString != "") {
                 let str = this.searchString.toLowerCase();
-                return filtered.filter(image => {
+                filtered = filtered.filter(image => {
                     return image.instanceFilename.toLowerCase().indexOf(str) >= 0;
                 });
             }
@@ -284,7 +295,7 @@ export default {
         availableVendors() {
             let vendors = [];
             this.images.forEach(image => {
-                let vendor = image.vendor ? image.vendor.name : this.$t("unknown");
+                let vendor = image.vendorFormatted;
                 if(!vendors.includes(vendor)) {
                     vendors.push(vendor);
                 }
@@ -294,7 +305,7 @@ export default {
         availableMagnifications() {
             let magnifications = [];
             this.images.forEach(image => {
-                let magn = image.magnification || this.$t("unknown");
+                let magn = image.magnificationFormatted;
                 if(!magnifications.includes(magn)) {
                     magnifications.push(magn);
                 }
@@ -332,16 +343,73 @@ export default {
             this.filtersOpened = !this.filtersOpened;
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
         },
+
+        async deleteImage(imageToDelete) {
+            try {
+                await imageToDelete.delete();
+                this.images = this.images.filter(image => image.id != imageToDelete.id);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-image-deletion", {imageName: imageToDelete.instanceFilename})
+                });
+            }
+            catch(error) {
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-image-deletion", {imageName: imageToDelete.instanceFilename})
+                });
+            }
+        },
+
+        addImage(image) {
+            this.formatImage(image);
+
+            // check if it is needed to update filters so that new images are displayed
+            let addFormat = !this.availableFormats.includes(image.extension);
+            let addVendor = !this.availableVendors.includes(image.vendorFormatted);
+            let addMagnification = !this.availableMagnifications.includes(image.magnificationFormatted);
+            let addResolution = !this.availableResolutions.includes(image.resolutionFormatted);
+            let updateMaxWidth = this.boundsWidth[1] == this.maxWidth && image.width > this.maxWidth;
+            let updateMaxHeight = this.boundsHeight[1] == this.maxHeight && image.height > this.maxHeight;
+            // ---
+
+            this.images.push(image);
+
+            if(addFormat) {
+                this.selectedFormats.push(image.extension);
+            }
+            if(addVendor) {
+                this.selectedVendors.push(image.vendorFormatted);
+            }
+            if(addMagnification) {
+                this.selectedMagnifications.push(image.magnificationFormatted);
+            }
+            if(addResolution) {
+                this.selectedResolutions.push(image.resolutionFormatted);
+            }
+            if(updateMaxWidth) {
+                this.boundsWidth[1] = image.width;
+            }
+            if(updateMaxHeight) {
+                this.boundsHeight[1] = image.height;
+            }
+        },
+
+        formatImage(image) {
+            image.vendor = vendorFromMime(image.mime);
+            image.resolutionFormatted = (image.resolution != null) ?
+                `${image.resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
+            image.vendorFormatted = image.vendor ? image.vendor.name : this.$t("unknown");
+            image.magnificationFormatted = image.magnification || this.$t("unknown");
+
+            return image;
+        },
     },
     async created() {
         this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
         this.loading = false;
 
-        this.images.forEach(image => {
-            image.vendor = vendorFromMime(image.mime);
-            image.resolutionFormatted = (image.resolution != null) ?
-                `${image.resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
-        });
+        this.images.forEach(image => this.formatImage(image));
 
         this.selectedVendors = this.availableVendors;
         this.selectedFormats = this.availableFormats;

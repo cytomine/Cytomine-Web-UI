@@ -58,11 +58,11 @@
         <tr>
             <td class="prop-label"><strong>{{$t("actions")}}</strong></td>
             <td class="prop-content">
-                <div class="buttons"> <!-- TODO add handler for actions -->
-                    <button class="button is-small">{{$t("button-rename")}}</button>
-                    <button class="button is-small">{{$t("button-properties")}}</button>
-                    <button class="button is-small">{{$t("button-download")}}</button>
-                    <button class="button is-danger is-small">{{$t("button-delete")}}</button>
+                <div class="buttons">
+                    <button class="button is-small">{{$t("button-rename")}}</button> <!-- TODO -->
+                    <button class="button is-small">{{$t("button-properties")}}</button> <!-- TODO -->
+                    <a class="button is-small" href="">{{$t("button-download")}}</a> <!-- TODO -->
+                    <button class="button is-danger is-small" @click="deleteImage()">{{$t("button-delete")}}</button>
                 </div>
             </td>
         </tr>
@@ -76,7 +76,19 @@ import CytomineDescription from "@/components/utils/CytomineDescription";
 export default {
     name: "image-details",
     components: {CytomineDescription},
-    props: ["image"]
+    props: ["image"],
+    methods: {
+        deleteImage() {
+            this.$dialog.confirm({
+                title: this.$t("delete-image"),
+                message: this.$t("delete-image-confirmation-message", {imageName: this.image.instanceFilename}),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.$emit("delete")
+            });
+        }
+    }
 };
 </script>
 
