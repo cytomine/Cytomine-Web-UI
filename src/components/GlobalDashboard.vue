@@ -65,12 +65,12 @@
             <div class="box last-image">
                 <h2> {{ $t("last-opened-image") }} </h2>
                 <div v-if="lastOpenedImage" class="card">
-                    <router-link :to="`project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
+                    <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
                     class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
                     </router-link>
                     <div class="card-content">
                         <div class="content">
-                            <router-link :to="`project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
+                            <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
                                 {{ lastOpenedImage.instanceFilename }}
                             </router-link>
                             <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>

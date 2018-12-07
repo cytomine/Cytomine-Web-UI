@@ -4,7 +4,9 @@
 <div>
     <h1>{{ $t("guided-tour") }}</h1>
     <ul>
-        <li v-for="(pos, index) in positions" :key="pos.name"><a @click="goToPosition(index)">{{pos.name}}</a></li>
+        <li v-for="(pos, index) in positions" :key="pos.name" :class="{selected: index==curPosition}">
+            <a @click="goToPosition(index)">{{pos.name}}</a>
+        </li>
     </ul>
     <div class="buttons has-addons">
         <button class="button" @click="previousPosition()" :disabled="curPosition <= 0"> {{ $t("button-previous") }} </button>
@@ -49,7 +51,12 @@ export default {
         },
 
         flyTo(location, targetZoom, duration=2000) {
-            let interZoom = Math.min(targetZoom, this.view.getZoom()) - 1;
+            let interZoom = Math.min(targetZoom, this.view.zoom) - 1;
+            let zoomOut = this.view.zoom - interZoom;
+            let zoomIn = targetZoom - interZoom;
+            let totalZoom = zoomOut + zoomIn;
+            let durationZoomOut = Math.round(zoomOut*duration/totalZoom);
+            let durationZoomIn = Math.round(zoomIn*duration/totalZoom);
 
             this.view.animate({
                 center: location,
@@ -59,14 +66,30 @@ export default {
             this.view.animate(
                 {
                     zoom: interZoom,
-                    duration: duration / 2
+                    duration: durationZoomOut
                 },
                 {
                     zoom: targetZoom,
-                    duration: duration / 2
+                    duration: durationZoomIn
                 }
             );
         },
     }
 };
 </script>
+
+<style scoped>
+.panel-guided-tour .buttons {
+    margin-top: 10px;
+    text-align: center;
+}
+
+ul {
+    max-height: 250px;
+    overflow: auto;
+}
+
+li.selected {
+    font-weight: bold;
+}
+</style>

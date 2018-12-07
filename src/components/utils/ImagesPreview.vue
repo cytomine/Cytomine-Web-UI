@@ -1,21 +1,21 @@
 <template>
 <div class="columns" v-if="images && images.length">
-    <div class="column" v-for="image in images.array" :key="image.id">
+    <div class="column" v-for="image in images" :key="image.image">
         <div class="card">
-            <router-link class="card-image recent-image" :to="`project/${image.project}/image/${image.id}`"
-                :style="'background-image: url(' + image.thumb + ')'">
+            <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${image.image}`"
+                :style="'background-image: url(' + image.imageThumb + ')'">
             </router-link>
             <div class="card-content">
                 <div class="content">
-                    <router-link :to="`project/${image.project}/image/${image.id}`">
-                        {{ image.instanceFilename }}
+                    <router-link :to="`/project/${image.project}/image/${image.image}`">
+                        {{ image.imageName }}
                     </router-link>
                 </div>
             </div>
         </div>
     </div>
     <div class="column vertical-center">
-        <router-link class="button" :to="`project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
+        <router-link class="button" :to="`/project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
     </div>
 </div>
 <div v-else>
@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 import {ImageInstanceCollection} from "cytomine-client";
 
 export default {
@@ -42,9 +44,15 @@ export default {
             images: []
         };
     },
+    computed: {
+        ...mapState({currentUser: state => state.currentUser.user})
+    },
     async created() {
-        // TODO: fetch last opened ? waiting for https://github.com/cytomine/Cytomine-core/issues/1126
-        this.images = await new ImageInstanceCollection({max: this.nbRecent, filterKey:"project", filterValue: this.idProject}).fetchPage();
+        this.images = await ImageInstanceCollection.fetchLastOpened({
+            max: this.nbRecent,
+            project: this.idProject,
+            user: this.currentUser.id
+        });
     }
 };
 </script>

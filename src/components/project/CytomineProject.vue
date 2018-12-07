@@ -2,19 +2,8 @@
     <div class="project-container">
         <project-sidebar v-if="project" :project="project" :key="idProject"></project-sidebar>
 
-        <div class="app-content" v-if="project">
-            <!--
-            Each image state is saved so that user can re-access its state later on
-            QUESTION: allow to clean ? the cached component should be destroyed,
-            but consequently the keep-alive does not work anymore (because destroyed object is
-            still referenced)
-
-            Should probably be handled in VueX
-        -->
-
-        <!-- <keep-alive include="cytomine-image"> -->
+        <div class="app-content" v-if="project && project.id == idProject">
             <router-view :key="$route.path" :project="project"></router-view>
-        <!-- </keep-alive> -->
         </div>
     </div>
 </template>
@@ -45,6 +34,7 @@ export default {
     methods: {
         async loadProject() {
             this.project = await Project.fetch(this.idProject);
+            await this.project.recordUserConnection();
         }
     },
     created() {

@@ -69,7 +69,7 @@ export default {
 <style>
 @import "~bulma/css/bulma.css";
 @import "~bulma-slider/dist/css/bulma-slider.min.css";
-@import "~font-awesome/css/font-awesome.min.css";
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600'); /* TODO: download */
 
 @import "~quill/dist/quill.core.css";
@@ -110,6 +110,10 @@ body {
 
 .notifications {
     margin-top: 10px;
+}
+
+.notification.info {
+    background: #77b1ea;
 }
 
 .bottom {
@@ -261,8 +265,11 @@ h1.page-title {
   border-radius: 5px;
   font-size: 13px;
   max-width: 50vw; /* TODO: special design for mobile ; modal? */
-  min-height: 50px;
-  min-width: 50px;
+}
+
+.popover .popover-inner {
+    min-width: 50px;
+    min-height: 50px;
 }
 
 .tooltip .tooltip-arrow {
@@ -274,6 +281,7 @@ h1.page-title {
   border-color: hsla(0,0%,4%,.25);
   z-index: 1;
   border-width: 8px;
+  pointer-events: none; /* tooltip arrow may overlap target element, leading to flickering if pointer-events not set to none */
 }
 
 .tooltip .tooltip-arrow::after {

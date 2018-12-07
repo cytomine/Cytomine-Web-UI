@@ -4,7 +4,7 @@
     <div v-if="!loading">
         <table class="table">
             <tbody>
-                <tr>
+                <tr v-if="showImageInfo">
                     <td><strong>{{$t("image")}}</strong></td>
                     <td> 
                         <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
@@ -12,31 +12,32 @@
                         </router-link>
                     </td>
                 </tr>
+
+                <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
+                    <tr>
+                        <td><strong>{{$t("area")}}</strong></td>
+                        <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>{{$t("perimeter")}}</strong></td>
+                        <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
+                    </tr>
+                </template>
+
                 <tr>
-                    <td><strong>{{$t("created-by")}}</strong></td>
-                    <td> 
-                        {{ creator.fullName }}
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>{{$t("created-on")}}</strong></td>
-                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
-                </tr>
-                <tr>
-                    <td><strong>{{$t("description")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("description")}}</h5>
                         <cytomine-description :object="annotation"></cytomine-description>
                     </td>
                 </tr>
 
                 <!-- TERMS -->
                 <tr>
-                    <td><strong>{{$t("terms")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("terms")}}</h5>
                         <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                         :title="`${$t('associated-by')} ${user.fullName}`">
-                            <div class="color-preview" :style="{background: term.color}"></div>
-                            {{term.name}}
+                            <cytomine-term :term="term"></cytomine-term>
                             <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
                         </b-tag> 
                         <b-field>
@@ -49,8 +50,7 @@
                                 size="is-small"
                                 @select="addTerm">
                                 <div slot-scope="{option: term}" class="autocomplete-term-option">
-                                    <div class="color-preview" :style="{background: term.color}"></div>
-                                    {{term.name}}
+                                    <cytomine-term :term="term"></cytomine-term>
                                 </div>
                                 <div slot="empty" class="autocomplete-term-option">
                                     {{$t("no-term-to-add")}}
@@ -62,8 +62,8 @@
 
                 <!-- PROPERTIES -->
                 <tr>
-                    <td><strong>{{$t("properties")}}</strong></td>
-                    <td>
+                    <td colspan="2">
+                        <h5>{{$t("properties")}}</h5>
                         <b-field grouped group-multiline>
                             <div class="control" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
                                 <b-taglist attached>
@@ -72,7 +72,7 @@
                                         {{prop.value}}
                                         <button class="edit is-small" :title="$t('button-edit')" 
                                         @click="startPropEdition(prop)">
-                                            <b-icon size="is-small" icon="pencil"></b-icon>
+                                            <i class="fas fa-pencil-alt"></i>
                                         </button>
                                         <button class="delete is-small" :title="$t('button-delete')" 
                                         @click="removeProp(idx)">
@@ -81,7 +81,7 @@
                                 </b-taglist>
                             </div>
 
-                            <button class="button is-small" @click="addNewProp()" key="showForm">
+                            <button class="button is-small add-prop" @click="addNewProp()" key="showForm">
                                 {{$t("button-add")}}
                             </button>
                         </b-field>
@@ -99,28 +99,36 @@
                     </td>
                 </tr>
 
-                <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
-                    <tr>
-                        <td><strong>{{$t("area")}}</strong></td>
-                        <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>{{$t("perimeter")}}</strong></td>
-                        <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
-                    </tr>
-                </template>
+                <tr>
+                    <td><strong>{{$t("created-by")}}</strong></td>
+                    <td>
+                        {{ creator.fullName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{$t("created-on")}}</strong></td>
+                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
+                </tr>
             </tbody>
         </table>
+
         <div class="actions">
             <router-link 
+                v-if="showImageInfo"
                 :to="annotationURL"
                 class="button is-link is-small is-fullwidth">
                 {{ $t("button-view-in-image") }}
             </router-link>
+            <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
+                {{ $t("button-center-view-on-annot") }}
+            </a>
             <div class="level">
                 <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
                 <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
                 <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
+                <button class="level-item button is-small is-danger" @click="confirmDeletion()">
+                    {{ $t("button-delete") }}
+                </button>
             </div>
         </div>
     </div>
@@ -131,11 +139,18 @@
 import {Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/utils/CytomineDescription";
+import CytomineTerm from "@/components/utils/CytomineTerm";
 
 export default {
     name: "annotations-details",
-    components: {CytomineDescription},
-    props: ["annotation", "terms", "users", "images"],
+    components: {CytomineDescription, CytomineTerm},
+    props: {
+        annotation: {type: Object},
+        terms: {type: Array},
+        users: {type: Array},
+        images: {type: Array},
+        showImageInfo: {type: Boolean, default: true}
+    },
     data() {
         return {
             loading: true,
@@ -151,20 +166,25 @@ export default {
     },
     computed: {
         creator() {
-            return this.users.find(user => user.id == this.annotation.user);
+            return this.users.find(user => user.id == this.annotation.user) || {};
         },
         image() {
-            return this.images.find(image => image.id == this.annotation.image);
+            return this.images.find(image => image.id == this.annotation.image) || {};
         },
         annotationURL() {
             return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
         },
         associatedTerms() {
-            return this.annotation.userByTerm.map(ubt => {
-                let term = this.terms.find(term => ubt.term == term.id);
-                let user = this.users.find(user => user.id == ubt.user[0]); // QUESTION: can we have several users?  
-                return {term, user};
-            });
+            if(this.annotation.userByTerm != null) {
+                return this.annotation.userByTerm.map(ubt => {
+                    let term = this.terms.find(term => ubt.term == term.id);
+                    let user = this.users.find(user => user.id == ubt.user[0]) || {}; // QUESTION: can we have several users?
+                    return {term, user};
+                });
+            }
+            else {
+                return [];
+            }
         },
         filteredTerms() {
             return this.terms.filter(({id, name}) => {
@@ -180,6 +200,7 @@ export default {
     methods: {
         copyURL() {
             copyToClipboard(window.location.origin + "/#" + this.annotationURL);
+            this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
         async addTerm(term) {
@@ -187,7 +208,7 @@ export default {
                 try {
                     // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
                     await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save(); 
-                    this.$emit("update");
+                    this.$emit("updateTerms");
                 }
                 catch(error) {
                     this.$notify({type: "error", text: this.$t("notif-error-add-term")});
@@ -202,7 +223,7 @@ export default {
                 // TODO decide who can delete what, and adapt accordingly
                 // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
                 await AnnotationTerm.delete(this.annotation.id, term.id);
-                this.$emit("update");
+                this.$emit("updateTerms");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-term")});
@@ -218,6 +239,7 @@ export default {
             try {
                 await Property.delete(prop.id, this.annotation);
                 this.properties.splice(idx, 1);
+                this.$emit("updateProperties");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-prop")});
@@ -238,6 +260,7 @@ export default {
                 if(newProp) {
                     this.properties.push(prop);
                 }
+                this.$emit("updateProperties");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-save-prop")});
@@ -248,7 +271,28 @@ export default {
             prop.key = prop.oldKey;
             prop.value = prop.oldValue;
             this.editedProperties.splice(idx, 1);
-        }
+        },
+
+        confirmDeletion() {
+            this.$dialog.confirm({
+                title: this.$t("confirm-deletion"),
+                message: this.$t("confirm-deletion-annotation"),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.deleteAnnot()
+            });
+        },
+
+        async deleteAnnot() {
+            try {
+                await this.annotation.delete();
+                this.$emit("deletion");
+            }
+            catch(err) {
+                this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
+            }
+        },
     },
     async created() {
         this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
@@ -258,26 +302,31 @@ export default {
 </script>
 
 <style scoped>
+.annotation-details {
+    position: relative;
+}
+
 .table {
     width: 100%;
     margin-bottom: 10px !important;
+    background: unset;
 }
 .table th, .table td {
     vertical-align: middle;
 }
+
+h5 {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.actions {
+    margin-bottom: 5px;
+}
+
 .annotation-details .actions .button {
     margin: 3px;
     box-sizing: border-box;
-}
-.color-preview {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    margin-right: 3px;
-    border-radius: 3px;
-    box-shadow: 0px 0px 1px #777;
-    position: relative;
-    top: 2px;
 }
 
 .annotation-details button.is-fullwidth {
@@ -302,7 +351,7 @@ export default {
     cursor: pointer;
     pointer-events: auto;
     display: inline-block;
-    font-size: 9px;
+    font-size: 8px;
     padding: 0px;
     outline: none;
     position: relative;
@@ -314,6 +363,25 @@ export default {
 .tag button.edit:hover {
     background-color: rgba(10, 10, 10, 0.3);
 }
+
+.add-prop {
+    height: 24px;
+}
+
+.new-prop-form {
+    margin-bottom: 5px;
+}
+
+.new-prop-form .button {
+    margin: 0px;
+    margin-right: 5px;
+}
+
+.new-prop-form .control {
+    margin-right: 10px;
+    display: inline-block;
+}
+
 </style>
 
 <style>
@@ -321,32 +389,22 @@ export default {
     margin-bottom: 0px !important;
 }
 
+.annotation-details .tags {
+    margin-bottom: unset !important;
+}
+
 .annotation-details .tag {
     margin-right: 5px;
     margin-bottom: 5px !important;
+    background-color: rgba(0, 0, 0, 0.04);
 }
 
 .annotation-details .tag.is-dark {
-    background-color: #e5e5e5;
+    background-color: rgba(0, 0, 0, 0.1);
     color: black;
 }
 
 .annotation-details .field.is-grouped.is-grouped-multiline {
-    margin-bottom: 5px !important;
+    margin-bottom: 0px !important;
 }
-
-.annotation-details .new-prop-form {
-    margin-bottom: 5px;
-}
-
-.annotation-details .new-prop-form .button {
-    margin: 0px;
-    margin-right: 5px;
-}
-
-.annotation-details .new-prop-form .control {
-    margin-right: 10px;
-    display: inline-block;
-}
-
 </style>

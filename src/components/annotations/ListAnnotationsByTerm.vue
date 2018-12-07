@@ -12,8 +12,8 @@
             <div class="annot-preview" :style="'background-image: url(' + annot.smallCropURL + ')'" 
             @click="openedAnnot = annot.id">
                 <button class="button is-small">
-                    <b-icon :icon="openedAnnot == annot.id ? 'minus' : 'plus'" size="is-small">
-                </b-icon></button>    
+                    <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
+                </button>
             </div>
 
             <annotation-details slot="popover" v-click-outside="(event) => close(event, annot.id)"
@@ -21,7 +21,8 @@
                 :terms="allTerms"
                 :users="allUsers"
                 :images="allImages"
-                @update="$emit('update', annot.id)"
+                @updateTerms="$emit('update', annot.id)"
+                @deletion="$emit('update', annot.id)"
                 v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
                 (prevents fetching unnecessary information) -->
             </annotation-details>

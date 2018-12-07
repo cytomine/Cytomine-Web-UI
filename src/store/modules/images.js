@@ -1,31 +1,58 @@
 import Vue from "vue";
 
-import Collection from "ol/Collection";
-
-import {TermCollection} from "cytomine-client";
+import {TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle} from "@/utils/style-utils.js";
+    verticesStyle, defaultColors} from "@/utils/style-utils.js";
+import constants from "@/utils/constants";
+
+import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
 export default {
     state: {
-        images: {}
+        triggerMapUpdateSize: [], // change of this property should trigger a size update of all visible maps
+        viewers: {}
     },
 
     mutations: {
-        addImage(state, {id, wrapper}) {
-            Vue.set(state.images, id, wrapper);
+
+        // --- Mutations common to all viewers
+
+        triggerMapUpdateSize(state) {
+            state.triggerMapUpdateSize = []; // new array will be considered as a new value
         },
 
-        removeImage(state, idImage) {
-            Vue.delete(state.images, idImage);
+        // --- Viewer-specific mutations
+
+        addViewer(state, {id, name, idProject}) {
+            Vue.set(state.viewers, id, {
+                maps: [],
+                name,
+                idProject,
+                links: [],
+                imageSelector: false
+            });
         },
 
-        togglePanel(state, {idImage, panel}) {
-            let imageWrapper = state.images[idImage];
-            if(imageWrapper == null) {
-                return;
-            }
+        removeViewer(state, idViewer) {
+            Vue.delete(state.viewers, idViewer);
+        },
+
+        setImageSelector(state, {idViewer, value}) {
+            state.viewers[idViewer].imageSelector = value;
+        },
+
+        addMap(state, {idViewer, wrapper}) {
+            state.viewers[idViewer].maps.push(wrapper);
+            state.viewers[idViewer].imageSelector = false;
+        },
+
+        removeMap(state, {idViewer, index}) {
+            state.viewers[idViewer].maps.splice(index, 1);
+        },
+
+        togglePanel(state, {idViewer, index, panel}) {
+            let imageWrapper = state.viewers[idViewer].maps[index];
             if(imageWrapper.activePanel === panel) {
                 imageWrapper.activePanel = null;
             }
@@ -34,43 +61,214 @@ export default {
             }
         },
 
-        // ----- Terms visibility
+        // ----- View links
 
-        toggleTermVisibility(state, {idImage, indexTerm}) {
-            let term = state.images[idImage].terms[indexTerm];
-            term.displayed = !term.displayed;
+        linkMaps(state, {idViewer, indexes}) {
+            let links = state.viewers[idViewer].links;
+            let groups = indexes.map(index => links.findIndex(group => group.includes(index)));
+
+            if(groups[0] != -1) {
+                if(groups[1] == -1) {
+                    links[groups[0]].push(indexes[1]);
+                }
+                else if(groups[0] != groups[1]) { // merge the groups
+                    links[groups[0]].push(...links[groups[1]]);
+                    links.splice(groups[1], 1);
+                }
+            }
+            else if(groups[1] != -1) {
+                links[groups[1]].push(indexes[0]);
+            }
+            else { // create new group linking the maps
+                links.push(indexes);
+            }
         },
 
-        setDisplayNoTerm(state, {idImage, value}) { // TODO: change name
-            state.images[idImage].displayNoTerm = value;
+        unlinkMap(state, {idViewer, index, deletion=false}) {
+            let links = state.viewers[idViewer].links;
+            for(let i = links.length - 1; i >= 0; i--) {
+                let group = links[i];
+                for(let j = group.length - 1; j >= 0; j--) {
+                    if(group[j] == index) {
+                        group.splice(j, 1);
+                        if(group.length == 1) { // if group no longer contains several maps, delete it
+                            links.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    if(deletion && group[j] > index) { // if a map is about to be deleted, higher indexes should be updated
+                        group[j] = group[j] - 1;
+                    }
+                }
+            }
+        },
+
+        // ----- Tracking
+
+        setBroadcast(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].broadcast = value;
+        },
+
+        setTrackedUser(state, {idViewer, index, idUser}) {
+            state.viewers[idViewer].maps[index].trackedUser = idUser;
+        },
+
+        // ----- View properties
+
+        setCenter(state, {idViewer, index, center}) {
+            let viewerWrapper = state.viewers[idViewer];
+            let refImageWrapper = viewerWrapper.maps[index];
+            let increments = refImageWrapper.center.map((val, i) => center[i] - val);
+            let refZoom = refImageWrapper.imageInstance.depth - refImageWrapper.zoom;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                let imageWrapper = viewerWrapper.maps[idx];
+                let diffZoom = imageWrapper.imageInstance.depth - imageWrapper.zoom - refZoom;
+                let zoomFactor = Math.pow(2, diffZoom);
+                viewerWrapper.maps[idx].center = viewerWrapper.maps[idx].center.map((val, i) => {
+                    return val + increments[i]*zoomFactor;
+                });
+            });
+        },
+
+        setZoom(state, {idViewer, index, zoom}) {
+            let viewerWrapper = state.viewers[idViewer];
+            let zoomIncrement = zoom - viewerWrapper.maps[index].zoom;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                viewerWrapper.maps[idx].zoom += zoomIncrement;
+            });
+        },
+
+        setRotation(state, {idViewer, index, rotation}) {
+            let viewerWrapper = state.viewers[idViewer];
+            let rotationInc = rotation - viewerWrapper.maps[index].rotation + 2*Math.PI;
+
+            // find all indexes that should be updated (if map is not linked to other, update only it)
+            let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+            mapIndexesToUpdate.forEach(idx => {
+                viewerWrapper.maps[idx].rotation = (viewerWrapper.maps[idx].rotation + rotationInc) % (2*Math.PI);
+            });
+        },
+
+        // ----- Color manipulation
+
+        setBrightness(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].brightness = value;
+        },
+
+        setContrast(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].contrast = value;
+        },
+
+        setHue(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].hue = value;
+        },
+
+        setSaturation(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].saturation = value;
+        },
+
+        resetColorManipulation(state, {idViewer, index}) {
+            state.viewers[idViewer].maps[index].brightness = 0;
+            state.viewers[idViewer].maps[index].contrast = 0;
+            state.viewers[idViewer].maps[index].hue = 0;
+            state.viewers[idViewer].maps[index].saturation = 0;
+        },
+
+        // ----- Digital zoom
+
+        setMaxZoom(state, {idViewer, index, maxZoom}) {
+            state.viewers[idViewer].maps[index].maxZoom = maxZoom;
+        },
+
+        setDigitalZoom(state, {idViewer, index, digitalZoom}) {
+            state.viewers[idViewer].maps[index].digitalZoom = digitalZoom;
+        },
+
+        // ----- Terms
+
+        toggleAssociateTermToNewAnnot(state, {idViewer, index, indexTerm}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let term = wrapper.terms[indexTerm];
+            term.associateToNewAnnot = !term.associateToNewAnnot;
+        },
+
+        toggleTermVisibility(state, {idViewer, index, indexTerm}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let term = wrapper.terms[indexTerm];
+            term.visible = !term.visible;
+
+            if(!term.visible) { // unselect annotation if it is no longer displayed
+                let selectedFeatures = wrapper.selectedFeatures;
+                for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+
+                    let feature = selectedFeatures[index];
+                    let annot = feature.properties.annot;
+
+                    if(!annot.term.includes(term.id)) {
+                        return;
+                    }
+
+                    let hasTermsToDisplay = wrapper.terms.some(term => term.visible && annot.term.includes(term.id));
+                    if(!hasTermsToDisplay) {
+                        selectedFeatures.splice(index, 1);
+                    }
+                }
+            }
+        },
+
+        setDisplayNoTerm(state, {idViewer, index, value}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.displayNoTerm = value;
+
+            if(!value) { // unselect annotation if it is no longer displayed
+                let selectedFeatures = wrapper.selectedFeatures;
+                for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+                    let feature = selectedFeatures[index];
+                    let annot = feature.properties.annot;
+
+                    if(annot.term.length == 0) {
+                        selectedFeatures.splice(index, 1);
+                    }
+                }
+            }
         },
 
         // ----- Selected layers
 
-        addLayer(state, {idImage, layer}) {
-            let wrapper = state.images[idImage];
+        addLayer(state, {idViewer, index, layer, propValues}) {
+            let wrapper = state.viewers[idViewer].maps[index];
             if(wrapper.selectedLayers == null) {
                 wrapper.selectedLayers = [];
             }
-            wrapper.selectedLayers.push(layer);
-            wrapper.map.addLayer(layer.olLayer);
+
+            wrapper.selectedPropertyValues = {...wrapper.selectedPropertyValues, ...propValues};
+            wrapper.selectedLayers.push({...layer});
         },
 
-        removeLayer(state, {idImage, indexLayer}) {
-            let wrapper = state.images[idImage];
-            wrapper.map.removeLayer(wrapper.selectedLayers[indexLayer].olLayer);
-            wrapper.selectedLayers[indexLayer].olLayer = null;
+        removeLayer(state, {idViewer, index, indexLayer}) {
+            let wrapper = state.viewers[idViewer].maps[index];
             wrapper.selectedLayers.splice(indexLayer, 1);
         },
 
-        toggleLayerVisibility(state, {idImage, indexLayer}) {
-            let layer = state.images[idImage].selectedLayers[indexLayer];
-            layer.displayed = !layer.displayed;
-            layer.olLayer.setVisible(layer.displayed);
+        toggleLayerVisibility(state, {idViewer, index, indexLayer}) {
+            let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+            layer.visible = !layer.visible;
         },
 
-        setLayersOpacity(state, {idImage, opacity}) {
-            let wrapper = state.images[idImage];
+        toggleLayerDrawOn(state, {idViewer, index, indexLayer}) {
+            let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+            layer.drawOn = !layer.drawOn;
+        },
+
+        setLayersOpacity(state, {idViewer, index, opacity}) {
+            let wrapper = state.viewers[idViewer].maps[index];
             wrapper.layersOpacity = opacity;
             wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity));
             changeOpacity(wrapper.defaultStyle, opacity);
@@ -78,37 +276,65 @@ export default {
             colorStroke[3] = opacity;
         },
 
-        refreshSelectedLayers(state, idImage) {
-            let wrapper = state.images[idImage];
-            wrapper.selectedLayers.forEach(layer => layer.olLayer.changed());
-            wrapper.selectedFeatures.forEach(feature => feature.changed());
+        triggerIndexLayersUpdate(state, {idViewer, index}) {
+            state.viewers[idViewer].maps[index].triggerIndexLayersUpdate = []; // new array will be considered as a new value
+        },
+
+        // ----- Properties
+
+        setPropertiesKeys(state, {idViewer, index, keys}) {
+            state.viewers[idViewer].maps[index].propertiesKeys = keys;
+        },
+
+        setSelectedPropertyKey(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].selectedPropertyKey = value;
+        },
+
+        setSelectedPropertyValues(state, {idViewer, index, properties}) {
+            state.viewers[idViewer].maps[index].selectedPropertyValues = properties;
+        },
+
+        setSelectedPropertyColor(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].selectedPropertyColor = value;
+        },
+
+        // ----- Measure features
+
+        setMeasureFeatures(state, {idViewer, index, measureFeatures}) {
+            state.viewers[idViewer].maps[index].measureFeatures = measureFeatures;
+        },
+
+        removeMeasureFeature(state, {idViewer, index, indexFeature}) {
+            state.viewers[idViewer].maps[index].measureFeatures.splice(indexFeature, 1);
         },
 
         // ----- Selected features
 
-        clearSelectedFeatures(state, idImage) {
-            let wrapper = state.images[idImage];
-            wrapper.selectedFeatures.clear();
+        setSelectedFeatures(state, {idViewer, index, selectedFeatures}) {
+            state.viewers[idViewer].maps[index].selectedFeatures = selectedFeatures;
+        },
+
+        clearSelectedFeatures(state, {idViewer, index}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.selectedFeatures = [];
             wrapper.annotsToSelect = [];
         },
 
-        reselectFeature(state, {idImage, feature}) {
-            let wrapper = state.images[idImage];
-            let index = wrapper.annotsToSelect.findIndex(annot => annot.id == feature.get("annot").id);
-            wrapper.annotsToSelect.splice(index, 1);
-            wrapper.selectedFeatures.push(feature);
+        selectFeature(state, {idViewer, index, feature}) {
+            state.viewers[idViewer].maps[index].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
         },
 
-        removeLayerFromSelectedFeatures(state, {idImage, idLayer, cache=false}) {
-            let wrapper = state.images[idImage];
+        removeLayerFromSelectedFeatures(state, {idViewer, index, idLayer, cache=false}) {
+            let wrapper = state.viewers[idViewer].maps[index];
 
             let selectedFeatures = wrapper.selectedFeatures;
-            for(let index = selectedFeatures.getLength() - 1; index >= 0; index--) {
-                let feature = selectedFeatures.item(index);
-                if(feature.get("annot").user == idLayer) {
-                    selectedFeatures.removeAt(index);
+            for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+                let feature = selectedFeatures[index];
+                let annot = feature.properties.annot;
+                if(annot.user == idLayer) {
+                    selectedFeatures.splice(index, 1);
                     if(cache) {
-                        wrapper.annotsToSelect.push(feature.get("annot"));
+                        wrapper.annotsToSelect.push(annot);
                     }
                 }
             }
@@ -118,54 +344,47 @@ export default {
             }
         },
 
+        setAnnotToSelect(state, {idViewer, index, annot}) {
+            state.viewers[idViewer].maps[index].annotsToSelect = [annot];
+        },
+
         // ----- Draw tools and associated interactions
 
-        activateTool(state, {idImage, tool}) {
-            state.images[idImage].activeTool = tool;
+        activateTool(state, {idViewer, index, tool}) {
+            state.viewers[idViewer].maps[index].activeTool = tool;
         },
 
-        activateEditTool(state, {idImage, tool}) {
-            state.images[idImage].activeEditTool = tool;
+        activateEditTool(state, {idViewer, index, tool}) {
+            state.viewers[idViewer].maps[index].activeEditTool = tool;
         },
 
-        setInteraction(state, {idImage, interaction}) {
-            let wrapper = state.images[idImage];
-            if(wrapper.currentInteraction != null) {
-                wrapper.map.removeInteraction(wrapper.currentInteraction);
-            }
-            wrapper.currentInteraction = interaction;
-            if(interaction != null) {
-                wrapper.map.addInteraction(interaction);
-            }
+        // ----- Annotation details
+
+        setDisplayAnnotDetails(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].displayAnnotDetails = value;
         },
 
-        setEditInteraction(state, {idImage, interaction}) {
-            let wrapper = state.images[idImage];
-            if(wrapper.currentEditInteraction != null) {
-                wrapper.map.removeInteraction(wrapper.currentEditInteraction);
-            }
-            wrapper.currentEditInteraction = interaction;
-            if(interaction != null) {
-                wrapper.map.addInteraction(interaction);
-            }
+        setPositionAnnotDetails(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].positionAnnotDetails = value;
         },
 
         // ----- Undo/Redo
 
-        addAction(state, {idImage, action}) {
-            let wrapper = state.images[idImage];
+        addAction(state, {idViewer, index, feature, oldAnnot}) {
+            let action = {feature, oldAnnot};
+            let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions.push(action);
             wrapper.undoneActions = [];
         },
 
-        undoAction(state, {idImage, opposedAction}) {
-            let wrapper = state.images[idImage];
+        undoAction(state, {idViewer, index, opposedAction}) {
+            let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions.pop();
             wrapper.undoneActions.push(opposedAction);
         },
 
-        redoAction(state, {idImage, opposedAction}) {
-            let wrapper = state.images[idImage];
+        redoAction(state, {idViewer, index, opposedAction}) {
+            let wrapper = state.viewers[idViewer].maps[index];
             wrapper.undoneActions.pop();
             wrapper.actions.push(opposedAction);
         },
@@ -174,22 +393,46 @@ export default {
     },
 
     actions: {
-        async addImage({commit}, {image, map, imageLayer}) {
-            let id = image.id;
+        async addViewer({commit, dispatch}, baseImage) {
+            let idViewer = baseImage.id;
+            commit("addViewer", {id: idViewer, name: baseImage.instanceFilename, idProject: baseImage.project});
+            await dispatch("addMap", {idViewer, image: baseImage});
+        },
 
+        async addMap({commit}, {idViewer, image}) {
             let initialOpacity = 0.5;
             let defaultStroke = createDefaultStroke(initialOpacity);
 
-            let terms = await TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
+            let termsPromise = TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
+            let propertiesKeysPromise = PropertyCollection.fetchKeysAnnotationProperties(null, image.id);
+
+            if(image.imageServerURLs == null) {
+                let imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
+                image.imageServerURL = imageServerURLs[0];
+            }
+
+            let terms = await termsPromise;
             terms.array.forEach(term => {
-                term.olStyle = createColorStyle(term.color, defaultStroke); // should be handled in image ! (can change opacity in one particular viewer)
-                term.displayed = true;
+                term.olStyle = createColorStyle(term.color, defaultStroke); // must be handled in image (can change opacity in one particular viewer)
+                term.visible = true;
+                term.associateToNewAnnot = false;
             });
+
+            let propertiesKeys = await propertiesKeysPromise;
 
             let wrapper = {
                 imageInstance: image,
-                map,
-                imageLayer,
+
+                maxZoom: image.depth + constants.DIGITAL_ZOOM_INCREMENT,
+                digitalZoom: true,
+
+                zoom: 0, // TODO
+                center: [image.width/2, image.height/2],
+                rotation: 0,
+
+                broadcast: false,
+                trackedUser: null,
+        
                 activePanel: null,
 
                 selectedLayers: null,
@@ -197,62 +440,109 @@ export default {
                 terms: terms.array,
                 displayNoTerm: true,
 
+                propertiesKeys,
+                selectedPropertyKey: null, // TODO: allow to select default property (https://github.com/cytomine/Cytomine-core/issues/1142)
+                selectedPropertyColor: defaultColors[0],
+                selectedPropertyValues: {},
+
                 defaultStroke,
                 defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
                 layersOpacity: initialOpacity,
 
-                selectedFeatures: new Collection(),
+                selectedFeatures: [],
                 annotsToSelect: [],
 
+                measureFeatures: [],
+
                 activeTool: "select",
-                currentInteraction: null,
                 activeEditTool: null,
-                currentEditInteraction: null,
+
+                brightness: 0,
+                contrast: 0,
+                hue: 0,
+                saturation: 0,
+
+                displayAnnotDetails: true,
+                positionAnnotDetails: {x: 0, y: 0},
 
                 actions: [],
-                undoneActions: []
+                undoneActions: [],
+
+                triggerIndexLayersUpdate: []
             };
-            commit("addImage", {id, wrapper});
+            commit("addMap", {idViewer, wrapper});
         },
 
-        toggleTermVisibility({commit}, payload) {
-            commit("toggleTermVisibility", payload);
-            commit("refreshSelectedLayers", payload.idImage);
+        removeMap({commit}, {idViewer, index}) {
+            commit("unlinkMap", {idViewer, index, deletion: true});
+            commit("removeMap", {idViewer, index});
         },
 
-        setDisplayNoTerm({commit}, payload) {
-            commit("setDisplayNoTerm", payload);
-            commit("refreshSelectedLayers", payload.idImage);
+        removeLayer({state, commit}, {idViewer, index, indexLayer, cacheSelectedFeatures}) {
+            let idLayer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer].id;
+            commit("removeLayer", {idViewer, index, indexLayer});
+            commit("removeLayerFromSelectedFeatures", {idViewer, index, idLayer, cache: cacheSelectedFeatures});
         },
 
-        setLayersOpacity({commit}, payload) {
-            commit("setLayersOpacity", payload);
-            commit("refreshSelectedLayers", payload.idImage);
-        },
-
-        removeLayer({state, commit}, {idImage, indexLayer, cacheSelectedFeatures}) {
-            let idLayer = state.images[idImage].selectedLayers[indexLayer].id;
-            commit("removeLayer", {idImage, indexLayer});
-            commit("removeLayerFromSelectedFeatures", {idImage, idLayer, cache: cacheSelectedFeatures});
-        },
-
-        toggleLayerVisibility({state, commit}, {idImage, indexLayer}) {
-            commit("toggleLayerVisibility", {idImage, indexLayer});
-            let layer = state.images[idImage].selectedLayers[indexLayer];
-            if(!layer.displayed) {
-                commit("removeLayerFromSelectedFeatures", {idImage, idLayer: layer.id});
+        toggleLayerVisibility({state, commit}, {idViewer, index, indexLayer}) {
+            commit("toggleLayerVisibility", {idViewer, index, indexLayer});
+            let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+            if(!layer.visible) {
+                commit("removeLayerFromSelectedFeatures", {idViewer, index, idLayer: layer.id});
             }
+        },
+
+        selectFeature({commit}, {idViewer, index, feature}) {
+            commit("clearSelectedFeatures", {idViewer, index});
+            commit("selectFeature", {idViewer, index, feature});
+        },
+
+        async setSelectedPropertyKey({state, commit}, {idViewer, index, value}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let idImage = wrapper.imageInstance.id;
+            let properties = {};
+            if(value != null) {
+                for(let layer of wrapper.selectedLayers) {
+                    let layerValues = await fetchLayerPropertiesValues(layer.id, idImage, value);
+                    properties = {...properties, ...layerValues};
+                }
+            }
+
+            commit("setSelectedPropertyValues", {idViewer, index, properties});
+            commit("setSelectedPropertyKey", {idViewer, index, value});
+        },
+
+        async addLayer({state, commit}, {idViewer, index, layer}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let idImage = wrapper.imageInstance.id;
+            let key = wrapper.selectedPropertyKey;
+            let propValues = {};
+            if(key != null) {
+                propValues = await fetchLayerPropertiesValues(layer.id, idImage, key);
+            }
+            commit("addLayer", {idViewer, index, layer, propValues});
+        },
+
+        async refreshProperties({state, commit, dispatch}, {idViewer, index}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let idImage = wrapper.imageInstance.id;
+            let keys = await PropertyCollection.fetchKeysAnnotationProperties(null, idImage);
+            commit("setPropertiesKeys", {idViewer, index, keys});
+
+            let currentKey = wrapper.selectedPropertyKey;
+            let newKey = keys.includes(currentKey) ? currentKey : null;
+            dispatch("setSelectedPropertyKey", {idViewer, index, value: newKey});
         }
     },
 
     getters: {
-        genStyleFunction: state => image => (feature) => {
+        genStyleFunction: state => (idViewer, index) => (feature) => {
             let annot = feature.get("annot");
             if(annot == null) {
                 return;
             }
 
-            let imageWrapper = state.images[image];
+            let imageWrapper = state.viewers[idViewer].maps[index];
 
             let cluster = isCluster(feature);
 
@@ -264,7 +554,7 @@ export default {
             // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
             if(!cluster) {
                 let hasTerms = (annot.term.length > 0);
-                let hasTermsToDisplay = imageWrapper.terms.some(term => term.displayed && annot.term.includes(term.id));
+                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
 
                 if((hasTerms && !hasTermsToDisplay) || (!hasTerms && !imageWrapper.displayNoTerm)) {
                     return null; // do not display annotation
@@ -288,7 +578,7 @@ export default {
             }
 
             // Styles for selected elements
-            if(imageWrapper.selectedFeatures.getArray().includes(feature)) {
+            if(imageWrapper.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
                 styles.push(...selectStyles);
 
                 // if in modify mode, display vertices
@@ -297,7 +587,46 @@ export default {
                 }
             }
 
+            // Properties
+            let propValue = imageWrapper.selectedPropertyValues[annot.id];
+            if (propValue != null) {
+                let color = imageWrapper.selectedPropertyColor;
+                let fontSize = "34px";
+                if(imageWrapper.zoom <= 3) {
+                    fontSize = "12px";
+                }
+                else if(imageWrapper.zoom <= 6) {
+                    fontSize = "19px";
+                }
+                else if(imageWrapper.zoom <= 8) {
+                    fontSize = "26px";
+                }
+                styles.push(createTextStyle(propValue, fontSize, color.fill, null));
+            }
+
             return styles;
         }
     }
 };
+
+// Helper functions
+
+async function fetchLayerPropertiesValues(idLayer, idImage, key) {
+    let propertiesValues = await PropertyCollection.fetchPropertiesValuesAndPositions(
+        idLayer,
+        idImage,
+        key
+    );
+
+    let properties = {};
+    propertiesValues.forEach(propVal => {
+        if(properties[propVal.idAnnotation] == null) {
+            properties[propVal.idAnnotation] = propVal.value;
+        }
+        else {
+            properties[propVal.idAnnotation] += "; " + propVal.value;
+        }
+    });
+
+    return properties;
+}

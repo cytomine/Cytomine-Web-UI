@@ -1,17 +1,18 @@
 <template>
 <vue-slider 
     :value="value" @input="$emit('input', $event)"
+    :min="min"
     :max="max" 
     :show="internalShow"
-    :tooltip-dir="['left', 'right']"
+    :tooltip-dir="isArray ? ['left', 'right'] : 'right'"
     :debug="false"
     ref="slider"
 >
-    <template slot="tooltip" slot-scope="{index, value}">
-        <span class="vue-slider-tooltip" @mousedown.stop @click.stop="startEdition(index)">
-            <template v-if="!isEdited[index]">{{value}}</template>
-            <b-input ref="input" v-else type="text" v-model="internalValue[index]" 
-            @blur="stopEdition(index)" @keyup.enter.native="stopEdition(index)"></b-input>
+    <template slot="tooltip" slot-scope="{index, value, merge}">
+        <span v-if="!merge" class="vue-slider-tooltip" @mousedown.stop @click.stop="startEdition(index)">
+            <template v-if="indexEdited != (index || 0)">{{value}}</template>
+            <b-input ref="inputSlider" v-else type="text" v-model="editedValue" @hook:mounted="focus()"
+             @blur="stopEdition(index)" @keyup.enter.native="stopEdition(index)"></b-input>
         </span>
     </template>
 </vue-slider>
@@ -25,64 +26,83 @@ export default {
     components: {vueSlider},
     props: {
         value: {type: null},
+        min: {type: Number},
         max: {type: Number},
-        show: {type: Boolean},
-        integerOnly: {type: Boolean, default: true}
+        show: {type: Boolean, default: true},
+        integerOnly: {type: Boolean, default: true},
+        revision: {type: Number} // change of this value will trigger a refresh
     },
     data() {
         return {
-            isEdited: [false, false],
-            internalValue: null,
-            internalShow: null
+            indexEdited: null,
+            internalShow: null,
+            editedValue: 0
         };
     },
+    computed: {
+        isArray() {
+            return Array.isArray(this.value);
+        }
+    },
     watch: {
-        value() {
-            this.internalValue = this.value.slice();
+        show(show) {
+            this.internalShow = show;
         },
-        show() {
-            this.internalShow = this.show;
+        revision() {
+            this.$refs.slider.refresh();
         }
     },
     methods: {
-        startEdition(index) {
-            if(!this.isEdited[index]) {
-                this.isEdited[index] = true;
+        startEdition(index=0) {
+            if(this.indexEdited != index) {
+                this.editedValue = this.isArray ? this.value[index] : this.value;
+                this.indexEdited = index;
                 this.refresh();
-                this.$nextTick(() => this.$refs.input.focus());
             }
         },
-        stopEdition(index) {
-            if(this.isEdited[index]) {
-                this.processInternalValue(index);
-                this.$refs.slider.setValue(this.internalValue);
-                this.isEdited[index] = false;
+        stopEdition(index=0) {
+            if(this.indexEdited == index) {
+                let newValue = this.processInternalValue(index);
+                this.$refs.slider.setValue(newValue);
+                this.indexEdited = null;
                 this.refresh();
             }
         },
         processInternalValue(index) {
-            // convert str to number if possible, if not, reset to initial value
-            if(isNaN(this.internalValue[index]) || this.internalValue[index].length == 0) {
-                this.internalValue[index] = this.value[index];
+            let newValue = this.isArray ? this.value.slice() : this.value;
+
+            // if entered value is incorrect, reset to initial value
+            if(isNaN(this.editedValue) || this.editedValue.length == 0) {
+                return newValue;
             }
-            else {
-                this.internalValue[index] = this.integerOnly ? parseInt(this.internalValue[index]) : 
-                    Number(this.internalValue[index]);
+
+            let parsedValue = this.integerOnly ? parseInt(this.editedValue) : Number(this.editedValue);
+
+            if(!this.isArray) {
+                return parsedValue;
             }
 
             // reorder bounds if needed
-            if(this.internalValue[0] > this.internalValue[1]) {
-                let tmp = this.internalValue[0];
-                this.internalValue[0] = this.internalValue[1];
-                this.internalValue[1] = tmp;
+            newValue[index] = parsedValue;
+            if(newValue[0] > newValue[1]) {
+                let tmp = newValue[0];
+                newValue[0] = newValue[1];
+                newValue[1] = tmp;
             }
+            return newValue;
         },
         refresh() { // force re-render of vue-slider component to render changes in tooltip slot
             if(this.show) {
                 this.internalShow = false;
                 this.internalShow = true;
             }
+        },
+        focus() {
+            this.$refs.inputSlider.focus();
         }
+    },
+    created() {
+        this.internalShow = this.show;
     }
 };
 </script>

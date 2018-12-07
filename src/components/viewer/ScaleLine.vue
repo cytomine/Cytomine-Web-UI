@@ -1,11 +1,15 @@
 <template>
     <div class="scale-line">
-        <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}" v-if="resolution != null">
-            {{scaleLength}}
-        </div>
-        <div class="scale-line-bottom" v-if="resolution != null">
-             <span v-show="magnification != 0">{{$t("magnification")}}: {{magnification}}X</span>
-        </div>
+        <template v-if="resolution != null">
+            <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}">
+                {{scaleLength}}
+            </div>
+            <div class="scale-line-bottom">
+                <span v-show="magnification != 0" :class="{'interpolation': interpolation}">
+                    {{$t("magnification")}}: {{magnification}}X
+                </span>
+            </div>
+        </template>
         <div class="scale-line-position" v-if="mousePosition != null">
             <div style="float: left;">x: {{Math.round(mousePosition[0])}}</div>
             <div style="float: right;">y: {{Math.round(mousePosition[1])}}</div>
@@ -18,8 +22,7 @@ export default {
     name: "scale-line",
     props: [
         "image",
-        "map",
-        "currentZoom",
+        "zoom",
         "mousePosition"
     ],
     data() {
@@ -29,12 +32,12 @@ export default {
     },
     computed: {
         magnification() {
-            let magnification = Math.pow(2, this.currentZoom - this.image.depth) * this.image.magnification;
+            let magnification = Math.pow(2, this.zoom - this.image.depth) * this.image.magnification;
             return Math.round(magnification * 100) / 100;
         },
         resolution() {
             if(this.image.resolution != null) {
-                return Math.pow(2, this.currentZoom - this.image.depth) * this.image.resolution;
+                return Math.pow(2, this.zoom - this.image.depth) * this.image.resolution;
             }
         },
         scaleLength() {
@@ -48,6 +51,9 @@ export default {
                 return `${length.toPrecision(3)} ${unit}`;
             }
         },
+        interpolation() {
+            return this.zoom > this.image.depth;
+        }
     }
 };
 </script>
@@ -80,6 +86,9 @@ export default {
     text-align: center;
     padding-top: 2px;
     margin-bottom: 10px;
+}
+.interpolation {
+    color: red;
 }
 .scale-line-position {
     text-align: center;

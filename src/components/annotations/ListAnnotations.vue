@@ -11,7 +11,8 @@
                                 {{$t("annotation-type")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes">
+                                <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
+                                    :allow-empty="false">
                                 </cytomine-multiselect>
                             </div>
                         </div>
@@ -172,34 +173,10 @@ export default {
         },
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.reduce((arr, userJob) => {
-                if(userJob.id != null) {
-                    let date = this.$options.filters.moment(Number(userJob.created), "DD/MM/YYYY, HH:mm");
-                    userJob.fullName = `${userJob.softwareName} - ${date}`;
-                    arr.push(userJob);
-                }
-                return arr;
-            }, []);
-
-            // ----- Multiselect with group -----
-            // let softwareMappings = [];
-            // this.userJobs = this.userJobs.reduce((tree, userJob) => {
-            //     if(userJob.id == null) {
-            //         return tree;
-            //     }
-
-            //     userJob.date = this.$options.filters.moment(Number(userJob.created), "DD/MM/YYYY, HH:mm");
-            //     let softwareName = userJob.softwareName
-            //     if(softwareMappings[softwareName] == null) {
-            //         softwareMappings[softwareName] = tree.length;
-            //         tree.push({softwareName, jobs: [userJob]});
-            //     }
-            //     else {
-            //         tree[softwareMappings[softwareName]].jobs.push(userJob);
-            //     }
-            //     return tree;
-            // }, []);
-            // ---------------------------------
+            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
+            this.userJobs.forEach(userJob => {
+                userJob.fullName = fullName(userJob);
+            });
 
             this.selectedUserJobs = this.userJobs;
         }

@@ -1,211 +1,471 @@
-<!-- TODO: re-render map when size of div changes (i.e. side panel toggled) > map.updateSize()-->
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
-<!-- TODO: properties -->
 <!-- TODO job templates -->
-<!-- TODO: multi images -->
-<!-- TODO annotation details -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
-    <div class="map-container">
-        <div class="map" id="map" @mousemove="updateMousePosition" @mousewheel="updateMousePosition" ref="map"></div>
-        <div class="draw-tools" v-if="imageInstance != null">
-            <draw-tools :image="imageInstance"></draw-tools>
+    <div class="map-container" v-if="!loading">
+
+        <vl-map :data-projection="projectionName"
+                :load-tiles-while-animating="true"
+                :load-tiles-while-interacting="true"
+                @pointermove="projectedMousePosition = $event.coordinate"
+                ref="map">
+
+            <vl-view :center.sync="center"
+                     :zoom.sync="zoom"
+                     :rotation.sync="rotation"
+                     :max-zoom="maxZoom"
+                     :min-zoom="minZoom"
+                     :extent="extent"
+                     :projection="projectionName"
+                     @mounted="viewMounted()"
+                     ref="view">
+            </vl-view>
+
+            <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
+                <vl-source-zoomify :projection="projectionName"
+                                   :url="baseLayerURL"
+                                   :size="imageSize"
+                                   :extent="extent"
+                                   :key="baseLayerURL"
+                                   crossOrigin="Anonymous"
+                                   ref="baseSource"
+                                   @mounted="setBaseSource()">
+                </vl-source-zoomify>
+            </vl-layer-tile>
+
+            <vl-layer-image>
+                <vl-source-raster v-if="baseSource != null && colorManipulationOn"
+                                  :sources="[baseSource]"
+                                  :operation="operation"
+                                  :lib="lib">
+                </vl-source-raster>
+            </vl-layer-image>
+
+            <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
+                              :idViewer="idViewer"
+                              :index="index"
+                              :user-layer="layer">
+            </annotation-layer>
+
+            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
+            </select-interaction>
+
+            <draw-interaction v-if="!['select', 'ruler', 'angle', 'area'].includes(activeTool)"
+                :idViewer="idViewer" :index="index">
+            </draw-interaction>
+
+            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null"
+                :idViewer="idViewer" :index="index">
+            </modify-interaction>
+
+            <measure-interaction :idViewer="idViewer" :index="index">
+            </measure-interaction>
+
+        </vl-map>
+
+        <div class="draw-tools">
+            <draw-tools :idViewer="idViewer" :index="index"></draw-tools>
         </div>
+
         <div class="panels">
             <ul>
-                <li><a @click="close()" class="close">
-                    <i class="fa fa-times-circle"></i>
-                </a></li>
-                <li><a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
-                        <i class="fa fa-info"></i>
-                </a></li>
-                <li><a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
-                        <i class="fa fa-link"></i>
-                </a></li>
-                <li><a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
-                        <i class="fa fa-sliders"></i>
-                </a></li>
-                <li><a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
-                        <i class="fa fa-files-o"></i>
-                </a></li>
-                <li><a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
-                        <i class="fa fa-map-signs"></i>
-                </a></li>
+                <li>
+                    <a @click="$emit('close')" class="close">
+                        <i class="fas fa-times-circle"></i>
+                    </a>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
+                        <i class="fas fa-info"></i>
+                    </a>
+                    <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
+                        :image="image"></image-information>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <digital-zoom class="panel-options panel-digital-zoom"
+                        v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
+                </li>
+
+                <li v-if="viewerWrapper.maps.length > 1">
+                    <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
+                        <i class="fas fa-link"></i>
+                    </a>
+                    <link-panel class="panel-options panel-link"
+                        v-show="activePanel == 'link'" :idViewer="idViewer" :index="index"></link-panel>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
+                        <i class="fas fa-sliders-h"></i>
+                    </a>
+                    <color-manipulation class="panel-options panel-colors" v-show="activePanel == 'colors'"
+                        :idViewer="idViewer" :index="index"></color-manipulation>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
+                        <i class="fas fa-copy"></i>
+                    </a>
+                    <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
+                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
+                    </annotations-panel>
+                </li>
+
+                <li v-if="terms.length > 0">
+                    <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
+                        <i class="fas fa-hashtag"></i>
+                    </a>
+                    <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
+                        :idViewer="idViewer" :index="index"></ontology-panel>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
+                        <i class="fas fa-tag"></i>
+                    </a>
+                    <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
+                        :idViewer="idViewer" :index="index"></properties-panel>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
+                        <i class="fas fa-street-view"></i>
+                    </a>
+                    <follow-panel class="panel-options panel-follow" v-show="activePanel == 'follow'"
+                        :idViewer="idViewer" :index="index" :project="project" :view="$refs.view"></follow-panel>
+                </li>
+
+                <li>
+                    <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
+                        <i class="fas fa-map-signs"></i>
+                    </a>
+                    <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
+                        :view="$refs.view"></guided-tour>
+                </li>
+
+                <li class="bottom" v-if="index == viewerWrapper.maps.length - 1 && !viewerWrapper.imageSelector">
+                    <a @click="addMap()">
+                        <i class="fas fa-plus-circle"></i>
+                    </a>
+                </li>
             </ul>
         </div>
 
-        <image-information class="panel-options panel-info" v-if="imageInstance != null" v-show="activePanel == 'info'"
-            :image="imageInstance"></image-information>
-
-        <div class="panel-options panel-link" v-show="activePanel == 'link'">
-            Not yet implemented
+        <div class="broadcast" v-if="imageWrapper.broadcast">
+            <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
 
-        <div class="panel-options panel-colors" v-show="activePanel == 'colors'">
-            Not yet implemented
-        </div>
-        <!-- <color-manipulation class="panel-options panel-colors" v-if="map != null" v-show="activePanel == 'colors'"
-            :map="map" :imageLayer="layer"></color-manipulation> -->
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
 
-        <annotations-panel class="panel-options panel-layers" v-if="imageInstance != null" v-show="activePanel == 'layers'"
-            :image="imageInstance"></annotations-panel>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
 
-        <guided-tour class="panel-options panel-guided-tour" v-if="view != null" v-show="activePanel == 'guided-tour'"
-            :view="view"></guided-tour>
-
-        <scale-line v-if="zoom != null"
-            :image="imageInstance" :currentZoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
-
-        <!--<annotation-details v-if="imageInstance != null" :image="imageInstance"></annotation-details>-->
+        <annotation-details-container :idViewer="idViewer" :index="index" :view="$refs.view">
+        </annotation-details-container>
     </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import _ from "lodash";
 
-import ImageInformation from "./ImageInformation";
-//import ColorManipulation from "./ColorManipulation";
-import AnnotationsPanel from "./AnnotationsPanel";
-import GuidedTour from "./GuidedTour";
+import AnnotationLayer from "./AnnotationLayer";
+import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
-//import AnnotationDetails from "./AnnotationDetails";
 
-import {Map, View} from "ol";
-import {Zoomify} from "ol/source";
-import {Tile as TileLayer} from "ol/layer";
-import Projection from "ol/proj/Projection";
-import {defaults as defaultControls, OverviewMap} from "ol/control";
+import ImageInformation from "./panels/ImageInformation";
+import DigitalZoom from "./panels/DigitalZoom";
+import ColorManipulation from "./panels/ColorManipulation";
+import LinkPanel from "./panels/LinkPanel";
+import AnnotationsPanel from "./panels/AnnotationsPanel";
+import OntologyPanel from "./panels/OntologyPanel";
+import PropertiesPanel from "./panels/PropertiesPanel";
+import FollowPanel from "./panels/FollowPanel";
+import GuidedTour from "./panels/GuidedTour";
 
-import {ImageInstance, AbstractImage} from "cytomine-client";
+import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
+
+import SelectInteraction from "./interactions/SelectInteraction";
+import DrawInteraction from "./interactions/DrawInteraction";
+import ModifyInteraction from "./interactions/ModifyInteraction";
+import MeasureInteraction from "./interactions/MeasureInteraction";
+
+import {addProj, createProj, getProj} from "vuelayers/lib/ol-ext";
+
+import View from "ol/View";
+import OverviewMap from "ol/control/OverviewMap";
+import WKT from "ol/format/WKT";
+
+import {Annotation, UserPosition} from "cytomine-client";
+
+import {constLib, operation} from "@/utils/color-manipulation.js";
 
 export default {
     name: "cytomine-image",
+    props: [
+        "idViewer",
+        "index",
+        "project"
+    ],
     components: {
-        ImageInformation,
-        //ColorManipulation,
-        AnnotationsPanel,
-        GuidedTour,
+        AnnotationLayer,
+
+        RotationSelector,
         ScaleLine,
         DrawTools,
-        //AnnotationDetails
+
+        AnnotationDetailsContainer,
+
+        ImageInformation,
+        DigitalZoom,
+        ColorManipulation,
+        LinkPanel,
+        AnnotationsPanel,
+        OntologyPanel,
+        PropertiesPanel,
+        FollowPanel,
+        GuidedTour,
+
+        SelectInteraction,
+        DrawInteraction,
+        ModifyInteraction,
+        MeasureInteraction
     },
     data() {
         return {
-            projectedMousePosition: [0, 0]
+            minZoom: 0,
+            
+            projectedMousePosition: [0, 0],
+
+            baseSource: null,
+            routedAnnotation: null,
+
+            timeoutSavePosition: null,
+
+            loading: true
         };
     },
     computed: {
-        view() {
-            if(this.map != null) {
-                return this.map.getView();
-            }
-        },
-        zoom() {
-            if(this.view != null) {
-                return this.view.getZoom();
-            }
-        },
-        idImage() {
-            return this.$route.params.idImage;
+        viewerWrapper() {
+            return this.$store.state.images.viewers[this.idViewer];
         },
         imageWrapper() {
-            return this.images[this.idImage] || {};
+            return this.viewerWrapper.maps[this.index];
         },
-        imageInstance() {
+        image() {
             return this.imageWrapper.imageInstance;
         },
-        layer() {
-            return this.imageWrapper.layer;
+        projectionName() {
+            return `CYTO-${this.image.id}`;
         },
-        map() {
-            return this.imageWrapper.map;
+        terms() {
+            return this.imageWrapper.terms;
+        },
+        selectedLayers() {
+            return this.imageWrapper.selectedLayers || [];
         },
         activePanel() {
             return this.imageWrapper.activePanel;
         },
-        ...mapState({images: state => state.images.images})
-    },
-    methods: {
-        togglePanel(panel) {
-            this.$store.commit("togglePanel", {idImage: this.idImage, panel});
+        activeTool() {
+            return this.imageWrapper.activeTool;
+        },
+        activeEditTool() {
+            return this.imageWrapper.activeEditTool;
+        },
+        maxZoom() {
+            return this.imageWrapper.maxZoom;
+        },
+        triggerUpdateSize() {
+            return this.$store.state.images.triggerMapUpdateSize;
         },
 
-        updateMousePosition(event) {
-            if(this.map != null) {
-                let rect = this.$refs.map.getBoundingClientRect();
-                let mousePosition = [event.clientX - rect.left, event.clientY - rect.top];
-                this.projectedMousePosition = this.map.getCoordinateFromPixel(mousePosition);
+        center: {
+            get() {
+                return this.imageWrapper.center;
+            },
+            set(value) {
+                this.$store.commit("setCenter", {idViewer: this.idViewer, index: this.index, center: value});
+            }
+        },
+        zoom: {
+            get() {
+                return this.imageWrapper.zoom;
+            },
+            set(value) {
+                this.$store.commit("setZoom", {idViewer: this.idViewer, index: this.index, zoom: Number(value)});
+            }
+        },
+        rotation: {
+            get() {
+                return this.imageWrapper.rotation;
+            },
+            set(value) {
+                this.$store.commit("setRotation", {idViewer: this.idViewer, index: this.index, rotation: Number(value)});
             }
         },
 
-        close() {
-            this.$store.commit("removeImage", this.imageInstance.id);
-            this.$router.push("/"); // TODO: change
-        }
+        viewState() {
+            return {center: this.center, zoom: this.zoom, rotation: this.rotation};
+        },
 
+        extent() {
+            return [0, 0, this.image.width, this.image.height];
+        },
+        imageSize() {
+            return [this.image.width, this.image.height];
+        },
+        baseLayerURL() { // TODO: randomize + filter (see ULiege repo)
+            return `${this.image.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
+                &channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
+        },
+
+        colorManipulationOn() {
+            return this.imageWrapper.brightness != 0 || this.imageWrapper.contrast != 0
+                || this.imageWrapper.hue != 0 || this.imageWrapper.saturation != 0;
+        },
+        operation() {
+            return operation;
+        },
+        lib() {
+            return {
+                ...constLib,
+                brightness: this.imageWrapper.brightness,
+                contrast: this.imageWrapper.contrast,
+                saturation: this.imageWrapper.saturation,
+                hue: this.imageWrapper.hue
+            };
+        },
+
+        layersToPreload() {
+            if(this.routedAnnotation != null) {
+                return [this.routedAnnotation.user];
+            }
+        }
     },
-    async mounted() {
-        if(this.imageInstance == null) {
-            let imageInstance = await ImageInstance.fetch(this.idImage);
+    watch: {
+        triggerUpdateSize() {
+            this.$refs.map.updateSize();
+        },
 
-            let imageServerURLs = await new AbstractImage({id: imageInstance.baseImage}).fetchImageServers();
-            let imageServerURL = imageServerURLs[0];
+        viewState() {
+            this.savePosition();
+        },
+    },
+    methods: {
+        addMap() {
+            this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
+        },
 
-            let extent = [0, 0, imageInstance.width, imageInstance.height];
-            let projection = new Projection({code: "CYTO", extent});
+        async viewMounted() {
+            await this.$refs.view.$createPromise; // wait for ol.View to be created
 
-            let view = new View({
-                center: [imageInstance.width/2, imageInstance.height/2],
-                minZoom: 2,
-                maxZoom: imageInstance.depth,
-                projection,
-                zoom: 2,
-                extent: extent
-            });
+            if(this.routedAnnotation != null) { // center view on annotation
+                let annot = this.routedAnnotation;
+                let geometry = new WKT().readGeometry(annot.location);
+                this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
 
-            let layer = new TileLayer({
-                title: "Image",
-                source: new Zoomify({
-                    url: `${imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                        &channels=0&layer=0&timeframe=0&mimeType=${imageInstance.mime}`,
-                    size: [imageInstance.width, imageInstance.height],
-                    extent
-                })
-            });
+                // HACK: center set by view.fit() is incorrect => reset it manually
+                this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
+                    : [annot.centroid.x, annot.centroid.y];
+                // ---
+            }
 
-            let overview = new OverviewMap({
-                layers: [layer],
+            this.savePosition();
+        },
+
+        async setBaseSource() {
+            await this.$refs.baseSource.$createPromise;
+            this.baseSource = this.$refs.baseSource.$source;
+        },
+
+        async addOverviewMap() {
+            await this.$refs.map.$createPromise; // wait for ol.Map to be created
+            await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
+
+            this.$refs.map.$map.addControl(new OverviewMap({
                 collapsed: false,
-                view: new View({projection})
-            });
+                view: new View({projection: this.projectionName}),
+                layers: [this.$refs.baseLayer.$layer]
+            }));
+        },
 
+        togglePanel(panel) {
+            this.$store.commit("togglePanel", {idViewer: this.idViewer, index: this.index, panel});
+        },
 
-            let map = new Map({
-                target: "map",
-                controls: defaultControls().extend([overview]),
-                loadTilesWhileInteracting: true,
-                layers: [layer],
-                view
-            });
+        savePosition: _.debounce(async function() {
+            if(this.$refs.view) {
+                let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
+                await UserPosition.create({
+                    image: this.image.id,
+                    zoom: this.zoom,
+                    // rotation: this.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
+                    bottomLeftX: Math.round(extent[0]),
+                    bottomLeftY: Math.round(extent[1]),
+                    bottomRightX: Math.round(extent[2]),
+                    bottomRightY: Math.round(extent[1]),
+                    topLeftX: Math.round(extent[0]),
+                    topLeftY: Math.round(extent[3]),
+                    topRightX: Math.round(extent[2]),
+                    topRightY: Math.round(extent[3]),
+                    // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
+                });
 
-            this.$store.dispatch("addImage", {image: imageInstance, imageLayer: layer, map});
+                clearTimeout(this.timeoutSavePosition);
+                this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
+            }
+        }, 500)
+    },
+    async created() {
+        if(getProj(this.projectionName) == null) { // if image opened for the first time
+            let projection = createProj({code: this.projectionName, extent: this.extent});
+            addProj(projection);
         }
-        else {
-            this.map.setTarget(null);
-            this.map.setTarget("map");
+
+        // remove all selected features in order to reselect them when they will be added to the map (otherwise,
+        // issue with the select interaction)
+        this.selectedLayers.forEach(layer => {
+            this.$store.commit("removeLayerFromSelectedFeatures", {
+                idViewer: this.idViewer,
+                index: this.index,
+                idLayer: layer.id,
+                cache: true
+            });
+        });
+
+        // TODO: this should be executed only once, for first image of viewer
+        let idRoutedAnnot = this.$route.params.idAnnotation;
+        if(idRoutedAnnot != null) {
+            let annot = await Annotation.fetch(idRoutedAnnot);
+            if(annot.image == this.image.id) {
+                this.routedAnnotation = annot;
+                this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+            }
         }
+
+        this.image.recordConsultation();
+        this.loading = false;
+    },
+    beforeDestroy() {
+        clearTimeout(this.timeoutSavePosition);
     }
 };
 </script>
 
 <style>
-@import "~ol/ol.css";
+@import "~vuelayers/lib/style.css";
+/* @import "~ol/ol.css"; */
 
 .map-container {
+    display:flex;
+    position: relative;
     width: 100%;
     height: 100%;
-    display:flex;
 }
 
 .map {
@@ -221,6 +481,23 @@ export default {
     border-radius: 3px;*/
 }
 
+.broadcast {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    background-color: #EE4242;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid white;
+}
+
+.broadcast i.fas {
+    margin-right: 5px;
+}
+
 .panels {
     background: #555;
     width: 40px;
@@ -232,18 +509,29 @@ export default {
     margin: 0;
 }
 
-.panels li a {
+.panels li {
+    position: relative;
+}
+
+.panels li.bottom {
+    position: absolute;
+    bottom: 0px;
+}
+
+.panels > ul > li > a {
     position: relative;
     display: block;
     padding: 10px;
-    font-size: 20px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-size: 18px;
     color: #eee;
     border-bottom: 1px solid #222;
     text-decoration: none;
     text-align:center;
 }
 
-.panels a:hover {
+.panels > ul > li > a:hover {
     color: #fff;
 }
 
@@ -255,30 +543,15 @@ export default {
     color: #ff7070;
 }
 
-.panel-guided-tour .buttons {
-    margin-top: 10px;
-    text-align: center;
-}
-
 .panel-options table {
     background: none;
     width: 100%;
 }
 
-/* ----- LIGHT ----- */
-
-/* .panels {
-    padding-top: 0px;
-} */
-
-.panels li a.active {
-    background: #f2f2f2;
-    color: #6c95c8;
-}
-
 .panel-options {
     position: absolute;
-    right: 40px;
+    right: 38px;
+    top: -20px;
     width: 300px;
     min-height: 100px;
     background: #f2f2f2;
@@ -287,30 +560,19 @@ export default {
     z-index: 100;
 }
 
-.panel-info {
-    top: 20px;
-}
-
-.panel-link {
-    top: 40px;
-}
-
-.panel-colors {
-    top: 80px;
-}
-
 .panel-layers {
-    top: 100px;
-    font-size: 0.9em;
+    top: unset;
+    bottom: -70px;
 }
 
-.panel-guided-tour {
-    top: 150px;
+.panel-ontology {
+    top: unset;
+    bottom: -50px;
 }
 
-.panel-guided-tour .buttons {
-    margin-top: 10px;
-    text-align: center;
+.panel-properties, .panel-guided-tour, .panel-follow {
+    top: unset;
+    bottom: -20px;
 }
 
 .panel-options h1 {
@@ -318,38 +580,30 @@ export default {
     padding-bottom: 15px !important;
 }
 
+/* ----- LIGHT ----- */
+
+.panels > ul > li > a.active {
+    background: #f2f2f2;
+    color: #6c95c8;
+}
+
 /* ----- DARK ----- */
 
-/* .panels li a.active {
+/* .panels > ul > li > a.active {
     background: #444;
     color: #a0c0e5;
 }
 
 .panel-options {
-    position: absolute;
-    right: 40px;
-    width: 300px;
-    min-height: 100px;
     background: #444;
-    padding: 10px;
-    border-radius: 5px 0px 0px 5px;
-    color: #dedede;
 }
 
-.panel-options .table {
-    color: #dedede !important;
-}
-
-.panel-options .table th {
+.panel-options, .panel-options .label, .panel-options .table, .panel-options .table th, .panel-options .table strong {
     color: #dedede !important;
 }
 
 .panel-options .table td, .panel-options .table th {
-    border-bottom: 1px solid #888;
-}
-
-.panel-options .table strong {
-    color: #dedede !important;
+    border-bottom: 1px solid #666;
 }
 
 .panel-options a {
@@ -366,30 +620,7 @@ export default {
     color: #dedede !important;
 }
 
-.panel-info {
-    top: 0px;
-}
-
-.panel-link {
-    top: 20px;
-}
-
-.panel-sliders {
-    top: 60px;
-}
-
-.panel-layers {
-    top: 70px;
-    font-size: 0.9em;
-}
-
-.panel-guided-tour {
-    top: 130px;
-}
-
 .panel-options h1 {
-    padding-top: 5px !important;
-    padding-bottom: 15px !important;
     font-weight: bold;
     color: #e9f2f3;
 } */
@@ -400,25 +631,31 @@ export default {
     background: none !important;
 }
 
-.ol-rotate {
-    top: 70px;
-    left: .5em;
+.ol-rotate:not(.custom) {
+    display: none;
 }
 
-.ol-viewport button {
+.ol-control button {
     background: white !important;
     color: black !important;
     border-radius: 2px !important;
     box-shadow: 0px 0px 1px #777;
 }
 
-.ol-viewport button:hover {
+.ol-control button:hover {
     box-shadow: 0px 0px 1px black;
     cursor: pointer;
 }
 
 .ol-zoom-in {
     margin-bottom: 5px !important;
+}
+
+/* ----- Rotation selector ----- */
+.rotation-selector-wrapper {
+    position: absolute;
+    left: .5em;
+    top: 70px;
 }
 
 </style>

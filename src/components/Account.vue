@@ -3,7 +3,7 @@
 
         <div class="panel">
             <p class="panel-heading">
-                <i class="fa fa-user" aria-hidden="true"></i>
+                <i class="fas fa-user" aria-hidden="true"></i>
                 {{ $t("profile") }}
             </p>
             <div class="panel-block">
@@ -35,7 +35,7 @@
 
         <div class="panel">
             <p class="panel-heading">
-                <i class="fa fa-briefcase" aria-hidden="true"></i>
+                <i class="fas fa-briefcase" aria-hidden="true"></i>
                 {{ $t("password") }}
             </p>
             <div class="panel-block">
@@ -67,7 +67,7 @@
 
         <div class="panel"> <!-- QUESTION: remove ? or only show for technical users ? -->
             <p class="panel-heading">
-                <i class="fa fa-exchange" aria-hidden="true"></i>
+                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
                 {{ $t("api-keys") }}
             </p>
             <div class="panel-block">
@@ -187,7 +187,11 @@ export default {
 
 .panel {
     width: 80%;
-    margin: auto;
+    margin-left: auto;
+    margin-right:auto;
 }
 
+.fas {
+    margin-right: 5px;
+}
 </style>

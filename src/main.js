@@ -24,15 +24,28 @@ import VueShortKey from "vue-shortkey";
 
 import * as vClickOutside from "v-click-outside-x";
 
+import VueLayers from "vuelayers";
+import ZoomifySource from "./vuelayers-suppl/zoomify-source";
+import RasterSource from "./vuelayers-suppl/raster-source";
+import TranslateInteraction from "./vuelayers-suppl/translate-interaction";
+import RotateInteraction from "./vuelayers-suppl/rotate-interaction";
+
 import App from "./App.vue";
 
 Vue.use(VueRouter);
 Vue.use(Notifications);
-Vue.use(Buefy, {defaultIconPack: "fa"});
+Vue.use(Buefy, {defaultIconPack: "fas"});
 Vue.use(VueMoment, {moment});
-Vue.use(VueShortKey, { prevent: ["input", "textarea"] });
+Vue.use(VueShortKey, { prevent: ["input", "textarea", ".ql-editor"] });
 Vue.use(vClickOutside);
 Vue.use(VTooltip);
+
+Vue.use(VueLayers);
+Vue.use(ZoomifySource);
+Vue.use(RasterSource);
+Vue.use(TranslateInteraction);
+Vue.use(RotateInteraction);
+
 Vue.config.productionTip = false;
 
 new Cytomine(constants.CYTOMINE_CORE_HOST);
