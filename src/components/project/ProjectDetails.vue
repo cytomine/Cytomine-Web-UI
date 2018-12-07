@@ -68,10 +68,9 @@
 </template>
 
 <script>
-import ImagesPreview from "@/components/utils/ImagesPreview";
-import ListUsernames from "@/components/utils/ListUsernames";
-
-import CytomineDescription from "@/components/utils/CytomineDescription";
+import ImagesPreview from "@/components/image/ImagesPreview";
+import ListUsernames from "@/components/user/ListUsernames";
+import CytomineDescription from "@/components/description/CytomineDescription";
 
 export default {
     name: "project-details",

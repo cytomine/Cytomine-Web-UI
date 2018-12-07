@@ -3,11 +3,11 @@ import VueRouter from "vue-router";
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
-import ListImages from "./components/images/ListImages.vue";
+import ListImages from "./components/image/ListImages.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
-import Account from "./components/Account.vue";
-import AdvancedSearch from "./components/AdvancedSearch.vue";
+import Account from "./components/user/Account.vue";
+import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
 import PageNotFound from "./components/PageNotFound.vue";

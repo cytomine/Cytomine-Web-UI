@@ -89,7 +89,7 @@
 <script>
 import {mapState} from "vuex";
 
-import ImagesPreview from "@/components/utils/ImagesPreview";
+import ImagesPreview from "@/components/image/ImagesPreview";
 
 import {ImageInstanceCollection, ProjectCollection} from "cytomine-client";
 

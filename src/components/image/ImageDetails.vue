@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import CytomineDescription from "@/components/utils/CytomineDescription";
+import CytomineDescription from "@/components/description/CytomineDescription";
 
 export default {
     name: "image-details",

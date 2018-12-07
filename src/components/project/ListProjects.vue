@@ -192,8 +192,8 @@
 <script>
 import { mapState } from "vuex";
 
-import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
-import CytomineSlider from "@/components/utils/CytomineSlider";
+import CytomineMultiselect from "@/components/form/CytomineMultiselect";
+import CytomineSlider from "@/components/form/CytomineSlider";
 import ProjectDetails from "./ProjectDetails";
 
 import isBetweenBounds from "@/utils/is-between-bounds.js";

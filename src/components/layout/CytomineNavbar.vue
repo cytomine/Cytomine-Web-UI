@@ -54,7 +54,7 @@
 import { mapState } from "vuex";
 
 import NavbarDropdown from "./NavbarDropdown.vue";
-import CytomineSearcher from "./CytomineSearcher.vue";
+import CytomineSearcher from "@/components/search/CytomineSearcher.vue";
 
 import {fullName} from "@/utils/user-utils.js";
 

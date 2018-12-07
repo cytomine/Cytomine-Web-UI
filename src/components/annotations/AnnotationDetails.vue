@@ -138,8 +138,8 @@
 <script>
 import {Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
-import CytomineDescription from "@/components/utils/CytomineDescription";
-import CytomineTerm from "@/components/utils/CytomineTerm";
+import CytomineDescription from "@/components/description/CytomineDescription";
+import CytomineTerm from "@/components/term/CytomineTerm";
 
 export default {
     name: "annotations-details",

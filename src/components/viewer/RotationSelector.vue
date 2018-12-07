@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import CytomineSlider from "@/components/utils/CytomineSlider";
+import CytomineSlider from "@/components/form/CytomineSlider";
 
 export default {
     name: "rotation-selector",

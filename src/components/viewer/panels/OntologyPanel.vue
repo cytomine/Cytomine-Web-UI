@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import CytomineTerm from "@/components/utils/CytomineTerm";
+import CytomineTerm from "@/components/term/CytomineTerm";
 
 export default {
     name: "ontology-panel",

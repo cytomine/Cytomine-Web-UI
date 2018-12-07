@@ -202,8 +202,8 @@
 </template>
 
 <script>
-import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
-import CytomineSlider from "@/components/utils/CytomineSlider";
+import CytomineMultiselect from "@/components/form/CytomineMultiselect";
+import CytomineSlider from "@/components/form/CytomineSlider";
 import ImageDetails from "./ImageDetails";
 import AddImageModal from "./AddImageModal";
 

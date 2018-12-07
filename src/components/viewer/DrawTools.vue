@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import CytomineTerm from "@/components/utils/CytomineTerm";
+import CytomineTerm from "@/components/term/CytomineTerm";
 
 import WKT from "ol/format/WKT";
 

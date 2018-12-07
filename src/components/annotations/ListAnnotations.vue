@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import CytomineMultiselect from "@/components/utils/CytomineMultiselect";
+import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 
 import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 

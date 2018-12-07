@@ -38,7 +38,7 @@
 import { mapState } from "vuex";
 
 import CytomineNavbar from "./components/layout/CytomineNavbar.vue";
-import Login from "./components/Login.vue";
+import Login from "./components/user/Login.vue";
 
 export default {
     name: "app",
