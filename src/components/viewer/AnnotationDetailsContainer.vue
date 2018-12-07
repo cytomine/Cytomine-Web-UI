@@ -91,7 +91,9 @@ export default {
             }
         },
         allUsers() {
-            return this.users.concat(this.userJobs);
+            let allUsers = this.users.concat(this.userJobs);
+            allUsers.forEach(user => user.fullName = fullName(user));
+            return allUsers;
         },
         layers() {
             return this.imageWrapper.selectedLayers || [];
@@ -127,22 +129,12 @@ export default {
     methods: {
         async fetchUsers() { // TODO in CytomineViewer
             this.users = (await UserCollection.fetchAll()).array;
-            this.users.forEach(user => {
-                user.fullName = fullName(user);
-            });
         },
         async fetchUserJobs() { // TODO in CytomineViewer
-            this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.image.project})).array;
-            this.userJobs = this.userJobs.reduce((arr, userJob) => {
-                if(userJob.id != null) {
-                    let date = this.$options.filters.moment(Number(userJob.created), "DD/MM/YYYY, HH:mm");
-                    userJob.fullName = `${userJob.softwareName} - ${date}`;
-                    arr.push(userJob);
-                }
-                return arr;
-            }, []);
-
-            this.selectedUserJobs = this.userJobs;
+            this.userJobs = (await UserJobCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.image.project
+            })).array;
         },
 
         centerViewOnAnnot() {

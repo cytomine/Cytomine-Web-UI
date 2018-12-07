@@ -173,14 +173,10 @@ export default {
         },
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.reduce((arr, userJob) => {
-                if(userJob.id != null) {
-                    let date = this.$options.filters.moment(Number(userJob.created), "DD/MM/YYYY, HH:mm");
-                    userJob.fullName = `${userJob.softwareName} - ${date}`;
-                    arr.push(userJob);
-                }
-                return arr;
-            }, []);
+            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
+            this.userJobs.forEach(userJob => {
+                userJob.fullName = fullName(userJob);
+            });
 
             this.selectedUserJobs = this.userJobs;
         }

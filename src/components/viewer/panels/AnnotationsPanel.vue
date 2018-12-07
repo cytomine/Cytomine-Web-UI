@@ -119,14 +119,7 @@ export default {
     },
     methods: {
         layerName(layer) {
-            let name = "";
-            if(layer.algo) {
-                let date = this.$options.filters.moment(Number(layer.created), "DD/MM/YYYY, HH:mm");
-                name = `${layer.softwareName} - ${date}`;
-            }
-            else {
-                name = fullName(layer);
-            }
+            let name = fullName(layer);
 
             let indexLayer = this.indexLayers.find(index => index.user == layer.id) || {};
             return `${name} (${indexLayer.countAnnotation || 0})`;
