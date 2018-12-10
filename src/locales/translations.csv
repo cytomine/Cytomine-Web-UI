@@ -261,3 +261,8 @@ confirm-unlink-view-to-track,"This view is linked with another one on which you 
 confirm-untrack-to-link-view,"This view is currently synchronized with that of another user. This may cause conflicts and flickering behaviour. If you confirm, the tracking of this user will be cancelled.",
 add-images,Add images,
 already-in-project,Already in project,
+rename-image,Rename the image,
+enter-new-name-of-image,Enter the new name to use for this image,
+notif-success-image-rename,Image {imageName} was successfully renamed,
+notif-error-image-rename,Failed to rename image {imageName},
+field-cannot-be-empty,Cannot be empty,
