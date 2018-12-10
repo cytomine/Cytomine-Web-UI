@@ -1,149 +1,121 @@
 <template>
 <div class="annotation-details">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <div v-if="!loading">
-        <table class="table">
-            <tbody>
-                <tr v-if="showImageInfo">
-                    <td><strong>{{$t("image")}}</strong></td>
-                    <td> 
-                        <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
-                            {{ image.instanceFilename }}
-                        </router-link>
-                    </td>
-                </tr>
+    <table class="table">
+        <tbody>
+            <tr v-if="showImageInfo">
+                <td><strong>{{$t("image")}}</strong></td>
+                <td>
+                    <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
+                        {{ image.instanceFilename }}
+                    </router-link>
+                </td>
+            </tr>
 
-                <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
-                    <tr>
-                        <td><strong>{{$t("area")}}</strong></td>
-                        <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>{{$t("perimeter")}}</strong></td>
-                        <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
-                    </tr>
-                </template>
-
+            <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
                 <tr>
-                    <td colspan="2">
-                        <h5>{{$t("description")}}</h5>
-                        <cytomine-description :object="annotation"></cytomine-description>
-                    </td>
+                    <td><strong>{{$t("area")}}</strong></td>
+                    <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
                 </tr>
-
-                <!-- TERMS -->
                 <tr>
-                    <td colspan="2">
-                        <h5>{{$t("terms")}}</h5>
-                        <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
-                        :title="`${$t('associated-by')} ${user.fullName}`">
-                            <cytomine-term :term="term"></cytomine-term>
-                            <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
-                        </b-tag> 
-                        <b-field>
-                            <b-autocomplete
-                                v-model="addTermString"
-                                :placeholder="$t('add-term')"
-                                :open-on-focus="true"
-                                :data="filteredTerms"
-                                field="name"
-                                size="is-small"
-                                @select="addTerm">
-                                <div slot-scope="{option: term}" class="autocomplete-term-option">
-                                    <cytomine-term :term="term"></cytomine-term>
-                                </div>
-                                <div slot="empty" class="autocomplete-term-option">
-                                    {{$t("no-term-to-add")}}
-                                </div>
-                            </b-autocomplete>
-                        </b-field>
-                    </td>
+                    <td><strong>{{$t("perimeter")}}</strong></td>
+                    <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
                 </tr>
+            </template>
 
-                <!-- PROPERTIES -->
-                <tr>
-                    <td colspan="2">
-                        <h5>{{$t("properties")}}</h5>
-                        <b-field grouped group-multiline>
-                            <div class="control" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
-                                <b-taglist attached>
-                                    <b-tag type="is-dark">{{prop.key}}</b-tag>
-                                    <b-tag>
-                                        {{prop.value}}
-                                        <button class="edit is-small" :title="$t('button-edit')" 
-                                        @click="startPropEdition(prop)">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </button>
-                                        <button class="delete is-small" :title="$t('button-delete')" 
-                                        @click="removeProp(idx)">
-                                        </button>
-                                    </b-tag>
-                                </b-taglist>
+            <tr>
+                <td colspan="2">
+                    <h5>{{$t("description")}}</h5>
+                    <cytomine-description :object="annotation"></cytomine-description>
+                </td>
+            </tr>
+
+            <!-- TERMS -->
+            <tr>
+                <td colspan="2">
+                    <h5>{{$t("terms")}}</h5>
+                    <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
+                    :title="`${$t('associated-by')} ${user.fullName}`">
+                        <cytomine-term :term="term"></cytomine-term>
+                        <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
+                    </b-tag>
+                    <b-field>
+                        <b-autocomplete
+                            v-model="addTermString"
+                            :placeholder="$t('add-term')"
+                            :open-on-focus="true"
+                            :data="filteredTerms"
+                            field="name"
+                            size="is-small"
+                            @select="addTerm">
+                            <div slot-scope="{option: term}" class="autocomplete-term-option">
+                                <cytomine-term :term="term"></cytomine-term>
                             </div>
+                            <div slot="empty" class="autocomplete-term-option">
+                                {{$t("no-term-to-add")}}
+                            </div>
+                        </b-autocomplete>
+                    </b-field>
+                </td>
+            </tr>
 
-                            <button class="button is-small add-prop" @click="addNewProp()" key="showForm">
-                                {{$t("button-add")}}
-                            </button>
-                        </b-field>
+            <!-- PROPERTIES -->
+            <tr>
+                <td colspan="2">
+                    <h5>{{$t("properties")}}</h5>
+                    <cytomine-properties :object="annotation" @update="$emit('updateProperties')">
+                    </cytomine-properties>
+                </td>
+            </tr>
 
-                        <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
-                            <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')"></b-input>
-                            <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')"></b-input>
-                            <button class="button is-small" type="submit" @click="saveProp(idx)">
-                                {{prop.id ? $t("button-save") : $t("button-add")}}
-                            </button>
-                            <button class="button is-small" @click="cancelPropEdition(idx)">
-                                {{$t("button-cancel")}}
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+            <tr>
+                <td><strong>{{$t("created-by")}}</strong></td>
+                <td>
+                    {{ creator.fullName }}
+                </td>
+            </tr>
+            <tr>
+                <td><strong>{{$t("created-on")}}</strong></td>
+                <td> {{ Number(annotation.created) | moment("ll") }} </td>
+            </tr>
+        </tbody>
+    </table>
 
-                <tr>
-                    <td><strong>{{$t("created-by")}}</strong></td>
-                    <td>
-                        {{ creator.fullName }}
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>{{$t("created-on")}}</strong></td>
-                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="actions">
-            <router-link 
-                v-if="showImageInfo"
-                :to="annotationURL"
-                class="button is-link is-small is-fullwidth">
-                {{ $t("button-view-in-image") }}
-            </router-link>
-            <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
-                {{ $t("button-center-view-on-annot") }}
-            </a>
-            <div class="level">
-                <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
-                <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
-                <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
-                <button class="level-item button is-small is-danger" @click="confirmDeletion()">
-                    {{ $t("button-delete") }}
-                </button>
-            </div>
+    <div class="actions">
+        <router-link
+            v-if="showImageInfo"
+            :to="annotationURL"
+            class="button is-link is-small is-fullwidth">
+            {{ $t("button-view-in-image") }}
+        </router-link>
+        <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
+            {{ $t("button-center-view-on-annot") }}
+        </a>
+        <div class="level">
+            <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
+            <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
+            <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
+            <button class="level-item button is-small is-danger" @click="confirmDeletion()">
+                {{ $t("button-delete") }}
+            </button>
         </div>
     </div>
 </div>
 </template>
 
 <script>
-import {Property, PropertyCollection, AnnotationTerm} from "cytomine-client";
+import {AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
+import CytomineProperties from "@/components/property/CytomineProperties";
 import CytomineTerm from "@/components/term/CytomineTerm";
 
 export default {
     name: "annotations-details",
-    components: {CytomineDescription, CytomineTerm},
+    components: {
+        CytomineDescription,
+        CytomineTerm,
+        CytomineProperties
+    },
     props: {
         annotation: {type: Object},
         terms: {type: Array},
@@ -153,15 +125,7 @@ export default {
     },
     data() {
         return {
-            loading: true,
-
             addTermString: "",
-
-            properties: [],
-            editedProperties: [],
-            newPropKey: "",
-            newPropValue: "",
-            showNewPropForm: false
         };
     },
     computed: {
@@ -191,10 +155,6 @@ export default {
                 return !this.annotation.term.includes(id) && 
                     name.toLowerCase().indexOf(this.addTermString.toLowerCase()) >= 0;
             });
-        },
-        notEditedProperties() {
-            let editedIds = this.editedProperties.map(prop => prop.id);
-            return this.properties.filter(prop => !editedIds.includes(prop.id));
         }
     },
     methods: {
@@ -230,49 +190,6 @@ export default {
             }
         },
 
-        addNewProp() {
-            let newProp = new Property({object: this.annotation});
-            this.editedProperties.push(newProp);
-        },
-        async removeProp(idx) {
-            let prop = this.properties[idx];
-            try {
-                await Property.delete(prop.id, this.annotation);
-                this.properties.splice(idx, 1);
-                this.$emit("updateProperties");
-            }
-            catch(error) {
-                this.$notify({type: "error", text: this.$t("notif-error-remove-prop")});
-            }
-        },
-        startPropEdition(prop) {
-            // store current values of key and value, so that they can be restored if needed (e.g. edit cancellation)
-            prop.oldKey = prop.key;
-            prop.oldValue = prop.value;
-            this.editedProperties.splice(0, 0, prop); // insert at first position
-        },
-        async saveProp(idx) {
-            let prop = this.editedProperties[idx];
-            let newProp = prop.isNew();
-            try {
-                await prop.save();
-                this.editedProperties.splice(idx, 1);
-                if(newProp) {
-                    this.properties.push(prop);
-                }
-                this.$emit("updateProperties");
-            }
-            catch(error) {
-                this.$notify({type: "error", text: this.$t("notif-error-save-prop")});
-            }
-        },
-        cancelPropEdition(idx) {
-            let prop = this.editedProperties[idx];
-            prop.key = prop.oldKey;
-            prop.value = prop.oldValue;
-            this.editedProperties.splice(idx, 1);
-        },
-
         confirmDeletion() {
             this.$dialog.confirm({
                 title: this.$t("confirm-deletion"),
@@ -293,10 +210,6 @@ export default {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
             }
         },
-    },
-    async created() {
-        this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
-        this.loading = false;
     }
 };
 </script>
@@ -336,75 +249,12 @@ h5 {
 .autocomplete-term-option {
     font-size: 13px;
 }
-
-.tag button.edit, .tag button.delete {
-    position: relative;
-    top: 1px;
-}
-
-.tag button.edit {
-    height: 16px;
-    width: 16px;
-    background-color: rgba(10, 10, 10, 0.2);
-    border: none;
-    border-radius: 290486px;
-    cursor: pointer;
-    pointer-events: auto;
-    display: inline-block;
-    font-size: 8px;
-    padding: 0px;
-    outline: none;
-    position: relative;
-    vertical-align: top;
-    color: white;
-    margin-left: 5px;
-}
-
-.tag button.edit:hover {
-    background-color: rgba(10, 10, 10, 0.3);
-}
-
-.add-prop {
-    height: 24px;
-}
-
-.new-prop-form {
-    margin-bottom: 5px;
-}
-
-.new-prop-form .button {
-    margin: 0px;
-    margin-right: 5px;
-}
-
-.new-prop-form .control {
-    margin-right: 10px;
-    display: inline-block;
-}
-
 </style>
 
 <style>
-.annotation-details .control {
-    margin-bottom: 0px !important;
-}
-
-.annotation-details .tags {
-    margin-bottom: unset !important;
-}
-
 .annotation-details .tag {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);
-}
-
-.annotation-details .tag.is-dark {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: black;
-}
-
-.annotation-details .field.is-grouped.is-grouped-multiline {
-    margin-bottom: 0px !important;
 }
 </style>

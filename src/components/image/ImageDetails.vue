@@ -17,6 +17,12 @@
             </td>
         </tr>
         <tr>
+            <td class="prop-label"><strong>{{$t("properties")}}</strong></td>
+            <td class="prop-content">
+                <cytomine-properties :object="image"></cytomine-properties>
+            </td>
+        </tr>
+        <tr>
             <td class="prop-label"><strong>{{$t("thumbnail")}}</strong></td>
             <td class="prop-content">
                 <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview">
@@ -60,7 +66,6 @@
             <td class="prop-content">
                 <div class="buttons">
                     <button class="button is-small">{{$t("button-rename")}}</button> <!-- TODO -->
-                    <button class="button is-small">{{$t("button-properties")}}</button> <!-- TODO -->
                     <a class="button is-small" href="">{{$t("button-download")}}</a> <!-- TODO -->
                     <button class="button is-danger is-small" @click="deleteImage()">{{$t("button-delete")}}</button>
                 </div>
@@ -72,10 +77,14 @@
 
 <script>
 import CytomineDescription from "@/components/description/CytomineDescription";
+import CytomineProperties from "@/components/property/CytomineProperties";
 
 export default {
     name: "image-details",
-    components: {CytomineDescription},
+    components: {
+        CytomineDescription,
+        CytomineProperties
+    },
     props: ["image"],
     methods: {
         deleteImage() {
