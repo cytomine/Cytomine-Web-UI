@@ -183,7 +183,10 @@ export default {
     },
     async created() {
         this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption];
-        this.selectedAnnotationType = this.userAnnotationOption;
+        this.selectedAnnotationType = (this.$route.query.type == "algo") ? this.jobAnnotationOption
+            : this.userAnnotationOption;
+
+
         try {
             await Promise.all([
                 this.fetchTerms(),

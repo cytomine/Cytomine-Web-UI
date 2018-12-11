@@ -2,14 +2,54 @@
 <table class="table">
     <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
     <tbody>
-        <tr>
-            <td class="prop-label"><strong>{{$t("description")}}</strong></td>
+        <tr v-if="!excludedProperties.includes('name')">
+            <td class="prop-label">{{$t("name")}}</td>
+            <td class="prop-content">
+                {{project.name}}
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('numberOfImages')">
+            <td class="prop-label">{{$t("images")}}</td>
+            <td class="prop-content">
+                <router-link :to="`/project/${project.id}/images`">{{project.numberOfImages}}</router-link>
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('membersCount')">
+            <td class="prop-label">{{$t("members")}}</td>
+            <td class="prop-content">
+                {{this.members.length}}
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('numberOfAnnotations')">
+            <td class="prop-label">{{$t("user-annotations")}}</td>
+            <td class="prop-content">
+                <router-link :to="`/project/${project.id}/annotations`">
+                    {{ project.numberOfAnnotations }}
+                </router-link>
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('numberOfJobAnnotations')">
+            <td class="prop-label">{{$t("job-annotations")}}</td>
+            <td class="prop-content">
+                <router-link :to="`/project/${project.id}/annotations?type=algo`">
+                    {{ project.numberOfJobAnnotations }}
+                </router-link>
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('numberOfReviewedAnnotations')">
+            <td class="prop-label">{{$t("reviewed-annotations")}}</td>
+            <td class="prop-content">
+                <a>{{project.numberOfReviewedAnnotations}}</a> <!-- TODO: router link -->
+            </td>
+        </tr>
+        <tr v-if="!excludedProperties.includes('description')">
+            <td class="prop-label">{{$t("description")}}</td>
             <td class="prop-content">
                 <cytomine-description :object="project"></cytomine-description>
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("tags")}}</strong></td>
+        <tr v-if="!excludedProperties.includes('tags')">
+            <td class="prop-label">{{$t("tags")}}</td>
             <td class="prop-content">
                 <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
                     <span class="tag is-rounded is-info">Demo</span>
@@ -17,50 +57,55 @@
                 </div>
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("ontology")}}</strong></td>
-            <td class="prop-content"><router-link to="">{{project.ontologyName}}</router-link></td>
+        <tr v-if="!excludedProperties.includes('ontology')">
+            <td class="prop-label">{{$t("ontology")}}</td>
+            <td class="prop-content">
+                <router-link to="">{{project.ontologyName}}</router-link>
+            </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("created-on")}}</strong></td>
+        <tr v-if="!excludedProperties.includes('created')">
+            <td class="prop-label">{{$t("created-on")}}</td>
             <td class="prop-content">
                 {{ Number(project.created) | moment("ll") }}
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("creator")}}</strong></td>
+        <tr v-if="!excludedProperties.includes('creator')">
+            <td class="prop-label">{{$t("creator")}}</td>
             <td class="prop-content">
                 <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("managers")}} ({{managers.length}})</strong></td>
+        <tr v-if="!excludedProperties.includes('managers')">
+            <td class="prop-label">{{$t("managers")}} ({{managers.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="managers" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("contributors")}} ({{contributors.length}})</strong></td>
+        <tr v-if="!excludedProperties.includes('contributors')">
+            <td class="prop-label">{{$t("contributors")}} ({{contributors.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr>
-            <td class="prop-label"><strong>{{$t("contacts")}} ({{contacts.length}})</strong></td>
+        <tr v-if="!excludedProperties.includes('contacts')">
+            <td class="prop-label">{{$t("contacts")}} ({{contacts.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="contacts" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr v-if="showImages">
-            <td class="prop-label"><strong>{{$t("images")}}</strong></td>
+        <tr v-if="!excludedProperties.includes('imagesPreview')">
+            <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
                 <images-preview :idProject="project.id"></images-preview>
             </td>
         </tr>
         <tr>
-            <td class="prop-label"><strong>{{$t("actions")}}</strong></td>
+            <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
-                <button class="button is-danger is-small" @click="deleteProject()">{{$t("button-delete")}}</button>
+                <div class="buttons">
+                    <button class="button is-small">{{$t("button-lock")}}</button> <!-- TODO -->
+                    <button class="button is-danger is-small" @click="deleteProject()">{{$t("button-delete")}}</button>
+                </div>
             </td>
         </tr>
     </tbody>
@@ -74,10 +119,14 @@ import CytomineDescription from "@/components/description/CytomineDescription";
 
 export default {
     name: "project-details",
-    components: {ImagesPreview, ListUsernames, CytomineDescription},
+    components: {
+        ImagesPreview,
+        ListUsernames,
+        CytomineDescription
+    },
     props: {
         project: {type: Object},
-        showImages: {type: Boolean, default: true}
+        excludedProperties: {type: Array, default: () => []}
     },
     data() {
         return {
@@ -86,6 +135,7 @@ export default {
             members: [],
             onlines: [],
             contacts: [],
+
             isLoading: true
         };
     },
@@ -147,6 +197,7 @@ export default {
 
 td.prop-label {
     white-space: nowrap;
+    font-weight: 600;
 }
 
 td.prop-content {

@@ -130,7 +130,7 @@
                     </b-table-column>
 
                     <b-table-column field="first_name" :label="$t('members')" centered sortable width="150">
-                        <a>{{ props.row.membersCount }}</a> <!-- TODO router link -->
+                        {{ props.row.membersCount }}
                     </b-table-column>
 
                     <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
@@ -138,11 +138,15 @@
                     </b-table-column>
 
                     <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-                        <a>{{ props.row.numberOfAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${props.row.id}/annotations`">
+                            {{ props.row.numberOfAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="150">
-                        <a>{{ props.row.numberOfJobAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${props.row.id}/annotations?type=algo`">
+                            {{ props.row.numberOfJobAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
@@ -161,7 +165,10 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <project-details :project="props.row" @delete="deleteProject(props.row)"></project-details>
+                    <project-details :project="props.row"
+                        :excluded-properties="excludedProperties"
+                        @delete="deleteProject(props.row)">
+                    </project-details>
                 </template>
 
                 <template slot="empty">
@@ -223,7 +230,19 @@ export default {
             boundsImages: [0, 0],
             boundsUserAnnotations: [0, 0],
             boundsJobAnnotations: [0, 0],
-            boundsReviewedAnnotations: [0, 0]
+            boundsReviewedAnnotations: [0, 0],
+
+            // TODO: should be defined in app config and retrieved from backend (corresponds to properties displayed in
+            // columns in the list of project)
+            excludedProperties: [
+                "name",
+                "membersCount",
+                "numberOfImages",
+                "numberOfAnnotations",
+                "numberOfJobAnnotations",
+                "numberOfReviewedAnnotations",
+                "lastActivity"
+            ]
         };
     },
     computed: {

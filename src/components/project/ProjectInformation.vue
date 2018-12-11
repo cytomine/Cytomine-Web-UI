@@ -1,6 +1,6 @@
 <template>
 <div class="box">
-    <project-details :project="project" :showImages="false">
+    <project-details :project="project" :excluded-properties="['imagesPreview']">
     </project-details>
 </div>
 </template>
