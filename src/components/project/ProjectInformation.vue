@@ -1,5 +1,5 @@
 <template>
-<div class="box" v-if="!loading">
+<div class="box">
     <project-details :project="project" :showImages="false">
     </project-details>
 </div>

@@ -83,7 +83,7 @@ export default {
 }
 
 .card-content a {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .vertical-center {

@@ -219,7 +219,7 @@ export default {
 }
 
 .description-modal .keyword-info .keyword {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .description-modal .quill-editor {
@@ -252,7 +252,7 @@ export default {
 
 .description-modal .ql-bold::before {
     content:"A";
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .description-modal .ql-italic::before {
@@ -267,7 +267,7 @@ export default {
 
 .ql-picker.ql-special-characters .ql-picker-label::before {
     content: "\03A9"; /* Omega */
-    font-weight: bold;
+    font-weight: 600;
     margin-right: 20px;
 }
 

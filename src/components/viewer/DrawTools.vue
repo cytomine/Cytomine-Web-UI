@@ -441,7 +441,7 @@ export default {
     z-index: 1000;
     pointer-events: none;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 600;
     text-align:center;
     line-height: 10px;
     font-family: Arial;

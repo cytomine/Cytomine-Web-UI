@@ -118,7 +118,7 @@ export default {
     font-size: 16px;
     text-align: center;
     padding: 10px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .sidebar ul {
@@ -138,7 +138,7 @@ export default {
     display: block;
     font-size: 14px;
     height: 100%;
-    font-weight: bold;
+    font-weight: 600;
     color: #eee;
     border-bottom: 1px solid #222;
     text-decoration: none;

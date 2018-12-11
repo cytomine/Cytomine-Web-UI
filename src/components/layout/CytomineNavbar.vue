@@ -125,7 +125,7 @@ font-weight: lighter;
 }
 
 .navbar {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .navbar-item.logo {
@@ -144,6 +144,6 @@ font-weight: lighter;
 }
 
 .navbar-item.language.selected {
-    font-weight: bold;
+    font-weight: 600;
 }
 </style>

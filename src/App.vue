@@ -70,7 +70,7 @@ export default {
 @import "~bulma/css/bulma.css";
 @import "~bulma-slider/dist/css/bulma-slider.min.css";
 @import "~@fortawesome/fontawesome-free/css/all.min.css";
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600'); /* TODO: download */
+@import "~npm-font-open-sans/open-sans.css";
 
 @import "~quill/dist/quill.core.css";
 @import "~quill/dist/quill.snow.css";
@@ -132,7 +132,7 @@ h1 {
 
 h2 {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 15px;
@@ -155,10 +155,15 @@ h1.page-title {
     background-color: whitesmoke;
 }
 
+strong, .label {
+    font-weight: 600 !important;
+}
+
 /* Panel */
 
 .panel-heading {
     border-radius: 8px 8px 0px 0px;
+    font-weight: 400 !important;
 }
 
 .panel-block {

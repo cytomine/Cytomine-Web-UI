@@ -1,6 +1,7 @@
 
 <template>
 <div class="color-manipulation">
+    <h1>{{$t("colors")}}</h1>
     <table>
         <tr>
             <td class="name">{{ $t("brightness") }}</td>
@@ -136,7 +137,7 @@ td, tr {
 }
 
 td.name {
-    font-weight: bold;
+    font-weight: 600;
     text-align: right;
     padding: 4px;
 }

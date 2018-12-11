@@ -97,6 +97,10 @@ export default {
     z-index: 50 !important;
 }
 
+.multiselect__option--selected {
+    font-weight: 600 !important;
+}
+
 .multiselect__option--selected::before {
     content: "\f00c";
     font-family: 'Font Awesome 5 Free';

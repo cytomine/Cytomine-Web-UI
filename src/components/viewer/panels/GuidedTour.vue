@@ -90,6 +90,6 @@ ul {
 }
 
 li.selected {
-    font-weight: bold;
+    font-weight: 600;
 }
 </style>

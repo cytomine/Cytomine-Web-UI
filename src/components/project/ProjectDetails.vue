@@ -155,6 +155,6 @@ td.prop-content {
 
 .tag {
     font-size: 10px !important;
-    font-weight: bold;
+    font-weight: 600;
 }
 </style>

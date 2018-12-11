@@ -486,7 +486,7 @@ export default {
     right: 60px;
     top: 10px;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 600;
     background-color: #EE4242;
     color: white;
     padding: 5px;
@@ -621,7 +621,7 @@ export default {
 }
 
 .panel-options h1 {
-    font-weight: bold;
+    font-weight: 600;
     color: #e9f2f3;
 } */
 

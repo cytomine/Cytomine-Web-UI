@@ -183,7 +183,7 @@ td {
 }
 
 a.project-name {
-    font-weight: bold;
+    font-weight: 600;
     font-size: 16px;
 }
 
@@ -205,7 +205,7 @@ a.project-name {
 }
 
 .stat-value {
-    font-weight: bold;
+    font-weight: 600;
     text-align: right;
     width: 25%;
 }
@@ -230,7 +230,7 @@ a.project-name {
 }
 
 .card-content a {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .db-quick-access {

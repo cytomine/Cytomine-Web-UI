@@ -121,7 +121,7 @@ export default {
     background: #f1f1f1;
     text-transform: uppercase;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 600;
     padding: 2px 0px 3px 30px;
     border-top: 1px solid #e3e3e3;
     margin-bottom: 0px;

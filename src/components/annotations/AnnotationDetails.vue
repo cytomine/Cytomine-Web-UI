@@ -229,7 +229,7 @@ export default {
 }
 
 h5 {
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 8px;
 }
 
