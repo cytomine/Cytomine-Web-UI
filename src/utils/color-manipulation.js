@@ -6,11 +6,11 @@
  * http://alienryderflex.com/saturation.html
  */
 
-function computeContrastFactor(contrast) {
+function computeContrastFactorFunc(contrast) {
     return 259 * (contrast + 255) / 255 / (259 - contrast);
 }
 
-function computeHueMatrix(hue) {
+function computeHueMatrixFunc(hue) {
     let angle = hue*Math.PI/180;
     let cosA = Math.cos(angle);
     let sinA = Math.sin(angle);
@@ -35,18 +35,18 @@ function computeHueMatrix(hue) {
     return hueMatrix;
 }
 
-function truncatePixelValue(val) {
+function truncatePixelValueFunc(val) {
     return val < 0 ? 0 : val > 255 ? 255 : val;
 }
 
-function changeBrightnessContrast(pixel) {
+function changeBrightnessContrastFunc(pixel) {
     for(let i = 0; i < 3; i++) {
         let newVal = truncatePixelValue(contrastFactor*(pixel[i] - 128) + 128) + brightness;
         pixel[i] = truncatePixelValue(newVal);
     }
 }
 
-function changeSaturation(pixel) {
+function changeSaturationFunc(pixel) {
     let r = pixel[0];
     let g = pixel[1];
     let b = pixel[2];
@@ -59,7 +59,7 @@ function changeSaturation(pixel) {
     }
 }
 
-function changeHue(pixel) {
+function changeHueFunc(pixel) {
     let r = pixel[0];
     let g = pixel[1];
     let b = pixel[2];
@@ -75,13 +75,13 @@ export let constLib = {
     Pg: 0.587,
     Pb: 0.114,
 
-    truncatePixelValue,
-    changeBrightnessContrast,
-    changeSaturation,
-    changeHue,
+    truncatePixelValue: truncatePixelValueFunc,
+    changeBrightnessContrast: changeBrightnessContrastFunc,
+    changeSaturation: changeSaturationFunc,
+    changeHue: changeHueFunc,
 
-    computeContrastFactor,
-    computeHueMatrix,
+    computeContrastFactor: computeContrastFactorFunc,
+    computeHueMatrix: computeHueMatrixFunc,
     contrastFactor: -1,
     hueMatrix: -1,
 };
