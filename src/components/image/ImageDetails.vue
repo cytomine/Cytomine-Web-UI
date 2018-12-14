@@ -69,6 +69,9 @@
                         <button class="button is-small" @click="isRenameModalActive = true">
                             {{$t("button-rename")}}
                         </button>
+                        <button class="button is-small" @click="isCalibrationModalActive = true">
+                            {{$t("button-set-calibration")}}
+                        </button>
                         <a class="button is-small" href="">{{$t("button-download")}}</a> <!-- TODO -->
                         <button class="button is-danger is-small" @click="deleteImage()">{{$t("button-delete")}}</button>
                     </div>
@@ -77,7 +80,7 @@
         </tbody>
     </table>
 
-    <b-modal :active="isRenameModalActive" has-modal-card>
+    <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
         <form>
             <div class="modal-card">
                 <header class="modal-card-head">
@@ -101,12 +104,45 @@
             </div>
         </form>
     </b-modal>
+
+    <b-modal :active="isCalibrationModalActive" has-modal-card @close="isCalibrationModalActive = false">
+        <form>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{$t("calibrate-image")}}</p>
+                </header>
+                <section class="modal-card-body">
+                    <div class="modal-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ $t("warning-calibration-applies-in-all-projects") }}
+                    </div>
+
+                    <b-field :label="`${$t('resolution')} (${$t('um-per-pixel')})`">
+                        <b-input v-model="newResolution"></b-input>
+                    </b-field>
+                    <b-field :label="$t('magnification')">
+                        <b-input v-model="newMagnification"></b-input>
+                    </b-field>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button" type="button" @click="isCalibrationModalActive = false">
+                        {{$t("button-cancel")}}
+                    </button>
+                    <button class="button is-link" @click="setCalibration()">
+                        {{$t("button-save")}}
+                    </button>
+                </footer>
+            </div>
+        </form>
+    </b-modal>
 </div>
 </template>
 
 <script>
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
+
+import {AbstractImage} from "cytomine-client";
 
 export default {
     name: "image-details",
@@ -118,7 +154,11 @@ export default {
     data() {
         return {
             isRenameModalActive: false,
-            newName: ""
+            newName: "",
+
+            isCalibrationModalActive: false,
+            newResolution: "",
+            newMagnification: "",
         };
     },
     computed: {
@@ -131,14 +171,20 @@ export default {
             if(val) {
                 this.newName = this.image.instanceFilename;
             }
+        },
+        isCalibrationModalActive(val) {
+            if(val) {
+                this.newResolution = this.image.resolution;
+                this.newMagnification = this.image.magnification;
+            }
         }
     },
     methods: {
-        rename() {
+        async rename() {
             let oldName = this.image.instanceFilename;
             try {
                 this.image.instanceFilename = this.newName;
-                this.image.save();
+                await this.image.save();
                 this.$notify({
                     type: "success",
                     text: this.$t("notif-success-image-rename", {imageName: this.image.instanceFilename})
@@ -153,6 +199,34 @@ export default {
             }
             this.isRenameModalActive = false;
         },
+
+        async setCalibration() {
+            try {
+                let baseImage = await AbstractImage.fetch(this.image.baseImage);
+                baseImage.resolution = this.newResolution;
+                baseImage.magnification = this.newMagnification;
+                await baseImage.save();
+
+                this.$emit("setCalibration", {
+                    resolution: baseImage.resolution,
+                    magnification: baseImage.magnification
+                });
+
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-image-calibration", {imageName: baseImage.originalFilename})
+                });
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-image-calibration", {imageName: this.image.originalFilename})
+                });
+            }
+            this.isCalibrationModalActive = false;
+        },
+
         deleteImage() {
             this.$dialog.confirm({
                 title: this.$t("delete-image"),
@@ -194,5 +268,22 @@ td.prop-content {
 .vendor-img {
     max-height: 40px;
     max-width: 150px;
+}
+
+.modal-warning {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+    padding: 5px;
+    border: 2px solid rgb(255, 120, 0);
+    border-width: 2px 0px 2px;
+    border-radius: 5px;
+    background: rgba(255, 69, 0, 0.05);
+}
+.modal-warning .fas {
+    margin-left: 10px;
+    margin-right: 20px;
+    font-size: 16px;
+    color: rgb(255, 120, 0);
 }
 </style>

@@ -171,6 +171,16 @@ strong, .label {
     display: block;
 }
 
+/* Bulma table override */
+
+.table tbody tr:last-child td, .table tbody tr:last-child th {
+    border-bottom-width: 1px !important;
+}
+
+.table tbody tr:last-child > td, .table tbody tr:last-child > th {
+    border-bottom-width: 0 !important;
+}
+
 /* Modal */
 
 .modal {

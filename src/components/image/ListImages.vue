@@ -175,7 +175,8 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <image-details :image="props.row" @delete="deleteImage(props.row)"></image-details>
+                    <image-details :image="props.row" @delete="deleteImage(props.row)" @setCalibration="(event) => setCalibration(props.row, event)">
+                    </image-details>
                 </template>
 
                 <template slot="empty">
@@ -261,11 +262,9 @@ export default {
             // TODO: tags
 
             filtered = filtered.filter(image => this.selectedFormats.includes(image.extension));
-            filtered = filtered.filter(image => ((image.vendor && this.selectedVendors.includes(image.vendor.name))
-                || (image.vendor == null && this.selectedVendors.includes(this.$t("unknown")))));
+            filtered = filtered.filter(image => this.selectedVendors.includes(image.vendorFormatted));
 
-            filtered = filtered.filter(image => (this.selectedMagnifications.includes(image.magnification)
-                || (image.magnification == null && this.selectedMagnifications.includes(this.$t("unknown")))));
+            filtered = filtered.filter(image => this.selectedMagnifications.includes(image.magnificationFormatted));
             filtered = filtered.filter(image => this.selectedResolutions.includes(image.resolutionFormatted));
 
             filtered = filtered.filter(image => isBetweenBounds(image.width, this.boundsWidth));
@@ -395,15 +394,45 @@ export default {
             }
         },
 
-        formatImage(image) {
-            image.vendor = vendorFromMime(image.mime);
-            image.resolutionFormatted = (image.resolution != null) ?
-                `${image.resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
-            image.vendorFormatted = image.vendor ? image.vendor.name : this.$t("unknown");
-            image.magnificationFormatted = image.magnification || this.$t("unknown");
+        setCalibration(image, {resolution, magnification}) {
+            image.resolution = resolution;
+            image.magnification = magnification;
 
+            // check if it is needed to update filters so that new images are displayed
+            let addMagnification = !this.availableMagnifications.includes(this.formatMagnification(magnification));
+            let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
+            // ---
+
+            this.formatImage(image);
+
+            if(addMagnification) {
+                this.selectedMagnifications.push(image.magnificationFormatted);
+            }
+            if(addResolution) {
+                this.selectedResolutions.push(image.resolutionFormatted);
+            }
+        },
+
+        formatImage(image) {
+            // use $set to make the new props reactive
+            this.$set(image, "resolutionFormatted", this.formatResolution(image.resolution));
+            this.$set(image, "vendorFormatted", this.formatVendor(image.mime));
+            this.$set(image, "magnificationFormatted", this.formatMagnification(image.magnification));
             return image;
         },
+
+        formatResolution(resolution) {
+            return (resolution != null) ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
+        },
+
+        formatVendor(mime) {
+            let vendor = vendorFromMime(mime);
+            return vendor ? vendor.name : this.$t("unknown");
+        },
+
+        formatMagnification(magnification) {
+            return magnification || this.$t("unknown");
+        }
     },
     async created() {
         this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
