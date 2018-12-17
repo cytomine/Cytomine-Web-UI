@@ -38,10 +38,10 @@
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
+            <router-link tag="li" :to="`/project/${project.id}/activity`" class="activity">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
-                    {{ $t("metrics") }}
+                    {{ $t("activity") }}
                 </a>
             </router-link>
             <router-link tag="li" :to="`/project/${project.id}/information`" class="information">
@@ -174,7 +174,7 @@ export default {
 .sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
 .sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
 .sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
-.sidebar li.metrics.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
+.sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
 .sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
 .sidebar li.parameters.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
 

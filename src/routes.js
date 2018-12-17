@@ -5,6 +5,7 @@ import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
+import ProjectActivity from "./components/project/ProjectActivity.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
 import Account from "./components/user/Account.vue";
 import AdvancedSearch from "./components/search/AdvancedSearch.vue";
@@ -60,11 +61,16 @@ const routes = [
             },
             {
                 path: "image/:idImage/annotation/:idAnnotation",
+                alias: "/tabs-images-:idProject-:idImage-:idAnnotation",
                 component: CytomineViewer
             },
             {
                 path: "annotations",
                 component: ListAnnotations
+            },
+            {
+                path: "activity",
+                component: ProjectActivity
             },
             {
                 path: "information",

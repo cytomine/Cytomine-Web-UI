@@ -30,6 +30,9 @@ import RasterSource from "./vuelayers-suppl/raster-source";
 import TranslateInteraction from "./vuelayers-suppl/translate-interaction";
 import RotateInteraction from "./vuelayers-suppl/rotate-interaction";
 
+import Chart from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
 import App from "./App.vue";
 
 Vue.use(VueRouter);
@@ -45,6 +48,14 @@ Vue.use(ZoomifySource);
 Vue.use(RasterSource);
 Vue.use(TranslateInteraction);
 Vue.use(RotateInteraction);
+
+Chart.plugins.unregister(ChartDataLabels);
+Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
+    anchor: "end",
+    align: "end",
+    offset: -5,
+    clamp: true
+});
 
 Vue.config.productionTip = false;
 

@@ -14,7 +14,7 @@ annotation,Annotation,Annotation
 annotations,Annotations,Annotations
 job,Job,Algorithme
 jobs,Jobs,Algorithmes
-metrics,Metrics,Métriques
+activity,Activity,
 parameters,Parameters,Paramètres
 no-project,No project to display,
 no-image,No image to display,
