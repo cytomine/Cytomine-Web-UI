@@ -80,7 +80,7 @@ export default {
         closeMap(index) {
             if(this.nbMaps == 1) {
                 this.$store.commit("removeViewer", this.idBaseImage);
-                this.$router.push("/"); // TODO: change
+                this.$router.push(`/project/${this.$route.params.idProject}`);
             }
             else {
                 this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
