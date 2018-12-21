@@ -6,6 +6,7 @@ import ListProjects from "./components/project/ListProjects.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
+import ProjectConfiguration from "./components/project/ProjectConfiguration.vue";
 import Account from "./components/user/Account.vue";
 import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
@@ -69,6 +70,10 @@ const routes = [
             {
                 path: "information",
                 component: ProjectInformation
+            },
+            {
+                path: "configuration",
+                component: ProjectConfiguration
             },
             {
                 path: "*",

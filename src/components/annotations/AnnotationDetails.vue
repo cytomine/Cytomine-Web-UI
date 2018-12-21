@@ -11,7 +11,8 @@
                 </td>
             </tr>
 
-            <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
+            <!-- Do not display perimeter and area for point annotations -->
+            <template v-if="configUI['project-explore-annotation-geometry-info'] && annotation.area > 0">
                 <tr>
                     <td><strong>{{$t("area")}}</strong></td>
                     <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
@@ -22,7 +23,7 @@
                 </tr>
             </template>
 
-            <tr>
+            <tr v-if="configUI['project-explore-annotation-description']">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
                     <cytomine-description :object="annotation"></cytomine-description>
@@ -59,7 +60,7 @@
             </tr>
 
             <!-- PROPERTIES -->
-            <tr>
+            <tr v-if="configUI['project-explore-annotation-properties']">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
                     <cytomine-properties :object="annotation" @update="$emit('updateProperties')">
@@ -67,16 +68,18 @@
                 </td>
             </tr>
 
-            <tr>
-                <td><strong>{{$t("created-by")}}</strong></td>
-                <td>
-                    {{ creator.fullName }}
-                </td>
-            </tr>
-            <tr>
-                <td><strong>{{$t("created-on")}}</strong></td>
-                <td> {{ Number(annotation.created) | moment("ll") }} </td>
-            </tr>
+            <template v-if="configUI['project-explore-annotation-creation-info']">
+                <tr>
+                    <td><strong>{{$t("created-by")}}</strong></td>
+                    <td>
+                        {{ creator.fullName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{$t("created-on")}}</strong></td>
+                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
+                </tr>
+            </template>
         </tbody>
     </table>
 
@@ -87,13 +90,24 @@
             class="button is-link is-small is-fullwidth">
             {{ $t("button-view-in-image") }}
         </router-link>
+
         <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
             {{ $t("button-center-view-on-annot") }}
         </a>
+
         <div class="level">
-            <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
-            <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
-            <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
+            <a :href="annotation.url" class="level-item button is-small">
+                {{ $t("button-view-crop") }}
+            </a>
+
+            <button class="level-item button is-small" @click="copyURL()">
+                {{ $t("button-copy-url") }}
+            </button>
+
+            <button v-if="configUI['project-explore-annotation-comments']" class="level-item button is-small"> <!-- TODO -->
+                {{ $t("button-comment") }}
+            </button>
+
             <button class="level-item button is-small is-danger" @click="confirmDeletion()">
                 {{ $t("button-delete") }}
             </button>
@@ -129,6 +143,9 @@ export default {
         };
     },
     computed: {
+        configUI() {
+            return this.$store.state.project.configUI;
+        },
         creator() {
             return this.users.find(user => user.id == this.annotation.user) || {};
         },

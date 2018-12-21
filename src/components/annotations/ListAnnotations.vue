@@ -103,7 +103,6 @@ import {fullName} from "@/utils/user-utils.js";
 export default {
     name: "list-annotations",
     components: {CytomineMultiselect, ListAnnotationsByTerm},
-    props: ["project"],
     data() {
         return {
             loading: true, 
@@ -132,6 +131,9 @@ export default {
         };
     },
     computed: {
+        project() {
+            return this.$store.state.project.project;
+        },
         selectedImagesIds() {
             return this.selectedImages.map(img => img.id);
         },

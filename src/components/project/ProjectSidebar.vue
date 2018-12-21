@@ -8,52 +8,54 @@
             <h1>{{`${$t("project")}: ${project.name}`}}</h1>
         </div>
         <ul>
-            <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
-                <a>
-                    <i class="far fa-images"></i>
-                    {{ $t("images") }}
-                </a>
-            </router-link>
-            <!-- TODO: change the way opened viewers are displayed -->
-            <router-link tag="li" class="image-link" v-for="(viewer, id) in viewers" :key="id"
-            v-if="viewer.idProject == project.id"
-            :to="`/project/${project.id}/image/${id}`">
-                <a>
-                    {{ viewer.name }}
-                </a>
-                <!-- TODO
-                <a class="close">
-                    <i class="fas fa-times"></i>
-                </a>-->
-            </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
+            <template v-if="configUI['project-images-tab']">
+                <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
+                    <a>
+                        <i class="far fa-images"></i>
+                        {{ $t("images") }}
+                    </a>
+                </router-link>
+                <!-- TODO: change the way opened viewers are displayed -->
+                <router-link v-if="viewer.idProject == project.id" tag="li" class="image-link"
+                    v-for="(viewer, id) in viewers" :key="id"
+                    :to="`/project/${project.id}/image/${id}`">
+
+                    <a>{{ viewer.name }}</a>
+
+                    <!-- TODO
+                    <a class="close">
+                        <i class="fas fa-times"></i>
+                    </a>-->
+                </router-link>
+            </template>
+            <router-link v-if="configUI['project-annotations-tab']" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
                     <i class="far fa-edit"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
+            <router-link  v-if="configUI['project-jobs-tab']" tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
                 <a>
                     <i class="fas fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
+            <router-link v-if="configUI['project-activity-tab']" tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
                     {{ $t("metrics") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/information`" class="information">
+            <router-link v-if="configUI['project-info-tab']" tag="li" :to="`/project/${project.id}/information`" class="information">
                 <a>
                     <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/parameters`" class="parameters">
+            <router-link  v-if="configUI['project-configuration-tab']" tag="li" :to="`/project/${project.id}/configuration`" class="configuration">
                 <a>
                     <i class="fas fa-cogs"></i>
-                    {{ $t("parameters") }}
+                    {{ $t("configuration") }}
                 </a>
             </router-link>
         </ul>
@@ -67,7 +69,6 @@
 <script>
 export default {
     name: "project-sidebar",
-    props: ["project"],
     data() {
         return {
             visibleSideBar: true,
@@ -76,6 +77,12 @@ export default {
     computed: {
         viewers() {
             return this.$store.state.images.viewers;
+        },
+        project() {
+            return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
         }
     },
     methods: {
@@ -176,7 +183,7 @@ export default {
 .sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
 .sidebar li.metrics.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
 .sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
-.sidebar li.parameters.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
+.sidebar li.configuration.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
 
 .sidebar li.image-link {
     position: relative;

@@ -197,7 +197,7 @@
         </div>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" :project="project" :imageInstances="images" @addImage="addImage">
+    <add-image-modal :active.sync="addImageModal" :imageInstances="images" @addImage="addImage">
     </add-image-modal>
 </div>
 </template>
@@ -221,7 +221,6 @@ export default {
         CytomineSlider,
         AddImageModal
     },
-    props: ["project"],
     data() {
         return {
             images: [],
@@ -249,6 +248,9 @@ export default {
         };
     },
     computed: {
+        project() {
+            return this.$store.state.project.project;
+        },
         filteredImages() {
             let filtered = this.images;
 

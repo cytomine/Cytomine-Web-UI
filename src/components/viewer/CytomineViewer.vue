@@ -10,7 +10,6 @@
             <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
                     :style="`height:${elementHeight}%; width:${elementWidth}%;`">
                 <cytomine-image v-if="idx <= nbMaps"
-                    :project="project"
                     :idViewer="idBaseImage"
                     :index="idx-1"
                     :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`" 
@@ -18,8 +17,7 @@
                 </cytomine-image>
             </div>
 
-            <image-selector v-show="imageSelector" class="image-selector-wrapper"
-                :project="project" :idViewer="idBaseImage">
+            <image-selector v-show="imageSelector" class="image-selector-wrapper" :idViewer="idBaseImage">
             </image-selector>
         </div>
     </template>
@@ -38,7 +36,6 @@ export default {
         CytomineImage,
         ImageSelector
     },
-    props: ["project"],
     data() {
         return {
             error: false,
@@ -87,20 +84,6 @@ export default {
             }
         },
 
-        async fetchProjetMembers() {
-            let managersPromise = this.project.fetchAdministrators();
-            let membersPromise = this.project.fetchUsers();
-
-            let managers = (await managersPromise).array;
-            let members = (await membersPromise).array;
-
-            let idsManagers = managers.map(user => user.id);
-            let contributors = members.filter(user => !idsManagers.includes(user.id));
-
-            this.project.managers = managers;
-            this.project.contributors = contributors;
-        },
-
         async addBaseImage() {
             if(this.viewer == null) {
                 try {
@@ -108,14 +91,14 @@ export default {
                     await this.$store.dispatch("addViewer", baseImage);
                 }
                 catch(err) {
+                    console.log(err);
                     this.error = true;
                 }
             }
         }
     },
     async created() {
-        await Promise.all([this.fetchProjetMembers(), this.addBaseImage()]);
-
+        await this.addBaseImage();
         this.loading = false;
     }
 };

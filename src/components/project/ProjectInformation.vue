@@ -11,7 +11,11 @@ import ProjectDetails from "./ProjectDetails";
 export default {
     name: "project-information",
     components: {ProjectDetails},
-    props: ["project"]
+    computed: {
+        project() {
+            return this.$store.state.project.project;
+        }
+    }
 };
 </script>
 

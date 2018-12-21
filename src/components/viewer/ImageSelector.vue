@@ -34,10 +34,7 @@ import {ImageInstanceCollection} from "cytomine-client";
 
 export default {
     name: "image-selector",
-    props: [
-        "project", 
-        "idViewer"
-    ],
+    props: ["idViewer"],
     data() {
         return {
             images: [],
@@ -47,6 +44,9 @@ export default {
         };
     },
     computed: {
+        project() {
+            return this.$store.state.project.project;
+        },
         filteredImages() { // TODO: in backend
             let filtered = this.images;
 
