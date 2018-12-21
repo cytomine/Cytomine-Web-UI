@@ -2,7 +2,7 @@
 <div class="box">
     <b-tabs v-model="activeTab">
         <b-tab-item :label="$t('general')">
-            
+            <general-configuration></general-configuration>
         </b-tab-item>
 
         <b-tab-item :label="$t('members')">
@@ -25,11 +25,15 @@
 </template>
 
 <script>
+import GeneralConfiguration from "./configuration-panels/GeneralConfiguration";
 import CustomUIProject from "./configuration-panels/CustomUIProject";
 
 export default {
     name: "project-configuration",
-    components: {"custom-ui-project": CustomUIProject},
+    components: {
+        GeneralConfiguration,
+        "custom-ui-project": CustomUIProject
+    },
     data() {
         return {
             activeTab: 0

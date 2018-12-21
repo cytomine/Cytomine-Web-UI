@@ -102,10 +102,7 @@
         <tr>
             <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
-                <div class="buttons">
-                    <button class="button is-small">{{$t("button-lock")}}</button> <!-- TODO -->
-                    <button class="button is-danger is-small" @click="deleteProject()">{{$t("button-delete")}}</button>
-                </div>
+                <project-actions :project="project" @delete="$emit('delete')"></project-actions>
             </td>
         </tr>
     </tbody>
@@ -115,6 +112,7 @@
 <script>
 import ImagesPreview from "@/components/image/ImagesPreview";
 import ListUsernames from "@/components/user/ListUsernames";
+import ProjectActions from "./ProjectActions";
 import CytomineDescription from "@/components/description/CytomineDescription";
 
 export default {
@@ -122,6 +120,7 @@ export default {
     components: {
         ImagesPreview,
         ListUsernames,
+        ProjectActions,
         CytomineDescription
     },
     props: {
@@ -162,17 +161,6 @@ export default {
         },
         async fetchOnlines() {
             this.onlines = await this.project.fetchConnectedUsers();
-        },
-
-        deleteProject() {
-            this.$dialog.confirm({
-                title: this.$t("delete-project"),
-                message: this.$t("delete-project-confirmation-message", {projectName: this.project.name}),
-                type: "is-danger",
-                confirmText: this.$t("button-confirm"),
-                cancelText: this.$t("button-cancel"),
-                onConfirm: () => this.$emit("delete")
-            });
         }
     },
     async created() {
