@@ -81,6 +81,40 @@ const routes = [
             }
         ]
     },
+
+    // redirections for old URLS
+    {path: "/userdashboard", redirect: "/"},
+    {path: "/project", redirect: "/projects"},
+    {path: "/ontology", redirect: "/"}, // TODO
+    {path: "/explorer", redirect: "/"},
+    {path: "/upload", redirect: "/"}, // TODO
+
+    {path: "/activity", redirect: "/"},
+    {path: "/activity-:idProject-", redirect: "/"}, // TODO
+    {path: "/activity-:idProject-:idUser", redirect: "/"}, // TODO
+
+    {path: "/search-", redirect: "/advanced-search"},
+
+    {path: "/admin", redirect: "/"}, // TODO
+    {path: "/admin-tabs-dashboard", redirect: "/"}, // TODO
+    {path: "/admin-tabs-users", redirect: "/"}, // TODO
+    {path: "/admin-tabs-groups", redirect: "/"}, // TODO
+    {path: "/admin-tabs-permissions", redirect: "/"}, // TODO
+    {path: "/admin-tabs-configuration", redirect: "/"}, // TODO
+
+    {path: "/tabs-dashboard-:idProject", redirect: "/project/:idProject/information"},
+    {path: "/tabs-images-:idProject", redirect: "/project/:idProject/images"},
+    {path: "/tabs-annotations-:idProject", redirect: "/project/:idProject/annotations"},
+    {path: "/tabs-annotationproperties-:idProject-:idAnnot", redirect: "/project/:idProject"},
+    {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
+    {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
+    {path: "/tabs-algos-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-config-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-usersconfig-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},
+    {path: "/tabs-image-:idProject-:idImage-:idAnnotation", redirect: "/project/:idProject/image/:idImage/annotation/:idAnnotation"},
+    // -----
+
     {
         path: "*",
         component: PageNotFound
