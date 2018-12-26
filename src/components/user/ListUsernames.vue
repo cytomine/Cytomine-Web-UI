@@ -51,7 +51,7 @@ export default {
                 return null;
             }
 
-            return this.onlines.find(online => online.id == id) != null;
+            return this.onlines.some(online => online.id == id);
         }
     }
 };

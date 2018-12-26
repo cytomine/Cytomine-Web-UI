@@ -1,14 +1,18 @@
 <template>
 <span v-if="user">
     <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online != null"></span>
-    {{fullName}}</span></template>
+    {{displayFullName ? fullName : user.username}}</span></template>
 
 <script>
 import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "username",
-    props: ["user", "online"],
+    props: {
+        user: {type: Object},
+        online: {type: Boolean, default: null},
+        displayFullName: {type: Boolean, default: true}
+    },
     computed: {
         fullName() {
             return fullName(this.user);

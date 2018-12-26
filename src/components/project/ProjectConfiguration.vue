@@ -6,7 +6,7 @@
         </b-tab-item>
 
         <b-tab-item :label="$t('members')">
-            
+            <project-members></project-members>
         </b-tab-item>
 
         <b-tab-item :label="$t('custom-ui')">
@@ -26,12 +26,14 @@
 
 <script>
 import GeneralConfiguration from "./configuration-panels/GeneralConfiguration";
+import ProjectMembers from "./configuration-panels/ProjectMembers";
 import CustomUIProject from "./configuration-panels/CustomUIProject";
 
 export default {
     name: "project-configuration",
     components: {
         GeneralConfiguration,
+        ProjectMembers,
         "custom-ui-project": CustomUIProject
     },
     data() {
