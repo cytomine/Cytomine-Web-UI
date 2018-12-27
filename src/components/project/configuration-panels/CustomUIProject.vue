@@ -13,16 +13,16 @@
                 {{$t(prop.label)}}
             </td>
             <td>
-                <button :class="['button', customUI[prop.key].CONTRIBUTOR_PROJECT ? 'is-success' : 'is-danger']"
-                        @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')">
-                    {{$t("contributor")}}
-                </button>
-            </td>
-            <td>
                 <button :class="['button', customUI[prop.key].ADMIN_PROJECT ? 'is-success' : 'is-danger']"
                         @click="toggleProp(prop.key, 'ADMIN_PROJECT')"
                         :disabled="prop.key == 'project-configuration-tab'">
                     {{$t("manager")}}
+                </button>
+            </td>
+            <td>
+                <button :class="['button', customUI[prop.key].CONTRIBUTOR_PROJECT ? 'is-success' : 'is-danger']"
+                        @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')">
+                    {{$t("contributor")}}
                 </button>
             </td>
         </tr>
