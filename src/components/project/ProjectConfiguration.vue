@@ -38,12 +38,28 @@ export default {
     },
     data() {
         return {
-            activeTab: 0
+            activeTab: 0,
+            tabNames: [
+                "general",
+                "members",
+                "customUI",
+                "softwares",
+                "imageFilters"
+            ]
         };
+    },
+    watch: {
+        activeTab(idx) {
+            this.$router.push(`?tab=${this.tabNames[idx]}`);
+        }
     },
     methods: {
     },
     async created() {
+        let idx = this.tabNames.indexOf(this.$route.query.tab);
+        if(idx != -1) {
+            this.activeTab = idx;
+        }
     }
 };
 </script>

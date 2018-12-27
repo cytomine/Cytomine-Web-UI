@@ -109,8 +109,8 @@ const routes = [
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
     {path: "/tabs-algos-:idProject", redirect: "/"}, // TODO
-    {path: "/tabs-config-:idProject", redirect: "/"}, // TODO
-    {path: "/tabs-usersconfig-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
+    {path: "/tabs-usersconfig-:idProject", redirect: {path: "/project/:idProject/configuration", query: {tab: "members"}}},
     {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},
     {path: "/tabs-image-:idProject-:idImage-:idAnnotation", redirect: "/project/:idProject/image/:idImage/annotation/:idAnnotation"},
     // -----
