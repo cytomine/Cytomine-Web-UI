@@ -14,7 +14,7 @@
         </b-tab-item>
 
         <b-tab-item :label="$t('softwares')">
-
+            <project-softwares></project-softwares>
         </b-tab-item>
 
         <b-tab-item :label="$t('image-filters')">
@@ -28,13 +28,15 @@
 import GeneralConfiguration from "./configuration-panels/GeneralConfiguration";
 import ProjectMembers from "./configuration-panels/ProjectMembers";
 import CustomUIProject from "./configuration-panels/CustomUIProject";
+import ProjectSoftwares from "./configuration-panels/ProjectSoftwares";
 
 export default {
     name: "project-configuration",
     components: {
         GeneralConfiguration,
         ProjectMembers,
-        "custom-ui-project": CustomUIProject
+        "custom-ui-project": CustomUIProject,
+        ProjectSoftwares
     },
     data() {
         return {

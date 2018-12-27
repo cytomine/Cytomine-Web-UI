@@ -342,3 +342,7 @@ remove-yourself-from-manager-confirmation-message,Are you sure you want to remov
 status,Status,
 offline,Offline users,
 notif-error-change-role,Failed to change the role of {username},
+enabled,Enabled,
+disabled,Disabled,
+no-software,No software to display,
+notif-error-change-status-software-project,Failed to change the status of software {softwareName},
