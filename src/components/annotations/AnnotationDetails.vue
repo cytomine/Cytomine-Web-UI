@@ -11,16 +11,15 @@
                 </td>
             </tr>
 
-            <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
-                <tr>
-                    <td><strong>{{$t("area")}}</strong></td>
-                    <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
-                </tr>
-                <tr>
-                    <td><strong>{{$t("perimeter")}}</strong></td>
-                    <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
-                </tr>
-            </template>
+            <tr v-if="annotation.area > 0">
+                <td><strong>{{$t("area")}}</strong></td>
+                <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
+            </tr>
+
+            <tr v-if="annotation.perimeter > 0">
+                <td><strong>{{$t(annotation.area > 0 ? "perimeter" : "length")}}</strong></td>
+                <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
+            </tr>
 
             <tr>
                 <td colspan="2">

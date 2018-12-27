@@ -176,6 +176,7 @@ export default {
                     this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
                 }
                 catch(err) {
+                    console.log(err);
                     this.$notify({type: "error", text: this.$t("notif-error-annotation-creation")});
                 }
             });

@@ -33,10 +33,9 @@
         <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
-        <!-- QUESTION: add handling of lines? need to add in backend
-        <button class="button is-small" :disabled="activeLayer == null" title="Line" @click="activateTool('line')" :class="{'is-selected': activeTool == 'line'}">
+        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('line')" @click="activateTool('line')" :class="{'is-selected': activeTool == 'line'}">
             <span class="icon is-small"><i class="fas fa-minus"></i></span>
-        </button> -->
+        </button>
         <!-- QUESTION: redefine expected behaviour
         <button class="button is-small" :disabled="activeLayer == null" title="Arrow" @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
             <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
