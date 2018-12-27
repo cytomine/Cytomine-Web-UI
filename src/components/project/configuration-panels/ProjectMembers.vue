@@ -4,8 +4,7 @@
     <template v-if="!loading">
         <div class="columns">
             <div class="column is-one-quarter">
-                <b-input class="" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
             </div>
 
             <div class="column">
@@ -252,10 +251,12 @@ export default {
         },
         selectAll: {
             get() {
-                return this.filteredMembers.length > 0 && this.filteredMembers.every(member => member.selected);
+                return this.filteredMembers.length > 0 && this.filteredMembers.every(member => {
+                    return member.selected || member.id == this.currentUser.id
+                });
             },
             set(value) {
-                this.filteredMembers.forEach(member => member.selected = value);
+                this.filteredMembers.forEach(member => member.selected = member.id != this.currentUser.id && value);
             }
         }
     },
