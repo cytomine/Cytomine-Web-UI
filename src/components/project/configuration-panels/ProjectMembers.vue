@@ -252,7 +252,7 @@ export default {
         selectAll: {
             get() {
                 return this.filteredMembers.length > 0 && this.filteredMembers.every(member => {
-                    return member.selected || member.id == this.currentUser.id
+                    return member.selected || member.id == this.currentUser.id;
                 });
             },
             set(value) {

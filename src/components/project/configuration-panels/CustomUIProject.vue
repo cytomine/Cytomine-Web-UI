@@ -4,7 +4,7 @@
 <table class="table custom-ui" v-if="!loading">
     <tbody v-for="category in customUITree" :key="category.label">
         <tr>
-            <th colspan="4">{{$t(category.label)}}</th>
+            <th colspan="3">{{$t(category.label)}}</th>
         </tr>
         <tr v-for="prop in category.props" v-if="customUI[prop.key]" :key="prop.key"> <!-- TODO remove v-if when question regarding partial results is answered -->
             <td>
