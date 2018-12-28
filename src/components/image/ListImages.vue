@@ -175,7 +175,10 @@
                 </template>
 
                 <template slot="detail" slot-scope="props">
-                    <image-details :image="props.row" @delete="deleteImage(props.row)" @setCalibration="(event) => setCalibration(props.row, event)">
+                    <image-details :image="props.row"
+                                   @delete="deleteImage(props.row)"
+                                   @setResolution="(event) => setResolution(props.row, event)"
+                                   @setMagnification="(event) => setMagnification(props.row, event)">
                     </image-details>
                 </template>
 
@@ -394,22 +397,27 @@ export default {
             }
         },
 
-        setCalibration(image, {resolution, magnification}) {
+        setResolution(image, resolution) {
             image.resolution = resolution;
-            image.magnification = magnification;
+            // check if it is needed to update filters so that new images are displayed
+            let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
 
+            this.formatImage(image);
+
+            if(addResolution) {
+                this.selectedResolutions.push(image.resolutionFormatted);
+            }
+        },
+
+        setMagnification(image, magnification) {
+            image.magnification = magnification;
             // check if it is needed to update filters so that new images are displayed
             let addMagnification = !this.availableMagnifications.includes(this.formatMagnification(magnification));
-            let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
-            // ---
 
             this.formatImage(image);
 
             if(addMagnification) {
                 this.selectedMagnifications.push(image.magnificationFormatted);
-            }
-            if(addResolution) {
-                this.selectedResolutions.push(image.resolutionFormatted);
             }
         },
 

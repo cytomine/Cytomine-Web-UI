@@ -25,14 +25,39 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="buttons">
+        <button class="button is-small" @click="calibrationModal = true">
+            {{$t("button-set-calibration")}}
+        </button>
+    </div>
+
+    <calibration-modal :image="image"
+                       :active.sync="calibrationModal"
+                       @setResolution="setResolution"
+                       @setScale="startCalibration()" />
 </div>
 </template>
 
 <script>
+import CalibrationModal from "@/components/image/CalibrationModal";
+
 export default {
     name: "image-information",
-    props: ["image"],
+    components: {CalibrationModal},
+    props: [
+        "idViewer",
+        "index"
+    ],
+    data() {
+        return {
+            calibrationModal: false
+        };
+    },
     computed: {
+        image() {
+            return this.$store.state.images.viewers[this.idViewer].maps[this.index].imageInstance;
+        },
         resolution() {
             if(this.image.resolution != null) {
                 return this.image.resolution.toFixed(3);
@@ -41,10 +66,28 @@ export default {
                 return this.$t("unknown");
             }
         },
-
         magnification() {
             return this.image.magnification || this.$t("unknown");
+        }
+    },
+    methods: {
+        setResolution(resolution) {
+            this.$store.commit("setResolution", {idViewer: this.idViewer, idImage: this.image.id, resolution});
+        },
+        startCalibration() {
+            this.calibrationModal = false;
+            this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
         }
     }
 };
 </script>
+
+<style scoped>
+.table {
+    margin-bottom: 10px !important;
+}
+
+.buttons {
+    justify-content: center;
+}
+</style>

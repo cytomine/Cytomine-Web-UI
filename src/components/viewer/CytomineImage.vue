@@ -80,7 +80,7 @@
                         <i class="fas fa-info"></i>
                     </a>
                     <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
-                        :image="image"></image-information>
+                        :idViewer="idViewer" :index="index"></image-information>
                 </li>
 
                 <li>
@@ -159,6 +159,11 @@
         <div class="broadcast" v-if="imageWrapper.broadcast">
             <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
+
+        <b-message class="info-calibration" v-if="imageWrapper.ongoingCalibration" type="is-info" has-icon icon-size="is-small">
+            <p>{{$t("calibration-mode-explanation")}}</p>
+            <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
+        </b-message>
 
         <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
 
@@ -419,7 +424,11 @@ export default {
                 clearTimeout(this.timeoutSavePosition);
                 this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
             }
-        }, 500)
+        }, 500),
+
+        cancelCalibration() {
+            this.$store.dispatch("cancelCalibration", {idViewer: this.idViewer, index: this.index});
+        }
     },
     async created() {
         if(getProj(this.projectionName) == null) { // if image opened for the first time
@@ -438,13 +447,22 @@ export default {
             });
         });
 
-        // TODO: this should be executed only once, for first image of viewer
-        let idRoutedAnnot = this.$route.params.idAnnotation;
-        if(idRoutedAnnot != null) {
-            let annot = await Annotation.fetch(idRoutedAnnot);
-            if(annot.image == this.image.id) {
-                this.routedAnnotation = annot;
-                this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+        // Actions related to query parameters should be executed only once, for first image of viewer
+        let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
+            return map.imageInstance.id == this.$route.params.idImage;
+        });
+        if(this.index == firstIndexTargettedImage) {
+            let idRoutedAnnot = this.$route.params.idAnnotation;
+            if(idRoutedAnnot != null) {
+                let annot = await Annotation.fetch(idRoutedAnnot);
+                if(annot.image == this.image.id) {
+                    this.routedAnnotation = annot;
+                    this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+                }
+            }
+
+            if(this.$route.query.action == "calibration") {
+                this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
             }
         }
 
@@ -492,6 +510,17 @@ export default {
     padding: 5px;
     border-radius: 5px;
     border: 2px solid white;
+}
+
+.info-calibration {
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    max-width: 400px;
+}
+
+.info-calibration p:first-child {
+    margin-bottom: 10px;
 }
 
 .broadcast i.fas {

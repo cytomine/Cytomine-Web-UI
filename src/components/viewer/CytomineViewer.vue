@@ -102,14 +102,18 @@ export default {
         },
 
         async addBaseImage() {
-            if(this.viewer == null) {
-                try {
+            try {
+                if(this.viewer == null) {
                     let baseImage = await ImageInstance.fetch(this.idBaseImage);
                     await this.$store.dispatch("addViewer", baseImage);
                 }
-                catch(err) {
-                    this.error = true;
+                else {
+                    await this.$store.dispatch("refreshData", this.idBaseImage);
                 }
+            }
+            catch(err) {
+                console.log(err);
+                this.error = true;
             }
         }
     },

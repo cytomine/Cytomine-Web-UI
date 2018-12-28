@@ -2,14 +2,14 @@
 <!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <div>
     <div class="buttons has-addons">
-        <button v-tooltip="$t('select')" class="button is-small" @click="activateTool('select')" :class="{'is-selected': activeTool == 'select'}" v-shortkey.once="['s']" @shortkey="activateTool('select')">
+        <button v-tooltip="$t('select')" class="button is-small" :disabled="ongoingCalibration" @click="activateTool('select')" :class="{'is-selected': activeTool == 'select'}" v-shortkey.once="['s']" @shortkey="activateTool('select')">
             <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
     </div>
 
     <div class="buttons has-addons term-selection" :class="{'has-preview': termsToAssociate.length > 0}"
         @mouseleave="showTermSelector = false">
-        <button v-tooltip="$t('terms-new-annotation')" class="button is-small" @click="showTermSelector = !showTermSelector">
+        <button v-tooltip="$t('terms-new-annotation')" class="button is-small" :disabled="ongoingCalibration" @click="showTermSelector = !showTermSelector">
             <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
         </button>
         <div class="color-preview" :style="{background: backgroundTermsNewAnnot}">
@@ -30,49 +30,49 @@
     </div>
 
     <div class="buttons has-addons">
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('point')" @click="activateTool('point')" :class="{'is-selected': activeTool == 'point'}" v-shortkey.once="['p']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('line')" @click="activateTool('line')" :class="{'is-selected': activeTool == 'line'}">
+        <button class="button is-small" :disabled="noActiveLayer" v-tooltip="$t('line')" @click="activateTool('line')" :class="{'is-selected': activeTool == 'line'}">
             <span class="icon is-small"><i class="fas fa-minus"></i></span>
         </button>
         <!-- QUESTION: redefine expected behaviour
-        <button class="button is-small" :disabled="activeLayer == null" title="Arrow" @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
+        <button class="button is-small" :disabled="noActiveLayer" title="Arrow" @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
             <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
         </button> -->
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('rectangle')" @click="activateTool('rectangle')" :class="{'is-selected': activeTool == 'rectangle'}">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('rectangle')" @click="activateTool('rectangle')" :class="{'is-selected': activeTool == 'rectangle'}">
             <span class="icon is-small"><i class="far fa-square"></i></span>
         </button>
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('circle')" @click="activateTool('circle')" :class="{'is-selected': activeTool == 'circle'}">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('circle')" @click="activateTool('circle')" :class="{'is-selected': activeTool == 'circle'}">
             <span class="icon is-small"><i class="far fa-circle"></i></span>
         </button>
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('polygon')" @click="activateTool('polygon')" :class="{'is-selected': activeTool == 'polygon'}">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('polygon')" @click="activateTool('polygon')" :class="{'is-selected': activeTool == 'polygon'}">
             <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
     </div>
 
     <div class="buttons has-addons">
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand')" @click="activateTool('freehand')" :class="{'is-selected': activeTool == 'freehand'}" v-shortkey.once="['f']" @shortkey="activateTool('freehand')">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('freehand')" @click="activateTool('freehand')" :class="{'is-selected': activeTool == 'freehand'}" v-shortkey.once="['f']" @shortkey="activateTool('freehand')">
             <span class="icon is-small"><i class="fas fa-pencil-alt"></i></span>
         </button>
         <!-- TODO: would be better if correct add and correct remove were targeted on a previously selected annot
         backend modif required (https://github.com/cytomine/Cytomine-core/issues/1141) -->
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand-correct-add')" @click="activateTool('correct-add')" :class="{'is-selected': activeTool == 'correct-add'}">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('freehand-correct-add')" @click="activateTool('correct-add')" :class="{'is-selected': activeTool == 'correct-add'}">
             <span class="icon is-small"><i class="suberscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
-        <button class="button is-small" :disabled="activeLayer == null" v-tooltip="$t('freehand-correct-remove')" @click="activateTool('correct-remove')" :class="{'is-selected': activeTool == 'correct-remove'}">
+        <button class="button is-small" :disabled="ongoingCalibration || noActiveLayer" v-tooltip="$t('freehand-correct-remove')" @click="activateTool('correct-remove')" :class="{'is-selected': activeTool == 'correct-remove'}">
             <span class="icon is-small"><i class="suberscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
     </div>
 
     <div class="buttons has-addons">
-        <button class="button is-small" v-tooltip="$t('measure-length')" @click="activateTool('ruler')" :class="{'is-selected': activeTool == 'ruler'}">
+        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-length')" @click="activateTool('ruler')" :class="{'is-selected': activeTool == 'ruler'}">
             <span class="icon is-small"><i class="fas fa-ruler"></i></span>
         </button>
-        <button class="button is-small" v-tooltip="$t('measure-angle')" @click="activateTool('angle')" :class="{'is-selected': activeTool == 'angle'}">
+        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-angle')" @click="activateTool('angle')" :class="{'is-selected': activeTool == 'angle'}">
             <span class="icon is-small"><i class="fas fa-less-than"></i><i class="fas fa-long-arrow-alt"></i></span>
         </button>
-        <button class="button is-small" v-tooltip="$t('measure-area')" @click="activateTool('area')" :class="{'is-selected': activeTool == 'area'}">
+        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-area')" @click="activateTool('area')" :class="{'is-selected': activeTool == 'area'}">
             <span class="icon is-small"><i class="fas fa-ruler-combined"></i></span>
         </button>
     </div>
@@ -136,6 +136,9 @@ export default {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
+        ongoingCalibration() {
+            return this.imageWrapper.ongoingCalibration;
+        },
         terms() {
             return this.imageWrapper.terms;
         },
@@ -155,7 +158,7 @@ export default {
                 return this.imageWrapper.activeTool;
             },
             set(tool) {
-                this.$store.commit("activateTool", {idViewer: this.idViewer, index: this.index, tool});
+                this.$store.dispatch("activateTool", {idViewer: this.idViewer, index: this.index, tool});
             }
         },
         displayAnnotDetails: {
@@ -191,8 +194,8 @@ export default {
         layers() {
             return this.imageWrapper.selectedLayers || [];
         },
-        activeLayer() {
-            return this.layers.find(layer => layer.drawOn);
+        noActiveLayer() {
+            return (this.layers.find(layer => layer.drawOn) == null);
         },
         actions() {
             return this.imageWrapper.actions;
@@ -202,19 +205,14 @@ export default {
         }
     },
     watch: {
-        activeLayer(layer) {
-            if(layer == null) {
+        noActiveLayer(value) {
+            if(value) {
                 this.activeTool = "select";
             }
         }
     },
     methods: {
         activateTool(tool) {
-            if(this.activeTool == "select" && tool != "select") {
-                this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-                this.activeEditTool = null;
-            }
-
             this.activeTool = tool;
         },
 
