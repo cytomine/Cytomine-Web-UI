@@ -120,7 +120,7 @@ export default {
                     text: this.$t("notif-error-image-calibration", {imageName: this.image.originalFilename})
                 });
             }
-            this.$emit('update:active', false)
+            this.$emit("update:active", false);
         }
     }
 };
