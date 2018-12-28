@@ -199,6 +199,14 @@ export default {
         catch(error) {
             this.$notify({type: "error", text: this.$t("notif-error-load-annotations-filters")});
         }
+
+        if(this.$route.query.image != null) {
+            let queriedImage = this.images.find(image => image.id == this.$route.query.image);
+            if(queriedImage != null) {
+                this.selectedImages = [queriedImage];
+            }
+        }
+
         this.loading = false;
     }
 };

@@ -138,47 +138,51 @@
             <b-table v-if="!loading" :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
 
-                <template slot-scope="props">
+                <template slot-scope="{row: image}">
                     <b-table-column :label="$t('overview')" width="100">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
-                            <img :src="props.row.thumb" :alt="props.row.instanceFilename" class="image-overview">
+                        <router-link :to="`/project/${image.project}/image/${image.id}`">
+                            <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="instanceFilename" :label="$t('name')" sortable width="400">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
-                            {{ props.row.instanceFilename }}
+                        <router-link :to="`/project/${image.project}/image/${image.id}`">
+                            {{ image.instanceFilename }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
-                        {{ props.row.magnification || $t("unknown") }}
+                        {{ image.magnification || $t("unknown") }}
                     </b-table-column>
 
                     <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfAnnotations }}</a>
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}`">
+                            {{ image.numberOfAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfJobAnnotations }}</a>
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
+                            {{ image.numberOfJobAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfReviewedAnnotations }}</a>
+                        <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`" class="button is-small is-link">
+                        <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
                             {{$t("button-open")}}
                         </router-link>
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="props">
-                    <image-details :image="props.row"
-                                   @delete="deleteImage(props.row)"
-                                   @setResolution="(event) => setResolution(props.row, event)"
-                                   @setMagnification="(event) => setMagnification(props.row, event)">
+                <template slot="detail" slot-scope="{row: image}">
+                    <image-details :image="image"
+                                   @delete="deleteImage(image)"
+                                   @setResolution="(event) => setResolution(image, event)"
+                                   @setMagnification="(event) => setMagnification(image, event)">
                     </image-details>
                 </template>
 
