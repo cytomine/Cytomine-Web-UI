@@ -50,16 +50,13 @@
             <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
             </select-interaction>
 
-            <draw-interaction v-if="!['select', 'ruler', 'angle', 'area'].includes(activeTool)"
+            <draw-interaction v-if="activeTool != 'select'"
                 :idViewer="idViewer" :index="index">
             </draw-interaction>
 
             <modify-interaction v-if="activeTool == 'select' && activeEditTool != null"
                 :idViewer="idViewer" :index="index">
             </modify-interaction>
-
-            <measure-interaction :idViewer="idViewer" :index="index">
-            </measure-interaction>
 
         </vl-map>
 
@@ -197,7 +194,6 @@ import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
 import SelectInteraction from "./interactions/SelectInteraction";
 import DrawInteraction from "./interactions/DrawInteraction";
 import ModifyInteraction from "./interactions/ModifyInteraction";
-import MeasureInteraction from "./interactions/MeasureInteraction";
 
 import {addProj, createProj, getProj} from "vuelayers/lib/ol-ext";
 
@@ -237,8 +233,7 @@ export default {
 
         SelectInteraction,
         DrawInteraction,
-        ModifyInteraction,
-        MeasureInteraction
+        ModifyInteraction
     },
     data() {
         return {

@@ -66,18 +66,6 @@
     </div>
 
     <div class="buttons has-addons">
-        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-length')" @click="activateTool('ruler')" :class="{'is-selected': activeTool == 'ruler'}">
-            <span class="icon is-small"><i class="fas fa-ruler"></i></span>
-        </button>
-        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-angle')" @click="activateTool('angle')" :class="{'is-selected': activeTool == 'angle'}">
-            <span class="icon is-small"><i class="fas fa-less-than"></i><i class="fas fa-long-arrow-alt"></i></span>
-        </button>
-        <button class="button is-small" :disabled="ongoingCalibration" v-tooltip="$t('measure-area')" @click="activateTool('area')" :class="{'is-selected': activeTool == 'area'}">
-            <span class="icon is-small"><i class="fas fa-ruler-combined"></i></span>
-        </button>
-    </div>
-
-    <div class="buttons has-addons">
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
             <span class="icon is-small"><i class="fas fa-info"></i></span>
         </button>
