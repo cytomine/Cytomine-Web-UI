@@ -196,6 +196,10 @@ strong, .label {
 
 /* Modal */
 
+.modal .animation-content {
+    max-width: unset !important;
+}
+
 .modal {
     z-index: 2000;
 }
