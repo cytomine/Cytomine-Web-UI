@@ -49,7 +49,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                                    label="label" track-by="role" :searchable="false">
+                                    label="label" track-by="index" :searchable="false">
                                 </cytomine-multiselect>
                             </div>
                         </div>
@@ -118,56 +118,60 @@
 
             <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
-                <template slot-scope="props">
-                    <b-table-column :visible="atLeastOneManaged" field="isManaged" label="" centered width="1" sortable>
-                        <i v-if="props.row.isManaged" class="fas fa-cog" :title="$t('manager-icon-label')"></i>
+                <template slot-scope="{row: project}">
+                    <b-table-column :visible="atLeastOneManaged" field="role.index" label="" centered width="1" sortable>
+                        <i v-if="project.role == managerRole || project.role == representativeRole"
+                           class="fas fa-cog"
+                           :title="$t(project.role == managerRole ? 'manager-icon-label' : 'representative-icon-label')">
+                            <i v-if="project.role == representativeRole" class="superscript fas fa-plus"></i>
+                        </i>
                     </b-table-column>
 
                     <b-table-column field="name" :label="$t('name')" sortable width="250">
-                        <router-link :to="`/project/${props.row.id}`">
-                            {{ props.row.name }}
+                        <router-link :to="`/project/${project.id}`">
+                            {{ project.name }}
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="first_name" :label="$t('members')" centered sortable width="150">
-                        {{ props.row.membersCount }}
+                    <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
+                        {{ project.membersCount }}
                     </b-table-column>
 
                     <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
-                        <router-link :to="`/project/${props.row.id}/images`">{{ props.row.numberOfImages }}</router-link>
+                        <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-                        <router-link :to="`/project/${props.row.id}/annotations`">
-                            {{ props.row.numberOfAnnotations }}
+                        <router-link :to="`/project/${project.id}/annotations`">
+                            {{ project.numberOfAnnotations }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="150">
-                        <router-link :to="`/project/${props.row.id}/annotations?type=algo`">
-                            {{ props.row.numberOfJobAnnotations }}
+                        <router-link :to="`/project/${project.id}/annotations?type=algo`">
+                            {{ project.numberOfJobAnnotations }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-                        <a>{{ props.row.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                        <a>{{ project.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
                     </b-table-column>
 
                     <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-                        {{ Number(props.row.lastActivity) | moment("ll") }}
+                        {{ Number(project.lastActivity) | moment("ll") }}
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
-                        <router-link :to="`/project/${props.row.id}`" class="button is-small is-link">
+                        <router-link :to="`/project/${project.id}`" class="button is-small is-link">
                             {{$t("button-open")}}
                         </router-link>
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="props">
-                    <project-details :project="props.row"
+                <template slot="detail" slot-scope="{row: project}">
+                    <project-details :project="project"
                         :excluded-properties="excludedProperties"
-                        @delete="deleteProject(props.row)">
+                        @delete="deleteProject(project)">
                     </project-details>
                 </template>
 
@@ -189,7 +193,10 @@
 
             <div class="legend" v-if="atLeastOneManaged">
                 <h2>{{$t("legend")}}</h2>
-                <i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}
+                <p><i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}</p>
+                <p><i class="fas fa-cog">
+                    <i class="superscript fas fa-plus"></i>
+                </i> : {{$t('representative-icon-label')}}</p>
             </div>
         </div>
     </div>
@@ -225,6 +232,7 @@ export default {
             availableRoles: [],
             contributorRole: null,
             managerRole: null,
+            representativeRole: null,
             selectedRoles: [],
             boundsMembers: [0, 0],
             boundsImages: [0, 0],
@@ -255,23 +263,15 @@ export default {
             }
 
             // TODO tags
-
-            filtered = filtered.filter(project => this.selectedOntologiesIds.includes(project.ontology));
-
-            let includeContributor = this.selectedRoles.includes(this.contributorRole);
-            let includeManager = this.selectedRoles.includes(this.managerRole);
             filtered = filtered.filter(project => {
-                return (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
+                return this.selectedOntologiesIds.includes(project.ontology) &&
+                    this.selectedRoles.includes(project.role) &&
+                    isBetweenBounds(project.numberOfImages, this.boundsImages) &&
+                    isBetweenBounds(project.membersCount, this.boundsMembers) &&
+                    isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations) &&
+                    isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+                    isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
             });
-
-            filtered = filtered.filter(project => isBetweenBounds(project.numberOfImages, this.boundsImages));
-            filtered = filtered.filter(project => isBetweenBounds(project.membersCount, this.boundsMembers));
-            filtered = filtered.filter(project =>
-                isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations));
-            filtered = filtered.filter(project =>
-                isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations));
-            filtered = filtered.filter(project =>
-                isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
 
             return filtered;
         },
@@ -291,7 +291,7 @@ export default {
             return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
         },
         atLeastOneManaged() {
-            return this.projects.some(project => project.isManaged);
+            return this.projects.some(project => project.role == this.managerRole || project.role == this.representativeRole);
         },
         ontologies() {
             let seenIds = [];
@@ -335,18 +335,38 @@ export default {
             light: true,
             admin: true,
             filterKey: "user",
-            filterUser: this.currentUser.id
+            filterValue: this.currentUser.id
         }).fetchAll();
+
+        // let representativeProjectsPromise = new ProjectCollection({
+        //     light: true,
+        //     representative: true,
+        //     filterKey: "user",
+        //     filterValue: this.currentUser.id
+        // }).fetchAll(); // TODO in core
+        let representativeProjectsPromise = {array: []};
 
         let projects = await ProjectCollection.fetchAll({
             withMembersCount: true,
             withLastActivity: true
         });
-        let managedProjects = await managedProjectsPromise;
-        let idManagedProjects = managedProjects.array.map(project => project.id);
+
+        let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
+        let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
+
+        this.contributorRole = {label: this.$t("contributor"), index: 0};
+        this.managerRole = {label: this.$t("manager"), index: 1};
+        this.representativeRole = {label: this.$t("representative"), index: 2};
+        this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
+        this.selectedRoles = this.availableRoles;
 
         this.projects = projects.array.map(project => {
-            project.isManaged = Number(idManagedProjects.includes(project.id)); // cast to number to allow sorting
+            if(idManagedProjects.includes(project.id)) {
+                project.role = idProjectsRepresentatives.includes(project.id) ? this.representativeRole : this.managerRole;
+            }
+            else {
+                project.role = this.contributorRole;
+            }
             return project;
         });
 
@@ -357,11 +377,6 @@ export default {
         this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
         this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
         this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
-
-        this.contributorRole = {role: "contributor", label: this.$t("contributor")};
-        this.managerRole = {role: "manager", label: this.$t("manager")};
-        this.availableRoles = [this.contributorRole, this.managerRole];
-        this.selectedRoles = this.availableRoles;
 
         this.loading = false;
     }
@@ -392,6 +407,21 @@ export default {
     border-radius: 10px;
     padding: 20px;
     background: #f8f8f8;
+}
+
+.legend p:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.fas.fa-cog {
+    width: 25px;
+    position: relative;
+}
+
+.superscript {
+    font-size: 8px;
+    position: absolute;
+    top: -3px;
 }
 </style>
 

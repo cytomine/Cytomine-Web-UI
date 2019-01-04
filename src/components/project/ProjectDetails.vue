@@ -75,6 +75,12 @@
                 <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
             </td>
         </tr>
+        <tr v-if="!excludedProperties.includes('representatives')">
+            <td class="prop-label">{{$t("representatives")}} ({{representatives.length}})</td>
+            <td class="prop-content">
+                <list-usernames :users="representatives" :onlines="onlines"></list-usernames>
+            </td>
+        </tr>
         <tr v-if="!excludedProperties.includes('managers')">
             <td class="prop-label">{{$t("managers")}} ({{managers.length}})</td>
             <td class="prop-content">
@@ -85,12 +91,6 @@
             <td class="prop-label">{{$t("contributors")}} ({{contributors.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
-            </td>
-        </tr>
-        <tr v-if="!excludedProperties.includes('contacts')">
-            <td class="prop-label">{{$t("contacts")}} ({{contacts.length}})</td>
-            <td class="prop-content">
-                <list-usernames :users="contacts" :onlines="onlines"></list-usernames>
             </td>
         </tr>
         <tr v-if="!excludedProperties.includes('imagesPreview')">
@@ -133,7 +133,7 @@ export default {
             managers: [],
             members: [],
             onlines: [],
-            contacts: [],
+            representatives: [],
 
             isLoading: true
         };
@@ -153,8 +153,8 @@ export default {
         async fetchManagers() {
             this.managers = (await this.project.fetchAdministrators()).array;
         },
-        async fetchContacts() {
-            this.contacts = (await this.project.fetchRepresentatives()).array;
+        async fetchRepresentatives() {
+            this.representatives = (await this.project.fetchRepresentatives()).array;
         },
         async fetchMembers() {
             this.members = (await this.project.fetchUsers()).array;
@@ -167,7 +167,7 @@ export default {
         await Promise.all([
             this.fetchCreator(),
             this.fetchManagers(),
-            this.fetchContacts(),
+            this.fetchRepresentatives(),
             this.fetchMembers(),
             this.fetchOnlines()
         ]);
