@@ -162,12 +162,13 @@
             <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
         </b-message>
 
-        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
 
-        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-        <annotation-details-container :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotation-details-container>
+        <annotation-details-container :idViewer="idViewer" :index="index" :view="$refs.view" />
+
+        <annotations-table class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view" />
     </div>
 </template>
 
@@ -178,6 +179,7 @@ import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
+import AnnotationsTable from "./AnnotationsTable";
 
 import ImageInformation from "./panels/ImageInformation";
 import DigitalZoom from "./panels/DigitalZoom";
@@ -218,6 +220,7 @@ export default {
         RotationSelector,
         ScaleLine,
         DrawTools,
+        AnnotationsTable,
 
         AnnotationDetailsContainer,
 
@@ -520,6 +523,13 @@ export default {
 
 .broadcast i.fas {
     margin-right: 5px;
+}
+
+.annotations-table-wrapper {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 40px;
 }
 
 .panels {

@@ -70,6 +70,7 @@ export default {
             this.imageWrapper.displayNoTerm;
             this.imageWrapper.selectedPropertyKey;
             this.imageWrapper.selectedPropertyColor;
+            this.imageWrapper.highlightedFeaturesIds;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.idViewer, this.index);
@@ -204,6 +205,8 @@ export default {
             this.resolution = resolution;
 
             await this.loadFeatures(extent, resolution);
+            this.$eventBus.$emit("reloadAnnotations", this.image.id);
+
             clearTimeout(this.refreshTimeout);
             this.refreshTimeout = setTimeout(() => this.loader(), 5000);
         },

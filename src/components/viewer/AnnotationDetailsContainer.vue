@@ -161,10 +161,14 @@ export default {
         },
 
         handleDeletion() {
-            if(this.olFeature != null) {
-                this.olFeature.set("deleted", true);
-                this.olSource.removeFeature(this.olFeature);
+            if(this.olFeature == null) {
+                return;
             }
+
+            this.olFeature.set("deleted", true);
+            this.olSource.removeFeature(this.olFeature);
+
+            this.$eventBus.$emit("deleteAnnotation", {idImage: this.image.id, idAnnotation: this.annot.id});
 
             this.$store.commit("addAction", {
                 idViewer: this.idViewer,
@@ -263,6 +267,6 @@ h1 {
 }
 
 .annotation-details-playground .draggable {
-    z-index: 10 !important;
+    z-index: 15 !important;
 }
 </style>

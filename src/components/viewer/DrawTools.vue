@@ -124,6 +124,9 @@ export default {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
+        image() {
+            return this.imageWrapper.imageInstance;
+        },
         ongoingCalibration() {
             return this.imageWrapper.ongoingCalibration;
         },
@@ -266,6 +269,8 @@ export default {
                 this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                 this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
 
+                this.$eventBus.$emit("deleteAnnotation", {idImage: this.image.id, idAnnotation: annot.id});
+
                 source.removeFeature(feature);
             }
             catch(err) {
@@ -292,6 +297,7 @@ export default {
                 this.$store.commit("undoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
+                console.log(err);
                 this.$notify({type: "error", text: this.$t("notif-error-undo")});
             }
         },
@@ -303,6 +309,7 @@ export default {
                 this.$store.commit("redoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
+                console.log(err);
                 this.$notify({type: "error", text: this.$t("notif-error-redo")});
             }
         },
@@ -321,6 +328,7 @@ export default {
                     if(this.selectedFeatures.map(ftr => ftr.id).includes(currentFeature.getId())) {
                         this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                     }
+                    this.$eventBus.$emit("deleteAnnotation", {idImage: this.image.id, idAnnotation: annot.id});
                 }
                 feature.set("deleted", true); // so that reverse action is correctly handled
             }
@@ -333,11 +341,13 @@ export default {
                 if(source != null) {
                     source.addFeature(feature);
                 }
+                this.$eventBus.$emit("addAnnotation", {idImage: this.image.id, annotation: annot});
                 oldAnnotReversedAction = null; // so that the reverse action results in a deletion
             }
             else { // annotation was updated
                 annot.location = oldAnnot.location;
                 await annot.save();
+                this.$eventBus.$emit("editAnnotation", {idImage: this.image.id, annotation: annot});
                 if(currentFeature != null) {
                     currentFeature.setGeometry(new WKT().readGeometry(annot.location));
                 }

@@ -225,6 +225,8 @@ export default {
                     feature.setId(annot.id);
                     layer.olSource.addFeature(feature);
 
+                    this.$eventBus.$emit("addAnnotation", {idImage: this.image.id, annotation: annot});
+
                     if(idx == this.nbActiveLayers - 1) {
                         this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
                     }
@@ -259,7 +261,9 @@ export default {
                     }
 
                     // refresh the sources because several annotations might have been modified
+                    this.$eventBus.$emit("reloadAnnotations", this.image.id);
                     this.activeLayers.map(layer => layer.olSource.clear());
+
                     this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
                 }
             }

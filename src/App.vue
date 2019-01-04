@@ -181,6 +181,19 @@ strong, .label {
     border-bottom-width: 0 !important;
 }
 
+.b-table .table th.is-sortable:not(.is-current-sort) .th-wrap::after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f0dc";
+    position: relative;
+    color: rgba(0, 0, 0, 0.2);
+    left: 8px;
+    top: 1px;
+}
+
+.b-table .table th.is-current-sort {
+    font-weight: 600 !important;
+}
+
 /* Modal */
 
 .modal {
@@ -232,6 +245,10 @@ strong, .label {
     font-size: 12px;
     margin-bottom: 5px;
     margin-left: 15px;
+}
+
+.filter-label .no-uppercase {
+    text-transform: none;
 }
 
 /* Loading */

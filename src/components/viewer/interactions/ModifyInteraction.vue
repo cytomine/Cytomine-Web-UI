@@ -36,6 +36,9 @@ export default {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
+        image() {
+            return this.imageWrapper.imageInstance;
+        },
         activeEditTool() {
             return this.imageWrapper.activeEditTool;
         },
@@ -52,6 +55,7 @@ export default {
                 try {
                     annot.location = this.format.writeFeature(feature);
                     await annot.save();
+                    this.$eventBus.$emit("editAnnotation", {idImage: this.image.id, annotation: annot});
                     this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot});
                 }
                 catch(err) {

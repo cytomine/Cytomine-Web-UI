@@ -3,7 +3,7 @@ import Vue from "vue";
 import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
 import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle, defaultColors} from "@/utils/style-utils.js";
+    verticesStyle, highlightStyles, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
@@ -346,6 +346,12 @@ export default {
             state.viewers[idViewer].maps[index].annotsToSelect = [annot];
         },
 
+        // ----- Highlighted features
+
+        setHighlightedFeaturesIds(state, {idViewer, index, ids}) {
+            state.viewers[idViewer].maps[index].highlightedFeaturesIds = ids;
+        },
+
         // ----- Draw tools and associated interactions
 
         activateTool(state, {idViewer, index, tool}) {
@@ -452,6 +458,8 @@ export default {
 
                 selectedFeatures: [],
                 annotsToSelect: [],
+
+                highlightedFeaturesIds: [],
 
                 activeTool: "select",
                 activeEditTool: null,
@@ -623,6 +631,9 @@ export default {
                 if(imageWrapper.activeEditTool == "modify") {
                     styles.push(verticesStyle);
                 }
+            }
+            else if(imageWrapper.highlightedFeaturesIds.includes(feature.getId())) {
+                styles.push(...highlightStyles);
             }
 
             // Properties

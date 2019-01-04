@@ -65,8 +65,10 @@ let width = 2;
 
 let blue = [0, 153, 255, 1];
 let white = [255, 255, 255, 1];
+let orange = [255, 204, 0];
 
 let blueStroke = new Stroke({color: blue, width: width});
+let orangeStroke = new Stroke({color: orange, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
 export let selectStyles = [
@@ -83,6 +85,12 @@ export let verticesStyle = new Style({
         return new MultiPoint(coordinates);
     }
 });
+
+export let highlightStyles = [
+    new Style({ stroke: whiteStroke }),
+    new Style({ stroke: orangeStroke }),
+    new Style({ image: new Circle({radius: 6, stroke: orangeStroke}) })
+];
 
 // -----
 
