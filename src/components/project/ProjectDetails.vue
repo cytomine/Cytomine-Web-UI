@@ -57,6 +57,12 @@
                 </div>
             </td>
         </tr>
+        <tr v-if="!excludedProperties.includes('attachedFiles')">
+            <td class="prop-label">{{$t("attached-files")}}</td>
+            <td class="prop-content">
+                <attached-files :object="project"></attached-files>
+            </td>
+        </tr>
         <tr v-if="!excludedProperties.includes('ontology')">
             <td class="prop-label">{{$t("ontology")}}</td>
             <td class="prop-content">
@@ -116,13 +122,15 @@
 import ImagesPreview from "@/components/image/ImagesPreview";
 import ListUsernames from "@/components/user/ListUsernames";
 import CytomineDescription from "@/components/description/CytomineDescription";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
 
 export default {
     name: "project-details",
     components: {
         ImagesPreview,
         ListUsernames,
-        CytomineDescription
+        CytomineDescription,
+        AttachedFiles
     },
     props: {
         project: {type: Object},

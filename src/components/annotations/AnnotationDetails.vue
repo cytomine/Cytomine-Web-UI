@@ -67,6 +67,13 @@
             </tr>
 
             <tr>
+                <td colspan="2">
+                    <h5>{{$t("attached-files")}}</h5>
+                    <attached-files :object="annotation"></attached-files>
+                </td>
+            </tr>
+
+            <tr>
                 <td><strong>{{$t("created-by")}}</strong></td>
                 <td>
                     {{ creator.fullName }}
@@ -107,13 +114,15 @@ import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import CytomineTerm from "@/components/term/CytomineTerm";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
 
 export default {
     name: "annotations-details",
     components: {
         CytomineDescription,
         CytomineTerm,
-        CytomineProperties
+        CytomineProperties,
+        AttachedFiles
     },
     props: {
         annotation: {type: Object},

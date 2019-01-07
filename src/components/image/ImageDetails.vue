@@ -24,6 +24,12 @@
                 </td>
             </tr>
             <tr>
+                <td class="prop-label"><strong>{{$t("attached-files")}}</strong></td>
+                <td class="prop-content">
+                    <attached-files :object="image"></attached-files>
+                </td>
+            </tr>
+            <tr>
                 <td class="prop-label"><strong>{{$t("thumbnail")}}</strong></td>
                 <td class="prop-content">
                     <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview">
@@ -146,6 +152,7 @@
 <script>
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
 import CalibrationModal from "./CalibrationModal";
 
 import {AbstractImage} from "cytomine-client";
@@ -155,6 +162,7 @@ export default {
     components: {
         CytomineDescription,
         CytomineProperties,
+        AttachedFiles,
         CalibrationModal
     },
     props: ["image"],

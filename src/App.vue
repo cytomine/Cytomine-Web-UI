@@ -270,6 +270,14 @@ strong, .label {
     border-bottom-color: #bbb;
 }
 
+/* Buefy fields */
+
+/* HACK: color style defined in buefy not working */
+.upload-draggable.is-link:hover, .upload-draggable.is-link.is-hovered {
+    background-color: rgba(50, 115, 220, 0.05) !important;
+    border-color: rgb(50, 115, 220) !important;
+}
+
 /* V-Tooltip */
 .v-popover {
     display: inline-block;
