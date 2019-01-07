@@ -444,7 +444,8 @@ export default {
 
                 let indexWithinPage = indexAnnot - (this.currentPage - 1)*this.perPage;
                 let heightFooter = 35;
-                let rowHeight = (this.$refs.tableContainer.scrollHeight - heightFooter) / (this.perPage + 1); // +1 for th
+                let nbRows = Math.min(this.perPage, this.filteredAnnotations.length - (this.currentPage-1)*this.perPage);
+                let rowHeight = (this.$refs.tableContainer.scrollHeight - heightFooter) / (nbRows + 1); // +1 for th
                 let nbVisibleRows = (this.$refs.tableContainer.clientHeight - rowHeight - heightFooter) / rowHeight;
                 this.$refs.tableContainer.scrollTop = rowHeight * (indexWithinPage - (nbVisibleRows - 1) / 2);
             }
