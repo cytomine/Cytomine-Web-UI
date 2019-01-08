@@ -10,19 +10,10 @@ import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
 export default {
     state: {
-        triggerMapUpdateSize: [], // change of this property should trigger a size update of all visible maps
         viewers: {}
     },
 
     mutations: {
-
-        // --- Mutations common to all viewers
-
-        triggerMapUpdateSize(state) {
-            state.triggerMapUpdateSize = []; // new array will be considered as a new value
-        },
-
-        // --- Viewer-specific mutations
 
         addViewer(state, {id, name, idProject}) {
             Vue.set(state.viewers, id, {
@@ -284,10 +275,6 @@ export default {
             colorStroke[3] = opacity;
         },
 
-        triggerIndexLayersUpdate(state, {idViewer, index}) {
-            state.viewers[idViewer].maps[index].triggerIndexLayersUpdate = []; // new array will be considered as a new value
-        },
-
         // ----- Properties
 
         setPropertiesKeys(state, {idViewer, index, keys}) {
@@ -320,6 +307,10 @@ export default {
 
         selectFeature(state, {idViewer, index, feature}) {
             state.viewers[idViewer].maps[index].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
+        },
+
+        changeAnnotSelectedFeature(state, {idViewer, index, indexFeature, annot}) {
+            state.viewers[idViewer].maps[index].selectedFeatures[indexFeature].properties.annot = annot;
         },
 
         removeLayerFromSelectedFeatures(state, {idViewer, index, idLayer, cache=false}) {
@@ -388,8 +379,14 @@ export default {
 
         // ----- Undo/Redo
 
-        addAction(state, {idViewer, index, feature, oldAnnot}) {
-            let action = {feature, oldAnnot};
+        resetActions(state, {idViewer, index}) { // TODO: remove when annotations corrections are correctly handled
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.actions = [];
+            wrapper.undoneActions = [];
+        },
+
+        addAction(state, {idViewer, index, annot, oldAnnot}) {
+            let action = {annot, oldAnnot};
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions.push(action);
             wrapper.undoneActions = [];
@@ -474,8 +471,6 @@ export default {
 
                 actions: [],
                 undoneActions: [],
-
-                triggerIndexLayersUpdate: [],
 
                 ongoingCalibration: false
             };

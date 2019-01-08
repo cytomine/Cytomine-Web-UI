@@ -32,6 +32,8 @@ import ImageSelector from "./ImageSelector";
 
 import {ImageInstance} from "cytomine-client";
 
+import constants from "@/utils/constants.js";
+
 export default {
     name: "cytomine-viewer",
     components: {
@@ -43,6 +45,7 @@ export default {
         return {
             error: false,
             loading: true,
+            reloadInterval: null
         };
     },
     computed: {
@@ -73,7 +76,7 @@ export default {
     },
     watch: {
         nbMaps() {
-            this.$store.commit("triggerMapUpdateSize");
+            this.$eventBus.$emit("updateMapSize");
         }
     },
     methods: {
@@ -119,8 +122,14 @@ export default {
     },
     async created() {
         await Promise.all([this.fetchProjetMembers(), this.addBaseImage()]);
-
+        this.reloadInterval = setInterval(
+            () => this.$eventBus.$emit("reloadAnnotations"),
+            constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
+        );
         this.loading = false;
+    },
+    beforeDestroy() {
+        clearInterval(this.reloadInterval);
     }
 };
 </script>

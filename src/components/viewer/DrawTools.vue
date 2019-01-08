@@ -220,14 +220,6 @@ export default {
             });
         },
 
-        findSource(annot) {
-            let layer = this.layers.find(layer => layer.id == annot.user);
-            if(layer == null) {
-                return null;
-            }
-            return layer.olSource;
-        },
-
         async fill() {
             let feature = this.selectedFeature;
             if(feature == null) {
@@ -235,14 +227,13 @@ export default {
             }
 
             this.activateEditTool(null);
-            let annot = feature.properties.annot;
+            let annot = feature.properties.annot.clone();
             let oldAnnot = annot.clone();
 
             try {
                 await annot.fill();
-                let olFeature = this.findSource(annot).getFeatureById(annot.id);
-                olFeature.setGeometry(this.format.readGeometry(annot.location));
-                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature: olFeature, oldAnnot});
+                this.$eventBus.$emit("editAnnotation", annot);
+                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-fill")});
@@ -260,24 +251,18 @@ export default {
             try {
                 let annot = feature.properties.annot;
                 await Annotation.delete(annot.id);
-
-                let source = this.findSource(annot);
-                let olFeature = source.getFeatureById(annot.id);
-                olFeature.set("deleted", true);
-
-                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature: olFeature, oldAnnot: annot});
-                this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-                this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
-
-                this.$eventBus.$emit("deleteAnnotation", {idImage: this.image.id, idAnnotation: annot.id});
-
-                source.removeFeature(feature);
+                this.$eventBus.$emit("deleteAnnotation", annot);
+                this.$store.commit("addAction", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    annot: null,
+                    oldAnnot: annot
+                });
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
             }
         },
-
         confirmDeletion() {
             this.$dialog.confirm({
                 title: this.$t("confirm-deletion"),
@@ -289,7 +274,7 @@ export default {
             });
         },
 
-        // BUG correction actions not treated correctly (backend does not return all corrected annots => cannot cancel all changes)
+
         async undo() {
             let action = this.actions[this.actions.length - 1];
             try {
@@ -301,7 +286,6 @@ export default {
                 this.$notify({type: "error", text: this.$t("notif-error-undo")});
             }
         },
-
         async redo() {
             let action = this.undoneActions[this.undoneActions.length - 1];
             try {
@@ -313,50 +297,27 @@ export default {
                 this.$notify({type: "error", text: this.$t("notif-error-redo")});
             }
         },
-
-        async reverseAction({feature, oldAnnot}) {
-            let annot = feature.get("annot");
-            let source = this.findSource(annot);
-            let currentFeature = source ? source.getFeatureById(annot.id) : null; // the features may have been redrawn => not necessarily the same as feature stored in action
-
-            let oldAnnotReversedAction = annot.clone();
+        async reverseAction({annot, oldAnnot}) {
+            let newAnnot = null;
 
             if(oldAnnot == null) { // annotation was created
                 await Annotation.delete(annot.id);
-                if(currentFeature != null) {
-                    source.removeFeature(currentFeature);
-                    if(this.selectedFeatures.map(ftr => ftr.id).includes(currentFeature.getId())) {
-                        this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-                    }
-                    this.$eventBus.$emit("deleteAnnotation", {idImage: this.image.id, idAnnotation: annot.id});
-                }
-                feature.set("deleted", true); // so that reverse action is correctly handled
+                this.$eventBus.$emit("deleteAnnotation", annot);
             }
-            else if(feature.get("deleted")) { // annotation was deleted
-                annot.id = null; // set ID to null in order to force creation of a new annotation
-                await annot.save();
-                // TODO: reset term, properties, description, etc (or rely on backend undo/todo)
-                feature.setId(annot.id);
-                feature.set("deleted", false);
-                if(source != null) {
-                    source.addFeature(feature);
-                }
-                this.$eventBus.$emit("addAnnotation", {idImage: this.image.id, annotation: annot});
-                oldAnnotReversedAction = null; // so that the reverse action results in a deletion
+            else if(annot == null) { // annotation was deleted
+                newAnnot = oldAnnot.clone();
+                newAnnot.id = null; // set ID to null in order to force creation of a new annotation
+                await newAnnot.save();
+                this.$eventBus.$emit("addAnnotation", newAnnot);
             }
             else { // annotation was updated
-                annot.location = oldAnnot.location;
-                await annot.save();
-                this.$eventBus.$emit("editAnnotation", {idImage: this.image.id, annotation: annot});
-                if(currentFeature != null) {
-                    currentFeature.setGeometry(new WKT().readGeometry(annot.location));
-                }
+                newAnnot = annot.clone();
+                newAnnot.location = oldAnnot.location; // TODO: fix
+                await newAnnot.save();
+                this.$eventBus.$emit("editAnnotation", newAnnot);
             }
 
-            this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
-
-            feature.set("annot", annot);
-            return {feature, oldAnnot: oldAnnotReversedAction};
+            return {annot: newAnnot, oldAnnot: annot};
         }
     }
 };

@@ -283,9 +283,6 @@ export default {
         maxZoom() {
             return this.imageWrapper.maxZoom;
         },
-        triggerUpdateSize() {
-            return this.$store.state.images.triggerMapUpdateSize;
-        },
 
         center: {
             get() {
@@ -351,15 +348,18 @@ export default {
         }
     },
     watch: {
-        triggerUpdateSize() {
-            this.$refs.map.updateSize();
-        },
-
         viewState() {
             this.savePosition();
         },
     },
     methods: {
+        async updateMapSize() {
+            await this.$nextTick();
+            if(this.$refs.map) {
+                this.$refs.map.updateSize();
+            }
+        },
+
         addMap() {
             this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
         },
@@ -467,7 +467,11 @@ export default {
         this.image.recordConsultation();
         this.loading = false;
     },
+    mounted() {
+        this.$eventBus.$on("updateMapSize", this.updateMapSize);
+    },
     beforeDestroy() {
+        this.$eventBus.$off("updateMapSize", this.updateMapSize);
         clearTimeout(this.timeoutSavePosition);
     }
 };

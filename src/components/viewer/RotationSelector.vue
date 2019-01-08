@@ -61,20 +61,21 @@ export default {
                     rotation: Number(value) / 180 * Math.PI
                 });
             }
-        },
-        triggerUpdateSize() {
-            return this.$store.state.images.triggerMapUpdateSize;
-        },
-    },
-    watch: {
-        triggerUpdateSize() {
-            this.revisionSlider++;
-        },
+        }
     },
     methods: {
         increment(inc) {
             this.degreesRotation = (this.degreesRotation + inc + 360) % 360;
+        },
+        updateMapSize() {
+            this.revisionSlider++;
         }
+    },
+    mounted() {
+        this.$eventBus.$on("updateMapSize", this.updateMapSize);
+    },
+    beforeDestroy() {
+        this.$eventBus.$off("updateMapSize", this.updateMapSize);
     }
 };
 </script>

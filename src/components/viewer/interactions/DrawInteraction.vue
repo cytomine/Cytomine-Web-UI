@@ -223,16 +223,14 @@ export default {
                     let feature = this.format.readFeature(annot.location);
                     feature.set("annot", annot);
                     feature.setId(annot.id);
-                    layer.olSource.addFeature(feature);
 
-                    this.$eventBus.$emit("addAnnotation", {idImage: this.image.id, annotation: annot});
+                    this.$eventBus.$emit("addAnnotation", annot);
 
                     if(idx == this.nbActiveLayers - 1) {
                         this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
                     }
 
-                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot: null});
-                    this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
+                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot: null});
                 }
                 catch(err) {
                     console.log(err);
@@ -249,22 +247,11 @@ export default {
             try {
                 let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, idLayers);
                 if(correctedAnnot != null) {
-                    let layer = this.activeLayers.find(layer => layer.id == correctedAnnot.user);
-                    let correctedFeature = layer.olSource.getFeatureById(correctedAnnot.id);
-                    if(correctedFeature != null) {
-                        this.$store.commit("addAction", {
-                            idViewer: this.idViewer,
-                            index: this.index,
-                            feature: correctedFeature,
-                            oldAnnot: correctedFeature.get("annot")
-                        });
-                    }
+                    // TODO: add action for undo/redo system (currently not possible because core does not return the list of affected annotations)
+                    this.$store.commit("resetActions", {idViewer: this.idViewer, index: this.index});
 
                     // refresh the sources because several annotations might have been modified
                     this.$eventBus.$emit("reloadAnnotations", this.image.id);
-                    this.activeLayers.map(layer => layer.olSource.clear());
-
-                    this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
                 }
             }
             catch(err) {

@@ -46,7 +46,7 @@ export default {
     methods: {
         async endEdit({features}) {
             features.forEach(async feature => {
-                let annot = feature.get("annot");
+                let annot = feature.get("annot").clone();
                 if(annot == null) {
                     return;
                 }
@@ -55,10 +55,11 @@ export default {
                 try {
                     annot.location = this.format.writeFeature(feature);
                     await annot.save();
-                    this.$eventBus.$emit("editAnnotation", {idImage: this.image.id, annotation: annot});
-                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, feature, oldAnnot});
+                    this.$eventBus.$emit("editAnnotation", annot);
+                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
                 }
                 catch(err) {
+                    console.log(err);
                     this.$notify({type: "error", text: this.$t("notif-error-annotation-update")});
                     annot.location = oldAnnot.location;
                     feature.setGeometry(this.format.readGeometry(annot.location));

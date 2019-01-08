@@ -195,8 +195,8 @@ export default {
             perPage: 10,
             currentPage: 1,
 
-            sortField: null,
-            sortOrder: "asc",
+            sortField: "id",
+            sortAsc: true,
 
             annotations: [],
             selectedAnnot: null,
@@ -258,14 +258,11 @@ export default {
                     termFilter;
             });
 
-            if(this.sortField != null) {
-                let asc = (this.sortOrder == "asc");
-                filtered.sort((a, b) => {
-                    let aVal = a[this.sortField];
-                    let bVal = b[this.sortField];
-                    return (aVal === bVal) ? 0 : (aVal < bVal && asc || aVal > bVal && !asc) ? -1 : +1;
-                });
-            }
+            filtered.sort((a, b) => {
+                let aVal = a[this.sortField];
+                let bVal = b[this.sortField];
+                return (aVal === bVal) ? 0 : (aVal < bVal && this.sortAsc || aVal > bVal && !this.sortAsc) ? -1 : +1;
+            });
             return filtered;
         },
         areaUnit() {
@@ -299,23 +296,13 @@ export default {
                 return;
             }
 
-            let fitOptions = {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.imageWrapper.zoom};
-
-            let olFeature = layer.olSource.getFeatureById(annot.id);
-            if(olFeature == null) {
-                this.selectedAnnot = null;
-
-                await annot.fetch(); // refetch annotation to obtain location data
-                this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
-                this.view.fit(this.format.readGeometry(annot.location), fitOptions);
-                return;
-            }
-
-            let geom = olFeature.getGeometry();
+            await annot.fetch(); // refetch annotation to obtain location data
+            let geom = this.format.readGeometry(annot.location);
             if(!containsExtent(this.view.$view.calculateExtent(), geom.getExtent())) {
-                this.view.fit(geom, fitOptions);
+                this.view.fit(geom, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.imageWrapper.zoom});
             }
-            this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature: olFeature});
+
+            this.$eventBus.$emit("selectAnnotation", {annot, idViewer: this.idViewer, index: this.index});
         },
         layers(newLayers, oldLayers) {
             // update filters to include newly added layers
@@ -351,29 +338,32 @@ export default {
         }
     },
     methods: {
-        initListeners() {
-            this.$eventBus.$on("addAnnotation", ({idImage, annotation}) => {
-                if(idImage == this.image.id) {
-                    this.annotations.splice(0, 0, this.formatAnnotation(annotation));
+        addAnnotationHandler(annotation) {
+            if(annotation.image == this.image.id) {
+                this.annotations.splice(0, 0, this.formatAnnotation(annotation));
+            }
+        },
+        reloadAnnotationsHandler(idImage) {
+            if(idImage == null || idImage == this.image.id) {
+                this.loadAnnotations();
+            }
+        },
+        editAnnotationHandler(updatedAnnot) {
+            if(updatedAnnot.image == this.image.id) {
+                let idx = this.annotations.findIndex(annot => annot.id == updatedAnnot.id);
+                if(idx == -1) {
+                    return;
                 }
-            });
-            // TODO: triggered too often if several annotations layers are loaded (each annotation layer triggers this event every 5 seconds)
-            this.$eventBus.$on("reloadAnnotations", idImage => {
-                if(idImage == this.image.id) {
-                    this.loadAnnotations();
+                this.$set(this.annotations, idx, this.formatAnnotation(updatedAnnot)); // annotations[idx] not reactive
+                if(this.selectedAnnot != null && this.selectedAnnot.id == updatedAnnot.id) {
+                    this.selectedAnnot = updatedAnnot;
                 }
-            });
-            this.$eventBus.$on("editAnnotation", ({idImage, annotation}) => {
-                if(idImage == this.image.id) {
-                    let idx = this.annotations.findIndex(annot => annot.id == annotation.id);
-                    this.annotations[idx] = this.formatAnnotation(annotation);
-                }
-            });
-            this.$eventBus.$on("deleteAnnotation", ({idImage, idAnnotation}) => {
-                if(idImage == this.image.id) {
-                    this.annotations = this.annotations.filter(annot => annot.id != idAnnotation);
-                }
-            });
+            }
+        },
+        deleteAnnotationHandler(deletedAnnot) {
+            if(deletedAnnot.image == this.image.id) {
+                this.annotations = this.annotations.filter(annot => annot.id != deletedAnnot.id);
+            }
         },
 
         async loadAnnotations() {
@@ -424,7 +414,7 @@ export default {
         // index for scrollToSelectedAnnot() method (actual sort performed in filteredAnnotations computed prop)
         sort(field, order) {
             this.sortField = field;
-            this.sortOrder = order;
+            this.sortAsc = (order == "asc");
         },
 
         async scrollToSelectedAnnot() {
@@ -461,8 +451,6 @@ export default {
         }
     },
     async created() {
-        this.initListeners();
-
         this.areaBounds[1] = this.maxArea;
         this.perimeterBounds[1] = this.maxPerimeter;
 
@@ -481,8 +469,18 @@ export default {
 
         this.selectedUsers = this.layers;
     },
+    mounted() {
+        this.$eventBus.$on("addAnnotation", this.addAnnotationHandler);
+        this.$eventBus.$on("reloadAnnotations", this.reloadAnnotationsHandler);
+        this.$eventBus.$on("editAnnotation", this.editAnnotationHandler);
+        this.$eventBus.$on("deleteAnnotation", this.deleteAnnotationHandler);
+    },
     beforeDestroy() {
-        this.$eventBus.$off(); // unsubscribe from all events
+        // unsubscribe from all events
+        this.$eventBus.$off("addAnnotation", this.addAnnotationHandler);
+        this.$eventBus.$off("reloadAnnotations", this.reloadAnnotationsHandler);
+        this.$eventBus.$off("editAnnotation", this.editAnnotationHandler);
+        this.$eventBus.$off("deleteAnnotation", this.deleteAnnotationHandler);
     }
 };
 </script>
