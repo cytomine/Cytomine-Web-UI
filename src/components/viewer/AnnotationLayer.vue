@@ -62,8 +62,12 @@ export default {
             // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => term.visible);
+            this.imageWrapper.terms.forEach(term => {
+                term.visible;
+                term.opacity;
+            });
             this.imageWrapper.displayNoTerm;
+            this.imageWrapper.noTermOpacity;
             this.imageWrapper.selectedPropertyKey;
             this.imageWrapper.selectedPropertyColor;
             this.imageWrapper.highlightedFeaturesIds;

@@ -2,11 +2,14 @@ import Vue from "vue";
 
 import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
-import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
+import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
     verticesStyle, highlightStyles, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
+
+let initialLayersOpacity = 0.5;
+let initialTermsOpacity = 1;
 
 export default {
     state: {
@@ -239,6 +242,29 @@ export default {
             }
         },
 
+        setTermOpacity(state, {idViewer, index, indexTerm, opacity}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let term = wrapper.terms[indexTerm];
+            term.opacity = opacity;
+            changeOpacity(term.olStyle, wrapper.layersOpacity*opacity);
+        },
+
+        setNoTermOpacity(state, {idViewer, index, opacity}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.noTermOpacity = opacity;
+            changeOpacity(wrapper.noTermStyle, wrapper.layersOpacity*opacity);
+        },
+
+        resetTermOpacities(state, {idViewer, index}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.terms.forEach(term => {
+                term.opacity = initialTermsOpacity;
+                changeOpacity(term.olStyle, wrapper.layersOpacity*initialTermsOpacity);
+            });
+            wrapper.noTermOpacity = initialTermsOpacity;
+            changeOpacity(wrapper.noTermStyle, wrapper.layersOpacity*wrapper.noTermOpacity);
+        },
+
         // ----- Selected layers
 
         addLayer(state, {idViewer, index, layer, propValues}) {
@@ -269,10 +295,10 @@ export default {
         setLayersOpacity(state, {idViewer, index, opacity}) {
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.layersOpacity = opacity;
-            wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity));
+            wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
+            changeOpacity(wrapper.noTermStyle, opacity*wrapper.noTermOpacity);
+            changeOpacity(wrapper.multipleTermsStyle, opacity);
             changeOpacity(wrapper.defaultStyle, opacity);
-            let colorStroke = wrapper.defaultStroke.getColor();
-            colorStroke[3] = opacity;
         },
 
         // ----- Properties
@@ -415,12 +441,9 @@ export default {
         },
 
         async addMap({commit}, {idViewer, image}) {
-            let initialOpacity = 0.5;
-            let defaultStroke = createDefaultStroke(initialOpacity);
-
             let [fetchedImage, terms, propertiesKeys] = await Promise.all([
                 fetchImage(image.id),
-                fetchTerms(image.project, defaultStroke, initialOpacity),
+                fetchTerms(image.project, initialLayersOpacity),
                 fetchPropertiesKeys(image.id)
             ]);
 
@@ -443,15 +466,17 @@ export default {
 
                 terms: terms,
                 displayNoTerm: true,
+                noTermOpacity: initialTermsOpacity,
 
                 propertiesKeys,
                 selectedPropertyKey: null, // TODO: allow to select default property (https://github.com/cytomine/Cytomine-core/issues/1142)
                 selectedPropertyColor: defaultColors[0],
                 selectedPropertyValues: {},
 
-                defaultStroke,
-                defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
-                layersOpacity: initialOpacity,
+                defaultStyle: createColorStyle("#fff", initialLayersOpacity),
+                noTermStyle: createColorStyle("#fff", initialLayersOpacity*initialTermsOpacity),
+                multipleTermsStyle: createColorStyle("#fff", initialLayersOpacity),
+                layersOpacity: initialLayersOpacity,
 
                 selectedFeatures: [],
                 annotsToSelect: [],
@@ -481,7 +506,7 @@ export default {
             await Promise.all(state.viewers[idViewer].maps.map(async (map, index) => {
                 let [image, terms] = await Promise.all([
                     fetchImage(map.imageInstance.id),
-                    fetchTerms(map.imageInstance.project, map.defaultStroke, map.opacity, map.terms),
+                    fetchTerms(map.imageInstance.project, map.opacity, map.terms),
                     dispatch("refreshProperties", {idViewer, index})
                 ]);
 
@@ -585,37 +610,38 @@ export default {
 
             let imageWrapper = state.viewers[idViewer].maps[index];
 
-            let cluster = isCluster(feature);
-
-            // QUESTION: decide whether it is better to filter with this method, or to force source refresh and query only appropriate annotations
             // QUESTION: what to do with clusters (returned count does not take into account the selected terms) ?
             // Possible solutions:
             // 1. in backend, for clusters, send array with composition of cluster (x for term 1, y for term 2, z for term1-2)
             // 2. force source refresh every time the list of terms to display is updated
             // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
-            if(!cluster) {
-                let hasTerms = (annot.term.length > 0);
-                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
-
-                if((hasTerms && !hasTermsToDisplay) || (!hasTerms && !imageWrapper.displayNoTerm)) {
-                    return null; // do not display annotation
-                }
+            if(isCluster(feature)) {
+                return [imageWrapper.defaultStyle, createTextStyle(annot.count.toString())];
             }
 
             let styles = [];
 
-            // Style based on term
-            if(annot.term.length == 1) {
-                let termToFind = annot.term[0];
-                styles.push(imageWrapper.terms.find(term => term.id == termToFind).olStyle);
+            let nbTerms = annot.term.length;
+
+            if(nbTerms == 1) {
+                let wrappedTerm = imageWrapper.terms.find(term => term.id == annot.term[0]);
+                if(!wrappedTerm.visible) {
+                    return; // do not display annot
+                }
+                styles.push(wrappedTerm.olStyle);
+            }
+            else if(nbTerms > 1) {
+                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
+                if(!hasTermsToDisplay) {
+                    return; // do not display
+                }
+                styles.push(imageWrapper.multipleTermsStyle);
             }
             else {
-                styles.push(imageWrapper.defaultStyle);
-            }
-
-            // Style for clusters
-            if(cluster) {
-                styles.push(createTextStyle(annot.count.toString()));
+                if(!imageWrapper.displayNoTerm) {
+                    return; // do not display annot
+                }
+                styles.push(imageWrapper.noTermStyle);
             }
 
             // Styles for selected elements
@@ -689,7 +715,7 @@ async function fetchPropertiesKeys(idImage) {
     return data;
 }
 
-async function fetchTerms(idProject, stroke, opacity, previousTerms=[]) {
+async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
     // TODO: fetch in another store module since common to all images of the project?
     let terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: idProject})).array;
 
@@ -701,7 +727,8 @@ async function fetchTerms(idProject, stroke, opacity, previousTerms=[]) {
             terms[i] = prevTerm;
         }
         else {
-            term.olStyle = createColorStyle(term.color, stroke, opacity);
+            term.opacity = initialTermsOpacity;
+            term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
             term.visible = true;
             term.associateToNewAnnot = false;
         }

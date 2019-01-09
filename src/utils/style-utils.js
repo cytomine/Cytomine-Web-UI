@@ -2,12 +2,6 @@ import {Style, Stroke, Fill, Circle, Text} from "ol/style"; // TODO: use vuelaye
 import {MultiPoint} from "ol/geom";
 import {asArray as hexToRgb} from "ol/color";
 
-// ------
-
-export function createDefaultStroke(opacity=0.5) {
-    return new Stroke({color: [0, 0, 0, opacity], width: 2});
-}
-
 // -----
 
 export function isCluster(feature) {
@@ -20,7 +14,11 @@ export function isCluster(feature) {
 
 // -----
 
-export function createColorStyle(color, defaultStroke, opacity=0.5) {
+function createStroke(opacity=0.5) {
+    return new Stroke({color: [0, 0, 0, opacity], width: 2});
+}
+
+export function createColorStyle(color, opacity=0.5) {
     let colorArray = hexToRgb(color);
 
     let colorWithOpacity = colorArray.slice();
@@ -30,14 +28,13 @@ export function createColorStyle(color, defaultStroke, opacity=0.5) {
     let circleStyle = new Circle({
         radius: 5,
         fill: new Fill({color: colorArray}),
-        stroke: createDefaultStroke(1),
-        opacity
+        stroke: createStroke(1),
     });
     circleStyle.setOpacity(opacity);
 
     return new Style({
         fill,
-        stroke: defaultStroke,
+        stroke: createStroke(opacity),
         image: circleStyle
     });
 }
@@ -95,7 +92,9 @@ export let highlightStyles = [
 // -----
 
 export function changeOpacity(style, opacity) {
-    let color = style.getFill().getColor();
+    let color = style.getStroke().getColor();
+    color[3] = opacity;
+    color = style.getFill().getColor();
     color[3] = opacity;
     style.getImage().setOpacity(opacity);
 }
