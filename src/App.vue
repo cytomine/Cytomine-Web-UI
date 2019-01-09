@@ -313,6 +313,8 @@ strong, .label {
     border-radius: 5px;
     font-size: 13px;
     max-width: 50vw; /* TODO: special design for mobile ; modal? */
+    max-height: 80vh;
+    overflow: auto;
 }
 
 .popover .popover-inner {
