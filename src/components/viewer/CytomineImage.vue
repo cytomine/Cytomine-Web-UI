@@ -76,73 +76,71 @@
                     <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                         <i class="fas fa-info"></i>
                     </a>
-                    <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
-                        :idViewer="idViewer" :index="index"></image-information>
+                    <image-information class="panel-options" v-show="activePanel == 'info'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
                         <i class="fas fa-search"></i>
                     </a>
-                    <digital-zoom class="panel-options panel-digital-zoom"
-                        v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
+                    <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li v-if="viewerWrapper.maps.length > 1">
                     <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
                         <i class="fas fa-link"></i>
                     </a>
-                    <link-panel class="panel-options panel-link"
-                        v-show="activePanel == 'link'" :idViewer="idViewer" :index="index"></link-panel>
+                    <link-panel class="panel-options" v-show="activePanel == 'link'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
                         <i class="fas fa-sliders-h"></i>
                     </a>
-                    <color-manipulation class="panel-options panel-colors" v-show="activePanel == 'colors'"
-                        :idViewer="idViewer" :index="index"></color-manipulation>
+                    <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
                         <i class="fas fa-copy"></i>
                     </a>
-                    <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
-                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
-                    </annotations-panel>
+                    <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
+                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload" />
                 </li>
 
                 <li v-if="terms.length > 0">
                     <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
                         <i class="fas fa-hashtag"></i>
                     </a>
-                    <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
-                        :idViewer="idViewer" :index="index"></ontology-panel>
+                    <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
                         <i class="fas fa-tag"></i>
                     </a>
-                    <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
-                        :idViewer="idViewer" :index="index"></properties-panel>
+                    <properties-panel class="panel-options" v-show="activePanel == 'properties'"
+                        :idViewer="idViewer" :index="index" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
                         <i class="fas fa-street-view"></i>
                     </a>
-                    <follow-panel class="panel-options panel-follow" v-show="activePanel == 'follow'"
-                        :idViewer="idViewer" :index="index" :project="project" :view="$refs.view"></follow-panel>
+                    <follow-panel class="panel-options" v-show="activePanel == 'follow'"
+                        :idViewer="idViewer" :index="index" :project="project" :view="$refs.view" />
                 </li>
 
                 <li>
                     <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                         <i class="fas fa-map-signs"></i>
                     </a>
-                    <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
-                        :view="$refs.view"></guided-tour>
+                    <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view" />
                 </li>
 
                 <li class="bottom" v-if="index == viewerWrapper.maps.length - 1 && !viewerWrapper.imageSelector">
@@ -588,8 +586,8 @@ export default {
 
 .panel-options {
     position: absolute;
+    bottom: -20px;
     right: 38px;
-    top: -20px;
     width: 300px;
     min-height: 100px;
     background: #f2f2f2;
@@ -598,20 +596,22 @@ export default {
     z-index: 100;
 }
 
-.panel-layers {
-    top: unset;
-    bottom: -70px;
+.panels li:nth-child(-n+6) .panel-options {
+    bottom: -90px;
+    min-height: 160px;
 }
 
-.panel-ontology {
-    top: unset;
-    bottom: -50px;
+.panels li:nth-child(-n+3) .panel-options {
+    top: -20px;
+    bottom: unset;
+    min-height: 100px;
 }
 
-.panel-properties, .panel-guided-tour, .panel-follow {
-    top: unset;
-    bottom: -20px;
+.panels li:nth-child(4) .panel-options {
+    top: -50px;
+    bottom: unset;
 }
+
 
 .panel-options h1 {
     padding-top: 5px !important;
