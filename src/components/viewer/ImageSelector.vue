@@ -1,31 +1,38 @@
 <template>
-<div class="image-selector-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
-        <div class="header">
-            <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
-            <button class="delete" @click="cancelMapCreation"></button>
-        </div>
-        <div class="image-selector">
-            <div class="card" v-for="(image, index) in filteredImages" :key="image.id" v-if="index <nbImagesDisplayed">
-                <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
-                <div class="card-content">
-                    <div class="content">
-                        <a @click="addMap(image)" :title="image.instanceFilename">
-                            {{ image.instanceFilename }}
-                        </a>
+<div>
+    <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
+        <b-loading :is-full-page="false" :active="loading"></b-loading>
+        <template v-if="!loading">
+            <div class="header">
+                <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
+                        type="search" icon="search"></b-input>
+                <button class="delete" @click="imageSelectorEnabled = false"></button>
+            </div>
+            <div class="image-selector">
+                <div class="card" v-for="(image, index) in filteredImages" :key="image.id" v-if="index <nbImagesDisplayed">
+                    <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+                    <div class="card-content">
+                        <div class="content">
+                            <a @click="addMap(image)" :title="image.instanceFilename">
+                                {{ image.instanceFilename }}
+                            </a>
+                        </div>
                     </div>
                 </div>
+
+                <button class="button" v-if="nbImagesDisplayed < filteredImages.length" @click="more()">
+                    {{$t("button-more")}}
+                </button>
+
+                <div class="space">&nbsp;</div>
             </div>
+        </template>
+    </div>
 
-            <button class="button" v-if="nbImagesDisplayed < filteredImages.length" @click="more()">
-                {{$t("button-more")}}
-            </button>
-
-            <div class="space">&nbsp;</div>
-        </div>
-    </template>
+    <a class="image-selector-button" @click="imageSelectorEnabled = true"
+        v-tooltip="{content: $t('add-image'), placement: 'left'}">
+        <i class="fas fa-plus"></i>
+    </a>
 </div>
 </template>
 
@@ -47,6 +54,14 @@ export default {
         project() {
             return this.$store.state.project.project;
         },
+        imageSelectorEnabled: {
+            get() {
+                return this.$store.state.images.viewers[this.idViewer].imageSelector;
+            },
+            set(value) {
+                this.$store.commit("setImageSelector", {idViewer: this.idViewer, value});
+            }
+        },
         filteredImages() { // TODO: in backend
             let filtered = this.images;
 
@@ -66,10 +81,6 @@ export default {
             this.imageToAdd = null;
         },
 
-        cancelMapCreation() {
-            this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: false});
-        },
-
         more() {
             this.nbImagesDisplayed += 20;
         }
@@ -87,12 +98,16 @@ export default {
 
 <style scoped>
 .image-selector-wrapper {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
     width: 100%;
     height: 270px;
+    z-index: 150;
 }
 
 .header {
@@ -138,6 +153,24 @@ export default {
 
 .space {
     margin-left: 5px;
+}
+
+.image-selector-button {
+    background: #95b5db;
+    border: 4px solid white;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 25px;
+    text-align: center;
+    line-height: 40px;
+    color: white;
+    font-size: 22px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    z-index: 100;
 }
 
 </style>

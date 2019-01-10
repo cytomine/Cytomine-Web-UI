@@ -42,6 +42,8 @@ import AnnotationDetails from "@/components/annotations/AnnotationDetails";
 import {AnnotationTermCollection, UserCollection, UserJobCollection} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
 
+import WKT from "ol/format/WKT";
+
 export default {
     name: "annotations-details-container",
     components: {VueDraggableResizable, AnnotationDetails},
@@ -56,7 +58,8 @@ export default {
             height: 500,
             users: [],
             userJobs: [],
-            reload: true
+            reload: true,
+            format: new WKT()
         };
     },
     computed: {
@@ -100,37 +103,20 @@ export default {
         },
         annot() {
             return this.selectedFeature ? this.selectedFeature.properties.annot : {};
-        },
-        olSource() {
-            let layer = this.layers.find(layer => layer.id == this.annot.user);
-            return layer != null ? layer.olSource : null;
-        },
-        olFeature() {
-            if(this.olSource != null) {
-                return this.olSource.getFeatureById(this.annot.id);
-            }
-        },
-
-        triggerUpdateSize() {
-            return this.$store.state.images.triggerMapUpdateSize;
-        },
+        }
     },
     watch: {
         selectedFeature() {
             if(this.selectedFeature != null) {
                 this.displayAnnotDetails = true;
             }
-        },
-
-        triggerUpdateSize() {
-            this.handleResize();
         }
     },
     methods: {
-        async fetchUsers() { // TODO in CytomineViewer
+        async fetchUsers() { // TODO in vuex (project module)
             this.users = (await UserCollection.fetchAll()).array;
         },
-        async fetchUserJobs() { // TODO in CytomineViewer
+        async fetchUserJobs() { // TODO in vuex (project module)
             this.userJobs = (await UserJobCollection.fetchAll({
                 filterKey: "project",
                 filterValue: this.image.project
@@ -138,7 +124,7 @@ export default {
         },
 
         centerViewOnAnnot() {
-            let geometry = this.olFeature.getGeometry();
+            let geometry = this.format.readGeometry(this.annot.location);
             this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
         },
         
@@ -150,10 +136,13 @@ export default {
                 return {term, user: [user]};
             });
 
-            if(this.olFeature != null) {
-                this.olFeature.set("annot", updatedAnnot);
-            }
-            this.selectedFeature.properties.annot = updatedAnnot;
+            this.$eventBus.$emit("editAnnotation", updatedAnnot);
+            this.$store.commit("changeAnnotSelectedFeature", {
+                idViewer: this.idViewer,
+                index: this.index,
+                indexFeature: 0,
+                annot: updatedAnnot
+            });
         },
 
         updateProperties() {
@@ -161,26 +150,22 @@ export default {
         },
 
         handleDeletion() {
-            if(this.olFeature != null) {
-                this.olFeature.set("deleted", true);
-                this.olSource.removeFeature(this.olFeature);
-            }
-
             this.$store.commit("addAction", {
                 idViewer: this.idViewer,
                 index: this.index,
-                feature: this.olFeature,
+                annot: null,
                 oldAnnot: this.annot
             });
-            this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
-            this.$store.commit("triggerIndexLayersUpdate", {idViewer: this.idViewer, index: this.index});
+            this.$eventBus.$emit("deleteAnnotation", this.annot);
         },
 
         dragStop(x, y) {
             this.positionAnnotDetails = {x, y};
         },
 
-        handleResize() {
+        async handleResize() {
+            await this.$nextTick(); // wait for update of clientWidth and clientHeight to their new values
+
             if(this.$refs.playground) {
                 let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
                 let maxY = Math.max(this.$refs.playground.clientHeight - this.height, 0);
@@ -198,8 +183,14 @@ export default {
     created() {
         this.fetchUsers();
         this.fetchUserJobs();
-
+    },
+    mounted() {
         window.addEventListener("resize", this.handleResize);
+        this.$eventBus.$on("updateMapSize", this.handleResize);
+    },
+    destroyed() {
+        window.removeEventListener("resize", this.handleResize);
+        this.$eventBus.$off("updateMapSize", this.handleResize);
     }
 };
 </script>
@@ -263,6 +254,6 @@ h1 {
 }
 
 .annotation-details-playground .draggable {
-    z-index: 10 !important;
+    z-index: 15 !important;
 }
 </style>

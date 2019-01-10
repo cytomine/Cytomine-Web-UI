@@ -88,7 +88,7 @@ export default {
     methods: {
         toggleSideBar() {
             this.visibleSideBar = !this.visibleSideBar;
-            this.$store.commit("triggerMapUpdateSize");
+            this.$eventBus.$emit("updateMapSize");
         }
     }
 };

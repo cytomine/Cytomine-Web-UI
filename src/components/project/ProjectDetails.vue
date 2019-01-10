@@ -2,25 +2,25 @@
 <table class="table">
     <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
     <tbody>
-        <tr v-if="!excludedProperties.includes('name')">
+        <tr v-if="isPropDisplayed('name')">
             <td class="prop-label">{{$t("name")}}</td>
             <td class="prop-content">
                 {{project.name}}
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('numberOfImages')">
+        <tr v-if="isPropDisplayed('numberOfImages')">
             <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
                 <router-link :to="`/project/${project.id}/images`">{{project.numberOfImages}}</router-link>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('membersCount')">
+        <tr v-if="isPropDisplayed('membersCount')">
             <td class="prop-label">{{$t("members")}}</td>
             <td class="prop-content">
                 {{this.members.length}}
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('numberOfAnnotations')">
+        <tr v-if="isPropDisplayed('numberOfAnnotations')">
             <td class="prop-label">{{$t("user-annotations")}}</td>
             <td class="prop-content">
                 <router-link :to="`/project/${project.id}/annotations`">
@@ -28,7 +28,7 @@
                 </router-link>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('numberOfJobAnnotations')">
+        <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
             <td class="prop-label">{{$t("job-annotations")}}</td>
             <td class="prop-content">
                 <router-link :to="`/project/${project.id}/annotations?type=algo`">
@@ -36,19 +36,19 @@
                 </router-link>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('numberOfReviewedAnnotations')">
+        <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
             <td class="prop-label">{{$t("reviewed-annotations")}}</td>
             <td class="prop-content">
                 <a>{{project.numberOfReviewedAnnotations}}</a> <!-- TODO: router link -->
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('description')">
+        <tr v-if="isPropDisplayed('description')">
             <td class="prop-label">{{$t("description")}}</td>
             <td class="prop-content">
                 <cytomine-description :object="project"></cytomine-description>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('tags')">
+        <tr v-if="isPropDisplayed('tags')">
             <td class="prop-label">{{$t("tags")}}</td>
             <td class="prop-content">
                 <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
@@ -57,37 +57,43 @@
                 </div>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('ontology')">
+        <tr v-if="isPropDisplayed('attachedFiles')">
+            <td class="prop-label">{{$t("attached-files")}}</td>
+            <td class="prop-content">
+                <attached-files :object="project"></attached-files>
+            </td>
+        </tr>
+        <tr v-if="isPropDisplayed('ontology')">
             <td class="prop-label">{{$t("ontology")}}</td>
             <td class="prop-content">
                 <router-link to="">{{project.ontologyName}}</router-link>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('created')">
+        <tr v-if="isPropDisplayed('created')">
             <td class="prop-label">{{$t("created-on")}}</td>
             <td class="prop-content">
                 {{ Number(project.created) | moment("ll") }}
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('creator')">
+        <tr v-if="isPropDisplayed('creator')">
             <td class="prop-label">{{$t("creator")}}</td>
             <td class="prop-content">
                 <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('representatives')">
+        <tr v-if="isPropDisplayed('representatives')">
             <td class="prop-label">{{$t("representatives")}} ({{representatives.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="representatives" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('managers')">
+        <tr v-if="isPropDisplayed('managers')">
             <td class="prop-label">{{$t("managers")}} ({{managers.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="managers" :onlines="onlines"></list-usernames>
             </td>
         </tr>
-        <tr v-if="!excludedProperties.includes('contributors')">
+        <tr v-if="isPropDisplayed('contributors')">
             <td class="prop-label">{{$t("contributors")}} ({{contributors.length}})</td>
             <td class="prop-content">
                 <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
@@ -114,6 +120,7 @@ import ImagesPreview from "@/components/image/ImagesPreview";
 import ListUsernames from "@/components/user/ListUsernames";
 import ProjectActions from "./ProjectActions";
 import CytomineDescription from "@/components/description/CytomineDescription";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
 
 export default {
     name: "project-details",
@@ -121,7 +128,8 @@ export default {
         ImagesPreview,
         ListUsernames,
         ProjectActions,
-        CytomineDescription
+        CytomineDescription,
+        AttachedFiles
     },
     props: {
         project: {type: Object},
@@ -161,6 +169,21 @@ export default {
         },
         async fetchOnlines() {
             this.onlines = await this.project.fetchConnectedUsers();
+        },
+
+        isPropDisplayed(prop) {
+            return !this.excludedProperties.includes(prop);
+        },
+
+        deleteProject() {
+            this.$dialog.confirm({
+                title: this.$t("delete-project"),
+                message: this.$t("delete-project-confirmation-message", {projectName: this.project.name}),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.$emit("delete")
+            });
         }
     },
     async created() {

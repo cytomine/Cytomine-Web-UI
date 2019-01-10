@@ -240,7 +240,7 @@ h3 {
 }
 
 .follow-panel-content {
-    max-height: 250px;
+    max-height: 150px;
     overflow: auto;
 }
 </style>

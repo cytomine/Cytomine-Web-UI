@@ -11,5 +11,6 @@ export default new Vuex.Store({
         currentUser,
         images,
         project
-    }
+    },
+    strict: process.env.NODE_ENV !== "production"
 });

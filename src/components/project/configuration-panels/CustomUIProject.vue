@@ -80,7 +80,8 @@ export default {
                         {key: "project-explore-annotation-description", label: "description", icon: "far fa-file-alt"},
                         {key: "project-explore-annotation-terms", label: "terms", icon: "fas fa-hashtag"}, // TODO in core
                         {key: "project-explore-annotation-properties", label: "properties", icon: "fas fa-tag"},
-                        {key: "project-explore-creation-info", label: "creation-info", icon: "fas fa-info"}, // TODO in core
+                        {key: "project-explore-annotation-attached-files", label: "attached-files", icon: "fas fa-paperclip"}, // TODO in core
+                        {key: "project-explore-annotation-creation-info", label: "creation-info", icon: "fas fa-info"}, // TODO in core
                         {key: "project-explore-annotation-comments", label: "comments", icon: "fas fa-comment"}
                         
                     ]
@@ -93,6 +94,7 @@ export default {
                         {key: "project-tools-select", label: "select", icon: "fas fa-mouse-pointer"},
 
                         {key: "project-tools-point", label: "point", icon: "fas fa-map-marker-alt"},
+                        {key: "project-tools-line", label: "line", icon: "fas fa-minus"}, // TODO in core
                         {key: "project-tools-rectangle", label: "rectangle", icon: "far fa-square"},
                         {key: "project-tools-circle", label: "circle", icon: "far fa-circle"},
                         {key: "project-tools-polygon", label: "polygon", icon: "fas fa-draw-polygon"},

@@ -181,7 +181,24 @@ strong, .label {
     border-bottom-width: 0 !important;
 }
 
+.b-table .table th.is-sortable:not(.is-current-sort) .th-wrap::after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f0dc";
+    position: relative;
+    color: rgba(0, 0, 0, 0.2);
+    left: 8px;
+    top: 1px;
+}
+
+.b-table .table th.is-current-sort {
+    font-weight: 600 !important;
+}
+
 /* Modal */
+
+.modal .animation-content {
+    max-width: unset !important;
+}
 
 .modal {
     z-index: 2000;
@@ -234,6 +251,10 @@ strong, .label {
     margin-left: 15px;
 }
 
+.filter-label .no-uppercase {
+    text-transform: none;
+}
+
 /* Loading */
 .loading-overlay .loading-icon::after {
     width: 5em;
@@ -247,6 +268,14 @@ strong, .label {
     height: 2em;
     border-left-color: #bbb;
     border-bottom-color: #bbb;
+}
+
+/* Buefy fields */
+
+/* HACK: color style defined in buefy not working */
+.upload-draggable.is-link:hover, .upload-draggable.is-link.is-hovered {
+    background-color: rgba(50, 115, 220, 0.05) !important;
+    border-color: rgb(50, 115, 220) !important;
 }
 
 /* V-Tooltip */
@@ -268,18 +297,24 @@ strong, .label {
 }
 
 .tooltip {
-  display: block !important;
-  z-index: 1000;
+    display: block !important;
+    z-index: 1000;
+}
+
+.tooltip:not(.popover) {
+    pointer-events: none; /* tooltip may overlap target element, leading to flickering if pointer-events not set to none */
 }
 
 .tooltip .tooltip-inner {
-  background: white;
-  border-radius: 20px;
-  padding: 5px 10px 4px;
-  box-shadow: 0 0 3px hsla(0,0%,4%,.1),0 0 0 1px hsla(0,0%,4%,.1);
-  border-radius: 5px;
-  font-size: 13px;
-  max-width: 50vw; /* TODO: special design for mobile ; modal? */
+    background: white;
+    border-radius: 20px;
+    padding: 5px 10px 4px;
+    box-shadow: 0 0 3px hsla(0,0%,4%,.1),0 0 0 1px hsla(0,0%,4%,.1);
+    border-radius: 5px;
+    font-size: 13px;
+    max-width: 50vw; /* TODO: special design for mobile ; modal? */
+    max-height: 80vh;
+    overflow: auto;
 }
 
 .popover .popover-inner {
@@ -288,15 +323,14 @@ strong, .label {
 }
 
 .tooltip .tooltip-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  margin: 5px;
-  border-color: hsla(0,0%,4%,.25);
-  z-index: 1;
-  border-width: 8px;
-  pointer-events: none; /* tooltip arrow may overlap target element, leading to flickering if pointer-events not set to none */
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: hsla(0,0%,4%,.25);
+    z-index: 1;
+    border-width: 8px;
 }
 
 .tooltip .tooltip-arrow::after {
@@ -307,17 +341,17 @@ strong, .label {
 }
 
 .tooltip[x-placement^="top"] {
-  margin-bottom: 8px;
+    margin-bottom: 8px;
 }
 
 .tooltip[x-placement^="top"] .tooltip-arrow {
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  bottom: -16px;
-  left: calc(50% - 8px);
-  margin-top: 0;
-  margin-bottom: 0;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    bottom: -16px;
+    left: calc(50% - 8px);
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .tooltip[x-placement^="top"] .tooltip-arrow::after {
@@ -327,17 +361,17 @@ strong, .label {
 }
 
 .tooltip[x-placement^="bottom"] {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .tooltip[x-placement^="bottom"] .tooltip-arrow {
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-top-color: transparent !important;
-  top: -16px;
-  left: calc(50% - 8px);
-  margin-top: 0;
-  margin-bottom: 0;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-top-color: transparent !important;
+    top: -16px;
+    left: calc(50% - 8px);
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .tooltip[x-placement^="bottom"] .tooltip-arrow::after {
@@ -347,17 +381,17 @@ strong, .label {
 }
 
 .tooltip[x-placement^="right"] {
-  margin-left: 8px;
+    margin-left: 8px;
 }
 
 .tooltip[x-placement^="right"] .tooltip-arrow {
-  border-left-color: transparent !important;
-  border-top-color: transparent !important;
-  border-bottom-color: transparent !important;
-  left: -16px;
-  top: calc(50% - 8px);
-  margin-left: 0;
-  margin-right: 0;
+    border-left-color: transparent !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    left: -16px;
+    top: calc(50% - 8px);
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .tooltip[x-placement^="right"] .tooltip-arrow::after {
@@ -367,17 +401,17 @@ strong, .label {
 }
 
 .tooltip[x-placement^="left"] {
-  margin-right: 8px;
+    margin-right: 8px;
 }
 
 .tooltip[x-placement^="left"] .tooltip-arrow {
-  border-top-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  right: -16px;
-  top: calc(50% - 8px);
-  margin-left: 0;
-  margin-right: 0;
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    right: -16px;
+    top: calc(50% - 8px);
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .tooltip[x-placement^="left"] .tooltip-arrow::after {
@@ -387,15 +421,15 @@ strong, .label {
 }
 
 .tooltip[aria-hidden='true'] {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .15s, visibility .15s;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
 }
 
 .tooltip[aria-hidden='false'] {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity .15s;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
 }
 
 </style>

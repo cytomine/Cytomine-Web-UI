@@ -17,8 +17,7 @@
                 </cytomine-image>
             </div>
 
-            <image-selector v-show="imageSelector" class="image-selector-wrapper" :idViewer="idBaseImage">
-            </image-selector>
+            <image-selector :idViewer="idBaseImage" />
         </div>
     </template>
 </div>
@@ -30,6 +29,8 @@ import ImageSelector from "./ImageSelector";
 
 import {ImageInstance} from "cytomine-client";
 
+import constants from "@/utils/constants.js";
+
 export default {
     name: "cytomine-viewer",
     components: {
@@ -40,6 +41,7 @@ export default {
         return {
             error: false,
             loading: true,
+            reloadInterval: null
         };
     },
     computed: {
@@ -70,14 +72,14 @@ export default {
     },
     watch: {
         nbMaps() {
-            this.$store.commit("triggerMapUpdateSize");
+            this.$eventBus.$emit("updateMapSize");
         }
     },
     methods: {
         closeMap(index) {
             if(this.nbMaps == 1) {
                 this.$store.commit("removeViewer", this.idBaseImage);
-                this.$router.push("/"); // TODO: change
+                this.$router.push(`/project/${this.$route.params.idProject}`);
             }
             else {
                 this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
@@ -85,21 +87,31 @@ export default {
         },
 
         async addBaseImage() {
-            if(this.viewer == null) {
-                try {
+            try {
+                if(this.viewer == null) {
                     let baseImage = await ImageInstance.fetch(this.idBaseImage);
                     await this.$store.dispatch("addViewer", baseImage);
                 }
-                catch(err) {
-                    console.log(err);
-                    this.error = true;
+                else {
+                    await this.$store.dispatch("refreshData", this.idBaseImage);
                 }
+            }
+            catch(err) {
+                console.log(err);
+                this.error = true;
             }
         }
     },
     async created() {
         await this.addBaseImage();
+        this.reloadInterval = setInterval(
+            () => this.$eventBus.$emit("reloadAnnotations"),
+            constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
+        );
         this.loading = false;
+    },
+    beforeDestroy() {
+        clearInterval(this.reloadInterval);
     }
 };
 </script>
@@ -120,12 +132,6 @@ export default {
 .map-cell {
     border-top: 3px solid #222;
     overflow: hidden;
-}
-
-.image-selector-wrapper {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
 }
 
 .box {

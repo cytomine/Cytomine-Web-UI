@@ -4,7 +4,6 @@
                  :update-while-interacting="false"> <!-- TODO: set to true to compare perfs -->
 
     <vl-source-vector ref="olSource"
-                      @mounted="associateSource()"
                       :loader-factory="loaderFactory" 
                       :strategy-factory="strategyFactory"
                       url="-"> <!-- loader factory not used if URL not specified -->
@@ -31,12 +30,9 @@ export default {
             format: new WKT(),
 
             resolution: null,
-            clustered: null,
-            maxResolutionNoClusters: null,
-
             lastExtent: null,
-
-            refreshTimeout: null
+            clustered: null,
+            maxResolutionNoClusters: null
         };
     },
     computed: {
@@ -66,10 +62,15 @@ export default {
             // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => term.visible);
+            this.imageWrapper.terms.forEach(term => {
+                term.visible;
+                term.opacity;
+            });
             this.imageWrapper.displayNoTerm;
+            this.imageWrapper.noTermOpacity;
             this.imageWrapper.selectedPropertyKey;
             this.imageWrapper.selectedPropertyColor;
+            this.imageWrapper.highlightedFeaturesIds;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.idViewer, this.index);
@@ -77,6 +78,52 @@ export default {
         }
     },
     methods: {
+        addAnnotationHandler(annot) {
+            if(annot.image == this.image.id && this.$refs.olSource) {
+                this.$refs.olSource.addFeature(this.createFeature(annot));
+            }
+        },
+        selectAnnotationHandler({annot, idViewer, index}) {
+            if(idViewer == this.idViewer && index == this.index && this.$refs.olSource) {
+                let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+                if(olFeature == null) {
+                    this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+                }
+                else {
+                    this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature: olFeature});
+                }
+            }
+        },
+        reloadAnnotationsHandler(idImage) {
+            if(idImage == null || idImage == this.image.id) {
+                this.loader();
+            }
+        },
+        editAnnotationHandler(annot) {
+            if(annot.image == this.image.id && this.$refs.olSource) {
+                let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+                if(olFeature == null) {
+                    return;
+                }
+                olFeature.setGeometry(this.format.readGeometry(annot.location));
+                olFeature.set("annot", annot);
+            }
+        },
+        deleteAnnotationHandler(annot) {
+            if(annot.image == this.image.id && this.$refs.olSource) {
+                let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+                if(olFeature == null) {
+                    return;
+                }
+                olFeature.set("deleted", true); // TODO: is it still needed?
+                this.$refs.olSource.removeFeature(olFeature);
+
+                if(this.selectedFeatures.some(ftr => ftr.id == annot.id)) {
+                    this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
+                }
+            }
+        },
+
         strategyFactory() {
             return (extent, resolution) => {
                 this.lastExtent = extent;
@@ -119,11 +166,12 @@ export default {
         },
 
         updateFeature(feature, annot) {
-            let selectedFeature = this.selectedFeatures.find(ftr => ftr.id == feature.getId());
+            let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id == feature.getId());
+            let isFeatureSelected = indexSelectedFeature != -1;
 
             if(annot == null) {
                 this.$refs.olSource.removeFeature(feature);
-                if(selectedFeature != null) {
+                if(isFeatureSelected) {
                     this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                 }
                 return;
@@ -135,19 +183,26 @@ export default {
                 return;
             }
 
-            if(selectedFeature != null) {
+            if(isFeatureSelected) {
                 if(this.activeTool == "select" && this.activeEditTool != null) {
                     // if feature is selected and under modification, updating it may lead to conflict
                     return;
                 }
-                selectedFeature.properties.annot = annot;
+                this.$store.commit("changeAnnotSelectedFeature", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    indexFeature: indexSelectedFeature,
+                    annot
+                });
             }
 
             feature.set("annot", annot);
             feature.setGeometry(this.format.readGeometry(annot.location));
         },
 
-        async loadFeatures(extent, resolution) {
+        async loader(extent=this.lastExtent, resolution=this.resolution) {
+            this.resolution = resolution;
+
             if(!this.userLayer.visible || this.$refs.olSource == null || extent == null) {
                 return;
             }
@@ -200,14 +255,6 @@ export default {
             });
         },
 
-        async loader(extent=this.lastExtent, resolution=this.resolution) {
-            this.resolution = resolution;
-
-            await this.loadFeatures(extent, resolution);
-            clearTimeout(this.refreshTimeout);
-            this.refreshTimeout = setTimeout(() => this.loader(), 5000);
-        },
-
         loaderFactory() {
             return (extent, resolution) => this.loader(extent, resolution);
         },
@@ -224,10 +271,6 @@ export default {
             return feature;
         },
 
-        associateSource() {
-            this.userLayer.olSource = this.$refs.olSource; // TODO in store
-        },
-
         sameTerms(terms1, terms2) {
             if(terms1.length != terms2.length) {
                 return false;
@@ -235,8 +278,20 @@ export default {
             return terms1.every(term => terms2.includes(term));
         }
     },
+    mounted() {
+        this.$eventBus.$on("addAnnotation", this.addAnnotationHandler);
+        this.$eventBus.$on("selectAnnotation", this.selectAnnotationHandler);
+        this.$eventBus.$on("reloadAnnotations", this.reloadAnnotationsHandler);
+        this.$eventBus.$on("editAnnotation", this.editAnnotationHandler);
+        this.$eventBus.$on("deleteAnnotation", this.deleteAnnotationHandler);
+    },
     beforeDestroy() {
-        clearTimeout(this.refreshTimeout);
+        // unsubscribe from all events
+        this.$eventBus.$off("addAnnotation", this.addAnnotationHandler);
+        this.$eventBus.$off("selectAnnotation", this.selectAnnotationHandler);
+        this.$eventBus.$off("reloadAnnotations", this.reloadAnnotationsHandler);
+        this.$eventBus.$off("editAnnotation", this.editAnnotationHandler);
+        this.$eventBus.$off("deleteAnnotation", this.deleteAnnotationHandler);
     }
 };
 </script>

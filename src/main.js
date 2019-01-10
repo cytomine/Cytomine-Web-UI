@@ -50,6 +50,8 @@ Vue.config.productionTip = false;
 
 new Cytomine(constants.CYTOMINE_CORE_HOST);
 
+Vue.prototype.$eventBus = new Vue();
+
 new Vue({
     render: h => h(App),
     router,

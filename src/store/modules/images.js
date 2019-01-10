@@ -1,28 +1,22 @@
 import Vue from "vue";
 
-import {TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
+import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
-import {isCluster, createColorStyle, createDefaultStroke, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle, defaultColors} from "@/utils/style-utils.js";
+import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
+    verticesStyle, highlightStyles, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
 
+let initialLayersOpacity = 0.5;
+let initialTermsOpacity = 1;
+
 export default {
     state: {
-        triggerMapUpdateSize: [], // change of this property should trigger a size update of all visible maps
         viewers: {}
     },
 
     mutations: {
-
-        // --- Mutations common to all viewers
-
-        triggerMapUpdateSize(state) {
-            state.triggerMapUpdateSize = []; // new array will be considered as a new value
-        },
-
-        // --- Viewer-specific mutations
 
         addViewer(state, {id, name, idProject}) {
             Vue.set(state.viewers, id, {
@@ -49,6 +43,10 @@ export default {
 
         removeMap(state, {idViewer, index}) {
             state.viewers[idViewer].maps.splice(index, 1);
+        },
+
+        setImageInstance(state, {idViewer, index, image}) {
+            state.viewers[idViewer].maps[index].imageInstance = image;
         },
 
         togglePanel(state, {idViewer, index, panel}) {
@@ -193,6 +191,10 @@ export default {
 
         // ----- Terms
 
+        setTerms(state, {idViewer, index, terms}) {
+            state.viewers[idViewer].maps[index].terms = terms;
+        },
+
         toggleAssociateTermToNewAnnot(state, {idViewer, index, indexTerm}) {
             let wrapper = state.viewers[idViewer].maps[index];
             let term = wrapper.terms[indexTerm];
@@ -240,6 +242,29 @@ export default {
             }
         },
 
+        setTermOpacity(state, {idViewer, index, indexTerm, opacity}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            let term = wrapper.terms[indexTerm];
+            term.opacity = opacity;
+            changeOpacity(term.olStyle, wrapper.layersOpacity*opacity);
+        },
+
+        setNoTermOpacity(state, {idViewer, index, opacity}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.noTermOpacity = opacity;
+            changeOpacity(wrapper.noTermStyle, wrapper.layersOpacity*opacity);
+        },
+
+        resetTermOpacities(state, {idViewer, index}) {
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.terms.forEach(term => {
+                term.opacity = initialTermsOpacity;
+                changeOpacity(term.olStyle, wrapper.layersOpacity*initialTermsOpacity);
+            });
+            wrapper.noTermOpacity = initialTermsOpacity;
+            changeOpacity(wrapper.noTermStyle, wrapper.layersOpacity*wrapper.noTermOpacity);
+        },
+
         // ----- Selected layers
 
         addLayer(state, {idViewer, index, layer, propValues}) {
@@ -270,14 +295,10 @@ export default {
         setLayersOpacity(state, {idViewer, index, opacity}) {
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.layersOpacity = opacity;
-            wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity));
+            wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
+            changeOpacity(wrapper.noTermStyle, opacity*wrapper.noTermOpacity);
+            changeOpacity(wrapper.multipleTermsStyle, opacity);
             changeOpacity(wrapper.defaultStyle, opacity);
-            let colorStroke = wrapper.defaultStroke.getColor();
-            colorStroke[3] = opacity;
-        },
-
-        triggerIndexLayersUpdate(state, {idViewer, index}) {
-            state.viewers[idViewer].maps[index].triggerIndexLayersUpdate = []; // new array will be considered as a new value
         },
 
         // ----- Properties
@@ -298,16 +319,6 @@ export default {
             state.viewers[idViewer].maps[index].selectedPropertyColor = value;
         },
 
-        // ----- Measure features
-
-        setMeasureFeatures(state, {idViewer, index, measureFeatures}) {
-            state.viewers[idViewer].maps[index].measureFeatures = measureFeatures;
-        },
-
-        removeMeasureFeature(state, {idViewer, index, indexFeature}) {
-            state.viewers[idViewer].maps[index].measureFeatures.splice(indexFeature, 1);
-        },
-
         // ----- Selected features
 
         setSelectedFeatures(state, {idViewer, index, selectedFeatures}) {
@@ -322,6 +333,10 @@ export default {
 
         selectFeature(state, {idViewer, index, feature}) {
             state.viewers[idViewer].maps[index].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
+        },
+
+        changeAnnotSelectedFeature(state, {idViewer, index, indexFeature, annot}) {
+            state.viewers[idViewer].maps[index].selectedFeatures[indexFeature].properties.annot = annot;
         },
 
         removeLayerFromSelectedFeatures(state, {idViewer, index, idLayer, cache=false}) {
@@ -348,6 +363,12 @@ export default {
             state.viewers[idViewer].maps[index].annotsToSelect = [annot];
         },
 
+        // ----- Highlighted features
+
+        setHighlightedFeaturesIds(state, {idViewer, index, ids}) {
+            state.viewers[idViewer].maps[index].highlightedFeaturesIds = ids;
+        },
+
         // ----- Draw tools and associated interactions
 
         activateTool(state, {idViewer, index, tool}) {
@@ -356,6 +377,20 @@ export default {
 
         activateEditTool(state, {idViewer, index, tool}) {
             state.viewers[idViewer].maps[index].activeEditTool = tool;
+        },
+
+        // ----- Calibration
+
+        setOngoingCalibration(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].ongoingCalibration = value;
+        },
+
+        setResolution(state, {idViewer, idImage, resolution}) {
+            state.viewers[idViewer].maps.forEach(({imageInstance}) => {
+                if(imageInstance.id == idImage) {
+                    imageInstance.resolution = resolution;
+                }
+            });
         },
 
         // ----- Annotation details
@@ -370,8 +405,14 @@ export default {
 
         // ----- Undo/Redo
 
-        addAction(state, {idViewer, index, feature, oldAnnot}) {
-            let action = {feature, oldAnnot};
+        resetActions(state, {idViewer, index}) { // TODO: remove when annotations corrections are correctly handled
+            let wrapper = state.viewers[idViewer].maps[index];
+            wrapper.actions = [];
+            wrapper.undoneActions = [];
+        },
+
+        addAction(state, {idViewer, index, annot, oldAnnot}) {
+            let action = {annot, oldAnnot};
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions.push(action);
             wrapper.undoneActions = [];
@@ -400,28 +441,14 @@ export default {
         },
 
         async addMap({commit}, {idViewer, image}) {
-            let initialOpacity = 0.5;
-            let defaultStroke = createDefaultStroke(initialOpacity);
-
-            let termsPromise = TermCollection.fetchAll({filterKey: "project", filterValue: image.project}); // TODO: decide how API calls are handled (here or in component?)
-            let propertiesKeysPromise = PropertyCollection.fetchKeysAnnotationProperties(null, image.id);
-
-            if(image.imageServerURLs == null) {
-                let imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
-                image.imageServerURL = imageServerURLs[0];
-            }
-
-            let terms = await termsPromise;
-            terms.array.forEach(term => {
-                term.olStyle = createColorStyle(term.color, defaultStroke); // must be handled in image (can change opacity in one particular viewer)
-                term.visible = true;
-                term.associateToNewAnnot = false;
-            });
-
-            let propertiesKeys = await propertiesKeysPromise;
+            let [fetchedImage, terms, propertiesKeys] = await Promise.all([
+                fetchImage(image.id),
+                fetchTerms(image.project, initialLayersOpacity),
+                fetchPropertiesKeys(image.id)
+            ]);
 
             let wrapper = {
-                imageInstance: image,
+                imageInstance: fetchedImage,
 
                 maxZoom: image.depth + constants.DIGITAL_ZOOM_INCREMENT,
                 digitalZoom: true,
@@ -437,22 +464,24 @@ export default {
 
                 selectedLayers: null,
 
-                terms: terms.array,
+                terms: terms,
                 displayNoTerm: true,
+                noTermOpacity: initialTermsOpacity,
 
                 propertiesKeys,
                 selectedPropertyKey: null, // TODO: allow to select default property (https://github.com/cytomine/Cytomine-core/issues/1142)
                 selectedPropertyColor: defaultColors[0],
                 selectedPropertyValues: {},
 
-                defaultStroke,
-                defaultStyle: createColorStyle("#fff", defaultStroke, initialOpacity),
-                layersOpacity: initialOpacity,
+                defaultStyle: createColorStyle("#fff", initialLayersOpacity),
+                noTermStyle: createColorStyle("#fff", initialLayersOpacity*initialTermsOpacity),
+                multipleTermsStyle: createColorStyle("#fff", initialLayersOpacity),
+                layersOpacity: initialLayersOpacity,
 
                 selectedFeatures: [],
                 annotsToSelect: [],
 
-                measureFeatures: [],
+                highlightedFeaturesIds: [],
 
                 activeTool: "select",
                 activeEditTool: null,
@@ -468,9 +497,22 @@ export default {
                 actions: [],
                 undoneActions: [],
 
-                triggerIndexLayersUpdate: []
+                ongoingCalibration: false
             };
             commit("addMap", {idViewer, wrapper});
+        },
+
+        async refreshData({state, commit, dispatch}, idViewer) {
+            await Promise.all(state.viewers[idViewer].maps.map(async (map, index) => {
+                let [image, terms] = await Promise.all([
+                    fetchImage(map.imageInstance.id),
+                    fetchTerms(map.imageInstance.project, map.opacity, map.terms),
+                    dispatch("refreshProperties", {idViewer, index})
+                ]);
+
+                commit("setImageInstance", {idViewer, index, image});
+                commit("setTerms", {idViewer, index, terms});
+            }));
         },
 
         removeMap({commit}, {idViewer, index}) {
@@ -490,6 +532,30 @@ export default {
             if(!layer.visible) {
                 commit("removeLayerFromSelectedFeatures", {idViewer, index, idLayer: layer.id});
             }
+        },
+
+        activateTool({state, commit}, {idViewer, index, tool}) {
+            if(state.viewers[idViewer].maps[index].activeTool == "select" && tool != "select") {
+                commit("clearSelectedFeatures", {idViewer, index});
+                commit("activateEditTool", {idViewer, index, tool: null});
+            }
+            commit("activateTool", {idViewer, index, tool});
+        },
+
+        startCalibration({dispatch, commit}, {idViewer, index}) {
+            dispatch("activateTool", {idViewer, index, tool: "line"});
+            commit("setOngoingCalibration", {idViewer, index, value: true});
+        },
+
+        endCalibration({state, commit}, {idViewer, index, resolution}) {
+            let idImage = state.viewers[idViewer].maps[index].imageInstance.id;
+            commit("setResolution", {idViewer, idImage, resolution});
+            commit("setOngoingCalibration", {idViewer, index, value: false});
+        },
+
+        cancelCalibration({commit}, {idViewer, index}) {
+            commit("activateTool", {idViewer, index, tool: "select"});
+            commit("setOngoingCalibration", {idViewer, index, value: false});
         },
 
         selectFeature({commit}, {idViewer, index, feature}) {
@@ -526,7 +592,7 @@ export default {
         async refreshProperties({state, commit, dispatch}, {idViewer, index}) {
             let wrapper = state.viewers[idViewer].maps[index];
             let idImage = wrapper.imageInstance.id;
-            let keys = await PropertyCollection.fetchKeysAnnotationProperties(null, idImage);
+            let keys = await fetchPropertiesKeys(idImage);
             commit("setPropertiesKeys", {idViewer, index, keys});
 
             let currentKey = wrapper.selectedPropertyKey;
@@ -544,37 +610,38 @@ export default {
 
             let imageWrapper = state.viewers[idViewer].maps[index];
 
-            let cluster = isCluster(feature);
-
-            // QUESTION: decide whether it is better to filter with this method, or to force source refresh and query only appropriate annotations
             // QUESTION: what to do with clusters (returned count does not take into account the selected terms) ?
             // Possible solutions:
             // 1. in backend, for clusters, send array with composition of cluster (x for term 1, y for term 2, z for term1-2)
             // 2. force source refresh every time the list of terms to display is updated
             // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
-            if(!cluster) {
-                let hasTerms = (annot.term.length > 0);
-                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
-
-                if((hasTerms && !hasTermsToDisplay) || (!hasTerms && !imageWrapper.displayNoTerm)) {
-                    return null; // do not display annotation
-                }
+            if(isCluster(feature)) {
+                return [imageWrapper.defaultStyle, createTextStyle(annot.count.toString())];
             }
 
             let styles = [];
 
-            // Style based on term
-            if(annot.term.length == 1) {
-                let termToFind = annot.term[0];
-                styles.push(imageWrapper.terms.find(term => term.id == termToFind).olStyle);
+            let nbTerms = annot.term.length;
+
+            if(nbTerms == 1) {
+                let wrappedTerm = imageWrapper.terms.find(term => term.id == annot.term[0]);
+                if(!wrappedTerm.visible) {
+                    return; // do not display annot
+                }
+                styles.push(wrappedTerm.olStyle);
+            }
+            else if(nbTerms > 1) {
+                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
+                if(!hasTermsToDisplay) {
+                    return; // do not display
+                }
+                styles.push(imageWrapper.multipleTermsStyle);
             }
             else {
-                styles.push(imageWrapper.defaultStyle);
-            }
-
-            // Style for clusters
-            if(cluster) {
-                styles.push(createTextStyle(annot.count.toString()));
+                if(!imageWrapper.displayNoTerm) {
+                    return; // do not display annot
+                }
+                styles.push(imageWrapper.noTermStyle);
             }
 
             // Styles for selected elements
@@ -585,6 +652,9 @@ export default {
                 if(imageWrapper.activeEditTool == "modify") {
                     styles.push(verticesStyle);
                 }
+            }
+            else if(imageWrapper.highlightedFeaturesIds.includes(feature.getId())) {
+                styles.push(...highlightStyles);
             }
 
             // Properties
@@ -629,4 +699,39 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
     });
 
     return properties;
+}
+
+async function fetchImage(idImage) {
+    let image = await ImageInstance.fetch(idImage);
+    if(image.imageServerURLs == null) {
+        let imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
+        image.imageServerURL = imageServerURLs[0];
+    }
+    return image;
+}
+
+async function fetchPropertiesKeys(idImage) {
+    let data = await PropertyCollection.fetchKeysAnnotationProperties(null, idImage);
+    return data;
+}
+
+async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
+    // TODO: fetch in another store module since common to all images of the project?
+    let terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: idProject})).array;
+
+    let nbTerms = terms.length;
+    for(let i = 0; i < nbTerms; i++) {
+        let term = terms[i];
+        let prevTerm = previousTerms.find(prevTerm => prevTerm.id == term.id);
+        if(prevTerm != null) {
+            terms[i] = prevTerm;
+        }
+        else {
+            term.opacity = initialTermsOpacity;
+            term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+            term.visible = true;
+            term.associateToNewAnnot = false;
+        }
+    }
+    return terms;
 }

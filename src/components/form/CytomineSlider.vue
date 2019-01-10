@@ -10,7 +10,7 @@
 >
     <template slot="tooltip" slot-scope="{index, value, merge}">
         <span v-if="!merge" class="vue-slider-tooltip" @mousedown.stop @click.stop="startEdition(index)">
-            <template v-if="indexEdited != (index || 0)">{{value}}</template>
+            <template v-if="indexEdited != (index || 0)">{{Math.round(value * 1000)/1000}}</template>
             <b-input ref="inputSlider" v-else type="text" v-model="editedValue" @hook:mounted="focus()"
              @blur="stopEdition(index)" @keyup.enter.native="stopEdition(index)"></b-input>
         </span>

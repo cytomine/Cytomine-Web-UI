@@ -42,8 +42,12 @@ export default {
         styleFunctionFactory() {
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => term.visible);
+            this.imageWrapper.terms.forEach(term => {
+                term.visible;
+                term.opacity;
+            });
             this.imageWrapper.displayNoTerm;
+            this.imageWrapper.noTermOpacity;
             this.imageWrapper.activeEditTool; // style is different in edit mode (vertices displayed)
             this.imageWrapper.selectedPropertyValues;
             this.imageWrapper.selectedPropertyColor;

@@ -65,9 +65,7 @@ export default {
         return {
             layers: [], // Array<User> (representing user layers)
             indexLayers: [],
-            selectedLayer: null,
-
-            timeoutIndex: null
+            selectedLayer: null
         };
     },
     computed: {
@@ -79,9 +77,6 @@ export default {
         },
         activePanel() {
             return this.imageWrapper.activePanel;
-        },
-        triggerIndexLayersUpdate() {
-            return this.imageWrapper.triggerIndexLayersUpdate;
         },
         layersOpacity: {
             get() {
@@ -109,15 +104,22 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     watch: {
-        activePanel() {
-            this.fetchIndexLayers();
-        },
-
-        triggerIndexLayersUpdate() {
+        activePanel(panel) {
             this.fetchIndexLayers();
         }
     },
     methods: {
+        annotationEventHandler(annot) {
+            if(annot.image == this.image.id) {
+                this.fetchIndexLayers();
+            }
+        },
+        reloadAnnotationsHandler(idImage) {
+            if(idImage == null || idImage == this.image.id) {
+                this.fetchIndexLayers();
+            }
+        },
+
         layerName(layer) {
             let name = fullName(layer);
 
@@ -139,7 +141,6 @@ export default {
 
             layer.visible = true;
             layer.drawOn = (layer.id == this.currentUser.id);
-            layer.olSource = null;
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -178,10 +179,7 @@ export default {
             if(!force && this.activePanel != "layers") {
                 return;
             }
-
             this.indexLayers = await this.image.fetchAnnotationsIndex();
-            clearTimeout(this.timeoutIndex);
-            this.timeoutIndex = setTimeout(() => this.fetchIndexLayers(), 10000); // schedule a refresh
         }
     },
     async created() {
@@ -194,8 +192,13 @@ export default {
             this.layersToPreload.forEach(id => this.addLayerById(id));
         }
     },
+    mounted() {
+        this.$eventBus.$on(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
+        this.$eventBus.$on("reloadAnnotations", this.reloadAnnotationsHandler);
+    },
     beforeDestroy() {
-        clearTimeout(this.timeoutIndex);
+        this.$eventBus.$off(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
+        this.$eventBus.$off("reloadAnnotations", this.reloadAnnotationsHandler);
     }
 };
 </script>

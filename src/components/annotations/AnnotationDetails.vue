@@ -11,14 +11,14 @@
                 </td>
             </tr>
 
-            <!-- Do not display perimeter and area for point annotations -->
-            <template v-if="configUI['project-explore-annotation-geometry-info'] && annotation.area > 0">
-                <tr>
+            <template v-if="configUI['project-explore-annotation-geometry-info']">
+                <tr v-if="annotation.area > 0">
                     <td><strong>{{$t("area")}}</strong></td>
                     <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
                 </tr>
-                <tr>
-                    <td><strong>{{$t("perimeter")}}</strong></td>
+
+                <tr v-if="annotation.perimeter > 0">
+                    <td><strong>{{$t(annotation.area > 0 ? "perimeter" : "length")}}</strong></td>
                     <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
                 </tr>
             </template>
@@ -65,6 +65,13 @@
                     <h5>{{$t("properties")}}</h5>
                     <cytomine-properties :object="annotation" @update="$emit('updateProperties')">
                     </cytomine-properties>
+                </td>
+            </tr>
+
+            <tr v-if="configUI['project-explore-annotation-attached-files']">
+                <td colspan="2">
+                    <h5>{{$t("attached-files")}}</h5>
+                    <attached-files :object="annotation"></attached-files>
                 </td>
             </tr>
 
@@ -122,13 +129,15 @@ import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import CytomineTerm from "@/components/term/CytomineTerm";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
 
 export default {
     name: "annotations-details",
     components: {
         CytomineDescription,
         CytomineTerm,
-        CytomineProperties
+        CytomineProperties,
+        AttachedFiles
     },
     props: {
         annotation: {type: Object},

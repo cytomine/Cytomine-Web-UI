@@ -4,7 +4,7 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("projects")}}
-            <a class="button is-link">{{$t('new-project')}}</a>
+            <button class="button is-link" @click="creationModal = true">{{$t('new-project')}}</button>
         </p>
         <div class="panel-block">
             <div class="search-block">
@@ -200,6 +200,8 @@
             </div>
         </div>
     </div>
+
+    <new-project-modal :active.sync="creationModal"></new-project-modal>
 </div>
 </template>
 
@@ -209,6 +211,7 @@ import { mapState } from "vuex";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import CytomineSlider from "@/components/form/CytomineSlider";
 import ProjectDetails from "./ProjectDetails";
+import NewProjectModal from "./NewProjectModal";
 
 import isBetweenBounds from "@/utils/is-between-bounds.js";
 
@@ -216,7 +219,12 @@ import {ProjectCollection} from "cytomine-client";
 
 export default {
     name: "list-projects",
-    components: {ProjectDetails, CytomineMultiselect, CytomineSlider},
+    components: {
+        ProjectDetails,
+        NewProjectModal,
+        CytomineMultiselect,
+        CytomineSlider
+    },
     data() {
         return {
             projects: [],
@@ -239,6 +247,9 @@ export default {
             boundsUserAnnotations: [0, 0],
             boundsJobAnnotations: [0, 0],
             boundsReviewedAnnotations: [0, 0],
+
+            creationModal: false,
+            nameNewProject: "",
 
             // TODO: should be defined in app config and retrieved from backend (corresponds to properties displayed in
             // columns in the list of project)
@@ -299,6 +310,7 @@ export default {
             this.projects.forEach(project => {
                 if(!seenIds.includes(project.ontology)) {
                     ontologies.push({id: project.ontology, name: project.ontologyName});
+                    seenIds.push(project.ontology);
                 }
             });
             return ontologies;

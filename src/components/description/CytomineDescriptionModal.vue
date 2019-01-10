@@ -1,7 +1,10 @@
 <template>
-<div class="description-modal modal-card">
+<div class="description-modal modal-card" :class="{expanded: expanded}">
     <div class="modal-card-head"> 
         <p class="modal-card-title">{{ $t("description") }}</p>
+        <button class="button is-small" @click="expanded = !expanded">
+            <i :class="['fas', expanded ? 'fa-compress' : 'fa-expand']"></i>
+        </button>
     </div>
     <div class="modal-card-body">
 
@@ -140,7 +143,10 @@ import constants from "@/utils/constants.js";
 export default {
     name: "cytomine-description-modal",
     components: {quillEditor},
-    props: ["description", "edit"],
+    props: [
+        "description",
+        "edit"
+    ],
     data() {
         return {
             descriptionContent: "",
@@ -155,7 +161,8 @@ export default {
             specialCharacters: [
                 "$", "€", "£", "¢", "¥", "¤", "‰", "©", "®", "™", "§", "¶", "Æ", "æ", "Œ", "œ", 
                 "±", "×", "÷", "⇒", "⇔", "∏", "∑", "≃", "≤", "≥"
-            ]
+            ],
+            expanded: false
         };
     },
     computed: {
@@ -199,6 +206,18 @@ export default {
 
 
 <style>
+.description-modal.expanded, .description-modal.expanded .modal-card-body {
+    width: 90vw;
+    height: 90vh;
+    max-height: 90vh;
+}
+
+.description-modal:not(.expanded), .description-modal:not(.expanded) .modal-card-body {
+    width: 50vw;
+    height: 60vh;
+    max-height: 60vh;
+}
+
 .description-modal .ql-editor.preview {
     padding: 0px 0px 10px 0px;
     text-align: justify;
@@ -208,6 +227,7 @@ export default {
 .description-modal .modal-card-body {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .description-modal .keyword-info {
@@ -223,9 +243,10 @@ export default {
 }
 
 .description-modal .quill-editor {
-    min-height: 50vh;
+    min-height: 30vh;
     display: flex;
     flex-direction: column;
+    flex: 1;
 } 
 
 .description-modal .ql-container {
@@ -233,16 +254,12 @@ export default {
     flex-grow: 1;
 }
 
-.description-modal .ql-editor {
-    height: unset !important;
-}
-
 #tooltip-container {
     position: absolute;
-    margin-right: 20px;
     left: 30px;
-    right: 20px;
-    height: 100%;
+    right: 40px;
+    top: 0px;
+    bottom: 0px;
     pointer-events: none; /* to allow selection of elements below it */
 }
 
