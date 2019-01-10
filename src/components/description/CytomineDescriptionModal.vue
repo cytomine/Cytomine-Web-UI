@@ -227,6 +227,7 @@ export default {
 .description-modal .modal-card-body {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .description-modal .keyword-info {
@@ -253,16 +254,12 @@ export default {
     flex-grow: 1;
 }
 
-.description-modal .ql-editor {
-    height: unset !important;
-}
-
 #tooltip-container {
     position: absolute;
-    margin-right: 20px;
     left: 30px;
-    right: 20px;
-    height: 100%;
+    right: 40px;
+    top: 0px;
+    bottom: 0px;
     pointer-events: none; /* to allow selection of elements below it */
 }
 
