@@ -30,6 +30,9 @@
         <button class="button is-small" @click="calibrationModal = true">
             {{$t("button-set-calibration")}}
         </button>
+        <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
+            {{$t("button-more-info")}}
+        </router-link>
     </div>
 
     <calibration-modal :image="image"
@@ -43,7 +46,7 @@
 import CalibrationModal from "@/components/image/CalibrationModal";
 
 export default {
-    name: "image-information",
+    name: "information-panel",
     components: {CalibrationModal},
     props: [
         "idViewer",
@@ -85,6 +88,16 @@ export default {
 <style scoped>
 .table {
     margin-bottom: 10px !important;
+    width: 100%;
+    table-layout: fixed;
+}
+
+td {
+    word-wrap: break-word;
+}
+
+td:first-child {
+    width: 120px;
 }
 
 .buttons {

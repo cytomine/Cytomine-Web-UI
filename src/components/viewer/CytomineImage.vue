@@ -76,7 +76,7 @@
                     <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                         <i class="fas fa-info"></i>
                     </a>
-                    <image-information class="panel-options" v-show="activePanel == 'info'"
+                    <information-panel class="panel-options" v-show="activePanel == 'info'"
                         :idViewer="idViewer" :index="index" />
                 </li>
 
@@ -173,7 +173,7 @@ import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
 import AnnotationsTable from "./AnnotationsTable";
 
-import ImageInformation from "./panels/ImageInformation";
+import InformationPanel from "./panels/InformationPanel";
 import DigitalZoom from "./panels/DigitalZoom";
 import ColorManipulation from "./panels/ColorManipulation";
 import LinkPanel from "./panels/LinkPanel";
@@ -216,7 +216,7 @@ export default {
 
         AnnotationDetailsContainer,
 
-        ImageInformation,
+        InformationPanel,
         DigitalZoom,
         ColorManipulation,
         LinkPanel,
@@ -586,7 +586,7 @@ export default {
     z-index: 100;
 }
 
-.panels li:nth-child(-n+6) .panel-options {
+.panels li:nth-child(-n+7) .panel-options {
     bottom: -90px;
     min-height: 160px;
 }

@@ -179,8 +179,8 @@
                 </template>
 
                 <template slot="detail" slot-scope="{row: image}">
-                    <image-details :image="image"
-                                   @delete="deleteImage(image)"
+                    <image-details :image="image" :excludedProperties="excludedProperties"
+                                   @delete="deleteImage(image.id)"
                                    @setResolution="(event) => setResolution(image, event)"
                                    @setMagnification="(event) => setMagnification(image, event)">
                     </image-details>
@@ -252,7 +252,18 @@ export default {
             boundsJobAnnotations: [0, 0],
             boundsReviewedAnnotations: [0, 0],
 
-            addImageModal: false
+            addImageModal: false,
+
+            // TODO: should be defined in project config and retrieved from backend (corresponds to properties displayed
+            // in table columns)
+            excludedProperties: [
+                "overview",
+                "instanceFilename",
+                "magnification",
+                "numberOfAnnotations",
+                "numberOfJobAnnotations",
+                "numberOfReviewedAnnotations"
+            ]
         };
     },
     computed: {
@@ -350,21 +361,8 @@ export default {
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
         },
 
-        async deleteImage(imageToDelete) {
-            try {
-                await imageToDelete.delete();
-                this.images = this.images.filter(image => image.id != imageToDelete.id);
-                this.$notify({
-                    type: "success",
-                    text: this.$t("notif-success-image-deletion", {imageName: imageToDelete.instanceFilename})
-                });
-            }
-            catch(error) {
-                this.$notify({
-                    type: "error",
-                    text: this.$t("notif-error-image-deletion", {imageName: imageToDelete.instanceFilename})
-                });
-            }
+        async deleteImage(idDeleted) {
+            this.images = this.images.filter(image => image.id != idDeleted);
         },
 
         addImage(image) {
@@ -379,7 +377,7 @@ export default {
             let updateMaxHeight = this.boundsHeight[1] == this.maxHeight && image.height > this.maxHeight;
             // ---
 
-            this.images.push(image);
+            this.images.unshift(image);
 
             if(addFormat) {
                 this.selectedFormats.push(image.extension);
@@ -428,7 +426,8 @@ export default {
         formatImage(image) {
             // use $set to make the new props reactive
             this.$set(image, "resolutionFormatted", this.formatResolution(image.resolution));
-            this.$set(image, "vendorFormatted", this.formatVendor(image.mime));
+            this.$set(image, "vendor", vendorFromMime(image.mime));
+            this.$set(image, "vendorFormatted", this.formatVendor(image.vendor));
             this.$set(image, "magnificationFormatted", this.formatMagnification(image.magnification));
             return image;
         },
@@ -437,8 +436,7 @@ export default {
             return (resolution != null) ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
         },
 
-        formatVendor(mime) {
-            let vendor = vendorFromMime(mime);
+        formatVendor(vendor) {
             return vendor ? vendor.name : this.$t("unknown");
         },
 

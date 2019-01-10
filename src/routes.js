@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import ListImages from "./components/image/ListImages.vue";
+import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
 import Account from "./components/user/Account.vue";
@@ -57,6 +58,10 @@ const routes = [
             {
                 path: "image/:idImage",
                 component: CytomineViewer
+            },
+            {
+                path: "image/:idImage/information",
+                component: ImageInformation
             },
             {
                 path: "image/:idImage/annotation/:idAnnotation",
