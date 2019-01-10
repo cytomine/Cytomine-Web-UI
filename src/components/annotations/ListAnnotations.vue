@@ -3,6 +3,31 @@
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading">
         <div class="box">
+            <h2> {{ $t("display") }} </h2>
+            <div class="filters">
+                <div class="columns">
+                <div class="column filter">
+                    <div class="filter-label">
+                        {{$t("preview-size")}}
+                    </div>
+                    <div class="filter-body">
+                        <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
+                            label="label" track-by="size"
+                            :allow-empty="false" :searchable="false" />
+                    </div>
+                </div>
+                <div class="column filter">
+                    <div class="filter-label">
+                        {{$t("number-per-page")}}
+                    </div>
+                    <div class="filter-body">
+                        <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
+                            :allow-empty="false" :searchable="false" />
+                    </div>
+                </div>
+                </div>
+            </div>
+
             <h2> {{ $t("filters") }} </h2>
             <div class="filters">
                     <div class="columns">
@@ -12,8 +37,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
-                                    :allow-empty="false">
-                                </cytomine-multiselect>
+                                    :allow-empty="false" :searchable="false" />
                             </div>
                         </div>
 
@@ -70,7 +94,10 @@
         <!-- TODO: download buttons -->
         <!-- QUESTION: do we allow saving the filters? -->
 
-        <list-annotations-by-term v-for="term in termsOptions" :key="term.id" 
+        <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
+            :size="selectedSize.size"
+            :nbPerPage="nbPerPage"
+
             :allTerms="terms"
             :allUsers="allUsers"
             :allImages="images"
@@ -109,6 +136,10 @@ export default {
             loading: true, 
             forceUpdate: [],
             users: [],
+
+            allowedSizes: [],
+            selectedSize: null,
+            nbPerPage: 25,
 
             userAnnotationOption: this.$t("user-annotations"),
             jobAnnotationOption: this.$t("job-annotations"),
@@ -186,6 +217,13 @@ export default {
         this.selectedAnnotationType = (this.$route.query.type == "algo") ? this.jobAnnotationOption
             : this.userAnnotationOption;
 
+        this.allowedSizes = [
+            {label: this.$t("small"), size: 85},
+            {label: this.$t("medium"), size: 125},
+            {label: this.$t("large"), size: 200},
+            {label: this.$t("huge"), size: 400},
+        ];
+        this.selectedSize = this.allowedSizes[0];
 
         try {
             await Promise.all([
@@ -215,5 +253,9 @@ export default {
 <style scoped>
 .box {
     margin: 20px 50px 20px 50px;
+}
+
+.filters:not(:last-child) {
+    margin-bottom: 20px;
 }
 </style>
