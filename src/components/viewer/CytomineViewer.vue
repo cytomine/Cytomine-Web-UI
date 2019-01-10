@@ -18,9 +18,7 @@
                 </cytomine-image>
             </div>
 
-            <image-selector v-show="imageSelector" class="image-selector-wrapper"
-                :project="project" :idViewer="idBaseImage">
-            </image-selector>
+            <image-selector :project="project" :idViewer="idBaseImage" />
         </div>
     </template>
 </div>
@@ -150,12 +148,6 @@ export default {
 .map-cell {
     border-top: 3px solid #222;
     overflow: hidden;
-}
-
-.image-selector-wrapper {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
 }
 
 .box {

@@ -67,7 +67,7 @@ export default {
     position: absolute;
     padding: 5px 10px 5px 10px;
     display: block;
-    right: 55px;
+    right: 70px;
     bottom: 15px;
     font-size: 9px;
     font-family: Helvetica;

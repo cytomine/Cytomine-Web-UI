@@ -142,12 +142,6 @@
                     </a>
                     <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view" />
                 </li>
-
-                <li class="bottom" v-if="index == viewerWrapper.maps.length - 1 && !viewerWrapper.imageSelector">
-                    <a @click="addMap()">
-                        <i class="fas fa-plus-circle"></i>
-                    </a>
-                </li>
             </ul>
         </div>
 
@@ -356,10 +350,6 @@ export default {
             if(this.$refs.map) {
                 this.$refs.map.updateSize();
             }
-        },
-
-        addMap() {
-            this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
         },
 
         async viewMounted() {
