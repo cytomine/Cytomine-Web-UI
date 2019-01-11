@@ -16,9 +16,8 @@
                     </a>
                 </router-link>
                 <!-- TODO: change the way opened viewers are displayed -->
-                <router-link v-if="viewer.idProject == project.id" tag="li" class="image-link"
-                    v-for="(viewer, id) in viewers" :key="id"
-                    :to="`/project/${project.id}/image/${id}`">
+                <router-link tag="li" class="image-link" v-for="viewer in viewers" :key="viewer.id"
+                    :to="`/project/${project.id}/image/${viewer.id}`">
 
                     <a>{{ viewer.name }}</a>
 
@@ -76,7 +75,14 @@ export default {
     },
     computed: {
         viewers() {
-            return this.$store.state.images.viewers;
+            let viewers = this.$store.state.images.viewers;
+            let results = [];
+            for(let id in viewers) {
+                if(viewers[id].idProject == this.project.id) {
+                    results.push({id, name: viewers[id].name});
+                }
+            }
+            return results;
         },
         project() {
             return this.$store.state.project.project;
@@ -91,7 +97,7 @@ export default {
             this.$eventBus.$emit("updateMapSize");
         },
         isTabDisplayed(tab) {
-            let displayed = this.configUI[`project-${tab}-tab`]
+            let displayed = this.configUI[`project-${tab}-tab`];
             return (displayed || displayed == null); // TODO: replace with return displayed once all tabs are managed in backend
         }
     }
