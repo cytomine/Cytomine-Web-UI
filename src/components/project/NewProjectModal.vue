@@ -99,7 +99,7 @@ export default {
 
                 let project = await new Project({name: this.name, ontology: idOntology}).save();
                 this.$notify({type: "success", text: this.$t("notif-success-project-creation")});
-                this.$router.push(`/project/${project.id}`);
+                this.$router.push(`/project/${project.id}/configuration`);
             }
             catch(error) {
                 console.log(error);
