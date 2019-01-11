@@ -49,6 +49,7 @@
 
 <script>
 import {fullName} from "@/utils/user-utils.js";
+import {ProjectDefaultLayerCollection} from "cytomine-client";
 
 export default {
     name: "annotations-panel",
@@ -131,19 +132,19 @@ export default {
             return this.$store.getters.canEditLayer(layer.id);
         },
 
-        addLayerById(id) {
+        addLayerById(id, visible) {
             let layer = this.layers.find(layer => layer.id == id);
             if(layer != null) {
-                this.addLayer(layer);
+                this.addLayer(layer, visible);
             }
         },
 
-        addLayer(layer = this.selectedLayer) {
+        addLayer(layer = this.selectedLayer, visible = true) {
             if(this.selectedLayersIds.includes(layer.id)) {
                 return;
             }
 
-            layer.visible = true;
+            layer.visible = visible;
             layer.drawOn = (layer.id == this.currentUser.id && this.canDraw(layer));
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
@@ -190,6 +191,17 @@ export default {
         await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
             this.addLayerById(this.currentUser.id);
+
+            try {
+                let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
+                    filterKey: "project",
+                    filterValue: this.project.id
+                });
+                defaultLayers.array.forEach(({user, hideByDefault}) => this.addLayerById(user, !hideByDefault));
+            }
+            catch(error) {
+                console.log(error)
+            }
         }
 
         if(this.layersToPreload != null) {
