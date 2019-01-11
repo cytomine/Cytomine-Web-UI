@@ -43,7 +43,7 @@
             <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
                               :idViewer="idViewer"
                               :index="index"
-                              :user-layer="layer">
+                              :layer="layer">
             </annotation-layer>
 
             <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">

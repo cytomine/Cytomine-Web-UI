@@ -1,5 +1,5 @@
 <template>
-<vl-layer-vector :visible="userLayer.visible"
+<vl-layer-vector :visible="layer.visible"
                  :extent="imageExtent"
                  :update-while-interacting="false"> <!-- TODO: set to true to compare perfs -->
 
@@ -23,7 +23,7 @@ export default {
     props: [
         "idViewer",
         "index",
-        "userLayer"
+        "layer"
     ],
     data() {
         return {
@@ -79,12 +79,12 @@ export default {
     },
     methods: {
         addAnnotationHandler(annot) {
-            if(annot.image == this.image.id && this.$refs.olSource) {
+            if(annot.user == this.layer.id && this.$refs.olSource) {
                 this.$refs.olSource.addFeature(this.createFeature(annot));
             }
         },
         selectAnnotationHandler({annot, idViewer, index}) {
-            if(idViewer == this.idViewer && index == this.index && this.$refs.olSource) {
+            if(idViewer == this.idViewer && index == this.index && annot.user == this.layer.id && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
@@ -100,7 +100,7 @@ export default {
             }
         },
         editAnnotationHandler(annot) {
-            if(annot.image == this.image.id && this.$refs.olSource) {
+            if(annot.user == this.layer.id && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     return;
@@ -110,7 +110,7 @@ export default {
             }
         },
         deleteAnnotationHandler(annot) {
-            if(annot.image == this.image.id && this.$refs.olSource) {
+            if(annot.user == this.layer.id && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     return;
@@ -153,7 +153,7 @@ export default {
             });
 
             let annots = await new AnnotationCollection({
-                user: this.userLayer.id,
+                user: this.layer.id,
                 image: this.image.id,
                 bbox: extent.join(),
                 showWKT: true,
@@ -170,6 +170,7 @@ export default {
             let isFeatureSelected = indexSelectedFeature != -1;
 
             if(annot == null) {
+                console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
                 this.$refs.olSource.removeFeature(feature);
                 if(isFeatureSelected) {
                     this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
@@ -188,6 +189,7 @@ export default {
                     // if feature is selected and under modification, updating it may lead to conflict
                     return;
                 }
+                console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
                 this.$store.commit("changeAnnotSelectedFeature", {
                     idViewer: this.idViewer,
                     index: this.index,
@@ -196,6 +198,7 @@ export default {
                 });
             }
 
+            console.log(`Updating annot ${annot.id} in layer ${this.layer.id} (external action)`);
             feature.set("annot", annot);
             feature.setGeometry(this.format.readGeometry(annot.location));
         },
@@ -203,7 +206,7 @@ export default {
         async loader(extent=this.lastExtent, resolution=this.resolution) {
             this.resolution = resolution;
 
-            if(!this.userLayer.visible || this.$refs.olSource == null || extent == null) {
+            if(!this.layer.visible || this.$refs.olSource == null || extent == null) {
                 return;
             }
 
@@ -232,7 +235,7 @@ export default {
                 this.$store.commit("removeLayerFromSelectedFeatures", {
                     idViewer: this.idViewer,
                     index: this.index,
-                    idLayer: this.userLayer.id,
+                    idLayer: this.layer.id,
                     cache: true
                 });
 

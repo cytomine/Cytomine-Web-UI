@@ -220,14 +220,10 @@ export default {
                         return {term, user: [this.currentUser.id]};
                     });
                     // ----
-                    let feature = this.format.readFeature(annot.location);
-                    feature.set("annot", annot);
-                    feature.setId(annot.id);
 
                     this.$eventBus.$emit("addAnnotation", annot);
-
                     if(idx == this.nbActiveLayers - 1) {
-                        this.$store.dispatch("selectFeature", {idViewer: this.idViewer, index: this.index, feature});
+                        this.$eventBus.$emit("selectAnnotation", {idViewer: this.idViewer, index: this.index, annot});
                     }
 
                     this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot: null});
