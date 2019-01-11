@@ -11,7 +11,7 @@
                 </td>
             </tr>
 
-            <template v-if="configUI['project-explore-annotation-geometry-info']">
+            <template v-if="isPropDisplayed('geometry-info')">
                 <tr v-if="annotation.area > 0">
                     <td><strong>{{$t("area")}}</strong></td>
                     <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
@@ -23,7 +23,7 @@
                 </tr>
             </template>
 
-            <tr v-if="configUI['project-explore-annotation-description']">
+            <tr v-if="isPropDisplayed('description')">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
                     <cytomine-description :object="annotation" :canEdit="canEdit" />
@@ -31,7 +31,7 @@
             </tr>
 
             <!-- TERMS -->
-            <tr>
+            <tr v-if="isPropDisplayed('terms')">
                 <td colspan="2">
                     <h5>{{$t("terms")}}</h5>
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
@@ -63,21 +63,21 @@
             </tr>
 
             <!-- PROPERTIES -->
-            <tr v-if="configUI['project-explore-annotation-properties']">
+            <tr v-if="isPropDisplayed('properties')">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
                     <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
                 </td>
             </tr>
 
-            <tr v-if="configUI['project-explore-annotation-attached-files']">
+            <tr v-if="isPropDisplayed('attached-files')">
                 <td colspan="2">
                     <h5>{{$t("attached-files")}}</h5>
                     <attached-files :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 
-            <template v-if="configUI['project-explore-annotation-creation-info']">
+            <template v-if="isPropDisplayed('creation-info')">
                 <tr>
                     <td><strong>{{$t("created-by")}}</strong></td>
                     <td>
@@ -113,7 +113,7 @@
                 {{ $t("button-copy-url") }}
             </button>
 
-            <button v-if="configUI['project-explore-annotation-comments']" class="level-item button is-small"> <!-- TODO -->
+            <button v-if="isPropDisplayed('comments')" class="level-item button is-small"> <!-- TODO -->
                 {{ $t("button-comment") }}
             </button>
 
@@ -189,6 +189,11 @@ export default {
         }
     },
     methods: {
+        isPropDisplayed(prop) {
+            let displayed = this.configUI[`project-explore-annotation-${prop}`];
+            return (displayed || displayed == null); // TODO: replace with return displayed once all props are managed in backend
+        },
+
         copyURL() {
             copyToClipboard(window.location.origin + "/#" + this.annotationURL);
             this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});

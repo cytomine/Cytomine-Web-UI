@@ -76,7 +76,7 @@ export default {
                         // display annotation details in viewer
                         {key: "project-explore-annotation-main", label: "annotation-details-box"},
                         {key: "project-explore-annotation-geometry-info", label: "geometry-info",
-                            icon: "fas fa-ruler-combined"},
+                            icon: "fas fa-ruler-combined"}, // TODO in core
                         {key: "project-explore-annotation-description", label: "description", icon: "far fa-file-alt"},
                         {key: "project-explore-annotation-terms", label: "terms", icon: "fas fa-hashtag"}, // TODO in core
                         {key: "project-explore-annotation-properties", label: "properties", icon: "fas fa-tag"},

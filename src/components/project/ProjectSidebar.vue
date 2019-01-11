@@ -8,7 +8,7 @@
             <h1>{{`${$t("project")}: ${project.name}`}}</h1>
         </div>
         <ul>
-            <template v-if="configUI['project-images-tab']">
+            <template v-if="isTabDisplayed('images')">
                 <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
                     <a>
                         <i class="far fa-images"></i>
@@ -28,31 +28,31 @@
                     </a>-->
                 </router-link>
             </template>
-            <router-link v-if="configUI['project-annotations-tab']" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
+            <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
                     <i class="far fa-edit"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link  v-if="configUI['project-jobs-tab']" tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
+            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
                 <a>
                     <i class="fas fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link v-if="configUI['project-activity-tab']" tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
+            <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/metrics`" class="metrics">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
                     {{ $t("metrics") }}
                 </a>
             </router-link>
-            <router-link v-if="configUI['project-info-tab']" tag="li" :to="`/project/${project.id}/information`" class="information">
+            <router-link v-if="isTabDisplayed('info')" tag="li" :to="`/project/${project.id}/information`" class="information">
                 <a>
                     <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
                 </a>
             </router-link>
-            <router-link  v-if="configUI['project-configuration-tab']" tag="li" :to="`/project/${project.id}/configuration`" class="configuration">
+            <router-link  v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`" class="configuration">
                 <a>
                     <i class="fas fa-cogs"></i>
                     {{ $t("configuration") }}
@@ -89,6 +89,10 @@ export default {
         toggleSideBar() {
             this.visibleSideBar = !this.visibleSideBar;
             this.$eventBus.$emit("updateMapSize");
+        },
+        isTabDisplayed(tab) {
+            let displayed = this.configUI[`project-${tab}-tab`]
+            return (displayed || displayed == null); // TODO: replace with return displayed once all tabs are managed in backend
         }
     }
 };

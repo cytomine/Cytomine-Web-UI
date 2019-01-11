@@ -133,7 +133,7 @@
                             <i class="fas fa-street-view"></i>
                         </a>
                         <follow-panel class="panel-options" v-show="activePanel == 'follow'"
-                            :idViewer="idViewer" :index="index" :project="project" :view="$refs.view" />
+                            :idViewer="idViewer" :index="index" :view="$refs.view" />
                     </li>
 
                     <li v-if="isPanelDisplayed('guided-tour')">
@@ -422,7 +422,8 @@ export default {
         }, 500),
 
         isPanelDisplayed(panel) {
-            return this.configUI[`project-explore-${panel}`];
+            let displayed = this.configUI[`project-explore-${panel}`];
+            return (displayed || displayed == null); // TODO: replace with return displayed once all panels are managed in backend
         },
         
         cancelCalibration() {
