@@ -21,7 +21,8 @@
             </td>
             <td>
                 <button :class="['button', customUI[prop.key].CONTRIBUTOR_PROJECT ? 'is-success' : 'is-danger']"
-                        @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')">
+                        @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')"
+                        :disabled="prop.key == 'project-configuration-tab'">
                     {{$t("contributor")}}
                 </button>
             </td>
