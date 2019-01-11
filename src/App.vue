@@ -13,13 +13,11 @@
     </notifications>
 
     <template v-if="!loading">
-        <div class="panel communication-error-panel" v-if="communicationError">
-            <p class="panel-heading">
+        <div class="box error" v-if="communicationError">
+            <h2>
                 {{$t("communication-error")}}
-            </p>
-            <div class="panel-block">
-                {{$t("core-cannot-be-reached")}}
-            </div>
+            </h2>
+            {{$t("core-cannot-be-reached")}}
         </div>
 
         <login v-else-if="!authenticated"></login>
@@ -102,8 +100,8 @@ body {
     background: #d4d4d4;
 }
 
-.communication-error-panel {
-    width: 30%;
+.box.error {
+    width: 50%;
     margin: auto;
     margin-top: 50px;
 }

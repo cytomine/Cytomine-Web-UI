@@ -200,7 +200,7 @@ export default {
                 defaultLayers.array.forEach(({user, hideByDefault}) => this.addLayerById(user, !hideByDefault));
             }
             catch(error) {
-                console.log(error)
+                console.log(error);
             }
         }
 

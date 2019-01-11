@@ -1,5 +1,9 @@
 <template>
-<div class="list-annotations-wrapper">
+<div class="box error" v-if="!configUI['project-annotations-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div>
+<div v-else class="list-annotations-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading">
         <div class="box">
@@ -164,6 +168,9 @@ export default {
     computed: {
         project() {
             return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
         },
         selectedImagesIds() {
             return this.selectedImages.map(img => img.id);

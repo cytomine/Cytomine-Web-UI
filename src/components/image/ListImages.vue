@@ -1,5 +1,9 @@
 <template>
-<div class="list-images-wrapper">
+<div class="box error" v-if="!configUI['project-images-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div>
+<div v-else class="list-images-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
@@ -268,6 +272,9 @@ export default {
     computed: {
         project() {
             return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
         },
         filteredImages() {
             let filtered = this.images;

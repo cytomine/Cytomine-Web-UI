@@ -1,25 +1,23 @@
 <template>
-<div class="cytomine-viewer">
+<div v-if="error" class="box error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("error-loading-image") }}</p>
+</div>
+<div v-else class="cytomine-viewer">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
-        <div v-if="error" class="box">
-            <h2> {{ $t("error") }} </h2>
-            <p>{{ $t("error-loading-image") }}</p>
+    <div v-if="!loading" class="maps-wrapper">
+        <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
+                :style="`height:${elementHeight}%; width:${elementWidth}%;`">
+            <cytomine-image v-if="idx <= nbMaps"
+                :idViewer="idBaseImage"
+                :index="idx-1"
+                :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
+                @close="closeMap(idx-1)">
+            </cytomine-image>
         </div>
-        <div v-else class="maps-wrapper">
-            <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-                    :style="`height:${elementHeight}%; width:${elementWidth}%;`">
-                <cytomine-image v-if="idx <= nbMaps"
-                    :idViewer="idBaseImage"
-                    :index="idx-1"
-                    :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`" 
-                    @close="closeMap(idx-1)">
-                </cytomine-image>
-            </div>
 
-            <image-selector :idViewer="idBaseImage" />
-        </div>
-    </template>
+        <image-selector :idViewer="idBaseImage" />
+    </div>
 </div>
 </template>
 
@@ -132,11 +130,5 @@ export default {
 .map-cell {
     border-top: 3px solid #222;
     overflow: hidden;
-}
-
-.box {
-    width: 50%;
-    margin: auto;
-    margin-top: 50px;
 }
 </style>

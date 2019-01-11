@@ -1,5 +1,9 @@
 <template>
-<div class="box">
+<div class="box error" v-if="!configUI['project-configuration-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div>
+<div class="box" v-else>
     <b-tabs v-model="activeTab">
         <b-tab-item :label="$t('general')">
             <general-configuration></general-configuration>
@@ -52,6 +56,11 @@ export default {
             ]
         };
     },
+    computed: {
+        configUI() {
+            return this.$store.state.project.configUI;
+        }
+    },
     watch: {
         activeTab(idx) {
             this.$router.push(`?tab=${this.tabNames[idx]}`);
@@ -69,7 +78,7 @@ export default {
 </script>
 
 <style scoped>
-.box {
+.box:not(.error) {
     margin: 20px 50px 20px 50px;
     min-height: 80vh;
 }
