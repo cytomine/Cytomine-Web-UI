@@ -34,8 +34,7 @@
                     </div>
                     <div class="filter-body">
                         <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" :multiple="true"
-                            :searchable="false">
-                        </cytomine-multiselect>
+                            :searchable="false" />
                     </div>
                 </div>
 
@@ -45,8 +44,7 @@
                     </div>
                     <div class="filter-body">
                         <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                            label="label" track-by="value" :searchable="false">
-                        </cytomine-multiselect>
+                            :searchable="false" />
                     </div>
                 </div>
             </div>
@@ -59,49 +57,48 @@
                  :per-page="perPage"
                  pagination-size="is-small">
 
-            <template slot-scope="props" slot="header">
-                <template v-if="props.column.label == 'SELECTOR'">
+            <template slot-scope="{column}" slot="header">
+                <template v-if="column.label == 'SELECTOR'">
                     <input type="checkbox" v-model="selectAll" :disabled="filteredMembers.length == 0">
                 </template>
-                <template v-else>{{ props.column.label }}</template>
+                <template v-else>{{ column.label }}</template>
             </template>
 
-            <template slot-scope="props">
+            <template slot-scope="{row: member}">
                 <b-table-column label="SELECTOR" width="20">
-                    <input type="checkbox" v-model="props.row.selected" :disabled="props.row.id == currentUser.id">
+                    <input type="checkbox" v-model="member.selected" :disabled="member.id == currentUser.id">
                 </b-table-column>
 
                 <b-table-column field="username" :label="$t('username')" sortable width="100">
-                    <username :user="props.row" 
-                              :online="onlineIds.includes(props.row.id)" 
-                              :displayFullName="false">
-                    </username>
+                    <username :user="member"
+                              :online="onlineIds.includes(member.id)"
+                              :displayFullName="false" />
                 </b-table-column>
 
                 <b-table-column field="name" :label="$t('name')" sortable width="150">
-                    {{ props.row.name }}
+                    {{ member.name }}
                 </b-table-column>
 
-                <b-table-column field="role.value" :label="$t('role')" sortable width="50">
+                <b-table-column field="indexRole" :label="$t('role')" sortable width="50">
                     <span class="icons">
-                        <a @click="confirmToggleManager(props.row)">
-                            <i class="fas fa-cog" :class="{disabled: props.row.role == contributorRole}"></i>
+                        <a @click="confirmToggleManager(member)">
+                            <i class="fas fa-cog" :class="{disabled: member.role == contributorRole}"></i>
                         </a>
-                        <a v-if="props.row.role != contributorRole" @click="toggleRepresentative(props.row)">
-                            <i class="fas fa-cog" :class="{disabled: props.row.representativeId == null}">
-                                <i class="superscript fas fa-plus" :class="{disabled: props.row.representativeId == null}"></i>
+                        <a v-if="member.role != contributorRole" @click="toggleRepresentative(member)">
+                            <i class="fas fa-cog" :class="{disabled: member.representativeId == null}">
+                                <i class="superscript fas fa-plus"></i>
                             </i>
                         </a>
                     </span>
                 </b-table-column>
 
                 <b-table-column field="email" :label="$t('email')" sortable width="200">
-                    <a :href="`mailto:${props.row.email}`">{{ props.row.email }}</a>
+                    <a :href="`mailto:${member.email}`">{{ member.email }}</a>
                 </b-table-column>
 
                 <b-table-column field="LDAP" :label="$t('source')" centered sortable width="50">
-                    <span class="tag ldap is-rounded is-info" :class="{ldap: props.row.LDAP}">
-                        {{$t(props.row.LDAP ? "LDAP" : "manual")}}
+                    <span class="tag ldap is-rounded is-info" :class="{ldap: member.LDAP}">
+                        {{$t(member.LDAP ? "LDAP" : "manual")}}
                     </span>
                 </b-table-column>
 
@@ -199,7 +196,6 @@ export default {
             
             contributorRole: null,
             managerRole: null,
-            representativeRole: null,
             availableRoles: [],
             selectedRoles: [],
 
@@ -267,12 +263,14 @@ export default {
             let managers = this.managers.map(manager => {
                 let member = manager.clone();
                 member.role = this.managerRole;
+                member.indexRole = 1; // to allow sorting
                 return member;
             });
 
             let contributors = this.contributors.map(contrib => {
                 let member = contrib.clone();
                 member.role = this.contributorRole;
+                member.indexRole = 0; // to allow sorting
                 return member;
             });
 
@@ -282,8 +280,8 @@ export default {
                 member.name = `${member.firstname} ${member.lastname}`;
                 let representative = this.representatives.find(r => r.user == member.id);
                 if(representative != null) {
-                    member.role = this.representativeRole;
                     member.representativeId = representative.id;
+                    member.indexRole = 2; // to allow sorting
                 }
             });
 
@@ -402,10 +400,9 @@ export default {
 
     },
     async created() {
-        this.contributorRole = {value: 0, label: this.$t("contributor")};
-        this.managerRole = {value: 1, label: this.$t("manager")};
-        this.representativeRole = {value: 2, label: this.$t("representative")};
-        this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
+        this.contributorRole = this.$t("contributor");
+        this.managerRole = this.$t("manager");
+        this.availableRoles = [this.contributorRole, this.managerRole];
         this.selectedRoles = this.availableRoles;
 
         this.onlineStatus = this.$t("online");
@@ -464,7 +461,7 @@ a:hover .fas {
     color: rgb(35, 102, 216);
 }
 
-a:hover .fas.disabled {
+a:hover .fas.disabled, a:hover .disabled .fas {
     color: rgba(35, 102, 216, 0.5);
 }
 
@@ -477,7 +474,7 @@ a:hover .fas.disabled {
     position: relative;
 }
 
-.fas.disabled {
+.fas.disabled, .disabled .fas {
     color: rgba(0, 0, 0, 0.1);
 }
 

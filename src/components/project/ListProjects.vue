@@ -49,7 +49,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                                    label="label" track-by="index" :searchable="false">
+                                    :searchable="false">
                                 </cytomine-multiselect>
                             </div>
                         </div>
@@ -119,11 +119,10 @@
             <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
                 <template slot-scope="{row: project}">
-                    <b-table-column :visible="atLeastOneManaged" field="role.index" label="" centered width="1" sortable>
-                        <i v-if="project.role == managerRole || project.role == representativeRole"
-                           class="fas fa-cog"
-                           :title="$t(project.role == managerRole ? 'manager-icon-label' : 'representative-icon-label')">
-                            <i v-if="project.role == representativeRole" class="superscript fas fa-plus"></i>
+                    <b-table-column :visible="atLeastOneManaged" field="roleIndex" label="" centered width="1" sortable>
+                        <i v-if="project.isManaged" class="fas fa-cog"
+                           :title="$t(project.isRepresented ? 'representative-icon-label' : 'manager-icon-label')">
+                            <i v-if="project.isRepresented" class="superscript fas fa-plus"></i>
                         </i>
                     </b-table-column>
 
@@ -238,9 +237,8 @@ export default {
             availableTags: [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}], // TODO
             selectedTags: [],
             availableRoles: [],
-            contributorRole: null,
-            managerRole: null,
-            representativeRole: null,
+            contributorLabel: null,
+            managerLabel: null,
             selectedRoles: [],
             boundsMembers: [0, 0],
             boundsImages: [0, 0],
@@ -273,10 +271,14 @@ export default {
                 filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
             }
 
+            let includeContributor = this.selectedRoles.includes(this.contributorLabel);
+            let includeManager = this.selectedRoles.includes(this.managerLabel);
+
             // TODO tags
             filtered = filtered.filter(project => {
+                let roleIncluded = (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
                 return this.selectedOntologiesIds.includes(project.ontology) &&
-                    this.selectedRoles.includes(project.role) &&
+                    roleIncluded &&
                     isBetweenBounds(project.numberOfImages, this.boundsImages) &&
                     isBetweenBounds(project.membersCount, this.boundsMembers) &&
                     isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations) &&
@@ -302,7 +304,7 @@ export default {
             return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
         },
         atLeastOneManaged() {
-            return this.projects.some(project => project.role == this.managerRole || project.role == this.representativeRole);
+            return this.projects.some(project => project.isManaged);
         },
         ontologies() {
             let seenIds = [];
@@ -366,19 +368,15 @@ export default {
         let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
         let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
 
-        this.contributorRole = {label: this.$t("contributor"), index: 0};
-        this.managerRole = {label: this.$t("manager"), index: 1};
-        this.representativeRole = {label: this.$t("representative"), index: 2};
-        this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
+        this.contributorLabel = this.$t("contributor");
+        this.managerLabel = this.$t("manager");
+        this.availableRoles = [this.contributorLabel, this.managerLabel];
         this.selectedRoles = this.availableRoles;
 
         this.projects = projects.array.map(project => {
-            if(idManagedProjects.includes(project.id)) {
-                project.role = idProjectsRepresentatives.includes(project.id) ? this.representativeRole : this.managerRole;
-            }
-            else {
-                project.role = this.contributorRole;
-            }
+            project.isManaged = idManagedProjects.includes(project.id);
+            project.isRepresented = idProjectsRepresentatives.includes(project.id);
+            project.roleIndex = Number(project.isManaged) + Number(project.isRepresented); // to allow sorting
             return project;
         });
 
