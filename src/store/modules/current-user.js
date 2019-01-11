@@ -18,7 +18,6 @@ export default {
         logout(state) {
             state.authenticated = false;
             state.user = null;
-            // TODO: clean other variables
         }
     },
 

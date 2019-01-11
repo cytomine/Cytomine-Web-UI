@@ -18,6 +18,10 @@ export default {
 
     mutations: {
 
+        logout(state) {
+            state.viewers = {};
+        },
+
         addViewer(state, {id, name, idProject}) {
             Vue.set(state.viewers, id, {
                 maps: [],

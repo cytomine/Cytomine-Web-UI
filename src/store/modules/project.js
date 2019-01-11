@@ -9,6 +9,13 @@ export default {
     },
 
     mutations: {
+        logout(state) {
+            state.project = null;
+            state.configUI = {};
+            state.managers = [];
+            state.contributors = [];
+        },
+
         setProject(state, project) {
             state.project = project;
         },
