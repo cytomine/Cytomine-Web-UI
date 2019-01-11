@@ -8,20 +8,21 @@
                     <b-tag type="is-dark">{{prop.key}}</b-tag>
                     <b-tag>
                         {{prop.value}}
-                        <button class="edit is-small" :title="$t('button-edit')" 
-                        @click="startPropEdition(prop)">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        <button class="delete is-small" :title="$t('button-delete')" 
-                        @click="removeProp(idx)">
-                        </button>
+                        <template v-if="canEdit">
+                            <button class="edit is-small" :title="$t('button-edit')" @click="startPropEdition(prop)">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="delete is-small" :title="$t('button-delete')" @click="removeProp(idx)">
+                            </button>
+                        </template>
                     </b-tag>
                 </b-taglist>
             </div>
 
-            <button class="button is-small add-prop" @click="addNewProp()" key="showForm">
+            <button v-if="canEdit" class="button is-small add-prop" @click="addNewProp()" key="showForm">
                 {{$t("button-add")}}
             </button>
+            <em v-else-if="properties.length == 0">{{$t("no-properties")}}</em>
         </b-field>
 
         <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
@@ -43,7 +44,10 @@ import {Property, PropertyCollection} from "cytomine-client";
 
 export default {
     name: "cytomine-properties",
-    props: ["object"],
+    props: {
+        object: {type: Object},
+        canEdit: {type: Boolean, default: true}
+    },
     data() {
         return {
             loading: true,
@@ -74,6 +78,7 @@ export default {
                 this.$emit("update");
             }
             catch(error) {
+                console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-remove-prop")});
             }
         },
@@ -95,6 +100,7 @@ export default {
                 this.$emit("update");
             }
             catch(error) {
+                console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-save-prop")});
             }
         },

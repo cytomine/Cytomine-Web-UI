@@ -26,7 +26,7 @@
             <tr v-if="configUI['project-explore-annotation-description']">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
-                    <cytomine-description :object="annotation"></cytomine-description>
+                    <cytomine-description :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 
@@ -37,9 +37,11 @@
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                     :title="`${$t('associated-by')} ${user.fullName}`">
                         <cytomine-term :term="term"></cytomine-term>
-                        <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
+                        <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
+                            @click="removeTerm(term)">
+                        </button>
                     </b-tag>
-                    <b-field>
+                    <b-field v-if="canEdit">
                         <b-autocomplete
                             v-model="addTermString"
                             :placeholder="$t('add-term')"
@@ -56,6 +58,7 @@
                             </div>
                         </b-autocomplete>
                     </b-field>
+                    <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
                 </td>
             </tr>
 
@@ -63,15 +66,14 @@
             <tr v-if="configUI['project-explore-annotation-properties']">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
-                    <cytomine-properties :object="annotation" @update="$emit('updateProperties')">
-                    </cytomine-properties>
+                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
                 </td>
             </tr>
 
             <tr v-if="configUI['project-explore-annotation-attached-files']">
                 <td colspan="2">
                     <h5>{{$t("attached-files")}}</h5>
-                    <attached-files :object="annotation"></attached-files>
+                    <attached-files :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 
@@ -115,7 +117,7 @@
                 {{ $t("button-comment") }}
             </button>
 
-            <button class="level-item button is-small is-danger" @click="confirmDeletion()">
+            <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
                 {{ $t("button-delete") }}
             </button>
         </div>
@@ -157,6 +159,9 @@ export default {
         },
         creator() {
             return this.users.find(user => user.id == this.annotation.user) || {};
+        },
+        canEdit() {
+            return this.$store.getters.canEditLayer(this.annotation.user);
         },
         image() {
             return this.images.find(image => image.id == this.annotation.image) || {};

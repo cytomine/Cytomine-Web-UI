@@ -25,7 +25,7 @@
                     <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
                 </td>
                 <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.drawOn" @change="toggleLayerDrawOn(index)">
+                    <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
                 </td>
 
                 <td class="name-column">
@@ -48,10 +48,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
-import {Project} from "cytomine-client";
-
 import {fullName} from "@/utils/user-utils.js";
 
 export default {
@@ -69,6 +65,12 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        project() {
+            return this.$store.state.project.project;
+        },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
@@ -99,12 +101,10 @@ export default {
         },
         unselectedLayers() {
             return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
-        },
-
-        ...mapState({currentUser: state => state.currentUser.user})
+        }
     },
     watch: {
-        activePanel(panel) {
+        activePanel() {
             this.fetchIndexLayers();
         }
     },
@@ -127,6 +127,10 @@ export default {
             return `${name} (${indexLayer.countAnnotation || 0})`;
         },
 
+        canDraw(layer) {
+            return this.$store.getters.canEditLayer(layer.id);
+        },
+
         addLayerById(id) {
             let layer = this.layers.find(layer => layer.id == id);
             if(layer != null) {
@@ -140,7 +144,7 @@ export default {
             }
 
             layer.visible = true;
-            layer.drawOn = (layer.id == this.currentUser.id);
+            layer.drawOn = (layer.id == this.currentUser.id && this.canDraw(layer));
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -172,7 +176,7 @@ export default {
         },
 
         async fetchLayers() {
-            this.layers = (await new Project({id: this.image.project}).fetchUserLayers(this.image.id)).array;
+            this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
         },
 
         async fetchIndexLayers(force=false) {

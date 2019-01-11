@@ -4,12 +4,12 @@
         <template v-if="attachedFiles.length > 0">
             <span class="file-item" v-for="(file, index) in attachedFiles" :key="file.id">
                 <a :href="host + file.url">{{file.filename}}</a>
-                <button class="delete is-small" @click="confirmDeletion(file, index)"></button>
+                <button v-if="canEdit" class="delete is-small" @click="confirmDeletion(file, index)"></button>
                 <template v-if="index < attachedFiles.length - 1">,</template>
             </span>
         </template>
         <em v-else>{{$t("no-attached-file")}} </em>
-        <button class="button is-small" @click="displayModal()">{{$t("button-add")}}</button>
+        <button v-if="canEdit" class="button is-small" @click="displayModal()">{{$t("button-add")}}</button>
     </template>
 </div>
 </template>
@@ -20,7 +20,10 @@ import AttachedFileModal from "./AttachedFileModal";
 
 export default {
     name: "attached-files",
-    props: ["object"],
+    props: {
+        object: {type: Object},
+        canEdit: {type: Boolean, default: true}
+    },
     data() {
         return {
             loading: true,

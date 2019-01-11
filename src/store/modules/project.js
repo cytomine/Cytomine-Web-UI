@@ -56,5 +56,17 @@ export default {
             commit("setManagers", managers);
             commit("setContributors", contributors);
         }
+    },
+
+    getters: {
+        canEditLayer: (state, _, rootState) => idLayer => {
+            let currentUser = rootState.currentUser.user;
+            if(state.managers.some(user => user.id == currentUser.id)) { // user is manager
+                return true;
+            }
+
+            let project = state.project;
+            return !project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted);
+        }
     }
 };

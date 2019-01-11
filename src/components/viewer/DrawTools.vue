@@ -102,31 +102,31 @@
     </div>
 
     <div class="buttons has-addons">
-        <button v-if="isToolDisplayed('fill')" :disabled="!isNotPointSelected" v-tooltip="$t('fill')"
+        <button v-if="isToolDisplayed('fill')" :disabled="isToolDisabled('fill')" v-tooltip="$t('fill')"
                 class="button is-small"
                 @click="fill()">
             <span class="icon is-small"><i class="fas fa-fill"></i></span>
         </button>
 
-        <button v-if="isToolDisplayed('edit')" :disabled="!isNotPointSelected" v-tooltip="$t('modify')"
+        <button v-if="isToolDisplayed('edit')" :disabled="isToolDisabled('edit')" v-tooltip="$t('modify')"
                 class="button is-small" :class="{'is-selected': activeEditTool == 'modify'}"
                 @click="activateEditTool('modify')">
             <span class="icon is-small"><i class="fas fa-edit"></i></span>
         </button>
 
-        <button v-if="isToolDisplayed('move')" :disabled="selectedFeature == null" v-tooltip="$t('move')"
+        <button v-if="isToolDisplayed('move')" :disabled="isToolDisabled('move')" v-tooltip="$t('move')"
                 class="button is-small" :class="{'is-selected': activeEditTool == 'translate'}"
                 @click="activateEditTool('translate')">
             <span class="icon is-small"><i class="fas fa-arrows-alt"></i></span>
         </button>
 
-        <button v-if="isToolDisplayed('rotate')" :disabled="!isNotPointSelected" v-tooltip="$t('rotate')"
+        <button v-if="isToolDisplayed('rotate')" :disabled="isToolDisabled('rotate')" v-tooltip="$t('rotate')"
                 class="button is-small" :class="{'is-selected': activeEditTool == 'rotate'}"
                 @click="activateEditTool('rotate')">
             <span class="icon is-small"><i class="fas fa-sync-alt"></i></span>
         </button>
 
-        <button v-if="isToolDisplayed('delete')" :disabled="selectedFeature == null" v-tooltip="$t('delete')"
+        <button v-if="isToolDisplayed('delete')" :disabled="isToolDisabled('delete')" v-tooltip="$t('delete')"
                 class="button is-small"
                 @click="confirmDeletion()" v-shortkey.once="['d']" @shortkey="confirmDeletion()">
             <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
@@ -134,13 +134,13 @@
     </div>
 
     <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons">
-        <button :disabled="actions.length == 0" v-tooltip="$t('undo')"
+        <button :disabled="actions.length == 0 || ongoingCalibration" v-tooltip="$t('undo')"
             class="button is-small"
             @click="undo()" v-shortkey.once="['ctrl', 'z']" @shortkey="undo()">
             <span class="icon is-small"><i class="fas fa-undo"></i></span>
         </button>
 
-        <button :disabled="undoneActions.length == 0" v-tooltip="$t('redo')"
+        <button :disabled="undoneActions.length == 0 || ongoingCalibration" v-tooltip="$t('redo')"
                 class="button is-small"
                 @click="redo()" v-shortkey.once="['ctrl', 'y']" @shortkey="redo()">
             <span class="icon is-small"><i class="fas fa-redo"></i></span>
@@ -228,12 +228,6 @@ export default {
                 return this.selectedFeatures[0];
             }
         },
-        isNotPointSelected() { // true iff there is a feature selected that is not a point
-            if(this.selectedFeature != null) {
-                return this.selectedFeature.geometry.type != "Point";
-            }
-            return false;
-        },
         layers() {
             return this.imageWrapper.selectedLayers || [];
         },
@@ -260,6 +254,27 @@ export default {
     methods: {
         isToolDisplayed(tool) {
             return this.configUI[`project-tools-${tool}`];
+        },
+
+        isToolDisabled(tool) {
+            if(this.selectedFeature == null) {
+                return true; // no feature selected -> all edit tools disabled
+            }
+
+            if(!this.$store.getters.canEditLayer(this.selectedFeature.properties.annot.user)) {
+                return true;
+            }
+
+            let geomType = this.selectedFeature.geometry.type;
+            if(geomType == "Point") {
+                return (tool != "move" && tool != "delete"); // disable all tools except move and delete for points
+            }
+            else if(geomType == "Line") {
+                return (tool == "fill"); // disable fill tool for lines
+            }
+            else {
+                return false;
+            }
         },
 
         activateTool(tool) {

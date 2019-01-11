@@ -7,12 +7,14 @@
                 <div class="ql-editor" v-html="previewDescription"></div> <!-- WARNING can lead to js injection -->
             </div>
             <a @click="openModal(false)"> {{ $t("see-full-text") }} </a> 
-            {{ $t("or") }} 
-            <a @click="openModal(true)"> {{ $t("edit") }} </a>
+            <template v-if="canEdit">
+                {{ $t("or") }}
+                <a @click="openModal(true)"> {{ $t("edit") }} </a>
+            </template>
         </template>
         <template v-else>
             <em>{{$t("no-description")}}</em>
-            <a @click="openModal(true)"> {{ $t("add-one") }} </a>    
+            <a v-if="canEdit" @click="openModal(true)"> {{ $t("add-one") }} </a>
         </template>
     </template>
 </div>
@@ -27,7 +29,10 @@ import constants from "@/utils/constants.js";
 export default {
     name: "cytomine-description",
     components: {DescriptionModal},
-    props: ["object"],
+    props: {
+        object: {type: Object},
+        canEdit: {type: Boolean, default: true}
+    },
     data() {
         return {
             loading: true,
