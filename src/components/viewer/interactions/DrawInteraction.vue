@@ -76,12 +76,13 @@ export default {
                 case "point":
                     return "Point";
                 case "line":
+                case "freehand-line":
                     return "LineString";
                 case "rectangle": 
                 case "circle":
                     return "Circle";
                 case "polygon": 
-                case "freehand": 
+                case "freehand-polygon":
                 case "correct-add": 
                 case "correct-remove":
                     return "Polygon";
@@ -91,7 +92,7 @@ export default {
             return this.activeTool == "correct-add" || this.activeTool == "correct-remove";
         },
         drawFreehand() {
-            return this.activeTool == "freehand" || this.drawCorrection;
+            return this.activeTool == "freehand-polygon" || this.activeTool == "freehand-line" || this.drawCorrection;
         },
         drawGeometryFunction() {
             if(this.activeTool == "rectangle") {

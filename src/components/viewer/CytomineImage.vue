@@ -98,7 +98,7 @@
 
                     <li v-if="isPanelDisplayed('colors')">
                         <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
-                            <i class="fas fa-sliders-h"></i>
+                            <i class="fas fa-adjust"></i>
                         </a>
                         <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
                             :idViewer="idViewer" :index="index" />

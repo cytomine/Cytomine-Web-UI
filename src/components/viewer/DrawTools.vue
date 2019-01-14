@@ -48,6 +48,15 @@
             <span class="icon is-small"><i class="fas fa-minus"></i></span>
         </button>
 
+        <button v-if="isToolDisplayed('freehand-line')" :disabled="disabledDraw" v-tooltip="$t('freehand-line')"
+                class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
+                @click="activateTool('freehand-line')">
+            <span class="icon is-small">
+                <img v-if="activeTool == 'freehand-line'" src="@/assets/free-line-white.svg">
+                <img v-else src="@/assets/free-line.svg">
+            </span>
+        </button>
+
         <!-- QUESTION: redefine expected behaviour
         <button class="button is-small" :disabled="disabledDraw" title="Arrow"
                 @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
@@ -71,15 +80,18 @@
                 @click="activateTool('polygon')">
             <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
+
+        <button v-if="isToolDisplayed('freehand-polygon')" :disabled="disabledDraw" v-tooltip="$t('freehand-polygon')"
+                class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
+                @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
+            <span class="icon is-small">
+                <img v-if="activeTool == 'freehand-polygon'" src="@/assets/free-polygon-white.svg">
+                <img v-else src="@/assets/free-polygon.svg">
+            </span>
+        </button>
     </div>
 
     <div class="buttons has-addons">
-        <button v-if="isToolDisplayed('freehand')" :disabled="disabledDraw" v-tooltip="$t('freehand')"
-                class="button is-small" :class="{'is-selected': activeTool == 'freehand'}"
-                @click="activateTool('freehand')" v-shortkey.once="['f']" @shortkey="activateTool('freehand')">
-            <span class="icon is-small"><i class="fas fa-pencil-alt"></i></span>
-        </button>
-
         <!-- TODO: would be better if correct add and correct remove were targeted on a previously selected annot
         backend modif required (https://github.com/cytomine/Cytomine-core/issues/1141) -->
         <button v-if="isToolDisplayed('union')" :disabled="disabledDraw" v-tooltip="$t('freehand-correct-add')"
@@ -478,4 +490,8 @@ export default {
     font-family: Arial;
 }
 
+.icon.is-small img {
+    height: 15px;
+    width: 15px;
+}
 </style>
