@@ -8,7 +8,9 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
-            <button class="button is-link" @click="addImageModal = true">{{$t('button-add-image')}}</button>
+            <button v-if="!currentUser.guestByNow" class="button is-link" @click="addImageModal = true">
+                {{$t('button-add-image')}}
+            </button>
         </p>
         <div class="panel-block">
             <div class="search-block">
@@ -270,6 +272,9 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         project() {
             return this.$store.state.project.project;
         },

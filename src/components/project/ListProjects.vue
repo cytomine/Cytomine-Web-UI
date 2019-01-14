@@ -4,7 +4,9 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("projects")}}
-            <button class="button is-link" @click="creationModal = true">{{$t('new-project')}}</button>
+            <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
+                {{$t('new-project')}}
+            </button>
         </p>
         <div class="panel-block">
             <div class="search-block">

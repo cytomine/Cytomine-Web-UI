@@ -1,10 +1,14 @@
 <template>
-    <div class="project-container">
-        <project-sidebar v-if="project" :key="idProject"></project-sidebar>
+    <div class="box error" v-if="permissionError || notFoundError">
+        <h2> {{ $t(permissionError ? "access-denied" : "not-found") }} </h2>
+        <p> {{ $t(permissionError ?  "insufficient-permission" : "not-found-error") }} </p>
+    </div>
+    <div v-else class="project-container">
+        <project-sidebar v-if="project" :key="idProject" />
 
-        <div class="app-content" v-if="project && project.id == idProject">
-            <router-view :key="$route.path">
-            </router-view>
+        <div class="app-content">
+            <b-loading :is-full-page="false" :active="loading" />
+            <router-view v-if="!loading" :key="$route.path" />
         </div>
     </div>
 </template>
@@ -15,6 +19,13 @@ import ProjectSidebar from "./ProjectSidebar.vue";
 export default {
     name: "cytomine-project",
     components: {ProjectSidebar},
+    data() {
+        return {
+            loading: true,
+            permissionError: false,
+            notFoundError: false
+        };
+    },
     computed: {
         idProject() {
             return this.$route.params.idProject;
@@ -24,17 +35,30 @@ export default {
         }
     },
     watch: {
-        idProject() {
-            this.loadProject();
+        async idProject() {
+            this.loading = true;
+            await this.loadProject();
         }
     },
     methods: {
-        loadProject() {
-            this.$store.dispatch("loadProject", this.idProject);
+        async loadProject() {
+            try {
+                await this.$store.dispatch("loadProject", this.idProject);
+                this.loading = false;
+            }
+            catch(error) {
+                console.log(error);
+                if(error.response.status == 403) {
+                    this.permissionError = true;
+                }
+                else {
+                    this.notFoundError = true;
+                }
+            }
         }
     },
-    created() {
-        this.loadProject();
+    async created() {
+        await this.loadProject();
     }
 };
 </script>

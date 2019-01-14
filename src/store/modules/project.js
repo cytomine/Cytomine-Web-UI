@@ -68,7 +68,7 @@ export default {
     getters: {
         canEditLayer: (state, _, rootState) => idLayer => {
             let currentUser = rootState.currentUser.user;
-            if(state.managers.some(user => user.id == currentUser.id)) { // user is manager
+            if(currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id)) { // user admin or manager
                 return true;
             }
 

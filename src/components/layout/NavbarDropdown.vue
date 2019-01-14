@@ -6,6 +6,7 @@
     <a class="navbar-link" :class="{'is-active': isActive}">
         <i v-if="icon != null" :class="['fas', icon]"></i>
         {{title}}
+        <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
     </a>
     <div class="navbar-dropdown" :class="classes" @click="opened = false;">
         <slot>
@@ -17,7 +18,13 @@
 <script>
 export default {
     name: "navbar-dropdown",
-    props: ["icon", "title", "classes", "listPathes"],
+    props: [
+        "icon",
+        "title",
+        "tag",
+        "classes",
+        "listPathes"
+    ],
     data() {
         return {
             opened: false,
@@ -39,3 +46,11 @@ export default {
     }
 };
 </script>
+
+<style>
+.navbar-item .tag {
+    margin-left: 7px;
+    position: relative;
+    top: 1px;
+}
+</style>

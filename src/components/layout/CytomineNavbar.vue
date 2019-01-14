@@ -14,7 +14,7 @@
                 <i class="fas fa-list-alt"></i>
                 {{ $t("projects") }}
             </router-link>
-            <router-link to="/storage" class="navbar-item">
+            <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item">
                 <i class="fas fa-download"></i>
                 {{ $t("storage") }}
             </router-link>
@@ -28,10 +28,21 @@
                 <a href="#" class="navbar-item">{{$t("about")}}</a>
             </navbar-dropdown>
 
-            <navbar-dropdown icon="fa-user" :title="currentUserFullInfo" :listPathes="['/account']">
+            <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
+                             :title="currentUserFullInfo"
+                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : ''"
+                             :listPathes="['/account']">
                 <router-link to="/account" class="navbar-item">
                     {{$t("account")}}
                 </router-link>
+                <template v-if="currentUser.admin">
+                    <a v-if="!currentUser.adminByNow" class="navbar-item" @click="openAdminSession()">
+                        {{$t("open-admin-session")}}
+                    </a>
+                    <a v-else class="navbar-item" @click="closeAdminSession()">
+                        {{$t("close-admin-session")}}
+                    </a>
+                </template>
                 <a class="navbar-item" @click="logout()">
                     {{ $t("logout") }}
                 </a>
@@ -88,6 +99,24 @@ export default {
         changeLanguage(newLocale) {
             this.$i18n.locale = newLocale;
             this.$moment.locale(newLocale);
+        },
+        async openAdminSession() {
+            try {
+                await this.$store.dispatch("openAdminSession");
+                this.$router.go();
+            }
+            catch(error) {
+                console.log(error);
+            }
+        },
+        async closeAdminSession() {
+            try {
+                await this.$store.dispatch("closeAdminSession");
+                this.$router.go();
+            }
+            catch(error) {
+                console.log(error);
+            }
         },
         async logout() {
             try {
