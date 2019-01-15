@@ -123,7 +123,7 @@ export default {
                 await this.$store.dispatch("logout");
             }
             catch(err) {
-                this.$notify({type: "error", text: "Error during logout"}); // TODO: add translation
+                this.$notify({type: "error", text: this.$t("notif-error-logout")});
             }
         }
     }
