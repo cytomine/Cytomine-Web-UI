@@ -67,8 +67,17 @@
             </b-table>
         </div>
         <div class="table-footer buttons">
-            <button class="button is-small" @click="activeModal = true">{{$t("filters")}}</button>
-            <button class="button is-small">{{$t("export")}}</button> <!-- TODO -->
+            <button class="button is-small" @click="activeModal = true">
+                {{$t("filters")}}
+            </button>
+            <button class="button is-small"
+                    :class="{'is-link': highlightFilteredAnnotations}"
+                    @click="highlightFilteredAnnotations = !highlightFilteredAnnotations">
+                {{$t('highlight-filtered')}}
+            </button>
+            <button class="button is-small">
+                {{$t("export")}}
+            </button> <!-- TODO -->
         </div>
     </div>
 
@@ -143,12 +152,6 @@
                             <cytomine-slider v-model="perimeterBounds" :max="maxPerimeter" :integerOnly="false" />
                         </div>
                     </div>
-                </div>
-                <div class="has-text-centered">
-                    <label>
-                        <input type="checkbox" v-model="highlightFilteredAnnotations" />
-                        {{$t("highlight-filtered-cells")}}
-                    </label>
                 </div>
             </section>
             <footer class="modal-card-foot">
