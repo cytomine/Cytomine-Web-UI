@@ -119,7 +119,7 @@
                         <button class="button is-small" @click="isMagnificationModalActive = true">
                             {{$t("button-set-magnification")}}
                         </button>
-                        <a class="button is-small" href="">{{$t("button-download")}}</a> <!-- TODO -->
+                        <a class="button is-small" :href="image.downloadURL">{{$t("button-download")}}</a>
                         <button class="button is-danger is-small" @click="confirmDeletion()">{{$t("button-delete")}}</button>
                     </div>
                 </td>

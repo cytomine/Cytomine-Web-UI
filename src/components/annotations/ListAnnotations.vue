@@ -34,69 +34,70 @@
 
             <h2> {{ $t("filters") }} </h2>
             <div class="filters">
-                    <div class="columns">
-                        <div class="column filter">
-                            <div class="filter-label">
-                                {{$t("annotation-type")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
-                                    :allow-empty="false" :searchable="false" />
-                            </div>
+                <div class="columns">
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("annotation-type")}}
                         </div>
-
-                        <div v-if="selectedAnnotationType == userAnnotationOption" class="column filter">
-                            <div class="filter-label">
-                                {{$t("members")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedMembers" :options="members"
-                                    label="fullName" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
-                        </div>
-
-                        <div v-else class="column filter">
-                            <div class="filter-label">
-                                {{$t("jobs")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs" 
-                                    label="fullName" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
+                                :allow-empty="false" :searchable="false" />
                         </div>
                     </div>
 
-                    <div class="columns">
-                        <div class="column filter">
-                            <div class="filter-label">
-                                {{$t("images")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedImages" :options="images"
-                                    label="instanceFilename" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
+                    <div v-if="selectedAnnotationType == userAnnotationOption" class="column filter">
+                        <div class="filter-label">
+                            {{$t("members")}}
                         </div>
-
-                        <div class="column filter">
-                            <div class="filter-label">
-                                {{$t("terms")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedTerms" :options="termsOptions"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedMembers" :options="members"
+                                label="fullName" track-by="id" :multiple="true" />
                         </div>
+                    </div>
 
+                    <div v-else class="column filter">
+                        <div class="filter-label">
+                            {{$t("jobs")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
+                                label="fullName" track-by="id" :multiple="true" />
+                        </div>
                     </div>
                 </div>
-        </div>
 
-        <!-- TODO: download buttons -->
-        <!-- QUESTION: do we allow saving the filters? -->
+                <div class="columns">
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("images")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedImages" :options="images"
+                                label="instanceFilename" track-by="id" :multiple="true" />
+                        </div>
+                    </div>
+
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("terms")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedTerms" :options="termsOptions"
+                                label="name" track-by="id" :multiple="true" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <h2 class="has-text-right"> {{ $t("download-results") }} </h2>
+            <div class="buttons download-buttons">
+                <!-- TODO in core: change URLs returned in column "View annotation on image" -->
+                <a class="button is-link" :href="downloadURL('pdf')">{{$t("download-PDF")}}</a>
+                <a class="button is-link" :href="downloadURL('csv')">{{$t("download-CSV")}}</a>
+                <a class="button is-link" :href="downloadURL('xls')">{{$t("download-excel")}}</a>
+            </div>
+        </div>
 
         <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
             :size="selectedSize.size"
@@ -127,7 +128,7 @@ import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 
 import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 
-import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection} from "cytomine-client";
+import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
 
@@ -182,6 +183,16 @@ export default {
         },
         allUsers() {
             return this.users.concat(this.userJobs);
+        },
+        collection() {
+            return new AnnotationCollection({
+                project: this.project.id,
+                terms: this.selectedTerms.map(term => term.id),
+                images: this.selectedImagesIds,
+                users: this.selectedUsersIds,
+                noTerm: this.selectedTerms.includes(this.noTermOption),
+                multipleTerms: this.selectedTerms.includes(this.multipleTermsOption)
+            });
         }
     },
     methods: {
@@ -219,6 +230,9 @@ export default {
             });
 
             this.selectedUserJobs = this.userJobs;
+        },
+        downloadURL(format) {
+            return this.collection.getDownloadURL(format);
         }
     },
     async created() {
@@ -266,5 +280,9 @@ export default {
 
 .filters:not(:last-child) {
     margin-bottom: 20px;
+}
+
+.download-buttons {
+    justify-content: right;
 }
 </style>
