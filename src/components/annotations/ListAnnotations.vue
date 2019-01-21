@@ -82,8 +82,9 @@
                             {{$t("terms")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedTerms" :options="termsOptions"
-                                label="name" track-by="id" :multiple="true" />
+                            <ontology-tree-multiselect :ontology="ontology"
+                                :additionalNodes="additionalNodes"
+                                v-model="selectedTermsIds" />
                         </div>
                     </div>
 
@@ -115,7 +116,7 @@
 
             :forceUpdate="forceUpdate"
 
-            v-show="selectedTerms.includes(term)"
+            v-show="selectedTermsIds.includes(term.id)"
 
             @update="forceUpdate = []"> <!-- assigning a new array will be considered as a change in children components -->
         </list-annotations-by-term>
@@ -125,6 +126,7 @@
 
 <script>
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
+import OntologyTreeMultiselect from "@/components/ontology/OntologyTreeMultiselect";
 
 import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 
@@ -134,7 +136,11 @@ import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "list-annotations",
-    components: {CytomineMultiselect, ListAnnotationsByTerm},
+    components: {
+        CytomineMultiselect,
+        OntologyTreeMultiselect,
+        ListAnnotationsByTerm
+    },
     data() {
         return {
             loading: true, 
@@ -155,9 +161,10 @@ export default {
 
             terms: [],
             termsOptions: [],
+            additionalNodes: [],
             noTermOption: {id: 0, name: this.$t("no-term")},
             multipleTermsOption: {id: -1, name: this.$t("multiple-terms")},
-            selectedTerms: [],
+            selectedTermsIds: [],
 
             members: [],
             selectedMembers: [],
@@ -169,6 +176,9 @@ export default {
     computed: {
         project() {
             return this.$store.state.project.project;
+        },
+        ontology() {
+            return this.$store.state.project.ontology;
         },
         configUI() {
             return this.$store.state.project.configUI;
@@ -187,11 +197,11 @@ export default {
         collection() {
             return new AnnotationCollection({
                 project: this.project.id,
-                terms: this.selectedTerms.map(term => term.id),
+                terms: this.selectedTermsIds,
                 images: this.selectedImagesIds,
                 users: this.selectedUsersIds,
-                noTerm: this.selectedTerms.includes(this.noTermOption),
-                multipleTerms: this.selectedTerms.includes(this.multipleTermsOption)
+                noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
+                multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
         }
     },
@@ -199,11 +209,13 @@ export default {
         async fetchTerms() {
             this.terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
             this.termsOptions = this.terms.slice();
+            this.termsOptions.push(this.noTermOption);
+            this.additionalNodes = [this.noTermOption];
             if(this.terms.length > 1) {
                 this.termsOptions.push(this.multipleTermsOption);
+                this.additionalNodes.push(this.multipleTermsOption);
             }
-            this.termsOptions.push(this.noTermOption);
-            this.selectedTerms = this.termsOptions;
+            this.selectedTermsIds = this.termsOptions.map(term => term.id);
         },
         async fetchImages() {
             this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;

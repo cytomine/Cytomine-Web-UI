@@ -165,7 +165,7 @@
 <script>
 import {AnnotationType, AnnotationCollection} from "cytomine-client";
 
-import CytomineTerm from "@/components/term/CytomineTerm";
+import CytomineTerm from "@/components/ontology/CytomineTerm";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import CytomineSlider from "@/components/form/CytomineSlider";
 

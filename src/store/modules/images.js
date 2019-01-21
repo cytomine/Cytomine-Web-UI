@@ -199,10 +199,9 @@ export default {
             state.viewers[idViewer].maps[index].terms = terms;
         },
 
-        toggleAssociateTermToNewAnnot(state, {idViewer, index, indexTerm}) {
+        setTermsNewAnnots(state, {idViewer, index, terms}) {
             let wrapper = state.viewers[idViewer].maps[index];
-            let term = wrapper.terms[indexTerm];
-            term.associateToNewAnnot = !term.associateToNewAnnot;
+            wrapper.termsNewAnnots = terms;
         },
 
         toggleTermVisibility(state, {idViewer, index, indexTerm}) {
@@ -469,6 +468,7 @@ export default {
                 selectedLayers: null,
 
                 terms: terms,
+                termsNewAnnots: [],
                 displayNoTerm: true,
                 noTermOpacity: initialTermsOpacity,
 
@@ -734,7 +734,6 @@ async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
             term.opacity = initialTermsOpacity;
             term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
             term.visible = true;
-            term.associateToNewAnnot = false;
         }
     }
     return terms;

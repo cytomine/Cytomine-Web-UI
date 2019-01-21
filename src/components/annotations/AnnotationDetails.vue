@@ -38,26 +38,27 @@
                     :title="`${$t('associated-by')} ${user.fullName}`">
                         <cytomine-term :term="term"></cytomine-term>
                         <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
-                            @click="removeTerm(term)">
+                            @click="removeTerm(term.id)">
                         </button>
                     </b-tag>
-                    <b-field v-if="canEdit">
-                        <b-autocomplete
-                            v-model="addTermString"
-                            :placeholder="$t('add-term')"
-                            :open-on-focus="true"
-                            :data="filteredTerms"
-                            field="name"
-                            size="is-small"
-                            @select="addTerm">
-                            <div slot-scope="{option: term}" class="autocomplete-term-option">
-                                <cytomine-term :term="term"></cytomine-term>
-                            </div>
-                            <div slot="empty" class="autocomplete-term-option">
-                                {{$t("no-term-to-add")}}
-                            </div>
-                        </b-autocomplete>
-                    </b-field>
+                    <div class="add-term-wrapper" v-if="canEdit" v-click-outside="() => showTermSelector = false">
+                        <b-field>
+                            <b-input size="is-small"
+                                    expanded
+                                    :placeholder="$t('add-term')"
+                                    v-model="addTermString"
+                                    @focus="showTermSelector = true" />
+                        </b-field>
+
+                        <div class="ontology-tree-container" v-show="showTermSelector">
+                            <ontology-tree class="ontology-tree"
+                                :ontology="ontology"
+                                :searchString="addTermString"
+                                :selectedNodes="associatedTermsIds"
+                                @select="addTerm"
+                                @unselect="removeTerm" />
+                        </div>
+                    </div>
                     <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
                 </td>
             </tr>
@@ -130,14 +131,16 @@ import {AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
-import CytomineTerm from "@/components/term/CytomineTerm";
+import CytomineTerm from "@/components/ontology/CytomineTerm";
 import AttachedFiles from "@/components/attached-file/AttachedFiles";
+import OntologyTree from "@/components/ontology/OntologyTree";
 
 export default {
     name: "annotations-details",
     components: {
         CytomineDescription,
         CytomineTerm,
+        OntologyTree,
         CytomineProperties,
         AttachedFiles
     },
@@ -151,11 +154,16 @@ export default {
     data() {
         return {
             addTermString: "",
+            showTermSelector: false,
+            revTerms: 0
         };
     },
     computed: {
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        ontology() {
+            return this.$store.state.project.ontology;
         },
         creator() {
             return this.users.find(user => user.id == this.annotation.user) || {};
@@ -181,11 +189,9 @@ export default {
                 return [];
             }
         },
-        filteredTerms() {
-            return this.terms.filter(({id, name}) => {
-                return !this.annotation.term.includes(id) && 
-                    name.toLowerCase().indexOf(this.addTermString.toLowerCase()) >= 0;
-            });
+        associatedTermsIds() {
+            this.revTerms;
+            return this.associatedTerms.map(({term}) => term.id);
         }
     },
     methods: {
@@ -199,30 +205,33 @@ export default {
             this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
-        async addTerm(term) {
-            if(term != null) {
+        async addTerm(idTerm) {
+            if(idTerm != null) {
                 try {
                     // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
-                    await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save(); 
+                    await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
                     this.$emit("updateTerms");
+                    this.showTermSelector = false;
                 }
                 catch(error) {
                     this.$notify({type: "error", text: this.$t("notif-error-add-term")});
+                    this.revTerms++;
                 }
                 finally {
                     this.addTermString = "";
                 }
             }
         },
-        async removeTerm(term) {
+        async removeTerm(idTerm) {
             try {
                 // TODO decide who can delete what, and adapt accordingly
                 // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
-                await AnnotationTerm.delete(this.annotation.id, term.id);
+                await AnnotationTerm.delete(this.annotation.id, idTerm);
                 this.$emit("updateTerms");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-term")});
+                this.revTerms++;
             }
         },
 
@@ -284,6 +293,25 @@ h5 {
 
 .autocomplete-term-option {
     font-size: 13px;
+}
+
+.add-term-wrapper {
+    position: relative;
+}
+
+.ontology-tree-container {
+    position: absolute;
+    top: 100%;
+    left: 0px;
+    z-index: 500;
+    padding-top: 5px;
+    background: white;
+    width: 100%;
+    max-height: 30vh;
+    overflow: auto;
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    border-radius: 4px;
+    margin-top: 4px;
 }
 </style>
 

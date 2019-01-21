@@ -1,9 +1,10 @@
-import {Cytomine, Project} from "cytomine-client";
+import {Cytomine, Project, Ontology} from "cytomine-client";
 
 export default {
     state: {
         project: null,
         configUI: {},
+        ontology: null,
         managers: [],
         contributors: []
     },
@@ -18,6 +19,10 @@ export default {
 
         setProject(state, project) {
             state.project = project;
+        },
+
+        setOntology(state, ontology) {
+            state.ontology = ontology;
         },
 
         setConfigUI(state, config) {
@@ -39,7 +44,8 @@ export default {
             commit("setProject", project);
 
             await Promise.all([
-                dispatch("fetchUIConfig"), 
+                dispatch("fetchUIConfig"),
+                dispatch("fetchOntology"),
                 dispatch("fetchProjectMembers"),
                 project.recordUserConnection()
             ]);
@@ -62,6 +68,11 @@ export default {
 
             commit("setManagers", managers);
             commit("setContributors", contributors);
+        },
+
+        async fetchOntology({state, commit}) {
+            let ontology = await Ontology.fetch(state.project.ontology);
+            commit("setOntology", ontology);
         }
     },
 

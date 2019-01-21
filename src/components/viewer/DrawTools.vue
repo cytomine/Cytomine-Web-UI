@@ -9,7 +9,7 @@
     </div>
 
     <div class="buttons has-addons term-selection" :class="{'has-preview': termsToAssociate.length > 0}"
-         @mouseleave="showTermSelector = false">
+         v-click-outside="() => showTermSelector = false">
         <button v-tooltip="$t('terms-new-annotation')" 
                 class="button is-small" :disabled="disabledDraw" 
                 @click="showTermSelector = !showTermSelector">
@@ -20,18 +20,12 @@
             <span v-if="termsToAssociate.length > 1">{{termsToAssociate.length}}</span>
         </div>
 
-        <div class="dropdown-menu" v-show="showTermSelector">
-            <div class="dropdown-content">
-                <a class="dropdown-item" v-for="(term, idx) in terms" :key="term.id"
-                   @click="toggleTerm(idx)" :class="{'is-selected': term.associateToNewAnnot}">
-                    <div class="autocomplete-term-option">
-                        <span class="selection"><i class="fas fa-check"></i></span>
-                        <span>
-                            <cytomine-term :term="term"></cytomine-term>
-                        </span>
-                    </div>
-                </a>
-            </div>
+        <div class="ontology-tree-container" v-show="showTermSelector">
+            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
+            <ontology-tree class="ontology-tree"
+                v-model="termsToAssociate"
+                :ontology="ontology"
+                :searchString="searchStringTerm" />
         </div>
     </div>
 
@@ -162,7 +156,7 @@
 </template>
 
 <script>
-import CytomineTerm from "@/components/term/CytomineTerm";
+import OntologyTree from "@/components/ontology/OntologyTree";
 
 import WKT from "ol/format/WKT";
 
@@ -170,7 +164,7 @@ import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-tools",
-    components: {CytomineTerm},
+    components: {OntologyTree},
     props: [
         "idViewer",
         "index"
@@ -178,12 +172,16 @@ export default {
     data() {
         return {
             showTermSelector: false,
-            format: new WKT()
+            format: new WKT(),
+            searchStringTerm: ""
         };
     },
     computed: {
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        ontology() {
+            return this.$store.state.project.ontology;
         },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
@@ -197,12 +195,17 @@ export default {
         terms() {
             return this.imageWrapper.terms;
         },
-        termsToAssociate() {
-            return this.terms.filter(term => term.associateToNewAnnot);
+        termsToAssociate: {
+            get() {
+                return this.imageWrapper.termsNewAnnots;
+            },
+            set(terms) {
+                this.$store.commit("setTermsNewAnnots", {idViewer: this.idViewer, index: this.index, terms});
+            }
         },
         backgroundTermsNewAnnot() {
             if(this.termsToAssociate.length == 1) {
-                return this.termsToAssociate[0].color;
+                return this.terms.find(term => this.termsToAssociate[0] == term.id).color;
             }
             else {
                 return "#e2e2e2";
@@ -448,25 +451,18 @@ export default {
     top: 2px;
 }
 
-.term-selection .dropdown-menu {
-    display: block;
-    z-index: 500;
+.term-selection .ontology-tree-container {
+    position: absolute;
+    top: 100%;
     left: -20px;
-}
-
-.term-selection .dropdown-menu a.is-selected {
-    background: #f5f5f5;
-}
-
-.term-selection .dropdown-menu a:not(.is-selected) i.fas {
-    display: none;
-}
-
-.term-selection .selection {
-    width: 15px;
-    display: inline-block;
-    position: relative;
-    right: 6px;
+    margin-top: 5px;
+    background: white;
+    min-width: 250px;
+    max-width: 20vw;
+    max-height: 40vh;
+    overflow: auto;
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    border-radius: 4px;
 }
 
 .term-selection:not(.has-preview) .color-preview {
@@ -493,5 +489,16 @@ export default {
 .icon.is-small img {
     height: 15px;
     width: 15px;
+}
+</style>
+
+<style>
+.term-selection .ontology-tree-container .control {
+    margin: 10px;
+    margin-bottom: 0px;
+}
+
+.term-selection .ontology-tree-container .ontology-tree {
+    padding: 10px 0px;
 }
 </style>

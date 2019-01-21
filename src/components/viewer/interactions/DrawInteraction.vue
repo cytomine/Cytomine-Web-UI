@@ -58,12 +58,7 @@ export default {
             return this.imageWrapper.rotation;
         },
         termsToAssociate() {
-            return this.imageWrapper.terms.reduce((ids, term) => {
-                if(term.associateToNewAnnot) {
-                    ids.push(term.id);
-                }
-                return ids;
-            }, []);
+            return this.imageWrapper.termsNewAnnots;
         },
         image() {
             return this.imageWrapper.imageInstance;
