@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
+import CytomineStorage from "./components/storage/CytomineStorage.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
@@ -28,6 +29,13 @@ const routes = [
         component: ListProjects,
         meta: {
             title: "Cytomine - Projects"
+        }
+    },
+    {
+        path: "/storage",
+        component: CytomineStorage,
+        meta: {
+            title: "Cytomine - Storage"
         }
     },
     {

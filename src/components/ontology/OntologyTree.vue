@@ -1,6 +1,6 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection}">
-    <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" ref="tree">
+    <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select">
         <template slot="toggle" slot-scope="{node}">
             <template v-if="!node.data.hidden && !node.isLeaf">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
@@ -183,32 +183,6 @@ export default {
     padding: 0px 0px 2px 0px;
 }
 
-.ontology-tree .sl-vue-tree {
-    position: relative;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none;
-}
-
-.ontology-tree .sl-vue-tree-root > .sl-vue-tree-nodes-list {
-    position: relative;
-}
-
-.ontology-tree .sl-vue-tree-node-list {
-    position: relative;
-}
-
-.ontology-tree .sl-vue-tree-node-item {
-    position: relative;
-    padding-left: 22px;
-    width: 100%;
-    line-height: 2.2;
-    font-size: 14px;
-}
-
 .ontology-tree .tree-checkbox {
     font-size: 16px;
     margin-right: 10px;
@@ -228,39 +202,8 @@ export default {
     color: #61b2e8;
 }
 
-.ontology-tree .sl-vue-tree-node-is-folder > .sl-vue-tree-title {
-    position: relative;
-    right: 20px;
-}
-
-.ontology-tree .tree-toggle.fas {
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 20px;
-    cursor: pointer;
-}
-
-.ontology-tree .sl-vue-tree-node-item {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-}
-
-.ontology-tree .sl-vue-tree-gap {
-    width: 18px;
-    min-height: 1px;
-    flex-shrink: 0;
-}
-
 .ontology-tree.selector .sl-vue-tree-gap {
     width: 24px;
-}
-
-.ontology-tree .sl-vue-tree-title {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    word-break: break-all !important;
 }
 
 .ontology-tree.selector .tree-selector {
@@ -271,23 +214,6 @@ export default {
 
 .ontology-tree .tree-selector:hover .tree-checkbox {
     color: #61b2e8;
-}
-
-.ontology-tree .sl-vue-tree-cursor {
-    position: absolute;
-    border: 1px dashed #61b2e8;
-    height: 1px;
-    width: 100%;
-}
-
-.ontology-tree .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-    outline: 1px dashed #61b2e8;
-}
-
-.ontology-tree .sl-vue-tree-drag-info {
-    position: absolute;
-    background-color: rgba(0,0,0,0.5);
-    padding: 5px 10px;
 }
 
 .ontology-tree .no-result {

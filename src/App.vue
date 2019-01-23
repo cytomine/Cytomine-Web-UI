@@ -25,7 +25,9 @@
         <template v-else>
             <cytomine-navbar></cytomine-navbar>
             <div class="bottom">
-                <router-view v-if="currentUser"></router-view>
+                <keep-alive include="cytomine-storage">
+                    <router-view v-if="currentUser"></router-view>
+                </keep-alive>
             </div>
         </template>
     </template>
@@ -428,6 +430,84 @@ strong, .label {
     visibility: visible;
     opacity: 1;
     transition: opacity .15s;
+}
+
+/* SL vue tree */
+.sl-vue-tree {
+    position: relative;
+}
+
+.sl-vue-tree.draggable {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.sl-vue-tree-root > .sl-vue-tree-nodes-list {
+    position: relative;
+}
+
+.sl-vue-tree-node-list {
+    position: relative;
+}
+
+.sl-vue-tree-node-item {
+    position: relative;
+    padding-left: 22px;
+    width: 100%;
+    line-height: 2.2;
+    font-size: 14px;
+}
+
+.sl-vue-tree-title {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    word-break: break-all !important;
+}
+
+.sl-vue-tree .tree-toggle.fas {
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.sl-vue-tree-node-is-folder > .sl-vue-tree-title {
+    position: relative;
+    right: 20px;
+}
+
+.sl-vue-tree-node-item {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.sl-vue-tree-gap {
+    width: 18px;
+    min-height: 1px;
+    flex-shrink: 0;
+}
+
+.sl-vue-tree-cursor {
+    position: absolute;
+    border: 1px dashed #61b2e8;
+    height: 1px;
+    width: 100%;
+}
+
+.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+    outline: 1px dashed #61b2e8;
+}
+
+.sl-vue-tree-drag-info {
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px 10px;
 }
 
 </style>

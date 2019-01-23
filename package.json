@@ -11,11 +11,13 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.5.0",
+        "axios": "^0.18.0",
         "buefy": "^0.7.1",
         "bulma": "^0.7.2",
         "bulma-slider": "^2.0.0",
         "copy-to-clipboard": "^3.0.8",
         "cytomine-client": "^0.2.0",
+        "filesize": "^4.0.0",
         "lodash": "^4.17.11",
         "npm-font-open-sans": "^1.1.0",
         "ol": "^5.3.0",
