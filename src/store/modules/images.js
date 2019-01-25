@@ -28,7 +28,8 @@ export default {
                 name,
                 idProject,
                 links: [],
-                imageSelector: false
+                imageSelector: false,
+                activeMap: 0
             });
         },
 
@@ -41,12 +42,18 @@ export default {
         },
 
         addMap(state, {idViewer, wrapper}) {
-            state.viewers[idViewer].maps.push(wrapper);
-            state.viewers[idViewer].imageSelector = false;
+            let viewerWrapper = state.viewers[idViewer];
+            viewerWrapper.maps.push(wrapper);
+            viewerWrapper.imageSelector = false;
+            viewerWrapper.activeMap = viewerWrapper.maps.length - 1;
         },
 
         removeMap(state, {idViewer, index}) {
             state.viewers[idViewer].maps.splice(index, 1);
+        },
+
+        setActiveMap(state, {idViewer, index}) {
+            state.viewers[idViewer].activeMap = index;
         },
 
         setImageInstance(state, {idViewer, index, image}) {

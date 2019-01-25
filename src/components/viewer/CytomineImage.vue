@@ -1,12 +1,14 @@
 <!-- TODO job templates -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
-    <div class="map-container" v-if="!loading">
+    <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
         <vl-map :data-projection="projectionName"
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
+                :keyboard-event-target="document"
                 @pointermove="projectedMousePosition = $event.coordinate"
+                @mounted="updateKeyboardInteractions"
                 ref="map">
 
             <vl-view :center.sync="center"
@@ -196,6 +198,8 @@ import {addProj, createProj, getProj} from "vuelayers/lib/ol-ext";
 
 import View from "ol/View";
 import OverviewMap from "ol/control/OverviewMap";
+import {KeyboardPan, KeyboardZoom} from "ol/interaction";
+import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
 import {Annotation, UserPosition} from "cytomine-client";
@@ -247,6 +251,9 @@ export default {
         };
     },
     computed: {
+        document() {
+            return document;
+        },
         configUI() {
             return this.$store.state.project.configUI;
         },
@@ -267,6 +274,19 @@ export default {
         },
         selectedLayers() {
             return this.imageWrapper.selectedLayers || [];
+        },
+        isActiveMap: {
+            get() {
+                return this.viewerWrapper.activeMap == this.index;
+            },
+            set(value) {
+                if(value) {
+                    this.$store.commit("setActiveMap", {idViewer: this.idViewer, index: this.index});
+                }
+                else {
+                    throw new Error("Cannot unset active map");
+                }
+            }
         },
         activePanel() {
             return this.imageWrapper.activePanel;
@@ -355,6 +375,19 @@ export default {
             if(this.$refs.map) {
                 this.$refs.map.updateSize();
             }
+        },
+
+        async updateKeyboardInteractions() {
+            await this.$refs.map.$createPromise; // wait for ol.Map to be created
+
+            this.$refs.map.$map.getInteractions().forEach(interaction => {
+                if(interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
+                    interaction.condition_ = (mapBrowserEvent) => {
+                        return noModifierKeys(mapBrowserEvent) && targetNotEditable(mapBrowserEvent)
+                            && this.isActiveMap && !mapBrowserEvent.originalEvent.target.classList.contains("ql-editor");
+                    };
+                }
+            });
         },
 
         async viewMounted() {
