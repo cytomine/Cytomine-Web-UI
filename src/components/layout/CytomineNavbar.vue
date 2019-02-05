@@ -24,8 +24,8 @@
             <cytomine-searcher></cytomine-searcher>
 
             <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
-                <a href="#" class="navbar-item">{{$t("hotkeys")}}</a>
-                <a href="#" class="navbar-item">{{$t("about")}}</a>
+                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
+                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
             </navbar-dropdown>
 
             <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
@@ -58,6 +58,9 @@
             </navbar-dropdown>
         </div>
     </div>
+
+    <hotkeys-modal :active.sync="hotkeysModal" />
+    <about-cytomine-modal :active.sync="aboutModal" />
 </nav>
 </template>
 
@@ -65,6 +68,8 @@
 import { mapState } from "vuex";
 
 import NavbarDropdown from "./NavbarDropdown.vue";
+import HotkeysModal from "./HotkeysModal.vue";
+import AboutCytomineModal from "./AboutCytomineModal.vue";
 import CytomineSearcher from "@/components/search/CytomineSearcher.vue";
 
 import {fullName} from "@/utils/user-utils.js";
@@ -73,6 +78,8 @@ export default {
     name: "cytomine-navbar",
     components: {
         NavbarDropdown,
+        HotkeysModal,
+        AboutCytomineModal,
         CytomineSearcher
     },
     data() {
@@ -83,7 +90,9 @@ export default {
             languages: [
                 {value: "en", name:"English"},
                 {value: "fr", name:"Français"}
-            ]
+            ],
+            hotkeysModal: false,
+            aboutModal: false
         };
     },
     computed: {

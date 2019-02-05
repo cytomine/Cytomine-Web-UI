@@ -46,8 +46,8 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
                 @click="activateTool('freehand-line')">
             <span class="icon is-small">
-                <img v-if="activeTool == 'freehand-line'" src="@/assets/free-line-white.svg">
-                <img v-else src="@/assets/free-line.svg">
+                <img v-if="activeTool == 'freehand-line'" src="@/assets/viewer/free-line-white.svg">
+                <img v-else src="@/assets/viewer/free-line.svg">
             </span>
         </button>
 
@@ -79,8 +79,8 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
                 @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
             <span class="icon is-small">
-                <img v-if="activeTool == 'freehand-polygon'" src="@/assets/free-polygon-white.svg">
-                <img v-else src="@/assets/free-polygon.svg">
+                <img v-if="activeTool == 'freehand-polygon'" src="@/assets/viewer/free-polygon-white.svg">
+                <img v-else src="@/assets/viewer/free-polygon.svg">
             </span>
         </button>
     </div>

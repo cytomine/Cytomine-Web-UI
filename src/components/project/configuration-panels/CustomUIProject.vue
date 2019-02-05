@@ -98,12 +98,12 @@ export default {
                         {key: "project-tools-point", label: "point", icon: "fas fa-map-marker-alt"},
                         {key: "project-tools-line", label: "line", icon: "fas fa-minus"}, // TODO in core
                         {key: "project-tools-freehand-line", label: "freehand-line",
-                            img: require("@/assets/free-line.svg")}, // TODO in core
+                            img: require("@/assets/viewer/free-line.svg")}, // TODO in core
                         {key: "project-tools-rectangle", label: "rectangle", icon: "far fa-square"},
                         {key: "project-tools-circle", label: "circle", icon: "far fa-circle"},
                         {key: "project-tools-polygon", label: "polygon", icon: "fas fa-draw-polygon"},
                         {key: "project-tools-freehand-polygon", label: "freehand-polygon",
-                            img: require("@/assets/free-polygon.svg")}, // TODO in core
+                            img: require("@/assets/viewer/free-polygon.svg")}, // TODO in core
                         {key: "project-tools-union", label: "freehand-correct-add", icon: "fas fa-pencil-alt",
                             superscript: "fas fa-plus"},
                         {key: "project-tools-diff", label: "freehand-correct-remove", icon: "fas fa-pencil-alt",
