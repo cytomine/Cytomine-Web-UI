@@ -1,4 +1,5 @@
 import Vue from "vue";
+import router from "@/routes.js";
 
 import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
@@ -22,10 +23,9 @@ export default {
             state.viewers = {};
         },
 
-        addViewer(state, {id, name, idProject}) {
+        addViewer(state, {id, idProject}) {
             Vue.set(state.viewers, id, {
                 maps: [],
-                name,
                 idProject,
                 links: [],
                 imageSelector: false,
@@ -49,7 +49,8 @@ export default {
         },
 
         removeMap(state, {idViewer, index}) {
-            state.viewers[idViewer].maps.splice(index, 1);
+            let viewerWrapper = state.viewers[idViewer];
+            viewerWrapper.maps.splice(index, 1);
         },
 
         setActiveMap(state, {idViewer, index}) {
@@ -57,7 +58,8 @@ export default {
         },
 
         setImageInstance(state, {idViewer, index, image}) {
-            state.viewers[idViewer].maps[index].imageInstance = image;
+            let viewerWrapper = state.viewers[idViewer];
+            viewerWrapper.maps[index].imageInstance = image;
         },
 
         togglePanel(state, {idViewer, index, panel}) {
@@ -373,7 +375,15 @@ export default {
             state.viewers[idViewer].maps[index].annotsToSelect = [annot];
         },
 
-        // ----- Highlighted features
+        // ----- Annotations table & highlighted features
+
+        setShowAnnotationsTable(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].showAnnotationsTable = value;
+        },
+
+        setHighlightFilteredAnnotations(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].highlightFilteredAnnotations = value;
+        },
 
         setHighlightedFeaturesIds(state, {idViewer, index, ids}) {
             state.viewers[idViewer].maps[index].highlightedFeaturesIds = ids;
@@ -415,7 +425,7 @@ export default {
 
         // ----- Undo/Redo
 
-        resetActions(state, {idViewer, index}) { // TODO: remove when annotations corrections are correctly handled
+        resetActions(state, {idViewer, index}) {
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions = [];
             wrapper.undoneActions = [];
@@ -444,13 +454,19 @@ export default {
     },
 
     actions: {
-        async addViewer({commit, dispatch}, baseImage) {
-            let idViewer = baseImage.id;
-            commit("addViewer", {id: idViewer, name: baseImage.instanceFilename, idProject: baseImage.project});
-            await dispatch("addMap", {idViewer, image: baseImage});
+        changePath({getters}, idViewer) {
+            router.replace(getters.pathViewer({idViewer, idAnnotation: router.currentRoute.params.idAnnotation}));
         },
 
-        async addMap({commit}, {idViewer, image}) {
+        async addViewer({commit, dispatch}, {idViewer, idProject, idImages}) {
+            commit("addViewer", {id: idViewer, idProject});
+            await Promise.all(idImages.map(async id => {
+                let image = await ImageInstance.fetch(id);
+                dispatch("addMap", {idViewer, image});
+            }));
+        },
+
+        async addMap({commit, dispatch}, {idViewer, image}) {
             let [fetchedImage, terms, propertiesKeys] = await Promise.all([
                 fetchImage(image.id),
                 fetchTerms(image.project, initialLayersOpacity),
@@ -492,6 +508,8 @@ export default {
                 selectedFeatures: [],
                 annotsToSelect: [],
 
+                showAnnotationsTable: false,
+                highlightFilteredAnnotations: false,
                 highlightedFeaturesIds: [],
 
                 activeTool: "select",
@@ -511,6 +529,16 @@ export default {
                 ongoingCalibration: false
             };
             commit("addMap", {idViewer, wrapper});
+            dispatch("changePath", idViewer);
+        },
+
+        async setImageInstance({commit, dispatch}, {idViewer, index, image}) {
+            await fetchImageServers(image);
+            commit("setImageInstance", {idViewer, index, image});
+            commit("clearSelectedFeatures", {idViewer, index});
+            commit("resetActions", {idViewer, index});
+            dispatch("refreshProperties", {idViewer, index});
+            dispatch("changePath", idViewer);
         },
 
         async refreshData({state, commit, dispatch}, idViewer) {
@@ -524,11 +552,13 @@ export default {
                 commit("setImageInstance", {idViewer, index, image});
                 commit("setTerms", {idViewer, index, terms});
             }));
+            dispatch("changePath", idViewer);
         },
 
-        removeMap({commit}, {idViewer, index}) {
+        removeMap({commit, dispatch}, {idViewer, index}) {
             commit("unlinkMap", {idViewer, index, deletion: true});
             commit("removeMap", {idViewer, index});
+            dispatch("changePath", idViewer);
         },
 
         removeLayer({state, commit}, {idViewer, index, indexLayer, cacheSelectedFeatures}) {
@@ -686,6 +716,13 @@ export default {
             }
 
             return styles;
+        },
+
+        pathViewer: state => ({idViewer, idAnnotation}) => {
+            let viewerWrapper = state.viewers[idViewer];
+            let imagesIds = viewerWrapper.maps.map(map => map.imageInstance.id);
+            let annot = idAnnotation ? `/annotation/${idAnnotation}` : "";
+            return `/project/${viewerWrapper.idProject}/image/${imagesIds.join("-")}${annot}?viewer=${idViewer}`;
         }
     }
 };
@@ -714,11 +751,15 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
 
 async function fetchImage(idImage) {
     let image = await ImageInstance.fetch(idImage);
+    await fetchImageServers(image);
+    return image;
+}
+
+async function fetchImageServers(image) {
     if(image.imageServerURLs == null) {
         let imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
         image.imageServerURL = imageServerURLs[0];
     }
-    return image;
 }
 
 async function fetchPropertiesKeys(idImage) {

@@ -8,7 +8,7 @@
 
         <div class="app-content">
             <b-loading :is-full-page="false" :active="loading" />
-            <router-view v-if="!loading" :key="$route.path" />
+            <router-view v-if="!loading" />
         </div>
     </div>
 </template>

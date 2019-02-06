@@ -32,7 +32,7 @@
     <div class="buttons has-addons">
         <button v-if="isToolDisplayed('point')" :disabled="disabledDraw" v-tooltip="$t('point')"
                 class="button is-small" :class="{'is-selected': activeTool == 'point'}"
-                @click="activateTool('point')" v-shortkey.once="['p']" @shortkey="activateTool('point')">
+                @click="activateTool('point')" v-shortkey.once="['o']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
 
@@ -354,6 +354,10 @@ export default {
             }
         },
         confirmDeletion() {
+            if(this.selectedFeature == null) {
+                return;
+            }
+
             this.$dialog.confirm({
                 title: this.$t("confirm-deletion"),
                 message: this.$t("confirm-deletion-annotation"),

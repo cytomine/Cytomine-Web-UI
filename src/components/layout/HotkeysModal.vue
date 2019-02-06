@@ -25,7 +25,7 @@
                             <h2>{{$t("draw")}}</h2>
                             <ul>
                                 <li><span class="key">s</span> {{$t("hotkey-select")}}</li>
-                                <li><span class="key">p</span> {{$t("hotkey-point")}}</li>
+                                <li><span class="key">o</span> {{$t("hotkey-point")}}</li>
                                 <li><span class="key">f</span> {{$t("hotkey-freehand")}}</li>
                                 <li><span class="key">d</span> {{$t("hotkey-delete")}}</li>
                                 <li><span class="key">Ctrl + Z</span> {{$t("hotkey-undo")}}</li>

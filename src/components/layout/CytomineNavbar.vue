@@ -164,6 +164,7 @@ font-weight: lighter;
 
 .navbar {
     font-weight: 600;
+    z-index: 500 !important;
 }
 
 .navbar-item.logo {

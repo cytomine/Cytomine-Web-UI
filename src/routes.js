@@ -65,7 +65,7 @@ const routes = [
                 component: ListImages
             },
             {
-                path: "image/:idImage",
+                path: "image/:idImages",
                 component: CytomineViewer
             },
             {
@@ -73,7 +73,7 @@ const routes = [
                 component: ImageInformation
             },
             {
-                path: "image/:idImage/annotation/:idAnnotation",
+                path: "image/:idImages/annotation/:idAnnotation",
                 component: CytomineViewer
             },
             {

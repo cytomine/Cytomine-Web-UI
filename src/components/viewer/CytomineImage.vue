@@ -281,7 +281,9 @@ export default {
             },
             set(value) {
                 if(value) {
-                    this.$store.commit("setActiveMap", {idViewer: this.idViewer, index: this.index});
+                    if(this.viewerWrapper) {
+                        this.$store.commit("setActiveMap", {idViewer: this.idViewer, index: this.index});
+                    }
                 }
                 else {
                     throw new Error("Cannot unset active map");
@@ -482,7 +484,7 @@ export default {
 
         // Actions related to query parameters should be executed only once, for first image of viewer
         let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
-            return map.imageInstance.id == this.$route.params.idImage;
+            return map.imageInstance.id == this.$route.params.idImages;
         });
         if(this.index == firstIndexTargettedImage) {
             let idRoutedAnnot = this.$route.params.idAnnotation;

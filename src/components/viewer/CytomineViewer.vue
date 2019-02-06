@@ -9,14 +9,14 @@
         <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
                 :style="`height:${elementHeight}%; width:${elementWidth}%;`">
             <cytomine-image v-if="idx <= nbMaps"
-                :idViewer="idBaseImage"
+                :idViewer="idViewer"
                 :index="idx-1"
-                :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
+                :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
                 @close="closeMap(idx-1)">
             </cytomine-image>
         </div>
 
-        <image-selector :idViewer="idBaseImage" />
+        <image-selector :idViewer="idViewer" />
     </div>
 </div>
 </template>
@@ -24,8 +24,6 @@
 <script>
 import CytomineImage from "./CytomineImage";
 import ImageSelector from "./ImageSelector";
-
-import {ImageInstance} from "cytomine-client";
 
 import constants from "@/utils/constants.js";
 
@@ -39,15 +37,22 @@ export default {
         return {
             error: false,
             loading: true,
-            reloadInterval: null
+            reloadInterval: null,
+            idViewer: null
         };
     },
     computed: {
-        idBaseImage() {
-            return this.$route.params.idImage;
+        viewers() {
+            return this.$store.state.images.viewers;
+        },
+        idImages() {
+            return this.$route.params.idImages.split("-");
+        },
+        paramIdViewer() {
+            return this.$route.query.viewer;
         },
         viewer() {
-            return this.$store.state.images.viewers[this.idBaseImage];
+            return this.viewers[this.idViewer];
         },
         nbMaps() {
             return this.viewer ? this.viewer.maps.length : 0;
@@ -69,30 +74,59 @@ export default {
         }
     },
     watch: {
+        paramIdViewer() {
+            this.findIdViewer();
+        },
+        idViewer(_, old) {
+            if(old != null) {
+                this.loading = true;
+                this.loadViewer();
+            }
+        },
         nbMaps() {
             this.$eventBus.$emit("updateMapSize");
         }
     },
     methods: {
+        findIdViewer() {
+            if(this.paramIdViewer != null) {
+                this.idViewer = this.paramIdViewer;
+                return;
+            }
+
+            for(let id in this.viewers) {
+                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") == this.$route.params.idImages) {
+                    this.idViewer = id;
+                    return;
+                }
+            }
+
+            this.idViewer = "_" + Math.random().toString(36).substr(2, 9); // TODO: change the ways IDs are generated (discuss with team)
+        },
+
         closeMap(index) {
             if(this.nbMaps == 1) {
-                this.$store.commit("removeViewer", this.idBaseImage);
+                this.$store.commit("removeViewer", this.idViewer);
                 this.$router.push(`/project/${this.$route.params.idProject}`);
             }
             else {
-                this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
+                this.$store.dispatch("removeMap", {idViewer: this.idViewer, index});
             }
         },
 
-        async addBaseImage() {
+        async loadViewer() {
             try {
                 if(this.viewer == null) {
-                    let baseImage = await ImageInstance.fetch(this.idBaseImage);
-                    await this.$store.dispatch("addViewer", baseImage);
+                    await this.$store.dispatch("addViewer", {
+                        idViewer: this.idViewer,
+                        idProject: this.$route.params.idProject,
+                        idImages: this.idImages
+                    });
                 }
                 else {
-                    await this.$store.dispatch("refreshData", this.idBaseImage);
+                    await this.$store.dispatch("refreshData", this.idViewer);
                 }
+                this.loading = false;
             }
             catch(err) {
                 console.log(err);
@@ -101,12 +135,12 @@ export default {
         }
     },
     async created() {
-        await this.addBaseImage();
+        this.findIdViewer();
+        await this.loadViewer();
         this.reloadInterval = setInterval(
             () => this.$eventBus.$emit("reloadAnnotations"),
             constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
         );
-        this.loading = false;
     },
     beforeDestroy() {
         clearInterval(this.reloadInterval);

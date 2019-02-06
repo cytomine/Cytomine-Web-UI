@@ -93,9 +93,15 @@ export default {
                 });
             }
         },
-
+        layersIds() {
+            return this.layers.map(layer => layer.id);
+        },
         selectedLayers() { // Array<User> (representing user layers)
-            return this.imageWrapper.selectedLayers || [];
+            // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
+            // may not be relevant for the current image => filter them
+            let layersIds = this.layers.map(layer => layer.id);
+            let selectedLayers = this.imageWrapper.selectedLayers || [];
+            return selectedLayers.filter(layer => layersIds.includes(layer.id));
         },
         selectedLayersIds() {
             return this.selectedLayers.map(layer => layer.id);

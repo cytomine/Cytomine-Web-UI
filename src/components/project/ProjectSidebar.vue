@@ -17,7 +17,7 @@
                 </router-link>
                 <!-- TODO: change the way opened viewers are displayed -->
                 <router-link tag="li" class="image-link" v-for="viewer in viewers" :key="viewer.id"
-                    :to="`/project/${project.id}/image/${viewer.id}`">
+                    :to="viewer.path">
 
                     <a>{{ viewer.name }}</a>
 
@@ -79,7 +79,18 @@ export default {
             let results = [];
             for(let id in viewers) {
                 if(viewers[id].idProject == this.project.id) {
-                    results.push({id, name: viewers[id].name});
+                    let viewer = viewers[id];
+                    let nbMaps = viewer.maps.length;
+                    if(nbMaps == 0) {
+                        return;
+                    }
+                    let name = nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename
+                        : this.$t("viewer-group", {nbImages: nbMaps});
+                    results.push({
+                        id,
+                        name,
+                        path: this.$store.getters.pathViewer({idViewer: id})
+                    });
                 }
             }
             return results;

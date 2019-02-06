@@ -9,7 +9,7 @@
                 <button class="delete" @click="imageSelectorEnabled = false"></button>
             </div>
             <div class="image-selector">
-                <div class="card" v-for="(image, index) in filteredImages" :key="image.id" v-if="index <nbImagesDisplayed">
+                <div class="card" v-for="image in displayedImages" :key="image.id">
                     <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
                     <div class="card-content">
                         <div class="content">
@@ -73,6 +73,9 @@ export default {
             }
             
             return filtered;
+        },
+        displayedImages() {
+            return this.filteredImages.slice(0, this.nbImagesDisplayed);
         }
     },
     methods: {

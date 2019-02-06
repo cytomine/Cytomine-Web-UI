@@ -189,7 +189,6 @@ export default {
     ],
     data() {
         return {
-            opened: false,
             loading: true,
             pendingReload: true,
 
@@ -203,7 +202,6 @@ export default {
 
             annotations: [],
             selectedAnnot: null,
-            highlightFilteredAnnotations: false,
 
             format: new WKT(),
 
@@ -237,6 +235,30 @@ export default {
             layers = layers.slice(); // create new array so that the modifications can be tracked with the watcher (see https://github.com/vuejs/vue/issues/2164)
             layers.forEach(layer => layer.fullName = fullName(layer));
             return layers;
+        },
+        opened: {
+            get() {
+                return this.imageWrapper.showAnnotationsTable;
+            },
+            set(value) {
+                this.$store.commit("setShowAnnotationsTable", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    value
+                });
+            }
+        },
+        highlightFilteredAnnotations: {
+            get() {
+                return this.imageWrapper.highlightFilteredAnnotations;
+            },
+            set(value) {
+                this.$store.commit("setHighlightFilteredAnnotations", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    value
+                });
+            }
         },
         maxArea() {
             return Math.max(1000, ...this.annotations.map(annot => annot.area));
@@ -454,9 +476,6 @@ export default {
         }
     },
     async created() {
-        this.areaBounds[1] = this.maxArea;
-        this.perimeterBounds[1] = this.maxPerimeter;
-
         this.annotationTypes = [
             {type: AnnotationType.ALGO, label: this.$t("job-annotations")},
             {type: AnnotationType.USER, label: this.$t("user-annotations")}
@@ -471,6 +490,10 @@ export default {
         this.selectedGeometries = this.geometries;
 
         this.selectedUsers = this.layers;
+
+        if(this.opened) {
+            this.loadAnnotations();
+        }
     },
     mounted() {
         this.$eventBus.$on("addAnnotation", this.addAnnotationHandler);
