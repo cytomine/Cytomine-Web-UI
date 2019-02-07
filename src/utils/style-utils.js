@@ -2,12 +2,6 @@ import {Style, Stroke, Fill, Circle, Text} from "ol/style"; // TODO: use vuelaye
 import {MultiPoint} from "ol/geom";
 import {asArray as hexToRgb} from "ol/color";
 
-// ------
-
-export function createDefaultStroke(opacity=0.5) {
-    return new Stroke({color: [0, 0, 0, opacity], width: 2});
-}
-
 // -----
 
 export function isCluster(feature) {
@@ -20,7 +14,11 @@ export function isCluster(feature) {
 
 // -----
 
-export function createColorStyle(color, defaultStroke, opacity=0.5) {
+function createStroke(opacity=0.5) {
+    return new Stroke({color: [0, 0, 0, opacity], width: 2});
+}
+
+export function createColorStyle(color, opacity=0.5) {
     let colorArray = hexToRgb(color);
 
     let colorWithOpacity = colorArray.slice();
@@ -30,14 +28,13 @@ export function createColorStyle(color, defaultStroke, opacity=0.5) {
     let circleStyle = new Circle({
         radius: 5,
         fill: new Fill({color: colorArray}),
-        stroke: createDefaultStroke(1),
-        opacity
+        stroke: createStroke(1),
     });
     circleStyle.setOpacity(opacity);
 
     return new Style({
         fill,
-        stroke: defaultStroke,
+        stroke: createStroke(opacity),
         image: circleStyle
     });
 }
@@ -65,8 +62,10 @@ let width = 2;
 
 let blue = [0, 153, 255, 1];
 let white = [255, 255, 255, 1];
+let orange = [255, 204, 0];
 
 let blueStroke = new Stroke({color: blue, width: width});
+let orangeStroke = new Stroke({color: orange, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
 export let selectStyles = [
@@ -84,10 +83,18 @@ export let verticesStyle = new Style({
     }
 });
 
+export let highlightStyles = [
+    new Style({ stroke: whiteStroke }),
+    new Style({ stroke: orangeStroke }),
+    new Style({ image: new Circle({radius: 6, stroke: orangeStroke}) })
+];
+
 // -----
 
 export function changeOpacity(style, opacity) {
-    let color = style.getFill().getColor();
+    let color = style.getStroke().getColor();
+    color[3] = opacity;
+    color = style.getFill().getColor();
     color[3] = opacity;
     style.getImage().setOpacity(opacity);
 }

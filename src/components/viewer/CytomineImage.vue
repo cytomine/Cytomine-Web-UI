@@ -1,13 +1,14 @@
-<!-- TODO: handle project config - implement in js client but wait for normalization of endpoint (currently: {host}/custom-ui/config.json?project={id}}) -->
 <!-- TODO job templates -->
 <!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
-    <div class="map-container" v-if="!loading">
+    <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
         <vl-map :data-projection="projectionName"
                 :load-tiles-while-animating="true"
                 :load-tiles-while-interacting="true"
+                :keyboard-event-target="document"
                 @pointermove="projectedMousePosition = $event.coordinate"
+                @mounted="updateKeyboardInteractions"
                 ref="map">
 
             <vl-view :center.sync="center"
@@ -44,13 +45,13 @@
             <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
                               :idViewer="idViewer"
                               :index="index"
-                              :user-layer="layer">
+                              :layer="layer">
             </annotation-layer>
 
             <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
             </select-interaction>
 
-            <draw-interaction v-if="!['select', 'ruler', 'angle', 'area'].includes(activeTool)"
+            <draw-interaction v-if="activeTool != 'select'"
                 :idViewer="idViewer" :index="index">
             </draw-interaction>
 
@@ -58,12 +59,9 @@
                 :idViewer="idViewer" :index="index">
             </modify-interaction>
 
-            <measure-interaction :idViewer="idViewer" :index="index">
-            </measure-interaction>
-
         </vl-map>
 
-        <div class="draw-tools">
+        <div v-if="configUI['project-tools-main']" class="draw-tools">
             <draw-tools :idViewer="idViewer" :index="index"></draw-tools>
         </div>
 
@@ -75,84 +73,78 @@
                     </a>
                 </li>
 
-                <li>
-                    <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
-                        <i class="fas fa-info"></i>
-                    </a>
-                    <image-information class="panel-options panel-info" v-show="activePanel == 'info'"
-                        :image="image"></image-information>
-                </li>
+                <template v-if="configUI['project-explore-hide-tools']">
+                    <li v-if="isPanelDisplayed('info')">
+                        <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
+                            <i class="fas fa-info"></i>
+                        </a>
+                        <information-panel class="panel-options" v-show="activePanel == 'info'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
-                        <i class="fas fa-search"></i>
-                    </a>
-                    <digital-zoom class="panel-options panel-digital-zoom"
-                        v-show="activePanel == 'digital-zoom'" :idViewer="idViewer" :index="index"></digital-zoom>
-                </li>
+                    <li v-if="isPanelDisplayed('digital-zoom')">
+                        <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li v-if="viewerWrapper.maps.length > 1">
-                    <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
-                        <i class="fas fa-link"></i>
-                    </a>
-                    <link-panel class="panel-options panel-link"
-                        v-show="activePanel == 'link'" :idViewer="idViewer" :index="index"></link-panel>
-                </li>
+                    <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
+                        <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
+                            <i class="fas fa-link"></i>
+                        </a>
+                        <link-panel class="panel-options" v-show="activePanel == 'link'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
-                        <i class="fas fa-sliders-h"></i>
-                    </a>
-                    <color-manipulation class="panel-options panel-colors" v-show="activePanel == 'colors'"
-                        :idViewer="idViewer" :index="index"></color-manipulation>
-                </li>
+                    <li v-if="isPanelDisplayed('colors')">
+                        <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
+                            <i class="fas fa-adjust"></i>
+                        </a>
+                        <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
-                        <i class="fas fa-copy"></i>
-                    </a>
-                    <annotations-panel class="panel-options panel-layers" v-show="activePanel == 'layers'"
-                        :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
-                    </annotations-panel>
-                </li>
+                    <li v-if="isPanelDisplayed('image-layers')">
+                        <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
+                            <i class="fas fa-copy"></i>
+                        </a>
+                        <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
+                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload" />
+                    </li>
 
-                <li v-if="terms.length > 0">
-                    <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
-                        <i class="fas fa-hashtag"></i>
-                    </a>
-                    <ontology-panel class="panel-options panel-ontology" v-show="activePanel == 'ontology'"
-                        :idViewer="idViewer" :index="index"></ontology-panel>
-                </li>
+                    <li v-if="isPanelDisplayed('ontology') && terms.length > 0">
+                        <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
+                            <i class="fas fa-hashtag"></i>
+                        </a>
+                        <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
-                        <i class="fas fa-tag"></i>
-                    </a>
-                    <properties-panel class="panel-options panel-properties" v-show="activePanel == 'properties'"
-                        :idViewer="idViewer" :index="index"></properties-panel>
-                </li>
+                    <li  v-if="isPanelDisplayed('property')">
+                        <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
+                            <i class="fas fa-tag"></i>
+                        </a>
+                        <properties-panel class="panel-options" v-show="activePanel == 'properties'"
+                            :idViewer="idViewer" :index="index" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
-                        <i class="fas fa-street-view"></i>
-                    </a>
-                    <follow-panel class="panel-options panel-follow" v-show="activePanel == 'follow'"
-                        :idViewer="idViewer" :index="index" :project="project" :view="$refs.view"></follow-panel>
-                </li>
+                    <li v-if="isPanelDisplayed('follow')">
+                        <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
+                            <i class="fas fa-street-view"></i>
+                        </a>
+                        <follow-panel class="panel-options" v-show="activePanel == 'follow'"
+                            :idViewer="idViewer" :index="index" :view="$refs.view" />
+                    </li>
 
-                <li>
-                    <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
-                        <i class="fas fa-map-signs"></i>
-                    </a>
-                    <guided-tour class="panel-options panel-guided-tour" v-show="activePanel == 'guided-tour'"
-                        :view="$refs.view"></guided-tour>
-                </li>
-
-                <li class="bottom" v-if="index == viewerWrapper.maps.length - 1 && !viewerWrapper.imageSelector">
-                    <a @click="addMap()">
-                        <i class="fas fa-plus-circle"></i>
-                    </a>
-                </li>
+                    <li v-if="isPanelDisplayed('guided-tour')">
+                        <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
+                            <i class="fas fa-map-signs"></i>
+                        </a>
+                        <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view" />
+                    </li>
+                </template>
             </ul>
         </div>
 
@@ -160,12 +152,20 @@
             <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
 
-        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index"></rotation-selector>
+        <b-message class="info-calibration" v-if="imageWrapper.ongoingCalibration" type="is-info" has-icon icon-size="is-small">
+            <p>{{$t("calibration-mode-explanation")}}</p>
+            <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
+        </b-message>
 
-        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition"></scale-line>
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
 
-        <annotation-details-container :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotation-details-container>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+
+        <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
+            :idViewer="idViewer" :index="index" :view="$refs.view" />
+
+        <annotations-table v-if="isPanelDisplayed('annotation-panel')"
+            class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view" />
     </div>
 </template>
 
@@ -176,8 +176,9 @@ import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
+import AnnotationsTable from "./AnnotationsTable";
 
-import ImageInformation from "./panels/ImageInformation";
+import InformationPanel from "./panels/InformationPanel";
 import DigitalZoom from "./panels/DigitalZoom";
 import ColorManipulation from "./panels/ColorManipulation";
 import LinkPanel from "./panels/LinkPanel";
@@ -192,12 +193,13 @@ import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
 import SelectInteraction from "./interactions/SelectInteraction";
 import DrawInteraction from "./interactions/DrawInteraction";
 import ModifyInteraction from "./interactions/ModifyInteraction";
-import MeasureInteraction from "./interactions/MeasureInteraction";
 
 import {addProj, createProj, getProj} from "vuelayers/lib/ol-ext";
 
 import View from "ol/View";
 import OverviewMap from "ol/control/OverviewMap";
+import {KeyboardPan, KeyboardZoom} from "ol/interaction";
+import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
 import {Annotation, UserPosition} from "cytomine-client";
@@ -208,8 +210,7 @@ export default {
     name: "cytomine-image",
     props: [
         "idViewer",
-        "index",
-        "project"
+        "index"
     ],
     components: {
         AnnotationLayer,
@@ -217,10 +218,11 @@ export default {
         RotationSelector,
         ScaleLine,
         DrawTools,
+        AnnotationsTable,
 
         AnnotationDetailsContainer,
 
-        ImageInformation,
+        InformationPanel,
         DigitalZoom,
         ColorManipulation,
         LinkPanel,
@@ -232,8 +234,7 @@ export default {
 
         SelectInteraction,
         DrawInteraction,
-        ModifyInteraction,
-        MeasureInteraction
+        ModifyInteraction
     },
     data() {
         return {
@@ -250,6 +251,12 @@ export default {
         };
     },
     computed: {
+        document() {
+            return document;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
+        },
         viewerWrapper() {
             return this.$store.state.images.viewers[this.idViewer];
         },
@@ -268,6 +275,21 @@ export default {
         selectedLayers() {
             return this.imageWrapper.selectedLayers || [];
         },
+        isActiveMap: {
+            get() {
+                return this.viewerWrapper.activeMap == this.index;
+            },
+            set(value) {
+                if(value) {
+                    if(this.viewerWrapper) {
+                        this.$store.commit("setActiveMap", {idViewer: this.idViewer, index: this.index});
+                    }
+                }
+                else {
+                    throw new Error("Cannot unset active map");
+                }
+            }
+        },
         activePanel() {
             return this.imageWrapper.activePanel;
         },
@@ -279,9 +301,6 @@ export default {
         },
         maxZoom() {
             return this.imageWrapper.maxZoom;
-        },
-        triggerUpdateSize() {
-            return this.$store.state.images.triggerMapUpdateSize;
         },
 
         center: {
@@ -348,17 +367,29 @@ export default {
         }
     },
     watch: {
-        triggerUpdateSize() {
-            this.$refs.map.updateSize();
-        },
-
         viewState() {
             this.savePosition();
         },
     },
     methods: {
-        addMap() {
-            this.$store.commit("setImageSelector", {idViewer: this.idViewer, value: true});
+        async updateMapSize() {
+            await this.$nextTick();
+            if(this.$refs.map) {
+                this.$refs.map.updateSize();
+            }
+        },
+
+        async updateKeyboardInteractions() {
+            await this.$refs.map.$createPromise; // wait for ol.Map to be created
+
+            this.$refs.map.$map.getInteractions().forEach(interaction => {
+                if(interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
+                    interaction.condition_ = (mapBrowserEvent) => {
+                        return noModifierKeys(mapBrowserEvent) && targetNotEditable(mapBrowserEvent)
+                            && this.isActiveMap && !mapBrowserEvent.originalEvent.target.classList.contains("ql-editor");
+                    };
+                }
+            });
         },
 
         async viewMounted() {
@@ -384,6 +415,10 @@ export default {
         },
 
         async addOverviewMap() {
+            if(!this.configUI["project-explore-overview"]) {
+                return;
+            }
+
             await this.$refs.map.$createPromise; // wait for ol.Map to be created
             await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
@@ -419,7 +454,16 @@ export default {
                 clearTimeout(this.timeoutSavePosition);
                 this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
             }
-        }, 500)
+        }, 500),
+
+        isPanelDisplayed(panel) {
+            let displayed = this.configUI[`project-explore-${panel}`];
+            return (displayed || displayed == null); // TODO: replace with return displayed once all panels are managed in backend
+        },
+        
+        cancelCalibration() {
+            this.$store.dispatch("cancelCalibration", {idViewer: this.idViewer, index: this.index});
+        }
     },
     async created() {
         if(getProj(this.projectionName) == null) { // if image opened for the first time
@@ -438,20 +482,33 @@ export default {
             });
         });
 
-        // TODO: this should be executed only once, for first image of viewer
-        let idRoutedAnnot = this.$route.params.idAnnotation;
-        if(idRoutedAnnot != null) {
-            let annot = await Annotation.fetch(idRoutedAnnot);
-            if(annot.image == this.image.id) {
-                this.routedAnnotation = annot;
-                this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+        // Actions related to query parameters should be executed only once, for first image of viewer
+        let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
+            return map.imageInstance.id == this.$route.params.idImages;
+        });
+        if(this.index == firstIndexTargettedImage) {
+            let idRoutedAnnot = this.$route.params.idAnnotation;
+            if(idRoutedAnnot != null) {
+                let annot = await Annotation.fetch(idRoutedAnnot);
+                if(annot.image == this.image.id) {
+                    this.routedAnnotation = annot;
+                    this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
+                }
+            }
+
+            if(this.$route.query.action == "calibration") {
+                this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
             }
         }
 
         this.image.recordConsultation();
         this.loading = false;
     },
+    mounted() {
+        this.$eventBus.$on("updateMapSize", this.updateMapSize);
+    },
     beforeDestroy() {
+        this.$eventBus.$off("updateMapSize", this.updateMapSize);
         clearTimeout(this.timeoutSavePosition);
     }
 };
@@ -494,8 +551,26 @@ export default {
     border: 2px solid white;
 }
 
+.info-calibration {
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    max-width: 400px;
+}
+
+.info-calibration p:first-child {
+    margin-bottom: 10px;
+}
+
 .broadcast i.fas {
     margin-right: 5px;
+}
+
+.annotations-table-wrapper {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 40px;
 }
 
 .panels {
@@ -550,8 +625,8 @@ export default {
 
 .panel-options {
     position: absolute;
+    bottom: -20px;
     right: 38px;
-    top: -20px;
     width: 300px;
     min-height: 100px;
     background: #f2f2f2;
@@ -560,20 +635,22 @@ export default {
     z-index: 100;
 }
 
-.panel-layers {
-    top: unset;
-    bottom: -70px;
+.panels li:nth-child(-n+7) .panel-options {
+    bottom: -90px;
+    min-height: 160px;
 }
 
-.panel-ontology {
-    top: unset;
-    bottom: -50px;
+.panels li:nth-child(-n+3) .panel-options {
+    top: -20px;
+    bottom: unset;
+    min-height: 100px;
 }
 
-.panel-properties, .panel-guided-tour, .panel-follow {
-    top: unset;
-    bottom: -20px;
+.panels li:nth-child(4) .panel-options {
+    top: -50px;
+    bottom: unset;
 }
+
 
 .panel-options h1 {
     padding-top: 5px !important;

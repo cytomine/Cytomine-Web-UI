@@ -1,28 +1,23 @@
 <template>
-<div class="cytomine-viewer">
+<div v-if="error" class="box error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("error-loading-image") }}</p>
+</div>
+<div v-else class="cytomine-viewer">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
-        <div v-if="error" class="box">
-            <h2> {{ $t("error") }} </h2>
-            <p>{{ $t("error-loading-image") }}</p>
+    <div v-if="!loading" class="maps-wrapper">
+        <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
+                :style="`height:${elementHeight}%; width:${elementWidth}%;`">
+            <cytomine-image v-if="idx <= nbMaps"
+                :idViewer="idViewer"
+                :index="idx-1"
+                :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
+                @close="closeMap(idx-1)">
+            </cytomine-image>
         </div>
-        <div v-else class="maps-wrapper">
-            <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-                    :style="`height:${elementHeight}%; width:${elementWidth}%;`">
-                <cytomine-image v-if="idx <= nbMaps"
-                    :project="project"
-                    :idViewer="idBaseImage"
-                    :index="idx-1"
-                    :key="`${idBaseImage}-${idx}-${viewer.maps[idx-1].imageInstance.id}`" 
-                    @close="closeMap(idx-1)">
-                </cytomine-image>
-            </div>
 
-            <image-selector v-show="imageSelector" class="image-selector-wrapper"
-                :project="project" :idViewer="idBaseImage">
-            </image-selector>
-        </div>
-    </template>
+        <image-selector :idViewer="idViewer" />
+    </div>
 </div>
 </template>
 
@@ -30,7 +25,7 @@
 import CytomineImage from "./CytomineImage";
 import ImageSelector from "./ImageSelector";
 
-import {ImageInstance} from "cytomine-client";
+import constants from "@/utils/constants.js";
 
 export default {
     name: "cytomine-viewer",
@@ -38,19 +33,26 @@ export default {
         CytomineImage,
         ImageSelector
     },
-    props: ["project"],
     data() {
         return {
             error: false,
             loading: true,
+            reloadInterval: null,
+            idViewer: null
         };
     },
     computed: {
-        idBaseImage() {
-            return this.$route.params.idImage;
+        viewers() {
+            return this.$store.state.images.viewers;
+        },
+        idImages() {
+            return this.$route.params.idImages.split("-");
+        },
+        paramIdViewer() {
+            return this.$route.query.viewer;
         },
         viewer() {
-            return this.$store.state.images.viewers[this.idBaseImage];
+            return this.viewers[this.idViewer];
         },
         nbMaps() {
             return this.viewer ? this.viewer.maps.length : 0;
@@ -72,51 +74,76 @@ export default {
         }
     },
     watch: {
+        paramIdViewer() {
+            this.findIdViewer();
+        },
+        idViewer(_, old) {
+            if(old != null) {
+                this.loading = true;
+                this.loadViewer();
+            }
+        },
         nbMaps() {
-            this.$store.commit("triggerMapUpdateSize");
+            this.$eventBus.$emit("updateMapSize");
         }
     },
     methods: {
+        findIdViewer() {
+            if(this.paramIdViewer != null) {
+                this.idViewer = this.paramIdViewer;
+                return;
+            }
+
+            for(let id in this.viewers) {
+                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") == this.$route.params.idImages) {
+                    this.idViewer = id;
+                    return;
+                }
+            }
+
+            this.idViewer = "_" + Math.random().toString(36).substr(2, 9); // TODO: change the ways IDs are generated (discuss with team)
+        },
+
         closeMap(index) {
             if(this.nbMaps == 1) {
-                this.$store.commit("removeViewer", this.idBaseImage);
-                this.$router.push("/"); // TODO: change
+                this.$store.commit("removeViewer", this.idViewer);
+                this.$router.push(`/project/${this.$route.params.idProject}`);
             }
             else {
-                this.$store.dispatch("removeMap", {idViewer: this.idBaseImage, index});
+                this.$store.dispatch("removeMap", {idViewer: this.idViewer, index});
             }
         },
 
-        async fetchProjetMembers() {
-            let managersPromise = this.project.fetchAdministrators();
-            let membersPromise = this.project.fetchUsers();
-
-            let managers = (await managersPromise).array;
-            let members = (await membersPromise).array;
-
-            let idsManagers = managers.map(user => user.id);
-            let contributors = members.filter(user => !idsManagers.includes(user.id));
-
-            this.project.managers = managers;
-            this.project.contributors = contributors;
-        },
-
-        async addBaseImage() {
-            if(this.viewer == null) {
-                try {
-                    let baseImage = await ImageInstance.fetch(this.idBaseImage);
-                    await this.$store.dispatch("addViewer", baseImage);
+        async loadViewer() {
+            try {
+                if(this.viewer == null) {
+                    await this.$store.dispatch("addViewer", {
+                        idViewer: this.idViewer,
+                        idProject: this.$route.params.idProject,
+                        idImages: this.idImages
+                    });
                 }
-                catch(err) {
-                    this.error = true;
+                else {
+                    await this.$store.dispatch("refreshData", this.idViewer);
                 }
+                this.loading = false;
+            }
+            catch(err) {
+                console.log(err);
+                this.error = true;
             }
         }
     },
     async created() {
-        await Promise.all([this.fetchProjetMembers(), this.addBaseImage()]);
-
-        this.loading = false;
+        this.findIdViewer();
+        await this.loadViewer();
+        this.reloadInterval = setInterval(
+            () => this.$eventBus.$emit("reloadAnnotations"),
+            constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
+        );
+    },
+    beforeDestroy() {
+        clearInterval(this.reloadInterval);
     }
 };
 </script>
@@ -137,17 +164,5 @@ export default {
 .map-cell {
     border-top: 3px solid #222;
     overflow: hidden;
-}
-
-.image-selector-wrapper {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-}
-
-.box {
-    width: 50%;
-    margin: auto;
-    margin-top: 50px;
 }
 </style>

@@ -3,10 +3,13 @@ import VueRouter from "vue-router";
 // Import Components
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
+import CytomineStorage from "./components/storage/CytomineStorage.vue";
 import ListImages from "./components/image/ListImages.vue";
+import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectActivity from "./components/project/ProjectActivity.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
+import ProjectConfiguration from "./components/project/ProjectConfiguration.vue";
 import Account from "./components/user/Account.vue";
 import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
@@ -27,6 +30,13 @@ const routes = [
         component: ListProjects,
         meta: {
             title: "Cytomine - Projects"
+        }
+    },
+    {
+        path: "/storage",
+        component: CytomineStorage,
+        meta: {
+            title: "Cytomine - Storage"
         }
     },
     {
@@ -56,12 +66,15 @@ const routes = [
                 component: ListImages
             },
             {
-                path: "image/:idImage",
+                path: "image/:idImages",
                 component: CytomineViewer
             },
             {
-                path: "image/:idImage/annotation/:idAnnotation",
-                alias: "/tabs-images-:idProject-:idImage-:idAnnotation",
+                path: "image/:idImage/information",
+                component: ImageInformation
+            },
+            {
+                path: "image/:idImages/annotation/:idAnnotation",
                 component: CytomineViewer
             },
             {
@@ -77,11 +90,49 @@ const routes = [
                 component: ProjectInformation
             },
             {
+                path: "configuration",
+                component: ProjectConfiguration
+            },
+            {
                 path: "*",
                 component: PageNotFound
             }
         ]
     },
+
+    // redirections for old URLS
+    {path: "/userdashboard", redirect: "/"},
+    {path: "/project", redirect: "/projects"},
+    {path: "/ontology", redirect: "/"}, // TODO
+    {path: "/explorer", redirect: "/"},
+    {path: "/upload", redirect: "/"}, // TODO
+
+    {path: "/activity", redirect: "/"},
+    {path: "/activity-:idProject-", redirect: "/"}, // TODO
+    {path: "/activity-:idProject-:idUser", redirect: "/"}, // TODO
+
+    {path: "/search-", redirect: "/advanced-search"},
+
+    {path: "/admin", redirect: "/"}, // TODO
+    {path: "/admin-tabs-dashboard", redirect: "/"}, // TODO
+    {path: "/admin-tabs-users", redirect: "/"}, // TODO
+    {path: "/admin-tabs-groups", redirect: "/"}, // TODO
+    {path: "/admin-tabs-permissions", redirect: "/"}, // TODO
+    {path: "/admin-tabs-configuration", redirect: "/"}, // TODO
+
+    {path: "/tabs-dashboard-:idProject", redirect: "/project/:idProject/information"},
+    {path: "/tabs-images-:idProject", redirect: "/project/:idProject/images"},
+    {path: "/tabs-annotations-:idProject", redirect: "/project/:idProject/annotations"},
+    {path: "/tabs-annotationproperties-:idProject-:idAnnot", redirect: "/project/:idProject"},
+    {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
+    {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
+    {path: "/tabs-algos-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
+    {path: "/tabs-usersconfig-:idProject", redirect: {path: "/project/:idProject/configuration", query: {tab: "members"}}},
+    {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},
+    {path: "/tabs-image-:idProject-:idImage-:idAnnotation", redirect: "/project/:idProject/image/:idImage/annotation/:idAnnotation"},
+    // -----
+
     {
         path: "*",
         component: PageNotFound

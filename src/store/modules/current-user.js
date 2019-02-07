@@ -14,11 +14,13 @@ export default {
         setUser(state, user) {
             state.user = user.clone();
         },
+        setAdminByNow(state, value) {
+            state.user.adminByNow = value;
+        },
 
         logout(state) {
             state.authenticated = false;
             state.user = null;
-            // TODO: clean other variables
         }
     },
 
@@ -41,6 +43,15 @@ export default {
             let user = state.user.clone();
             await user.regenerateKeys();
             commit("setUser", user);
+        },
+
+        async openAdminSession({commit}) {
+            await Cytomine.instance.openAdminSession();
+            commit("setAdminByNow", true);
+        },
+        async closeAdminSession({commit}) {
+            await Cytomine.instance.closeAdminSession();
+            commit("setAdminByNow", false);
         },
 
         async login({state, dispatch}, payload) {

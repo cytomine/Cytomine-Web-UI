@@ -25,7 +25,7 @@
                     <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
                 </td>
                 <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.drawOn" @change="toggleLayerDrawOn(index)">
+                    <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
                 </td>
 
                 <td class="name-column">
@@ -48,11 +48,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
-import {Project} from "cytomine-client";
-
 import {fullName} from "@/utils/user-utils.js";
+import {ProjectDefaultLayerCollection} from "cytomine-client";
 
 export default {
     name: "annotations-panel",
@@ -65,12 +62,16 @@ export default {
         return {
             layers: [], // Array<User> (representing user layers)
             indexLayers: [],
-            selectedLayer: null,
-
-            timeoutIndex: null
+            selectedLayer: null
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        project() {
+            return this.$store.state.project.project;
+        },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
         },
@@ -79,9 +80,6 @@ export default {
         },
         activePanel() {
             return this.imageWrapper.activePanel;
-        },
-        triggerIndexLayersUpdate() {
-            return this.imageWrapper.triggerIndexLayersUpdate;
         },
         layersOpacity: {
             get() {
@@ -95,29 +93,40 @@ export default {
                 });
             }
         },
-
+        layersIds() {
+            return this.layers.map(layer => layer.id);
+        },
         selectedLayers() { // Array<User> (representing user layers)
-            return this.imageWrapper.selectedLayers || [];
+            // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
+            // may not be relevant for the current image => filter them
+            let layersIds = this.layers.map(layer => layer.id);
+            let selectedLayers = this.imageWrapper.selectedLayers || [];
+            return selectedLayers.filter(layer => layersIds.includes(layer.id));
         },
         selectedLayersIds() {
             return this.selectedLayers.map(layer => layer.id);
         },
         unselectedLayers() {
             return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
-        },
-
-        ...mapState({currentUser: state => state.currentUser.user})
+        }
     },
     watch: {
         activePanel() {
             this.fetchIndexLayers();
-        },
-
-        triggerIndexLayersUpdate() {
-            this.fetchIndexLayers();
         }
     },
     methods: {
+        annotationEventHandler(annot) {
+            if(annot.image == this.image.id) {
+                this.fetchIndexLayers();
+            }
+        },
+        reloadAnnotationsHandler(idImage) {
+            if(idImage == null || idImage == this.image.id) {
+                this.fetchIndexLayers();
+            }
+        },
+
         layerName(layer) {
             let name = fullName(layer);
 
@@ -125,21 +134,24 @@ export default {
             return `${name} (${indexLayer.countAnnotation || 0})`;
         },
 
-        addLayerById(id) {
+        canDraw(layer) {
+            return this.$store.getters.canEditLayer(layer.id);
+        },
+
+        addLayerById(id, visible) {
             let layer = this.layers.find(layer => layer.id == id);
             if(layer != null) {
-                this.addLayer(layer);
+                this.addLayer(layer, visible);
             }
         },
 
-        addLayer(layer = this.selectedLayer) {
+        addLayer(layer = this.selectedLayer, visible = true) {
             if(this.selectedLayersIds.includes(layer.id)) {
                 return;
             }
 
-            layer.visible = true;
-            layer.drawOn = (layer.id == this.currentUser.id);
-            layer.olSource = null;
+            layer.visible = visible;
+            layer.drawOn = (layer.id == this.currentUser.id && this.canDraw(layer));
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -171,31 +183,44 @@ export default {
         },
 
         async fetchLayers() {
-            this.layers = (await new Project({id: this.image.project}).fetchUserLayers(this.image.id)).array;
+            this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
         },
 
         async fetchIndexLayers(force=false) {
             if(!force && this.activePanel != "layers") {
                 return;
             }
-
             this.indexLayers = await this.image.fetchAnnotationsIndex();
-            clearTimeout(this.timeoutIndex);
-            this.timeoutIndex = setTimeout(() => this.fetchIndexLayers(), 10000); // schedule a refresh
         }
     },
     async created() {
         await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
             this.addLayerById(this.currentUser.id);
+
+            try {
+                let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
+                    filterKey: "project",
+                    filterValue: this.project.id
+                });
+                defaultLayers.array.forEach(({user, hideByDefault}) => this.addLayerById(user, !hideByDefault));
+            }
+            catch(error) {
+                console.log(error);
+            }
         }
 
         if(this.layersToPreload != null) {
             this.layersToPreload.forEach(id => this.addLayerById(id));
         }
     },
+    mounted() {
+        this.$eventBus.$on(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
+        this.$eventBus.$on("reloadAnnotations", this.reloadAnnotationsHandler);
+    },
     beforeDestroy() {
-        clearTimeout(this.timeoutIndex);
+        this.$eventBus.$off(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
+        this.$eventBus.$off("reloadAnnotations", this.reloadAnnotationsHandler);
     }
 };
 </script>

@@ -11,72 +11,85 @@
                 </td>
             </tr>
 
-            <template v-if="annotation.area > 0"> <!-- Do not display perimeter and area for point annotations -->
-                <tr>
+            <template v-if="isPropDisplayed('geometry-info')">
+                <tr v-if="annotation.area > 0">
                     <td><strong>{{$t("area")}}</strong></td>
                     <td>{{ `${annotation.area.toFixed(3)} ${annotation.areaUnit}` }}</td>
                 </tr>
-                <tr>
-                    <td><strong>{{$t("perimeter")}}</strong></td>
+
+                <tr v-if="annotation.perimeter > 0">
+                    <td><strong>{{$t(annotation.area > 0 ? "perimeter" : "length")}}</strong></td>
                     <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
                 </tr>
             </template>
 
-            <tr>
+            <tr v-if="isPropDisplayed('description')">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
-                    <cytomine-description :object="annotation"></cytomine-description>
+                    <cytomine-description :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 
             <!-- TERMS -->
-            <tr>
+            <tr v-if="isPropDisplayed('terms')">
                 <td colspan="2">
                     <h5>{{$t("terms")}}</h5>
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                     :title="`${$t('associated-by')} ${user.fullName}`">
                         <cytomine-term :term="term"></cytomine-term>
-                        <button class="delete is-small" :title="$t('button-delete')" @click="removeTerm(term)"></button>
+                        <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
+                            @click="removeTerm(term.id)">
+                        </button>
                     </b-tag>
-                    <b-field>
-                        <b-autocomplete
-                            v-model="addTermString"
-                            :placeholder="$t('add-term')"
-                            :open-on-focus="true"
-                            :data="filteredTerms"
-                            field="name"
-                            size="is-small"
-                            @select="addTerm">
-                            <div slot-scope="{option: term}" class="autocomplete-term-option">
-                                <cytomine-term :term="term"></cytomine-term>
-                            </div>
-                            <div slot="empty" class="autocomplete-term-option">
-                                {{$t("no-term-to-add")}}
-                            </div>
-                        </b-autocomplete>
-                    </b-field>
+                    <div class="add-term-wrapper" v-if="canEdit" v-click-outside="() => showTermSelector = false">
+                        <b-field>
+                            <b-input size="is-small"
+                                    expanded
+                                    :placeholder="$t('add-term')"
+                                    v-model="addTermString"
+                                    @focus="showTermSelector = true" />
+                        </b-field>
+
+                        <div class="ontology-tree-container" v-show="showTermSelector">
+                            <ontology-tree class="ontology-tree"
+                                :ontology="ontology"
+                                :searchString="addTermString"
+                                :selectedNodes="associatedTermsIds"
+                                @select="addTerm"
+                                @unselect="removeTerm" />
+                        </div>
+                    </div>
+                    <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
                 </td>
             </tr>
 
             <!-- PROPERTIES -->
-            <tr>
+            <tr v-if="isPropDisplayed('properties')">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
-                    <cytomine-properties :object="annotation" @update="$emit('updateProperties')">
-                    </cytomine-properties>
+                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
                 </td>
             </tr>
 
-            <tr>
-                <td><strong>{{$t("created-by")}}</strong></td>
-                <td>
-                    {{ creator.fullName }}
+            <tr v-if="isPropDisplayed('attached-files')">
+                <td colspan="2">
+                    <h5>{{$t("attached-files")}}</h5>
+                    <attached-files :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
-            <tr>
-                <td><strong>{{$t("created-on")}}</strong></td>
-                <td> {{ Number(annotation.created) | moment("ll") }} </td>
-            </tr>
+
+            <template v-if="isPropDisplayed('creation-info')">
+                <tr>
+                    <td><strong>{{$t("created-by")}}</strong></td>
+                    <td>
+                        {{ creator.fullName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{$t("created-on")}}</strong></td>
+                    <td> {{ Number(annotation.created) | moment("ll") }} </td>
+                </tr>
+            </template>
         </tbody>
     </table>
 
@@ -87,14 +100,25 @@
             class="button is-link is-small is-fullwidth">
             {{ $t("button-view-in-image") }}
         </router-link>
+
         <a v-else class="button is-link is-small is-fullwidth" @click="$emit('centerView')">
             {{ $t("button-center-view-on-annot") }}
         </a>
+
         <div class="level">
-            <a :href="annotation.url" class="level-item button is-small"> {{ $t("button-view-crop") }} </a>
-            <button class="level-item button is-small" @click="copyURL()"> {{ $t("button-copy-url") }} </button>
-            <button class="level-item button is-small"> {{ $t("button-comment") }} </button> <!-- TODO -->
-            <button class="level-item button is-small is-danger" @click="confirmDeletion()">
+            <a :href="annotation.url" class="level-item button is-small">
+                {{ $t("button-view-crop") }}
+            </a>
+
+            <button class="level-item button is-small" @click="copyURL()">
+                {{ $t("button-copy-url") }}
+            </button>
+
+            <button v-if="isPropDisplayed('comments')" class="level-item button is-small"> <!-- TODO -->
+                {{ $t("button-comment") }}
+            </button>
+
+            <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
                 {{ $t("button-delete") }}
             </button>
         </div>
@@ -107,14 +131,18 @@ import {AnnotationTerm} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
-import CytomineTerm from "@/components/term/CytomineTerm";
+import CytomineTerm from "@/components/ontology/CytomineTerm";
+import AttachedFiles from "@/components/attached-file/AttachedFiles";
+import OntologyTree from "@/components/ontology/OntologyTree";
 
 export default {
     name: "annotations-details",
     components: {
         CytomineDescription,
         CytomineTerm,
-        CytomineProperties
+        OntologyTree,
+        CytomineProperties,
+        AttachedFiles
     },
     props: {
         annotation: {type: Object},
@@ -126,11 +154,22 @@ export default {
     data() {
         return {
             addTermString: "",
+            showTermSelector: false,
+            revTerms: 0
         };
     },
     computed: {
+        configUI() {
+            return this.$store.state.project.configUI;
+        },
+        ontology() {
+            return this.$store.state.project.ontology;
+        },
         creator() {
             return this.users.find(user => user.id == this.annotation.user) || {};
+        },
+        canEdit() {
+            return this.$store.getters.canEditLayer(this.annotation.user);
         },
         image() {
             return this.images.find(image => image.id == this.annotation.image) || {};
@@ -150,43 +189,49 @@ export default {
                 return [];
             }
         },
-        filteredTerms() {
-            return this.terms.filter(({id, name}) => {
-                return !this.annotation.term.includes(id) && 
-                    name.toLowerCase().indexOf(this.addTermString.toLowerCase()) >= 0;
-            });
+        associatedTermsIds() {
+            this.revTerms;
+            return this.associatedTerms.map(({term}) => term.id);
         }
     },
     methods: {
+        isPropDisplayed(prop) {
+            let displayed = this.configUI[`project-explore-annotation-${prop}`];
+            return (displayed || displayed == null); // TODO: replace with return displayed once all props are managed in backend
+        },
+
         copyURL() {
             copyToClipboard(window.location.origin + "/#" + this.annotationURL);
             this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
-        async addTerm(term) {
-            if(term != null) {
+        async addTerm(idTerm) {
+            if(idTerm != null) {
                 try {
                     // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
-                    await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save(); 
+                    await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
                     this.$emit("updateTerms");
+                    this.showTermSelector = false;
                 }
                 catch(error) {
                     this.$notify({type: "error", text: this.$t("notif-error-add-term")});
+                    this.revTerms++;
                 }
                 finally {
                     this.addTermString = "";
                 }
             }
         },
-        async removeTerm(term) {
+        async removeTerm(idTerm) {
             try {
                 // TODO decide who can delete what, and adapt accordingly
                 // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
-                await AnnotationTerm.delete(this.annotation.id, term.id);
+                await AnnotationTerm.delete(this.annotation.id, idTerm);
                 this.$emit("updateTerms");
             }
             catch(error) {
                 this.$notify({type: "error", text: this.$t("notif-error-remove-term")});
+                this.revTerms++;
             }
         },
 
@@ -248,6 +293,25 @@ h5 {
 
 .autocomplete-term-option {
     font-size: 13px;
+}
+
+.add-term-wrapper {
+    position: relative;
+}
+
+.ontology-tree-container {
+    position: absolute;
+    top: 100%;
+    left: 0px;
+    z-index: 500;
+    padding-top: 5px;
+    background: white;
+    width: 100%;
+    max-height: 30vh;
+    overflow: auto;
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    border-radius: 4px;
+    margin-top: 4px;
 }
 </style>
 

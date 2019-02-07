@@ -70,7 +70,6 @@ import {AbstractImageCollection, ImageInstance} from "cytomine-client";
 export default {
     name: "add-image-modal",
     props: [
-        "project",
         "imageInstances",
         "active"
     ],
@@ -83,6 +82,9 @@ export default {
         };
     },
     computed: {
+        project() {
+            return this.$store.state.project.project;
+        },
         filteredImages() {
             let filtered = this.images;
 

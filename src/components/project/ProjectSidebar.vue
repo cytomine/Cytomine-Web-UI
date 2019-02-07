@@ -8,52 +8,53 @@
             <h1>{{`${$t("project")}: ${project.name}`}}</h1>
         </div>
         <ul>
-            <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
-                <a>
-                    <i class="far fa-images"></i>
-                    {{ $t("images") }}
-                </a>
-            </router-link>
-            <!-- TODO: change the way opened viewers are displayed -->
-            <router-link tag="li" class="image-link" v-for="(viewer, id) in viewers" :key="id"
-            v-if="viewer.idProject == project.id"
-            :to="`/project/${project.id}/image/${id}`">
-                <a>
-                    {{ viewer.name }}
-                </a>
-                <!-- TODO
-                <a class="close">
-                    <i class="fas fa-times"></i>
-                </a>-->
-            </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
+            <template v-if="isTabDisplayed('images')">
+                <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
+                    <a>
+                        <i class="far fa-images"></i>
+                        {{ $t("images") }}
+                    </a>
+                </router-link>
+                <!-- TODO: change the way opened viewers are displayed -->
+                <router-link tag="li" class="image-link" v-for="viewer in viewers" :key="viewer.id"
+                    :to="viewer.path">
+
+                    <a>{{ viewer.name }}</a>
+
+                    <!-- TODO
+                    <a class="close">
+                        <i class="fas fa-times"></i>
+                    </a>-->
+                </router-link>
+            </template>
+            <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
                     <i class="far fa-edit"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
+            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
                 <a>
                     <i class="fas fa-tasks"></i>
                     {{ $t("jobs") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/activity`" class="activity">
+            <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`" class="activity">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
                     {{ $t("activity") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/information`" class="information">
+            <router-link v-if="isTabDisplayed('info')" tag="li" :to="`/project/${project.id}/information`" class="information">
                 <a>
                     <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
                 </a>
             </router-link>
-            <router-link tag="li" :to="`/project/${project.id}/parameters`" class="parameters">
+            <router-link  v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`" class="configuration">
                 <a>
                     <i class="fas fa-cogs"></i>
-                    {{ $t("parameters") }}
+                    {{ $t("configuration") }}
                 </a>
             </router-link>
         </ul>
@@ -67,7 +68,6 @@
 <script>
 export default {
     name: "project-sidebar",
-    props: ["project"],
     data() {
         return {
             visibleSideBar: true,
@@ -75,13 +75,41 @@ export default {
     },
     computed: {
         viewers() {
-            return this.$store.state.images.viewers;
+            let viewers = this.$store.state.images.viewers;
+            let results = [];
+            for(let id in viewers) {
+                if(viewers[id].idProject == this.project.id) {
+                    let viewer = viewers[id];
+                    let nbMaps = viewer.maps.length;
+                    if(nbMaps == 0) {
+                        return;
+                    }
+                    let name = nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename
+                        : this.$t("viewer-group", {nbImages: nbMaps});
+                    results.push({
+                        id,
+                        name,
+                        path: this.$store.getters.pathViewer({idViewer: id})
+                    });
+                }
+            }
+            return results;
+        },
+        project() {
+            return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
         }
     },
     methods: {
         toggleSideBar() {
             this.visibleSideBar = !this.visibleSideBar;
-            this.$store.commit("triggerMapUpdateSize");
+            this.$eventBus.$emit("updateMapSize");
+        },
+        isTabDisplayed(tab) {
+            let displayed = this.configUI[`project-${tab}-tab`];
+            return (displayed || displayed == null); // TODO: replace with return displayed once all tabs are managed in backend
         }
     }
 };
@@ -176,7 +204,7 @@ export default {
 .sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
 .sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
 .sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
-.sidebar li.parameters.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
+.sidebar li.configuration.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
 
 .sidebar li.image-link {
     position: relative;

@@ -9,8 +9,7 @@
         :open="openedAnnot == annot.id" :auto-hide="false"> 
             <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-            <div class="annot-preview" :style="'background-image: url(' + annot.smallCropURL + ')'" 
-            @click="openedAnnot = annot.id">
+            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="openedAnnot = annot.id">
                 <button class="button is-small">
                     <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
                 </button>
@@ -32,7 +31,7 @@
             :total="nbAnnotations"
             :current="currentPage"
             size="is-small"
-            :per-page="perPage"
+            :per-page="nbPerPage"
             @change="fetchPage">
         </b-pagination>
     </template>
@@ -48,6 +47,9 @@ export default {
     name: "list-annotations-by-term",
     components: {AnnotationDetails},
     props: [
+        "nbPerPage",
+        "size",
+
         "term", 
         "multipleTerms", 
         "noTerm", 
@@ -64,7 +66,6 @@ export default {
         return {
             annotations: [],
             nbAnnotations: 0,
-            perPage: 20,
             currentPage: 1,
             openedAnnot: 0
         };
@@ -80,7 +81,7 @@ export default {
                 multipleTerm: this.multipleTerms, 
                 showTerm: true,
                 showGIS: true,
-                max: this.perPage
+                max: this.nbPerPage
             });
         },
         title() {
@@ -139,6 +140,13 @@ export default {
             if(!isModal && this.openedAnnot == id) {
                 this.openedAnnot = 0;
             }
+        },
+        styleAnnotDetails(annot) {
+            return {
+                backgroundImage: `url(${annot.url}?maxSize=${this.size})`, // TODO in core: allow parameter specifying we want a square image ; rework the way annotation contours are drawn
+                width: this.size + "px",
+                height: this.size + "px"
+            };
         }
     },
     created() {
@@ -154,8 +162,6 @@ export default {
 
 .annot-preview {
     display: inline-block;
-    width: 100px;
-    height: 100px;
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;

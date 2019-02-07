@@ -1,6 +1,6 @@
 <template>
 <span v-if="term">
-    <div class="color-preview" :style="{background: term.color}"></div>
+    <div class="color-preview" v-if="term.color" :style="{background: term.color}"></div>
     {{term.name}}
 </span>
 </template>

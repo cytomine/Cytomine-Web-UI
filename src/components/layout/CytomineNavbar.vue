@@ -14,7 +14,7 @@
                 <i class="fas fa-list-alt"></i>
                 {{ $t("projects") }}
             </router-link>
-            <router-link to="/storage" class="navbar-item">
+            <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item">
                 <i class="fas fa-download"></i>
                 {{ $t("storage") }}
             </router-link>
@@ -24,14 +24,25 @@
             <cytomine-searcher></cytomine-searcher>
 
             <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
-                <a href="#" class="navbar-item">{{$t("hotkeys")}}</a>
-                <a href="#" class="navbar-item">{{$t("about")}}</a>
+                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
+                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
             </navbar-dropdown>
 
-            <navbar-dropdown icon="fa-user" :title="currentUserFullInfo" :listPathes="['/account']">
+            <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
+                             :title="currentUserFullInfo"
+                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : ''"
+                             :listPathes="['/account']">
                 <router-link to="/account" class="navbar-item">
                     {{$t("account")}}
                 </router-link>
+                <template v-if="currentUser.admin">
+                    <a v-if="!currentUser.adminByNow" class="navbar-item" @click="openAdminSession()">
+                        {{$t("open-admin-session")}}
+                    </a>
+                    <a v-else class="navbar-item" @click="closeAdminSession()">
+                        {{$t("close-admin-session")}}
+                    </a>
+                </template>
                 <a class="navbar-item" @click="logout()">
                     {{ $t("logout") }}
                 </a>
@@ -47,6 +58,9 @@
             </navbar-dropdown>
         </div>
     </div>
+
+    <hotkeys-modal :active.sync="hotkeysModal" />
+    <about-cytomine-modal :active.sync="aboutModal" />
 </nav>
 </template>
 
@@ -54,6 +68,8 @@
 import { mapState } from "vuex";
 
 import NavbarDropdown from "./NavbarDropdown.vue";
+import HotkeysModal from "./HotkeysModal.vue";
+import AboutCytomineModal from "./AboutCytomineModal.vue";
 import CytomineSearcher from "@/components/search/CytomineSearcher.vue";
 
 import {fullName} from "@/utils/user-utils.js";
@@ -62,6 +78,8 @@ export default {
     name: "cytomine-navbar",
     components: {
         NavbarDropdown,
+        HotkeysModal,
+        AboutCytomineModal,
         CytomineSearcher
     },
     data() {
@@ -72,7 +90,9 @@ export default {
             languages: [
                 {value: "en", name:"English"},
                 {value: "fr", name:"Français"}
-            ]
+            ],
+            hotkeysModal: false,
+            aboutModal: false
         };
     },
     computed: {
@@ -89,12 +109,30 @@ export default {
             this.$i18n.locale = newLocale;
             this.$moment.locale(newLocale);
         },
+        async openAdminSession() {
+            try {
+                await this.$store.dispatch("openAdminSession");
+                this.$router.go();
+            }
+            catch(error) {
+                console.log(error);
+            }
+        },
+        async closeAdminSession() {
+            try {
+                await this.$store.dispatch("closeAdminSession");
+                this.$router.go();
+            }
+            catch(error) {
+                console.log(error);
+            }
+        },
         async logout() {
             try {
                 await this.$store.dispatch("logout");
             }
             catch(err) {
-                this.$notify({type: "error", text: "Error during logout"}); // TODO: add translation
+                this.$notify({type: "error", text: this.$t("notif-error-logout")});
             }
         }
     }
@@ -126,6 +164,7 @@ font-weight: lighter;
 
 .navbar {
     font-weight: 600;
+    z-index: 500 !important;
 }
 
 .navbar-item.logo {

@@ -50,7 +50,6 @@ export default {
     props: [
         "idViewer",
         "index",
-        "project",
         "view"
     ],
     data() {
@@ -64,6 +63,12 @@ export default {
         };
     },
     computed: {
+        projectManagers() {
+            return this.$store.state.project.managers;
+        },
+        projectContributors() {
+            return this.$store.state.project.contributors;
+        },
         currentUser() {
             return this.$store.state.currentUser.user;
         },
@@ -106,13 +111,13 @@ export default {
             }
         },
         onlineManagers() {
-            return this.project.managers.filter(({id}) => this.onlineUsers.includes(id));
+            return this.projectManagers.filter(({id}) => this.onlineUsers.includes(id));
         },
         onlineContributors() {
-            return this.project.contributors.filter(({id}) => this.onlineUsers.includes(id));
+            return this.projectContributors.filter(({id}) => this.onlineUsers.includes(id));
         },
         trackedUserFullName() {
-            let allUsers = this.project.managers.concat(this.project.contributors);
+            let allUsers = this.projectManagers.concat(this.projectContributors);
             let trackedUser = allUsers.find(user => user.id == this.trackedUser);
             if(trackedUser != null) {
                 return fullName(trackedUser);
@@ -235,7 +240,7 @@ h3 {
 }
 
 .follow-panel-content {
-    max-height: 250px;
+    max-height: 150px;
     overflow: auto;
 }
 </style>

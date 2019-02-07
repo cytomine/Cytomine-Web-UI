@@ -1,9 +1,14 @@
 <template>
-    <div class="project-container">
-        <project-sidebar v-if="project" :project="project" :key="idProject"></project-sidebar>
+    <div class="box error" v-if="permissionError || notFoundError">
+        <h2> {{ $t(permissionError ? "access-denied" : "not-found") }} </h2>
+        <p> {{ $t(permissionError ?  "insufficient-permission" : "not-found-error") }} </p>
+    </div>
+    <div v-else class="project-container">
+        <project-sidebar v-if="project" :key="idProject" />
 
-        <div class="app-content" v-if="project && project.id == idProject">
-            <router-view :key="$route.path" :project="project"></router-view>
+        <div class="app-content">
+            <b-loading :is-full-page="false" :active="loading" />
+            <router-view v-if="!loading" />
         </div>
     </div>
 </template>
@@ -11,34 +16,49 @@
 <script>
 import ProjectSidebar from "./ProjectSidebar.vue";
 
-import {Project} from "cytomine-client";
-
 export default {
     name: "cytomine-project",
     components: {ProjectSidebar},
     data() {
         return {
-            project: null
+            loading: true,
+            permissionError: false,
+            notFoundError: false
         };
     },
     computed: {
         idProject() {
             return this.$route.params.idProject;
+        },
+        project() {
+            return this.$store.state.project.project;
         }
     },
     watch: {
-        idProject() {
-            this.loadProject();
+        async idProject() {
+            this.loading = true;
+            await this.loadProject();
         }
     },
     methods: {
         async loadProject() {
-            this.project = await Project.fetch(this.idProject);
-            await this.project.recordUserConnection();
+            try {
+                await this.$store.dispatch("loadProject", this.idProject);
+                this.loading = false;
+            }
+            catch(error) {
+                console.log(error);
+                if(error.response.status == 403) {
+                    this.permissionError = true;
+                }
+                else {
+                    this.notFoundError = true;
+                }
+            }
         }
     },
-    created() {
-        this.loadProject();
+    async created() {
+        await this.loadProject();
     }
 };
 </script>

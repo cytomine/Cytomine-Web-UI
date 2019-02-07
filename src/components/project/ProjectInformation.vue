@@ -1,4 +1,8 @@
 <template>
+<!-- <div class="box error" v-if="!configUI['project-info-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div> TODO once core handles info-tab field -->
 <div class="box">
     <project-details :project="project" :excluded-properties="['imagesPreview']">
     </project-details>
@@ -11,7 +15,14 @@ import ProjectDetails from "./ProjectDetails";
 export default {
     name: "project-information",
     components: {ProjectDetails},
-    props: ["project"]
+    computed: {
+        project() {
+            return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
+        }
+    }
 };
 </script>
 

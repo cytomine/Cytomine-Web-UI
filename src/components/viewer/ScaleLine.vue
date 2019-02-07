@@ -1,15 +1,18 @@
 <template>
-    <div class="scale-line">
+    <div class="scale-line" :class="{'interpolation': interpolation}">
         <template v-if="resolution != null">
             <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}">
                 {{scaleLength}}
             </div>
             <div class="scale-line-bottom">
-                <span v-show="magnification != 0" :class="{'interpolation': interpolation}">
+                <span v-show="magnification != 0">
                     {{$t("magnification")}}: {{magnification}}X
                 </span>
             </div>
         </template>
+
+        <div v-else-if="interpolation" class="interpolation-warning">{{$t("digital-zoom")}}</div>
+
         <div class="scale-line-position" v-if="mousePosition != null">
             <div style="float: left;">x: {{Math.round(mousePosition[0])}}</div>
             <div style="float: right;">y: {{Math.round(mousePosition[1])}}</div>
@@ -64,11 +67,11 @@ export default {
     position: absolute;
     padding: 5px 10px 5px 10px;
     display: block;
-    right: 55px;
+    right: 70px;
     bottom: 15px;
     font-size: 9px;
     font-family: Helvetica;
-    min-width: 100px;
+    min-width: 120px;
 }
 .scale-line-top {
     margin-top: 5px;
@@ -86,12 +89,26 @@ export default {
     text-align: center;
     padding-top: 2px;
     margin-bottom: 10px;
+    min-height: 10px;
 }
 .interpolation {
     color: red;
 }
+
+.interpolation .scale-line-top, .interpolation .scale-line-bottom {
+    border-color: red;
+}
+
 .scale-line-position {
     text-align: center;
     padding: 0px 5px 0 5px;
+    color: black !important;
+}
+
+.interpolation-warning {
+    text-align: center;
+    font-size: 11px;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
 }
 </style>

@@ -1,10 +1,16 @@
 <template>
-<div class="list-images-wrapper">
+<div class="box error" v-if="!configUI['project-images-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div>
+<div v-else class="list-images-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
-            <button class="button is-link" @click="addImageModal = true">{{$t('button-add-image')}}</button>
+            <button v-if="!currentUser.guestByNow" class="button is-link" @click="addImageModal = true">
+                {{$t('button-add-image')}}
+            </button>
         </p>
         <div class="panel-block">
             <div class="search-block">
@@ -138,44 +144,51 @@
             <b-table v-if="!loading" :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
 
-                <template slot-scope="props">
+                <template slot-scope="{row: image}">
                     <b-table-column :label="$t('overview')" width="100">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
-                            <img :src="props.row.thumb" :alt="props.row.instanceFilename" class="image-overview">
+                        <router-link :to="`/project/${image.project}/image/${image.id}`">
+                            <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="instanceFilename" :label="$t('name')" sortable width="400">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
-                            {{ props.row.instanceFilename }}
+                        <router-link :to="`/project/${image.project}/image/${image.id}`">
+                            {{ image.instanceFilename }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
-                        {{ props.row.magnification || $t("unknown") }}
+                        {{ image.magnification || $t("unknown") }}
                     </b-table-column>
 
                     <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfAnnotations }}</a>
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}`">
+                            {{ image.numberOfAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfJobAnnotations }}</a>
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
+                            {{ image.numberOfJobAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-                        <a>{{ props.row.numberOfReviewedAnnotations }}</a>
+                        <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
-                        <router-link :to="`/project/${props.row.project}/image/${props.row.id}`" class="button is-small is-link">
+                        <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
                             {{$t("button-open")}}
                         </router-link>
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="props">
-                    <image-details :image="props.row" @delete="deleteImage(props.row)" @setCalibration="(event) => setCalibration(props.row, event)">
+                <template slot="detail" slot-scope="{row: image}">
+                    <image-details :image="image" :excludedProperties="excludedProperties"
+                                   @delete="deleteImage(image.id)"
+                                   @setResolution="(event) => setResolution(image, event)"
+                                   @setMagnification="(event) => setMagnification(image, event)">
                     </image-details>
                 </template>
 
@@ -197,7 +210,7 @@
         </div>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" :project="project" :imageInstances="images" @addImage="addImage">
+    <add-image-modal :active.sync="addImageModal" :imageInstances="images" @addImage="addImage">
     </add-image-modal>
 </div>
 </template>
@@ -221,7 +234,6 @@ export default {
         CytomineSlider,
         AddImageModal
     },
-    props: ["project"],
     data() {
         return {
             images: [],
@@ -245,10 +257,30 @@ export default {
             boundsJobAnnotations: [0, 0],
             boundsReviewedAnnotations: [0, 0],
 
-            addImageModal: false
+            addImageModal: false,
+
+            // TODO: should be defined in project config and retrieved from backend (corresponds to properties displayed
+            // in table columns)
+            excludedProperties: [
+                "overview",
+                "instanceFilename",
+                "magnification",
+                "numberOfAnnotations",
+                "numberOfJobAnnotations",
+                "numberOfReviewedAnnotations"
+            ]
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        project() {
+            return this.$store.state.project.project;
+        },
+        configUI() {
+            return this.$store.state.project.configUI;
+        },
         filteredImages() {
             let filtered = this.images;
 
@@ -343,21 +375,8 @@ export default {
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
         },
 
-        async deleteImage(imageToDelete) {
-            try {
-                await imageToDelete.delete();
-                this.images = this.images.filter(image => image.id != imageToDelete.id);
-                this.$notify({
-                    type: "success",
-                    text: this.$t("notif-success-image-deletion", {imageName: imageToDelete.instanceFilename})
-                });
-            }
-            catch(error) {
-                this.$notify({
-                    type: "error",
-                    text: this.$t("notif-error-image-deletion", {imageName: imageToDelete.instanceFilename})
-                });
-            }
+        async deleteImage(idDeleted) {
+            this.images = this.images.filter(image => image.id != idDeleted);
         },
 
         addImage(image) {
@@ -372,7 +391,7 @@ export default {
             let updateMaxHeight = this.boundsHeight[1] == this.maxHeight && image.height > this.maxHeight;
             // ---
 
-            this.images.push(image);
+            this.images.unshift(image);
 
             if(addFormat) {
                 this.selectedFormats.push(image.extension);
@@ -394,29 +413,35 @@ export default {
             }
         },
 
-        setCalibration(image, {resolution, magnification}) {
+        setResolution(image, resolution) {
             image.resolution = resolution;
-            image.magnification = magnification;
+            // check if it is needed to update filters so that new images are displayed
+            let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
 
+            this.formatImage(image);
+
+            if(addResolution) {
+                this.selectedResolutions.push(image.resolutionFormatted);
+            }
+        },
+
+        setMagnification(image, magnification) {
+            image.magnification = magnification;
             // check if it is needed to update filters so that new images are displayed
             let addMagnification = !this.availableMagnifications.includes(this.formatMagnification(magnification));
-            let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
-            // ---
 
             this.formatImage(image);
 
             if(addMagnification) {
                 this.selectedMagnifications.push(image.magnificationFormatted);
             }
-            if(addResolution) {
-                this.selectedResolutions.push(image.resolutionFormatted);
-            }
         },
 
         formatImage(image) {
             // use $set to make the new props reactive
             this.$set(image, "resolutionFormatted", this.formatResolution(image.resolution));
-            this.$set(image, "vendorFormatted", this.formatVendor(image.mime));
+            this.$set(image, "vendor", vendorFromMime(image.mime));
+            this.$set(image, "vendorFormatted", this.formatVendor(image.vendor));
             this.$set(image, "magnificationFormatted", this.formatMagnification(image.magnification));
             return image;
         },
@@ -425,8 +450,7 @@ export default {
             return (resolution != null) ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
         },
 
-        formatVendor(mime) {
-            let vendor = vendorFromMime(mime);
+        formatVendor(vendor) {
             return vendor ? vendor.name : this.$t("unknown");
         },
 

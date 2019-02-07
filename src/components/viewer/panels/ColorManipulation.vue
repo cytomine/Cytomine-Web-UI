@@ -91,21 +91,14 @@ export default {
             set(value) {
                 this.setSaturation(value);
             }
-        },
-
-        triggerUpdateSize() {
-            return this.$store.state.images.triggerMapUpdateSize;
-        },
+        }
     },
     watch: {
         activePanel(panel) {
             if(panel == "colors") {
                 this.revisionSliders++;
             }
-        },
-        triggerUpdateSize() {
-            this.revisionSliders++;
-        },
+        }
     },
     methods: {
         reset() {
@@ -127,6 +120,16 @@ export default {
         setSaturation: _.debounce(function(value) {
             this.$store.commit("setSaturation", {idViewer: this.idViewer, index: this.index, value});
         }, debounceDelay),
+
+        updateMapSize() {
+            this.revisionSliders++;
+        }
+    },
+    mounted() {
+        this.$eventBus.$on("updateMapSize", this.updateMapSize);
+    },
+    beforeDestroy() {
+        this.$eventBus.$off("updateMapSize", this.updateMapSize);
     }
 };
 </script>
