@@ -53,7 +53,7 @@ Chart.plugins.unregister(ChartDataLabels);
 Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
     anchor: "end",
     align: "end",
-    offset: -5,
+    offset: 5,
     clamp: true
 });
 

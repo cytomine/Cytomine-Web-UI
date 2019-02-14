@@ -11,7 +11,7 @@
             <div v-if="!node.data.hidden" class="tree-selector">
                 <i class="tree-checkbox"
                    v-if="allowSelection"
-                   :class="node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square']">
+                   :class="classNames(node)">
                 </i>
                 <cytomine-term :term="node.data"></cytomine-term>
             </div>
@@ -41,9 +41,11 @@ export default {
     props: {
         ontology: {type: Object},
         additionalNodes: {type: Array, default: () => []},
+        startWithAdditionalNodes: {type: Boolean, default: false},
         searchString: {type: String, default: ""},
         selectedNodes: {type: Array, default: () => []},
-        allowSelection: {type: Boolean, default: true}
+        allowSelection: {type: Boolean, default: true},
+        multipleSelection: {type: Boolean, default: true}
     },
     components: {
         SlVueTree,
@@ -65,7 +67,6 @@ export default {
     },
     watch: {
         ontology() {
-            console.log("maketree-ontologywatcher");
             this.makeTree();
         },
         additionalNodes() {
@@ -87,8 +88,8 @@ export default {
             }
 
             let nodes = this.createNodes(this.ontology.children.array.slice());
-            nodes.push(...this.createNodes(this.additionalNodes.slice()));
-            this.treeNodes = nodes;
+            let additionalNodes = this.createNodes(this.additionalNodes.slice());
+            this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
             this.filter();
         },
@@ -125,6 +126,15 @@ export default {
             });
         },
 
+        classNames(node) {
+            if(this.multipleSelection) {
+                return node.isSelected ? ["fas", "fa-check-square"] : ["far", "fa-square"];
+            }
+            else {
+                return node.isSelected ? ["fas", "fa-dot-circle"] : ["far", "fa-circle"];
+            }
+        },
+
         select(nodes, event) {
             if(!this.allowSelection) {
                 return;
@@ -132,13 +142,19 @@ export default {
 
             if(this.clickOnTreeSelector(event.target)) {
                 nodes.forEach(node => {
-                    let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
-                    if(indexSelected >= 0) {
-                        this.internalSelectedNodes.splice(indexSelected, 1);
-                        this.$emit("unselect", node.data.id);
+                    if(this.multipleSelection) {
+                        let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
+                        if(indexSelected >= 0) {
+                            this.internalSelectedNodes.splice(indexSelected, 1);
+                            this.$emit("unselect", node.data.id);
+                        }
+                        else {
+                            this.internalSelectedNodes.push(node.data.id);
+                            this.$emit("select", node.data.id);
+                        }
                     }
                     else {
-                        this.internalSelectedNodes.push(node.data.id);
+                        this.internalSelectedNodes = [node.data.id];
                         this.$emit("select", node.data.id);
                     }
                 });

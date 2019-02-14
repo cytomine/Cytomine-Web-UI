@@ -1,274 +1,144 @@
-<!-- TODO translations -->
 <template>
+<!-- <div class="box error" v-if="!configUI['project-activity-tab']">
+    <h2> {{ $t("access-denied") }} </h2>
+    <p>{{ $t("insufficient-permission") }}</p>
+</div> TODO once core handles activity-tab field -->
 <div class="project-activity-wrapper">
-    <div class="tile is-ancestor">
-        <div class="tile is-vertical is-9">
+    <div class="settings-container">
+    <b-dropdown position="is-bottom-left">
+        <button class="button is-hovered" slot="trigger"><i class="fas fa-cog"></i></button>
 
-            <div class="tile single-metrics">
-                <div class="tile is-parent">
-                    <div class="tile is-child box single-metric">
-                        <strong class="metric">X</strong> <!-- TODO -->
-                        <strong>Project visits</strong>  
-                    </div>
-                </div>
-                <div class="tile is-parent">
-                    <div class="tile is-child box single-metric">
-                        <strong class="metric">Y</strong> <!-- TODO -->
-                        <strong>Image consultations</strong>    
-                    </div>
-                </div>
-            </div>
+        <b-dropdown-item custom>
+            <table class="table is-fullwidth">
+                <tbody>
+                    <tr>
+                        <td>{{$t("display")}}</td>
+                        <td>
+                            <b-field class="toggle-component">
+                                <b-radio-button v-model="activeComponent" native-value="project-activity-charts" size="is-small" type="is-link">
+                                    {{$t("activity-charts")}}
+                                </b-radio-button>
 
-            <div class="tile is-parent">
-                <div class="tile is-child box chart-box">
-                    <h2>Activity</h2>
-                    <div class="chart-container">
-                       <!-- TODO: graph of number of image consultations / annotation actions / other.. -->
-                    </div>
-                </div>
-            </div>
+                                <b-radio-button v-model="activeComponent" native-value="project-activity-logs"  size="is-small" type="is-link">
+                                    {{$t("activity-logs")}}
+                                </b-radio-button>
+                            </b-field>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{$t("time-period")}}</td>
+                        <td class="date-selection">
+                            <b-field>
+                                <b-datepicker v-model="startDate" :placeholder="$t('from')" :max-date="endDate || new Date()"
+                                            :month-names="moment.months()" :day-names="moment.weekdaysMin()"
+                                            :date-formatter="date => moment(date).format('ll')" size="is-small">
+                                    <div class="has-text-centered">
+                                        <button class="button is-small is-link" :disabled="startDate == null" @click="startDate = null">
+                                            {{$t("button-clear")}}
+                                        </button>
+                                    </div>
+                                </b-datepicker>
+                            </b-field>
+                            <b-field>
+                                <b-datepicker v-model="endDate" :placeholder="$t('to')" :min-date="startDate" :max-date="new Date()"
+                                            :month-names="moment.months()" :day-names="moment.weekdaysMin()"
+                                            :date-formatter="date => moment(date).format('ll')" size="is-small">
+                                    <div class="has-text-centered">
+                                        <button class="button is-small is-link" :disabled="endDate == null" @click="endDate = null">
+                                            {{$t("button-clear")}}
+                                        </button>
+                                    </div>
+                                </b-datepicker>
+                            </b-field>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </b-dropdown-item>
+    </b-dropdown>
+    </div>
 
-            <div class="tile number-annotations">
-                <div class="tile is-vertical single-metrics">
-                    <div class="tile is-parent">
-                        <div class="tile is-child box single-metric">
-                            <strong class="metric">{{ project.numberOfAnnotations }}</strong>
-                            <strong>{{$t("user-annotations")}}</strong>  
-                        </div>
-                    </div>
-                    <div class="tile is-parent">
-                        <div class="tile is-child box single-metric">
-                            <strong class="metric">{{ project.numberOfJobAnnotations }}</strong>
-                            <strong>{{$t("job-annotations")}}</strong>    
-                        </div>
-                    </div>
-                    <div class="tile is-parent">
-                        <div class="tile is-child box single-metric">
-                            <strong class="metric">{{ project.numberOfReviewedAnnotations }}</strong>
-                            <strong>{{$t("reviewed-annotations")}}</strong>    
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tile is-parent">
-                    <div class="tile is-child box chart-box number-annotations">
-                        <h2>Number of annotations</h2>
-                        <div class="chart-container">
-                            <number-annotations-chart css-classes="chart" :project="project"></number-annotations-chart>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tile annotation-repartition">
-                <div class="tile is-6 is-parent">
-                    <div class="tile is-child box chart-box">
-                        <h2>Manual annotation VS. term</h2>
-                        <div class="chart-container">
-                            <annotation-term-chart css-classes="chart" :project="project"></annotation-term-chart>
-                        </div>
-                    </div>
-                </div>
-                <div class="tile is-6 is-parent">
-                    <div class="tile is-child box chart-box">
-                        <h2>Manual annotation VS. contributor</h2>
-                        <div class="chart-container">
-                            <annotation-contributor-chart css-classes="chart" :project="project"></annotation-contributor-chart>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tile is-parent">
-            <div class="tile is-child box last-actions">
-                <h2>Last actions</h2>
-                <select v-model="selectedUser">
-                    <option :value="null">All users/algorithms</option>
-                    <optgroup label="Members">
-                        <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
-                    </optgroup>
-                    <optgroup label="Algorithms">
-                        <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
-                    </optgroup>
-                </select>
-                
-                <div class="list-actions">
-                    <ul>
-                        <li v-for="action in lastActions" :key="action.id">
-                            <strong>{{Number(action.created) | moment("ll LTS")}}:</strong> {{action.message}}
-                        </li>
-                    </ul>
-
-                    <button class="button" v-if="!loadedAllActions" @click="loadActions()">Load more</button>
-                    <div class="has-text-centered" v-else>
-                        <strong>Nothing more to load.</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="content-wrapper">
+        <keep-alive>
+            <component :is="activeComponent"
+                       :startDate="startDate ? startDate.getTime() : null"
+                       :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null" />
+        </keep-alive>
     </div>
 </div>
 </template>
 
 <script>
-import {Cytomine, UserJobCollection} from "cytomine-client";
+import moment from "moment";
 
-import NumberAnnotationsChart from "./charts/NumberAnnotationsChart.js";
-import AnnotationTermChart from "./charts/AnnotationTermChart.bar.js";
-import AnnotationContributorChart from "./charts/AnnotationContributorChart.js";
-
-import {fullName} from "@/utils/user-utils.js";
+import ProjectActivityCharts from "./activity/ProjectActivityCharts";
+import ProjectActivityLogs from "./activity/ProjectActivityLogs";
 
 export default {
     name: "project-activity",
     components: {
-        NumberAnnotationsChart,
-        AnnotationTermChart,
-        AnnotationContributorChart
+        ProjectActivityCharts,
+        ProjectActivityLogs
     },
-    props: ["project"],
     data() {
         return {
-            loading: true,
-            offset: 0,
-            nbActionsPerPage: 10,
-            loadedAllActions: false,
-
-            userJobs: [],
-            members: [],
-            selectedUser: null,
-
-            lastActions: []
+            activeComponent: "project-activity-charts",
+            startDate: null,
+            endDate: null
         };
     },
-    watch: {
-        selectedUser() {
-            this.lastActions = [];
-            this.offset = 0;
-            this.loadedAllActions = false;
-            this.loadActions();
-        }
-    },
-    methods: {
-        async loadActions() {
-            // TODO in js client
-            let {data} = await Cytomine.instance.api.get(`project/${this.project.id}/commandhistory.json`, {params: {
-                max: this.nbActionsPerPage,
-                offset: this.offset,
-                user: this.selectedUser
-            }});
-
-            this.lastActions.push(...data);
-            this.offset += this.nbActionsPerPage;
-
-            if(data.length < this.nbActionsPerPage) {
-                this.loadedAllActions = true;
-            }
+    computed: {
+        configUI() {
+            return this.$store.state.project.configUI;
         },
-
-        async fetchMembers() {
-            this.members = (await this.project.fetchUsers()).array;
-            this.members.forEach(member => member.fullName = fullName(member));
+        moment() {
+            return moment;
         },
-
-        async fetchUserJobs() {
-            this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
-            this.userJobs.forEach(uJob => uJob.fullName = fullName(uJob));
-        }
-    },
-    async created() {
-        await Promise.all([
-            this.loadActions(),
-            this.fetchMembers(),
-            this.fetchUserJobs()
-        ]);
-
-        this.loading = false;
     }
 };
 </script>
 
 <style scoped>
 .project-activity-wrapper {
-    padding: 20px 50px 20px 50px;
-    height: 100%;
-    position: relative;
-}
-
-.project-activity-wrapper h2 {
-    font-size: 18px;
-}
-
-.single-metrics {
-    flex-grow: 0;
-    min-width: 250px;
-}
-
-.single-metric strong {
-    display: block;
-    text-align: center;
-}
-
-.single-metric .metric {
-    font-size: 26px;
-}
-
-.is-ancestor {
+    padding: 60px 50px 20px 50px;
     height: 100%;
 }
 
-.last-actions {
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    word-wrap: break-word;
+.settings-container {
+    position: absolute;
+    right: 50px;
+    top: 10px;
 }
 
-.list-actions {
-    overflow: auto;
+.content-wrapper {
+    height: 100%;
 }
 
-li {
-    margin-bottom: 5px;
-}
-
-.button {
-    display: block;
-    margin: auto;
-}
-
-select {
-    /* width: 100%; */
-    
-    width: 90%;
-    margin: auto;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-}
-
-.chart-box {
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-container {
-    position: relative;
-    flex-grow: 1;
-    min-height: 100px;
-}
-
-
-.chart-box.number-annotations .chart-container {
-    min-height: 200px;
+td:first-child {
+    font-weight: 600;
+    padding-right: 20px;
+    text-align: right;
 }
 </style>
 
 <style>
-.project-activity-wrapper .chart {
-    position: absolute;
-    height: 100%;
-    width: 100%;
+.project-activity-wrapper h2 {
+    font-size: 16px;
+}
+
+.project-activity-wrapper .settings-container > .dropdown > .dropdown-menu {
+    min-width: 500px;
+}
+
+.project-activity-wrapper .date-selection .pagination .fas {
+    color: #276CDA !important;
+}
+
+.project-activity-wrapper .date-selection .datepicker-cell.is-selected {
+    background-color: #276CDA !important;
+}
+
+.project-activity-wrapper .date-selection .datepicker-cell.is-today {
+    border-color: rgba(39, 108, 218, 0.5) !important;
 }
 </style>
