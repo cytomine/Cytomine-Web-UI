@@ -24,7 +24,7 @@
         <b-field :label="$t('name')" 
                     :type="selectedFile && !validName ? 'is-danger' : ''" 
                     :message="selectedFile && !validName ? $t('field-cannot-be-empty') : ''">
-            <b-input v-model="name" :disabled="selectedFile == null" />
+            <b-input v-model="name" :disabled="selectedFile == null"></b-input>
         </b-field>
     </section>
     <footer class="modal-card-foot">

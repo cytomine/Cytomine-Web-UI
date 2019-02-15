@@ -9,7 +9,7 @@
                 <b-field :label="$t('name')"
                          :type="!validName && displayErrors ? 'is-danger' : null"
                          :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                    <b-input v-model="name" />
+                    <b-input v-model="name"></b-input>
                 </b-field>
 
                 <div class="field">

@@ -2,7 +2,8 @@
 <div class="project-softwares-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <template v-if="!loading">
-        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
+        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search">
+        </b-input>
 
         <b-table :data="filteredSoftwares"
                 default-sort="selected"

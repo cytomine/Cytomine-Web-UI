@@ -23,7 +23,8 @@
                 </div>
                 <div class="column is-half">
                     <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id"
-                        :allow-empty="false" />
+                        :allow-empty="false">
+                    </cytomine-multiselect>
                 </div>
             </div>
 
@@ -32,7 +33,8 @@
                     <strong>{{$t('link-with-project')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id" />
+                    <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id">
+                    </cytomine-multiselect>
                 </div>
             </div>
 
@@ -69,7 +71,8 @@
                                 </template>
                                 <template v-else>
                                     <td>
-                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile" />
+                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile">
+                                        </uploaded-file-status>
                                         <span v-else class="tag is-danger">
                                             {{$t("upload-error")}}
                                         </span>
@@ -120,12 +123,13 @@
             <b-loading :is-full-page="false" :active="loading"></b-loading>
             <template v-if="!loading">
                 <b-input v-model="searchString" class="search-uploaded-file"
-                    :placeholder="$t('search-placeholder')" icon="search" />
+                    :placeholder="$t('search-placeholder')" icon="search">
+                </b-input>
 
                 <b-table :data="filteredUploadedFiles" :paginated="true" :per-page="perPage"
                 pagination-size="is-small" detailed detail-key="id">
                     <template slot-scope="{row: uFile}">
-                        <b-table-column :label="$t('preview')" width="120">
+                        <b-table-column :label="$t('preview')" width="80">
                             <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
                             <div v-else class="is-size-7 has-text-grey">{{$t("no-preview-available")}}</div>
                         </b-table-column>
@@ -151,7 +155,7 @@
                         </b-table-column>
 
                         <b-table-column field="status" :label="$t('status')" sortable width="80">
-                            <uploaded-file-status :file="uFile" />
+                            <uploaded-file-status :file="uFile"></uploaded-file-status>
                         </b-table-column>
 
                         <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
@@ -160,7 +164,7 @@
                     </template>
 
                     <template slot="detail" slot-scope="{row: uFile}">
-                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()" />
+                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()"></uploaded-file-details>
                     </template>
 
                     <template slot="empty">
@@ -496,8 +500,8 @@ export default {
 }
 
 .image-overview {
-    max-height: 45px;
-    max-width: 120px;
+    max-height: 50px;
+    max-width: 80px;
 }
 
 .panel-block {

@@ -30,7 +30,8 @@
                         <template v-if="annot.term.length > 0">
                             <cytomine-term v-for="idTerm in annot.term" :key="idTerm"
                                             class="term"
-                                            :term="terms.find(term => term.id == idTerm)" />
+                                            :term="terms.find(term => term.id == idTerm)">
+                            </cytomine-term>
                         </template>
                         <em class="has-text-grey" v-else>{{$t("no-term")}}</em>
                     </b-table-column>
@@ -140,7 +141,7 @@
                             {{$t("area")}} <span v-if="areaUnit" class="no-uppercase">({{areaUnit}})</span>
                         </div>
                         <div class="filter-body">
-                            <cytomine-slider v-model="areaBounds" :max="maxArea" :integerOnly="false" />
+                            <cytomine-slider v-model="areaBounds" :max="maxArea" :integerOnly="false"></cytomine-slider>
                         </div>
                     </div>
 
@@ -149,7 +150,7 @@
                             {{$t("perimeter")}} <span v-if="perimeterUnit" class="no-uppercase">({{perimeterUnit}})</span>
                         </div>
                         <div class="filter-body">
-                            <cytomine-slider v-model="perimeterBounds" :max="maxPerimeter" :integerOnly="false" />
+                            <cytomine-slider v-model="perimeterBounds" :max="maxPerimeter" :integerOnly="false"></cytomine-slider>
                         </div>
                     </div>
                 </div>

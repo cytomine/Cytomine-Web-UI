@@ -183,7 +183,8 @@
     <calibration-modal :image="image"
                        :active.sync="isCalibrationModalActive"
                        @setResolution="(event) => $emit('setResolution', event)"
-                       @setScale="$router.push(`/project/${image.project}/image/${image.id}?action=calibration`)" />
+                       @setScale="$router.push(`/project/${image.project}/image/${image.id}?action=calibration`)">
+    </calibration-modal>
 </div>
 </template>
 

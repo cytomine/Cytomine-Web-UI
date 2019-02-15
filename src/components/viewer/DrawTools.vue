@@ -21,11 +21,12 @@
         </div>
 
         <div class="ontology-tree-container" v-show="showTermSelector">
-            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
+            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small"></b-input>
             <ontology-tree class="ontology-tree"
                 v-model="termsToAssociate"
                 :ontology="ontology"
-                :searchString="searchStringTerm" />
+                :searchString="searchStringTerm">
+            </ontology-tree>
         </div>
     </div>
 

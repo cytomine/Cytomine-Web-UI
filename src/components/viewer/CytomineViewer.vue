@@ -16,7 +16,7 @@
             </cytomine-image>
         </div>
 
-        <image-selector :idViewer="idViewer" />
+        <image-selector :idViewer="idViewer"></image-selector>
     </div>
 </div>
 </template>

@@ -59,8 +59,8 @@
         </div>
     </div>
 
-    <hotkeys-modal :active.sync="hotkeysModal" />
-    <about-cytomine-modal :active.sync="aboutModal" />
+    <hotkeys-modal :active.sync="hotkeysModal"></hotkeys-modal>
+    <about-cytomine-modal :active.sync="aboutModal"></about-cytomine-modal>
 </nav>
 </template>
 

@@ -4,7 +4,7 @@
     <template v-if="!loading">
         <div class="columns">
             <div class="column is-one-quarter">
-                <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
+                <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
             </div>
 
             <div class="column">
@@ -34,7 +34,8 @@
                     </div>
                     <div class="filter-body">
                         <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" :multiple="true"
-                            :searchable="false" />
+                            :searchable="false">
+                        </cytomine-multiselect>
                     </div>
                 </div>
 
@@ -44,7 +45,8 @@
                     </div>
                     <div class="filter-body">
                         <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                            :searchable="false" />
+                            :searchable="false">
+                        </cytomine-multiselect>
                     </div>
                 </div>
             </div>
@@ -72,7 +74,8 @@
                 <b-table-column field="username" :label="$t('username')" sortable width="100">
                     <username :user="member"
                               :online="onlineIds.includes(member.id)"
-                              :displayFullName="false" />
+                              :displayFullName="false">
+                    </username>
                 </b-table-column>
 
                 <b-table-column field="name" :label="$t('name')" sortable width="150">

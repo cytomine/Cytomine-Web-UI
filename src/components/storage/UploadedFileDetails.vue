@@ -20,7 +20,7 @@
                 {{filesize(node.data.size)}}
             </div>
             <div class="status">
-                <uploaded-file-status :file="node.data" :iconOnly="true" />
+                <uploaded-file-status :file="node.data" :iconOnly="true"></uploaded-file-status>
             </div>
             <div class="buttons">
                 <a class="button is-small is-link" :href="node.data.downloadURL">

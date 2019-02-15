@@ -57,7 +57,8 @@
     <calibration-modal :image="image"
                        :active.sync="calibrationModal"
                        @setResolution="setResolution"
-                       @setScale="startCalibration()" />
+                       @setScale="startCalibration()">
+    </calibration-modal>
 </div>
 </template>
 
