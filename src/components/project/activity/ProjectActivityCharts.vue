@@ -79,9 +79,9 @@
                     <number-annotations-chart css-classes="chart" 
                         :project="project" 
                         :startDate="startDate"
-                        :endDate="endDate" 
-                        :term="selectedTerms[0]"
-                        :daysRange="daysRange" />
+                        :endDate="endDate"
+                        :daysRange="daysRange"
+                        :term="selectedTerms[0] || null" /> <!-- If option "all term" (id 0) was selected, return null instead -->
                 </div>
             </div>
         </div>
