@@ -62,7 +62,8 @@
         <keep-alive>
             <component :is="activeComponent"
                        :startDate="startDate ? startDate.getTime() : null"
-                       :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null" />
+                       :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null">
+            </component>
         </keep-alive>
     </div>
 </div>

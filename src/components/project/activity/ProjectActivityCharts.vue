@@ -10,7 +10,8 @@
                         :project="project" 
                         :startDate="startDate" 
                         :endDate="endDate"
-                        :daysRange="daysRange" />
+                        :daysRange="daysRange">
+                    </activity-overview-chart>
                 </div>
             </div>
         </div>
@@ -72,7 +73,8 @@
                             :additionalNodes="[{id: 0, name: this.$t('all')}]"
                             :startWithAdditionalNodes="true"
                             :multiple="false"
-                            v-model="selectedTerms" />
+                            v-model="selectedTerms">
+                        </ontology-tree-multiselect>
                     </div>
                 </div>
                 <div class="chart-container big">
@@ -81,7 +83,8 @@
                         :startDate="startDate"
                         :endDate="endDate"
                         :daysRange="daysRange"
-                        :term="selectedTerms[0] || null" /> <!-- If option "all term" (id 0) was selected, return null instead -->
+                        :term="selectedTerms[0] || null"> <!-- If option "all term" (id 0) was selected, return null instead -->
+                    </number-annotations-chart>
                 </div>
             </div>
         </div>
@@ -97,7 +100,8 @@
                         :project="project"
                         :startDate="startDate"
                         :endDate="endDate"
-                        @nbElems="val => nbElemsAnnotationTermChart = val" />
+                        @nbElems="val => nbElemsAnnotationTermChart = val">
+                    </annotation-term-chart>
                 </div>
             </div>
         </div>
@@ -110,7 +114,8 @@
                         :project="project"
                         :startDate="startDate"
                         :endDate="endDate"
-                        @nbElems="val => nbElemsAnnotationContributorChart = val" />
+                        @nbElems="val => nbElemsAnnotationContributorChart = val">
+                    </annotation-contributor-chart>
                 </div>
             </div>
         </div>
