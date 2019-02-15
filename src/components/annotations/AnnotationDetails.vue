@@ -26,7 +26,7 @@
             <tr v-if="isPropDisplayed('description')">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
-                    <cytomine-description :object="annotation" :canEdit="canEdit" />
+                    <cytomine-description :object="annotation" :canEdit="canEdit"></cytomine-description>
                 </td>
             </tr>
 
@@ -47,7 +47,8 @@
                                     expanded
                                     :placeholder="$t('add-term')"
                                     v-model="addTermString"
-                                    @focus="showTermSelector = true" />
+                                    @focus="showTermSelector = true">
+                            </b-input>
                         </b-field>
 
                         <div class="ontology-tree-container" v-show="showTermSelector">
@@ -56,7 +57,8 @@
                                 :searchString="addTermString"
                                 :selectedNodes="associatedTermsIds"
                                 @select="addTerm"
-                                @unselect="removeTerm" />
+                                @unselect="removeTerm">
+                            </ontology-tree>
                         </div>
                     </div>
                     <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
@@ -67,14 +69,15 @@
             <tr v-if="isPropDisplayed('properties')">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
-                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
+                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')">
+                    </cytomine-properties>
                 </td>
             </tr>
 
             <tr v-if="isPropDisplayed('attached-files')">
                 <td colspan="2">
                     <h5>{{$t("attached-files")}}</h5>
-                    <attached-files :object="annotation" :canEdit="canEdit" />
+                    <attached-files :object="annotation" :canEdit="canEdit"></attached-files>
                 </td>
             </tr>
 

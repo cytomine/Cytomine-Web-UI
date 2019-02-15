@@ -79,7 +79,8 @@
                             <i class="fas fa-info"></i>
                         </a>
                         <information-panel class="panel-options" v-show="activePanel == 'info'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </information-panel>
                     </li>
 
                     <li v-if="isPanelDisplayed('digital-zoom')">
@@ -87,7 +88,8 @@
                             <i class="fas fa-search"></i>
                         </a>
                         <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </digital-zoom>
                     </li>
 
                     <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
@@ -95,7 +97,8 @@
                             <i class="fas fa-link"></i>
                         </a>
                         <link-panel class="panel-options" v-show="activePanel == 'link'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </link-panel>
                     </li>
 
                     <li v-if="isPanelDisplayed('colors')">
@@ -103,7 +106,8 @@
                             <i class="fas fa-adjust"></i>
                         </a>
                         <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </color-manipulation>
                     </li>
 
                     <li v-if="isPanelDisplayed('image-layers')">
@@ -111,7 +115,8 @@
                             <i class="fas fa-copy"></i>
                         </a>
                         <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
-                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload" />
+                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
+                        </annotations-panel>
                     </li>
 
                     <li v-if="isPanelDisplayed('ontology') && terms.length > 0">
@@ -119,7 +124,8 @@
                             <i class="fas fa-hashtag"></i>
                         </a>
                         <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </ontology-panel>
                     </li>
 
                     <li  v-if="isPanelDisplayed('property')">
@@ -127,7 +133,8 @@
                             <i class="fas fa-tag"></i>
                         </a>
                         <properties-panel class="panel-options" v-show="activePanel == 'properties'"
-                            :idViewer="idViewer" :index="index" />
+                            :idViewer="idViewer" :index="index">
+                        </properties-panel>
                     </li>
 
                     <li v-if="isPanelDisplayed('follow')">
@@ -135,14 +142,16 @@
                             <i class="fas fa-street-view"></i>
                         </a>
                         <follow-panel class="panel-options" v-show="activePanel == 'follow'"
-                            :idViewer="idViewer" :index="index" :view="$refs.view" />
+                            :idViewer="idViewer" :index="index" :view="$refs.view">
+                        </follow-panel>
                     </li>
 
                     <li v-if="isPanelDisplayed('guided-tour')">
                         <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
                             <i class="fas fa-map-signs"></i>
                         </a>
-                        <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view" />
+                        <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view">
+                        </guided-tour>
                     </li>
                 </template>
             </ul>
@@ -157,15 +166,19 @@
             <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
         </b-message>
 
-        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index">
+        </rotation-selector>
 
-        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
+        </scale-line>
 
         <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
-            :idViewer="idViewer" :index="index" :view="$refs.view" />
+            :idViewer="idViewer" :index="index" :view="$refs.view">
+        </annotation-details-container>
 
         <annotations-table v-if="isPanelDisplayed('annotation-panel')"
-            class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view" />
+            class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view">
+        </annotations-table>
     </div>
 </template>
 

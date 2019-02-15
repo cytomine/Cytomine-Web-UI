@@ -17,7 +17,8 @@
                     <div class="filter-body">
                         <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
                             label="label" track-by="size"
-                            :allow-empty="false" :searchable="false" />
+                            :allow-empty="false" :searchable="false">
+                        </cytomine-multiselect>
                     </div>
                 </div>
                 <div class="column filter">
@@ -26,7 +27,8 @@
                     </div>
                     <div class="filter-body">
                         <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
-                            :allow-empty="false" :searchable="false" />
+                            :allow-empty="false" :searchable="false">
+                        </cytomine-multiselect>
                     </div>
                 </div>
                 </div>
@@ -41,7 +43,8 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
-                                :allow-empty="false" :searchable="false" />
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
                         </div>
                     </div>
 
@@ -51,7 +54,8 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedMembers" :options="members"
-                                label="fullName" track-by="id" :multiple="true" />
+                                label="fullName" track-by="id" :multiple="true">
+                            </cytomine-multiselect>
                         </div>
                     </div>
 
@@ -61,7 +65,8 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
-                                label="fullName" track-by="id" :multiple="true" />
+                                label="fullName" track-by="id" :multiple="true">
+                            </cytomine-multiselect>
                         </div>
                     </div>
                 </div>
@@ -73,7 +78,8 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedImages" :options="images"
-                                label="instanceFilename" track-by="id" :multiple="true" />
+                                label="instanceFilename" track-by="id" :multiple="true">
+                            </cytomine-multiselect>
                         </div>
                     </div>
 
@@ -84,7 +90,8 @@
                         <div class="filter-body">
                             <ontology-tree-multiselect :ontology="ontology"
                                 :additionalNodes="additionalNodes"
-                                v-model="selectedTermsIds" />
+                                v-model="selectedTermsIds">
+                            </ontology-tree-multiselect>
                         </div>
                     </div>
 

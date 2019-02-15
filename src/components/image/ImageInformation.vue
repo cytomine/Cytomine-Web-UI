@@ -10,7 +10,8 @@
         <image-details v-if="image" :image="image" 
             @setResolution="resolution => image.resolution = resolution"
             @setMagnification="magnification => image.magnification = magnification"
-            @delete="deleteImage()" />
+            @delete="deleteImage()">
+        </image-details>
     </template>
 </div>
 </template>

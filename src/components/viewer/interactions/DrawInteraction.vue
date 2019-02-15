@@ -17,7 +17,8 @@
     <calibration-modal :image="image"
                        :pixelLength="pixelLengthCalibrationFeature"
                        :active.sync="calibrationModal"
-                       @setResolution="endCalibration" />
+                       @setResolution="endCalibration">
+    </calibration-modal>
 </div>
 </template>
 
