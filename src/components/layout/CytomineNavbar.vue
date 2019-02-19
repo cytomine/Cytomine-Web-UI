@@ -18,6 +18,10 @@
                 <i class="fas fa-download"></i>
                 {{ $t("storage") }}
             </router-link>
+            <router-link to="/ontology" class="navbar-item">
+                <i class="fas fa-hashtag"></i>
+                {{ $t("ontologies") }}
+            </router-link>
         </div>
 
         <div class="navbar-end">

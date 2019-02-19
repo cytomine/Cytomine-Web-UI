@@ -486,6 +486,7 @@ export default {
 .panel-heading {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .image-overview {

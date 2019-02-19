@@ -119,7 +119,7 @@ body {
 .bottom {
     flex: 1;
     overflow-y: auto;
-    position: relative;
+    /* position: relative; */
 }
 
 h1 {
@@ -157,6 +157,12 @@ h1.page-title {
 
 strong, .label {
     font-weight: 600 !important;
+}
+
+.content-wrapper {
+    padding: 1.5% 2.5%;
+    position: relative;
+    min-height: 100%;
 }
 
 /* Panel */
@@ -435,14 +441,11 @@ strong, .label {
 /* SL vue tree */
 .sl-vue-tree {
     position: relative;
-}
-
-.sl-vue-tree.draggable {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
 }
 
@@ -460,6 +463,8 @@ strong, .label {
     width: 100%;
     line-height: 2.2;
     font-size: 14px;
+    display: flex;
+    flex-direction: row;
 }
 
 .sl-vue-tree-title {
@@ -488,7 +493,7 @@ strong, .label {
 }
 
 .sl-vue-tree-gap {
-    width: 18px;
+    width: 20px;
     min-height: 1px;
     flex-shrink: 0;
 }
@@ -505,9 +510,11 @@ strong, .label {
 }
 
 .sl-vue-tree-drag-info {
-    position: absolute;
-    background-color: rgba(0,0,0,0.5);
-    padding: 5px 10px;
+    display: none;
+}
+
+.draggable .sl-vue-tree-selected > .sl-vue-tree-node-item {
+    background-color: rgba(100, 100, 100, 0.1);
 }
 
 </style>

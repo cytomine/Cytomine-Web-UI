@@ -1,0 +1,178 @@
+<template>
+<div class="content-wrapper">
+    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <div v-if="!loading" class="columns">
+        <div class="column is-one-quarter">
+            <div class="panel">
+                <p class="panel-heading">
+                    {{$t("ontologies")}}
+                    <button class="button is-link" @click="creationModal = true">
+                        {{$t('new-ontology')}}
+                    </button>
+                </p>
+                <div class="panel-block">
+                    <b-input size="is-small" v-model="searchString" type="search" icon="search" 
+                        :placeholder="$t('search-placeholder')">
+                    </b-input>
+                </div>
+                <div class="panel-main-content">
+                    <a v-for="ontology in filteredOntologies" :key="ontology.id" @click="selectOntology(ontology)"
+                    class="panel-block" :class="{'is-active': selectedOntology.id == ontology.id}">
+                        <span class="panel-icon">
+                            <i v-if="selectedOntology.id == ontology.id" class="fas fa-caret-right" aria-hidden="true"></i>
+                        </span>
+                        {{ontology.name}}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="panel">
+                <p class="panel-heading">
+                    {{selectedOntology.name}}
+                </p>
+                <div class="panel-block panel-main-content">
+                    <ontology-details :ontology="selectedOntology" 
+                        @delete="deleteOntology()"
+                        @rename="renameOntology">
+                    </ontology-details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <add-ontology-modal :active.sync="creationModal" @newOntology="addOntology"></add-ontology-modal>
+</div>    
+</template>
+
+<script>
+import {OntologyCollection} from "cytomine-client";
+import OntologyDetails from "./OntologyDetails";
+import AddOntologyModal from "./AddOntologyModal";
+
+export default {
+    name: "list-ontologies",
+    components: {
+        OntologyDetails,
+        AddOntologyModal
+    },
+    data() {
+        return {
+            loading: true,
+            ontologies: [],
+            selectedOntology: null,
+            searchString: "",
+            creationModal: false
+        };
+    },
+    computed: {
+        idTargetOntology() {
+            return this.$route.params.idOntology;
+        },
+        filteredOntologies() {
+            if(this.searchString.length > 0) {
+                let str = this.searchString.toLowerCase();
+                return this.ontologies.filter(ontology => ontology.name.toLowerCase().indexOf(str) >= 0);
+            }
+            return this.ontologies;
+        }
+    },
+    watch: {
+        idTargetOntology() {
+            if(this.idTargetOntology == null) {
+                this.selectedOntology = this.ontologies[0];
+                return;
+            }
+            if(this.selectedOntology != null && this.selectedOntology.id === this.idTargetOntology) {
+                return;
+            }
+            this.selectTargetOntology();
+        }
+    },
+    methods: {
+        selectOntology(ontology) {
+            this.selectedOntology = ontology;
+            this.$router.push(`/ontology/${this.selectedOntology.id}`);
+        },
+        selectTargetOntology() {
+            this.selectedOntology = this.ontologies.find(ontology => ontology.id == this.idTargetOntology);
+            if(this.selectedOntology == null) {
+                this.error = true;
+            }
+        },
+        sortOntologies() {
+            this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
+        },
+        addOntology(ontology) {
+            this.ontologies.push(ontology);
+            this.sortOntologies();
+            this.selectedOntology = ontology;
+        },
+        renameOntology(newName) {
+            this.selectedOntology.name = newName;
+            this.sortOntologies();
+        },
+        async deleteOntology() {
+            let index = this.ontologies.findIndex(ontology => ontology.id == this.selectedOntology.id);
+            try {
+                await this.selectedOntology.delete();
+                this.ontologies.splice(index, 1);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-ontology-deletion", {name: this.selectedOntology.name})
+                });
+                this.selectedOntology = this.ontologies[0];
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-ontology-deletion")});
+            }
+        }
+    },
+    async created() {
+        this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+        this.sortOntologies();
+
+        if(this.idTargetOntology) {
+            this.selectTargetOntology();
+        }
+        else {
+            this.selectedOntology = this.ontologies[0];
+        }
+
+        this.loading = false;
+    }
+};
+</script>
+
+<style scoped>
+.content-wrapper {
+    height: 100%;
+}
+
+.columns {
+    height: 100%;
+}
+
+.panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-icon {
+    font-size: 1.2em;
+}
+
+.panel-main-content {
+    overflow: auto;
+    flex-grow: 1;
+}
+</style>

@@ -66,7 +66,7 @@
         <tr v-if="isPropDisplayed('ontology')">
             <td class="prop-label">{{$t("ontology")}}</td>
             <td class="prop-content">
-                <router-link to="">{{project.ontologyName}}</router-link>
+                <router-link :to="`/ontology/${project.ontology}`">{{project.ontologyName}}</router-link>
             </td>
         </tr>
         <tr v-if="isPropDisplayed('created')">

@@ -1,5 +1,5 @@
 <template>
-<div class="storage-wrapper">
+<div class="storage-wrapper content-wrapper">
     <div class="panel">
         <p class="panel-heading">
             {{ $t("upload") }}
@@ -437,10 +437,6 @@ export default {
 </script>
 
 <style scoped>
-.storage-wrapper {
-    padding: 30px 50px 30px 50px;
-}
-
 .small-text {
     font-size: 0.9em;
 }

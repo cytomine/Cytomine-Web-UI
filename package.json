@@ -26,6 +26,7 @@
         "v-click-outside-x": "^3.5.5",
         "v-tooltip": "^2.0.0-rc.33",
         "vue": "^2.5.17",
+        "vue-color": "^2.7.0",
         "vue-draggable-resizable": "^1.7.3",
         "vue-i18n": "^8.3.2",
         "vue-moment": "^4.0.0",

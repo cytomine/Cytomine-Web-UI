@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import CytomineStorage from "./components/storage/CytomineStorage.vue";
+import ListOntologies from "./components/ontology/ListOntologies.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
@@ -37,6 +38,10 @@ const routes = [
         meta: {
             title: "Cytomine - Storage"
         }
+    },
+    {
+        path: "/ontology/:idOntology?",
+        component: ListOntologies
     },
     {
         path: "/advanced-search/:searchString?",
@@ -98,9 +103,8 @@ const routes = [
     // redirections for old URLS
     {path: "/userdashboard", redirect: "/"},
     {path: "/project", redirect: "/projects"},
-    {path: "/ontology", redirect: "/"}, // TODO
     {path: "/explorer", redirect: "/"},
-    {path: "/upload", redirect: "/"}, // TODO
+    {path: "/upload", redirect: "/storage"},
 
     {path: "/activity", redirect: "/"},
     {path: "/activity-:idProject-", redirect: "/"}, // TODO

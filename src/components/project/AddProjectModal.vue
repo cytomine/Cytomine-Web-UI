@@ -54,7 +54,7 @@
 import {Project, Ontology, OntologyCollection} from "cytomine-client";
 
 export default {
-    name: "new-project-modal",
+    name: "add-project-modal",
     props: ["active"],
     data() {
         return {
