@@ -470,7 +470,7 @@ strong, .label {
 .sl-vue-tree-title {
     flex-grow: 1;
     display: flex;
-    align-items: center;
+    align-items: top;
     word-break: break-all !important;
 }
 

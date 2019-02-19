@@ -1,5 +1,5 @@
 <template>
-<div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag}">
+<div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
     <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
         <template slot="toggle" slot-scope="{node}">
             <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
@@ -18,19 +18,21 @@
             </div>
         </template>
 
-        <template slot="sidebar" slot-scope="{node}" v-if="!node.data.hidden && allowEdition">
-            <div class="buttons">
-                <button class="button is-small" @click="startTermUpdate(node)">
-                    <span class="icon is-small">
-                        <i class="fas fa-edit"></i>
-                    </span>
-                </button>
-                <button class="button is-small" @click="confirmTermDeletion(node)">
-                    <span class="icon is-small">
-                        <i class="far fa-trash-alt"></i>
-                    </span>
-                </button>
-            </div>
+        <template slot="sidebar" slot-scope="{node}" v-if="!node.data.hidden">
+            <slot name="custom-sidebar" :term="node.data">
+                <div v-if="allowEdition" class="buttons">
+                    <button class="button is-small" @click="startTermUpdate(node)">
+                        <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                    </button>
+                    <button class="button is-small" @click="confirmTermDeletion(node)">
+                        <span class="icon is-small">
+                            <i class="far fa-trash-alt"></i>
+                        </span>
+                    </button>
+                </div>
+            </slot>
         </template>
     </sl-vue-tree>
 
@@ -38,7 +40,7 @@
         <em class="has-text-grey no-result">{{$t('no-result')}}</em>
     </slot>
 
-    <div class="add-term-container">
+    <div v-if="allowEdition" class="add-term-container">
         <button class="button is-small is-link" @click="startTermCreation()">{{$t("add-term")}}</button>
     </div>
 
@@ -325,13 +327,13 @@ export default {
     margin-bottom: 0px !important;
 }
 
-.ontology-tree .sl-vue-tree-sidebar {
+.ontology-tree.editable .sl-vue-tree-sidebar {
     width: 100px;
     padding-left: 20px;
     flex-shrink: 0;
 }
 
-.ontology-tree .sl-vue-tree-sidebar {
+.ontology-tree.editable .sl-vue-tree-sidebar {
     display: flex;
     align-items: top;
 }

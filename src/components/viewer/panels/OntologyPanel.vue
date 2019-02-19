@@ -17,7 +17,7 @@
                        :searchString="searchString"
                        :additionalNodes="additionalNodes">
 
-            <div class="sidebar-tree" slot="sidebar" slot-scope="{term}">
+            <div class="sidebar-tree" slot="custom-sidebar" slot-scope="{term}">
                 <div class="visibility">
                     <input v-if="term.id"
                            type="checkbox"
