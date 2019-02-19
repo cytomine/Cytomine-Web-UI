@@ -14,7 +14,7 @@
                    v-if="allowSelection"
                    :class="node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square']">
                 </i>
-                <cytomine-term :term="node.data"></cytomine-term> ({{node.data.id}})
+                <cytomine-term :term="node.data"></cytomine-term>
             </div>
         </template>
 
