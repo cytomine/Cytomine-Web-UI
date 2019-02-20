@@ -15,17 +15,6 @@
                         {{ $t("images") }}
                     </a>
                 </router-link>
-                <!-- TODO: change the way opened viewers are displayed -->
-                <router-link tag="li" class="image-link" v-for="viewer in viewers" :key="viewer.id"
-                    :to="viewer.path">
-
-                    <a>{{ viewer.name }}</a>
-
-                    <!-- TODO
-                    <a class="close">
-                        <i class="fas fa-times"></i>
-                    </a>-->
-                </router-link>
             </template>
             <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
@@ -74,27 +63,6 @@ export default {
         };
     },
     computed: {
-        viewers() {
-            let viewers = this.$store.state.images.viewers;
-            let results = [];
-            for(let id in viewers) {
-                if(viewers[id].idProject == this.project.id) {
-                    let viewer = viewers[id];
-                    let nbMaps = viewer.maps.length;
-                    if(nbMaps == 0) {
-                        return;
-                    }
-                    let name = nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename
-                        : this.$t("viewer-group", {nbImages: nbMaps});
-                    results.push({
-                        id,
-                        name,
-                        path: this.$store.getters.pathViewer({idViewer: id})
-                    });
-                }
-            }
-            return results;
-        },
         project() {
             return this.$store.state.project.project;
         },

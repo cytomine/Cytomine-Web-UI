@@ -23,10 +23,11 @@ export default {
             state.viewers = {};
         },
 
-        addViewer(state, {id, idProject}) {
+        addViewer(state, {id, project}) {
             Vue.set(state.viewers, id, {
                 maps: [],
-                idProject,
+                idProject: project.id,
+                nameProject: project.name,
                 links: [],
                 imageSelector: false,
                 activeMap: 0
@@ -458,8 +459,8 @@ export default {
             router.replace(getters.pathViewer({idViewer, idAnnotation: router.currentRoute.params.idAnnotation}));
         },
 
-        async addViewer({commit, dispatch}, {idViewer, idProject, idImages}) {
-            commit("addViewer", {id: idViewer, idProject});
+        async addViewer({commit, dispatch, rootState}, {idViewer, idImages}) {
+            commit("addViewer", {id: idViewer, project: rootState.project.project});
             await Promise.all(idImages.map(async id => {
                 let image = await ImageInstance.fetch(id);
                 dispatch("addMap", {idViewer, image});

@@ -65,7 +65,6 @@ export default {
 };
 </script>
 
-<!-- <style lang="sass" src="bulma"></style> Alternative requiring an handling of sass -->
 <style>
 @import "~bulma/css/bulma.css";
 @import "~bulma-slider/dist/css/bulma-slider.min.css";
