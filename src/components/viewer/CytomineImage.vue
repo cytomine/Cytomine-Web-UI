@@ -172,6 +172,12 @@
         <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
         </scale-line>
 
+        <div v-if="imageWrapper.showCrosshair && viewerWrapper.maps.length > 1" class="view-positioning-helper">
+            <div class="horizontal-line"></div>
+            <div class="vertical-line"></div>
+            <div class="center"></div>
+        </div>
+
         <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
             :idViewer="idViewer" :index="index" :view="$refs.view">
         </annotation-details-container>
@@ -527,9 +533,20 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import "~vuelayers/lib/style.css";
-/* @import "~ol/ol.css"; */
+
+$backgroundPanelBar: #555;
+$widthPanelBar: 38px;
+$backgroundPanel: #f2f2f2;
+$colorPanelLink: #eee;
+$colorHoverPanelLink: white;
+$colorBorderPanelLink: #222;
+$colorOpenedPanelLink: #6c95c8;
+
+$colorPositioningHelper: rgba(0, 0, 0, 0.5);
+$sizePositioningHelperCenter: 50px;
+$sizePositioningLineSize: 2px;
 
 .map-container {
     display:flex;
@@ -546,9 +563,7 @@ export default {
     position: absolute;
     top: 10px;
     left: 50px;
-    /*background: #eee;
-    padding: 2px;
-    border-radius: 3px;*/
+    z-index: 10;
 }
 
 .broadcast {
@@ -569,10 +584,10 @@ export default {
     left: 50px;
     top: 50px;
     max-width: 400px;
-}
 
-.info-calibration p:first-child {
-    margin-bottom: 10px;
+    p:first-child {
+        margin-bottom: 10px;
+    }
 }
 
 .broadcast i.fas {
@@ -583,69 +598,77 @@ export default {
     position: absolute;
     bottom: 0px;
     left: 0px;
-    right: 40px;
+    right: $widthPanelBar;
+    z-index: 5;
 }
 
 .panels {
-    background: #555;
-    width: 40px;
+    background: $backgroundPanelBar;
     display: flex;
-}
 
-.panels ul {
-    padding: 0;
-    margin: 0;
-}
+    > ul {
+        padding: 0;
+        margin: 0;
 
-.panels li {
-    position: relative;
-}
+        > li {
+            position: relative;
 
-.panels li.bottom {
-    position: absolute;
-    bottom: 0px;
-}
+            > a {
+                position: relative;
+                display: block;
+                width: $widthPanelBar;
+                padding: 10px;
+                padding-top: 7px;
+                padding-bottom: 7px;
+                font-size: 18px;
+                color: $colorPanelLink;
+                border-bottom: 1px solid $colorBorderPanelLink;
+                text-decoration: none;
+                text-align:center;
 
-.panels > ul > li > a {
-    position: relative;
-    display: block;
-    padding: 10px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    font-size: 18px;
-    color: #eee;
-    border-bottom: 1px solid #222;
-    text-decoration: none;
-    text-align:center;
-}
+                :hover {
+                    color: $colorHoverPanelLink;
+                }
+            }
 
-.panels > ul > li > a:hover {
-    color: #fff;
-}
+            a.active {
+                background: $backgroundPanel;
+                color: $colorOpenedPanelLink;
+                :hover {
+                    color: unset;
+                }
+            }
 
-.panels a.close {
-    color: #ffc4c4;
-}
-
-.panels a.close:hover {
-    color: #ff7070;
-}
-
-.panel-options table {
-    background: none;
-    width: 100%;
+            a.close {
+                color: #ffc4c4;
+                :hover {
+                    color: #ff7070;
+                }
+            }
+        }
+    }
 }
 
 .panel-options {
     position: absolute;
     bottom: -20px;
-    right: 38px;
+    right: $widthPanelBar;
     width: 300px;
     min-height: 100px;
-    background: #f2f2f2;
+    background: $backgroundPanel;
     padding: 10px;
     border-radius: 5px 0px 0px 5px;
     z-index: 100;
+
+    h1 {
+        padding-top: 5px !important;
+        padding-bottom: 15px !important;
+    }
+
+    table {
+        background: none;
+        width: 100%;
+    }
 }
 
 .panels li:nth-child(-n+7) .panel-options {
@@ -663,57 +686,6 @@ export default {
     top: -50px;
     bottom: unset;
 }
-
-
-.panel-options h1 {
-    padding-top: 5px !important;
-    padding-bottom: 15px !important;
-}
-
-/* ----- LIGHT ----- */
-
-.panels > ul > li > a.active {
-    background: #f2f2f2;
-    color: #6c95c8;
-}
-
-/* ----- DARK ----- */
-
-/* .panels > ul > li > a.active {
-    background: #444;
-    color: #a0c0e5;
-}
-
-.panel-options {
-    background: #444;
-}
-
-.panel-options, .panel-options .label, .panel-options .table, .panel-options .table th, .panel-options .table strong {
-    color: #dedede !important;
-}
-
-.panel-options .table td, .panel-options .table th {
-    border-bottom: 1px solid #666;
-}
-
-.panel-options a {
-    color: #a0c0e5;
-}
-
-.panel-options a:hover {
-    color: #e9f2f3;
-}
-
-.panel-options select, .panel-options button {
-    background-color: #5f5f5f !important;
-    border: 1px solid #888 !important;
-    color: #dedede !important;
-}
-
-.panel-options h1 {
-    font-weight: 600;
-    color: #e9f2f3;
-} */
 
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */
 
@@ -746,6 +718,57 @@ export default {
     position: absolute;
     left: .5em;
     top: 70px;
+}
+
+/* ----- View positioning helper ----- */
+
+/*
+<div class="view-positioning-helper">
+    <div class="horizontal-line"></div>
+    <div class="vertical-line"></div>
+    <div class="center"></div>
+</div>
+*/
+
+.view-positioning-helper {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: $widthPanelBar;
+    pointer-events: none;
+    z-index: 1;
+
+    .horizontal-line {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        box-sizing: border-box;
+        height: calc(50% + #{$sizePositioningLineSize} / 2);
+        width: 100%;
+        border-bottom: $sizePositioningLineSize dashed $colorPositioningHelper;
+    }
+
+    .vertical-line {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        box-sizing: border-box;
+        height: 100%;
+        width: calc(50% + #{$sizePositioningLineSize} / 2);
+        border-right: $sizePositioningLineSize dashed $colorPositioningHelper;
+    }
+
+    .center {
+        position: absolute;
+        top: calc(50% - #{$sizePositioningHelperCenter} / 2);
+        left: calc(50% - #{$sizePositioningHelperCenter} / 2);
+        box-sizing: border-box;
+        width: $sizePositioningHelperCenter;
+        height: $sizePositioningHelperCenter;
+        border-radius: calc(#{$sizePositioningHelperCenter} / 2);
+        border: $sizePositioningLineSize dashed $colorPositioningHelper;
+    }
 }
 
 </style>

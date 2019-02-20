@@ -168,6 +168,10 @@ export default {
             });
         },
 
+        setShowCrosshair(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].showCrosshair = value;
+        },
+
         // ----- Color manipulation
 
         setBrightness(state, {idViewer, index, value}) {
@@ -483,6 +487,7 @@ export default {
                 zoom: 0, // TODO
                 center: [image.width/2, image.height/2],
                 rotation: 0,
+                showCrosshair: false,
 
                 broadcast: false,
                 trackedUser: null,
