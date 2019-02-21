@@ -125,6 +125,7 @@
 
             v-show="selectedTermsIds.includes(term.id)"
 
+            @addTerm="addTerm"
             @update="forceUpdate = []"> <!-- assigning a new array will be considered as a change in children components -->
         </list-annotations-by-term>
     </div>
@@ -167,8 +168,6 @@ export default {
             selectedImages: [],
 
             terms: [],
-            termsOptions: [],
-            additionalNodes: [],
             noTermOption: {id: 0, name: this.$t("no-term")},
             multipleTermsOption: {id: -1, name: this.$t("multiple-terms")},
             selectedTermsIds: [],
@@ -210,18 +209,21 @@ export default {
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
+        },
+        additionalNodes() {
+            let additionalNodes = [this.noTermOption];
+            if(this.terms.length > 1) {
+                additionalNodes.push(this.multipleTermsOption);
+            }
+            return additionalNodes;
+        },
+        termsOptions() {
+            return this.terms.concat(this.additionalNodes);
         }
     },
     methods: {
         async fetchTerms() {
             this.terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.termsOptions = this.terms.slice();
-            this.termsOptions.push(this.noTermOption);
-            this.additionalNodes = [this.noTermOption];
-            if(this.terms.length > 1) {
-                this.termsOptions.push(this.multipleTermsOption);
-                this.additionalNodes.push(this.multipleTermsOption);
-            }
             this.selectedTermsIds = this.termsOptions.map(term => term.id);
         },
         async fetchImages() {
@@ -252,6 +254,10 @@ export default {
         },
         downloadURL(format) {
             return this.collection.getDownloadURL(format);
+        },
+        addTerm(term) {
+            this.terms.push(term);
+            this.selectedTermsIds.push(term.id);
         }
     },
     async created() {
@@ -273,7 +279,7 @@ export default {
                 this.fetchImages(), 
                 this.fetchUsers(),
                 this.fetchMembers(),
-                this.fetchUserJobs()  
+                this.fetchUserJobs()
             ]);
         }     
         catch(error) {

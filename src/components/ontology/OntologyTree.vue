@@ -40,13 +40,9 @@
         <em class="has-text-grey no-result">{{$t('no-result')}}</em>
     </slot>
 
-    <div v-if="allowEdition" class="add-term-container">
-        <button class="button is-small is-link" @click="startTermCreation()">{{$t("add-term")}}</button>
+    <div v-if="allowEdition || allowNew" class="add-term-container">
+        <button class="button is-small" @click="startTermCreation()">{{$t("add-term")}}</button>
     </div>
-
-    <term-modal :active.sync="activeModal" :term="editedNode ? editedNode.data : null" :ontology="ontology"
-        @newTerm="createTerm" @updateTerm="updateTerm">
-    </term-modal>
 
 </div>
 </template>
@@ -70,18 +66,17 @@ export default {
         selectedNodes: {type: Array, default: () => []},
         allowSelection: {type: Boolean, default: true},
         allowDrag: {type: Boolean, default: false},
-        allowEdition: {type: Boolean, default: false}
+        allowEdition: {type: Boolean, default: false},
+        allowNew: {type: Boolean, default: false},
     },
     components: {
         SlVueTree,
-        CytomineTerm,
-        TermModal
+        CytomineTerm
     },
     data() {
         return {
             treeNodes: [],
             internalSelectedNodes: [],
-            activeModal: false,
             editedNode: null
         };
     },
@@ -206,18 +201,35 @@ export default {
 
         startTermCreation() {
             this.editedNode = null;
-            this.activeModal = true;
+            this.openModal();
         },
         createTerm(term) {
             this.treeNodes.push(this.createNode(term));
+            this.$emit("newTerm", term);
         },
 
         startTermUpdate(node) {
             this.editedNode = node;
-            this.activeModal = true;
+            this.openModal();
         },
         updateTerm(term) {
             this.$refs.tree.updateNode(this.editedNode.path, {data: {...term}});
+        },
+
+        openModal() {
+            this.$modal.open({
+                parent: this,
+                component: TermModal,
+                props: {
+                    term: this.editedNode ? this.editedNode.data : null,
+                    ontology: this.ontology
+                },
+                events: {
+                    newTerm: this.createTerm,
+                    updateTerm: this.updateTerm
+                },
+                hasModalCard: true
+            });
         },
 
         drop(nodes, position) {
@@ -275,6 +287,7 @@ export default {
 .add-term-container {
     text-align: center;
     margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 </style>
 

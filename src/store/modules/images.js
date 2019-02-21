@@ -209,6 +209,15 @@ export default {
 
         // ----- Terms
 
+        addTerm(state, {idViewer, term}) { // if a term is added, required to add it to all images as they belong to same project
+            let maps = state.viewers[idViewer].maps;
+            maps.forEach(map => {
+                let mapTerm = term.clone();
+                formatTerm(mapTerm, map.layersOpacity);
+                map.terms.push(mapTerm);
+            });
+        },
+
         setTerms(state, {idViewer, index, terms}) {
             state.viewers[idViewer].maps[index].terms = terms;
         },
@@ -785,10 +794,14 @@ async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
             terms[i] = prevTerm;
         }
         else {
-            term.opacity = initialTermsOpacity;
-            term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
-            term.visible = true;
+            formatTerm(term, layersOpacity);
         }
     }
     return terms;
+}
+
+function formatTerm(term, layersOpacity) {
+    term.opacity = initialTermsOpacity;
+    term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+    term.visible = true;
 }

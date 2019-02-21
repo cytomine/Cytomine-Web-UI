@@ -1,32 +1,30 @@
 <template>
-<b-modal class="term-modal" :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
+<div class="modal-card term-modal">
     <form>
-        <div class="modal-card add-image-modal">
-            <header class="modal-card-head">
-                <p class="modal-card-title">{{$t(term ? "update-term" : "create-term")}}</p>
-            </header>
-            <section class="modal-card-body">
-                <b-field :label="$t('name')"
-                         :type="!validName && displayErrors ? 'is-danger' : null"
-                         :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                    <b-input v-model="name"></b-input>
-                </b-field>
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{$t(term ? "update-term" : "create-term")}}</p>
+        </header>
+        <section class="modal-card-body">
+            <b-field :label="$t('name')"
+                        :type="!validName && displayErrors ? 'is-danger' : null"
+                        :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
+                <b-input v-model="name"></b-input>
+            </b-field>
 
-                <sketch-picker v-model="color"
-                    :presetColors="['#F44E3B', '#FB9E00', '#FCDC00', '#68BC00', '#16A5A5', '#009CE0', '#7B10D8', '#F06292', '#000', '#777', '#FFF']">
-                </sketch-picker>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button" type="button" @click="$emit('update:active', false)">
-                    {{$t("button-cancel")}}
-                </button>
-                <button class="button is-link" :disabled="!validName && displayErrors" @click="save()">
-                    {{$t("button-save")}}
-                </button>
-            </footer>
-        </div>
+            <sketch-picker v-model="color"
+                :presetColors="['#F44E3B', '#FB9E00', '#FCDC00', '#68BC00', '#16A5A5', '#009CE0', '#7B10D8', '#F06292', '#000', '#777', '#FFF']">
+            </sketch-picker>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button" type="button" @click="$parent.close()">
+                {{$t("button-cancel")}}
+            </button>
+            <button class="button is-link" :disabled="!validName && displayErrors" @click="save()">
+                {{$t("button-save")}}
+            </button>
+        </footer>
     </form>
-</b-modal>
+</div>
 </template>
 
 <script>
@@ -39,7 +37,6 @@ export default {
     name: "term-modal",
     components: {"sketch-picker": Sketch},
     props: [
-        "active",
         "term",
         "ontology"
     ],
@@ -53,15 +50,6 @@ export default {
     computed: {
         validName() {
             return this.name.length > 0;
-        }
-    },
-    watch: {
-        active(val) {
-            if(val) {
-                this.name = this.term ? this.term.name : "";
-                this.color = this.term ? {hex: this.term.color} : defaultColor;
-                this.displayErrors = false;
-            }
         }
     },
     methods: {
@@ -83,7 +71,7 @@ export default {
                 let term = await new Term({name: this.name, color: this.color.hex, ontology: this.ontology.id}).save();
                 this.$notify({type: "success", text: this.$t("notif-success-term-creation")});
                 this.$emit("newTerm", term);
-                this.$emit("update:active", false);
+                this.$parent.close();
             }
             catch(error) {
                 console.log(error);
@@ -98,13 +86,18 @@ export default {
                 await term.save();
                 this.$notify({type: "success", text: this.$t("notif-success-term-update")});
                 this.$emit("updateTerm", term);
-                this.$emit("update:active", false);
+                this.$parent.close();
             }
             catch(error) {
                 console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-term-update")});
             }
         }
+    },
+    created() {
+        this.name = this.term ? this.term.name : "";
+        this.color = this.term ? {hex: this.term.color} : defaultColor;
+        this.displayErrors = false;
     }
 };
 </script>

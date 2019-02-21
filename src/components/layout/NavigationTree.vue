@@ -10,7 +10,7 @@
                         {{viewer.name}}
                     </span>
                     <ul class="viewer-details" v-if="viewer.maps.length > 1">
-                        <li v-for="map in viewer.maps" :key="map.imageInstance.id">
+                        <li v-for="(map, index) in viewer.maps" :key="index">
                             {{map.imageInstance.instanceFilename}}
                         </li>
                     </ul>

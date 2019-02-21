@@ -56,6 +56,8 @@
                                 :ontology="ontology"
                                 :searchString="addTermString"
                                 :selectedNodes="associatedTermsIds"
+                                :allowNew="true"
+                                @newTerm="newTerm"
                                 @select="addTerm"
                                 @unselect="removeTerm">
                             </ontology-tree>
@@ -208,6 +210,11 @@ export default {
             this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
+        async newTerm(term) {
+            this.$emit("addTerm", term);
+            this.$store.dispatch("fetchOntology");
+            this.addTerm(term.id);
+        },
         async addTerm(idTerm) {
             if(idTerm != null) {
                 try {

@@ -20,6 +20,7 @@
                 :terms="allTerms"
                 :users="allUsers"
                 :images="allImages"
+                @addTerm="term => $emit('addTerm', term)"
                 @updateTerms="$emit('update', annot.id)"
                 @deletion="$emit('update', annot.id)"
                 v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
