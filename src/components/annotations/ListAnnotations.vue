@@ -10,27 +10,38 @@
             <h2> {{ $t("display") }} </h2>
             <div class="filters">
                 <div class="columns">
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("preview-size")}}
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("preview-size")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
+                                label="label" track-by="size"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
-                            label="label" track-by="size"
-                            :allow-empty="false" :searchable="false">
-                        </cytomine-multiselect>
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("number-per-page")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                </div>
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("number-per-page")}}
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("outline-color")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedColor" :options="colors"
+                                label="label" track-by="name"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
-                            :allow-empty="false" :searchable="false">
-                        </cytomine-multiselect>
-                    </div>
-                </div>
                 </div>
             </div>
 
@@ -109,6 +120,7 @@
 
         <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
             :size="selectedSize.size"
+            :color="selectedColor.hexaCode"
             :nbPerPage="nbPerPage"
 
             :allTerms="terms"
@@ -141,6 +153,7 @@ import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
+import {defaultColors} from "@/utils/style-utils.js";
 
 export default {
     name: "list-annotations",
@@ -176,7 +189,9 @@ export default {
             selectedMembers: [],
             
             userJobs: [],
-            selectedUserJobs: []
+            selectedUserJobs: [],
+
+            selectedColor: null
         };
     },
     computed: {
@@ -219,6 +234,11 @@ export default {
         },
         termsOptions() {
             return this.terms.concat(this.additionalNodes);
+        },
+        colors() {
+            let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
+            colors.push({label: this.$t("no-outline")});
+            return colors;
         }
     },
     methods: {
@@ -272,6 +292,8 @@ export default {
             {label: this.$t("huge"), size: 400},
         ];
         this.selectedSize = this.allowedSizes[0];
+
+        this.selectedColor = this.colors[0];
 
         try {
             await Promise.all([

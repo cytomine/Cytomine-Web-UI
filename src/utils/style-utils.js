@@ -101,13 +101,21 @@ export function changeOpacity(style, opacity) {
 
 // -----
 
+function createDefaultColor(name, hexaCode) {
+    return {
+        name,
+        fill: new Fill({color: "#" + hexaCode}),
+        hexaCode
+    };
+}
+
 export const defaultColors = Object.freeze([
-    {name: "black", fill: new Fill({color: "#000"})},
-    {name: "white", fill: textFill},
-    {name: "red", fill: new Fill({color: "#ff0000"})},
-    {name: "orange", fill: new Fill({color: "#ff6600"})},
-    {name: "yellow", fill: new Fill({color: "#ffff00"})},
-    {name: "green", fill: new Fill({color: "#008000"})},
-    {name: "blue", fill: new Fill({color: "#0000ff"})},
-    {name: "purple", fill: new Fill({color: "#800080"})},
+    createDefaultColor("black", "000000"),
+    createDefaultColor("white", "ffffff"),
+    createDefaultColor("red", "ff0000"),
+    createDefaultColor("orange", "ff6600"),
+    createDefaultColor("yellow", "ffff00"),
+    createDefaultColor("green", "008000"),
+    createDefaultColor("blue", "0000ff"),
+    createDefaultColor("purple", "800080")
 ]);

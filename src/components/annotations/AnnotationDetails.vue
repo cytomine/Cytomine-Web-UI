@@ -111,7 +111,7 @@
         </a>
 
         <div class="level">
-            <a :href="annotation.url" class="level-item button is-small">
+            <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
                 {{ $t("button-view-crop") }}
             </a>
 
