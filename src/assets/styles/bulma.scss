@@ -1,0 +1,97 @@
+$primary: #61b2e8;
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
+@import "~bulma-slider/dist/css/bulma-slider.min.css";
+
+$loadingColor: #bbb;
+
+/* Table */
+
+.table tbody tr:last-child td, .table tbody tr:last-child th {
+    border-bottom-width: 1px !important;
+}
+
+.table tbody tr:last-child > td, .table tbody tr:last-child > th {
+    border-bottom-width: 0 !important;
+}
+
+.b-table .table th.is-sortable:not(.is-current-sort) .th-wrap::after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f0dc";
+    position: relative;
+    color: rgba(0, 0, 0, 0.2);
+    left: 8px;
+    top: 1px;
+}
+
+.b-table .table th.is-current-sort {
+    font-weight: 600 !important;
+}
+
+/* Panel */
+
+.panel-heading {
+    border-radius: 8px 8px 0px 0px;
+    font-weight: 400 !important;
+}
+
+.panel-block {
+    background: #fff;
+    display: block;
+}
+
+/* Modal */
+
+.modal .animation-content {
+    max-width: unset !important;
+}
+
+.modal {
+    z-index: 2000;
+}
+
+.modal-background {
+    background-color: rgba(10, 10, 10, 0.7);
+}
+
+.modal-card {
+    max-height: 80vh;
+}
+
+.modal .modal-card-head {
+    padding: 15px !important;
+}
+
+.modal .modal-card-title {
+    font-size: 1.2rem !important;
+    font-weight: normal !important;
+}
+
+.modal .modal-card-body {
+    line-height: 1.5;
+}
+
+.modal .modal-card-foot {
+    padding: 10px !important;
+    justify-content: flex-end;
+}
+
+.modal .modal-card-foot button {
+    font-size: 14px;
+    font-weight: normal !important;
+}
+
+/* Loading */
+.loading-overlay .loading-icon::after {
+    width: 5em;
+    height: 5em;
+    border-left-color: $loadingColor;
+    border-bottom-color: $loadingColor;
+}
+
+.loading-overlay.small .loading-icon::after {
+    width: 2em;
+    height: 2em;
+    border-left-color: $loadingColor;
+    border-bottom-color: $loadingColor;
+}
