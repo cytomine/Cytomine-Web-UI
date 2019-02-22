@@ -72,7 +72,7 @@
 
                     <div v-else class="column filter">
                         <div class="filter-label">
-                            {{$t("jobs")}}
+                            {{$t("algorithms")}}
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"

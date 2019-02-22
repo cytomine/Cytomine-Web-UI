@@ -12,8 +12,8 @@ image,Image,Image
 images,Images,Images
 annotation,Annotation,Annotation
 annotations,Annotations,Annotations
-job,Job,Algorithme
-jobs,Jobs,Algorithmes
+algorithm,Algorithm,Algorithme
+algorithms,Algorithms,Algorithmes
 metrics,Metrics,Métriques
 configuration,Configuration,
 no-project,No project to display,
@@ -524,3 +524,23 @@ navigation,Navigation,
 show-crosshair,Show crosshair,
 outline-color,Outline color,
 no-outline,No outline,
+button-launch-new-algorithm,Launch new algorithm,
+software,Software,
+run-number,Run number,
+software-execution,{softwareName} (run #{executionNumber}),
+execution-date,Execution date,
+launched-by,Launched by,
+not-launch,Not launched,
+in-queue,In queue,
+running,Running,
+success,Success,
+failed,Failed,
+indeterminate,Indeterminate,
+wait,Wait,
+previewed,Previewed,
+no-algorithm-run,No algorithm run,
+launcher,Launcher,
+status-comment,Status comment,
+execution-duration,Execution duration,
+parameters,Parameters,
+button-show,Show,

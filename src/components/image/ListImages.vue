@@ -141,7 +141,7 @@
                 </div>
             </b-collapse>
 
-            <b-table v-if="!loading" :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
+            <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
 
                 <template slot-scope="{row: image}">

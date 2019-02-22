@@ -7,11 +7,15 @@ $loadingColor: #bbb;
 
 /* Table */
 
-.table tbody tr:last-child td, .table tbody tr:last-child th {
+.table tbody tr:last-child td {
     border-bottom-width: 1px !important;
 }
 
-.table tbody tr:last-child > td, .table tbody tr:last-child > th {
+.table tbody tr:last-child th {
+    border-bottom-width: 2px !important;
+}
+
+.table tbody > tr:last-child > td, .table tbody > tr:last-child > th {
     border-bottom-width: 0 !important;
 }
 
