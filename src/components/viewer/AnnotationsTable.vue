@@ -517,6 +517,7 @@ export default {
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
     background: #f5f5f5;
     height: 25vh;
+    pointer-events: auto;
 }
 
 .delete {
@@ -556,6 +557,7 @@ export default {
     font-size: 12px;
     letter-spacing: 0.5px;
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .opener .fas {
@@ -616,6 +618,7 @@ export default {
 .annotations-table-filters-modal, .annotations-table-filters-modal .modal-card-body {
     overflow: visible !important;
     width: 60vw !important;
+    pointer-events: auto;
 }
 
 </style>

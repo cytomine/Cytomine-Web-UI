@@ -600,6 +600,7 @@ $sizePositioningLineSize: 2px;
     left: 0px;
     right: $widthPanelBar;
     z-index: 5;
+    pointer-events: none;
 }
 
 .panels {
@@ -631,7 +632,7 @@ $sizePositioningLineSize: 2px;
                 }
             }
 
-            a.active {
+            > a.active {
                 background: $backgroundPanel;
                 color: $colorOpenedPanelLink;
                 :hover {
@@ -639,7 +640,7 @@ $sizePositioningLineSize: 2px;
                 }
             }
 
-            a.close {
+            > a.close {
                 color: #ffc4c4;
                 :hover {
                     color: #ff7070;
@@ -721,14 +722,6 @@ $sizePositioningLineSize: 2px;
 }
 
 /* ----- View positioning helper ----- */
-
-/*
-<div class="view-positioning-helper">
-    <div class="horizontal-line"></div>
-    <div class="vertical-line"></div>
-    <div class="center"></div>
-</div>
-*/
 
 .view-positioning-helper {
     position: absolute;
