@@ -1,5 +1,5 @@
 <template>
-<div class="list-projects-wrapper">
+<div class="list-projects-wrapper content-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
@@ -202,7 +202,7 @@
         </div>
     </div>
 
-    <new-project-modal :active.sync="creationModal"></new-project-modal>
+    <add-project-modal :active.sync="creationModal"></add-project-modal>
 </div>
 </template>
 
@@ -212,7 +212,7 @@ import { mapState } from "vuex";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import CytomineSlider from "@/components/form/CytomineSlider";
 import ProjectDetails from "./ProjectDetails";
-import NewProjectModal from "./NewProjectModal";
+import AddProjectModal from "./AddProjectModal";
 
 import isBetweenBounds from "@/utils/is-between-bounds.js";
 
@@ -222,7 +222,7 @@ export default {
     name: "list-projects",
     components: {
         ProjectDetails,
-        NewProjectModal,
+        AddProjectModal,
         CytomineMultiselect,
         CytomineSlider
     },
@@ -396,10 +396,6 @@ export default {
 </script>
 
 <style scoped>
-.list-projects-wrapper {
-    padding: 30px 50px 30px 50px;
-}
-
 .panel-block {
     padding-top: 10px;
 }
@@ -407,6 +403,7 @@ export default {
 .panel-heading {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .search-block {

@@ -56,6 +56,8 @@
                                 :ontology="ontology"
                                 :searchString="addTermString"
                                 :selectedNodes="associatedTermsIds"
+                                :allowNew="true"
+                                @newTerm="newTerm"
                                 @select="addTerm"
                                 @unselect="removeTerm">
                             </ontology-tree>
@@ -109,7 +111,7 @@
         </a>
 
         <div class="level">
-            <a :href="annotation.url" class="level-item button is-small">
+            <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
                 {{ $t("button-view-crop") }}
             </a>
 
@@ -208,6 +210,11 @@ export default {
             this.$notify({type: "success", text: this.$t("notif-success-annot-URL-copied")});
         },
 
+        async newTerm(term) {
+            this.$emit("addTerm", term);
+            this.$store.dispatch("fetchOntology");
+            this.addTerm(term.id);
+        },
         async addTerm(idTerm) {
             if(idTerm != null) {
                 try {

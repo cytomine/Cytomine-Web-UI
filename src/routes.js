@@ -4,10 +4,12 @@ import VueRouter from "vue-router";
 import GlobalDashboard from "./components/GlobalDashboard.vue";
 import ListProjects from "./components/project/ListProjects.vue";
 import CytomineStorage from "./components/storage/CytomineStorage.vue";
+import ListOntologies from "./components/ontology/ListOntologies.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectActivity from "./components/project/ProjectActivity.vue";
+import ListAlgorithms from "./components/algorithms/ListAlgorithms.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
 import ProjectConfiguration from "./components/project/ProjectConfiguration.vue";
 import Account from "./components/user/Account.vue";
@@ -38,6 +40,10 @@ const routes = [
         meta: {
             title: "Cytomine - Storage"
         }
+    },
+    {
+        path: "/ontology/:idOntology?",
+        component: ListOntologies
     },
     {
         path: "/advanced-search/:searchString?",
@@ -82,6 +88,10 @@ const routes = [
                 component: ListAnnotations
             },
             {
+                path: "algorithms",
+                component: ListAlgorithms
+            },
+            {
                 path: "activity",
                 component: ProjectActivity
             },
@@ -103,9 +113,8 @@ const routes = [
     // redirections for old URLS
     {path: "/userdashboard", redirect: "/"},
     {path: "/project", redirect: "/projects"},
-    {path: "/ontology", redirect: "/"}, // TODO
     {path: "/explorer", redirect: "/"},
-    {path: "/upload", redirect: "/"}, // TODO
+    {path: "/upload", redirect: "/storage"},
 
     {path: "/activity", redirect: "/"},
     {path: "/activity-:idProject-", redirect: "/"}, // TODO
@@ -126,7 +135,7 @@ const routes = [
     {path: "/tabs-annotationproperties-:idProject-:idAnnot", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
-    {path: "/tabs-algos-:idProject", redirect: "/"}, // TODO
+    {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/algorithms"},
     {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
     {path: "/tabs-usersconfig-:idProject", redirect: {path: "/project/:idProject/configuration", query: {tab: "members"}}},
     {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},

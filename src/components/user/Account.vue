@@ -1,5 +1,5 @@
 <template>
-    <div class="account-wrapper">
+    <div class="content-wrapper">
 
         <div class="panel">
             <p class="panel-heading">
@@ -180,13 +180,8 @@ export default {
 </script>
 
 <style scoped>
-
-.account-wrapper {
-    padding: 25px;
-}
-
 .panel {
-    width: 80%;
+    max-width: 1200px;
     margin-left: auto;
     margin-right:auto;
 }

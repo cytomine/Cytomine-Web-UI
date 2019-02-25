@@ -15,17 +15,6 @@
                         {{ $t("images") }}
                     </a>
                 </router-link>
-                <!-- TODO: change the way opened viewers are displayed -->
-                <router-link tag="li" class="image-link" v-for="viewer in viewers" :key="viewer.id"
-                    :to="viewer.path">
-
-                    <a>{{ viewer.name }}</a>
-
-                    <!-- TODO
-                    <a class="close">
-                        <i class="fas fa-times"></i>
-                    </a>-->
-                </router-link>
             </template>
             <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
                 <a>
@@ -33,10 +22,10 @@
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/jobs`" class="jobs">
+            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/algorithms`" class="algorithms">
                 <a>
                     <i class="fas fa-tasks"></i>
-                    {{ $t("jobs") }}
+                    {{ $t("algorithms") }}
                 </a>
             </router-link>
             <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`" class="activity">
@@ -74,27 +63,6 @@ export default {
         };
     },
     computed: {
-        viewers() {
-            let viewers = this.$store.state.images.viewers;
-            let results = [];
-            for(let id in viewers) {
-                if(viewers[id].idProject == this.project.id) {
-                    let viewer = viewers[id];
-                    let nbMaps = viewer.maps.length;
-                    if(nbMaps == 0) {
-                        return;
-                    }
-                    let name = nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename
-                        : this.$t("viewer-group", {nbImages: nbMaps});
-                    results.push({
-                        id,
-                        name,
-                        path: this.$store.getters.pathViewer({idViewer: id})
-                    });
-                }
-            }
-            return results;
-        },
         project() {
             return this.$store.state.project.project;
         },
@@ -201,7 +169,7 @@ export default {
 
 .sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
 .sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
-.sidebar li.jobs.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
+.sidebar li.algorithms.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
 .sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
 .sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
 .sidebar li.configuration.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }

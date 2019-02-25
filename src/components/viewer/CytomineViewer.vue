@@ -119,7 +119,6 @@ export default {
                 if(this.viewer == null) {
                     await this.$store.dispatch("addViewer", {
                         idViewer: this.idViewer,
-                        idProject: this.$route.params.idProject,
                         idImages: this.idImages
                     });
                 }

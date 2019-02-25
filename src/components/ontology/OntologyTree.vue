@@ -1,10 +1,11 @@
 <template>
-<div class="ontology-tree" :class="{selector: allowSelection}">
-    <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select">
+<div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
+    <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
         <template slot="toggle" slot-scope="{node}">
-            <template v-if="!node.data.hidden && !node.isLeaf">
+            <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
             </template>
+            <div class="sl-vue-tree-gap"></div>
         </template>
 
         <template slot="title" slot-scope="{node}">
@@ -17,20 +18,40 @@
             </div>
         </template>
 
-        <template slot="sidebar" slot-scope="{node}">
-            <slot v-if="!node.data.hidden" name="sidebar" :term="node.data"></slot>
+        <template slot="sidebar" slot-scope="{node}" v-if="!node.data.hidden">
+            <slot name="custom-sidebar" :term="node.data">
+                <div v-if="allowEdition" class="buttons">
+                    <button class="button is-small" @click="startTermUpdate(node)">
+                        <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                    </button>
+                    <button class="button is-small" @click="confirmTermDeletion(node)">
+                        <span class="icon is-small">
+                            <i class="far fa-trash-alt"></i>
+                        </span>
+                    </button>
+                </div>
+            </slot>
         </template>
     </sl-vue-tree>
 
     <slot v-if="noResult" name="no-result">
         <em class="has-text-grey no-result">{{$t('no-result')}}</em>
     </slot>
+
+    <div v-if="allowEdition || allowNew" class="add-term-container">
+        <button class="button is-small" @click="startTermCreation()">{{$t("add-term")}}</button>
+    </div>
+
 </div>
 </template>
 
 <script>
 import SlVueTree from "sl-vue-tree";
 import CytomineTerm from "./CytomineTerm";
+import TermModal from "./TermModal";
+import {Term} from "cytomine-client";
 
 export default {
     name: "ontology-tree",
@@ -45,7 +66,10 @@ export default {
         searchString: {type: String, default: ""},
         selectedNodes: {type: Array, default: () => []},
         allowSelection: {type: Boolean, default: true},
-        multipleSelection: {type: Boolean, default: true}
+        multipleSelection: {type: Boolean, default: true},
+        allowDrag: {type: Boolean, default: false},
+        allowEdition: {type: Boolean, default: false},
+        allowNew: {type: Boolean, default: false}
     },
     components: {
         SlVueTree,
@@ -54,7 +78,8 @@ export default {
     data() {
         return {
             treeNodes: [],
-            internalSelectedNodes: []
+            internalSelectedNodes: [],
+            editedNode: null
         };
     },
     computed: {
@@ -87,30 +112,34 @@ export default {
                 return;
             }
 
-            let nodes = this.createNodes(this.ontology.children.array.slice());
-            let additionalNodes = this.createNodes(this.additionalNodes.slice());
+            let nodes = this.createSubTree(this.ontology.children.array.slice());
+            let additionalNodes = this.createSubTree(this.additionalNodes.slice());
             this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
             this.filter();
         },
 
-        createNodes(nodes) {
-            return nodes.map(node => {
-                return {
-                    title: node.name,
-                    isLeaf: !node.isFolder,
-                    isDraggable: false,
-                    isExpanded: true,
-                    isSelected: this.internalSelectedNodes.includes(node.id),
-                    data: {
-                        id: node.id,
-                        name: node.name,
-                        color: node.color,
-                        hidden: false
-                    },
-                    children: node.children && node.children.length > 0 ? this.createNodes(node.children) : null
-                };
-            });
+        createSubTree(terms) {
+            return terms.map(term => this.createNode(term));
+        },
+
+        createNode(term) {
+            return {
+                title: term.name,
+                isLeaf: false, // all terms can be used as parent for drag and drop
+                isDraggable: this.isDraggable,
+                isExpanded: true,
+                isSelected: this.internalSelectedNodes.includes(term.id),
+                data: {
+                    id: term.id,
+                    name: term.name,
+                    color: term.color,
+                    parent: term.parent,
+                    ontology: this.ontology.id,
+                    hidden: false
+                },
+                children: term.children && term.children.length > 0 ? this.createSubTree(term.children) : []
+            };
         },
 
         filter() {
@@ -185,6 +214,83 @@ export default {
                 }
                 fct(node);
             });
+        },
+
+        startTermCreation() {
+            this.editedNode = null;
+            this.openModal();
+        },
+        createTerm(term) {
+            this.treeNodes.push(this.createNode(term));
+            this.$emit("newTerm", term);
+        },
+
+        startTermUpdate(node) {
+            this.editedNode = node;
+            this.openModal();
+        },
+        updateTerm(term) {
+            this.$refs.tree.updateNode(this.editedNode.path, {data: {...term}});
+        },
+
+        openModal() {
+            this.$modal.open({
+                parent: this,
+                component: TermModal,
+                props: {
+                    term: this.editedNode ? this.editedNode.data : null,
+                    ontology: this.ontology
+                },
+                events: {
+                    newTerm: this.createTerm,
+                    updateTerm: this.updateTerm
+                },
+                hasModalCard: true
+            });
+        },
+
+        drop(nodes, position) {
+            nodes.forEach(async node => {
+                let idParent = (position.placement == "inside") ? position.node.data.id : position.node.data.parent;
+                if(node.data.parent !== idParent) {
+                    try {
+                        await new Term(node.data).changeParent(idParent);
+                        this.applyToAllNodes(tmp => {
+                            if(tmp.data.id == node.data.id) {
+                                tmp.data.parent = idParent;
+                            }
+                        });
+                    }
+                    catch(error) {
+                        console.log(error);
+                        this.$notify({type: "error", text: this.$t("notif-error-ontology-tree-update")});
+                    }
+                }
+                else {
+                    this.$notify({type: "warn", text: this.$t("notif-warn-ontology-tree-order-not-persisted")});
+                }
+            });
+        },
+
+        confirmTermDeletion(node) {
+            this.$dialog.confirm({
+                title: this.$t("confirm-deletion"),
+                message: this.$t("confirm-deletion-term", {name: node.data.name}),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.deleteTerm(node)
+            });
+        },
+        async deleteTerm(node) {
+            try {
+                await Term.delete(node.data.id);
+                this.$refs.tree.remove([node.path]);
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-term-deletion")});
+            }
         }
     },
     created() {
@@ -193,6 +299,15 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.add-term-container {
+    text-align: center;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+</style>
+
 
 <style>
 .ontology-tree {
@@ -236,5 +351,20 @@ export default {
     margin-left: 20px;
     line-height: 2.2;
     font-size: 14px;
+}
+
+.ontology-tree .buttons, .ontology-tree .button {
+    margin-bottom: 0px !important;
+}
+
+.ontology-tree.editable .sl-vue-tree-sidebar {
+    width: 100px;
+    padding-left: 20px;
+    flex-shrink: 0;
+}
+
+.ontology-tree.editable .sl-vue-tree-sidebar {
+    display: flex;
+    align-items: top;
 }
 </style>

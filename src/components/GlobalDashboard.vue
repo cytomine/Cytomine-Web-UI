@@ -1,84 +1,86 @@
 <template>
-<div id="global-dashboard" class="columns is-gapless">
+<div class="content-wrapper">
     <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
 
     <template v-if="!loading">
-        <div class="column is-two-thirds">
-            <div class="box">
-                <h2> {{ $t("recently-opened") }} </h2>
-                <b-table :data="recentProjects">
+        <div class="columns">
+            <div class="column is-two-thirds">
+                <div class="box">
+                    <h2> {{ $t("recently-opened") }} </h2>
+                    <b-table :data="recentProjects">
 
-                    <template slot-scope="props">
-                        <b-table-column :label="$t('project')" width="100" centered>
-                            <router-link class="project-name" :to="`/project/${props.row.id}`">
-                                {{ props.row.name }}
-                            </router-link>
-                        </b-table-column>
+                        <template slot-scope="props">
+                            <b-table-column :label="$t('project')" width="100" centered>
+                                <router-link class="project-name" :to="`/project/${props.row.id}`">
+                                    {{ props.row.name }}
+                                </router-link>
+                            </b-table-column>
 
-                        <b-table-column :label="$t('images')" width="400">
-                            <images-preview :idProject="props.row.id"></images-preview>
-                        </b-table-column>
-                    </template>
+                            <b-table-column :label="$t('images')" width="400">
+                                <images-preview :idProject="props.row.id"></images-preview>
+                            </b-table-column>
+                        </template>
 
-                    <template slot="empty">
-                        <div class="content has-text-grey has-text-centered">
-                            <p>{{$t("no-recent-project")}}</p>
-                        </div>
-                    </template>
-                </b-table>
+                        <template slot="empty">
+                            <div class="content has-text-grey has-text-centered">
+                                <p>{{$t("no-recent-project")}}</p>
+                            </div>
+                        </template>
+                    </b-table>
 
-                <p class="has-text-centered all-projects">
-                    <router-link class="button is-link" to="/projects">{{$t("view-all-projects")}}</router-link>
-                </p>
-            </div>
-        </div>
-
-        <div class="column right-column">
-            <div class="box stats">
-                <h2> {{ $t("statistics") }} </h2>
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td class="stat-value">{{projects.length}}</td>
-                            <td>{{$t("projects")}}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-value">{{images.length}}</td>
-                            <td>{{$t("images")}}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-value">{{nbUserAnnots}}</td>
-                            <td>{{$t("user-annotations")}}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-value">{{nbJobAnnots}}</td>
-                            <td>{{$t("job-annotations")}}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-value">{{nbReviewed}}</td>
-                            <td>{{$t("reviewed-annotations")}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <p class="has-text-centered all-projects">
+                        <router-link class="button is-link" to="/projects">{{$t("view-all-projects")}}</router-link>
+                    </p>
+                </div>
             </div>
 
-            <div class="box last-image">
-                <h2> {{ $t("last-opened-image") }} </h2>
-                <div v-if="lastOpenedImage" class="card">
-                    <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
-                    class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
-                    </router-link>
-                    <div class="card-content">
-                        <div class="content">
-                            <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
-                                {{ lastOpenedImage.instanceFilename }}
-                            </router-link>
-                            <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>
+            <div class="column right-column">
+                <div class="box stats">
+                    <h2> {{ $t("statistics") }} </h2>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td class="stat-value">{{projects.length}}</td>
+                                <td>{{$t("projects")}}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-value">{{images.length}}</td>
+                                <td>{{$t("images")}}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-value">{{nbUserAnnots}}</td>
+                                <td>{{$t("user-annotations")}}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-value">{{nbJobAnnots}}</td>
+                                <td>{{$t("job-annotations")}}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-value">{{nbReviewed}}</td>
+                                <td>{{$t("reviewed-annotations")}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="box last-image">
+                    <h2> {{ $t("last-opened-image") }} </h2>
+                    <div v-if="lastOpenedImage" class="card">
+                        <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
+                        class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
+                        </router-link>
+                        <div class="card-content">
+                            <div class="content">
+                                <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
+                                    {{ lastOpenedImage.instanceFilename }}
+                                </router-link>
+                                <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="has-text-grey has-text-centered" v-else>
-                    {{$t("no-recent-image")}}
+                    <div class="has-text-grey has-text-centered" v-else>
+                        {{$t("no-recent-image")}}
+                    </div>
                 </div>
             </div>
         </div>
@@ -170,14 +172,6 @@ export default {
 </script>
 
 <style scoped>
-#global-dashboard {
-    padding: 20px 50px 20px 50px;
-}
-
-.box {
-    margin: 10px !important;
-}
-
 td {
     vertical-align: middle !important;
 }
@@ -216,7 +210,7 @@ a.project-name {
 
 .card-image {
     width: 100%;
-    height: 40vh;
+    height: 30vh;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;

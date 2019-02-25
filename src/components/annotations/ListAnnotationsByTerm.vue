@@ -20,6 +20,7 @@
                 :terms="allTerms"
                 :users="allUsers"
                 :images="allImages"
+                @addTerm="term => $emit('addTerm', term)"
                 @updateTerms="$emit('update', annot.id)"
                 @deletion="$emit('update', annot.id)"
                 v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
@@ -49,6 +50,7 @@ export default {
     props: [
         "nbPerPage",
         "size",
+        "color",
 
         "term", 
         "multipleTerms", 
@@ -141,9 +143,13 @@ export default {
                 this.openedAnnot = 0;
             }
         },
+        cropURL(annot) {
+            let outlineParams = this.color ? "&draw=true&color=0x" + this.color : "";
+            return `${annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
+        },
         styleAnnotDetails(annot) {
             return {
-                backgroundImage: `url(${annot.url}?maxSize=${this.size})`, // TODO in core: allow parameter specifying we want a square image ; rework the way annotation contours are drawn
+                backgroundImage: `url(${this.cropURL(annot)})`,
                 width: this.size + "px",
                 height: this.size + "px"
             };
@@ -163,7 +169,6 @@ export default {
 .annot-preview {
     display: inline-block;
     background-position: center center;
-    background-size: cover;
     background-repeat: no-repeat;
     margin: 10px;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);

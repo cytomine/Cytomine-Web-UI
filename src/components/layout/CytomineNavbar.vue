@@ -10,6 +10,9 @@
     </div>
     <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
         <div class="navbar-start">
+            <navbar-dropdown icon="fa-folder" v-if="this.nbViewers > 0" :title="$t('navigation')">
+                <navigation-tree></navigation-tree>
+            </navbar-dropdown>
             <router-link to="/projects" class="navbar-item">
                 <i class="fas fa-list-alt"></i>
                 {{ $t("projects") }}
@@ -17,6 +20,10 @@
             <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item">
                 <i class="fas fa-download"></i>
                 {{ $t("storage") }}
+            </router-link>
+            <router-link to="/ontology" class="navbar-item">
+                <i class="fas fa-hashtag"></i>
+                {{ $t("ontologies") }}
             </router-link>
         </div>
 
@@ -67,10 +74,11 @@
 <script>
 import { mapState } from "vuex";
 
-import NavbarDropdown from "./NavbarDropdown.vue";
-import HotkeysModal from "./HotkeysModal.vue";
-import AboutCytomineModal from "./AboutCytomineModal.vue";
-import CytomineSearcher from "@/components/search/CytomineSearcher.vue";
+import NavbarDropdown from "./NavbarDropdown";
+import NavigationTree from "./NavigationTree";
+import HotkeysModal from "./HotkeysModal";
+import AboutCytomineModal from "./AboutCytomineModal";
+import CytomineSearcher from "@/components/search/CytomineSearcher";
 
 import {fullName} from "@/utils/user-utils.js";
 
@@ -78,6 +86,7 @@ export default {
     name: "cytomine-navbar",
     components: {
         NavbarDropdown,
+        NavigationTree,
         HotkeysModal,
         AboutCytomineModal,
         CytomineSearcher
@@ -101,6 +110,9 @@ export default {
         },
         currentUserFullInfo() {
             return fullName(this.currentUser);
+        },
+        nbViewers() {
+            return Object.keys(this.$store.state.images.viewers).length;
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },

@@ -13,7 +13,6 @@ import {Cytomine} from "cytomine-client";
 import constants from "./utils/constants.js";
 
 import Buefy from "buefy";
-import "buefy/dist/buefy.css";
 
 import VTooltip from "v-tooltip";
 

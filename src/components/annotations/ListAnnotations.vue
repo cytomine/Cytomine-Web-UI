@@ -10,27 +10,38 @@
             <h2> {{ $t("display") }} </h2>
             <div class="filters">
                 <div class="columns">
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("preview-size")}}
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("preview-size")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
+                                label="label" track-by="size"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
-                            label="label" track-by="size"
-                            :allow-empty="false" :searchable="false">
-                        </cytomine-multiselect>
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("number-per-page")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                </div>
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("number-per-page")}}
+                    <div class="column filter">
+                        <div class="filter-label">
+                            {{$t("outline-color")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect v-model="selectedColor" :options="colors"
+                                label="label" track-by="name"
+                                :allow-empty="false" :searchable="false">
+                            </cytomine-multiselect>
+                        </div>
                     </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
-                            :allow-empty="false" :searchable="false">
-                        </cytomine-multiselect>
-                    </div>
-                </div>
                 </div>
             </div>
 
@@ -61,7 +72,7 @@
 
                     <div v-else class="column filter">
                         <div class="filter-label">
-                            {{$t("jobs")}}
+                            {{$t("algorithms")}}
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
@@ -109,6 +120,7 @@
 
         <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
             :size="selectedSize.size"
+            :color="selectedColor.hexaCode"
             :nbPerPage="nbPerPage"
 
             :allTerms="terms"
@@ -125,6 +137,7 @@
 
             v-show="selectedTermsIds.includes(term.id)"
 
+            @addTerm="addTerm"
             @update="forceUpdate = []"> <!-- assigning a new array will be considered as a change in children components -->
         </list-annotations-by-term>
     </div>
@@ -140,6 +153,7 @@ import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
+import {defaultColors} from "@/utils/style-utils.js";
 
 export default {
     name: "list-annotations",
@@ -167,8 +181,6 @@ export default {
             selectedImages: [],
 
             terms: [],
-            termsOptions: [],
-            additionalNodes: [],
             noTermOption: {id: 0, name: this.$t("no-term")},
             multipleTermsOption: {id: -1, name: this.$t("multiple-terms")},
             selectedTermsIds: [],
@@ -177,7 +189,9 @@ export default {
             selectedMembers: [],
             
             userJobs: [],
-            selectedUserJobs: []
+            selectedUserJobs: [],
+
+            selectedColor: null
         };
     },
     computed: {
@@ -210,18 +224,26 @@ export default {
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
+        },
+        additionalNodes() {
+            let additionalNodes = [this.noTermOption];
+            if(this.terms.length > 1) {
+                additionalNodes.push(this.multipleTermsOption);
+            }
+            return additionalNodes;
+        },
+        termsOptions() {
+            return this.terms.concat(this.additionalNodes);
+        },
+        colors() {
+            let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
+            colors.push({label: this.$t("no-outline")});
+            return colors;
         }
     },
     methods: {
         async fetchTerms() {
             this.terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.termsOptions = this.terms.slice();
-            this.termsOptions.push(this.noTermOption);
-            this.additionalNodes = [this.noTermOption];
-            if(this.terms.length > 1) {
-                this.termsOptions.push(this.multipleTermsOption);
-                this.additionalNodes.push(this.multipleTermsOption);
-            }
             this.selectedTermsIds = this.termsOptions.map(term => term.id);
         },
         async fetchImages() {
@@ -252,6 +274,10 @@ export default {
         },
         downloadURL(format) {
             return this.collection.getDownloadURL(format);
+        },
+        addTerm(term) {
+            this.terms.push(term);
+            this.selectedTermsIds.push(term.id);
         }
     },
     async created() {
@@ -267,13 +293,15 @@ export default {
         ];
         this.selectedSize = this.allowedSizes[0];
 
+        this.selectedColor = this.colors[0];
+
         try {
             await Promise.all([
                 this.fetchTerms(),
                 this.fetchImages(), 
                 this.fetchUsers(),
                 this.fetchMembers(),
-                this.fetchUserJobs()  
+                this.fetchUserJobs()
             ]);
         }     
         catch(error) {

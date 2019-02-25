@@ -23,10 +23,11 @@ export default {
             state.viewers = {};
         },
 
-        addViewer(state, {id, idProject}) {
+        addViewer(state, {id, project}) {
             Vue.set(state.viewers, id, {
                 maps: [],
-                idProject,
+                idProject: project.id,
+                nameProject: project.name,
                 links: [],
                 imageSelector: false,
                 activeMap: 0
@@ -167,6 +168,10 @@ export default {
             });
         },
 
+        setShowCrosshair(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].showCrosshair = value;
+        },
+
         // ----- Color manipulation
 
         setBrightness(state, {idViewer, index, value}) {
@@ -203,6 +208,15 @@ export default {
         },
 
         // ----- Terms
+
+        addTerm(state, {idViewer, term}) { // if a term is added, required to add it to all images as they belong to same project
+            let maps = state.viewers[idViewer].maps;
+            maps.forEach(map => {
+                let mapTerm = term.clone();
+                formatTerm(mapTerm, map.layersOpacity);
+                map.terms.push(mapTerm);
+            });
+        },
 
         setTerms(state, {idViewer, index, terms}) {
             state.viewers[idViewer].maps[index].terms = terms;
@@ -458,8 +472,8 @@ export default {
             router.replace(getters.pathViewer({idViewer, idAnnotation: router.currentRoute.params.idAnnotation}));
         },
 
-        async addViewer({commit, dispatch}, {idViewer, idProject, idImages}) {
-            commit("addViewer", {id: idViewer, idProject});
+        async addViewer({commit, dispatch, rootState}, {idViewer, idImages}) {
+            commit("addViewer", {id: idViewer, project: rootState.project.project});
             await Promise.all(idImages.map(async id => {
                 let image = await ImageInstance.fetch(id);
                 dispatch("addMap", {idViewer, image});
@@ -482,6 +496,7 @@ export default {
                 zoom: 0, // TODO
                 center: [image.width/2, image.height/2],
                 rotation: 0,
+                showCrosshair: false,
 
                 broadcast: false,
                 trackedUser: null,
@@ -779,10 +794,14 @@ async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
             terms[i] = prevTerm;
         }
         else {
-            term.opacity = initialTermsOpacity;
-            term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
-            term.visible = true;
+            formatTerm(term, layersOpacity);
         }
     }
     return terms;
+}
+
+function formatTerm(term, layersOpacity) {
+    term.opacity = initialTermsOpacity;
+    term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+    term.visible = true;
 }

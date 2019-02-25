@@ -58,7 +58,7 @@
     </b-dropdown>
     </div>
 
-    <div class="content-wrapper">
+    <div class="component-wrapper">
         <keep-alive>
             <component :is="activeComponent"
                        :startDate="startDate ? startDate.getTime() : null"
@@ -111,7 +111,7 @@ export default {
     top: 10px;
 }
 
-.content-wrapper {
+.component-wrapper {
     height: 100%;
 }
 

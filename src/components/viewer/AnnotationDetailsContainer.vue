@@ -25,6 +25,7 @@
                                 :users="allUsers"
                                 :showImageInfo="false"
                                 :key="selectedFeature.id"
+                                @addTerm="addTerm"
                                 @updateTerms="updateTerms()"
                                 @updateProperties="updateProperties()"
                                 @centerView="centerViewOnAnnot()"
@@ -128,6 +129,10 @@ export default {
             this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
         },
         
+        addTerm(term) {
+            this.$store.commit("addTerm", {idViewer: this.idViewer, term});
+        },
+
         async updateTerms() {
             // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
