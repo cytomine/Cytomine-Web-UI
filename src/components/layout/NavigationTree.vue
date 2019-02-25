@@ -3,7 +3,7 @@
     <div v-for="(project, idProject, index) in navigationObject" :key="idProject">
         <div class="navbar-item project-item">{{project.name}}</div>
         <template v-for="viewer in project.viewers">
-            <router-link class="navbar-item viewer-item" :to="viewer.path" :key="viewer.id">
+            <router-link class="navbar-item viewer-item" :to="viewer.path" :key="viewer.id" exact>
                 <div class="viewer-name">
                     <span>
                         <i class="fas fa-caret-right"></i>
