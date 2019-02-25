@@ -1,5 +1,4 @@
 <!-- TODO job templates -->
-<!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
     <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
@@ -458,7 +457,7 @@ export default {
                 await UserPosition.create({
                     image: this.image.id,
                     zoom: this.zoom,
-                    // rotation: this.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
+                    rotation: this.rotation,
                     bottomLeftX: Math.round(extent[0]),
                     bottomLeftY: Math.round(extent[1]),
                     bottomRightX: Math.round(extent[2]),

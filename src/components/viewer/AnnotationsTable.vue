@@ -406,7 +406,7 @@ export default {
             }
 
             // TODO in core: job annotations not returned when users field contains users and userjobs ;
-            // if setting includeAlgo to true, user annotations not returned
+            // if setting includeAlgo to true, user annotations not returned (https://github.com/cytomine/Cytomine-core/issues/1149)
             let annots = (await new AnnotationCollection({
                 images: [this.image.id],
                 showGIS: true,

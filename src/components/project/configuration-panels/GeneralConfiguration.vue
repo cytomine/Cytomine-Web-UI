@@ -124,7 +124,7 @@
         </tbody>
     </table>
 
-    <!-- TODO in core -->
+    <!-- TODO in core (https://github.com/cytomine/Cytomine-core/issues/1142) -->
     <h2>{{$t("default-property")}}</h2>
     <b-field>
         <b-select size="is-small">

@@ -393,6 +393,8 @@ export default {
             }
         },
         async reverseAction({annot, oldAnnot}) {
+            // TODO: take into account prop/term/description/attached files when recreating annotation 
+            // (or use backend system for undo/redo ; https://github.com/cytomine/Cytomine-core/issues/1145)
             let newAnnot = null;
 
             if(oldAnnot == null) { // annotation was created

@@ -112,7 +112,7 @@ export default {
             try {
                 let data = await this.collection.fetchPage(numPage - 1);
                 this.annotations = data.array;
-                this.nbAnnotations = data._total; // TODO add getter in collection
+                this.nbAnnotations = data.totalNbItems;
 
                 // if openedAnnot no longer in collection (can happen if term was removed from annotation), 
                 // reset openedAnnot value (otherwise, if annot added again to collection, popover reopens)
