@@ -127,11 +127,21 @@ export default {
     height:100%;
 }
 
-.multiselect__tags-wrap, .multiselect__single {
+.multiselect__placeholder, .multiselect__tags-wrap, .multiselect__single {
     margin-bottom: 8px;
     line-height: 20px;
     vertical-align: top;
     font-size: 14px;
+}
+
+.multiselect__tags-wrap :first-child {
+    margin-left: 5px;
+}
+
+.multiselect__placeholder, .multiselect__single {
+    padding-left: 5px;
+    position: relative;
+    padding-top: 0px !important;
 }
 
 .multiselect__input {

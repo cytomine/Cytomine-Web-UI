@@ -8,7 +8,7 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("algorithms")}}
-            <button class="button is-link"> <!-- TODO -->
+            <button class="button is-link" @click="launchModal = true">
                 {{$t('button-launch-new-algorithm')}}
             </button>
         </p>
@@ -66,10 +66,9 @@
                 </div>
             </div>
 
-            <b-table :data="filteredJobs" class="table-algorithms" :paginated="true" :per-page="perPage"
-            pagination-size="is-small" detailed detail-key="id"
-            default-sort-direction="desc"
-            default-sort="created">
+            <b-table :data="filteredJobs" class="table-algorithms" ref="table"
+            :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id"
+            default-sort="created" default-sort-direction="desc">
 
                 <template slot-scope="{row: job}">
                     <b-table-column field="software" :label="$t('software')" sortable width="1000">
@@ -85,7 +84,7 @@
                         {{ job.username }}
                     </b-table-column>
 
-                    <b-table-column field="software" :label="$t('execution-date')" sortable width="1000">
+                    <b-table-column field="created" :label="$t('execution-date')" sortable width="1000">
                         {{ Number(job.created) | moment("ll LT") }}
                     </b-table-column>
 
@@ -95,7 +94,7 @@
                 </template>
 
                 <template slot="detail" slot-scope="{row: job}">
-                    <algorithm-details :job="job"></algorithm-details>
+                    <algorithm-details :key="job.id" :job="job" @update="props => job.populate(props)"></algorithm-details>
                 </template>
 
                 <template slot="empty">
@@ -115,6 +114,8 @@
             </b-table>
         </div>
     </div>
+
+    <launch-algorithm-modal :active.sync="launchModal" @add="addJob"></launch-algorithm-modal>
 </div>
 </template>
 
@@ -122,6 +123,7 @@
 import {JobCollection} from "cytomine-client";
 import AlgorithmStatus from "./AlgorithmStatus";
 import AlgorithmDetails from "./AlgorithmDetails";
+import LaunchAlgorithmModal from "./LaunchAlgorithmModal";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import jobStatusLabelMapping from "@/utils/job-utils";
 import moment from "moment";
@@ -131,6 +133,7 @@ export default {
     components: {
         AlgorithmStatus,
         AlgorithmDetails,
+        LaunchAlgorithmModal,
         CytomineMultiselect
     },
     data() {
@@ -139,15 +142,18 @@ export default {
             jobs: [],
             searchString: "",
             perPage: 10,
-            addAlgorithmModal: false,
+            launchModal: false,
 
             selectedSoftwares: [],
             selectedLaunchers: [],
             selectedDate: null,
-            selectedStatus: []
+            selectedStatus: [],
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         project() {
             return this.$store.state.project.project;
         },
@@ -181,7 +187,21 @@ export default {
                     selectedStatusValues.includes(job.status);
             });
         },
+    },
+    methods: {
+        addJob(job) {
+            job.username = this.currentUser.username; // HACK because not correctly returned by core
+            if(!this.availableSoftwares.includes(job.softwareName)) {
+                this.selectedSoftwares.push(job.softwareName);
+            }
 
+            if(!this.availableLaunchers.includes(job.username)) {
+                this.selectedLaunchers.push(job.username);
+            }
+
+            this.jobs.unshift(job);
+            this.$refs.table.toggleDetails(job);
+        }
     },
     async created() {
         this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;

@@ -315,6 +315,14 @@ export default {
             }
         }
 
+        if(this.$route.query.userJob != null) {
+            let queriedUserJob = this.userJobs.find(uj => uj.id == this.$route.query.userJob);
+            if(queriedUserJob != null) {
+                this.selectedAnnotationType = this.jobAnnotationOption;
+                this.selectedUserJobs = [queriedUserJob];
+            }
+        }
+
         this.loading = false;
     }
 };
