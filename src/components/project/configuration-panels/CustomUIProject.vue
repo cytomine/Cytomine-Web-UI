@@ -9,8 +9,10 @@
         <tr v-for="prop in category.props" v-if="customUI[prop.key]" :key="prop.key"> <!-- TODO remove v-if when question regarding partial results is answered -->
             <td>
                 <i v-if="prop.superscript" class="superscript" :class="prop.superscript"></i>
-                <i v-if="prop.icon" :class="prop.icon"></i>
-                <img v-if="prop.img" :src="prop.img">
+                <span class="icon" v-if="prop.icon || prop.iconComponent">
+                    <i v-if="prop.icon" :class="prop.icon"></i>
+                    <component v-else :is="prop.iconComponent"></component>
+                </span>
                 {{$t(prop.label)}}
             </td>
             <td>
@@ -33,6 +35,9 @@
 </template>
 
 <script>
+import IconPolygonFreeHand from "@/components/icons/IconPolygonFreeHand";
+import IconLineFreeHand from "@/components/icons/IconLineFreeHand";
+
 export default {
     name: "custom-ui-project",
     data() {
@@ -98,12 +103,12 @@ export default {
                         {key: "project-tools-point", label: "point", icon: "fas fa-map-marker-alt"},
                         {key: "project-tools-line", label: "line", icon: "fas fa-minus"}, // TODO in core
                         {key: "project-tools-freehand-line", label: "freehand-line",
-                            img: require("@/assets/viewer/free-line.svg")}, // TODO in core
+                            iconComponent: IconLineFreeHand}, // TODO in core
                         {key: "project-tools-rectangle", label: "rectangle", icon: "far fa-square"},
                         {key: "project-tools-circle", label: "circle", icon: "far fa-circle"},
                         {key: "project-tools-polygon", label: "polygon", icon: "fas fa-draw-polygon"},
                         {key: "project-tools-freehand-polygon", label: "freehand-polygon",
-                            img: require("@/assets/viewer/free-polygon.svg")}, // TODO in core
+                            iconComponent: IconPolygonFreeHand}, // TODO in core
                         {key: "project-tools-union", label: "freehand-correct-add", icon: "fas fa-pencil-alt",
                             superscript: "fas fa-plus"},
                         {key: "project-tools-diff", label: "freehand-correct-remove", icon: "fas fa-pencil-alt",
@@ -149,7 +154,7 @@ export default {
 
 
 <style scoped>
-.custom-ui .button {
+.button {
     padding: 0px 40px;
 }
 
@@ -157,12 +162,7 @@ td, th {
     vertical-align: middle !important;
 }
 
-img {
-    width: 20px;
-    margin-right: 10px;
-}
-
-.fas, .far {
+.icon {
     width: 20px;
     text-align: center;
     margin-right: 10px;
@@ -175,5 +175,11 @@ img {
     bottom: 10px;
     right: 4px;
     margin-right: 0px;
+}
+</style>
+
+<style>
+.custom-ui .icon svg {
+    height: 1.15em !important;
 }
 </style>

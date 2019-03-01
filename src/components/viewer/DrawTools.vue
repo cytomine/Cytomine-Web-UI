@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="draw-tools-wrapper">
     <div class="buttons has-addons" v-if="isToolDisplayed('select')">
         <button v-tooltip="$t('select')"
                 class="button is-small" :class="{'is-selected': activeTool == 'select'}" :disabled="ongoingCalibration"
@@ -47,8 +47,7 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
                 @click="activateTool('freehand-line')">
             <span class="icon is-small">
-                <img v-if="activeTool == 'freehand-line'" src="@/assets/viewer/free-line-white.svg">
-                <img v-else src="@/assets/viewer/free-line.svg">
+                <icon-line-free-hand></icon-line-free-hand>
             </span>
         </button>
 
@@ -80,8 +79,7 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
                 @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
             <span class="icon is-small">
-                <img v-if="activeTool == 'freehand-polygon'" src="@/assets/viewer/free-polygon-white.svg">
-                <img v-else src="@/assets/viewer/free-polygon.svg">
+                <icon-polygon-free-hand></icon-polygon-free-hand>
             </span>
         </button>
     </div>
@@ -158,6 +156,8 @@
 
 <script>
 import OntologyTree from "@/components/ontology/OntologyTree";
+import IconPolygonFreeHand from "@/components/icons/IconPolygonFreeHand";
+import IconLineFreeHand from "@/components/icons/IconLineFreeHand";
 
 import WKT from "ol/format/WKT";
 
@@ -165,7 +165,11 @@ import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-tools",
-    components: {OntologyTree},
+    components: {
+        OntologyTree,
+        IconPolygonFreeHand,
+        IconLineFreeHand
+    },
     props: [
         "idViewer",
         "index"
@@ -439,11 +443,6 @@ export default {
     font-size: 8px;
 }
 
-.button.is-selected {
-    background-color: #6899d0;
-    color: #fff;
-}
-
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
@@ -492,20 +491,36 @@ export default {
     line-height: 10px;
     font-family: Arial;
 }
-
-.icon.is-small img {
-    height: 15px;
-    width: 15px;
-}
 </style>
 
-<style>
-.term-selection .ontology-tree-container .control {
-    margin: 10px;
-    margin-bottom: 0px;
-}
+<style lang="scss">
+$colorActiveIcon: #fff;
 
-.term-selection .ontology-tree-container .ontology-tree {
-    padding: 10px 0px;
+.draw-tools-wrapper {
+
+    .term-selection .ontology-tree-container {
+
+        .control {
+            margin: 10px;
+            margin-bottom: 0px;
+        }
+
+        .ontology-tree {
+            padding: 10px 0px;
+        }
+    }
+
+    .button.is-selected {
+        background-color: #6899d0;
+        color: $colorActiveIcon;
+
+        path {
+            stroke: $colorActiveIcon;
+        }
+    }
+
+    .icon svg {
+        height: 1.15em !important;
+    }
 }
 </style>

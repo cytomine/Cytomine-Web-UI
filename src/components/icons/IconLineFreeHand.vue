@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
+<template>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="free-line-white.svg">
+   sodipodi:docname="free-line.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -48,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,10 +56,18 @@
      id="layer1"
      transform="translate(-27.016003,-31.914518)">
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.36600008;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke-width:1.36583543;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       stroke="#000000"
        d="m 28.507424,40.008532 c 0,0 2.07514,5.220154 3.70608,4.821065 2.487226,-0.608621 1.213333,-9.083876 3.706081,-9.642132 1.676478,-0.375451 3.706081,5.096557 3.706081,5.096557"
        id="path4148"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cssc" />
   </g>
 </svg>
+</template>
+
+<script>
+export default {
+    name: "icon-line-free-hand"
+};
+</script>

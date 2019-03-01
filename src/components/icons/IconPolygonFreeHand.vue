@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
+<template>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="free-polygon-white.svg">
+   sodipodi:docname="free-polygon.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -26,7 +24,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="52.572505"
-     inkscape:cx="6.5525872"
+     inkscape:cx="9.7957273"
      inkscape:cy="6.9348154"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -48,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,10 +56,18 @@
      id="layer1"
      transform="translate(-27.016003,-31.914518)">
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.30400008;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke-width:1.30416775;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       stroke="#000000"
        d="m 38.949622,43.986228 c 1.403938,-1.500316 -3.266544,-2.492688 0.146877,-5.771595 2.156977,-2.071976 -2.231271,-4.068703 -4.032879,-3.734999 -1.435084,0.265814 0.161219,2.123932 -1.933719,3.928337 -2.094933,1.804405 -4.714354,-0.508566 -4.747541,2.161303 -0.03833,3.084086 9.163323,4.917269 10.567262,3.416954 z"
        id="path4186"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="zsazsz" />
   </g>
 </svg>
+</template>
+
+<script>
+export default {
+    name: "icon-polygon-free-hand"
+};
+</script>
