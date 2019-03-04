@@ -9,15 +9,15 @@
                     <h2> {{ $t("recently-opened") }} </h2>
                     <b-table :data="recentProjects">
 
-                        <template slot-scope="props">
+                        <template slot-scope="{row: project}">
                             <b-table-column :label="$t('project')" width="100" centered>
-                                <router-link class="project-name" :to="`/project/${props.row.id}`">
-                                    {{ props.row.name }}
+                                <router-link class="project-name" :to="`/project/${project.id}`">
+                                    {{ project.name }}
                                 </router-link>
                             </b-table-column>
 
                             <b-table-column :label="$t('images')" width="400">
-                                <images-preview :idProject="props.row.id"></images-preview>
+                                <list-images-preview :idProject="project.id"></list-images-preview>
                             </b-table-column>
                         </template>
 
@@ -65,19 +65,9 @@
 
                 <div class="box last-image">
                     <h2> {{ $t("last-opened-image") }} </h2>
-                    <div v-if="lastOpenedImage" class="card">
-                        <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
-                        class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
-                        </router-link>
-                        <div class="card-content">
-                            <div class="content">
-                                <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
-                                    {{ lastOpenedImage.instanceFilename }}
-                                </router-link>
-                                <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>
-                            </div>
-                        </div>
-                    </div>
+                    <image-preview v-if="lastOpenedImage" :image="lastOpenedImage" 
+                        :fullHeightCard="false" :showProject="true">
+                    </image-preview>
                     <div class="has-text-grey has-text-centered" v-else>
                         {{$t("no-recent-image")}}
                     </div>
@@ -91,13 +81,17 @@
 <script>
 import {mapState} from "vuex";
 
-import ImagesPreview from "@/components/image/ImagesPreview";
+import ListImagesPreview from "@/components/image/ListImagesPreview";
+import ImagePreview from "@/components/image/ImagePreview";
 
 import {ImageInstanceCollection, ProjectCollection} from "cytomine-client";
 
 export default {
     name: "global-dashboard",
-    components: {ImagesPreview},
+    components: {
+        ListImagesPreview,
+        ImagePreview
+    },
     props: {
         nbRecent: {
             type: Number,
@@ -206,29 +200,5 @@ a.project-name {
 
 .last-image {
     flex: 1;
-}
-
-.card-image {
-    width: 100%;
-    height: 30vh;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    position: relative;
-    border-bottom: 1px solid #ddd;
-}
-
-.card-content {
-    padding: 20px;
-    word-break: break-all;
-}
-
-.card-content a {
-    font-weight: 600;
-}
-
-.db-quick-access {
-    display: flex;
-    justify-content: space-around;
 }
 </style>

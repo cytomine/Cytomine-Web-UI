@@ -35,10 +35,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import {mapState} from "vuex";
 
 import CytomineNavbar from "./components/layout/CytomineNavbar.vue";
 import Login from "./components/user/Login.vue";
+
+import {Cytomine} from "cytomine-client";
+
+const PING_INTERVAL = 20000;
 
 export default {
     name: "app",
@@ -46,21 +50,39 @@ export default {
     data() {
         return {
             communicationError: false,
-            loading: true
+            loading: true,
+            timeout: null
         };
     },
     computed: mapState({
         currentUser: state => state.currentUser.user,
-        authenticated: state => state.currentUser.authenticated
+        authenticated: state => state.currentUser.authenticated,
+        project: state => state.project.project
     }),
+    methods: {
+        async ping() {
+            try {
+                await Cytomine.instance.ping(this.project ? this.project.id : null);
+            }
+            catch(error) {
+                console.log(error);
+                this.communicationError = true;
+            }
+
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(this.ping, PING_INTERVAL);
+        }
+    },
     async created() {
         try {
             await this.$store.dispatch("fetchUser");
         }
-        catch(err) {
+        catch(error) {
+            console.log(error);
             this.communicationError = true;
         }
         this.loading = false;
+        this.timeout = setTimeout(this.ping, PING_INTERVAL);
     }
 };
 </script>

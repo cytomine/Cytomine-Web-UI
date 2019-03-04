@@ -220,7 +220,7 @@ import {KeyboardPan, KeyboardZoom} from "ol/interaction";
 import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
-import {Annotation, UserPosition} from "cytomine-client";
+import {ImageConsultation, Annotation, UserPosition} from "cytomine-client";
 
 import {constLib, operation} from "@/utils/color-manipulation.js";
 
@@ -519,7 +519,7 @@ export default {
             }
         }
 
-        this.image.recordConsultation();
+        await new ImageConsultation({image: this.image.id}).save();
         this.loading = false;
     },
     mounted() {

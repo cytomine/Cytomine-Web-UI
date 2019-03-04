@@ -15,6 +15,7 @@ import Account from "./components/user/Account.vue";
 import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
+import UserActivity from "./components/user/UserActivity.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
 // Define routes
@@ -99,6 +100,10 @@ const routes = [
                 component: ProjectConfiguration
             },
             {
+                path: "activity/user/:idUser",
+                component: UserActivity
+            },
+            {
                 path: "*",
                 component: PageNotFound
             }
@@ -133,6 +138,7 @@ const routes = [
     {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/algorithms"},
     {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
     {path: "/tabs-usersconfig-:idProject", redirect: {path: "/project/:idProject/configuration", query: {tab: "members"}}},
+    {path: "/tabs-#tabs-useractivity-:idProject-:idUser", redirect: "/project/:idProject/activity/user/:idUser"},
     {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},
     {path: "/tabs-image-:idProject-:idImage-:idAnnotation", redirect: "/project/:idProject/image/:idImage/annotation/:idAnnotation"},
     // -----

@@ -21,7 +21,7 @@
         <template v-if="filteredImages.length > 0">
             <router-link v-for="img in subsetImages" :key="img.id" :to="`/project/${img.project}/image/${img.id}`"
             class="navbar-item" @click.native="deactivate"
-            v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(${$t('in')} ${img.projectName})</span>`">
+            v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(${$t('in-project', {projectName: img.projectName})})</span>`">
             </router-link>
             <a v-if="moreImages" class="navbar-item">...</a>
         </template>
