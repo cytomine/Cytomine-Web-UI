@@ -16,6 +16,7 @@ import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
 import UserActivity from "./components/user/UserActivity.vue";
+import AdminPanel from "./components/admin/AdminPanel.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
 // Define routes
@@ -109,6 +110,10 @@ const routes = [
             }
         ]
     },
+    {
+        path: "/admin",
+        component: AdminPanel
+    },
 
     // redirections for old URLS
     {path: "/userdashboard", redirect: "/"},
@@ -122,12 +127,11 @@ const routes = [
 
     {path: "/search-", redirect: "/advanced-search"},
 
-    {path: "/admin", redirect: "/"}, // TODO
-    {path: "/admin-tabs-dashboard", redirect: "/"}, // TODO
-    {path: "/admin-tabs-users", redirect: "/"}, // TODO
+    {path: "/admin-tabs-dashboard", redirect: "/admin?tab=dashboard"},
+    {path: "/admin-tabs-users", redirect: "/admin?tab=users"},
     {path: "/admin-tabs-groups", redirect: "/"}, // TODO
     {path: "/admin-tabs-permissions", redirect: "/"}, // TODO
-    {path: "/admin-tabs-configuration", redirect: "/"}, // TODO
+    {path: "/admin-tabs-configuration", redirect: "/admin?tab=configuration"},
 
     {path: "/tabs-dashboard-:idProject", redirect: "/project/:idProject/information"},
     {path: "/tabs-images-:idProject", redirect: "/project/:idProject/images"},
