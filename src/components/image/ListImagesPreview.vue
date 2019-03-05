@@ -53,6 +53,7 @@ export default {
 
 .column {
     max-width: 200px;
+    min-width: 150px;
 }
 
 .vertical-center {

@@ -31,7 +31,7 @@ export default {
             return this.image.image || this.image.id; // if provided object is image consultation, image.image
         },
         figureStyle() {
-            return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)})"`};
+            return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)}")`};
         }
     }
 };
