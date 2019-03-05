@@ -25,6 +25,10 @@
                 <i class="fas fa-hashtag"></i>
                 {{ $t("ontologies") }}
             </router-link>
+            <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
+                <i class="fas fa-wrench"></i>
+                {{ $t("admin") }}
+            </router-link>
         </div>
 
         <div class="navbar-end">

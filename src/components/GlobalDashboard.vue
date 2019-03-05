@@ -3,21 +3,23 @@
     <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
 
     <template v-if="!loading">
+        <div v-if="welcomeMessage" class="box" v-html="welcomeMessage"></div>
+
         <div class="columns">
             <div class="column is-two-thirds">
                 <div class="box">
                     <h2> {{ $t("recently-opened") }} </h2>
                     <b-table :data="recentProjects">
 
-                        <template slot-scope="props">
+                        <template slot-scope="{row: project}">
                             <b-table-column :label="$t('project')" width="100" centered>
-                                <router-link class="project-name" :to="`/project/${props.row.id}`">
-                                    {{ props.row.name }}
+                                <router-link class="project-name" :to="`/project/${project.id}`">
+                                    {{ project.name }}
                                 </router-link>
                             </b-table-column>
 
                             <b-table-column :label="$t('images')" width="400">
-                                <images-preview :idProject="props.row.id"></images-preview>
+                                <list-images-preview :idProject="project.id"></list-images-preview>
                             </b-table-column>
                         </template>
 
@@ -37,26 +39,26 @@
             <div class="column right-column">
                 <div class="box stats">
                     <h2> {{ $t("statistics") }} </h2>
-                    <table class="table">
+                    <table class="table is-fullwidth">
                         <tbody>
                             <tr>
-                                <td class="stat-value">{{projects.length}}</td>
+                                <td>{{projects.length}}</td>
                                 <td>{{$t("projects")}}</td>
                             </tr>
                             <tr>
-                                <td class="stat-value">{{images.length}}</td>
+                                <td>{{images.length}}</td>
                                 <td>{{$t("images")}}</td>
                             </tr>
                             <tr>
-                                <td class="stat-value">{{nbUserAnnots}}</td>
+                                <td>{{nbUserAnnots}}</td>
                                 <td>{{$t("user-annotations")}}</td>
                             </tr>
                             <tr>
-                                <td class="stat-value">{{nbJobAnnots}}</td>
+                                <td>{{nbJobAnnots}}</td>
                                 <td>{{$t("job-annotations")}}</td>
                             </tr>
                             <tr>
-                                <td class="stat-value">{{nbReviewed}}</td>
+                                <td>{{nbReviewed}}</td>
                                 <td>{{$t("reviewed-annotations")}}</td>
                             </tr>
                         </tbody>
@@ -65,19 +67,9 @@
 
                 <div class="box last-image">
                     <h2> {{ $t("last-opened-image") }} </h2>
-                    <div v-if="lastOpenedImage" class="card">
-                        <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`"
-                        class="card-image" :style="`background-image: url(${lastOpenedImage.thumb})`">
-                        </router-link>
-                        <div class="card-content">
-                            <div class="content">
-                                <router-link :to="`/project/${lastOpenedImage.project}/image/${lastOpenedImage.id}`">
-                                    {{ lastOpenedImage.instanceFilename }}
-                                </router-link>
-                                <span class='in-project'>({{$t("in")}} {{lastOpenedImage.projectName}})</span>
-                            </div>
-                        </div>
-                    </div>
+                    <image-preview v-if="lastOpenedImage" :image="lastOpenedImage" 
+                        :fullHeightCard="false" :showProject="true">
+                    </image-preview>
                     <div class="has-text-grey has-text-centered" v-else>
                         {{$t("no-recent-image")}}
                     </div>
@@ -91,13 +83,19 @@
 <script>
 import {mapState} from "vuex";
 
-import ImagesPreview from "@/components/image/ImagesPreview";
+import ListImagesPreview from "@/components/image/ListImagesPreview";
+import ImagePreview from "@/components/image/ImagePreview";
 
-import {ImageInstanceCollection, ProjectCollection} from "cytomine-client";
+import {ImageInstanceCollection, ProjectCollection, Configuration} from "cytomine-client";
+
+import constants from "@/utils/constants.js";
 
 export default {
     name: "global-dashboard",
-    components: {ImagesPreview},
+    components: {
+        ListImagesPreview,
+        ImagePreview
+    },
     props: {
         nbRecent: {
             type: Number,
@@ -114,6 +112,7 @@ export default {
             nbUserAnnots: 0,
             nbJobAnnots: 0,
             nbReviewed: 0,
+            welcomeMessage: null,
             loading: true
         };
     },
@@ -121,7 +120,7 @@ export default {
         recentProjects() {
             let array = [];
             this.recentProjectsId.forEach(id => {
-                let project = this.projects.find(project => project.id == id);
+                let project = this.projects.array.find(project => project.id == id);
                 if(project != null) {
                     array.push(project);
                 }
@@ -131,41 +130,52 @@ export default {
         lastOpenedImage() {
             if(this.recentImages && this.recentImages.length > 0) {
                 let lastOpened = this.recentImages[0];
-                let project = this.projects.find(project => project.id == lastOpened.project);
+                let project = this.projects.array.find(project => project.id == lastOpened.project);
                 lastOpened.projectName = project.name;
                 return lastOpened;
             }
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
-
-    async created() {
-
-        // Launch all requests in parallel
-        let lightImagesPromise = ImageInstanceCollection.fetchAllLight();
-
-        let nbUserAnnotsPromise = this.currentUser.fetchNbAnnotations();
-        let nbReviewedPromise = this.currentUser.fetchNbAnnotations(true);
-        // TODO: job annots
-
-        let projectsPromise = ProjectCollection.fetchAll();
-
-        async function fetchRecentProjectsId(nbRecent) {
-            let listRecent = await ProjectCollection.fetchLastOpened(nbRecent);
-            return listRecent.map(recent => recent.id);
+    methods: {
+        async fetchImages() {
+            this.images = await ImageInstanceCollection.fetchAllLight();
+        },
+        async fetchProjects() {
+            this.projects = await ProjectCollection.fetchAll();
+        },
+        async fetchNbAnnots() {
+            this.nbUserAnnots = await this.currentUser.fetchNbAnnotations();
+        },
+        async fetchNbReviewedAnnots() {
+            this.nbReviewed = await this.currentUser.fetchNbAnnotations(true);
+        },
+        async fetchRecentProjectsId() {
+            let listRecent = await ProjectCollection.fetchLastOpened(this.nbRecent);
+            this.recentProjectsId = listRecent.map(recent => recent.id);
+        },
+        async fetchRecentImages() {
+            this.recentImages = await ImageInstanceCollection.fetchLastOpened({max: 1});
+        },
+        async fetchWelcomeMessage() {
+            try {
+                this.welcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_WELCOME)).value;
+            }
+            catch(error) {
+                // no welcome message defined
+            }
         }
-
-        let recentProjetsPromise = fetchRecentProjectsId(this.nbRecent);
-        let recentImagesPromise = ImageInstanceCollection.fetchLastOpened({max: 1});
-
-        // Retrieve the results of the requests
-        this.images = await lightImagesPromise;
-        this.nbUserAnnots = await nbUserAnnotsPromise;
-        this.nbReviewed = await nbReviewedPromise;
-        this.projects = (await projectsPromise).array;
-        this.recentImages = await recentImagesPromise;
-        this.recentProjectsId = await recentProjetsPromise;
-
+    },
+    async created() {
+        await Promise.all([
+            this.fetchImages(),
+            this.fetchProjects(),
+            this.fetchNbAnnots(),
+            this.fetchNbReviewedAnnots(),
+            this.fetchRecentProjectsId(),
+            this.fetchRecentImages(),
+            this.fetchWelcomeMessage()
+        ]);
         this.loading = false;
     }
 };
@@ -194,11 +204,7 @@ a.project-name {
     padding-bottom: 40px;
 }
 
-.stats .table {
-    width: 100%;
-}
-
-.stat-value {
+td:first-child {
     font-weight: 600;
     text-align: right;
     width: 25%;
@@ -206,29 +212,5 @@ a.project-name {
 
 .last-image {
     flex: 1;
-}
-
-.card-image {
-    width: 100%;
-    height: 30vh;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    position: relative;
-    border-bottom: 1px solid #ddd;
-}
-
-.card-content {
-    padding: 20px;
-    word-break: break-all;
-}
-
-.card-content a {
-    font-weight: 600;
-}
-
-.db-quick-access {
-    display: flex;
-    justify-content: space-around;
 }
 </style>

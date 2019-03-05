@@ -69,7 +69,6 @@ export default {
             }
 
             try {
-                // TODO BUG in core: filename property ignored
                 let attached = await new AttachedFile({file: this.selectedFile, filename: this.name}, this.object).save();
                 this.$emit("addAttachedFile", attached);
                 this.$notify({type: "success", text: this.$t("notif-success-attached-file-creation")});

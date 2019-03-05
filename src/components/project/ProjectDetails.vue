@@ -102,7 +102,7 @@
         <tr v-if="!excludedProperties.includes('imagesPreview')">
             <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
-                <images-preview :idProject="project.id"></images-preview>
+                <list-images-preview :idProject="project.id"></list-images-preview>
             </td>
         </tr>
         <tr>
@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import ImagesPreview from "@/components/image/ImagesPreview";
+import ListImagesPreview from "@/components/image/ListImagesPreview";
 import ListUsernames from "@/components/user/ListUsernames";
 import ProjectActions from "./ProjectActions";
 import CytomineDescription from "@/components/description/CytomineDescription";
@@ -125,7 +125,7 @@ import AttachedFiles from "@/components/attached-file/AttachedFiles";
 export default {
     name: "project-details",
     components: {
-        ImagesPreview,
+        ListImagesPreview,
         ListUsernames,
         ProjectActions,
         CytomineDescription,

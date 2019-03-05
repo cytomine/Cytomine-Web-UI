@@ -127,7 +127,7 @@ export default {
             return {
                 title: term.name,
                 isLeaf: false, // all terms can be used as parent for drag and drop
-                isDraggable: this.isDraggable,
+                isDraggable: this.allowDrag,
                 isExpanded: true,
                 isSelected: this.internalSelectedNodes.includes(term.id),
                 data: {

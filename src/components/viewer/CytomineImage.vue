@@ -1,5 +1,4 @@
 <!-- TODO job templates -->
-<!-- TODO shortcut keys (decide the ones to keep + help menu)-->
 <template>
     <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
@@ -221,7 +220,7 @@ import {KeyboardPan, KeyboardZoom} from "ol/interaction";
 import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
-import {Annotation, UserPosition} from "cytomine-client";
+import {ImageConsultation, Annotation, UserPosition} from "cytomine-client";
 
 import {constLib, operation} from "@/utils/color-manipulation.js";
 
@@ -458,7 +457,7 @@ export default {
                 await UserPosition.create({
                     image: this.image.id,
                     zoom: this.zoom,
-                    // rotation: this.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
+                    rotation: this.rotation,
                     bottomLeftX: Math.round(extent[0]),
                     bottomLeftY: Math.round(extent[1]),
                     bottomRightX: Math.round(extent[2]),
@@ -520,7 +519,7 @@ export default {
             }
         }
 
-        this.image.recordConsultation();
+        await new ImageConsultation({image: this.image.id}).save();
         this.loading = false;
     },
     mounted() {
@@ -600,6 +599,7 @@ $sizePositioningLineSize: 2px;
     left: 0px;
     right: $widthPanelBar;
     z-index: 5;
+    pointer-events: none;
 }
 
 .panels {
@@ -631,7 +631,7 @@ $sizePositioningLineSize: 2px;
                 }
             }
 
-            a.active {
+            > a.active {
                 background: $backgroundPanel;
                 color: $colorOpenedPanelLink;
                 :hover {
@@ -639,7 +639,7 @@ $sizePositioningLineSize: 2px;
                 }
             }
 
-            a.close {
+            > a.close {
                 color: #ffc4c4;
                 :hover {
                     color: #ff7070;
@@ -721,14 +721,6 @@ $sizePositioningLineSize: 2px;
 }
 
 /* ----- View positioning helper ----- */
-
-/*
-<div class="view-positioning-helper">
-    <div class="horizontal-line"></div>
-    <div class="vertical-line"></div>
-    <div class="center"></div>
-</div>
-*/
 
 .view-positioning-helper {
     position: absolute;

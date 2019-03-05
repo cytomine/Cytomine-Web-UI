@@ -14,22 +14,21 @@
                     <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
                     pagination-size="is-small">
 
-                        <template slot-scope="props">
+                        <template slot-scope="{row: image}">
                             <b-table-column :label="$t('overview')">
-                                <img :src="props.row.preview" :alt="props.row.originalFilename" class="image-overview">
+                                <img :src="image.preview" :alt="image.originalFilename" class="image-overview">
                             </b-table-column>
 
                             <b-table-column field="originalFilename" :label="$t('name')" sortable>
-                                {{ props.row.originalFilename }}
+                                {{ image.originalFilename }}
                             </b-table-column>
 
                             <b-table-column field="created" :label="$t('created-on')" sortable>
-                                {{ Number(props.row.created) | moment("ll LT") }}
+                                {{ Number(image.created) | moment("ll LT") }}
                             </b-table-column>
 
                             <b-table-column label=" " centered>
-                                <button v-if="!alreadyInProject(props.row)" 
-                                        class="button is-small is-link" @click="addImage(props.row)">
+                                <button v-if="!image.inProject" class="button is-small is-link" @click="addImage(image)">
                                     {{$t("button-add")}}
                                 </button>
                                 <span v-else>
@@ -69,10 +68,7 @@ import {AbstractImageCollection, ImageInstance} from "cytomine-client";
 
 export default {
     name: "add-image-modal",
-    props: [
-        "imageInstances",
-        "active"
-    ],
+    props: ["active"],
     data() {
         return {
             loading: true,
@@ -116,10 +112,6 @@ export default {
                     text: this.$t("notif-error-add-image", propsTranslation)
                 });
             }
-        },
-
-        alreadyInProject(abstractImage) { // TODO: should be sent in backend response
-            return this.imageInstances.map(img => img.baseImage).includes(abstractImage.id);
         }
     },
     async created() {

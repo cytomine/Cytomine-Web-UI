@@ -185,12 +185,12 @@ export default {
             if(this.trackedUser == null) {
                 return;
             }
-            // TODO in backend: fetchLastPosition() allowed only if targetted user is broadcasting
+            // TODO in backend: fetchLastPosition() allowed only if targetted user is broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
             let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
             this.view.animate({
                 center: [pos.x, pos.y],
                 zoom: pos.zoom,
-                // rotation: pos.rotation, // TODO in core (https://github.com/cytomine/Cytomine-core/issues/1144)
+                rotation: pos.rotation,
                 duration: 500
             });
 
@@ -198,7 +198,7 @@ export default {
             this.timeoutTracking = setTimeout(this.track, 500);
         },
 
-        async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting
+        async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
             if(this.trackedUser == null && this.activePanel != "follow") {
                 return;
             }

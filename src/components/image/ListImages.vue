@@ -210,8 +210,7 @@
         </div>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" :imageInstances="images" @addImage="addImage">
-    </add-image-modal>
+    <add-image-modal :active.sync="addImageModal" @addImage="addImage"></add-image-modal>
 </div>
 </template>
 
@@ -260,7 +259,7 @@ export default {
             addImageModal: false,
 
             // TODO: should be defined in project config and retrieved from backend (corresponds to properties displayed
-            // in table columns)
+            // in table columns) - https://github.com/cytomine/Cytomine-core/issues/1154
             excludedProperties: [
                 "overview",
                 "instanceFilename",

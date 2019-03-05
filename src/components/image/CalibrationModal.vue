@@ -104,7 +104,7 @@ export default {
             try {
                 let baseImage = await AbstractImage.fetch(this.image.baseImage);
                 baseImage.resolution = this.computedResolution;
-                await baseImage.save(); // TODO in core: update the permiter and area properties of annotations created in this image
+                await baseImage.save(); // TODO in core: update the permiter and area properties of annotations created in this image (https://github.com/cytomine/Cytomine-core/issues/1147)
 
                 this.$emit("setResolution", baseImage.resolution);
 

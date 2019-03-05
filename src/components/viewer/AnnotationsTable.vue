@@ -406,7 +406,7 @@ export default {
             }
 
             // TODO in core: job annotations not returned when users field contains users and userjobs ;
-            // if setting includeAlgo to true, user annotations not returned
+            // if setting includeAlgo to true, user annotations not returned (https://github.com/cytomine/Cytomine-core/issues/1149)
             let annots = (await new AnnotationCollection({
                 images: [this.image.id],
                 showGIS: true,
@@ -517,6 +517,7 @@ export default {
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
     background: #f5f5f5;
     height: 25vh;
+    pointer-events: auto;
 }
 
 .delete {
@@ -556,6 +557,7 @@ export default {
     font-size: 12px;
     letter-spacing: 0.5px;
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .opener .fas {
@@ -616,6 +618,7 @@ export default {
 .annotations-table-filters-modal, .annotations-table-filters-modal .modal-card-body {
     overflow: visible !important;
     width: 60vw !important;
+    pointer-events: auto;
 }
 
 </style>

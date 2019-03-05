@@ -118,8 +118,8 @@
                 </b-table-column>
 
                 <b-table-column label="" centered width="50">
-                    <router-link :to="``" class="button is-small is-link">
-                        {{$t("button-details")}} <!-- TODO -->
+                    <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
+                        {{$t("button-details")}}
                     </router-link>
                 </b-table-column>
             </template>
