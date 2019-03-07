@@ -6,7 +6,7 @@ export default {
         configUI: {},
         ontology: null,
         managers: [],
-        contributors: []
+        members: []
     },
 
     mutations: {
@@ -14,7 +14,7 @@ export default {
             state.project = null;
             state.configUI = {};
             state.managers = [];
-            state.contributors = [];
+            state.members = [];
         },
 
         setProject(state, project) {
@@ -33,8 +33,8 @@ export default {
             state.managers = managers;
         },
 
-        setContributors(state, contributors) {
-            state.contributors = contributors;
+        setMembers(state, members) {
+            state.members = members;
         },
     },
 
@@ -68,11 +68,8 @@ export default {
             let managers = (await managersPromise).array;
             let members = (await membersPromise).array;
 
-            let idsManagers = managers.map(user => user.id);
-            let contributors = members.filter(user => !idsManagers.includes(user.id));
-
             commit("setManagers", managers);
-            commit("setContributors", contributors);
+            commit("setMembers", members);
         },
 
         async fetchOntology({state, commit}) {
@@ -82,14 +79,20 @@ export default {
     },
 
     getters: {
-        canEditLayer: (state, _, rootState) => idLayer => {
+        canEditLayer: (state, getters, rootState) => idLayer => {
             let currentUser = rootState.currentUser.user;
-            if(currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id)) { // user admin or manager
-                return true;
-            }
-
             let project = state.project;
-            return !project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted);
+            return getters.canManageProject || (!project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted));
+        },
+
+        canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
+            let currentUser = rootState.currentUser.user;
+            return currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id);
+        },
+
+        contributors: (state) => {
+            let idsManagers = state.managers.map(user => user.id);
+            return state.members.filter(user => !idsManagers.includes(user.id));
         }
     }
 };

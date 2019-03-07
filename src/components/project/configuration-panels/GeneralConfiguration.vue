@@ -96,7 +96,7 @@
     <b-field grouped>
         <b-select size="is-small" :placeholder="$t('select-layer-placeholder')" v-model="layerToAdd">
             <option v-for="layer in unselectedLayers" :key="layer.id" :value="layer">
-                {{layer.fullName}}
+                {{fullName(layer)}}
             </option>
         </b-select>
 
@@ -113,7 +113,7 @@
                 <th></th>
             </tr>
             <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
-                <td>{{layer.fullName}}</td>
+                <td>{{fullName(layer)}}</td>
                 <td class="is-centered">
                     <input type="checkbox" v-model="defaultLayers[idx].hideByDefault" @change="saveDefaultLayer(idx)">
                 </td>
@@ -152,7 +152,6 @@ export default {
             hideManagersLayers: null,
             hideContributorsLayers: null,
 
-            layers: [], // TODO: ensure correct refresh of layers list when user adds users to the project
             layerToAdd: null,
             defaultLayers: []
         };
@@ -160,6 +159,9 @@ export default {
     computed: {
         project() {
             return this.$store.state.project.project;
+        },
+        layers() {
+            return this.$store.state.project.members;
         },
         currentEditingMode() {
             return this.project.isReadOnly ? "READ-ONLY" : this.project.isRestricted ? "RESTRICTED" : "CLASSIC";
@@ -206,17 +208,15 @@ export default {
         }
     },
     methods: {
+        fullName(layer) {
+            return fullName(layer);
+        },
+
         initData() {
             this.editingMode = this.currentEditingMode;
             this.blindMode = this.project.blindMode;
             this.hideManagersLayers = this.project.hideAdminsLayers;
             this.hideContributorsLayers = this.project.hideUsersLayers;
-        },
-
-        async fetchLayers() {
-            let layers = (await this.project.fetchUserLayers()).array;
-            layers.forEach(layer => layer.fullName = fullName(layer));
-            this.layers = layers;
         },
 
         async fetchDefaultLayers() {
@@ -301,7 +301,6 @@ export default {
     },
     created() {
         this.initData();
-        this.fetchLayers();
         this.fetchDefaultLayers();
     }
 };

@@ -32,6 +32,10 @@ $loadingColor: #bbb;
     font-weight: 600 !important;
 }
 
+.b-table .table th .button {
+    font-weight: 400;
+}
+
 /* Panel */
 
 .panel-heading {
@@ -86,6 +90,7 @@ $loadingColor: #bbb;
 }
 
 /* Loading */
+
 .loading-overlay .loading-icon::after {
     width: 5em;
     height: 5em;
@@ -98,4 +103,19 @@ $loadingColor: #bbb;
     height: 2em;
     border-left-color: $loadingColor;
     border-bottom-color: $loadingColor;
+}
+
+/* Radio button */
+
+.radio-buttons-fullwidth .control {
+    flex: 1;
+
+    .b-radio {
+        width: 100%;
+        border-color: #b5b5b5;
+
+        &:hover:not(.is-link) {
+            background: #f5f5f5;
+        }
+    }
 }

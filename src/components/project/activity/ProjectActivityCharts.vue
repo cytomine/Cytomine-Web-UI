@@ -249,6 +249,10 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+    font-size: 16px;
+}
+
 .single-metrics {
     flex-grow: 0;
     min-width: 250px;

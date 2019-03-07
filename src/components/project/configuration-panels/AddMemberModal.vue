@@ -52,7 +52,7 @@ export default {
             return this.$store.state.project.project;
         },
         projectMembersIds() {
-            let projectMembers = this.$store.state.project.contributors.concat(this.$store.state.project.managers);
+            let projectMembers = this.$store.state.project.members;
             let excluded = projectMembers.concat(this.selectedUsers);
             return excluded.map(u => u.id);
         },

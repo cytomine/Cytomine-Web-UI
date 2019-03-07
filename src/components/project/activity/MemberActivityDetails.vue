@@ -2,6 +2,14 @@
 <div class="user-activity-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div class="content-wrapper" v-if="!loading">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><router-link :to="`/project/${project.id}`">{{project.name}}</router-link></li>
+                <li><router-link :to="`/project/${project.id}/activity?tab=members`">{{$t("members-activity")}}</router-link></li>
+                <li class="is-active"><a href="#" aria-current="page">{{$t("activity-of-user", {username: user.fullName})}}</a></li>
+            </ul>
+        </nav>
+
         <div class="box">
             <h1>{{$t("activity-of-user", {username: user.fullName})}}</h1>
 
@@ -63,7 +71,7 @@
                 </template>
 
                 <p class="has-text-centered" slot="footer">
-                    <a class="button is-link" :href="connections.downloadURL" target="_self">{{$t("export-as-csv")}}</a>
+                    <a class="button is-link" :href="connections.downloadURL" target="_self">{{$t("button-export-as-csv")}}</a>
                 </p>
 
                 <template slot="bottom-left">
@@ -127,7 +135,7 @@
                 </template>
 
                 <p class="has-text-centered" slot="footer">
-                    <a class="button is-link" :href="consultations.downloadURL" target="_self">{{$t("export-as-csv")}}</a>
+                    <a class="button is-link" :href="consultations.downloadURL" target="_self">{{$t("button-export-as-csv")}}</a>
                 </p>
 
                 <template slot="bottom-left">
@@ -145,6 +153,7 @@
 </template>
 
 <script>
+// TODO: refresh interval (+ display last update date)
 import {fullName} from "@/utils/user-utils.js";
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from "cytomine-client";
 import ProjectConnectionDetails from "@/components/project/ProjectConnectionDetails";

@@ -7,13 +7,15 @@
                 <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
             </div>
 
-            <div class="column">
-                <button class="button" @click="toggleFilterDisplay()">
-                    <span class="icon">
-                        <i class="fas fa-filter"></i>
-                    </span>
-                    <span>{{filtersOpened ? $t("button-hide-filters") : $t("button-show-filters")}}</span>
-                </button>
+            <div class="column filter is-one-quarter">
+                <div class="filter-label">
+                    {{$t("role")}}
+                </div>
+                <div class="filter-body">
+                    <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+                        :searchable="false">
+                    </cytomine-multiselect>
+                </div>
             </div>
             <div class="column is-one-half has-text-right-desktop buttons">
                 <button class="button is-link add-member" @click="addMemberModal = true">
@@ -25,32 +27,6 @@
                 </button>
             </div>
         </div>
-
-        <b-collapse :open="filtersOpened">
-            <div class="filters columns">
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("status")}}
-                    </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" :multiple="true"
-                            :searchable="false">
-                        </cytomine-multiselect>
-                    </div>
-                </div>
-
-                <div class="column filter">
-                    <div class="filter-label">
-                        {{$t("role")}}
-                    </div>
-                    <div class="filter-body">
-                        <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                            :searchable="false">
-                        </cytomine-multiselect>
-                    </div>
-                </div>
-            </div>
-        </b-collapse>
 
         <b-table :data="filteredMembers"
                  class="table-members"
@@ -72,10 +48,7 @@
                 </b-table-column>
 
                 <b-table-column field="username" :label="$t('username')" sortable width="100">
-                    <username :user="member"
-                              :online="onlineIds.includes(member.id)"
-                              :displayFullName="false">
-                    </username>
+                    {{member.username}}
                 </b-table-column>
 
                 <b-table-column field="name" :label="$t('name')" sortable width="150">
@@ -105,21 +78,9 @@
                     </span>
                 </b-table-column>
 
-                <b-table-column field="lastImage" :label="$t('last-image')" centered sortable width="100">
-                    - <!-- TODO in backend -->
-                </b-table-column>
-
-                <b-table-column field="lastConnection" :label="$t('last-connection')" centered sortable width="100">
-                    - <!-- TODO in backend -->
-                </b-table-column>
-
-                <b-table-column field="numberConnections" :label="$t('number-connections')" centered sortable width="100">
-                    - <!-- TODO in backend -->
-                </b-table-column>
-
                 <b-table-column label="" centered width="50">
                     <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
-                        {{$t("button-details")}}
+                        {{$t("button-view-activity")}}
                     </router-link>
                 </b-table-column>
             </template>
@@ -130,9 +91,9 @@
                 </div>
             </template>
 
-            <p class="has-text-centered" slot="footer">
-                <button class="button is-link">{{$t("export-as-csv")}}</button> <!-- TODO -->
-            </p>
+            <div class="has-text-centered" slot="footer">
+                <button class="button is-link">{{$t("button-export-as-csv")}}</button> <!-- TODO -->
+            </div>
 
             <template slot="bottom-left">
                 <b-select v-model="perPage" size="is-small">
@@ -176,7 +137,6 @@
 
 <script>
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
-import Username from "@/components/user/Username";
 import AddMemberModal from "./AddMemberModal";
 import {fullName} from "@/utils/user-utils.js";
 import {ProjectRepresentative, ProjectRepresentativeCollection} from "cytomine-client";
@@ -185,8 +145,7 @@ export default {
     name: "projet-members",
     components: {
         CytomineMultiselect,
-        AddMemberModal,
-        Username
+        AddMemberModal
     },
     data() {
         return {
@@ -194,23 +153,15 @@ export default {
             addMemberModal: false,
 
             perPage: 25,
-            filtersOpened: false,
             searchString: "",
             
-            contributorRole: null,
-            managerRole: null,
+            contributorRole: this.$t("contributor"),
+            managerRole: this.$t("manager"),
             availableRoles: [],
             selectedRoles: [],
 
-            onlineStatus: "",
-            offlineStatus: "",
-            availableStatus: [],
-            selectedStatus: [],
-
             allMembers: [],
-
             representatives: [],
-            onlineIds: []
         };
     },
     computed: {
@@ -220,11 +171,11 @@ export default {
         project() {
             return this.$store.state.project.project;
         },
-        contributors() {
-            return this.$store.state.project.contributors;
+        unformattedMembers() {
+            return this.$store.state.project.members;
         },
-        managers() {
-            return this.$store.state.project.managers;
+        idManagers() {
+            return this.$store.state.project.managers.map(manager => manager.id);
         },
         filteredMembers() {
             let filtered = this.allMembers;
@@ -237,11 +188,6 @@ export default {
             }
 
             filtered = filtered.filter(member => this.selectedRoles.includes(member.role));
-            filtered = filtered.filter(member => {
-                let online = this.onlineIds.includes(member.id);
-                return (this.selectedStatus.includes(this.onlineStatus) && online) || 
-                    (this.selectedStatus.includes(this.offlineStatus) && !online); 
-            });
 
             return filtered;
         },
@@ -263,46 +209,34 @@ export default {
         formatMembers() {
             let selectedIds = this.selectedMembers.map(m => m.id); // store current selection to be able to reselect it
 
-            let managers = this.managers.map(manager => {
-                let member = manager.clone();
-                member.role = this.managerRole;
-                member.indexRole = 1; // to allow sorting
-                return member;
-            });
-
-            let contributors = this.contributors.map(contrib => {
-                let member = contrib.clone();
-                member.role = this.contributorRole;
-                member.indexRole = 0; // to allow sorting
-                return member;
-            });
-
-            let members = contributors.concat(managers);
-            members.forEach(member => {
+            this.allMembers = this.unformattedMembers.map(uMember => {
+                let member = uMember.clone();
                 member.selected = selectedIds.includes(member.id);
                 member.name = `${member.firstname} ${member.lastname}`;
+
+                if(this.idManagers.includes(member.id)) {
+                    member.role = this.managerRole;
+                    member.indexRole = 1; // to allow sorting
+                }
+                else {
+                    member.role = this.contributorRole;
+                    member.indexRole = 0; // to allow sorting
+                }
+
                 let representative = this.representatives.find(r => r.user == member.id);
                 if(representative != null) {
                     member.representativeId = representative.id;
                     member.indexRole = 2; // to allow sorting
                 }
-            });
 
-            this.allMembers = members;
+                return member;
+            });
         },
         async fetchRepresentatives() {
             this.representatives = (await ProjectRepresentativeCollection.fetchAll({
                 filterKey: "project",
                 filterValue: this.project.id
             })).array;
-        },
-        async fetchOnlines() {
-            let onlines = await this.project.fetchConnectedUsers();
-            this.onlineIds = onlines.map(o => o.id);
-        },
-
-        toggleFilterDisplay() {
-            this.filtersOpened = !this.filtersOpened;
         },
 
         confirmMembersRemoval() {
@@ -403,28 +337,29 @@ export default {
 
     },
     async created() {
-        this.contributorRole = this.$t("contributor");
-        this.managerRole = this.$t("manager");
         this.availableRoles = [this.contributorRole, this.managerRole];
         this.selectedRoles = this.availableRoles;
-
-        this.onlineStatus = this.$t("online");
-        this.offlineStatus = this.$t("offline");
-        this.availableStatus = [this.onlineStatus, this.offlineStatus];
-        this.selectedStatus = this.availableStatus;
-
-        await Promise.all([
-            this.fetchRepresentatives(),
-            this.fetchOnlines()
-        ]);
-
-        this.formatMembers();
+        await this.refreshMembers();
         this.loading = false;
     }
 };
 </script>
 
 <style scoped>
+.filter {
+    display: flex;
+    align-items: center;
+}
+
+.filter-label {
+    margin-right: 1em;
+    margin-bottom: 0px !important;
+}
+
+.filter-body {
+    flex-grow: 1;
+}
+
 .list-members-wrapper {
     min-height: 200px;
 }
@@ -436,10 +371,6 @@ export default {
 
 .tag.ldap {
     background-color: #A0C0E6;
-}
-
-.table-footer {
-    text-align: center;
 }
 
 .legend {

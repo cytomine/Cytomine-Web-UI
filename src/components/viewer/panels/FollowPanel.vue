@@ -67,7 +67,7 @@ export default {
             return this.$store.state.project.managers;
         },
         projectContributors() {
-            return this.$store.state.project.contributors;
+            return this.$store.getters.contributors;
         },
         currentUser() {
             return this.$store.state.currentUser.user;
@@ -98,7 +98,7 @@ export default {
                 return this.imageWrapper.broadcast;
             },
             set(value) {
-                // QUESTION: forbid user to broadcast several times the same image
+                // TODO: forbid user to broadcast several times the same image
                 this.$store.commit("setBroadcast", {idViewer: this.idViewer, index: this.index, value});
             }
         },
