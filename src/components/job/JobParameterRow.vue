@@ -21,7 +21,7 @@ import {Cytomine} from "cytomine-client";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 
 export default {
-    name: "algo-parameter-row",
+    name: "job-parameter-row",
     components: {CytomineMultiselect},
     props: [
         "param",
@@ -96,7 +96,7 @@ export default {
             }
             catch(error) {
                 console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-algo-parameters-options", {paramName: this.param.name})});
+                this.$notify({type: "error", text: this.$t("notif-error-analysis-parameters-options", {paramName: this.param.name})});
             }
         }
         this.loading = false;

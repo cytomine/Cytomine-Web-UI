@@ -22,10 +22,10 @@
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/algorithms`" class="algorithms">
+            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`" class="analysis">
                 <a>
                     <i class="fas fa-tasks"></i>
-                    {{ $t("algorithms") }}
+                    {{ $t("analysis") }}
                 </a>
             </router-link>
             <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`" class="activity">
@@ -169,7 +169,7 @@ export default {
 
 .sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
 .sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
-.sidebar li.algorithms.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
+.sidebar li.analysis.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
 .sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
 .sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
 .sidebar li.configuration.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }

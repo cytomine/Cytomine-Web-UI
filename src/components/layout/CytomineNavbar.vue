@@ -10,7 +10,7 @@
     </div>
     <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
         <div class="navbar-start">
-            <navbar-dropdown icon="fa-folder" v-if="this.nbViewers > 0" :title="$t('navigation')">
+            <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbViewers > 0" :title="$t('viewers')">
                 <navigation-tree></navigation-tree>
             </navbar-dropdown>
             <router-link to="/projects" class="navbar-item">
@@ -34,11 +34,6 @@
         <div class="navbar-end">
             <cytomine-searcher></cytomine-searcher>
 
-            <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
-                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
-                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
-            </navbar-dropdown>
-
             <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
                              :title="currentUserFullInfo"
                              :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : ''"
@@ -57,6 +52,11 @@
                 <a class="navbar-item" @click="logout()">
                     {{ $t("logout") }}
                 </a>
+            </navbar-dropdown>
+
+            <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
+                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
+                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
             </navbar-dropdown>
 
             <navbar-dropdown :title="currentLanguage" :classes="['is-right']">
@@ -155,50 +155,31 @@ export default {
 };
 </script>
 
-<style>
-
-/*nav.navbar {
-height: 50px;
-color: white;
-flex-shrink: 0;
-border-bottom: 1px solid #111;
-background: #444;
-padding-left: 20px;
-display: flex;
-align-items: center;
-}
-
-.cytomine {
-font-family: "cytomine";
-font-size: 2em;
-font-weight: lighter;
-}*/
-
+<style lang="scss">
 #logo {
     height: 35px;
+    font-family: "cytomine";
+    font-size: 2em;
+    font-weight: lighter;
+    line-height: 1em;
 }
 
 .navbar {
     font-weight: 600;
     z-index: 500 !important;
-}
-
-.navbar-item.logo {
-    font-family: "cytomine";
-    font-size: 2em;
-    font-weight: lighter;
-}
-
-.navbar .fas {
-    padding-right: 7px;
+    
+    .fas, .far {
+        padding-right: 7px;
+    }
 }
 
 .navbar-item.language {
     font-size: 13px;
     font-weight: normal;
+
+    &.selected {
+        font-weight: 600;
+    }
 }
 
-.navbar-item.language.selected {
-    font-weight: 600;
-}
 </style>

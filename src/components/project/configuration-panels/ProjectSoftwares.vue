@@ -32,7 +32,7 @@
 
             <template slot="empty">
                 <div class="content has-text-grey has-text-centered">
-                    <p>{{$t("no-software")}}</p>
+                    <p>{{$t("no-algorithm")}}</p>
                 </div>
             </template>
 
@@ -94,7 +94,7 @@ export default {
                 console.log(error);
                 this.$notify({
                     type: "error",
-                    text: this.$t("notif-error-change-status-software-project", {softwareName: software.name})
+                    text: this.$t("notif-error-change-status-algorithm-project", {softwareName: software.name})
                 });
             }
         }

@@ -29,7 +29,7 @@
             </td>
         </tr>
         <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-            <td class="prop-label">{{$t("job-annotations")}}</td>
+            <td class="prop-label">{{$t("analysis-annotations")}}</td>
             <td class="prop-content">
                 <router-link :to="`/project/${project.id}/annotations?type=algo`">
                     {{ project.numberOfJobAnnotations }}

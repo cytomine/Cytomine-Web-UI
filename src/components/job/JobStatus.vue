@@ -9,7 +9,7 @@ import {JobStatus} from "cytomine-client";
 import jobStatusLabelMapping from "@/utils/job-utils";
 
 export default {
-    name: "algorithm-status",
+    name: "job-status",
     props: ["status"],
     computed: {
         labels() {

@@ -1,5 +1,5 @@
 <template>
-<div class="algo-details-wrapper">
+<div class="job-details-wrapper">
     <b-loading :is-full-page="false" :active.sync="loading" class="small"></b-loading>
 
     <template v-if="!loading">
@@ -93,7 +93,7 @@
                 <tr v-else>
                     <td>{{$t("data")}}</td>
                     <td>
-                        {{$t("deleted-algo-data")}}
+                        {{$t("deleted-analysis-data")}}
                     </td>
                 </tr>
             </tbody>
@@ -103,10 +103,10 @@
             <form>
                 <div class="modal-card">
                     <header class="modal-card-head">
-                        <p class="modal-card-title">{{$t("delete-algo-data")}}</p>
+                        <p class="modal-card-title">{{$t("delete-analysis-data")}}</p>
                     </header>
                     <section class="modal-card-body">
-                        <p>{{$t("confirm-deletion-algo-data")}}</p>
+                        <p>{{$t("confirm-deletion-analysis-data")}}</p>
                         <ul>
                             <li>{{$tc("count-annotations", allData.annotations, {count: allData.annotations})}}</li>
                             <li>{{$tc("count-reviewed-annotations", allData.reviewed, {count: allData.reviewed})}}</li>
@@ -147,7 +147,7 @@ const REFRESH_INTERVAL = 2000;
 const REFRESH_INTERVAL_DELETION_TASK = 1000;
 
 export default {
-    name: "algorithm-details",
+    name: "job-details",
     props: ["job"],
     data() {
         return {
@@ -220,12 +220,12 @@ export default {
                 this.refresh(true);
                 this.deletionTask = null;
                 this.deletionModal = false;
-                this.$notify({type: "success", text: this.$t("notif-success-algo-data-deletion")});
+                this.$notify({type: "success", text: this.$t("notif-success-analysis-data-deletion")});
             }
             catch(error) {
                 console.log(error);
                 this.deletionTask = null;
-                this.$notify({type: "error", text: this.$t("notif-error-algo-data-deletion")});
+                this.$notify({type: "error", text: this.$t("notif-error-analysis-data-deletion")});
             }
         },
         async refreshDeletionTask() {
@@ -249,7 +249,7 @@ export default {
 </script>
 
 <style scoped>
-.algo-details-wrapper {
+.job-details-wrapper {
     position: relative;
     min-height: 50px;
 }

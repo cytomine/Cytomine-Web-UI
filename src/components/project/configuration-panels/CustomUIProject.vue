@@ -51,7 +51,7 @@ export default {
                     props: [
                         {key: "project-images-tab", label: "images", icon: "far fa-images"},
                         {key: "project-annotations-tab", label: "annotations", icon: "far fa-edit"},
-                        {key: "project-jobs-tab", label: "algorithms", icon: "fas fa-tasks"},
+                        {key: "project-jobs-tab", label: "analysis", icon: "fas fa-tasks"},
                         {key: "project-activity-tab", label: "activity", icon: "fas fa-tachometer-alt"}, // TODO in core
                         {key: "project-info-tab", label: "information", icon: "fas fa-info-circle"}, // TODO in core
                         {key: "project-configuration-tab", label: "configuration", icon: "fas fa-cogs"}
@@ -71,7 +71,7 @@ export default {
                         {key: "project-explore-property", label: "properties", icon: "fas fa-tag"},
                         {key: "project-explore-follow", label: "broadcast", icon: "fas fa-street-view"}, // TODO in core
                         {key: "project-explore-guided-tour", label: "guided-tour", icon: "fas fa-map-signs"}, // TODO in core
-                        {key: "project-explore-job", label: "algorithms", icon: "fas fa-tasks"},
+                        {key: "project-explore-job", label: "analysis", icon: "fas fa-tasks"},
                         // list of annotations
                         {key: "project-explore-annotation-panel", label: "annotations-table", icon: "fas fa-table"},
                         

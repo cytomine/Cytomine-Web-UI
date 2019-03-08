@@ -55,7 +55,7 @@
                             </tr>
                             <tr>
                                 <td>{{nbJobAnnots}}</td>
-                                <td>{{$t("job-annotations")}}</td>
+                                <td>{{$t("analysis-annotations")}}</td>
                             </tr>
                             <tr>
                                 <td>{{nbReviewed}}</td>

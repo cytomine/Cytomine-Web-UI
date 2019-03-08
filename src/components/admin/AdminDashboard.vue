@@ -79,15 +79,15 @@
                     <tbody>
                         <tr>
                             <td>{{totalCounts.softwares}}</td>
-                            <td>{{$t("softwares")}}</td>
-                        </tr>
-                        <tr>
-                            <td>{{totalCounts.jobs}}</td>
                             <td>{{$t("algorithms")}}</td>
                         </tr>
                         <tr>
+                            <td>{{totalCounts.jobs}}</td>
+                            <td>{{$t("analyses")}}</td>
+                        </tr>
+                        <tr>
                             <td>{{totalCounts.jobAnnotations}}</td>
-                            <td>{{$t("job-annotations")}}</td>
+                            <td>{{$t("analysis-annotations")}}</td>
                         </tr>
                     </tbody>
                 </table>

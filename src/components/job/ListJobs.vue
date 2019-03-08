@@ -3,13 +3,13 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
-<div v-else class="list-algorithms-wrapper content-wrapper">
+<div v-else class="list-jobs-wrapper content-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
-            {{$t("algorithms")}}
+            {{$t("analysis")}}
             <button class="button is-link" @click="launchModal = true">
-                {{$t('button-launch-new-algorithm')}}
+                {{$t('button-launch-new-analysis')}}
             </button>
         </p>
         <div class="panel-block">
@@ -18,7 +18,7 @@
                 <div class="columns">
                     <div class="column filter">
                         <div class="filter-label">
-                            {{$t("software")}}
+                            {{$t("algorithm")}}
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true">
@@ -66,14 +66,12 @@
                 </div>
             </div>
 
-            <b-table :data="filteredJobs" class="table-algorithms" ref="table"
-            :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id"
-            default-sort="created" default-sort-direction="desc">
+            <b-table :data="filteredJobs" ref="table" default-sort="created" default-sort-direction="desc"
+            :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id">
 
                 <template slot-scope="{row: job}">
-                    <b-table-column field="software" :label="$t('software')" sortable width="1000">
+                    <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
                         {{job.softwareName}}
-                        <!-- {{$t("software-execution", {softwareName: job.softwareName, executionNumber: job.number})}} -->
                     </b-table-column>
 
                     <b-table-column :label="$t('run-number')" width="500" centered>
@@ -89,17 +87,17 @@
                     </b-table-column>
 
                     <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
-                        <algorithm-status :status="job.status"></algorithm-status>
+                        <job-status :status="job.status"></job-status>
                     </b-table-column>
                 </template>
 
                 <template slot="detail" slot-scope="{row: job}">
-                    <algorithm-details :key="job.id" :job="job" @update="props => job.populate(props)"></algorithm-details>
+                    <job-details :key="job.id" :job="job" @update="props => job.populate(props)"></job-details>
                 </template>
 
                 <template slot="empty">
                     <div class="content has-text-grey has-text-centered">
-                        <p>{{$t("no-algorithm-run")}}</p>
+                        <p>{{$t("no-analysis-run")}}</p>
                     </div>
                 </template>
 
@@ -115,25 +113,25 @@
         </div>
     </div>
 
-    <launch-algorithm-modal :active.sync="launchModal" @add="addJob"></launch-algorithm-modal>
+    <add-job-modal :active.sync="launchModal" @add="addJob"></add-job-modal>
 </div>
 </template>
 
 <script>
 import {JobCollection} from "cytomine-client";
-import AlgorithmStatus from "./AlgorithmStatus";
-import AlgorithmDetails from "./AlgorithmDetails";
-import LaunchAlgorithmModal from "./LaunchAlgorithmModal";
+import JobStatus from "./JobStatus";
+import JobDetails from "./JobDetails";
+import AddJobModal from "./AddJobModal";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import jobStatusLabelMapping from "@/utils/job-utils";
 import moment from "moment";
 
 export default {
-    name: "list-algorithms",
+    name: "list-jobs",
     components: {
-        AlgorithmStatus,
-        AlgorithmDetails,
-        LaunchAlgorithmModal,
+        JobStatus,
+        JobDetails,
+        AddJobModal,
         CytomineMultiselect
     },
     data() {
@@ -225,20 +223,20 @@ export default {
 }
 </style>
 
-<style>
-.list-algorithms-wrapper .datepicker .input {
+<style lang="scss">
+.list-jobs-wrapper .datepicker .input {
     min-height: 40px;
     background-color: rgba(255, 255, 255, 0.75);
     border-radius: 5px;
     border: 1px solid #e8e8e8;
     font-size: 14px;
     font-family: inherit;
-}
 
-.list-algorithms-wrapper .datepicker .input::placeholder {
-    color: black !important;
-    opacity: 1;
-    font-weight: 600;
+    &::placeholder {
+        color: black !important;
+        opacity: 1;
+        font-weight: 600;
+    }
 }
 </style>
 

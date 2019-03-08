@@ -9,7 +9,7 @@ import ListImages from "./components/image/ListImages.vue";
 import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
 import ProjectActivity from "./components/project/ProjectActivity.vue";
-import ListAlgorithms from "./components/algorithms/ListAlgorithms.vue";
+import ListJobs from "./components/job/ListJobs.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
 import ProjectConfiguration from "./components/project/ProjectConfiguration.vue";
 import Account from "./components/user/Account.vue";
@@ -90,8 +90,8 @@ const routes = [
                 component: ListAnnotations
             },
             {
-                path: "algorithms",
-                component: ListAlgorithms
+                path: "analysis",
+                component: ListJobs
             },
             {
                 path: "activity",
@@ -144,7 +144,7 @@ const routes = [
     {path: "/tabs-annotationproperties-:idProject-:idAnnot", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
-    {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/algorithms"},
+    {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/analysis"},
     {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
     {path: "/tabs-usersconfig-:idProject", redirect: "/project/:idProject/configuration?tab=members"},
     {path: "/tabs-#tabs-useractivity-:idProject-:idUser", redirect: "/project/:idProject/activity/user/:idUser"},

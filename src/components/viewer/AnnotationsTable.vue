@@ -478,7 +478,7 @@ export default {
     },
     async created() {
         this.annotationTypes = [
-            {type: AnnotationType.ALGO, label: this.$t("job-annotations")},
+            {type: AnnotationType.ALGO, label: this.$t("analysis-annotations")},
             {type: AnnotationType.USER, label: this.$t("user-annotations")}
         ];
         this.selectedObjectTypes = this.annotationTypes;

@@ -85,7 +85,7 @@ export default {
                     borderWidth: 0
                 },
                 {
-                    label: this.$t("job-annotations"),
+                    label: this.$t("analysis-annotations"),
                     data: [],
                     backgroundColor: "#aaa",
                     borderWidth: 0

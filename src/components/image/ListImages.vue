@@ -118,7 +118,7 @@
 
                         <div class="column filter">
                             <div class="filter-label">
-                                {{$t("job-annotations")}}
+                                {{$t("analysis-annotations")}}
                             </div>
                             <div class="filter-body">
                                 <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
@@ -167,7 +167,7 @@
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="100">
+                    <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
                         <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                             {{ image.numberOfJobAnnotations }}
                         </router-link>

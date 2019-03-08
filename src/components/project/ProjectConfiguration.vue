@@ -17,8 +17,8 @@
             {{$t("custom-ui")}}
         </b-radio-button>
 
-        <b-radio-button v-model="activeTab" native-value="softwares" type="is-link">
-            {{$t("softwares")}}
+        <b-radio-button v-model="activeTab" native-value="algorithms" type="is-link">
+            {{$t("algorithms")}}
         </b-radio-button>
 
         <b-radio-button v-model="activeTab" native-value="imageFilters" type="is-link">
@@ -65,7 +65,7 @@ export default {
                     return ProjectMembers;
                 case "customUI":
                     return CustomUIProject;
-                case "softwares":
+                case "algorithms":
                     return ProjectSoftwares;
                 case "imageFilters":
                     return ProjectImageFilters;

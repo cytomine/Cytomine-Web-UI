@@ -49,7 +49,7 @@
             <div class="tile is-parent">
                 <div class="tile is-child box single-metric">
                     <strong class="metric">{{ nbAnnotations[annotationTypes.ALGO] }}</strong>
-                    <strong>{{$t("job-annotations")}}</strong>    
+                    <strong>{{$t("analysis-annotations")}}</strong>
                 </div>
             </div>
             <div class="tile is-parent">

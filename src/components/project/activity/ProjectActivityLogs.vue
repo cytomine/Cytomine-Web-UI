@@ -3,11 +3,11 @@
     <h2>{{$t("activity-logs")}}</h2>
 
     <b-select v-model="selectedUser">
-        <option :value="null">{{$t("all-users-algorithms")}}</option>
+        <option :value="null">{{$t("all-users-analyses")}}</option>
         <optgroup :label="$t('members')">
             <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
         </optgroup>
-        <optgroup :label="$t('algorithms')">
+        <optgroup :label="$t('analyses')">
             <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
         </optgroup>
     </b-select>
