@@ -36,7 +36,7 @@
 
             <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
                              :title="currentUserFullInfo"
-                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : ''"
+                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
                              :listPathes="['/account']">
                 <router-link to="/account" class="navbar-item">
                     {{$t("account")}}
