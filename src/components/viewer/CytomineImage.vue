@@ -184,6 +184,10 @@
         <annotations-table v-if="isPanelDisplayed('annotation-panel')"
             class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view">
         </annotations-table>
+
+        <div class="custom-overview" ref="overview">
+            <p class="image-name" :class="{hidden: overviewCollapsed}">{{image.instanceFilename}}</p>
+        </div>
     </div>
 </template>
 
@@ -265,7 +269,9 @@ export default {
 
             timeoutSavePosition: null,
 
-            loading: true
+            loading: true,
+
+            overview: null
         };
     },
     computed: {
@@ -382,6 +388,10 @@ export default {
             if(this.routedAnnotation != null) {
                 return [this.routedAnnotation.user];
             }
+        },
+
+        overviewCollapsed() {
+            return this.overview ? this.overview.getCollapsed() : null;
         }
     },
     watch: {
@@ -440,11 +450,14 @@ export default {
             await this.$refs.map.$createPromise; // wait for ol.Map to be created
             await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
-            this.$refs.map.$map.addControl(new OverviewMap({
+            this.overview = new OverviewMap({
                 collapsed: false,
                 view: new View({projection: this.projectionName}),
-                layers: [this.$refs.baseLayer.$layer]
-            }));
+                layers: [this.$refs.baseLayer.$layer],
+                tipLabel: this.$t("overview"),
+                target: this.$refs.overview
+            });
+            this.$refs.map.$map.addControl(this.overview);
         },
 
         togglePanel(panel) {
@@ -576,6 +589,10 @@ $sizePositioningLineSize: 2px;
     padding: 5px;
     border-radius: 5px;
     border: 2px solid white;
+
+    i.fas {
+        margin-right: 5px;
+    }
 }
 
 .info-calibration {
@@ -587,10 +604,6 @@ $sizePositioningLineSize: 2px;
     p:first-child {
         margin-bottom: 10px;
     }
-}
-
-.broadcast i.fas {
-    margin-right: 5px;
 }
 
 .annotations-table-wrapper {
@@ -626,23 +639,20 @@ $sizePositioningLineSize: 2px;
                 text-decoration: none;
                 text-align:center;
 
-                :hover {
+                &:hover {
                     color: $colorHoverPanelLink;
                 }
-            }
 
-            > a.active {
-                background: $backgroundPanel;
-                color: $colorOpenedPanelLink;
-                :hover {
-                    color: unset;
+                &.active {
+                    background: $backgroundPanel;
+                    color: $colorOpenedPanelLink;
                 }
-            }
 
-            > a.close {
-                color: #ffc4c4;
-                :hover {
-                    color: #ff7070;
+                &.close {
+                    color: #ffc4c4;
+                    :hover {
+                        color: #ff7070;
+                    }
                 }
             }
         }
@@ -702,11 +712,11 @@ $sizePositioningLineSize: 2px;
     color: black !important;
     border-radius: 2px !important;
     box-shadow: 0px 0px 1px #777;
-}
 
-.ol-control button:hover {
-    box-shadow: 0px 0px 1px black;
-    cursor: pointer;
+    &:hover {
+        box-shadow: 0px 0px 1px black;
+        cursor: pointer;
+    }
 }
 
 .ol-zoom-in {
@@ -760,6 +770,36 @@ $sizePositioningLineSize: 2px;
         height: $sizePositioningHelperCenter;
         border-radius: calc(#{$sizePositioningHelperCenter} / 2);
         border: $sizePositioningLineSize dashed $colorPositioningHelper;
+    }
+}
+
+.custom-overview {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0.5em;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px 4px 0px 0px;
+
+    .ol-overviewmap {
+        position: static;
+        background: none;
+    }
+
+    .ol-overviewmap:not(.ol-collapsed) button {
+        bottom: 2px !important;
+    }
+
+    .image-name {
+        font-size: 0.8em;
+        padding: 2px 5px;
+        width: 158px;
+        word-wrap: break-word;
+
+        &.hidden {
+            display: none;
+        }
     }
 }
 
