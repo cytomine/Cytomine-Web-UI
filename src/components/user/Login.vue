@@ -1,5 +1,5 @@
 <template>
-    <div class="panel login-panel">
+    <div class="panel">
         <p class="panel-heading">
             <i class="fas fa-user" aria-hidden="true"></i>
             {{$t("login")}}
@@ -44,19 +44,25 @@ export default {
             try {
                 let successMessage = this.$t("notif-success-login");
                 await this.$store.dispatch("login", {username: this.username, password: this.password, rememberMe: this.rememberMe});
-                this.$notify({type: "success", text: successMessage});
+                if(this.$store.state.currentUser.user == null) {
+                    this.$notify({type: "error", text: this.$t("notif-unexpected-error-login")});
+                }
+                else {
+                    this.$notify({type: "success", text: successMessage});
+                }
             }
-            catch(err) {
-                this.$notify({type: "error", text: this.$t("notif-error-login")});
+            catch(error) {
+                this.$notify({type: "error", text: error.response.data.message});
             }
         }
     }
 };
 </script>
 
-<style>
-.login-panel {
-    width: 30%;
+<style scoped>
+.panel {
+    width: 100%;
+    max-width: 500px;
     margin: auto;
     margin-top: 50px;
 }

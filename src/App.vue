@@ -20,7 +20,7 @@
             {{$t("core-cannot-be-reached")}}
         </div>
 
-        <login v-else-if="!authenticated"></login>
+        <login v-else-if="currentUser == null"></login>
 
         <template v-else>
             <cytomine-navbar></cytomine-navbar>
@@ -56,7 +56,6 @@ export default {
     },
     computed: mapState({
         currentUser: state => state.currentUser.user,
-        authenticated: state => state.currentUser.authenticated,
         project: state => state.project.project
     }),
     methods: {

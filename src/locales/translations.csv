@@ -46,7 +46,7 @@ notif-error-keys-not-regenerated,Error during the regeneration of API keys,
 login,Login,Authentification
 remember-me,Remember me,
 notif-success-login,Welcome on Cytomine,Bienvenue sur Cytomine
-notif-error-login,Invalid credentials,Identifiants invalides
+notif-unexpected-error-login,Unexpected error,Une erreur inattendue s'est produite
 annotation-layers,Annotation layers,
 select-layer,Select a layer,
 button-add,Add,

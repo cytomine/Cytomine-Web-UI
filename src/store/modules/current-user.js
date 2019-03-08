@@ -2,35 +2,32 @@ import {Cytomine, User} from "cytomine-client";
 
 export default {
     state: {
-        authenticated: false,
         user: null
     },
 
     mutations: {
-        setAuthenticated(state, authenticated) {
-            state.authenticated = authenticated;
-        },
-
         setUser(state, user) {
-            state.user = user.clone();
+            state.user = user ? user.clone() : null;
         },
         setAdminByNow(state, value) {
             state.user.adminByNow = value;
         },
 
         logout(state) {
-            state.authenticated = false;
             state.user = null;
         }
     },
 
     actions: {
         async fetchUser({commit}) {
+            // need to perform a ping first because if user is not authenticated, fetchCurrent() returns 302 instead of error
             let {authenticated} = await Cytomine.instance.ping();
-            commit("setAuthenticated", authenticated);
             if(authenticated) {
                 let user = await User.fetchCurrent();
                 commit("setUser", user);
+            }
+            else {
+                commit("setUser", null);
             }
         },
 
@@ -54,12 +51,9 @@ export default {
             commit("setAdminByNow", false);
         },
 
-        async login({state, dispatch}, payload) {
+        async login({dispatch}, payload) {
             await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
             await dispatch("fetchUser");
-            if(!state.authenticated) {
-                throw new Error("Invalid credentials");
-            }
         },
 
         async logout({commit}) {
