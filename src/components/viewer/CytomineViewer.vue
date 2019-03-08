@@ -83,6 +83,12 @@ export default {
                 this.loadViewer();
             }
         },
+        viewer() {
+            if(this.viewer == null) {
+                console.log("Viewer closed from external source");
+                this.$router.push(`/project/${this.$route.params.idProject}`);
+            }
+        },
         nbMaps() {
             this.$eventBus.$emit("updateMapSize");
         }
