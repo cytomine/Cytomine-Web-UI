@@ -26,26 +26,10 @@
 
                 <b-dropdown-item custom>
                     <b-field :label="$t('from')" horizontal>
-                        <b-datepicker v-model="startDate" :placeholder="$t('select-date')" :max-date="endDate || new Date()"
-                                    :month-names="moment.months()" :day-names="moment.weekdaysMin()"
-                                    :date-formatter="date => moment(date).format('ll')" size="is-small">
-                            <div class="has-text-centered">
-                                <button class="button is-small is-link" :disabled="startDate == null" @click="startDate = null">
-                                    {{$t("button-clear")}}
-                                </button>
-                            </div>
-                        </b-datepicker>
+                        <cytomine-datepicker v-model="startDate" :maxDate="endDate || new Date()"></cytomine-datepicker>
                     </b-field>
                     <b-field :label="$t('to')" horizontal>
-                        <b-datepicker v-model="endDate" :placeholder="$t('select-date')" :min-date="startDate" :max-date="new Date()"
-                                    :month-names="moment.months()" :day-names="moment.weekdaysMin()"
-                                    :date-formatter="date => moment(date).format('ll')" size="is-small">
-                            <div class="has-text-centered">
-                                <button class="button is-small is-link" :disabled="endDate == null" @click="endDate = null">
-                                    {{$t("button-clear")}}
-                                </button>
-                            </div>
-                        </b-datepicker>
+                        <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()"></cytomine-datepicker>
                     </b-field>
                 </b-dropdown-item>
             </b-dropdown>
@@ -70,10 +54,13 @@ import ProjectActivityCharts from "./activity/ProjectActivityCharts";
 import MembersActivity from "./activity/MembersActivity";
 import ProjectActivityLogs from "./activity/ProjectActivityLogs";
 
+import CytomineDatepicker from "@/components/form/CytomineDatepicker";
+
 const defaultTab = "charts";
 
 export default {
     name: "project-activity",
+    components: {CytomineDatepicker},
     data() {
         return {
             activeTab: defaultTab,

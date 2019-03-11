@@ -198,10 +198,10 @@
 </template>
 
 <script>
-import NumberAnnotationsChart from "./NumberAnnotationsChart.js";
-import AnnotationTermChart from "./AnnotationTermChart.js";
-import AnnotationContributorChart from "./AnnotationContributorChart.js";
-import ActivityOverviewChart from "./ActivityOverviewChart.js";
+import NumberAnnotationsChart from "@/components/charts/NumberAnnotationsChart.js";
+import AnnotationTermChart from "@/components/charts/AnnotationTermChart.js";
+import AnnotationContributorChart from "@/components/charts/AnnotationContributorChart.js";
+import ActivityOverviewChart from "@/components/charts/ActivityOverviewChart.js";
 import OntologyTreeMultiselect from "@/components/ontology/OntologyTreeMultiselect";
 
 import {AnnotationType} from "cytomine-client";

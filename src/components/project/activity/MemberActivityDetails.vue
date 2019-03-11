@@ -91,9 +91,45 @@
 
             <hr>
 
-            <!-- <h2>{{$t("average-connections")}}</h2> TODO
+            <h2>{{$t("connections-chart")}}</h2>
 
-            <hr> -->
+            <div class="columns">
+                <div class="column is-narrow">
+                    <b-field :label="$t('by')" horizontal>
+                        <b-select size="is-small" v-model="period">
+                            <option value="hour">{{$t("hour")}}</option>
+                            <option value="day">{{$t("day")}}</option>
+                            <option value="week">{{$t("week")}}</option>
+                        </b-select>
+                    </b-field>
+                </div>
+                <div class="column is-narrow">
+                    <b-field :label="$t('from')" horizontal>
+                        <cytomine-datepicker v-model="startDate" :resetButton="false" :maxDate="endDate || new Date()">
+                        </cytomine-datepicker>
+                    </b-field>
+                </div>
+                <div class="column is-narrow">
+                    <b-field :label="$t('to')" horizontal>
+                        <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()">
+                        </cytomine-datepicker>
+                    </b-field>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <last-connections-chart css-classes="chart"
+                    :project="project.id"
+                    :user="idUser"
+                    :period="period"
+                    :startDate="startDate.getTime()"
+                    :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null"
+                    :showDates="true"
+                    :revision="chartRevision">
+                </last-connections-chart>
+            </div>
+
+            <hr>
 
             <h2>{{$t("detailed-image-consultations")}}</h2>
 
@@ -160,13 +196,22 @@
 <script>
 import {fullName} from "@/utils/user-utils.js";
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from "cytomine-client";
+
+import CytomineDatepicker from "@/components/form/CytomineDatepicker";
 import ProjectConnectionDetails from "@/components/project/ProjectConnectionDetails";
+import LastConnectionsChart from "@/components/charts/LastConnectionsChart.js";
 
 import constants from "@/utils/constants.js";
 
+import moment from "moment";
+
 export default {
     name: "user-activity",
-    components: {ProjectConnectionDetails},
+    components: {
+        CytomineDatepicker,
+        ProjectConnectionDetails,
+        LastConnectionsChart
+    },
     data() {
         return {
             loading: true,
@@ -180,12 +225,17 @@ export default {
             consultationsPerPage: 10,
 
             lastUpdate: null,
-            timeout: null
+            timeout: null,
+
+            chartRevision: 0,
+            period: "day",
+            startDate: moment().subtract(1, "month").toDate(),
+            endDate: null
         };
     },
     computed: {
         idUser() {
-            return this.$route.params.idUser;
+            return Number(this.$route.params.idUser);
         },
         project() {
             return this.$store.state.project.project;
@@ -199,6 +249,7 @@ export default {
                 this.fetchConnections(),
                 this.fetchConsultations()
             ]);
+            this.chartRevision++;
             this.lastUpdate = new Date();
             clearTimeout(this.timeout);
             this.timeout = setTimeout(this.fetchData, constants.MEMBERS_ACTIVITY_REFRESH_INTERVAL);
@@ -255,10 +306,33 @@ h1 {
 .tag {
     margin-left: 0.5em;
 }
+
+.chart-container {
+    margin-top: 2em;
+    height: 18em;
+    position: relative;
+}
 </style>
 
-<style>
-.user-activity-wrapper .table-wrapper {
-    margin-bottom: 0px;
+<style lang="scss">
+.user-activity-wrapper {
+    .table-wrapper {
+        margin-bottom: 0px;
+    }
+
+    .chart {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .field.is-horizontal {
+        align-items: center;
+    }
+
+    .field-label {
+        margin-right: 1em !important;
+        padding-top: 0px !important;
+    }
 }
 </style>

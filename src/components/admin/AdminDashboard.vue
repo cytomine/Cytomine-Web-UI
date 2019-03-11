@@ -94,22 +94,45 @@
             </div>
         </div>
 
-        <!-- TODO: Connections charts -->
+        <hr>
+        <h2>{{$t("last-connections")}}</h2>
+
+        <div class="is-flex">
+            <strong class="has-margin-right">{{$t("period")}}</strong>
+            <b-select v-model="selectedChartOption">
+                <option v-for="option in chartOptions" :key="option.label" :value="option">
+                    {{option.label}}
+                </option>
+            </b-select>
+        </div>
+
+        <div class="chart-container">
+            <last-connections-chart css-classes="chart"
+                :startDate="selectedChartOption.startDate"
+                :period="selectedChartOption.period">
+            </last-connections-chart>
+        </div>
+
     </template>
 </div>
 </template>
 
 <script>
 import {Cytomine} from "cytomine-client";
+import LastConnectionsChart from "@/components/charts/LastConnectionsChart.js";
+import moment from "moment";
 
 export default {
     name: "admin-dashboard",
+    components: {LastConnectionsChart},
     data() {
         return {
             loading: true,
             currentStats: {},
             totalCounts: {},
             storageStats: {},
+            chartOptions: [],
+            selectedChartOption: null
         };
     },
     methods: {
@@ -124,6 +147,21 @@ export default {
         }
     },
     async created() {
+        let chartOptions = [
+            {interval: "day", period: "hour"},
+            {interval: "week", period: "day"},
+            {interval: "year", period: "week"}
+        ];
+        this.chartOptions = chartOptions.map(option => {
+            let startDate = moment()
+                .add(1, option.period + "s")
+                .subtract(1, option.interval + "s")
+                .startOf(option.period)
+                .valueOf();
+            return {label: this.$t(`last-${option.interval}`), period: option.period, startDate};
+        });
+        this.selectedChartOption = this.chartOptions[0];
+
         try {
             await Promise.all([
                 this.fetchCurrentStats(),
@@ -151,4 +189,27 @@ td:first-child {
     text-align: right;
     padding-right: 1em;
 }
+
+.is-flex {
+    align-items: center;
+}
+
+.has-margin-right {
+    margin-right: 1em;
+}
+
+.chart-container {
+    margin-top: 2em;
+    height: 20em;
+    position: relative;
+}
 </style>
+
+<style>
+.admin-dashboard-wrapper .chart {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+</style>
+

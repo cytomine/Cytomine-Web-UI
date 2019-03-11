@@ -41,15 +41,8 @@
                             {{$t("execution-date")}}
                         </div>
                         <div class="filter-body">
-                            <b-datepicker v-model="selectedDate" :placeholder="$t('all')" :max-date="new Date()"
-                                        :month-names="moment.months()" :day-names="moment.weekdaysMin()"
-                                        :date-formatter="date => moment(date).format('ll')" size="is-small">
-                                <div class="has-text-centered">
-                                    <button class="button is-small is-link" :disabled="selectedDate == null" @click="selectedDate = null">
-                                        {{$t("button-reset")}}
-                                    </button>
-                                </div>
-                            </b-datepicker>
+                            <cytomine-datepicker v-model="selectedDate" :placeholder="$t('all')" :maxDate="new Date()">
+                            </cytomine-datepicker>
                         </div>
                     </div>
 
@@ -123,6 +116,7 @@ import JobStatus from "./JobStatus";
 import JobDetails from "./JobDetails";
 import AddJobModal from "./AddJobModal";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
+import CytomineDatepicker from "@/components/form/CytomineDatepicker";
 import jobStatusLabelMapping from "@/utils/job-utils";
 import moment from "moment";
 
@@ -132,7 +126,8 @@ export default {
         JobStatus,
         JobDetails,
         AddJobModal,
-        CytomineMultiselect
+        CytomineMultiselect,
+        CytomineDatepicker
     },
     data() {
         return {
@@ -157,10 +152,6 @@ export default {
         },
         configUI() {
             return this.$store.state.project.configUI;
-        },
-
-        moment() {
-            return moment;
         },
 
         availableSoftwares() {
