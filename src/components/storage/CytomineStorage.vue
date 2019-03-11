@@ -22,8 +22,8 @@
                     <strong>{{$t('storage')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id"
-                        :allow-empty="false">
+                    <cytomine-multiselect v-model="selectedStorages" :options="storages" label="name" track-by="id"
+                                          :allow-empty="false" :multiple="true">
                     </cytomine-multiselect>
                 </div>
             </div>
@@ -33,7 +33,8 @@
                     <strong>{{$t('link-with-project')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id">
+                    <cytomine-multiselect v-model="selectedProjects" :options="projects" label="name" track-by="id"
+                                          :multiple="true">
                     </cytomine-multiselect>
                 </div>
             </div>
@@ -212,9 +213,9 @@ export default {
             timeoutRefreshSessionUploads: null,
 
             storages: [],
-            selectedStorage: null,
+            selectedStorages: null,
             projects: [],
-            selectedProject: null,
+            selectedProjects: [],
 
             uploadedFiles: [],
             searchString: "",
@@ -254,11 +255,11 @@ export default {
         },
         queryString() {
             let str = `cytomine=${constants.CYTOMINE_CORE_HOST}`;
-            if(this.selectedStorage) {
-                str += `&idStorage=${this.selectedStorage.id}`;
+            if(this.selectedStorages) {
+                str += `&idStorage=${this.selectedStorages.map(storage => storage.id).join(",")}`;
             }
-            if(this.selectedProject) {
-                str += `&idProject=${this.selectedProject.id}`;
+            if(this.selectedProjects) {
+                str += `&idProject=${this.selectedProjects.map(project => project.id).join(",")}`;
             }
             return str;
         },
