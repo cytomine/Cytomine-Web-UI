@@ -44,6 +44,8 @@ import {fullName} from "@/utils/user-utils.js";
 
 import {UserPosition} from "cytomine-client";
 
+import constants from "@/utils/constants.js";
+
 export default {
     name: "follow-panel",
     components: {Username},
@@ -195,7 +197,7 @@ export default {
             });
 
             clearTimeout(this.timeoutTracking);
-            this.timeoutTracking = setTimeout(this.track, 500);
+            this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
         },
 
         async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
@@ -207,7 +209,7 @@ export default {
             this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
 
             clearTimeout(this.timeoutOnlineUsers);
-            this.timeoutOnlineUsers = setTimeout(this.fetchOnline, 10000);
+            this.timeoutOnlineUsers = setTimeout(this.fetchOnline, constants.BROADCASTING_USERS_REFRESH_INTERVAL);
         },
     },
     created() {

@@ -143,8 +143,9 @@
 import {Job, JobStatus, JobDataCollection, Task} from "cytomine-client";
 import filesize from "filesize";
 
-const REFRESH_INTERVAL = 2000;
-const REFRESH_INTERVAL_DELETION_TASK = 1000;
+import constants from "@/utils/constants.js";
+const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
+const REFRESH_INTERVAL_DELETION_TASK = constants.JOB_DELETION_TASK_REFRESH_INTERVAL;
 
 export default {
     name: "job-details",

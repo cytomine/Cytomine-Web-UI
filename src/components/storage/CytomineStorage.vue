@@ -300,7 +300,7 @@ export default {
             this.loading = false;
 
             clearTimeout(this.timeoutRefreshFullList);
-            this.timeoutRefreshFullList = setTimeout(this.fetchUploadedFiles, 10000);
+            this.timeoutRefreshFullList = setTimeout(this.fetchUploadedFiles, constants.STORAGE_REFRESH_INTERVAL);
         },
 
         async refreshStatusSessionUploads() {
@@ -338,7 +338,7 @@ export default {
 
             if(unfinishedConversions) {
                 clearTimeout(this.timeoutRefreshSessionUploads);
-                this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, 2000);
+                this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, constants.ONGOING_UPLOAD_REFRESH_INTERVAL);
             }
         },
 

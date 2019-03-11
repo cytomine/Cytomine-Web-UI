@@ -228,6 +228,8 @@ import {ImageConsultation, Annotation, UserPosition} from "cytomine-client";
 
 import {constLib, operation} from "@/utils/color-manipulation.js";
 
+import constants from "@/utils/constants.js";
+
 export default {
     name: "cytomine-image",
     props: [
@@ -483,7 +485,7 @@ export default {
                 });
 
                 clearTimeout(this.timeoutSavePosition);
-                this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
+                this.timeoutSavePosition = setTimeout(this.savePosition, constants.SAVE_POSITION_IN_IMAGE_INTERVAL);
             }
         }, 500),
 

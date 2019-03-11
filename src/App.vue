@@ -42,7 +42,7 @@ import Login from "./components/user/Login.vue";
 
 import {Cytomine} from "cytomine-client";
 
-const PING_INTERVAL = 20000;
+import constants from "@/utils/constants.js";
 
 export default {
     name: "app",
@@ -69,7 +69,7 @@ export default {
             }
 
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(this.ping, PING_INTERVAL);
+            this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
         }
     },
     async created() {
@@ -81,7 +81,7 @@ export default {
             this.communicationError = true;
         }
         this.loading = false;
-        this.timeout = setTimeout(this.ping, PING_INTERVAL);
+        this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
     }
 };
 </script>
