@@ -147,7 +147,8 @@ export default {
             try {
                 await this.$store.dispatch("logout");
             }
-            catch(err) {
+            catch(error) {
+                console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-logout")});
             }
         }

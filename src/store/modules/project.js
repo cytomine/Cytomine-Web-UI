@@ -86,7 +86,7 @@ export default {
         },
 
         canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
-            let currentUser = rootState.currentUser.user;
+            let currentUser = rootState.currentUser.user || {};
             return currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id);
         },
 
