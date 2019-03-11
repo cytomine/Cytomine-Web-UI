@@ -8,7 +8,9 @@
         </tr>
         <tr>
             <td>{{$t("browser")}}</td>
-            <td>{{connection.browser}} <span v-if="connection.browserVersion">{{connection.browserVersion}}</span></td>
+            <td class="is-capitalized">
+                {{connection.browser}} <span v-if="connection.browserVersion">{{connection.browserVersion}}</span>
+            </td>
         </tr>
         <tr v-if="consultations != null">
             <td>{{$t("image-consultations")}}</td>

@@ -1,6 +1,11 @@
 <template>
-    <div class="box">
-        <h2>{{$t("members-activity")}}</h2>
+    <div class="box" v-if="!loading">
+        <div class="columns">
+            <h2 class="column is-marginless">{{$t("members-activity")}}</h2>
+            <p class="column has-text-right is-size-7 has-text-grey">
+                {{$t("data-last-updated-on", {time: $options.filters.moment(lastUpdate, "LTS")})}}
+            </p>
+        </div>
 
         <div class="columns">
             <div class="column is-one-quarter">
@@ -56,7 +61,7 @@
                 </b-table-column>
 
                 <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-                    <i class="fas fa-cog" :title="$t('manager-icon-label')" v-if="member.role === contributorRole"></i>
+                    <i class="fas fa-cog" :title="$t('manager-icon-label')" v-if="member.role === managerRole"></i>
                 </b-table-column>
 
                 <b-table-column field="email" :label="$t('email')" sortable width="200">
@@ -123,9 +128,10 @@
 </template>
 
 <script>
-// TODO: refresh interval (+ display last update date)
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import Username from "@/components/user/Username";
+
+import constants from "@/utils/constants.js";
 
 export default {
     name: "members-activity",
@@ -135,6 +141,8 @@ export default {
     },
     data() {
         return {
+            loading: true,
+
             searchString: "",
             filtersOpened: false,
             perPage: 25,
@@ -150,6 +158,9 @@ export default {
             offlineStatus: this.$t("offline"),
             availableStatus: [],
             selectedStatus: [],
+
+            lastUpdate: null,
+            timeout: null
         };
     },
     computed: {
@@ -175,6 +186,15 @@ export default {
         }
     },
     methods: {
+        async fetchData() {
+            await Promise.all([
+                this.fetchMembers(),
+                this.fetchOnlines()
+            ]);
+            this.lastUpdate = new Date();
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(this.fetchData, constants.MEMBERS_ACTIVITY_REFRESH_INTERVAL);
+        },
         async fetchMembers() {
             let members = (await this.project.fetchUsersActivity()).array;
             members.forEach(member => {
@@ -194,13 +214,13 @@ export default {
 
         this.availableStatus = [this.onlineStatus, this.offlineStatus];
         this.selectedStatus = this.availableStatus;
-
-        await Promise.all([
-            this.fetchMembers(),
-            this.fetchOnlines()
-        ]);
-
+    },
+    async activated() {
+        await this.fetchData();
         this.loading = false;
+    },
+    deactivated() {
+        clearTimeout(this.timeout);
     }
 };
 </script>

@@ -640,3 +640,5 @@ reviewed-annotations-info-message,"Annotations validated during the review proce
 number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,
 annotations-vs-terms-chart-info-message,"This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period and taken into account.",
 annotations-vs-contributors-chart-info-message,"This chart presents the number of annotation created by each project member during the selected period",
+data-last-updated-on,Data refreshed at {time},
+ongoing,Ongoing,

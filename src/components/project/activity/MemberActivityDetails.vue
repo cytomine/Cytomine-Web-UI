@@ -11,6 +11,10 @@
         </nav>
 
         <div class="box">
+            <p class="last-update is-size-7 has-text-grey">
+                {{$t("data-last-updated-on", {time: $options.filters.moment(lastUpdate, "LTS")})}}
+            </p>
+
             <h1>{{$t("activity-of-user", {username: user.fullName})}}</h1>
 
             <div class="level">
@@ -49,6 +53,7 @@
 
                     <b-table-column :label="$t('duration')" field="time" sortable>
                         {{ connection.time | duration("humanize") }}
+                        <span class="tag is-success" v-if="connection.online">{{$t("ongoing")}}</span>
                     </b-table-column>
 
                     <b-table-column :label="$t('number-viewed-images')" field="countViewedImages" centered sortable>
@@ -153,10 +158,11 @@
 </template>
 
 <script>
-// TODO: refresh interval (+ display last update date)
 import {fullName} from "@/utils/user-utils.js";
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from "cytomine-client";
 import ProjectConnectionDetails from "@/components/project/ProjectConnectionDetails";
+
+import constants from "@/utils/constants.js";
 
 export default {
     name: "user-activity",
@@ -171,7 +177,10 @@ export default {
             connectionsPerPage: 10,
 
             consultations: null,
-            consultationsPerPage: 10
+            consultationsPerPage: 10,
+
+            lastUpdate: null,
+            timeout: null
         };
     },
     computed: {
@@ -183,6 +192,17 @@ export default {
         }
     },
     methods: {
+        async fetchData() {
+            await Promise.all([
+                this.fetchUser(),
+                this.fetchResumeActivity(),
+                this.fetchConnections(),
+                this.fetchConsultations()
+            ]);
+            this.lastUpdate = new Date();
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(this.fetchData, constants.MEMBERS_ACTIVITY_REFRESH_INTERVAL);
+        },
         async fetchUser() {
             await this.user.fetch();
             this.user.fullName = fullName(this.user);
@@ -199,13 +219,11 @@ export default {
     },
     async created() {
         this.user = new User({id: this.idUser});
-        await Promise.all([
-            this.fetchUser(),
-            this.fetchResumeActivity(),
-            this.fetchConnections(),
-            this.fetchConsultations()
-        ]);
+        await this.fetchData();
         this.loading = false;
+    },
+    destroyed() {
+        clearTimeout(this.timeout);
     }
 };
 </script>
@@ -222,6 +240,20 @@ h1 {
 .image-overview {
     max-height: 45px;
     max-width: 128px;
+}
+
+.box {
+    position: relative;
+}
+
+.last-update {
+    position: absolute;
+    top: 1.5em;
+    right: 2em;
+}
+
+.tag {
+    margin-left: 0.5em;
 }
 </style>
 
