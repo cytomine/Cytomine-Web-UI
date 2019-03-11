@@ -74,7 +74,7 @@
             <tr v-if="isPropDisplayed('format')">
                 <td class="prop-label">{{$t("format")}}</td>
                 <td class="prop-content format">
-                    {{image.extension}}
+                    {{image.contentType}}
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('vendor')">
@@ -86,10 +86,42 @@
                     <template v-else>{{$t("unknown")}}</template>
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('size')">
-                <td class="prop-label">{{$t("image-size")}}</td>
+            <tr v-if="isPropDisplayed('width')">
+                <td class="prop-label">{{$t("image-width")}}</td>
                 <td class="prop-content">
-                    {{`${image.width} x ${image.height} ${$t("pixels")}`}}
+                    {{image.width}} {{$t("pixels")}}
+                    <template v-if="image.physicalSizeX">({{(image.width * image.physicalSizeX).toFixed(3)}} {{$t("um")}})</template>
+                </td>
+            </tr>
+            <tr v-if="isPropDisplayed('height')">
+                <td class="prop-label">{{$t("image-height")}}</td>
+                <td class="prop-content">
+                    {{image.height}} {{$t("pixels")}}
+                    <template v-if="image.physicalSizeY">({{(image.height * image.physicalSizeY).toFixed(3)}} {{$t("um")}})</template>
+                </td>
+            </tr>
+            <tr v-if="isPropDisplayed('depth')">
+                <td class="prop-label">{{$t("image-depth")}}</td>
+                <td class="prop-content">
+                    {{$tc("count-slices", image.depth, {count: image.depth})}}
+                    <template v-if="image.physicalSizeZ && image.depth > 0">
+                        {{(image.depth * image.physicalSizeZ).toFixed(3)}} {{$t("um")}})
+                    </template>
+                </td>
+            </tr>
+            <tr v-if="isPropDisplayed('time')">
+                <td class="prop-label">{{$t("image-time")}}</td>
+                <td class="prop-content">
+                    {{$tc("count-frames", image.time, {count: image.time})}}
+                    <template v-if="image.fps && image.time > 0">
+                        ({{(image.time * image.fps).toFixed(3)}} {{$t("seconds")}})
+                    </template>
+                </td>
+            </tr>
+            <tr v-if="isPropDisplayed('channels')">
+                <td class="prop-label">{{$t("image-channels")}}</td>
+                <td class="prop-content">
+                    {{$tc("count-bands", image.channels, {count: image.channels})}}
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('resolution')">
@@ -103,6 +135,14 @@
                 <td class="prop-label">{{$t("magnification")}}</td>
                 <td class="prop-content">
                     <template v-if="image.magnification">{{image.magnification}}</template>
+                    <template v-else>{{$t("unknown")}}</template>
+                </td>
+            </tr>
+            <tr v-if="isPropDisplayed('fps')">
+                <td class="prop-label">{{$t("frame-rate")}}</td>
+                <td class="prop-content">
+                    <template v-if="image.fps">{{image.fps.toFixed(3)}} {{$t("frame-per-second")}}</template>
+                    <template v-else-if="image.time < 2">-</template>
                     <template v-else>{{$t("unknown")}}</template>
                 </td>
             </tr>
