@@ -84,7 +84,7 @@ export default {
     },
     methods: {
         findRoot() {
-            this.rootId = this.file.parentId || this.file.id;
+            this.rootId = this.file.parent || this.file.id;
         },
         async makeTree() {
             try {
@@ -96,7 +96,7 @@ export default {
             }
         },
         createNodes(idParent) {
-            let directChildren = this.uploadedFiles.filter(file => file.parentId == idParent);
+            let directChildren = this.uploadedFiles.filter(file => file.parent == idParent);
             return directChildren.map(file => {
                 let children = this.createNodes(file.id);
                 return {
