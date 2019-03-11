@@ -138,16 +138,16 @@
                             {{ uFile.originalFilename }}
                         </b-table-column>
 
+                        <b-table-column field="contentType" :label="$t('content-type')" sortable width="100">
+                            {{ uFile.contentType }}
+                        </b-table-column>
+
                         <b-table-column field="created" :label="$t('created')" sortable width="150">
                             {{ Number(uFile.created) | moment("lll") }}
                         </b-table-column>
 
                         <b-table-column field="size" :label="$t('size')" sortable width="80">
                             {{ filesize(uFile.size) }}
-                        </b-table-column>
-
-                        <b-table-column field="contentType" :label="$t('content-type')" sortable width="100">
-                            {{ uFile.contentType }}
                         </b-table-column>
 
                         <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">
@@ -158,9 +158,9 @@
                             <uploaded-file-status :file="uFile"></uploaded-file-status>
                         </b-table-column>
 
-                        <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
-                            {{ uFile.parentFilename ? uFile.parentFilename : "-" }}
-                        </b-table-column>
+                        <!--<b-table-column field="parentFilename" :label="$t('from')" sortable width="150">-->
+                            <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
+                        <!--</b-table-column>-->
                     </template>
 
                     <template slot="detail" slot-scope="{row: uFile}">
@@ -189,7 +189,7 @@
 </template>
 
 <script>
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFile, UploadedFileStatus} from "cytomine-client";
+import {Cytomine, StorageCollection, ProjectCollection, UploadedFile, UploadedFileStatus, UploadedFileCollection} from "cytomine-client";
 import axios from "axios";
 import filesize from "filesize";
 import constants from "@/utils/constants.js";
@@ -288,14 +288,15 @@ export default {
     methods: {
         async fetchStorages() {
             this.storages = (await StorageCollection.fetchAll()).array;
-            this.selectedStorage = this.storages.find(storage => storage.user == this.currentUser.id);
+            this.selectedStorages = [this.storages.find(storage => storage.user === this.currentUser.id)];
         },
         async fetchProjects() {
             this.projects = (await ProjectCollection.fetchAll()).array;
         },
         async fetchUploadedFiles() {
-            let {data} = await Cytomine.instance.api.get("uploadedfile.json?datatables=true&length=0"); // TODO: change in core
-            this.uploadedFiles = data.aaData;
+            this.uploadedFiles = (await UploadedFileCollection.fetchAll({
+                onlyRootsWithDetails: true
+            })).array;
 
             this.loading = false;
 
