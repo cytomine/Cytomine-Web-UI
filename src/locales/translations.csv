@@ -23,7 +23,7 @@ user-annotations,Manual Annotations,Annotations manuelles
 analysis-annotations,Analysis Annotations,Annotations d'analyse
 reviewed-annotations,Reviewed Annotations,Annotations revues
 profile,Profile,Profil
-username,User name,Nom d'utilisateur
+username,Username,Nom d'utilisateur
 firstname,First name,Prénom
 lastname,Last name,Nom
 email,Email address,Adresse mail
@@ -660,3 +660,13 @@ notif-success-user-creation,User successfully created,
 notif-error-user-creation,Failed to create the user,
 notif-success-user-update,User successfully updated,
 notif-error-user-update,Failed to update the user,
+button-login,Login,
+button-get-username,Get username,
+forgot-username,Forgot username,
+forgot-password,Forgot password,
+button-reset-password,Reset password,
+notif-success-forgot-username,A mail containing your username was sent to your email address,
+notif-error-forgot-username,Failed to send an email to the provided email address,
+notif-success-forgot-password,A mail containing a connection link was sent to your email address,
+notif-error-forgot-password,Failed to send an email allowing to reset the password,
+forgot-credentials,Forgot your {username} or your {password}?,

@@ -46,6 +46,10 @@ $loadingColor: #bbb;
 .panel-block {
     background: #fff;
     display: block;
+
+    &:last-of-type {
+        border-radius: 0px 0px 8px 8px;
+    }
 }
 
 /* Modal */
