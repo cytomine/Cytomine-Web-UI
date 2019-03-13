@@ -128,7 +128,7 @@ export default {
         async openAdminSession() {
             try {
                 await this.$store.dispatch("openAdminSession");
-                this.$router.go();
+                this.$router.push("/admin");
             }
             catch(error) {
                 console.log(error);
@@ -137,7 +137,7 @@ export default {
         async closeAdminSession() {
             try {
                 await this.$store.dispatch("closeAdminSession");
-                this.$router.go();
+                this.$router.push("/");
             }
             catch(error) {
                 console.log(error);
