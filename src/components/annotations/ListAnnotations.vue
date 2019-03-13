@@ -173,7 +173,7 @@ export default {
             nbPerPage: 25,
 
             userAnnotationOption: this.$t("user-annotations"),
-            jobAnnotationOption: this.$t("job-annotations"),
+            jobAnnotationOption: this.$t("analysis-annotations"),
             annotationTypes: [],
             selectedAnnotationType : "",
 
