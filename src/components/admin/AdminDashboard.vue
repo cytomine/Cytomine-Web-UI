@@ -146,7 +146,7 @@ export default {
             this.storageStats = await Cytomine.instance.fetchStorageStats();
         }
     },
-    async created() {
+    created() {
         let chartOptions = [
             {interval: "day", period: "hour"},
             {interval: "week", period: "day"},
@@ -161,7 +161,8 @@ export default {
             return {label: this.$t(`last-${option.interval}`), period: option.period, startDate};
         });
         this.selectedChartOption = this.chartOptions[0];
-
+    },
+    async activated() {
         try {
             await Promise.all([
                 this.fetchCurrentStats(),

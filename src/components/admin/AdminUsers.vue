@@ -6,8 +6,8 @@
         </div>
 
         <div class="column is-one-half has-text-right-desktop">
-            <button class="button is-link" @click="addUserModal = true">
-                {{$t('button-new-user')}} <!-- TODO -->
+            <button class="button is-link" @click="startUserCreation()">
+                {{$t('button-new-user')}}
             </button>
         </div>
     </div>
@@ -49,8 +49,8 @@
 
             <b-table-column label="" width="75">
                 <div class="buttons">
-                    <button class="button is-link is-small">
-                        {{$t("button-edit")}} <!-- TODO -->
+                    <button class="button is-link is-small" @click="startUserEdition(user)">
+                        {{$t("button-edit")}}
                     </button>
                     <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
                         {{$t("button-lock")}}
@@ -77,14 +77,20 @@
             </b-select>
         </template>
     </b-table>
+
+    <user-modal :active.sync="modal" :user="editedUser" :roles="roles"
+        @addUser="addUser" @updateUser="updateUser">
+    </user-modal>
 </div>
 </template>
 
 <script>
 import {UserCollection} from "cytomine-client";
+import UserModal from "./UserModal";
 
 export default {
     name: "admin-users",
+    components: {UserModal},
     data() {
         return {
             users: [],
@@ -96,7 +102,9 @@ export default {
                 "ROLE_USER": {label: this.$t("user"), index: 1, class: "is-link"},
                 "ROLE_ADMIN": {label: this.$t("admin"), index: 2, class: "is-success"},
                 "ROLE_SUPER_ADMIN": {label: this.$t("super-admin"), index: 3, class: "is-success"},
-            }
+            },
+            modal: false,
+            editedUser: null
         };
     },
     computed: {
@@ -112,6 +120,10 @@ export default {
         }
     },
     methods: {
+        formatUser(user) {
+            user.name = `${user.firstname} ${user.lastname}`;
+            user.roleObject = this.roles[user.role];
+        },
         async lock(user) {
             try {
                 await user.lock();
@@ -129,14 +141,27 @@ export default {
                 console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-user-unlock")});
             }
+        },
+        startUserCreation() {
+            this.editedUser = null;
+            this.modal = true;
+        },
+        addUser(user) {
+            this.formatUser(user);
+            this.users.push(user);
+        },
+        startUserEdition(user) {
+            this.editedUser = user;
+            this.modal = true;
+        },
+        updateUser(user) {
+            this.formatUser(user);
+            this.editedUser.populate(user);
         }
     },
     async created() {
         let users = (await UserCollection.fetchAll({withRoles: true})).array;
-        users.forEach(user => {
-            user.name = `${user.firstname} ${user.lastname}`;
-            user.roleObject = this.roles[user.role];
-        });
+        users.forEach(user => this.formatUser(user));
         this.users = users;
     }
 };
