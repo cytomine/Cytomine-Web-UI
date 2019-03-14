@@ -92,7 +92,7 @@ export default {
             }
             catch(error) {
                 console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-add-viewer-image")})
+                this.$notify({type: "error", text: this.$t("notif-error-add-viewer-image")});
             }
         },
 
@@ -102,7 +102,6 @@ export default {
     },
     async created() {
         try {
-            nop
             this.images = (await ImageInstanceCollection.fetchAll({
                 filterKey: "project",
                 filterValue: this.project.id

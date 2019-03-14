@@ -199,7 +199,7 @@ export default {
             }
             catch(error) {
                 console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-tracked-user-position")})
+                this.$notify({type: "error", text: this.$t("notif-error-tracked-user-position")});
             }
 
             clearTimeout(this.timeoutTracking);
