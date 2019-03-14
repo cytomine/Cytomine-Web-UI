@@ -276,7 +276,7 @@ export default {
     },
     watch: {
         async queryString() {
-            this.signatureDate = new Date().toString();
+            this.signatureDate = new Date().toISOString();
             this.signature = await Cytomine.instance.fetchSignature({
                 uri: this.uri,
                 queryString: this.queryString,
