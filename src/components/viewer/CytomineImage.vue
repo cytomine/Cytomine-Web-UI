@@ -469,20 +469,27 @@ export default {
         savePosition: _.debounce(async function() {
             if(this.$refs.view) {
                 let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
-                await UserPosition.create({
-                    image: this.image.id,
-                    zoom: this.zoom,
-                    rotation: this.rotation,
-                    bottomLeftX: Math.round(extent[0]),
-                    bottomLeftY: Math.round(extent[1]),
-                    bottomRightX: Math.round(extent[2]),
-                    bottomRightY: Math.round(extent[1]),
-                    topLeftX: Math.round(extent[0]),
-                    topLeftY: Math.round(extent[3]),
-                    topRightX: Math.round(extent[2]),
-                    topRightY: Math.round(extent[3]),
-                    // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
-                });
+
+                try {
+                    await UserPosition.create({
+                        image: this.image.id,
+                        zoom: this.zoom,
+                        rotation: this.rotation,
+                        bottomLeftX: Math.round(extent[0]),
+                        bottomLeftY: Math.round(extent[1]),
+                        bottomRightX: Math.round(extent[2]),
+                        bottomRightY: Math.round(extent[1]),
+                        topLeftX: Math.round(extent[0]),
+                        topLeftY: Math.round(extent[3]),
+                        topRightX: Math.round(extent[2]),
+                        topRightY: Math.round(extent[3]),
+                        // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
+                    });
+                }
+                catch(error) {
+                    console.log(error);
+                    this.$notify({type: "error", text: this.$t("notif-error-save-user-position")});
+                }
 
                 clearTimeout(this.timeoutSavePosition);
                 this.timeoutSavePosition = setTimeout(this.savePosition, constants.SAVE_POSITION_IN_IMAGE_INTERVAL);

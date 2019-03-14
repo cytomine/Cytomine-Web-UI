@@ -8,51 +8,57 @@
             <section class="modal-card-body">
                 <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
                 <template v-if="!loading">
-                    <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                    <b-message v-if="images == null" type="is-danger" has-icon icon-size="is-small">
+                        <h2> {{ $t("error") }} </h2>
+                        <p> {{ $t("unexpected-error-info-message") }} </p>
+                    </b-message>
+                    <template v-else>
+                        <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
+                        type="search" icon="search"></b-input>
 
-                    <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
-                    pagination-size="is-small">
+                        <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
+                        pagination-size="is-small">
 
-                        <template slot-scope="{row: image}">
-                            <b-table-column :label="$t('overview')">
-                                <img :src="image.preview" :alt="image.originalFilename" class="image-overview">
-                            </b-table-column>
+                            <template slot-scope="{row: image}">
+                                <b-table-column :label="$t('overview')">
+                                    <img :src="image.preview" :alt="image.originalFilename" class="image-overview">
+                                </b-table-column>
 
-                            <b-table-column field="originalFilename" :label="$t('name')" sortable>
-                                {{ image.originalFilename }}
-                            </b-table-column>
+                                <b-table-column field="originalFilename" :label="$t('name')" sortable>
+                                    {{ image.originalFilename }}
+                                </b-table-column>
 
-                            <b-table-column field="created" :label="$t('created-on')" sortable>
-                                {{ Number(image.created) | moment("ll LT") }}
-                            </b-table-column>
+                                <b-table-column field="created" :label="$t('created-on')" sortable>
+                                    {{ Number(image.created) | moment("ll LT") }}
+                                </b-table-column>
 
-                            <b-table-column label=" " centered>
-                                <button v-if="!image.inProject" class="button is-small is-link" @click="addImage(image)">
-                                    {{$t("button-add")}}
-                                </button>
-                                <span v-else>
-                                    {{$t("already-in-project")}}
-                                </span>
-                            </b-table-column>
-                        </template>
+                                <b-table-column label=" " centered>
+                                    <button v-if="!image.inProject" class="button is-small is-link" @click="addImage(image)">
+                                        {{$t("button-add")}}
+                                    </button>
+                                    <span v-else>
+                                        {{$t("already-in-project")}}
+                                    </span>
+                                </b-table-column>
+                            </template>
 
-                        <template slot="empty">
-                            <div class="content has-text-grey has-text-centered">
-                                <p>{{$t("no-image")}}</p>
-                            </div>
-                        </template>
+                            <template slot="empty">
+                                <div class="content has-text-grey has-text-centered">
+                                    <p>{{$t("no-image")}}</p>
+                                </div>
+                            </template>
 
-                        <template slot="bottom-left">
-                            <b-select v-model="perPage" size="is-small">
-                                <option value="10">10 {{$t("per-page")}}</option>
-                                <option value="25">25 {{$t("per-page")}}</option>
-                                <option value="50">50 {{$t("per-page")}}</option>
-                                <option value="100">100 {{$t("per-page")}}</option>
-                            </b-select>
-                        </template>
+                            <template slot="bottom-left">
+                                <b-select v-model="perPage" size="is-small">
+                                    <option value="10">10 {{$t("per-page")}}</option>
+                                    <option value="25">25 {{$t("per-page")}}</option>
+                                    <option value="50">50 {{$t("per-page")}}</option>
+                                    <option value="100">100 {{$t("per-page")}}</option>
+                                </b-select>
+                            </template>
 
-                    </b-table>
+                        </b-table>
+                    </template>
                 </template>
             </section>
             <footer class="modal-card-foot">
@@ -115,7 +121,12 @@ export default {
         }
     },
     async created() {
-        this.images = (await AbstractImageCollection.fetchAll({project: this.project.id})).array;
+        try {
+            this.images = (await AbstractImageCollection.fetchAll({project: this.project.id})).array;
+        }
+        catch(error) {
+            console.log(error);
+        }
         this.loading = false;
     }
 };

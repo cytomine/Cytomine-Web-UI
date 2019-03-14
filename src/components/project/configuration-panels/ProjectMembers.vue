@@ -1,7 +1,11 @@
 <template>
 <div class="list-members-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else-if="!loading">
         <div class="columns">
             <div class="column is-one-quarter">
                 <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
@@ -29,11 +33,11 @@
         </div>
 
         <b-table :data="filteredMembers"
-                 class="table-members"
-                 default-sort="username"
-                 :paginated="true"
-                 :per-page="perPage"
-                 pagination-size="is-small">
+                class="table-members"
+                default-sort="username"
+                :paginated="true"
+                :per-page="perPage"
+                pagination-size="is-small">
 
             <template slot-scope="{column}" slot="header">
                 <template v-if="column.label == 'SELECTOR'">
@@ -128,10 +132,9 @@
                 {{$t('project-representative')}}
             </p>
         </div>
+        
+        <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()"></add-member-modal>
     </template>
-
-    <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()">
-    </add-member-modal>
 </div>
 </template>
 
@@ -150,6 +153,8 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
+
             addMemberModal: false,
 
             perPage: 25,
@@ -331,8 +336,15 @@ export default {
         },
 
         async refreshMembers() {
-            await this.$store.dispatch("fetchProjectMembers");
-            this.formatMembers();
+            try {
+                await this.$store.dispatch("fetchProjectMembers");
+                await this.fetchRepresentatives();
+                this.formatMembers();
+            }
+            catch(error) {
+                console.log(error);
+                this.error = true;
+            }
         }
 
     },

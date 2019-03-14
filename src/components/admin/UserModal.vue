@@ -55,7 +55,7 @@ export default {
     data() {
         return {
             internalUser: {},
-            rolesWithIds: [],
+            rolesWithIds: null,
             selectedRole: defaultRole,
             displayErrors: false
         };
@@ -78,6 +78,11 @@ export default {
     watch: {
         active(val) {
             if(val) {
+                if(this.rolesWithIds == null) {
+                    this.$notify({type: "error", text: this.$t("notif-unexpected-error")});
+                    this.$emit("update:active", false);
+                    return;
+                }
                 this.internalUser = this.user ? this.user.clone() : new User();
                 this.selectedRole = this.user ? this.user.role : defaultRole;
                 this.displayErrors = false;
@@ -134,7 +139,12 @@ export default {
         },
     },
     async created() {
-        this.rolesWithIds = (await RoleCollection.fetchAll()).array;
+        try {
+            this.rolesWithIds = (await RoleCollection.fetchAll()).array;
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 };
 </script>

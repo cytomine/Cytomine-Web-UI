@@ -1,5 +1,9 @@
 <template>
-<div class="advanced-search-results">
+<div class="box error" v-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
+<div v-else class="advanced-search-results">
     <div class="panel">
         <p class="panel-heading">
             {{$t("advanced-search")}}
@@ -16,7 +20,7 @@
             </a>
         </p>
         <div class="panel-block">
-            <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
+            <b-loading :is-full-page="false" :active="loading"></b-loading>
 
             <b-table v-show="activeTab == 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'projects'">
@@ -84,7 +88,9 @@ export default {
     name: "advanced-search",
     data() {
         return {
-            isLoading: false,
+            loading: true,
+            error: false,
+
             searchString: "",
             projects: [],
             images: [],
@@ -118,17 +124,32 @@ export default {
             }
         }
     },
+    methods: {
+        async fetchImages() {
+            this.images = await ImageInstanceCollection.fetchAllLight();
+        },
+        async fetchProjects() {
+            this.projects = (await new ProjectCollection({
+                light: true,
+                filterKey: "user",
+                filterValue: this.currentUser.id
+            }).fetchAll()).array;
+        }
+    },
     async created() {
-        this.isLoading = true;
         this.searchString = this.pathSearchString || "";
-        let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-        this.projects = (await new ProjectCollection({
-            light: true,
-            filterKey: "user",
-            filterValue: this.currentUser.id
-        }).fetchAll()).array;
-        this.images = await imagesPromise;
-        this.isLoading = false;
+        try {
+            await Promise.all([
+                this.fetchImages(),
+                this.fetchProjects()
+            ]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+
+        this.loading = false;
     }
 };
 </script>

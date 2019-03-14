@@ -3,39 +3,50 @@
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <template v-if="!loading">
         <h2>{{$t("currently")}}</h2>
-        <div class="level">
-            <div class="level-item has-text-centered">
-                <div>
-                <p class="heading">{{$t("online-users")}}</p>
-                <p class="title">{{currentStats.users}}</p>
+        <b-message v-if="!currentStats" type="is-danger" has-icon icon-size="is-small">
+            {{$t("failed-fetch-current-stats")}}
+        </b-message>
+        <template v-else>
+            <div class="level">
+                <div class="level-item has-text-centered">
+                    <div>
+                    <p class="heading">{{$t("online-users")}}</p>
+                    <p class="title">{{currentStats.users}}</p>
+                    </div>
+                </div>
+                <div class="level-item has-text-centered">
+                    <div>
+                    <p class="heading">{{$t("active-projects")}}</p>
+                    <p class="title">{{currentStats.projects}}</p>
+                    </div>
+                </div>
+                <div class="level-item has-text-centered">
+                    <div>
+                    <p class="heading">{{$t("used-storage-space")}}</p>
+                    <p class="title">
+                        <template v-if="storageStats">{{Math.round(storageStats.usedP * 100)}}%</template>
+                        <template v-else>?</template>
+                    </p>
+                    </div>
                 </div>
             </div>
-            <div class="level-item has-text-centered">
-                <div>
-                <p class="heading">{{$t("active-projects")}}</p>
-                <p class="title">{{currentStats.projects}}</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                <p class="heading">{{$t("used-storage-space")}}</p>
-                <p class="title">{{Math.round(storageStats.usedP * 100)}}%</p>
-                </div>
-            </div>
-        </div>
 
-        <p v-if="currentStats.mostActiveProject">
-            <strong>{{$t("most-active-project")}}</strong>:
-            <router-link :to="`/project/${currentStats.mostActiveProject.project.id}`">
-                {{currentStats.mostActiveProject.project.name}}
-            </router-link>
-            ({{$tc("count-active-users", currentStats.mostActiveProject.users, {count: currentStats.mostActiveProject.project})}})
-        </p>
+            <p v-if="currentStats.mostActiveProject">
+                <strong>{{$t("most-active-project")}}</strong>:
+                <router-link :to="`/project/${currentStats.mostActiveProject.project.id}`">
+                    {{currentStats.mostActiveProject.project.name}}
+                </router-link>
+                ({{$tc("count-active-users", currentStats.mostActiveProject.users, {count: currentStats.mostActiveProject.project})}})
+            </p>
+        </template>
 
         <hr>
 
         <h2>{{$t("total")}}</h2>
-        <div class="columns">
+        <b-message v-if="!totalCounts" type="is-danger" has-icon icon-size="is-small">
+            {{$t("failed-fetch-total-counts")}}
+        </b-message>
+        <div v-else class="columns">
             <div class="column">
                 <table class="table is-fullwidth">
                     <tbody>
@@ -128,21 +139,24 @@ export default {
     data() {
         return {
             loading: true,
-            currentStats: {},
-            totalCounts: {},
-            storageStats: {},
+            currentStats: null,
+            totalCounts: null,
+            storageStats: null,
             chartOptions: [],
             selectedChartOption: null
         };
     },
     methods: {
         async fetchCurrentStats() {
+            this.currentStats = null; // reset to null so that we know if an error occurred (if so, variable remains null)
             this.currentStats = await Cytomine.instance.fetchCurrentStats();
         },
         async fetchTotalCounts() {
+            this.totalCounts = null;
             this.totalCounts = await Cytomine.instance.fetchTotalCounts();
         },
         async fetchStorageStats() {
+            this.storageStats = null;
             this.storageStats = await Cytomine.instance.fetchStorageStats();
         }
     },
@@ -163,17 +177,12 @@ export default {
         this.selectedChartOption = this.chartOptions[0];
     },
     async activated() {
-        try {
-            await Promise.all([
-                this.fetchCurrentStats(),
-                this.fetchTotalCounts(),
-                this.fetchStorageStats()
-            ]);
-        }
-        catch(error) {
-            console.log(error);
-            this.error = true;
-        }
+        this.loading = true;
+        await Promise.all([
+            this.fetchCurrentStats(),
+            this.fetchTotalCounts(),
+            this.fetchStorageStats()
+        ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process
         this.loading = false;
     }
 };

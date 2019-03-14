@@ -188,13 +188,19 @@ export default {
                 return;
             }
             // TODO in backend: fetchLastPosition() allowed only if targetted user is broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
-            let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
-            this.view.animate({
-                center: [pos.x, pos.y],
-                zoom: pos.zoom,
-                rotation: pos.rotation,
-                duration: 500
-            });
+            try {
+                let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
+                this.view.animate({
+                    center: [pos.x, pos.y],
+                    zoom: pos.zoom,
+                    rotation: pos.rotation,
+                    duration: 500
+                });
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-tracked-user-position")})
+            }
 
             clearTimeout(this.timeoutTracking);
             this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);

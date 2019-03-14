@@ -1,5 +1,8 @@
 <template>
-<div v-if="!loading" class="ontology-details-wrapper">
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+    {{$t("unexpected-error-info-message")}}
+</b-message>
+<div v-else-if="!loading" class="ontology-details-wrapper">
     <table class="table is-fullwidth">
         <tbody>
             <tr>
@@ -27,7 +30,7 @@
             <tr>
                 <td><strong>{{$t("creator")}}</strong></td>
                 <td>
-                    {{creatorFullname}}
+                    {{creatorFullname || $t("unknown")}}
                 </td>
             </tr>
             <tr>
@@ -86,6 +89,8 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
+
             fullOntology: {},
             creatorFullname: null,
 
@@ -113,9 +118,26 @@ export default {
     },
     methods: {
         async fetchOntology() {
-            this.fullOntology = await Ontology.fetch(this.ontology.id);
-            let creator = await User.fetch(this.fullOntology.user);
-            this.creatorFullname = fullName(creator);
+            this.loading = true;
+            this.error = false;
+
+            try {
+                this.fullOntology = await Ontology.fetch(this.ontology.id);
+            }
+            catch(error) {
+                console.log(error);
+                this.error = true;
+            }
+
+            try {
+                let creator = await User.fetch(this.fullOntology.user);
+                this.creatorFullname = fullName(creator);
+            }
+            catch(error) {
+                console.log(error);
+            }
+
+            this.loading = false;
         },
 
         async rename() {
@@ -150,9 +172,8 @@ export default {
             });
         }
     },
-    async created() {
-        await this.fetchOntology();
-        this.loading = false;
+    created() {
+        this.fetchOntology();
     }
 };
 </script>

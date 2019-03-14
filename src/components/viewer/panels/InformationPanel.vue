@@ -111,7 +111,7 @@ export default {
                     this.isFirstImage = true;
                 }
                 else {
-                    this.$store.dispatch("setImageInstance", {
+                    await this.$store.dispatch("setImageInstance", {
                         idViewer: this.idViewer,
                         index: this.index,
                         image: prev
@@ -131,7 +131,7 @@ export default {
                     this.isLastImage = true;
                 }
                 else {
-                    this.$store.dispatch("setImageInstance", {
+                    await this.$store.dispatch("setImageInstance", {
                         idViewer: this.idViewer,
                         index: this.index,
                         image: next

@@ -37,7 +37,7 @@
                             <p slot="popover">{{$t("project-connections-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{nbProjectVisits}}</strong>
+                    <strong class="metric">{{nbProjectVisits != null ? nbProjectVisits : "?"}}</strong>
                     <strong>{{$t("project-connections")}}</strong>  
                 </div>
             </div>
@@ -49,7 +49,7 @@
                             <p slot="popover">{{$t("image-consultations-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{nbImageConsultations}}</strong>
+                    <strong class="metric">{{nbImageConsultations != null ? nbImageConsultations : "?"}}</strong>
                     <strong>{{$t("image-consultations")}}</strong>    
                 </div>
             </div>
@@ -61,7 +61,7 @@
                             <p slot="popover">{{$t("annotation-actions-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{nbAnnotationActions}}</strong>
+                    <strong class="metric">{{nbAnnotationActions != null ? nbAnnotationActions : "?"}}</strong>
                     <strong>{{$t("annotation-actions")}}</strong>    
                 </div>
             </div>
@@ -78,7 +78,9 @@
                             <p slot="popover">{{$t("manual-annotations-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{ nbAnnotations[annotationTypes.USER] }}</strong>
+                    <strong class="metric">
+                        {{ nbAnnotations[annotationTypes.USER] != null ? nbAnnotations[annotationTypes.USER] : "?" }}
+                    </strong>
                     <strong>{{$t("user-annotations")}}</strong>  
                 </div>
             </div>
@@ -90,7 +92,9 @@
                             <p slot="popover">{{$t("analysis-annotations-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{ nbAnnotations[annotationTypes.ALGO] }}</strong>
+                    <strong class="metric">
+                        {{ nbAnnotations[annotationTypes.ALGO] != null ? nbAnnotations[annotationTypes.ALGO] : "?" }}
+                    </strong>
                     <strong>{{$t("analysis-annotations")}}</strong>
                 </div>
             </div>
@@ -102,7 +106,9 @@
                             <p slot="popover">{{$t("reviewed-annotations-info-message")}}</p>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{ nbAnnotations[annotationTypes.REVIEWED] }}</strong>
+                    <strong class="metric">
+                        {{ nbAnnotations[annotationTypes.REVIEWED] != null ? nbAnnotations[annotationTypes.REVIEWED] : "?" }}
+                    </strong>
                     <strong>{{$t("reviewed-annotations")}}</strong>    
                 </div>
             </div>
@@ -222,13 +228,13 @@ export default {
     data() {
         return {
             loading: true,
-            nbProjectVisits: 0,
-            nbImageConsultations: 0,
-            nbAnnotationActions: 0,
+            nbProjectVisits: null,
+            nbImageConsultations: null,
+            nbAnnotationActions: null,
             nbAnnotations: {
-                [AnnotationType.USER]: 0,
-                [AnnotationType.ALGO]: 0,
-                [AnnotationType.REVIEWED]: 0
+                [AnnotationType.USER]: null,
+                [AnnotationType.ALGO]: null,
+                [AnnotationType.REVIEWED]: null
             },
             selectedTerms: [0],
             nbElemsAnnotationTermChart: 0,
@@ -293,15 +299,19 @@ export default {
     },
     methods: {
         async fetchNbConnections() {
+            this.nbProjectVisits = null;
             this.nbProjectVisits = await this.project.fetchNbConnections(this.queryParams);
         },
         async fetchNbImageConsultations() {
+            this.nbImageConsultations = null;
             this.nbImageConsultations = await this.project.fetchNbImageConsultations(this.queryParams);
         },
         async fetchNbAnnotationActions() {
+            this.nbAnnotationActions = null;
             this.nbAnnotationActions = await this.project.fetchNbAnnotationActions(this.queryParams);
         },
         async fetchNbAnnotations(type) {
+            this.nbAnnotations[type] = null;
             this.nbAnnotations[type] = await this.project.fetchNbAnnotations({annotationType: type, ...this.queryParams});
         },
         async loadData() {
@@ -312,7 +322,7 @@ export default {
                 this.fetchNbAnnotations(AnnotationType.USER),
                 this.fetchNbAnnotations(AnnotationType.ALGO),
                 this.fetchNbAnnotations(AnnotationType.REVIEWED)
-            ]);
+            ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process);
         }
     },
     async created() {

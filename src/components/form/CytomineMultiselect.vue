@@ -16,6 +16,7 @@
     :showPointer="false"
     :placeholder="$t('select-options')"
     :allow-empty="allowEmpty"
+    :disabled="disabled"
 >
 
     <template slot="beforeList" v-if="multiple && options.length > 0 && selectAllAvailable">
@@ -59,7 +60,8 @@ export default {
         multiple: {type: Boolean, default: false},
         selectAllAvailable: {type: Boolean, default: true},
         searchable: {type: Boolean, default: true},
-        allowEmpty: {type: Boolean, default: true}
+        allowEmpty: {type: Boolean, default: true},
+        disabled: {type: Boolean, default: false}
     },
     data() {
         return {

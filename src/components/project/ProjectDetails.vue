@@ -1,7 +1,11 @@
 <template>
-<table class="table">
-    <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
-    <tbody>
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+    <h2> {{ $t("error") }} </h2>
+    <p> {{ $t("unexpected-error-info-message") }} </p>
+</b-message>
+<table v-else class="table">
+    <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
+    <tbody v-if="!loading">
         <tr v-if="isPropDisplayed('name')">
             <td class="prop-label">{{$t("name")}}</td>
             <td class="prop-content">
@@ -137,13 +141,14 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             creator: null,
             managers: [],
             members: [],
             onlines: [],
-            representatives: [],
-
-            isLoading: true
+            representatives: []
         };
     },
     computed: {
@@ -187,15 +192,20 @@ export default {
         }
     },
     async created() {
-        await Promise.all([
-            this.fetchCreator(),
-            this.fetchManagers(),
-            this.fetchRepresentatives(),
-            this.fetchMembers(),
-            this.fetchOnlines()
-        ]);
-
-        this.isLoading = false;
+        try {
+            await Promise.all([
+                this.fetchCreator(),
+                this.fetchManagers(),
+                this.fetchRepresentatives(),
+                this.fetchMembers(),
+                this.fetchOnlines()
+            ]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+        this.loading = false;
     }
 };
 </script>
@@ -204,6 +214,7 @@ export default {
 .table {
     background: none;
     position: relative;
+    height: 3em;
 }
 
 td.prop-label {

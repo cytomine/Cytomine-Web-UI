@@ -213,7 +213,15 @@ export default {
             // TODO: test performances
             // TODO: in core, add method allowing to retrieve only created/updated/deleted annotations since a given
             // timestamp? would probably be more efficient than current approach
-            let arrayAnnots = await this.fetchAnnots(extent);
+            let arrayAnnots;
+            try {
+                arrayAnnots = await this.fetchAnnots(extent);
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-fetch-annotations-viewer")});
+                return;
+            }
 
             if(arrayAnnots.length == 0) {
                 return;

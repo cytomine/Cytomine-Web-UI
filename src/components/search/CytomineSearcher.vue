@@ -1,8 +1,9 @@
 <template>
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
-    <b-field class="no-margin">
+    <b-field class="no-margin" :type="error ? 'is-danger' : null">
         <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
-        icon="search" @click.native="activate()" :loading="isLoading"></b-input>
+            icon="search" @click.native="activate()" :loading="loading" :disabled="error">
+        </b-input>
         <p class="control">
             <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
         </p>
@@ -45,7 +46,8 @@ export default {
     data() {
         return {
             isActive: false,
-            isLoading: false,
+            loading: false,
+            error: false,
             searchString: "",
             projects: [],
             images: [],
@@ -54,7 +56,7 @@ export default {
     },
     computed: {
         displayResults() {
-            return this.isActive && this.searchString.length > 0;
+            return this.isActive && !this.error && this.searchString.length > 0;
         },
         lowCaseSearchString() {
             return this.searchString.toLowerCase();
@@ -87,17 +89,30 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
+        async fetchImages() {
+            this.images = await ImageInstanceCollection.fetchAllLight();
+        },
+        async fetchProjects() {
+            this.projects = (await new ProjectCollection({
+                light: true,
+                filterKey: "user",
+                filterValue: this.currentUser.id
+            }).fetchAll()).array;
+        },
         async activate() {
             if(!this.isActive) {
-                this.isLoading = true;
-                let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-                this.projects = (await new ProjectCollection({
-                    light: true,
-                    filterKey: "user",
-                    filterValue: this.currentUser.id
-                }).fetchAll()).array;
-                this.images = await imagesPromise;
-                this.isLoading = false;
+                try {
+                    this.loading = true;
+                    await Promise.all([
+                        this.fetchImages(),
+                        this.fetchProjects()
+                    ]);
+                }
+                catch(error) {
+                    console.log(error);
+                    this.error = true;
+                }
+                this.loading = false;
                 this.isActive = true;
             }
         },

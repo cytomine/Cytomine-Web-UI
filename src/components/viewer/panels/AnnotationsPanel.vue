@@ -2,48 +2,53 @@
 <template>
 <div class="layers">
     <h1>{{ $t("annotation-layers") }}</h1>
-    <b-field>
-        <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
-            <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
-                {{ layerName(layer) }}
-            </option>
-        </b-select>
-        <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("button-add") }}</button>
-    </b-field>
-    <table class="table layers-table">
-        <thead>
-            <tr>
-                <th class="checkbox-column"><span class="far fa-eye"></span></th>
-                <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
-                <th class="name-column"></th>
-                <th class="checkbox-column"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
-                </td>
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
-                </td>
-
-                <td class="name-column">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else>
+        <b-field>
+            <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
+                <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
                     {{ layerName(layer) }}
-                </td>
-                <td class="checkbox-column">
-                    <button class="button is-small" @click="removeLayer(index)">
-                        <span class="fas fa-times"></span>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </option>
+            </b-select>
+            <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("button-add") }}</button>
+        </b-field>
+        <table class="table layers-table">
+            <thead>
+                <tr>
+                    <th class="checkbox-column"><span class="far fa-eye"></span></th>
+                    <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
+                    <th class="name-column"></th>
+                    <th class="checkbox-column"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
+                    <td class="checkbox-column">
+                        <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
+                    </td>
+                    <td class="checkbox-column">
+                        <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
+                    </td>
 
-    <div class="opacity">
-        <label>{{ $t("layers-opacity") }}</label>
-        <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
-    </div>
+                    <td class="name-column">
+                        {{ layerName(layer) }}
+                    </td>
+                    <td class="checkbox-column">
+                        <button class="button is-small" @click="removeLayer(index)">
+                            <span class="fas fa-times"></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="opacity">
+            <label>{{ $t("layers-opacity") }}</label>
+            <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
+        </div>
+    </template>
 </div>
 </template>
 
@@ -60,6 +65,8 @@ export default {
     ],
     data() {
         return {
+            error: false,
+
             layers: [], // Array<User> (representing user layers)
             indexLayers: [],
             selectedLayer: null
@@ -194,7 +201,16 @@ export default {
         }
     },
     async created() {
-        await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
+        try {
+            await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+            this.$notify({type: "error", text: this.$t("notif-error-loading-annotation-layers")});
+            return;
+        }
+
         if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
             this.addLayerById(this.currentUser.id);
 

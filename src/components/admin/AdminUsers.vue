@@ -1,86 +1,95 @@
 <template>
 <div>
-    <div class="columns">
-        <div class="column is-one-quarter">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
-        </div>
+    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <template v-if="!loading">
+        <b-message v-if="users == null" type="is-danger" has-icon icon-size="is-small">
+            <h2> {{ $t("error") }} </h2>
+            <p> {{ $t("unexpected-error-info-message") }} </p>
+        </b-message>
+        <template v-else>
+            <div class="columns">
+                <div class="column is-one-quarter">
+                    <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+                </div>
 
-        <div class="column is-one-half has-text-right-desktop">
-            <button class="button is-link" @click="startUserCreation()">
-                {{$t('button-new-user')}}
-            </button>
-        </div>
-    </div>
-
-    <b-table :data="filteredUsers" default-sort="username" :paginated="true" :per-page="perPage" pagination-size="is-small">
-
-        <template slot-scope="{row: user}">
-
-            <b-table-column field="username" :label="$t('username')" sortable width="100">
-                {{user.username}}
-            </b-table-column>
-
-            <b-table-column field="name" :label="$t('name')" sortable width="150">
-                {{ user.name }}
-            </b-table-column>
-
-            <b-table-column field="roleObject.index" :label="$t('role')" sortable width="50">
-                <span class="tag" :class="user.roleObject.class">{{user.roleObject.label}}</span>
-            </b-table-column>
-
-            <b-table-column field="email" :label="$t('email')" sortable width="150">
-                <a :href="`mailto:${user.email}`">{{ user.email }}</a>
-            </b-table-column>
-
-            <b-table-column field="LDAP" :label="$t('source')" centered sortable width="50">
-                <span :class="['tag', user.LDAP ? 'is-link' : 'is-grey']">
-                    {{$t(user.LDAP ? "LDAP" : "manual")}}
-                </span>
-            </b-table-column>
-
-            <b-table-column field="created" :label="$t('created')" sortable width="150">
-                {{Number(user.created) | moment("ll LT")}}
-            </b-table-column>
-
-            <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-                <template v-if="user.updated">{{Number(user.updated) | moment("ll LT")}}</template>
-                <template v-else>-</template>
-            </b-table-column>
-
-            <b-table-column label="" width="75">
-                <div class="buttons">
-                    <button class="button is-link is-small" @click="startUserEdition(user)">
-                        {{$t("button-edit")}}
-                    </button>
-                    <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
-                        {{$t("button-lock")}}
-                    </button>
-                    <button v-else class="button is-success is-small" @click="unlock(user)">
-                        {{$t("button-unlock")}}
+                <div class="column is-one-half has-text-right-desktop">
+                    <button class="button is-link" @click="startUserCreation()">
+                        {{$t('button-new-user')}}
                     </button>
                 </div>
-            </b-table-column>
-        </template>
-
-        <template slot="empty">
-            <div class="content has-text-grey has-text-centered">
-                <p>{{$t("no-user-fitting-criteria")}}</p>
             </div>
-        </template>
 
-        <template slot="bottom-left">
-            <b-select v-model="perPage" size="is-small">
-                <option value="10">10 {{$t("per-page")}}</option>
-                <option value="25">25 {{$t("per-page")}}</option>
-                <option value="50">50 {{$t("per-page")}}</option>
-                <option value="100">100 {{$t("per-page")}}</option>
-            </b-select>
-        </template>
-    </b-table>
+            <b-table :data="filteredUsers" default-sort="username" :paginated="true" :per-page="perPage" pagination-size="is-small">
 
-    <user-modal :active.sync="modal" :user="editedUser" :roles="roles"
-        @addUser="addUser" @updateUser="updateUser">
-    </user-modal>
+                <template slot-scope="{row: user}">
+
+                    <b-table-column field="username" :label="$t('username')" sortable width="100">
+                        {{user.username}}
+                    </b-table-column>
+
+                    <b-table-column field="name" :label="$t('name')" sortable width="150">
+                        {{ user.name }}
+                    </b-table-column>
+
+                    <b-table-column field="roleObject.index" :label="$t('role')" sortable width="50">
+                        <span class="tag" :class="user.roleObject.class">{{user.roleObject.label}}</span>
+                    </b-table-column>
+
+                    <b-table-column field="email" :label="$t('email')" sortable width="150">
+                        <a :href="`mailto:${user.email}`">{{ user.email }}</a>
+                    </b-table-column>
+
+                    <b-table-column field="LDAP" :label="$t('source')" centered sortable width="50">
+                        <span :class="['tag', user.LDAP ? 'is-link' : 'is-grey']">
+                            {{$t(user.LDAP ? "LDAP" : "manual")}}
+                        </span>
+                    </b-table-column>
+
+                    <b-table-column field="created" :label="$t('created')" sortable width="150">
+                        {{Number(user.created) | moment("ll LT")}}
+                    </b-table-column>
+
+                    <b-table-column field="updated" :label="$t('updated')" sortable width="150">
+                        <template v-if="user.updated">{{Number(user.updated) | moment("ll LT")}}</template>
+                        <template v-else>-</template>
+                    </b-table-column>
+
+                    <b-table-column label="" width="75">
+                        <div class="buttons">
+                            <button class="button is-link is-small" @click="startUserEdition(user)">
+                                {{$t("button-edit")}}
+                            </button>
+                            <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
+                                {{$t("button-lock")}}
+                            </button>
+                            <button v-else class="button is-success is-small" @click="unlock(user)">
+                                {{$t("button-unlock")}}
+                            </button>
+                        </div>
+                    </b-table-column>
+                </template>
+
+                <template slot="empty">
+                    <div class="content has-text-grey has-text-centered">
+                        <p>{{$t("no-user-fitting-criteria")}}</p>
+                    </div>
+                </template>
+
+                <template slot="bottom-left">
+                    <b-select v-model="perPage" size="is-small">
+                        <option value="10">10 {{$t("per-page")}}</option>
+                        <option value="25">25 {{$t("per-page")}}</option>
+                        <option value="50">50 {{$t("per-page")}}</option>
+                        <option value="100">100 {{$t("per-page")}}</option>
+                    </b-select>
+                </template>
+            </b-table>
+
+            <user-modal :active.sync="modal" :user="editedUser" :roles="roles"
+                @addUser="addUser" @updateUser="updateUser">
+            </user-modal>
+        </template>
+    </template>
 </div>
 </template>
 
@@ -93,7 +102,8 @@ export default {
     components: {UserModal},
     data() {
         return {
-            users: [],
+            loading: true,
+            users: null,
             addUserModal: false,
             searchString: "",
             perPage: 25,
@@ -160,9 +170,15 @@ export default {
         }
     },
     async created() {
-        let users = (await UserCollection.fetchAll({withRoles: true})).array;
-        users.forEach(user => this.formatUser(user));
-        this.users = users;
+        try {
+            let users = (await UserCollection.fetchAll({withRoles: true})).array;
+            users.forEach(user => this.formatUser(user));
+            this.users = users;
+        }
+        catch(error) {
+            console.log(error);
+        }
+        this.loading = false;
     }
 };
 </script>

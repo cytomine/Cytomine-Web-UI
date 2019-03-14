@@ -1,7 +1,11 @@
 <template>
 <div class="project-image-filters-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else-if="!loading">
         <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search">
         </b-input>
 
@@ -52,6 +56,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             searchString: "",
             perPage: 10,
@@ -95,21 +100,28 @@ export default {
         }
     },
     async created() {
-        let promiseFilters = ImageFilterCollection.fetchAll();
-        let promiseFiltersProjects = ImageFilterProjectCollection.fetchAll({
-            filterKey: "project",
-            filterValue: this.project.id
-        });
+        try {
+            let promiseFilters = ImageFilterCollection.fetchAll();
+            let promiseFiltersProjects = ImageFilterProjectCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.project.id
+            });
 
-        let filters = (await promiseFilters).array;
-        let filtersProject = (await promiseFiltersProjects).array;
+            let filters = (await promiseFilters).array;
+            let filtersProject = (await promiseFiltersProjects).array;
 
-        filters.forEach(filter => {
-            filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter == filter.id);
-            filter.selected = filter.imageFilterProject != null;
-        });
+            filters.forEach(filter => {
+                filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter == filter.id);
+                filter.selected = filter.imageFilterProject != null;
+            });
 
-        this.imageFilters = filters;
+            this.imageFilters = filters;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+
         this.loading = false;
     }
 };

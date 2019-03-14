@@ -1,38 +1,44 @@
 <template>
 <div class="tile is-child box last-actions">
-    <h2>{{$t("activity-logs")}}</h2>
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else>
+        <h2>{{$t("activity-logs")}}</h2>
 
-    <b-select v-model="selectedUser">
-        <option :value="null">{{$t("all-users-analyses")}}</option>
-        <optgroup :label="$t('members')">
-            <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
-        </optgroup>
-        <optgroup :label="$t('analyses')">
-            <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
-        </optgroup>
-    </b-select>
+        <b-select v-model="selectedUser">
+            <option :value="null">{{$t("all-users-analyses")}}</option>
+            <optgroup :label="$t('members')">
+                <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
+            </optgroup>
+            <optgroup :label="$t('analyses')">
+                <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
+            </optgroup>
+        </b-select>
 
-    <div class="list-actions" @scroll="scrollHandler" ref="listActions" v-if="actions.length > 0">
-        <div v-for="(month, idx) in formattedActions" :key="idx">
-            <h3>{{month.refDate | moment("MMMM YY")}}</h3>
-            <div v-for="(day, idx) in month.days" :key="idx">
-                <h4>{{day.refDate | moment("ll")}}</h4>
-                <ul>
-                    <li v-for="action in day.actions" :key="action.id">
-                        <strong>{{Number(action.created) | moment("l LTS")}}:</strong> {{action.message}}
-                    </li>
-                </ul>
+        <div class="list-actions" @scroll="scrollHandler" ref="listActions" v-if="actions.length > 0">
+            <div v-for="(month, idx) in formattedActions" :key="idx">
+                <h3>{{month.refDate | moment("MMMM YY")}}</h3>
+                <div v-for="(day, idx) in month.days" :key="idx">
+                    <h4>{{day.refDate | moment("ll")}}</h4>
+                    <ul>
+                        <li v-for="action in day.actions" :key="action.id">
+                            <strong>{{Number(action.created) | moment("l LTS")}}:</strong> {{action.message}}
+                        </li>
+                    </ul>
+                </div>
             </div>
+
+            <button class="button" :class="{'is-loading': loading}" v-if="!loadedAllActions" @click="loadActions()">
+                Load more
+            </button>
         </div>
 
-        <button class="button" :class="{'is-loading': loading}" v-if="!loadedAllActions" @click="loadActions()">
-            Load more
-        </button>
-    </div>
-
-    <div class="no-result" v-else>
-        <em class="has-text-grey">{{$t("no-log-to-display")}}</em>
-    </div>
+        <div class="no-result" v-else>
+            <em class="has-text-grey">{{$t("no-log-to-display")}}</em>
+        </div>
+    </template>
 </div>
 </template>
 
@@ -53,6 +59,8 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
+
             offset: 0,
             nbActionsPerPage: 50,
             loadedAllActions: false,
@@ -121,26 +129,31 @@ export default {
 
         async loadActions(append=true) {
             this.loading = true;
-
             if(!append) {
                 this.actions = [];
                 this.offset = 0;
                 this.loadedAllActions = false;
             }
 
-            let data = await this.project.fetchCommandHistory({
-                max: this.nbActionsPerPage,
-                offset: this.offset,
-                user: this.selectedUser,
-                startDate: this.startDate,
-                endDate: this.endDate
-            });
+            try {
+                let data = await this.project.fetchCommandHistory({
+                    max: this.nbActionsPerPage,
+                    offset: this.offset,
+                    user: this.selectedUser,
+                    startDate: this.startDate,
+                    endDate: this.endDate
+                });
 
-            this.actions.push(...data);
-            this.offset += this.nbActionsPerPage;
+                this.actions.push(...data);
+                this.offset += this.nbActionsPerPage;
 
-            if(data.length < this.nbActionsPerPage) {
-                this.loadedAllActions = true;
+                if(data.length < this.nbActionsPerPage) {
+                    this.loadedAllActions = true;
+                }
+            }
+            catch(error) {
+                console.log(error);
+                this.error = true;
             }
             
             this.loading = false;
@@ -158,11 +171,17 @@ export default {
         }
     },
     async created() {
-        await Promise.all([
-            this.loadActions(),
-            this.fetchMembers(),
-            this.fetchUserJobs()
-        ]);
+        try {
+            await Promise.all([
+                this.loadActions(),
+                this.fetchMembers(),
+                this.fetchUserJobs()
+            ]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
 
         this.loading = false;
     }

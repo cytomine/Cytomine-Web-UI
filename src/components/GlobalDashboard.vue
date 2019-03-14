@@ -9,7 +9,10 @@
             <div class="column is-two-thirds">
                 <div class="box">
                     <h2> {{ $t("recently-opened") }} </h2>
-                    <b-table :data="recentProjects">
+                    <b-message v-if="!recentProjects" type="is-danger" has-icon icon-size="is-small">
+                        {{$t("failed-fetch-recent-projects")}}
+                    </b-message>
+                    <b-table v-else :data="recentProjects">
 
                         <template slot-scope="{row: project}">
                             <b-table-column :label="$t('project')" width="100" centered>
@@ -42,23 +45,23 @@
                     <table class="table is-fullwidth">
                         <tbody>
                             <tr>
-                                <td>{{projects.length}}</td>
+                                <td>{{projects ? projects.length : "?"}}</td>
                                 <td>{{$t("projects")}}</td>
                             </tr>
                             <tr>
-                                <td>{{images.length}}</td>
+                                <td>{{images ? images.length : "?"}}</td>
                                 <td>{{$t("images")}}</td>
                             </tr>
                             <tr>
-                                <td>{{nbUserAnnots}}</td>
+                                <td>{{nbUserAnnots != null ? nbUserAnnots : "?"}}</td>
                                 <td>{{$t("user-annotations")}}</td>
                             </tr>
                             <tr>
-                                <td>{{nbJobAnnots}}</td>
+                                <td>{{nbJobAnnots != null ? nbJobAnnots : "?"}}</td>
                                 <td>{{$t("analysis-annotations")}}</td>
                             </tr>
                             <tr>
-                                <td>{{nbReviewed}}</td>
+                                <td>{{nbReviewed != null ? nbReviewed : "?"}}</td>
                                 <td>{{$t("reviewed-annotations")}}</td>
                             </tr>
                         </tbody>
@@ -104,20 +107,23 @@ export default {
     },
     data() {
         return {
-            projects: [],
-            recentProjectsId: [],
-            images: [],
+            projects: null,
+            recentProjectsId: null,
+            images: null,
             recentImages: [],
-            nbProjects: 0,
-            nbUserAnnots: 0,
-            nbJobAnnots: 0,
-            nbReviewed: 0,
+            nbUserAnnots: null,
+            nbJobAnnots: null, // TODO
+            nbReviewed: null,
             welcomeMessage: null,
             loading: true
         };
     },
     computed: {
         recentProjects() {
+            if(!this.recentProjectsId) {
+                return;
+            }
+
             let array = [];
             this.recentProjectsId.forEach(id => {
                 let project = this.projects.array.find(project => project.id == id);
@@ -131,7 +137,9 @@ export default {
             if(this.recentImages && this.recentImages.length > 0) {
                 let lastOpened = this.recentImages[0];
                 let project = this.projects.array.find(project => project.id == lastOpened.project);
-                lastOpened.projectName = project.name;
+                if(project) {
+                    lastOpened.projectName = project.name;
+                }
                 return lastOpened;
             }
         },
@@ -175,7 +183,7 @@ export default {
             this.fetchRecentProjectsId(),
             this.fetchRecentImages(),
             this.fetchWelcomeMessage()
-        ]);
+        ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process
         this.loading = false;
     }
 };

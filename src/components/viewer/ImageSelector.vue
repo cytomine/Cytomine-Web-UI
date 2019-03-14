@@ -8,7 +8,13 @@
                         type="search" icon="search"></b-input>
                 <button class="delete" @click="imageSelectorEnabled = false"></button>
             </div>
-            <div class="image-selector">
+            <div class="content-wrapper" v-if="error">
+                <b-message type="is-danger" has-icon icon-size="is-small">
+                    <h2> {{ $t("error") }} </h2>
+                    <p> {{ $t("unexpected-error-info-message") }} </p>
+                </b-message>
+            </div>
+            <div v-else class="image-selector">
                 <div class="card" v-for="image in displayedImages" :key="image.id">
                     <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
                     <div class="card-content">
@@ -47,7 +53,8 @@ export default {
             images: [],
             searchString: "",
             nbImagesDisplayed: 20,
-            loading: true
+            loading: true,
+            error: false
         };
     },
     computed: {
@@ -80,8 +87,13 @@ export default {
     },
     methods: {
         async addMap(image) {
-            await this.$store.dispatch("addMap", {idViewer: this.idViewer, image});
-            this.imageToAdd = null;
+            try {
+                await this.$store.dispatch("addMap", {idViewer: this.idViewer, image});
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-add-viewer-image")})
+            }
         },
 
         more() {
@@ -89,11 +101,17 @@ export default {
         }
     },
     async created() {
-        this.images = (await ImageInstanceCollection.fetchAll({
-            filterKey: "project",
-            filterValue: this.project.id
-        })).array; // TODO: should not load full array, should be done with backend
-
+        try {
+            nop
+            this.images = (await ImageInstanceCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.project.id
+            })).array; // TODO: should not load full array, should be done with backend
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 };

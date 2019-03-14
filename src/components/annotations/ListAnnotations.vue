@@ -3,6 +3,10 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("error-load-annotations-filters") }}</p>
+</div>
 <div v-else class="list-annotations-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading">
@@ -164,7 +168,8 @@ export default {
     },
     data() {
         return {
-            loading: true, 
+            loading: true,
+            error: false,
             forceUpdate: [],
             users: [],
 
@@ -303,9 +308,10 @@ export default {
                 this.fetchMembers(),
                 this.fetchUserJobs()
             ]);
-        }     
+        }
         catch(error) {
-            this.$notify({type: "error", text: this.$t("notif-error-load-annotations-filters")});
+            this.error = true;
+            return;
         }
 
         if(this.$route.query.image != null) {

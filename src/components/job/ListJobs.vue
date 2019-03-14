@@ -3,6 +3,10 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
 <div v-else class="list-jobs-wrapper content-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
@@ -132,6 +136,8 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
+
             jobs: [],
             searchString: "",
             perPage: 10,
@@ -193,11 +199,17 @@ export default {
         }
     },
     async created() {
-        this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-        this.selectedSoftwares = this.availableSoftwares.slice();
-        this.selectedLaunchers = this.availableLaunchers.slice();
-        this.selectedStatus = this.availableStatus.slice();
-        this.loading = false;
+        try {
+            this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
+            this.selectedSoftwares = this.availableSoftwares.slice();
+            this.selectedLaunchers = this.availableLaunchers.slice();
+            this.selectedStatus = this.availableStatus.slice();
+            this.loading = false;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
     }    
 };
 </script>

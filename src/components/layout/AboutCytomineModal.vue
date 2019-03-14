@@ -9,7 +9,7 @@
                 <section v-if="!loading" class="modal-card-body">
                     <dl>
                         <dt>{{$t("version")}}</dt>
-                        <dd>{{version}}</dd>
+                        <dd>{{version || "?"}}</dd>
 
                         <dt>{{$t("sponsors")}}</dt>
                         <dd>
@@ -94,8 +94,13 @@ export default {
         }
     },
     async created() {
-        let {version} = await Cytomine.instance.ping();
-        this.version = version;
+        try {
+            let {version} = await Cytomine.instance.ping();
+            this.version = version;
+        }
+        catch(error) {
+            console.log(error);
+        }
         this.loading = false;
     }
 };

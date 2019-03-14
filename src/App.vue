@@ -61,7 +61,10 @@ export default {
     methods: {
         async ping() {
             try {
-                await Cytomine.instance.ping(this.project ? this.project.id : null);
+                let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+                if(this.currentUser != null && !authenticated) {
+                    await this.$store.dispatch("logout");
+                }
             }
             catch(error) {
                 console.log(error);

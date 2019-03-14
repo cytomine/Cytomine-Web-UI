@@ -1,7 +1,11 @@
 <template>
 <div class="list-projects-wrapper content-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <div v-if="!loading" class="panel">
+    <div class="box error" v-if="error">
+        <h2> {{ $t("error") }} </h2>
+        <p>{{ $t("unexpected-error-info-message") }}</p>
+    </div>
+    <div v-else-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("projects")}}
             <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
@@ -228,10 +232,13 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             projects: [],
             searchString: "",
             perPage: 10,
-            loading: true,
+
             // filters
             filtersOpened: false,
             initSliders: false,
@@ -347,48 +354,54 @@ export default {
         }
     },
     async created() {
-        let managedProjectsPromise = new ProjectCollection({
-            light: true,
-            admin: true,
-            filterKey: "user",
-            filterValue: this.currentUser.id
-        }).fetchAll();
+        try {
+            let managedProjectsPromise = new ProjectCollection({
+                light: true,
+                admin: true,
+                filterKey: "user",
+                filterValue: this.currentUser.id
+            }).fetchAll();
 
-        // let representativeProjectsPromise = new ProjectCollection({
-        //     light: true,
-        //     representative: true,
-        //     filterKey: "user",
-        //     filterValue: this.currentUser.id
-        // }).fetchAll(); // TODO in core
-        let representativeProjectsPromise = {array: []};
+            // let representativeProjectsPromise = new ProjectCollection({
+            //     light: true,
+            //     representative: true,
+            //     filterKey: "user",
+            //     filterValue: this.currentUser.id
+            // }).fetchAll(); // TODO in core
+            let representativeProjectsPromise = {array: []};
 
-        let projects = await ProjectCollection.fetchAll({
-            withMembersCount: true,
-            withLastActivity: true
-        });
+            let projects = await ProjectCollection.fetchAll({
+                withMembersCount: true,
+                withLastActivity: true
+            });
 
-        let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
-        let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
+            let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
+            let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
 
-        this.contributorLabel = this.$t("contributor");
-        this.managerLabel = this.$t("manager");
-        this.availableRoles = [this.contributorLabel, this.managerLabel];
-        this.selectedRoles = this.availableRoles;
+            this.contributorLabel = this.$t("contributor");
+            this.managerLabel = this.$t("manager");
+            this.availableRoles = [this.contributorLabel, this.managerLabel];
+            this.selectedRoles = this.availableRoles;
 
-        this.projects = projects.array.map(project => {
-            project.isManaged = idManagedProjects.includes(project.id);
-            project.isRepresented = idProjectsRepresentatives.includes(project.id);
-            project.roleIndex = Number(project.isManaged) + Number(project.isRepresented); // to allow sorting
-            return project;
-        });
+            this.projects = projects.array.map(project => {
+                project.isManaged = idManagedProjects.includes(project.id);
+                project.isRepresented = idProjectsRepresentatives.includes(project.id);
+                project.roleIndex = Number(project.isManaged) + Number(project.isRepresented); // to allow sorting
+                return project;
+            });
 
-        this.selectedOntologies = this.ontologies;
+            this.selectedOntologies = this.ontologies;
 
-        this.boundsMembers = [0, this.maxNbMembers];
-        this.boundsImages = [0, this.maxNbImages];
-        this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-        this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-        this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+            this.boundsMembers = [0, this.maxNbMembers];
+            this.boundsImages = [0, this.maxNbImages];
+            this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
+            this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
+            this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
 
         this.loading = false;
     }

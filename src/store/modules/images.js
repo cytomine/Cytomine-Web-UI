@@ -552,7 +552,7 @@ export default {
             commit("setImageInstance", {idViewer, index, image});
             commit("clearSelectedFeatures", {idViewer, index});
             commit("resetActions", {idViewer, index});
-            dispatch("refreshProperties", {idViewer, index});
+            await dispatch("refreshProperties", {idViewer, index});
             dispatch("changePath", idViewer);
         },
 

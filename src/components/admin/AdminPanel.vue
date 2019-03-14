@@ -86,3 +86,10 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.box {
+    position: relative;
+    min-height: 20em;
+}
+</style>

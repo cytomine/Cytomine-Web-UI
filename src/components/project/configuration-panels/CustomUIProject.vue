@@ -1,7 +1,11 @@
 <!-- QUESTION: when disabling an option (e.g. images page of project), only hide link, or prevent user from viewing page? -->
 <!-- QUESTION for Renaud: for new projects in which config was never changed, custom-ui/project/${id}.json does not return all properties, bug? or treat as true? -->
 <template>
-<table class="table custom-ui" v-if="!loading">
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+    <h2> {{ $t("error") }} </h2>
+    <p> {{ $t("unexpected-error-info-message") }} </p>
+</b-message>
+<table class="table custom-ui" v-else-if="!loading">
     <tbody v-for="category in customUITree" :key="category.label">
         <tr>
             <th colspan="3">{{$t(category.label)}}</th>
@@ -43,6 +47,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             customUI: {},
             customUITree: [
@@ -146,7 +151,13 @@ export default {
         }
     },
     async created() {
-        this.customUI = await this.project.fetchUIConfig();
+        try {
+            this.customUI = await this.project.fetchUIConfig();
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 };

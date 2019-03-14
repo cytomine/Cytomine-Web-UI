@@ -1,7 +1,11 @@
 <template>
 <div class="project-softwares-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else-if="!loading">
         <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search">
         </b-input>
 
@@ -57,6 +61,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             searchString: "",
             perPage: 10,
@@ -100,21 +105,27 @@ export default {
         }
     },
     async created() {
-        let promiseSoftwares = SoftwareCollection.fetchAll();
-        let promiseSoftwareProjects = SoftwareProjectCollection.fetchAll({
-            filterKey: "project",
-            filterValue: this.project.id
-        });
+        try {
+            let promiseSoftwares = SoftwareCollection.fetchAll();
+            let promiseSoftwareProjects = SoftwareProjectCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.project.id
+            });
 
-        let softwares = (await promiseSoftwares).array;
-        let softwareProjects = (await promiseSoftwareProjects).array;
+            let softwares = (await promiseSoftwares).array;
+            let softwareProjects = (await promiseSoftwareProjects).array;
 
-        softwares.forEach(software => {
-            software.softwareProject = softwareProjects.find(sp => sp.software == software.id);
-            software.selected = software.softwareProject != null;
-        });
+            softwares.forEach(software => {
+                software.softwareProject = softwareProjects.find(sp => sp.software == software.id);
+                software.selected = software.softwareProject != null;
+            });
 
-        this.softwares = softwares;
+            this.softwares = softwares;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 };

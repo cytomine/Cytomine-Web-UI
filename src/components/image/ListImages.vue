@@ -3,7 +3,11 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
-<div v-else class="list-images-wrapper">
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
+<div v-else class="list-images-wrapper content-wrapper">
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
@@ -235,10 +239,13 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             images: [],
             searchString: "",
             perPage: 10,
-            loading: true,
+
             // filters
             filtersOpened: false,
             initSliders: false,
@@ -458,30 +465,32 @@ export default {
         }
     },
     async created() {
-        this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-        this.loading = false;
+        try {
+            this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
+            this.images.forEach(image => this.formatImage(image));
 
-        this.images.forEach(image => this.formatImage(image));
+            this.selectedVendors = this.availableVendors;
+            this.selectedFormats = this.availableFormats;
+            this.selectedMagnifications = this.availableMagnifications;
+            this.selectedResolutions = this.availableResolutions;
 
-        this.selectedVendors = this.availableVendors;
-        this.selectedFormats = this.availableFormats;
-        this.selectedMagnifications = this.availableMagnifications;
-        this.selectedResolutions = this.availableResolutions;
+            this.boundsWidth = [0, this.maxWidth];
+            this.boundsHeight = [0, this.maxHeight];
+            this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
+            this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
+            this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
 
-        this.boundsWidth = [0, this.maxWidth];
-        this.boundsHeight = [0, this.maxHeight];
-        this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-        this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-        this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+            this.loading = false;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
     }
 };
 </script>
 
 <style scoped>
-.list-images-wrapper {
-    padding: 30px 50px 30px 50px;
-}
-
 .panel-heading {
     display: flex;
     justify-content: space-between;

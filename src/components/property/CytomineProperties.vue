@@ -3,7 +3,8 @@
     <b-loading :is-full-page="false" :active="loading"></b-loading>
     <template v-if="!loading">    
         <b-field grouped group-multiline>
-            <div class="control" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
+            <em v-if="error">{{$t("error-fetch-properties")}}</em>
+            <div class="control" v-else v-for="(prop, idx) in notEditedProperties" :key="prop.id">
                 <b-taglist attached>
                     <b-tag type="is-dark">{{prop.key}}</b-tag>
                     <b-tag>
@@ -51,6 +52,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             properties: [],
             editedProperties: [],
@@ -112,17 +114,19 @@ export default {
         },
     },
     async created() {
-        this.properties = (await PropertyCollection.fetchAll({object: this.object})).array;
+        try {
+            this.properties = (await PropertyCollection.fetchAll({object: this.object})).array;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 };
 </script>
 
-<style>
-.add-prop {
-    height: 24px;
-}
-
+<style scoped>
 .new-prop-form {
     margin-bottom: 5px;
     margin-top: 5px;
@@ -163,6 +167,10 @@ export default {
 
 .tag button.edit:hover {
     background-color: rgba(10, 10, 10, 0.3);
+}
+
+em {
+    margin-right: 0.5em;
 }
 </style>
 

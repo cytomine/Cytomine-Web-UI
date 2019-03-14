@@ -4,7 +4,12 @@
         <p class="panel-heading">
             {{ $t("upload") }}
         </p>
-        <div class="panel-block">
+        <div class="panel-block" v-if="newUploadError">
+            <b-message type="is-danger" has-icon icon-size="is-small">
+                {{ $t("error-cannot-upload") }}
+            </b-message>
+        </div>
+        <div class="panel-block" v-else>
             <b-message type="is-info" has-icon icon-size="is-small">
                 <h2>{{$t("important-notes")}}</h2>
                 <ul class="small-text">
@@ -119,7 +124,13 @@
         <p class="panel-heading">
             {{ $t("storage") }}
         </p>
-        <div class="panel-block">
+        <div class="panel-block" v-if="storageViewError">
+            <b-message type="is-danger" has-icon icon-size="is-small">
+                <h2> {{ $t("error") }} </h2>
+                <p> {{ $t("unexpected-error-info-message") }} </p>
+            </b-message>
+        </div>
+        <div class="panel-block storage" v-else>
             <b-loading :is-full-page="false" :active="loading"></b-loading>
             <template v-if="!loading">
                 <b-input v-model="searchString" class="search-uploaded-file"
@@ -208,6 +219,9 @@ export default {
     data() {
         return {
             loading: true,
+            newUploadError: false,
+            storageViewError: false,
+
             timeoutRefreshFullList: null,
             timeoutRefreshSessionUploads: null,
 
@@ -277,25 +291,48 @@ export default {
     watch: {
         async queryString() {
             this.signatureDate = new Date().toISOString();
-            this.signature = await Cytomine.instance.fetchSignature({
-                uri: this.uri,
-                queryString: this.queryString,
-                method: "POST",
-                date: this.signatureDate
-            });
+            try {
+                this.signature = await Cytomine.instance.fetchSignature({
+                    uri: this.uri,
+                    queryString: this.queryString,
+                    method: "POST",
+                    date: this.signatureDate
+                });
+            }
+            catch(error) {
+                this.newUploadError = true;
+            }
         }
     },
     methods: {
         async fetchStorages() {
-            this.storages = (await StorageCollection.fetchAll()).array;
-            this.selectedStorage = this.storages.find(storage => storage.user == this.currentUser.id);
+            try {
+                this.storages = (await StorageCollection.fetchAll()).array;
+                this.selectedStorage = this.storages.find(storage => storage.user == this.currentUser.id);
+            }
+            catch(error) {
+                console.log(error);
+                this.newUploadError = true;
+            }
         },
         async fetchProjects() {
-            this.projects = (await ProjectCollection.fetchAll()).array;
+            try {
+                this.projects = (await ProjectCollection.fetchAll()).array;
+            }
+            catch(error) {
+                console.log(error); // not mandatory for upload => only log error, no other action
+            }
         },
         async fetchUploadedFiles() {
-            let {data} = await Cytomine.instance.api.get("uploadedfile.json?datatables=true&length=0"); // TODO: change in core
-            this.uploadedFiles = data.aaData;
+            try {
+                let {data} = await Cytomine.instance.api.get("uploadedfile.json?datatables=true&length=0"); // TODO: change in core
+                this.uploadedFiles = data.aaData;
+            }
+            catch(error) {
+                console.log(error);
+                this.storageViewError = true;
+                return;
+            }
 
             this.loading = false;
 
@@ -314,23 +351,29 @@ export default {
             let unfinishedConversions = false;
             let statusChange = false;
 
-            await Promise.all(this.dropFiles.map(async wrapper => {
-                if(wrapper.uploadedFile) {
-                    let oldStatus = wrapper.uploadedFile.status;
-                    if(!pendingStatus.includes(oldStatus)) {
-                        return;
-                    }
+            try {
+                await Promise.all(this.dropFiles.map(async wrapper => {
+                    if(wrapper.uploadedFile) {
+                        let oldStatus = wrapper.uploadedFile.status;
+                        if(!pendingStatus.includes(oldStatus)) {
+                            return;
+                        }
 
-                    await wrapper.uploadedFile.fetch();
-                    let status = wrapper.uploadedFile.status;
-                    if(status != oldStatus) {
-                        statusChange = true;
+                        await wrapper.uploadedFile.fetch();
+                        let status = wrapper.uploadedFile.status;
+                        if(status != oldStatus) {
+                            statusChange = true;
+                        }
+                        if(pendingStatus.includes(status)) {
+                            unfinishedConversions = true;
+                        }
                     }
-                    if(pendingStatus.includes(status)) {
-                        unfinishedConversions = true;
-                    }
-                }
-            }));
+                }));
+            }
+            catch(error) {
+                console.log(error);
+                return;
+            }
 
             if(statusChange) {
                 this.fetchUploadedFiles();
@@ -500,7 +543,7 @@ export default {
     max-width: 80px;
 }
 
-.panel-block {
+.panel-block.storage {
     min-height: 200px;
     position: relative;
 }

@@ -3,8 +3,11 @@
     <h2>
         {{$t("file-tree")}}
     </h2>
-
-    <sl-vue-tree v-model="nodes" :allowMultiselect="false">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <sl-vue-tree v-else v-model="nodes" :allowMultiselect="false">
         <template slot="toggle" slot-scope="{node}">
             <template v-if="!node.isLeaf">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
@@ -69,7 +72,8 @@ export default {
             rootId: null,
             uploadedFiles: [],
             nodes: [],
-            preview: null
+            preview: null,
+            error: false
         };
     },
     watch: {
@@ -93,6 +97,7 @@ export default {
             }
             catch(error) {
                 console.log(error);
+                this.error = true;
             }
         },
         createNodes(idParent) {
