@@ -40,18 +40,24 @@
             </p>
             <div class="panel-block">
                 <form>
-                    <b-field :label="$t('password-current')" horizontal>
-                        <div class="control">
-                            <input class="input" type="password" :class="{'is-success': correctPassword}" v-model="currentPassword">
-                        </div>
+                    <input id="password" class="hidden" type="password"> <!-- HACK: fake field to prevent autofill -->
+
+                    <b-message v-if="currentUser.passwordExpired" type="is-danger" has-icon icon-size="is-small">
+                        {{$t("password-expired-info-message")}}
+                    </b-message>
+
+                    <b-field v-else :label="$t('password-current')" :type="typeCurrentPassword" horizontal>
+                        <b-input type="password" v-model="currentPassword" :loading="isCheckingPassword"></b-input>
                     </b-field>
 
                     <b-field :label="$t('password-new')" horizontal>
-                        <b-input type="password" v-model="newPassword" :disabled="!correctPassword"></b-input>
+                        <b-input type="password" v-model="newPassword"
+                            :disabled="!correctPassword && !currentUser.passwordExpired">
+                        </b-input>
                     </b-field>
 
                     <b-field :label="$t('password-confirm')" horizontal>
-                        <b-input type="password" v-model="confirmPassword" :disabled="newPassword == ''"></b-input>
+                        <b-input type="password" v-model="confirmPassword" :disabled="newPassword === ''"></b-input>
                     </b-field>
 
                     <b-field grouped position="is-right">
@@ -95,6 +101,7 @@
 <script>
 import { mapState } from "vuex";
 import _ from "lodash";
+import {User} from "cytomine-client";
 
 export default {
     name: "Account",
@@ -102,6 +109,7 @@ export default {
         return {
             updatedUser: this.$store.state.currentUser.user.clone(),
             currentPassword: "",
+            isCheckingPassword: false,
             correctPassword: false,
             newPassword: "",
             confirmPassword: ""
@@ -111,15 +119,19 @@ export default {
         savePasswordDisabled() {
             return !(this.newPassword == this.confirmPassword && this.newPassword != "");
         },
+        typeCurrentPassword() {
+            if(this.currentPassword.length === 0) {
+                return;
+            }
+            return this.correctPassword ? "is-success" : "is-danger";
+        },
         ...mapState({currentUser: state => state.currentUser.user})
     },
     watch: {
         currentPassword() {
-            this.debouncedCheckPassword();
+            this.isCheckingPassword = true;
+            this.checkPassword();
         }
-    },
-    created() {
-        this.debouncedCheckPassword = _.debounce(this.checkPassword, 250);
     },
     methods: {
         async editDetails() {
@@ -152,19 +164,14 @@ export default {
             }
         },
 
-        checkPassword() {
-            // TODO: change ! should be possible to send API request to check correctness (in current frontend, use of
-            // j_spring_security_check, but not ideal because it may lead to disconnection)
-            if(this.currentPassword == "password") {
-                this.correctPassword = true;
-
-            }
-            else {
-                this.correctPassword = false;
+        checkPassword: _.debounce(async function() {
+            this.correctPassword = await User.checkCurrentPassword(this.currentPassword);
+            if(!this.correctPassword) {
                 this.newPassword = "";
                 this.confirmPassword = "";
             }
-        },
+            this.isCheckingPassword = false;
+        }, 500),
 
         async regenerateKeys() {
             try {
@@ -188,5 +195,9 @@ export default {
 
 .fas {
     margin-right: 5px;
+}
+
+input.hidden {
+    display: none;
 }
 </style>

@@ -6,7 +6,7 @@
                 <p class="modal-card-title">{{$t(editionMode ? "update-user" : "create-user")}}</p>
             </header>
             <section class="modal-card-body">
-                <!--  fake fields to prevent autofill of form fields -->
+                <!-- HACK: fake fields to prevent autofill -->
                 <input id="username" class="hidden" type="text">
                 <input id="password" class="hidden" type="password">
 
