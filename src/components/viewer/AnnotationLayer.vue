@@ -70,7 +70,6 @@ export default {
             this.imageWrapper.noTermOpacity;
             this.imageWrapper.selectedPropertyKey;
             this.imageWrapper.selectedPropertyColor;
-            this.imageWrapper.highlightedFeaturesIds;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.idViewer, this.index);

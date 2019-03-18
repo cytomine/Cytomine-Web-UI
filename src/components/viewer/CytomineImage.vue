@@ -161,10 +161,6 @@
             :idViewer="idViewer" :index="index" :view="$refs.view">
         </annotation-details-container>
 
-        <annotations-table v-if="isPanelDisplayed('annotation-panel')"
-            class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotations-table>
-
         <div class="custom-overview" ref="overview">
             <p class="image-name" :class="{hidden: overviewCollapsed}">{{image.instanceFilename}}</p>
         </div>
@@ -178,7 +174,6 @@ import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
-import AnnotationsTable from "./AnnotationsTable";
 
 import InformationPanel from "./panels/InformationPanel";
 import DigitalZoom from "./panels/DigitalZoom";
@@ -221,7 +216,6 @@ export default {
         RotationSelector,
         ScaleLine,
         DrawTools,
-        AnnotationsTable,
 
         AnnotationDetailsContainer,
 
@@ -572,15 +566,6 @@ $sizePositioningLineSize: 2px;
     i.fas {
         margin-right: 5px;
     }
-}
-
-.annotations-table-wrapper {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: $widthPanelBar;
-    z-index: 5;
-    pointer-events: none;
 }
 
 .panels {

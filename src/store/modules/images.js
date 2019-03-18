@@ -4,7 +4,7 @@ import router from "@/routes.js";
 import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
 
 import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle, highlightStyles, defaultColors} from "@/utils/style-utils.js";
+    verticesStyle, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
@@ -385,20 +385,6 @@ export default {
             state.viewers[idViewer].maps[index].annotsToSelect = [annot];
         },
 
-        // ----- Annotations table & highlighted features
-
-        setShowAnnotationsTable(state, {idViewer, index, value}) {
-            state.viewers[idViewer].maps[index].showAnnotationsTable = value;
-        },
-
-        setHighlightFilteredAnnotations(state, {idViewer, index, value}) {
-            state.viewers[idViewer].maps[index].highlightFilteredAnnotations = value;
-        },
-
-        setHighlightedFeaturesIds(state, {idViewer, index, ids}) {
-            state.viewers[idViewer].maps[index].highlightedFeaturesIds = ids;
-        },
-
         // ----- Draw tools and associated interactions
 
         activateTool(state, {idViewer, index, tool}) {
@@ -513,10 +499,6 @@ export default {
 
                 selectedFeatures: [],
                 annotsToSelect: [],
-
-                showAnnotationsTable: false,
-                highlightFilteredAnnotations: false,
-                highlightedFeaturesIds: [],
 
                 activeTool: "select",
                 activeEditTool: null,
@@ -681,9 +663,6 @@ export default {
                 if(imageWrapper.activeEditTool == "modify") {
                     styles.push(verticesStyle);
                 }
-            }
-            else if(imageWrapper.highlightedFeaturesIds.includes(feature.getId())) {
-                styles.push(...highlightStyles);
             }
 
             // Properties

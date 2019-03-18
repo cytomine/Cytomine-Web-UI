@@ -75,10 +75,6 @@ export default {
                         {key: "project-explore-ontology", label: "ontology", icon: "fas fa-hashtag"},
                         {key: "project-explore-property", label: "properties", icon: "fas fa-tag"},
                         {key: "project-explore-follow", label: "broadcast", icon: "fas fa-street-view"}, // TODO in core
-                        {key: "project-explore-job", label: "analysis", icon: "fas fa-tasks"},
-                        // list of annotations
-                        {key: "project-explore-annotation-panel", label: "annotations-table", icon: "fas fa-table"},
-                        
                     ]
                 },
                 {
