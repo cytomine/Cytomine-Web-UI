@@ -160,11 +160,6 @@
             <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
 
-        <b-message class="info-calibration" v-if="imageWrapper.ongoingCalibration" type="is-info" has-icon icon-size="is-small">
-            <p>{{$t("calibration-mode-explanation")}}</p>
-            <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
-        </b-message>
-
         <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index">
         </rotation-selector>
 
@@ -499,10 +494,6 @@ export default {
         isPanelDisplayed(panel) {
             let displayed = this.configUI[`project-explore-${panel}`];
             return (displayed || displayed == null); // TODO: replace with return displayed once all panels are managed in backend
-        },
-        
-        cancelCalibration() {
-            this.$store.dispatch("cancelCalibration", {idViewer: this.idViewer, index: this.index});
         }
     },
     async created() {
@@ -534,10 +525,6 @@ export default {
                     this.routedAnnotation = annot;
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
                 }
-            }
-
-            if(this.$route.query.action == "calibration") {
-                this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
             }
         }
 
@@ -601,17 +588,6 @@ $sizePositioningLineSize: 2px;
 
     i.fas {
         margin-right: 5px;
-    }
-}
-
-.info-calibration {
-    position: absolute;
-    left: 50px;
-    top: 50px;
-    max-width: 400px;
-
-    p:first-child {
-        margin-bottom: 10px;
     }
 }
 

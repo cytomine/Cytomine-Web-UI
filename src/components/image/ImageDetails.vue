@@ -29,7 +29,7 @@
             <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
                 <td class="prop-label">{{$t("reviewed-annotations")}}</td>
                 <td class="prop-content">
-                    <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                    <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link (todo with current system ; add option to annotation type) -->
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('description')">
@@ -182,8 +182,7 @@
 
     <calibration-modal :image="image"
                        :active.sync="isCalibrationModalActive"
-                       @setResolution="(event) => $emit('setResolution', event)"
-                       @setScale="$router.push(`/project/${image.project}/image/${image.id}?action=calibration`)">
+                       @setResolution="(event) => $emit('setResolution', event)">
     </calibration-modal>
 </div>
 </template>

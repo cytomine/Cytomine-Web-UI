@@ -56,8 +56,7 @@
 
     <calibration-modal :image="image"
                        :active.sync="calibrationModal"
-                       @setResolution="setResolution"
-                       @setScale="startCalibration()">
+                       @setResolution="setResolution">
     </calibration-modal>
 </div>
 </template>
@@ -98,10 +97,6 @@ export default {
     methods: {
         setResolution(resolution) {
             this.$store.commit("setResolution", {idViewer: this.idViewer, idImage: this.image.id, resolution});
-        },
-        startCalibration() {
-            this.calibrationModal = false;
-            this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
         },
         async previousImage() {
             try {

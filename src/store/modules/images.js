@@ -415,10 +415,6 @@ export default {
 
         // ----- Calibration
 
-        setOngoingCalibration(state, {idViewer, index, value}) {
-            state.viewers[idViewer].maps[index].ongoingCalibration = value;
-        },
-
         setResolution(state, {idViewer, idImage, resolution}) {
             state.viewers[idViewer].maps.forEach(({imageInstance}) => {
                 if(imageInstance.id == idImage) {
@@ -539,9 +535,7 @@ export default {
                 positionAnnotDetails: {x: 0, y: 0},
 
                 actions: [],
-                undoneActions: [],
-
-                ongoingCalibration: false
+                undoneActions: []
             };
             commit("addMap", {idViewer, wrapper});
             dispatch("changePath", idViewer);
@@ -596,22 +590,6 @@ export default {
                 commit("activateEditTool", {idViewer, index, tool: null});
             }
             commit("activateTool", {idViewer, index, tool});
-        },
-
-        startCalibration({dispatch, commit}, {idViewer, index}) {
-            dispatch("activateTool", {idViewer, index, tool: "line"});
-            commit("setOngoingCalibration", {idViewer, index, value: true});
-        },
-
-        endCalibration({state, commit}, {idViewer, index, resolution}) {
-            let idImage = state.viewers[idViewer].maps[index].imageInstance.id;
-            commit("setResolution", {idViewer, idImage, resolution});
-            commit("setOngoingCalibration", {idViewer, index, value: false});
-        },
-
-        cancelCalibration({commit}, {idViewer, index}) {
-            commit("activateTool", {idViewer, index, tool: "select"});
-            commit("setOngoingCalibration", {idViewer, index, value: false});
         },
 
         selectFeature({commit}, {idViewer, index, feature}) {

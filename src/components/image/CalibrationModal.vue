@@ -13,26 +13,17 @@
                     </div>
 
                     <div class="columns">
-                        <b-field class="column" :type="fieldType" :message="fieldMessage"
-                                 :label="$t(pixelLength ? 'length-of-drawn-segment' : 'resolution')">
+                        <b-field class="column" :type="fieldType" :message="fieldMessage" :label="$t('resolution')">
                             <b-field :type="fieldType">
                                 <b-input v-model="calibrationField" expanded></b-input>
                                 <b-select v-model="calibrationFactor">
-                                    <option :value="0.001"> {{ $t(pixelLength ? 'nm' : 'nm-per-pixel') }}</option>
-                                    <option :value="1">{{ $t(pixelLength ? 'um' : 'um-per-pixel') }}</option>
-                                    <option :value="1000">{{ $t(pixelLength ? 'mm' : 'mm-per-pixel') }}</option>
+                                    <option :value="0.001"> {{ $t('nm-per-pixel') }}</option>
+                                    <option :value="1">{{ $t('um-per-pixel') }}</option>
+                                    <option :value="1000">{{ $t('mm-per-pixel') }}</option>
                                 </b-select>
                             </b-field>
                         </b-field>
-
-                        <p v-if="!pixelLength" class="control column is-narrow">
-                            <button class="button" @click="$emit('setScale')">{{ $t('button-set-scale') }}</button>
-                        </p>
                     </div>
-
-                    <b-field v-if="pixelLength" :label="$t('computed-resolution')" disabled>
-                        <b-input disabled :value="computedResolution ? `${computedResolution} ${$t('um-per-pixel')}` : '-'"></b-input>
-                    </b-field>
                 </section>
                 <footer class="modal-card-foot">
                     <button class="button" type="button" @click="$emit('update:active', false)">
@@ -55,13 +46,10 @@ export default {
     name: "calibration-modal",
     props: {
         active: {type: Boolean},
-        image: {type: Object},
-        // if pixelLength is provided, the calibration modal will ask the user to provide the actual length of the annot ; otherwise the resolution will be asked
-        pixelLength: {type: Number, default: null}
+        image: {type: Object}
     },
     data() {
         return {
-            defaultValue: "",
             calibrationField: "",
             calibrationFactor: 1,
             displayErrors: false
@@ -76,25 +64,17 @@ export default {
         },
         fieldMessage() {
             return !this.validField && this.displayErrors ? this.$t("must-be-positive-number") : "";
-        },
-        computedResolution() {
-            let resolution = this.calibrationField*this.calibrationFactor;
-            if(this.pixelLength) {
-                resolution /= this.pixelLength;
-            }
-            return resolution;
         }
     },
     watch: {
         active(val) {
             if(val) {
-                this.defaultValue = this.pixelLength ? "" : this.image.resolution;
-                this.calibrationField = this.defaultValue;
+                this.calibrationField = this.image.resolution;
                 this.displayErrors = false;
             }
         },
         calibrationField() {
-            if(this.calibrationField != this.defaultValue) {
+            if(this.calibrationField != this.image.resolution) {
                 this.displayErrors = true;
             }
         }
@@ -103,7 +83,7 @@ export default {
         async setResolution() {
             try {
                 let baseImage = await AbstractImage.fetch(this.image.baseImage);
-                baseImage.resolution = this.computedResolution;
+                baseImage.resolution = this.calibrationField*this.calibrationFactor;
                 await baseImage.save(); // TODO in core: update the permiter and area properties of annotations created in this image (https://github.com/cytomine/Cytomine-core/issues/1147)
 
                 this.$emit("setResolution", baseImage.resolution);

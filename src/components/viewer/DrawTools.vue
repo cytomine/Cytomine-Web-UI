@@ -2,7 +2,7 @@
 <div class="draw-tools-wrapper">
     <div class="buttons has-addons" v-if="isToolDisplayed('select')">
         <button v-tooltip="$t('select')"
-                class="button is-small" :class="{'is-selected': activeTool == 'select'}" :disabled="ongoingCalibration"
+                class="button is-small" :class="{'is-selected': activeTool == 'select'}"
                 @click="activateTool('select')" v-shortkey.once="['s']" @shortkey="activateTool('select')">
             <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
@@ -139,13 +139,13 @@
     </div>
 
     <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons">
-        <button :disabled="actions.length == 0 || ongoingCalibration" v-tooltip="$t('undo')"
+        <button :disabled="actions.length == 0" v-tooltip="$t('undo')"
             class="button is-small"
             @click="undo()" v-shortkey.once="['ctrl', 'z']" @shortkey="undo()">
             <span class="icon is-small"><i class="fas fa-undo"></i></span>
         </button>
 
-        <button :disabled="undoneActions.length == 0 || ongoingCalibration" v-tooltip="$t('redo')"
+        <button :disabled="undoneActions.length == 0" v-tooltip="$t('redo')"
                 class="button is-small"
                 @click="redo()" v-shortkey.once="['ctrl', 'y']" @shortkey="redo()">
             <span class="icon is-small"><i class="fas fa-redo"></i></span>
@@ -193,9 +193,6 @@ export default {
         },
         image() {
             return this.imageWrapper.imageInstance;
-        },
-        ongoingCalibration() {
-            return this.imageWrapper.ongoingCalibration;
         },
         terms() {
             return this.imageWrapper.terms;
@@ -255,7 +252,7 @@ export default {
             return (this.layers.find(layer => layer.drawOn) == null);
         },
         disabledDraw() {
-            return this.noActiveLayer || this.ongoingCalibration;
+            return this.noActiveLayer;
         },
         actions() {
             return this.imageWrapper.actions;
