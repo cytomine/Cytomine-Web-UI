@@ -1,12 +1,6 @@
 <template>
 <div>
     <h1>{{$t("link-images")}}</h1>
-    <p>
-        <label>
-            <input type="checkbox" v-model="showCrosshair">
-            {{$t("show-crosshair")}}
-        </label>
-    </p>
 
     <p>{{$t("link-view-with")}}</p>
     <p v-for="(map, idx) in maps" v-if="idx != index" :key="idx">
@@ -41,15 +35,6 @@ export default {
         },
         linkedIndexes() {
             return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
-        },
-
-        showCrosshair: {
-            get() {
-                return this.maps[this.index].showCrosshair;
-            },
-            set(value) {
-                this.$store.commit("setShowCrosshair", {idViewer: this.idViewer, index: this.index, value});
-            }
         },
 
         trackedUser() {
@@ -87,9 +72,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-p:first-of-type {
-    margin-bottom: 1em;
-}
-</style>

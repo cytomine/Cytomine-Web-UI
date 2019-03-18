@@ -166,12 +166,6 @@
         <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
         </scale-line>
 
-        <div v-if="imageWrapper.showCrosshair && viewerWrapper.maps.length > 1" class="view-positioning-helper">
-            <div class="horizontal-line"></div>
-            <div class="vertical-line"></div>
-            <div class="center"></div>
-        </div>
-
         <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
             :idViewer="idViewer" :index="index" :view="$refs.view">
         </annotation-details-container>
@@ -713,49 +707,6 @@ $sizePositioningLineSize: 2px;
     position: absolute;
     left: .5em;
     top: 70px;
-}
-
-/* ----- View positioning helper ----- */
-
-.view-positioning-helper {
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: $widthPanelBar;
-    pointer-events: none;
-    z-index: 1;
-
-    .horizontal-line {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        box-sizing: border-box;
-        height: calc(50% + #{$sizePositioningLineSize} / 2);
-        width: 100%;
-        border-bottom: $sizePositioningLineSize dashed $colorPositioningHelper;
-    }
-
-    .vertical-line {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        box-sizing: border-box;
-        height: 100%;
-        width: calc(50% + #{$sizePositioningLineSize} / 2);
-        border-right: $sizePositioningLineSize dashed $colorPositioningHelper;
-    }
-
-    .center {
-        position: absolute;
-        top: calc(50% - #{$sizePositioningHelperCenter} / 2);
-        left: calc(50% - #{$sizePositioningHelperCenter} / 2);
-        box-sizing: border-box;
-        width: $sizePositioningHelperCenter;
-        height: $sizePositioningHelperCenter;
-        border-radius: calc(#{$sizePositioningHelperCenter} / 2);
-        border: $sizePositioningLineSize dashed $colorPositioningHelper;
-    }
 }
 
 .custom-overview {
