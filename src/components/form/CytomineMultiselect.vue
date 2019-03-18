@@ -97,8 +97,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import "~vue-multiselect/dist/vue-multiselect.min.css";
+@import "~bulma/sass/utilities/initial-variables.sass";
 
 .multiselect--active, .multiselect__content-wrapper {
     z-index: 50 !important;
@@ -153,5 +154,13 @@ export default {
 
 .multiselect__input {
     font-size: 14px !important;
+}
+
+.is-danger .multiselect__tags {
+    border-color: $red;
+}
+
+.is-danger .multiselect__select::before {
+    border-color: $red transparent transparent;
 }
 </style>
