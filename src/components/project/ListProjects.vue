@@ -258,8 +258,6 @@ export default {
             creationModal: false,
             nameNewProject: "",
 
-            // TODO: should be defined in app config and retrieved from backend (corresponds to properties displayed in
-            // columns in the list of project) - https://github.com/cytomine/Cytomine-core/issues/1155
             excludedProperties: [
                 "name",
                 "membersCount",

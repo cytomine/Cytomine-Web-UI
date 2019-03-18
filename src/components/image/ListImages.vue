@@ -265,8 +265,6 @@ export default {
 
             addImageModal: false,
 
-            // TODO: should be defined in project config and retrieved from backend (corresponds to properties displayed
-            // in table columns) - https://github.com/cytomine/Cytomine-core/issues/1154
             excludedProperties: [
                 "overview",
                 "instanceFilename",
