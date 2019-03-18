@@ -29,7 +29,6 @@
         <button class="button" :class="size" @click="isRenameModalActive = true">
             {{$t("button-rename")}}
         </button>
-        <button class="button" :class="size">{{$t("button-lock")}}</button> <!-- TODO -->
         <button class="button is-danger" :class="size" @click="deleteProject()">
             {{$t("button-delete")}}
         </button>
