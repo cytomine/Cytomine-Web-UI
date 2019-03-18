@@ -1,4 +1,3 @@
-<!-- TODO job templates -->
 <template>
     <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
@@ -144,14 +143,6 @@
                             :idViewer="idViewer" :index="index" :view="$refs.view">
                         </follow-panel>
                     </li>
-
-                    <li v-if="isPanelDisplayed('guided-tour')">
-                        <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
-                            <i class="fas fa-map-signs"></i>
-                        </a>
-                        <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view">
-                        </guided-tour>
-                    </li>
                 </template>
             </ul>
         </div>
@@ -197,7 +188,6 @@ import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
 import PropertiesPanel from "./panels/PropertiesPanel";
 import FollowPanel from "./panels/FollowPanel";
-import GuidedTour from "./panels/GuidedTour";
 
 import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
 
@@ -243,7 +233,6 @@ export default {
         OntologyPanel,
         PropertiesPanel,
         FollowPanel,
-        GuidedTour,
 
         SelectInteraction,
         DrawInteraction,
