@@ -38,13 +38,15 @@
                        :multipleSelection="multiple"
                        @select="handleSelection()"
                        @setSelectedNodes="nodes => $emit('setSelectedNodes', nodes)">
-            <ul class="multiselect__content" slot="no-result">
-                <li @click="selectAll()">
-                    <span class="multiselect__option">
-                        {{$t("no-result")}}
-                    </span>
-                </li>
-            </ul>
+            <template v-slot:no-result>
+                <ul class="multiselect__content">
+                    <li @click="selectAll()">
+                        <span class="multiselect__option">
+                            {{$t("no-result")}}
+                        </span>
+                    </li>
+                </ul>
+            </template>
         </ontology-tree>
     </div>
 </div>

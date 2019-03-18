@@ -9,7 +9,7 @@
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <template slot="popover">
+                            <template v-slot:popover>
                                 <p>{{$t("activity-chart-info-message")}}</p>
                                 <p>{{$t("barchart-hover-mouse-for-details")}}</p>
                                 <p>{{$t("barchart-click-label-to-toggle-visibility")}}</p>
@@ -34,7 +34,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("project-connections-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("project-connections-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">{{nbProjectVisits != null ? nbProjectVisits : "?"}}</strong>
@@ -46,7 +48,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("image-consultations-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("image-consultations-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">{{nbImageConsultations != null ? nbImageConsultations : "?"}}</strong>
@@ -58,7 +62,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("annotation-actions-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("annotation-actions-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">{{nbAnnotationActions != null ? nbAnnotationActions : "?"}}</strong>
@@ -75,7 +81,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("manual-annotations-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("manual-annotations-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">
@@ -89,7 +97,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("analysis-annotations-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("analysis-annotations-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">
@@ -103,7 +113,9 @@
                     <div class="absolute-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("reviewed-annotations-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("reviewed-annotations-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                     <strong class="metric">
@@ -133,7 +145,7 @@
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <template slot="popover">
+                            <template v-slot:popover>
                                 <p>{{$t("number-annotations-chart-info-message")}}</p>
                                 <p>{{$t("barchart-hover-mouse-for-details")}}</p>
                                 <p>{{$t("barchart-click-label-to-toggle-visibility")}}</p>
@@ -162,7 +174,9 @@
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("annotations-vs-terms-chart-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("annotations-vs-terms-chart-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                 </div>
@@ -184,7 +198,9 @@
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
-                            <p slot="popover">{{$t("annotations-vs-contributors-chart-info-message")}}</p>
+                            <template v-slot:popover>
+                                <p>{{$t("annotations-vs-contributors-chart-info-message")}}</p>
+                            </template>
                         </v-popover>
                     </div>
                 </div>

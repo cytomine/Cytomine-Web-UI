@@ -16,7 +16,7 @@
                      hoverable
                      :selected.sync="selectedAnnot">
 
-                <template slot-scope="{row: annot, index}">
+                <template v-slot:default="{row: annot, index}">
                     <b-table-column label="#" centered>
                         {{(currentPage - 1)*perPage + index + 1}}
                     </b-table-column>
@@ -53,7 +53,7 @@
                     <b-table-column label="" width="40">&zwnj;</b-table-column>
                 </template>
 
-                <template slot="bottom-left">
+                <template v-slot:bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>
@@ -62,9 +62,11 @@
                     </b-select>
                 </template>
 
-                <div slot="empty" class="has-text-centered">
-                    {{$t("no-annotation")}}
-                </div>
+                <template v-slot:empty>
+                    <div class="has-text-centered">
+                        {{$t("no-annotation")}}
+                    </div>
+                </template>
             </b-table>
         </div>
         <div class="table-footer buttons">

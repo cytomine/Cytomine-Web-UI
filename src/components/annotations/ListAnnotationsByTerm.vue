@@ -9,23 +9,26 @@
         :open="openedAnnot == annot.id" :auto-hide="false"> 
             <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="openedAnnot = annot.id">
+            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click.stop="toggle(annot.id)">
                 <button class="button is-small">
                     <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
                 </button>
             </div>
 
-            <annotation-details slot="popover" v-click-outside="(event) => close(event, annot.id)"
-                :annotation="annot"
-                :terms="allTerms"
-                :users="allUsers"
-                :images="allImages"
-                @addTerm="term => $emit('addTerm', term)"
-                @updateTerms="$emit('update', annot.id)"
-                @deletion="$emit('update', annot.id)"
-                v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
-                (prevents fetching unnecessary information) -->
-            </annotation-details>
+            <template v-slot:popover>
+                <annotation-details
+                    v-click-outside="(event) => close(event, annot.id)"
+                    :annotation="annot"
+                    :terms="allTerms"
+                    :users="allUsers"
+                    :images="allImages"
+                    @addTerm="term => $emit('addTerm', term)"
+                    @updateTerms="$emit('update', annot.id)"
+                    @deletion="$emit('update', annot.id)"
+                    v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
+                    (prevents fetching unnecessary information) -->
+                </annotation-details>
+            </template>
         </v-popover>
         
         <b-pagination
@@ -131,6 +134,9 @@ export default {
                     )
                 });
             }
+        },
+        toggle(id) {
+            this.openedAnnot = this.openedAnnot === id ? 0 : id;
         },
         close(event, id) {
             // do not close the popover if click was performed in modal or in notification

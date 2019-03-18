@@ -16,30 +16,31 @@
                        :allowSelection="false"
                        :searchString="searchString"
                        :additionalNodes="additionalNodes">
+            <template v-slot:custom-sidebar="{term}">
+                <div class="sidebar-tree">
+                    <div class="visibility">
+                        <input v-if="term.id"
+                            type="checkbox"
+                            :checked="terms[termsMapping[term.id]].visible"
+                            @change="toggleTermVisibility(termsMapping[term.id])">
 
-            <div class="sidebar-tree" slot="custom-sidebar" slot-scope="{term}">
-                <div class="visibility">
-                    <input v-if="term.id"
-                           type="checkbox"
-                           :checked="terms[termsMapping[term.id]].visible"
-                           @change="toggleTermVisibility(termsMapping[term.id])">
+                        <input v-else type="checkbox" v-model="displayNoTerm">
+                    </div>
 
-                    <input v-else type="checkbox" v-model="displayNoTerm">
+                    <div class="opacity">
+                        <input v-if="term.id"
+                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+                            :disabled="!terms[termsMapping[term.id]].visible"
+                            :value="terms[termsMapping[term.id]].opacity"
+                            @change="event => changeOpacity(termsMapping[term.id], event)"
+                            @input="event => changeOpacity(termsMapping[term.id], event)">
+
+                        <input v-else
+                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+                            v-model="noTermOpacity">
+                    </div>
                 </div>
-
-                <div class="opacity">
-                    <input v-if="term.id"
-                        class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                        :disabled="!terms[termsMapping[term.id]].visible"
-                        :value="terms[termsMapping[term.id]].opacity"
-                        @change="event => changeOpacity(termsMapping[term.id], event)"
-                        @input="event => changeOpacity(termsMapping[term.id], event)">
-
-                    <input v-else
-                        class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                        v-model="noTermOpacity">
-                </div>
-            </div>
+            </template>
         </ontology-tree>
     </div>
     <div class="has-text-right">

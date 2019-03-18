@@ -19,7 +19,7 @@
                         <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
                         pagination-size="is-small">
 
-                            <template slot-scope="{row: image}">
+                            <template v-slot:default="{row: image}">
                                 <b-table-column :label="$t('overview')">
                                     <img :src="image.preview" :alt="image.originalFilename" class="image-overview">
                                 </b-table-column>
@@ -42,13 +42,13 @@
                                 </b-table-column>
                             </template>
 
-                            <template slot="empty">
+                            <template v-slot:empty>
                                 <div class="content has-text-grey has-text-centered">
                                     <p>{{$t("no-image")}}</p>
                                 </div>
                             </template>
 
-                            <template slot="bottom-left">
+                            <template v-slot:bottom-left>
                                 <b-select v-model="perPage" size="is-small">
                                     <option value="10">10 {{$t("per-page")}}</option>
                                     <option value="25">25 {{$t("per-page")}}</option>

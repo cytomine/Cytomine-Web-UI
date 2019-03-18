@@ -56,7 +56,7 @@
             <b-table :data="filteredMembers" default-sort="username"
                     :paginated="true" :per-page="perPage" pagination-size="is-small">
 
-                <template slot-scope="{row: member}">
+                <template v-slot:default="{row: member}">
                     <b-table-column field="username" :label="$t('username')" sortable width="100">
                         <username :user="member" :online="onlineIds ? onlineIds.includes(member.id) : null" 
                             :displayFullName="false">
@@ -102,19 +102,21 @@
                     </b-table-column>
                 </template>
 
-                <template slot="empty">
+                <template v-slot:empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-member-fitting-criteria")}}</p>
                     </div>
                 </template>
 
-                <p class="has-text-centered" v-if="isManager" slot="footer">
-                    <router-link class="button is-link add-member" :to="`/project/${project.id}/configuration?tab=members`">
-                        {{$t('button-manage-members')}}
-                    </router-link>
-                </p>
+                <template v-slot:footer v-if="isManager">
+                    <p class="has-text-centered">
+                        <router-link class="button is-link add-member" :to="`/project/${project.id}/configuration?tab=members`">
+                            {{$t('button-manage-members')}}
+                        </router-link>
+                    </p>
+                </template>
 
-                <template slot="bottom-left">
+                <template v-slot:bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>

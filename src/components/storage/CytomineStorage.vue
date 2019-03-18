@@ -139,7 +139,7 @@
 
                 <b-table :data="filteredUploadedFiles" :paginated="true" :per-page="perPage"
                 pagination-size="is-small" detailed detail-key="id">
-                    <template slot-scope="{row: uFile}">
+                    <template v-slot:default="{row: uFile}">
                         <b-table-column :label="$t('preview')" width="80">
                             <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
                             <div v-else class="is-size-7 has-text-grey">{{$t("no-preview-available")}}</div>
@@ -174,17 +174,17 @@
                         </b-table-column>
                     </template>
 
-                    <template slot="detail" slot-scope="{row: uFile}">
+                    <template v-slot:detail="{row: uFile}">
                         <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()"></uploaded-file-details>
                     </template>
 
-                    <template slot="empty">
+                    <template v-slot:empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-uploaded-file")}}</p>
                         </div>
                     </template>
 
-                    <template slot="bottom-left">
+                    <template v-slot:bottom-left>
                         <b-select v-model="perPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>

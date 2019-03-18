@@ -39,14 +39,14 @@
                 :per-page="perPage"
                 pagination-size="is-small">
 
-            <template slot-scope="{column}" slot="header">
+            <template v-slot:header="{column}">
                 <template v-if="column.label == 'SELECTOR'">
                     <input type="checkbox" v-model="selectAll" :disabled="filteredMembers.length == 0">
                 </template>
                 <template v-else>{{ column.label }}</template>
             </template>
 
-            <template slot-scope="{row: member}">
+            <template v-slot:default="{row: member}">
                 <b-table-column label="SELECTOR" width="20">
                     <input type="checkbox" v-model="member.selected" :disabled="member.id == currentUser.id">
                 </b-table-column>
@@ -89,17 +89,19 @@
                 </b-table-column>
             </template>
 
-            <template slot="empty">
+            <template v-slot:empty>
                 <div class="content has-text-grey has-text-centered">
                     <p>{{$t("no-member-fitting-criteria")}}</p>
                 </div>
             </template>
+            
+            <template v-slot:footer>
+                <div class="has-text-centered">
+                    <button class="button is-link">{{$t("button-export-as-csv")}}</button> <!-- TODO -->
+                </div>
+            </template>
 
-            <div class="has-text-centered" slot="footer">
-                <button class="button is-link">{{$t("button-export-as-csv")}}</button> <!-- TODO -->
-            </div>
-
-            <template slot="bottom-left">
+            <template v-slot:bottom-left>
                 <b-select v-model="perPage" size="is-small">
                     <option value="10">10 {{$t("per-page")}}</option>
                     <option value="25">25 {{$t("per-page")}}</option>

@@ -16,7 +16,7 @@
                 :per-page="perPage"
                 pagination-size="is-small">
 
-            <template slot-scope="{row: filter}">
+            <template v-slot:default="{row: filter}">
                 <b-table-column field="name" :label="$t('name')" sortable>
                     {{filter.name}}
                 </b-table-column>
@@ -29,13 +29,13 @@
                 </b-table-column>
             </template>
 
-            <template slot="empty">
+            <template v-slot:empty>
                 <div class="content has-text-grey has-text-centered">
                     <p>{{$t("no-image-filter")}}</p>
                 </div>
             </template>
 
-            <template slot="bottom-left">
+            <template v-slot:bottom-left>
                 <b-select v-model="perPage" size="is-small">
                     <option value="10">10 {{$t("per-page")}}</option>
                     <option value="25">25 {{$t("per-page")}}</option>

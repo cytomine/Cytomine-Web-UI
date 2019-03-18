@@ -53,7 +53,7 @@
                     :paginated="true" :per-page="connectionsPerPage" pagination-size="is-small"
                     detailed detail-key="id">
 
-                    <template slot-scope="{row: connection}">
+                    <template v-slot:default="{row: connection}">
                         <b-table-column :label="$t('date')" field="created" sortable>
                             {{ Number(connection.created) | moment("ll LT") }}
                         </b-table-column>
@@ -72,21 +72,25 @@
                         </b-table-column>
                     </template>
 
-                    <template slot="empty">
+                    <template v-slot:empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-project-connection")}}</p>
                         </div>
                     </template>
 
-                    <template slot="detail" slot-scope="{row: connection}">
+                    <template v-slot:detail="{row: connection}">
                         <project-connection-details :connection="connection" :key="connection.id"></project-connection-details>
                     </template>
 
-                    <p class="has-text-centered" slot="footer">
-                        <a class="button is-link" :href="connections.downloadURL" target="_self">{{$t("button-export-as-csv")}}</a>
-                    </p>
+                    <template v-slot:footer>
+                        <p class="has-text-centered">
+                            <a class="button is-link" :href="connections.downloadURL" target="_self">
+                                {{$t("button-export-as-csv")}}
+                            </a>
+                        </p>
+                    </template>
 
-                    <template slot="bottom-left">
+                    <template v-slot:bottom-left>
                         <b-select v-model="connectionsPerPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>
@@ -142,7 +146,7 @@
 
                 <b-table :data="consultations.array" :paginated="true" :per-page="consultationsPerPage" pagination-size="is-small">
 
-                    <template slot-scope="{row: consultation}">
+                    <template v-slot:default="{row: consultation}">
                         <b-table-column :label="$t('overview')" field="created">
                             <router-link :to="`/project/${project.id}/image/${consultation.image}`">
                                 <img :src="consultation.imageThumb" class="image-overview">
@@ -176,17 +180,21 @@
                         </b-table-column>
                     </template>
 
-                    <template slot="empty">
+                    <template v-slot:empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-image-consultation")}}</p>
                         </div>
                     </template>
 
-                    <p class="has-text-centered" slot="footer">
-                        <a class="button is-link" :href="consultations.downloadURL" target="_self">{{$t("button-export-as-csv")}}</a>
-                    </p>
+                    <template v-slot:footer>
+                        <p class="has-text-centered">
+                            <a class="button is-link" :href="consultations.downloadURL" target="_self">
+                                {{$t("button-export-as-csv")}}
+                            </a>
+                        </p>
+                    </template>
 
-                    <template slot="bottom-left">
+                    <template v-slot:bottom-left>
                         <b-select v-model="consultationsPerPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>
@@ -223,6 +231,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
             user: null,
             resumeActivity: null,
 

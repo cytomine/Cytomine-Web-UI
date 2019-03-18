@@ -124,7 +124,7 @@
 
             <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
-                <template slot-scope="{row: project}">
+                <template v-slot:default="{row: project}">
                     <b-table-column :visible="atLeastOneManaged" field="roleIndex" label="" centered width="1" sortable>
                         <i v-if="project.isManaged" class="fas fa-cog"
                            :title="$t(project.isRepresented ? 'representative-icon-label' : 'manager-icon-label')">
@@ -173,20 +173,20 @@
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="{row: project}">
+                <template v-slot:detail="{row: project}">
                     <project-details :project="project"
                         :excluded-properties="excludedProperties"
                         @delete="deleteProject(project)">
                     </project-details>
                 </template>
 
-                <template slot="empty">
+                <template v-slot:empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-project")}}</p>
                     </div>
                 </template>
 
-                <template slot="bottom-left">
+                <template v-slot:bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>
