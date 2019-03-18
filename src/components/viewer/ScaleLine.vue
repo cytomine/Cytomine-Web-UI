@@ -40,16 +40,16 @@ export default {
         },
         resolution() {
             if(this.image.resolution != null) {
-                return Math.pow(2, this.zoom - this.image.depth) * this.image.resolution;
+                return Math.pow(2, this.image.depth - this.zoom) * this.image.resolution;
             }
         },
         scaleLength() {
             if (this.resolution != null && this.resolution != 0) {
                 let length = this.scaleLineLength * this.resolution;
-                let unit = "µm";
+                let unit = this.$t("um");
                 if (length > 1000) {
                     length /= 1000;
-                    unit = "mm";
+                    unit = this.$t("mm");
                 }
                 return `${length.toPrecision(3)} ${unit}`;
             }
