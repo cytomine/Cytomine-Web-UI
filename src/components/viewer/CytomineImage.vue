@@ -14,7 +14,7 @@
                      :zoom.sync="zoom"
                      :rotation.sync="rotation"
                      :max-zoom="maxZoom"
-                     :min-zoom="minZoom"
+                     :max-resolution="Math.pow(2, image.depth)"
                      :extent="extent"
                      :projection="projectionName"
                      @mounted="viewMounted()"
@@ -507,7 +507,7 @@ export default {
     },
     async created() {
         if(getProj(this.projectionName) == null) { // if image opened for the first time
-            let projection = createProj({code: this.projectionName, extent: this.extent});
+            let projection = createProj({code: this.projectionName, units: "pixels", extent: this.extent});
             addProj(projection);
         }
 
