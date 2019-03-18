@@ -38,15 +38,6 @@
                     <cytomine-description :object="image"></cytomine-description>
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('tags')">
-                <td class="prop-label">{{$t("tags")}}</td>
-                <td class="prop-content">
-                    <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
-                        <span class="tag is-rounded is-info">Demo</span>
-                        <span class="tag is-rounded is-info">CHU</span>
-                    </div>
-                </td>
-            </tr>
             <tr v-if="isPropDisplayed('properties')">
                 <td class="prop-label">{{$t("properties")}}</td>
                 <td class="prop-content">
@@ -328,11 +319,6 @@ td.prop-label {
 
 td.prop-content {
     width: 100%;
-}
-
-.tag {
-    font-size: 10px !important;
-    font-weight: 600;
 }
 
 .format {

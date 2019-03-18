@@ -52,15 +52,6 @@
                 <cytomine-description :object="project"></cytomine-description>
             </td>
         </tr>
-        <tr v-if="isPropDisplayed('tags')">
-            <td class="prop-label">{{$t("tags")}}</td>
-            <td class="prop-content">
-                <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
-                    <span class="tag is-rounded is-info">Demo</span>
-                    <span class="tag is-rounded is-info">CHU</span>
-                </div>
-            </td>
-        </tr>
         <tr v-if="isPropDisplayed('attachedFiles')">
             <td class="prop-label">{{$t("attached-files")}}</td>
             <td class="prop-content">
@@ -224,10 +215,5 @@ td.prop-label {
 
 td.prop-content {
     width: 100%;
-}
-
-.tag {
-    font-size: 10px !important;
-    font-weight: 600;
 }
 </style>

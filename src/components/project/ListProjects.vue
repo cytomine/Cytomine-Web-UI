@@ -29,17 +29,6 @@
                     <div class="columns">
                         <div class="column filter">
                             <div class="filter-label">
-                                {{$t("tags")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
-                        </div>
-
-                        <div class="column filter">
-                            <div class="filter-label">
                                 {{$t("ontology")}}
                             </div>
                             <div class="filter-body">
@@ -59,6 +48,8 @@
                                 </cytomine-multiselect>
                             </div>
                         </div>
+
+                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -82,9 +73,7 @@
                             </div>
                         </div>
 
-                        <div class="column">
-
-                        </div>
+                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -243,8 +232,6 @@ export default {
             filtersOpened: false,
             initSliders: false,
             selectedOntologies: [],
-            availableTags: [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}], // TODO
-            selectedTags: [],
             availableRoles: [],
             contributorLabel: null,
             managerLabel: null,
@@ -281,7 +268,6 @@ export default {
             let includeContributor = this.selectedRoles.includes(this.contributorLabel);
             let includeManager = this.selectedRoles.includes(this.managerLabel);
 
-            // TODO tags
             filtered = filtered.filter(project => {
                 let roleIncluded = (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
                 return this.selectedOntologiesIds.includes(project.ontology) &&

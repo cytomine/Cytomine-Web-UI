@@ -31,18 +31,7 @@
             <b-collapse :open="filtersOpened">
                 <div class="filters">
                     <div class="columns">
-                        <div class="column filter">
-                            <div class="filter-label">
-                                {{$t("tags")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
-                        </div>
-
-                        <div class="column filter">
+                        <div class="column filter is-one-quarter">
                             <div class="filter-label">
                                 {{$t("format")}}
                             </div>
@@ -52,7 +41,7 @@
                             </div>
                         </div>
 
-                        <div class="column filter">
+                        <div class="column filter is-one-quarter">
                             <div class="filter-label">
                                 {{$t("vendor")}}
                             </div>
@@ -61,8 +50,6 @@
                                 </cytomine-multiselect>
                             </div>
                         </div>
-
-                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -250,7 +237,6 @@ export default {
             filtersOpened: false,
             initSliders: false,
 
-            selectedTags: [],
             selectedFormats: [],
             selectedVendors: [],
             selectedMagnifications: [],
@@ -295,8 +281,6 @@ export default {
                 });
             }
 
-            // TODO: tags
-
             filtered = filtered.filter(image => this.selectedFormats.includes(image.extension));
             filtered = filtered.filter(image => this.selectedVendors.includes(image.vendorFormatted));
 
@@ -314,9 +298,6 @@ export default {
                 isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
 
             return filtered;
-        },
-        availableTags() {
-            return [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}]; // TODO
         },
         availableFormats() {
             let formats = [];
