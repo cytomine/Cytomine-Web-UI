@@ -22,10 +22,9 @@
 
             <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
                 <vl-source-zoomify :projection="projectionName"
-                                   :url="baseLayerURL"
+                                   :urls="baseLayerURLs"
                                    :size="imageSize"
                                    :extent="extent"
-                                   :key="baseLayerURL"
                                    crossOrigin="Anonymous"
                                    ref="baseSource"
                                    @mounted="setBaseSource()">
@@ -336,9 +335,9 @@ export default {
         imageSize() {
             return [this.image.width, this.image.height];
         },
-        baseLayerURL() { // TODO: randomize + filter (see ULiege repo)
-            return `${this.image.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                &channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
+        baseLayerURLs() { // TODO: image filters (see ULiege repo)
+            let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
+            return this.image.imageServerURLs.map(url => url + params);
         },
 
         colorManipulationOn() {

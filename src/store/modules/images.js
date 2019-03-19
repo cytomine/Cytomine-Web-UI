@@ -724,8 +724,7 @@ async function fetchImage(idImage) {
 
 async function fetchImageServers(image) {
     if(image.imageServerURLs == null) {
-        let imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
-        image.imageServerURL = imageServerURLs[0];
+        image.imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
     }
 }
 
