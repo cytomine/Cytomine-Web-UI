@@ -32,7 +32,7 @@
                     </b-table-column>
 
                     <b-table-column field="roleObject.index" :label="$t('role')" sortable width="50">
-                        <span class="tag" :class="user.roleObject.class">{{user.roleObject.label}}</span>
+                        <span class="tag" :class="user.roleObject.class">{{$t(user.roleObject.label)}}</span>
                     </b-table-column>
 
                     <b-table-column field="email" :label="$t('email')" sortable width="150">
@@ -85,8 +85,7 @@
                 </template>
             </b-table>
 
-            <user-modal :active.sync="modal" :user="editedUser" :roles="roles"
-                @addUser="addUser" @updateUser="updateUser">
+            <user-modal :active.sync="modal" :user="editedUser" @addUser="addUser" @updateUser="updateUser">
             </user-modal>
         </template>
     </template>
@@ -96,6 +95,7 @@
 <script>
 import {UserCollection} from "cytomine-client";
 import UserModal from "./UserModal";
+import {rolesMapping} from "@/utils/role-utils";
 
 export default {
     name: "admin-users",
@@ -107,17 +107,14 @@ export default {
             addUserModal: false,
             searchString: "",
             perPage: 25,
-            roles: {
-                "ROLE_GUEST": {label: this.$t("guest"), index: 0, class: "is-light"},
-                "ROLE_USER": {label: this.$t("user"), index: 1, class: "is-link"},
-                "ROLE_ADMIN": {label: this.$t("admin"), index: 2, class: "is-success"},
-                "ROLE_SUPER_ADMIN": {label: this.$t("super-admin"), index: 3, class: "is-success"},
-            },
             modal: false,
             editedUser: null
         };
     },
     computed: {
+        roles() {
+            return rolesMapping;
+        },
         filteredUsers() {
             if(this.searchString === "") {
                 return this.users;

@@ -12,6 +12,10 @@
                         <b-input :value="currentUser.username" disabled></b-input>
                     </b-field>
 
+                    <b-field :label="$t('role')" horizontal>
+                        <span class="tag" :class="role.class">{{$t(role.label)}}</span>
+                    </b-field>
+
                     <b-field :label="$t('lastname')" horizontal>
                         <b-input v-model="updatedUser.lastname"></b-input>
                     </b-field>
@@ -102,6 +106,7 @@
 import { mapState } from "vuex";
 import _ from "lodash";
 import {User} from "cytomine-client";
+import {rolesMapping} from "@/utils/role-utils";
 
 export default {
     name: "Account",
@@ -116,6 +121,10 @@ export default {
         };
     },
     computed: {
+        role() {
+            let key = this.currentUser.guestByNow ? "ROLE_GUEST" : this.currentUser.adminByNow ? "ROLE_ADMIN" : "ROLE_USER";
+            return rolesMapping[key];
+        },
         savePasswordDisabled() {
             return !(this.newPassword == this.confirmPassword && this.newPassword != "");
         },

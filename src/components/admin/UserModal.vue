@@ -23,7 +23,7 @@
                 <b-field :label="$t('role')" horizontal>
                     <b-select v-model="selectedRole">
                         <option v-for="(value, key) in roles" :value="key" :key="key">
-                            {{value.label}}
+                            {{$t(value.label)}}
                         </option>
                     </b-select>
                 </b-field>
@@ -43,14 +43,14 @@
 
 <script>
 import {User, RoleCollection} from "cytomine-client";
+import {rolesMapping} from "@/utils/role-utils";
 const defaultRole = "ROLE_GUEST";
 
 export default {
     name: "user-modal",
     props: [
         "active",
-        "user",
-        "roles"
+        "user"
     ],
     data() {
         return {
@@ -61,6 +61,9 @@ export default {
         };
     },
     computed: {
+        roles() {
+            return rolesMapping;
+        },
         editionMode() {
             return this.user != null;
         },
