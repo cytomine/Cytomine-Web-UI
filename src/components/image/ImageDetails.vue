@@ -29,7 +29,9 @@
             <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
                 <td class="prop-label">{{$t("reviewed-annotations")}}</td>
                 <td class="prop-content">
-                    <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link (todo with current system ; add option to annotation type) -->
+                    <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+                        {{ image.numberOfReviewedAnnotations }}
+                    </router-link>
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('description')">

@@ -148,7 +148,9 @@
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-                        <a>{{ project.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                            {{ project.numberOfReviewedAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">

@@ -43,7 +43,9 @@
         <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
             <td class="prop-label">{{$t("reviewed-annotations")}}</td>
             <td class="prop-content">
-                <a>{{project.numberOfReviewedAnnotations}}</a> <!-- TODO: router link -->
+                <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                    {{project.numberOfReviewedAnnotations}}
+                </router-link>
             </td>
         </tr>
         <tr v-if="isPropDisplayed('description')">

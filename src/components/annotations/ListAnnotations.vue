@@ -63,12 +63,12 @@
                         </div>
                     </div>
 
-                    <div v-if="selectedAnnotationType == userAnnotationOption" class="column filter">
+                    <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter">
                         <div class="filter-label">
-                            {{$t("members")}}
+                            {{$t("analyses")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedMembers" :options="members"
+                            <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
                                 label="fullName" track-by="id" :multiple="true">
                             </cytomine-multiselect>
                         </div>
@@ -76,10 +76,10 @@
 
                     <div v-else class="column filter">
                         <div class="filter-label">
-                            {{$t("analyses")}}
+                            {{$t(reviewed ? "reviewers" : "members")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
+                            <cytomine-multiselect v-model="selectedMembers" :options="members"
                                 label="fullName" track-by="id" :multiple="true">
                             </cytomine-multiselect>
                         </div>
@@ -136,6 +136,8 @@
             :noTerm="term == noTermOption"
             :imagesIds="selectedImagesIds"
             :usersIds="selectedUsersIds"
+            :reviewed="reviewed"
+            :reviewUsersIds="reviewUsersIds"
 
             :forceUpdate="forceUpdate"
 
@@ -179,6 +181,7 @@ export default {
 
             userAnnotationOption: this.$t("user-annotations"),
             jobAnnotationOption: this.$t("analysis-annotations"),
+            reviewedAnnotationOption: this.$t("reviewed-annotations"),
             annotationTypes: [],
             selectedAnnotationType : "",
 
@@ -212,10 +215,19 @@ export default {
         selectedImagesIds() {
             return this.selectedImages.map(img => img.id);
         },
+        reviewed() {
+            return this.selectedAnnotationType == this.reviewedAnnotationOption;
+        },
         selectedUsersIds() {
+            if(this.reviewed) {
+                return null;
+            }
             let users = (this.selectedAnnotationType == this.jobAnnotationOption) ? this.selectedUserJobs 
                 : this.selectedMembers;
             return users.map(user => user.id);
+        },
+        reviewUsersIds() {
+            return this.reviewed ? this.selectedMembers.map(u => u.id) : null;
         },
         allUsers() {
             return this.users.concat(this.userJobs);
@@ -226,6 +238,8 @@ export default {
                 terms: this.selectedTermsIds,
                 images: this.selectedImagesIds,
                 users: this.selectedUsersIds,
+                reviewed: this.reviewed,
+                reviewUsers: this.reviewUsersIds, // TODO: fix in backend
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
@@ -286,9 +300,9 @@ export default {
         }
     },
     async created() {
-        this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption];
+        this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
         this.selectedAnnotationType = (this.$route.query.type == "algo") ? this.jobAnnotationOption
-            : this.userAnnotationOption;
+            : (this.$route.query.type == "reviewed") ? this.reviewedAnnotationOption : this.userAnnotationOption;
 
         this.allowedSizes = [
             {label: this.$t("small"), size: 85},

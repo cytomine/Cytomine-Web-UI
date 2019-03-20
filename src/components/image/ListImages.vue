@@ -165,7 +165,9 @@
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-                        <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+                            {{ image.numberOfReviewedAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
