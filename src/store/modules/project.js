@@ -1,4 +1,5 @@
 import {Cytomine, Project, ProjectConnection, Ontology} from "cytomine-client";
+import {fullName} from "@/utils/user-utils.js";
 
 export default {
     state: {
@@ -67,6 +68,8 @@ export default {
 
             let managers = (await managersPromise).array;
             let members = (await membersPromise).array;
+
+            members.forEach(member => member.fullName = fullName(member));
 
             commit("setManagers", managers);
             commit("setMembers", members);

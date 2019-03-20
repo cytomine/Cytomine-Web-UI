@@ -385,6 +385,10 @@ export default {
             state.viewers[idViewer].maps[index].annotsToSelect = [annot];
         },
 
+        setShowComments(state, {idViewer, index, annot}) {
+            state.viewers[idViewer].maps[index].showComments = annot ? annot.id : null;
+        },
+
         // ----- Draw tools and associated interactions
 
         activateTool(state, {idViewer, index, tool}) {
@@ -447,7 +451,9 @@ export default {
 
     actions: {
         changePath({getters}, idViewer) {
-            router.replace(getters.pathViewer({idViewer, idAnnotation: router.currentRoute.params.idAnnotation}));
+            let idAnnotation = router.currentRoute.params.idAnnotation;
+            let action = router.currentRoute.query.action;
+            router.replace(getters.pathViewer({idViewer, idAnnotation, action}));
         },
 
         async addViewer({commit, dispatch, rootState}, {idViewer, idImages}) {
@@ -471,7 +477,7 @@ export default {
                 maxZoom: image.depth + constants.DIGITAL_ZOOM_INCREMENT,
                 digitalZoom: true,
 
-                zoom: 0, // TODO
+                zoom: 0,
                 center: [image.width/2, image.height/2],
                 rotation: 0,
 
@@ -499,6 +505,7 @@ export default {
 
                 selectedFeatures: [],
                 annotsToSelect: [],
+                showComments: null, // set to the identifier of an annotation to automatically open comments modal if this annotation if the first to be selected
 
                 activeTool: "select",
                 activeEditTool: null,
@@ -685,11 +692,12 @@ export default {
             return styles;
         },
 
-        pathViewer: state => ({idViewer, idAnnotation}) => {
+        pathViewer: state => ({idViewer, idAnnotation, action}) => {
             let viewerWrapper = state.viewers[idViewer];
             let imagesIds = viewerWrapper.maps.map(map => map.imageInstance.id);
             let annot = idAnnotation ? `/annotation/${idAnnotation}` : "";
-            return `/project/${viewerWrapper.idProject}/image/${imagesIds.join("-")}${annot}?viewer=${idViewer}`;
+            let actionStr = action ? "&action=" + action : "";
+            return `/project/${viewerWrapper.idProject}/image/${imagesIds.join("-")}${annot}?viewer=${idViewer}${actionStr}`;
         }
     }
 };

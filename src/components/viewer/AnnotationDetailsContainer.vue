@@ -25,6 +25,7 @@
                                 :users="allUsers"
                                 :showImageInfo="false"
                                 :key="selectedFeature.id"
+                                :showComments="showComments"
                                 @addTerm="addTerm"
                                 @updateTerms="updateTerms()"
                                 @updateProperties="updateProperties()"
@@ -60,7 +61,8 @@ export default {
             users: [],
             userJobs: [],
             reload: true,
-            format: new WKT()
+            format: new WKT(),
+            showComments: false
         };
     },
     computed: {
@@ -110,6 +112,11 @@ export default {
         selectedFeature() {
             if(this.selectedFeature != null) {
                 this.displayAnnotDetails = true;
+                let targetAnnot = this.imageWrapper.showComments;
+                this.showComments = targetAnnot == this.annot.id;
+                if(targetAnnot !== null) {
+                    this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot: null});
+                }
             }
         }
     },

@@ -499,6 +499,9 @@ export default {
                 let annot = await Annotation.fetch(idRoutedAnnot);
                 if(annot.image == this.image.id) {
                     this.routedAnnotation = annot;
+                    if(this.$route.query.action === "comments") {
+                        this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot});
+                    }
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
                 }
             }

@@ -119,8 +119,9 @@
                 {{ $t("button-copy-url") }}
             </button>
 
-            <button v-if="isPropDisplayed('comments')" class="level-item button is-small"> <!-- TODO -->
-                {{ $t("button-comment") }}
+            <button v-if="isPropDisplayed('comments') && comments" class="level-item button is-small"
+                    @click="openCommentsModal()">
+                {{ $t("button-comments") }} ({{comments.length}})
             </button>
 
             <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
@@ -132,13 +133,14 @@
 </template>
 
 <script>
-import {AnnotationTerm} from "cytomine-client";
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import CytomineTerm from "@/components/ontology/CytomineTerm";
 import AttachedFiles from "@/components/attached-file/AttachedFiles";
 import OntologyTree from "@/components/ontology/OntologyTree";
+import AnnotationCommentsModal from "./AnnotationCommentsModal";
 
 export default {
     name: "annotations-details",
@@ -147,19 +149,22 @@ export default {
         CytomineTerm,
         OntologyTree,
         CytomineProperties,
-        AttachedFiles
+        AttachedFiles,
+        AnnotationCommentsModal
     },
     props: {
         annotation: {type: Object},
         terms: {type: Array},
         users: {type: Array},
         images: {type: Array},
-        showImageInfo: {type: Boolean, default: true}
+        showImageInfo: {type: Boolean, default: true},
+        showComments: {type: Boolean, default: false}
     },
     data() {
         return {
             addTermString: "",
             showTermSelector: false,
+            comments: null,
             revTerms: 0
         };
     },
@@ -245,6 +250,20 @@ export default {
             }
         },
 
+        openCommentsModal() {
+            this.$modal.open({
+                parent: this,
+                component: AnnotationCommentsModal,
+                props: {annotation: this.annotation, comments: this.comments},
+                hasModalCard: true,
+                events: {"addComment": this.addComment}
+            });
+        },
+
+        addComment(comment) {
+            this.comments.unshift(comment);
+        },
+
         confirmDeletion() {
             this.$dialog.confirm({
                 title: this.$t("confirm-deletion"),
@@ -264,7 +283,21 @@ export default {
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-deletion")});
             }
-        },
+        }
+    },
+    async created() {
+        if(this.isPropDisplayed("creation-info") && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
+            try {
+                this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;
+                if(this.showComments) {
+                    this.openCommentsModal();
+                }
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-fetch-annotation-comments")});
+            }
+        }
     }
 };
 </script>
