@@ -1,10 +1,10 @@
 import Vue from "vue";
 import router from "@/routes.js";
 
-import {ImageInstance, TermCollection, PropertyCollection, AbstractImage} from "cytomine-client";
+import {ImageInstance, TermCollection, PropertyCollection, AbstractImage, AnnotationType} from "cytomine-client";
 
 import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
-    verticesStyle, defaultColors} from "@/utils/style-utils.js";
+    verticesStyle, reviewedStyles, reviewedSelectStyles, defaultColors} from "@/utils/style-utils.js";
 import constants from "@/utils/constants";
 
 import {createGeoJsonFmt} from "vuelayers/lib/ol-ext/format";
@@ -662,14 +662,19 @@ export default {
                 styles.push(imageWrapper.noTermStyle);
             }
 
+            let isReviewed = annot.type === AnnotationType.REVIEWED;
+
             // Styles for selected elements
             if(imageWrapper.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
-                styles.push(...selectStyles);
+                styles.push(...isReviewed ? reviewedSelectStyles : selectStyles);
 
                 // if in modify mode, display vertices
                 if(imageWrapper.activeEditTool == "modify") {
                     styles.push(verticesStyle);
                 }
+            }
+            else if(isReviewed) {
+                styles.push(...reviewedStyles);
             }
 
             // Properties

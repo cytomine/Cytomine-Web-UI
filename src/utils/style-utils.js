@@ -61,9 +61,13 @@ export function createTextStyle(text, fontSize="22px", fill=textFill, stroke=tex
 let width = 2;
 
 let blue = [0, 153, 255, 1];
+let green = [51, 160, 79, 1];
+let lightGreen = [17, 214, 76, 1];
 let white = [255, 255, 255, 1];
 
 let blueStroke = new Stroke({color: blue, width: width});
+let greenStroke = new Stroke({color: green, width: width + 1});
+let lightGreenStroke = new Stroke({color: lightGreen, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
 export let selectStyles = [
@@ -80,6 +84,17 @@ export let verticesStyle = new Style({
         return new MultiPoint(coordinates);
     }
 });
+
+export let reviewedStyles = [
+    new Style({ stroke: greenStroke }),
+    new Style({ image: new Circle({radius: 6, stroke: greenStroke}) })
+];
+
+export let reviewedSelectStyles = [
+    new Style({ stroke: whiteStroke }),
+    new Style({ stroke: lightGreenStroke }),
+    new Style({ image: new Circle({radius: 6, stroke: lightGreenStroke}) })
+];
 
 // -----
 

@@ -6,7 +6,7 @@
     <vl-source-vector ref="olSource"
                       :loader-factory="loaderFactory" 
                       :strategy-factory="strategyFactory"
-                      url="-"> <!-- loader factory not used if URL not specified -->
+                      url="-"> <!-- HACK because loader factory not used if URL not specified -->
         <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
     </vl-source-vector>
 
@@ -16,7 +16,7 @@
 <script>
 import WKT from "ol/format/WKT";
 
-import {AnnotationCollection} from "cytomine-client";
+import {AnnotationCollection, AnnotationType} from "cytomine-client";
 
 export default {
     name: "annotation-layer",
@@ -77,13 +77,17 @@ export default {
         }
     },
     methods: {
+        annotBelongsToLayer(annot) {
+            return this.layer.isReview ? annot.type === AnnotationType.REVIEWED : annot.user === this.layer.id;
+        },
+
         addAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 this.$refs.olSource.addFeature(this.createFeature(annot));
             }
         },
         selectAnnotationHandler({annot, idViewer, index}) {
-            if(idViewer == this.idViewer && index == this.index && annot.user == this.layer.id && this.$refs.olSource) {
+            if(idViewer == this.idViewer && index == this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
@@ -99,7 +103,7 @@ export default {
             }
         },
         editAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     return;
@@ -109,7 +113,7 @@ export default {
             }
         },
         deleteAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
                 if(olFeature == null) {
                     return;
@@ -152,8 +156,9 @@ export default {
             });
 
             let annots = await new AnnotationCollection({
-                user: this.layer.id,
+                user: !this.layer.isReview ? this.layer.id : null,
                 image: this.image.id,
+                reviewed: this.layer.isReview,
                 bbox: extent.join(),
                 showWKT: true,
                 showTerm: true,

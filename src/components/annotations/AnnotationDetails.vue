@@ -37,11 +37,11 @@
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                     :title="`${$t('associated-by')} ${user.fullName}`">
                         <cytomine-term :term="term"></cytomine-term>
-                        <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
+                        <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
                             @click="removeTerm(term.id)">
                         </button>
                     </b-tag>
-                    <div class="add-term-wrapper" v-if="canEdit" v-click-outside="() => showTermSelector = false">
+                    <div class="add-term-wrapper" v-if="canEditTerms" v-click-outside="() => showTermSelector = false">
                         <b-field>
                             <b-input size="is-small"
                                     expanded
@@ -90,10 +90,22 @@
                         {{ creator.fullName }}
                     </td>
                 </tr>
-                <tr>
+                <tr v-if="!isReview">
                     <td><strong>{{$t("created-on")}}</strong></td>
                     <td> {{ Number(annotation.created) | moment("ll") }} </td>
                 </tr>
+                <template v-else>
+                    <tr>
+                        <td><strong>{{$t("reviewed-by")}}</strong></td>
+                        <td>
+                            {{ reviewer.fullName }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>{{$t("reviewed-on")}}</strong></td>
+                        <td> {{ Number(annotation.created) | moment("ll") }} </td>
+                    </tr>
+                </template>
             </template>
         </tbody>
     </table>
@@ -178,8 +190,21 @@ export default {
         creator() {
             return this.users.find(user => user.id == this.annotation.user) || {};
         },
+        isReview() {
+            return this.annotation.type === AnnotationType.REVIEWED;
+        },
+        reviewer() {
+            if(this.isReview) {
+                return this.users.find(user => user.id == this.annotation.reviewUser) || {};
+            }
+        },
         canEdit() {
-            return this.$store.getters.canEditLayer(this.annotation.user);
+            return this.$store.getters.canEditAnnot(this.annotation);
+        },
+        canEditTerms() {
+            // HACK: because core prevents from modifying term of algo annot (https://github.com/cytomine/Cytomine-core/issues/1138 & 1139)
+            // + term modification forbidden for reviewed annotation
+            return this.canEdit && this.annotation.type === AnnotationType.USER;
         },
         image() {
             return this.images.find(image => image.id == this.annotation.image) || {};

@@ -279,7 +279,7 @@ export default {
                 return true; // no feature selected -> all edit tools disabled
             }
 
-            if(!this.$store.getters.canEditLayer(this.selectedFeature.properties.annot.user)) {
+            if(!this.$store.getters.canEditAnnot(this.selectedFeature.properties.annot)) {
                 return true;
             }
 

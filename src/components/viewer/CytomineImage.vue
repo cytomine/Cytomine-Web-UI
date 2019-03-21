@@ -197,7 +197,7 @@ import {KeyboardPan, KeyboardZoom} from "ol/interaction";
 import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
-import {ImageConsultation, Annotation, UserPosition} from "cytomine-client";
+import {ImageConsultation, Annotation, AnnotationType, UserPosition} from "cytomine-client";
 
 import {constLib, operation} from "@/utils/color-manipulation.js";
 
@@ -359,7 +359,7 @@ export default {
 
         layersToPreload() {
             if(this.routedAnnotation != null) {
-                return [this.routedAnnotation.user];
+                return this.routedAnnotation.type === AnnotationType.REVIEWED ? [-1] : [this.routedAnnotation.user];
             }
         },
 

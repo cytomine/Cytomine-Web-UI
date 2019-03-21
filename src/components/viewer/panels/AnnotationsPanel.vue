@@ -135,6 +135,10 @@ export default {
         },
 
         layerName(layer) {
+            if(layer.isReview) {
+                return this.$t("review-layer");
+            }
+
             let name = fullName(layer);
 
             let indexLayer = this.indexLayers.find(index => index.user == layer.id) || {};
@@ -142,7 +146,7 @@ export default {
         },
 
         canDraw(layer) {
-            return this.$store.getters.canEditLayer(layer.id);
+            return !layer.isReview && this.$store.getters.canEditLayer(layer.id);
         },
 
         addLayerById(id, visible) {
@@ -191,6 +195,12 @@ export default {
 
         async fetchLayers() {
             this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
+            if(this.image.inReview || this.image.reviewer) {
+                this.layers.push({
+                    id: -1,
+                    isReview: true
+                });
+            }
         },
 
         async fetchIndexLayers(force=false) {

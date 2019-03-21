@@ -677,3 +677,6 @@ comment-will-be-sent-by-email,The comment will be sent by email to the selected 
 notif-error-new-comment,Failed to add a comment to the annotation,
 notif-success-new-comment,Your comment was successfully send by email,
 reviewers,Reviewers,
+review-layer,Review layer,
+reviewed-by,Reviewed by,
+reviewed-on,Reviewed on,

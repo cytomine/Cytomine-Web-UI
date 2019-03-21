@@ -1,4 +1,4 @@
-import {Cytomine, Project, ProjectConnection, Ontology} from "cytomine-client";
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
 
 export default {
@@ -86,6 +86,15 @@ export default {
             let currentUser = rootState.currentUser.user;
             let project = state.project;
             return getters.canManageProject || (!project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted));
+        },
+
+        canEditAnnot: (_, getters, rootState) => annot => {
+            let currentUser = rootState.currentUser.user;
+            let idLayer = annot.user;
+            if(annot.type === AnnotationType.REVIEWED) {
+                return currentUser.adminByNow || annot.reviewUser === currentUser.id;
+            }
+            return getters.canEditLayer(idLayer);
         },
 
         canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager

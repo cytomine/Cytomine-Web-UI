@@ -107,12 +107,12 @@ export default {
         },
         errorComment() {
             if(this.displayErrors && this.text.length === 0) {
-                return this.$t('field-cannot-be-empty');
+                return this.$t("field-cannot-be-empty");
             }
         },
         errorSelectedMembers() {
             if(this.displayErrors && !this.sendToAllMembers && this.selectedMembers.length === 0) {
-                return this.$t('field-cannot-be-empty');
+                return this.$t("field-cannot-be-empty");
             }
         }
     },

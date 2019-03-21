@@ -54,6 +54,7 @@ export default {
                 let oldAnnot = annot.clone();
                 try {
                     annot.location = this.format.writeFeature(feature);
+                    annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
                     await annot.save();
                     this.$eventBus.$emit("editAnnotation", annot);
                     this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
