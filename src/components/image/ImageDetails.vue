@@ -55,7 +55,9 @@
             <tr v-if="isPropDisplayed('thumbnail')">
                 <td class="prop-label">{{$t("thumbnail")}}</td>
                 <td class="prop-content">
-                    <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview"> <!-- TODO in backend: do not return anything when thumb not available instead of returning overview? -->
+                    <a @click="isMetadataModalActive = true">
+                        <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview"> <!-- TODO in backend: do not return anything when thumb not available instead of returning overview? -->
+                    </a>
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('originalFilename')">
@@ -105,6 +107,9 @@
                     <div class="buttons">
                         <button class="button is-small" @click="isRenameModalActive = true">
                             {{$t("button-rename")}}
+                        </button>
+                        <button class="button is-small" @click="isMetadataModalActive = true">
+                            {{$t("button-metadata")}}
                         </button>
                         <button class="button is-small" @click="isCalibrationModalActive = true">
                             {{$t("button-set-calibration")}}
@@ -177,6 +182,9 @@
                        :active.sync="isCalibrationModalActive"
                        @setResolution="(event) => $emit('setResolution', event)">
     </calibration-modal>
+
+    <image-metadata-modal :active.sync="isMetadataModalActive" :idAbstractImage="image.baseImage">
+    </image-metadata-modal>
 </div>
 </template>
 
@@ -185,6 +193,7 @@ import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import AttachedFiles from "@/components/attached-file/AttachedFiles";
 import CalibrationModal from "./CalibrationModal";
+import ImageMetadataModal from "./ImageMetadataModal";
 
 import {AbstractImage, ImageInstance} from "cytomine-client";
 
@@ -194,7 +203,8 @@ export default {
         CytomineDescription,
         CytomineProperties,
         AttachedFiles,
-        CalibrationModal
+        CalibrationModal,
+        ImageMetadataModal
     },
     props: {
         image: {type: Object},
@@ -209,6 +219,8 @@ export default {
 
             isMagnificationModalActive: false,
             newMagnification: "",
+
+            isMetadataModalActive: false
         };
     },
     computed: {
