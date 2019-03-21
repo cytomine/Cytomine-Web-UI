@@ -148,6 +148,7 @@ export default {
 <style scoped>
 .target-element {
     font-weight: 600;
+    min-width: 0px; /* to allow correct handling of overflow-wrap */
 }
 
 .filesize {

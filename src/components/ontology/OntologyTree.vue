@@ -341,7 +341,10 @@ export default {
 .ontology-tree.selector .tree-selector {
     cursor: pointer;
     flex-grow: 1;
-    word-break: break-all !important;
+}
+
+.ontology-tree .tree-selector {
+    min-width: 0px; /* to allow correct handling of overflow-wrap */
 }
 
 .ontology-tree .tree-selector:hover .tree-checkbox {

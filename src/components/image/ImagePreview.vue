@@ -52,7 +52,7 @@ export default {
 
 .card-content {
     padding: 20px;
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .card-content a {

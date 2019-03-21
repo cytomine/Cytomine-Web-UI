@@ -166,7 +166,7 @@ export default {
 .card-content {
     padding: 10px;
     font-size: 12px;
-    word-break: break-all;
+    overflow-wrap: break-word;
     overflow: hidden;
     height: 60px;
 }

@@ -30,7 +30,8 @@
     flex-grow: 1;
     display: flex;
     align-items: top;
-    word-break: break-all !important;
+    overflow-wrap: break-word;
+    min-width: 0px; /* to allow correct handling of overflow-wrap */
 }
 
 .sl-vue-tree .tree-toggle.fas {
