@@ -1,46 +1,43 @@
-<!-- Source sidebar: https://codepen.io/oknoblich/pen/klnjw -->
-<!-- TODO: animation for the closing/opening of the bar -->
-
 <template>
-<div class="sidebar-wrapper">
-    <nav class="sidebar large" v-show="visibleSideBar">
-        <div class="title-nav">
-            <h1>{{`${$t("project")}: ${project.name}`}}</h1>
-        </div>
+<div class="sidebar-wrapper" :class="{expanded: expanded}" ref="sidebar">
+    <nav class="sidebar" @click="clickHandler">
+        <h1 class="project-name">{{`${$t("project")}: ${project.name}`}}</h1>
         <ul>
             <template v-if="isTabDisplayed('images')">
-                <router-link tag="li" :to="`/project/${project.id}/images`" class="images">
+                <router-link tag="li" :to="`/project/${project.id}/images`">
                     <a>
                         <i class="far fa-images"></i>
                         {{ $t("images") }}
                     </a>
                 </router-link>
             </template>
-            <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`" class="annotations">
+            <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`">
                 <a>
                     <i class="far fa-edit"></i>
                     {{ $t("annotations") }}
                 </a>
             </router-link>
-            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`" class="analysis">
+            <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`">
                 <a>
                     <i class="fas fa-tasks"></i>
                     {{ $t("analysis") }}
                 </a>
             </router-link>
-            <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`" class="activity">
+            <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
                     {{ $t("activity") }}
                 </a>
             </router-link>
-            <router-link v-if="isTabDisplayed('info')" tag="li" :to="`/project/${project.id}/information`" class="information">
+            <router-link v-if="isTabDisplayed('info')" tag="li" :to="`/project/${project.id}/information`">
                 <a>
                     <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
                 </a>
             </router-link>
-            <router-link  v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`" class="configuration">
+        </ul>
+        <ul class="bottom-menu">
+            <router-link v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`">
                 <a>
                     <i class="fas fa-cogs"></i>
                     {{ $t("configuration") }}
@@ -48,8 +45,9 @@
             </router-link>
         </ul>
     </nav>
-    <div class="arrow-sidebar" @click="toggleSideBar">
-        <i :class="{'sidebar-opened': visibleSideBar}"></i>
+
+    <div class="arrow-sidebar" @click="expanded = false">
+        <i></i>
     </div>
 </div>
 </template>
@@ -57,165 +55,156 @@
 <script>
 export default {
     name: "project-sidebar",
-    data() {
-        return {
-            visibleSideBar: true,
-        };
-    },
     computed: {
         project() {
             return this.$store.state.project.project;
         },
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        expanded: {
+            get() {
+                return this.$store.state.currentUser.expandedSidebar;
+            },
+            set(val) {
+                this.$store.commit("setExpandedSidebar", val);
+            }
         }
     },
     methods: {
-        toggleSideBar() {
-            this.visibleSideBar = !this.visibleSideBar;
-            this.$eventBus.$emit("updateMapSize");
+        clickHandler(event) {
+            let el = event.target;
+            if(!this.expanded && el.tagName !== "I" && el.tagName !== "A") { // if user clicked on icon, navigation purpose => do not expand the nav bar
+                this.expanded = true;
+            }
         },
         isTabDisplayed(tab) {
             let displayed = this.configUI[`project-${tab}-tab`];
             return (displayed || displayed == null); // TODO: replace with return displayed once all tabs are managed in backend
+        },
+        transitionEndHandler() { // led to a change of the size of the content div => need to reload OL map
+            this.$eventBus.$emit("updateMapSize");
         }
+    },
+    mounted() {
+        this.$refs.sidebar.addEventListener("transitionend", this.transitionEndHandler);
+    },
+    beforeDestroy() {
+        this.$refs.sidebar.removeEventListener("transitionend", this.transitionEndHandler);
     }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$background: #444;
+$activeBackground: #4f4f4f;
+$hoverBackground: #82aad8;
+$color: #ccc;
+$activeColor: #eee;
+$hoverColor: white;
+$arrowBackground: #484848;
+$border: #383838;
+$arrowColor: #888;
+
 .sidebar-wrapper {
     display: flex;
     height: 100%;
-    background: #333;
+    background: $background;
+    overflow: hidden;
+    transition: width .2s linear;
+    width: 55px;
+}
+
+.sidebar-wrapper.expanded {
+    width:218px;
 }
 
 .sidebar {
-    width: 220px;
+    width: 200px;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
-.title-nav {
-    padding: 10px 0px 25px;
+.project-name {
+    padding: 10px 0px 10px;
+    width: 200px !important;
     line-height: 20px;
     text-align: center;
-    color: #eee;
-    border-bottom: 1px solid #222;
-    background: #2a2a2a;
+    color: $background;
     font-size: 1.1em;
     margin: 0;
-}
-
-.title-nav h1 {
     letter-spacing: 2px;
-    padding: 10px;
     text-transform: uppercase;
     font-size: 16px;
     text-align: center;
-    padding: 10px;
     font-weight: 600;
 }
 
-.sidebar ul {
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+.sidebar-wrapper.expanded .project-name {
+    color: $activeColor !important;
 }
 
-.sidebar li:not(.image-link) {
-    flex: 1;
+ul {
+    width: 100%;
 }
 
-.sidebar li:not(.image-link) a {
+li {
+    height: 4em;
+}
+
+.bottom-menu {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
+a {
     position: relative;
     display: block;
     font-size: 14px;
     height: 100%;
     font-weight: 600;
-    color: #eee;
-    border-bottom: 1px solid #222;
+    color: $color;
     text-decoration: none;
     display: flex;
     align-items: center;
-    padding-left: 20px;
-    padding-right: 20px;
 }
 
-.sidebar.large li:not(.image-link) a {
-    flex-direction: column;
-    justify-content: center;
-}
-
-.sidebar:not(.large) li:not(.image-link) .fas, .sidebar:not(.large) li:not(.image-link) .far {
+.fas, .far {
     font-size: 16px;
-    margin-right: 8px;
-    position: relative;
-    top: 5px;
-}
-
-.sidebar.large li:not(.image-link) .fas, .sidebar.large li:not(.image-link) .far {
-    display: block;
-    font-size: 3vh;
-    margin-bottom: 1.5vh;
+    width: 55px;
     text-align: center;
+    flex-shrink: 0;
 }
 
-.sidebar li:not(.image-link) a:hover, .sidebar li:not(.image-link).is-active a, .sidebar li.is-active {
-    background: #444 !important;
+li a:hover {
+    color: $hoverColor;
+    background: $hoverBackground!important;
 }
 
-.sidebar li.images.is-active a { box-shadow: inset 5px 0 0 #bb5454, inset 6px 0 0 #222; }
-.sidebar li.annotations.is-active a { box-shadow: inset 5px 0 0 #bba154, inset 6px 0 0 #222; }
-.sidebar li.analysis.is-active a { box-shadow: inset 5px 0 0 #55bb55, inset 6px 0 0 #222; }
-.sidebar li.activity.is-active a { box-shadow: inset 5px 0 0 #54a1bb, inset 6px 0 0 #222; }
-.sidebar li.information.is-active a { box-shadow: inset 5px 0 0 #6d54bb, inset 6px 0 0 #222; }
-.sidebar li.configuration.is-active a { box-shadow: inset 5px 0 0 #b3b3b3, inset 6px 0 0 #222; }
-
-.sidebar li.image-link {
-    position: relative;
-    display: block;
-    padding: 12px;
-    font-size: 12px;
-    background-color: #3a3a3a;
-    border-bottom: 1px solid #222;
-    text-align: left;
-    color: #eee;
-}
-
-.sidebar li.image-link a {
-    color: #eee;
-}
-
- .sidebar li.image-link a.close {
-    float: right;
+li.is-active a {
+    box-shadow: inset 5px 0 0 $hoverBackground;
+    color: $activeColor;
+    background: $activeBackground;
 }
 
 .arrow-sidebar {
-    width: 20px;
-    border-left: 1px solid #666;
-    background: #444;
-    color: white;
+    width: 18px;
+    border-left: 1px solid $border;
+    background: $arrowBackground;
     justify-content: center;
     display:flex;
     align-items: center;
 }
 
 .arrow-sidebar i {
-    border: solid white;
-    border-width: 0 3px 3px 0;
+    border: solid $arrowColor;
+    border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 3px;
-    transform: rotate(-45deg);
-    margin-right: 5px;
-    margin-left: 0px;
-}
-
-.arrow-sidebar i.sidebar-opened {
-    margin-right: 0px;
-    margin-left: 3px;
     transform: rotate(135deg);
+    margin-left: 3px;
 }
 </style>

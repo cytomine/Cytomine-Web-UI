@@ -2,7 +2,8 @@ import {Cytomine, User} from "cytomine-client";
 
 export default {
     state: {
-        user: null
+        user: null,
+        expandedSidebar: true
     },
 
     mutations: {
@@ -15,6 +16,10 @@ export default {
 
         logout(state) {
             state.user = null;
+            state.expandedSidebar = true;
+        },
+        setExpandedSidebar(state, val) {
+            state.expandedSidebar = val;
         }
     },
 
