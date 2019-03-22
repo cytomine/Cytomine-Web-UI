@@ -24,6 +24,15 @@
 
                 <h1>{{$t("activity-of-user", {username: user.fullName})}}</h1>
 
+                <ul>
+                    <li><strong>{{$t("email")}}:</strong>&nbsp;<a :href="`mailto:${user.email}`">{{user.email}}</a></li>
+                    <li><strong>{{$t("registration-date")}}:</strong> {{Number(user.created) | moment("ll LTS")}}</li>
+                    <li><strong>{{$t("first-project-connection")}}:</strong> {{Number(resumeActivity.firstConnection) | moment("ll LTS")}}</li>
+                    <li><strong>{{$t("last-project-connection")}}:</strong> {{Number(resumeActivity.lastConnection) | moment("ll LTS")}}</li>
+                </ul>
+
+                <hr>
+
                 <div class="level">
                     <div class="level-item has-text-centered">
                         <div>
@@ -222,7 +231,7 @@ import constants from "@/utils/constants.js";
 import moment from "moment";
 
 export default {
-    name: "user-activity",
+    name: "member-activity-details",
     components: {
         CytomineDatepicker,
         ProjectConnectionDetails,
@@ -311,6 +320,10 @@ h1 {
     font-weight: 400;
     font-size: 22px;
     margin-bottom: 1rem;
+}
+
+li {
+    margin-bottom: 0.5em;
 }
 
 .image-overview {
