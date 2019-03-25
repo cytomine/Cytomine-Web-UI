@@ -89,7 +89,12 @@
                 </template>
 
                 <template v-slot:detail="{row: job}">
-                    <job-details :key="job.id" :job="job" @update="props => job.populate(props)"></job-details>
+                    <job-details
+                        :key="job.id"
+                        :job="job"
+                        @update="props => job.populate(props)"
+                        @delete="deleteJob(job)"
+                    />
                 </template>
 
                 <template v-slot:empty>
@@ -196,6 +201,22 @@ export default {
 
             this.jobs.unshift(job);
             this.$refs.table.toggleDetails(job);
+        },
+        async deleteJob(jobToDelete) {
+            try {
+                await jobToDelete.delete();
+                this.jobs = this.jobs.filter(job => job.id != jobToDelete.id);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-analysis-deletion")
+                });
+            }
+            catch(error) {
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-analysis-deletion")
+                });
+            }
         }
     },
     async created() {

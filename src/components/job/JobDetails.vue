@@ -87,7 +87,10 @@
                 <tr v-if="!job.dataDeleted">
                     <td>{{$t("actions")}}</td>
                     <td>
-                        <button class="button is-small is-danger" @click="deletionModal = true">{{$t("delete-data")}}</button>
+                        <div class="buttons are-small">
+                            <button class="button" @click="deletionModal = true">{{$t("delete-data")}}</button>
+                            <button class="button is-danger" @click="confirmJobDeletion()">{{$t("button-delete")}}</button>
+                        </div>
                     </td>
                 </tr>
                 <tr v-else>
@@ -236,6 +239,16 @@ export default {
             await this.deletionTask.fetch();
             clearTimeout(this.timeoutRefreshDeletionTask);
             this.timeoutRefreshDeletionTask = setTimeout(this.refreshDeletionTask, REFRESH_INTERVAL_DELETION_TASK);
+        },
+        confirmJobDeletion() {
+            this.$dialog.confirm({
+                title: this.$t("delete-analysis"),
+                message: this.$t("delete-analysis-confirmation-message"),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.$emit("delete")
+            });
         }
     },
     async created() {
