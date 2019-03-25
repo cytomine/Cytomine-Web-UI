@@ -270,8 +270,7 @@ export default {
     },
     methods: {
         isToolDisplayed(tool) {
-            let displayed = this.configUI[`project-tools-${tool}`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all tools are managed in backend
+            return this.configUI[`project-tools-${tool}`];
         },
 
         isToolDisabled(tool) {

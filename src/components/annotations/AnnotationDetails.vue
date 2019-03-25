@@ -231,8 +231,7 @@ export default {
     },
     methods: {
         isPropDisplayed(prop) {
-            let displayed = this.configUI[`project-explore-annotation-${prop}`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all props are managed in backend
+            return this.configUI[`project-explore-annotation-${prop}`];
         },
 
         copyURL() {
@@ -311,7 +310,7 @@ export default {
         }
     },
     async created() {
-        if(this.isPropDisplayed("creation-info") && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
+        if(this.isPropDisplayed("comments") && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
             try {
                 this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;
                 if(this.showComments) {

@@ -1,9 +1,9 @@
 <template>
-<!-- <div class="box error" v-if="!configUI['project-activity-tab']">
+<div class="box error" v-if="!configUI['project-activities-tab']">
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
-</div> TODO once core handles activity-tab field -->
-<div class="project-activity-wrapper content-wrapper">
+</div>
+<div v-else class="project-activity-wrapper content-wrapper">
     <div class="columns">
         <div class="column">
             <b-field class="radio-buttons-fullwidth is-hovered">

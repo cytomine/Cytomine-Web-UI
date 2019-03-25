@@ -23,13 +23,13 @@
                     {{ $t("analysis") }}
                 </a>
             </router-link>
-            <router-link v-if="isTabDisplayed('activity')" tag="li" :to="`/project/${project.id}/activity`">
+            <router-link v-if="isTabDisplayed('activities')" tag="li" :to="`/project/${project.id}/activity`">
                 <a>
                     <i class="fas fa-tachometer-alt"></i>
                     {{ $t("activity") }}
                 </a>
             </router-link>
-            <router-link v-if="isTabDisplayed('info')" tag="li" :to="`/project/${project.id}/information`">
+            <router-link v-if="isTabDisplayed('information')" tag="li" :to="`/project/${project.id}/information`">
                 <a>
                     <i class="fas fa-info-circle"></i>
                     {{ $t("information") }}
@@ -79,8 +79,7 @@ export default {
             }
         },
         isTabDisplayed(tab) {
-            let displayed = this.configUI[`project-${tab}-tab`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all tabs are managed in backend
+            return this.configUI[`project-${tab}-tab`];
         },
         transitionEndHandler() { // led to a change of the size of the content div => need to reload OL map
             this.$eventBus.$emit("updateMapSize");

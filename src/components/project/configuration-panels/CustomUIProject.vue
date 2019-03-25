@@ -1,5 +1,3 @@
-<!-- QUESTION: when disabling an option (e.g. images page of project), only hide link, or prevent user from viewing page? -->
-<!-- QUESTION for Renaud: for new projects in which config was never changed, custom-ui/project/${id}.json does not return all properties, bug? or treat as true? -->
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t("error") }} </h2>
@@ -10,7 +8,7 @@
         <tr>
             <th colspan="3">{{$t(category.label)}}</th>
         </tr>
-        <tr v-for="prop in category.props" v-if="customUI[prop.key]" :key="prop.key"> <!-- TODO remove v-if when question regarding partial results is answered -->
+        <tr v-for="prop in category.props" :key="prop.key">
             <td>
                 <i v-if="prop.superscript" class="superscript" :class="prop.superscript"></i>
                 <span class="icon" v-if="prop.icon || prop.iconComponent">
@@ -57,8 +55,8 @@ export default {
                         {key: "project-images-tab", label: "images", icon: "far fa-images"},
                         {key: "project-annotations-tab", label: "annotations", icon: "far fa-edit"},
                         {key: "project-jobs-tab", label: "analysis", icon: "fas fa-tasks"},
-                        {key: "project-activity-tab", label: "activity", icon: "fas fa-tachometer-alt"}, // TODO in core
-                        {key: "project-info-tab", label: "information", icon: "fas fa-info-circle"}, // TODO in core
+                        {key: "project-activities-tab", label: "activity", icon: "fas fa-tachometer-alt"},
+                        {key: "project-information-tab", label: "information", icon: "fas fa-info-circle"},
                         {key: "project-configuration-tab", label: "configuration", icon: "fas fa-cogs"}
                     ]
                 },
@@ -68,13 +66,13 @@ export default {
                         {key: "project-explore-hide-tools", label: "all-panels"}, // hide all panels
                         {key: "project-explore-overview", label: "overview", icon: "fas fa-image"},
                         {key: "project-explore-info", label: "information", icon: "fas fa-info"},
-                        {key: "project-explore-digital-zoom", label: "digital-zoom", icon: "fas fa-search"}, // TODO in core
-                        {key: "project-explore-link", label: "link-images", icon: "fas fa-link"}, // TODO in core
-                        {key: "project-explore-color-manipulation", label: "colors", icon: "fas fa-adjust"}, // TODO in core
+                        {key: "project-explore-digital-zoom", label: "digital-zoom", icon: "fas fa-search"},
+                        {key: "project-explore-link", label: "link-images", icon: "fas fa-link"},
+                        {key: "project-explore-color-manipulation", label: "colors", icon: "fas fa-adjust"},
                         {key: "project-explore-image-layers", label: "annotation-layers", icon: "fas fa-copy"},
                         {key: "project-explore-ontology", label: "ontology", icon: "fas fa-hashtag"},
                         {key: "project-explore-property", label: "properties", icon: "fas fa-tag"},
-                        {key: "project-explore-follow", label: "broadcast", icon: "fas fa-street-view"}, // TODO in core
+                        {key: "project-explore-follow", label: "broadcast", icon: "fas fa-street-view"}
                     ]
                 },
                 {
@@ -83,12 +81,12 @@ export default {
                         // display annotation details in viewer
                         {key: "project-explore-annotation-main", label: "annotation-details-box"},
                         {key: "project-explore-annotation-geometry-info", label: "geometry-info",
-                            icon: "fas fa-ruler-combined"}, // TODO in core
+                            icon: "fas fa-ruler-combined"},
                         {key: "project-explore-annotation-description", label: "description", icon: "far fa-file-alt"},
-                        {key: "project-explore-annotation-terms", label: "terms", icon: "fas fa-hashtag"}, // TODO in core
+                        {key: "project-explore-annotation-terms", label: "terms", icon: "fas fa-hashtag"},
                         {key: "project-explore-annotation-properties", label: "properties", icon: "fas fa-tag"},
-                        {key: "project-explore-annotation-attached-files", label: "attached-files", icon: "fas fa-paperclip"}, // TODO in core
-                        {key: "project-explore-annotation-creation-info", label: "creation-info", icon: "fas fa-info"}, // TODO in core
+                        {key: "project-explore-annotation-attached-files", label: "attached-files", icon: "fas fa-paperclip"},
+                        {key: "project-explore-annotation-creation-info", label: "creation-info", icon: "fas fa-info"},
                         {key: "project-explore-annotation-comments", label: "comments", icon: "fas fa-comment"}
                         
                     ]
@@ -101,14 +99,14 @@ export default {
                         {key: "project-tools-select", label: "select", icon: "fas fa-mouse-pointer"},
 
                         {key: "project-tools-point", label: "point", icon: "fas fa-map-marker-alt"},
-                        {key: "project-tools-line", label: "line", icon: "fas fa-minus"}, // TODO in core
+                        {key: "project-tools-line", label: "line", icon: "fas fa-minus"},
                         {key: "project-tools-freehand-line", label: "freehand-line",
-                            iconComponent: IconLineFreeHand}, // TODO in core
+                            iconComponent: IconLineFreeHand},
                         {key: "project-tools-rectangle", label: "rectangle", icon: "far fa-square"},
                         {key: "project-tools-circle", label: "circle", icon: "far fa-circle"},
                         {key: "project-tools-polygon", label: "polygon", icon: "fas fa-draw-polygon"},
                         {key: "project-tools-freehand-polygon", label: "freehand-polygon",
-                            iconComponent: IconPolygonFreeHand}, // TODO in core
+                            iconComponent: IconPolygonFreeHand},
                         {key: "project-tools-union", label: "freehand-correct-add", icon: "fas fa-pencil-alt",
                             superscript: "fas fa-plus"},
                         {key: "project-tools-diff", label: "freehand-correct-remove", icon: "fas fa-pencil-alt",
@@ -120,7 +118,7 @@ export default {
                         {key: "project-tools-rotate", label: "rotate", icon: "fas fa-sync-alt"},
                         {key: "project-tools-delete", label: "delete", icon: "fas fa-trash-alt"},
 
-                        {key: "project-tools-undo-redo", label: "undo-redo", icon: "fas fa-undo"}, // TODO in core
+                        {key: "project-tools-undo-redo", label: "undo-redo", icon: "fas fa-undo"},
                     ]
                 }
             ]

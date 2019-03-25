@@ -70,7 +70,7 @@
                     </a>
                 </li>
 
-                <template v-if="configUI['project-explore-hide-tools']">
+                <template v-if="isPanelDisplayed('hide-tools')">
                     <li v-if="isPanelDisplayed('info')">
                         <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
                             <i class="fas fa-info"></i>
@@ -156,7 +156,7 @@
         <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
         </scale-line>
 
-        <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
+        <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
             :idViewer="idViewer" :index="index" :view="$refs.view">
         </annotation-details-container>
 
@@ -416,7 +416,7 @@ export default {
         },
 
         async addOverviewMap() {
-            if(!this.configUI["project-explore-overview"]) {
+            if(!this.isPanelDisplayed("overview")) {
                 return;
             }
 
@@ -468,8 +468,7 @@ export default {
         }, 500),
 
         isPanelDisplayed(panel) {
-            let displayed = this.configUI[`project-explore-${panel}`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all panels are managed in backend
+            return this.configUI[`project-explore-${panel}`];
         }
     },
     async created() {
