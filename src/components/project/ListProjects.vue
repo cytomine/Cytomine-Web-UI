@@ -114,10 +114,10 @@
             <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
                 <template v-slot:default="{row: project}">
-                    <b-table-column :visible="atLeastOneManaged" field="roleIndex" label="" centered width="1" sortable>
-                        <i v-if="project.isManaged" class="fas fa-cog"
-                           :title="$t(project.isRepresented ? 'representative-icon-label' : 'manager-icon-label')">
-                            <i v-if="project.isRepresented" class="superscript fas fa-plus"></i>
+                    <b-table-column :visible="showRole" field="roleIndex" label="" centered width="1" sortable>
+                        <i v-if="project.currentUserRoles.admin" class="fas fa-cog"
+                           :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')">
+                            <i v-if="project.currentUserRoles.representative" class="superscript fas fa-plus"></i>
                         </i>
                     </b-table-column>
 
@@ -187,7 +187,7 @@
                 </template>
             </b-table>
 
-            <div class="legend" v-if="atLeastOneManaged">
+            <div class="legend" v-if="showRole">
                 <h2>{{$t("legend")}}</h2>
                 <p><i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}</p>
                 <p><i class="fas fa-cog">
@@ -271,7 +271,8 @@ export default {
             let includeManager = this.selectedRoles.includes(this.managerLabel);
 
             filtered = filtered.filter(project => {
-                let roleIncluded = (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
+                let managedProject = project.currentUserRoles.admin;
+                let roleIncluded = (includeContributor && !managedProject) || (includeManager && managedProject);
                 return this.selectedOntologiesIds.includes(project.ontology) &&
                     roleIncluded &&
                     isBetweenBounds(project.numberOfImages, this.boundsImages) &&
@@ -298,8 +299,8 @@ export default {
         maxNbReviewedAnnotations() {
             return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
         },
-        atLeastOneManaged() {
-            return this.projects.some(project => project.isManaged);
+        showRole() { // show role iff the current user is manager or representative of at least one project
+            return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
         },
         ontologies() {
             let seenIds = [];
@@ -341,28 +342,11 @@ export default {
     },
     async created() {
         try {
-            let managedProjectsPromise = new ProjectCollection({
-                light: true,
-                admin: true,
-                filterKey: "user",
-                filterValue: this.currentUser.id
-            }).fetchAll();
-
-            // let representativeProjectsPromise = new ProjectCollection({
-            //     light: true,
-            //     representative: true,
-            //     filterKey: "user",
-            //     filterValue: this.currentUser.id
-            // }).fetchAll(); // TODO in core
-            let representativeProjectsPromise = {array: []};
-
             let projects = await ProjectCollection.fetchAll({
                 withMembersCount: true,
-                withLastActivity: true
+                withLastActivity: true,
+                withCurrentUserRoles: true
             });
-
-            let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
-            let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
 
             this.contributorLabel = this.$t("contributor");
             this.managerLabel = this.$t("manager");
@@ -370,9 +354,8 @@ export default {
             this.selectedRoles = this.availableRoles;
 
             this.projects = projects.array.map(project => {
-                project.isManaged = idManagedProjects.includes(project.id);
-                project.isRepresented = idProjectsRepresentatives.includes(project.id);
-                project.roleIndex = Number(project.isManaged) + Number(project.isRepresented); // to allow sorting
+                let roles = project.currentUserRoles;
+                project.roleIndex = Number(roles.admin) + Number(roles.representative); // to allow sorting
                 return project;
             });
 
