@@ -51,11 +51,8 @@ export default {
         selectedFeatures() {
             return this.imageWrapper.selectedFeatures;
         },
-        activeTool() {
-            return this.imageWrapper.activeTool;
-        },
-        activeEditTool() {
-            return this.imageWrapper.activeEditTool;
+        ongoingEdit() {
+            return this.imageWrapper.ongoingEdit;
         },
         styleFunctionFactory() {
             // Force computed property update when one of those properties change (leading to new style function =>
@@ -110,6 +107,16 @@ export default {
                 }
                 olFeature.setGeometry(this.format.readGeometry(annot.location));
                 olFeature.set("annot", annot);
+
+                let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id == annot.id);
+                if(indexSelectedFeature >= 0) {
+                    this.$store.commit("changeAnnotSelectedFeature", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        indexFeature: indexSelectedFeature,
+                        annot
+                    });
+                }
             }
         },
         deleteAnnotationHandler(annot) {
@@ -189,8 +196,9 @@ export default {
             }
 
             if(isFeatureSelected) {
-                if(this.activeTool == "select" && this.activeEditTool != null) {
+                if(this.ongoingEdit) {
                     // if feature is selected and under modification, updating it may lead to conflict
+                    console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`)
                     return;
                 }
                 console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);

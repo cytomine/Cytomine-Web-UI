@@ -1,20 +1,26 @@
 <template>
 <div>
-    <vl-interaction-modify v-if="activeEditTool == 'modify'"
-                           ref="olModifyInteraction"
-                           :source="`select-target-${idViewer}-${index}`"
-                           @modifyend="endEdit">
-    </vl-interaction-modify>
+    <vl-interaction-modify
+        v-if="activeEditTool == 'modify'"
+        ref="olModifyInteraction"
+        :source="`select-target-${idViewer}-${index}`"
+        @modifystart="startEdit"
+        @modifyend="endEdit"
+    />
 
-    <vl-interaction-translate v-if="activeEditTool == 'translate'"
-                              :source="`select-target-${idViewer}-${index}`"
-                              @translateend="endEdit">
-    </vl-interaction-translate>
+    <vl-interaction-translate
+        v-if="activeEditTool == 'translate'"
+        :source="`select-target-${idViewer}-${index}`"
+        @translatestart="startEdit"
+        @translateend="endEdit"
+    />
 
-    <vl-interaction-rotate v-if="activeEditTool == 'rotate'"
-                           :source="`select-target-${idViewer}-${index}`"
-                           @rotateend="endEdit">
-    </vl-interaction-rotate>
+    <vl-interaction-rotate
+        v-if="activeEditTool == 'rotate'"
+        :source="`select-target-${idViewer}-${index}`"
+        @rotatestart="startEdit"
+        @rotateend="endEdit"
+    />
 </div>
 </template>
 
@@ -42,8 +48,19 @@ export default {
         activeEditTool() {
             return this.imageWrapper.activeEditTool;
         },
+        ongoingEdit: {
+            get() {
+                return this.imageWrapper.activeEditTool;
+            },
+            set(value) {
+                this.$store.commit("setOngoingEdit", {idViewer: this.idViewer, index: this.index, value});
+            }
+        },
     },
     methods: {
+        startEdit() {
+            this.ongoingEdit = true;
+        },
         async endEdit({features}) {
             features.forEach(async feature => {
                 let annot = feature.get("annot").clone();
@@ -66,6 +83,7 @@ export default {
                     feature.setGeometry(this.format.readGeometry(annot.location));
                 }
             });
+            this.ongoingEdit = false;
         },
     }
 };

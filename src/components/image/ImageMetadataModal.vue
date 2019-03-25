@@ -94,8 +94,8 @@ export default {
 <style lang="scss">
 .metadata-modal.modal-card {
     &, .modal-card-body {
-        width: 100%;
-        max-width: 800px;
+        width: 800px;
+        max-width: 100%;
     }
 
     .image-preview {

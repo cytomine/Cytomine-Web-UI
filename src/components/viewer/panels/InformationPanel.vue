@@ -97,6 +97,8 @@ export default {
     methods: {
         setResolution(resolution) {
             this.$store.commit("setResolution", {idViewer: this.idViewer, idImage: this.image.id, resolution});
+            // refresh the sources to update perimeter/area
+            this.$eventBus.$emit("reloadAnnotations", this.image.id);
         },
         async previousImage() {
             try {

@@ -150,41 +150,22 @@
         </form>
     </b-modal>
 
-    <b-modal :active="isMagnificationModalActive" has-modal-card @close="isMagnificationModalActive = false">
-        <form>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">{{$t("set-magnification")}}</p>
-                </header>
-                <section class="modal-card-body">
-                    <div class="modal-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        {{ $t("warning-change-applies-in-all-projects") }}
-                    </div>
+    <magnification-modal
+        :image="image"
+        :active.sync="isMagnificationModalActive"
+        @setMagnification="(event) => $emit('setMagnification', event)"
+    />
 
-                    <b-field :label="$t('magnification')">
-                        <b-input v-model="newMagnification"></b-input>
-                    </b-field>
-                </section>
-                <footer class="modal-card-foot">
-                    <button class="button" type="button" @click="isMagnificationModalActive = false">
-                        {{$t("button-cancel")}}
-                    </button>
-                    <button class="button is-link" @click="setMagnification()">
-                        {{$t("button-save")}}
-                    </button>
-                </footer>
-            </div>
-        </form>
-    </b-modal>
+    <calibration-modal
+        :image="image"
+        :active.sync="isCalibrationModalActive"
+        @setResolution="(event) => $emit('setResolution', event)"
+    />
 
-    <calibration-modal :image="image"
-                       :active.sync="isCalibrationModalActive"
-                       @setResolution="(event) => $emit('setResolution', event)">
-    </calibration-modal>
-
-    <image-metadata-modal :active.sync="isMetadataModalActive" :idAbstractImage="image.baseImage">
-    </image-metadata-modal>
+    <image-metadata-modal
+        :active.sync="isMetadataModalActive"
+        :idAbstractImage="image.baseImage"
+    />
 </div>
 </template>
 
@@ -192,10 +173,11 @@
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import AttachedFiles from "@/components/attached-file/AttachedFiles";
+import MagnificationModal from "./MagnificationModal";
 import CalibrationModal from "./CalibrationModal";
 import ImageMetadataModal from "./ImageMetadataModal";
 
-import {AbstractImage, ImageInstance} from "cytomine-client";
+import {ImageInstance} from "cytomine-client";
 
 export default {
     name: "image-details",
@@ -203,6 +185,7 @@ export default {
         CytomineDescription,
         CytomineProperties,
         AttachedFiles,
+        MagnificationModal,
         CalibrationModal,
         ImageMetadataModal
     },
@@ -212,15 +195,11 @@ export default {
     },
     data() {
         return {
-            isCalibrationModalActive: false,
-
             isRenameModalActive: false,
             newName: "",
-
+            isCalibrationModalActive: false,
             isMagnificationModalActive: false,
-            newMagnification: "",
-
-            isMetadataModalActive: false
+            isMetadataModalActive: false,
         };
     },
     computed: {
@@ -232,11 +211,6 @@ export default {
         isRenameModalActive(val) {
             if(val) {
                 this.newName = this.image.instanceFilename;
-            }
-        },
-        isMagnificationModalActive(val) {
-            if(val) {
-                this.newMagnification = this.image.magnification;
             }
         }
     },
@@ -263,29 +237,6 @@ export default {
                 });
             }
             this.isRenameModalActive = false;
-        },
-
-        async setMagnification() {
-            try {
-                let baseImage = await AbstractImage.fetch(this.image.baseImage);
-                baseImage.magnification = this.newMagnification;
-                await baseImage.save();
-
-                this.$emit("setMagnification", baseImage.magnification);
-
-                this.$notify({
-                    type: "success",
-                    text: this.$t("notif-success-magnification-update", {imageName: baseImage.originalFilename})
-                });
-            }
-            catch(error) {
-                console.log(error);
-                this.$notify({
-                    type: "error",
-                    text: this.$t("notif-error-magnification-update", {imageName: this.image.originalFilename})
-                });
-            }
-            this.isMagnificationModalActive = false;
         },
 
         confirmDeletion() {
@@ -342,22 +293,6 @@ td.prop-content {
 .vendor-img {
     max-height: 40px;
     max-width: 150px;
-}
-
-.modal-warning {
-    display: flex;
-    margin-bottom: 15px;
-    align-items: center;
-    padding: 5px;
-    border-left: 3px solid rgb(255, 120, 0);
-    border-radius: 4px;
-    background: rgba(255, 69, 0, 0.05);
-}
-.modal-warning .fas {
-    margin-left: 10px;
-    margin-right: 20px;
-    font-size: 16px;
-    color: rgb(255, 120, 0);
 }
 
 .image-overview {

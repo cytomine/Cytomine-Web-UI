@@ -399,6 +399,10 @@ export default {
             state.viewers[idViewer].maps[index].activeEditTool = tool;
         },
 
+        setOngoingEdit(state, {idViewer, index, value}) {
+            state.viewers[idViewer].maps[index].ongoingEdit = value;
+        },
+
         // ----- Calibration
 
         setResolution(state, {idViewer, idImage, resolution}) {
@@ -509,6 +513,7 @@ export default {
 
                 activeTool: "select",
                 activeEditTool: null,
+                ongoingEdit: false,
 
                 brightness: 0,
                 contrast: 0,
