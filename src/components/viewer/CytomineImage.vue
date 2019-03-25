@@ -454,7 +454,7 @@ export default {
                         topLeftY: Math.round(extent[3]),
                         topRightX: Math.round(extent[2]),
                         topRightY: Math.round(extent[3]),
-                        // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
+                        broadcast: this.imageWrapper.broadcast
                     });
                 }
                 catch(error) {
