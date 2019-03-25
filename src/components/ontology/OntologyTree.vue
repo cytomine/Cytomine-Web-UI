@@ -1,14 +1,14 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
     <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
-        <template v-slot:toggle="{node}">
+        <template #toggle="{node}">
             <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
             </template>
             <div class="sl-vue-tree-gap"></div>
         </template>
 
-        <template v-slot:title="{node}">
+        <template #title="{node}">
             <div v-if="!node.data.hidden" class="tree-selector">
                 <i class="tree-checkbox"
                    v-if="allowSelection"
@@ -19,7 +19,7 @@
             <div v-else></div>
         </template>
 
-        <template v-slot:sidebar="{node}">
+        <template #sidebar="{node}">
             <slot v-if="!node.data.hidden" name="custom-sidebar" :term="node.data">
                 <div v-if="allowEdition" class="buttons">
                     <button class="button is-small" @click="startTermUpdate(node)">

@@ -19,7 +19,7 @@
     :disabled="disabled"
 >
 
-    <template v-slot:beforeList v-if="multiple && options.length > 0 && selectAllAvailable">
+    <template #beforeList v-if="multiple && options.length > 0 && selectAllAvailable">
         <li class="multiselect__element multiselect__select-all" @click="selectAll()">
             <span :class="['multiselect__option', allSelected ? 'multiselect__option--selected' : '']">
                 {{$t("select-all")}}
@@ -27,7 +27,7 @@
         </li>
     </template>
 
-    <template v-slot:selection="{isOpen}" v-if="multiple && options.length > 0">
+    <template #selection="{isOpen}" v-if="multiple && options.length > 0">
         <div class="multiselect__tags-wrap" v-if="!isOpen">
             <strong v-if="allSelected"> {{$t("all")}} </strong>
             <template v-else>
@@ -42,7 +42,7 @@
         <div v-else></div>
     </template>
 
-    <template v-slot:option="{option}">
+    <template #option="{option}">
       <slot name="option" :option="option"></slot>
     </template>
 

@@ -16,7 +16,7 @@
                        :allowSelection="false"
                        :searchString="searchString"
                        :additionalNodes="additionalNodes">
-            <template v-slot:custom-sidebar="{term}">
+            <template #custom-sidebar="{term}">
                 <div class="sidebar-tree">
                     <div class="visibility">
                         <input v-if="term.id"

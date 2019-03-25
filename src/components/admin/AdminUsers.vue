@@ -21,7 +21,7 @@
 
             <b-table :data="filteredUsers" default-sort="username" :paginated="true" :per-page="perPage" pagination-size="is-small">
 
-                <template v-slot:default="{row: user}">
+                <template #default="{row: user}">
 
                     <b-table-column field="username" :label="$t('username')" sortable width="100">
                         {{user.username}}
@@ -69,13 +69,13 @@
                     </b-table-column>
                 </template>
 
-                <template v-slot:empty>
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-user-fitting-criteria")}}</p>
                     </div>
                 </template>
 
-                <template v-slot:bottom-left>
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>

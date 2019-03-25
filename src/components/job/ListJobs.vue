@@ -66,7 +66,7 @@
             <b-table :data="filteredJobs" ref="table" default-sort="created" default-sort-direction="desc"
             :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id">
 
-                <template v-slot:default="{row: job}">
+                <template #default="{row: job}">
                     <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
                         {{job.softwareName}}
                     </b-table-column>
@@ -88,7 +88,7 @@
                     </b-table-column>
                 </template>
 
-                <template v-slot:detail="{row: job}">
+                <template #detail="{row: job}">
                     <job-details
                         :key="job.id"
                         :job="job"
@@ -97,13 +97,13 @@
                     />
                 </template>
 
-                <template v-slot:empty>
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-analysis-run")}}</p>
                     </div>
                 </template>
 
-                <template v-slot:bottom-left>
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>

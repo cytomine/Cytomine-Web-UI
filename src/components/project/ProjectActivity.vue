@@ -22,7 +22,7 @@
         </div>
         <div class="column is-narrow">
             <b-dropdown position="is-bottom-left" class="date-picker-dropdown" :disabled="activeTab === 'members'">
-                <template v-slot:trigger>
+                <template #trigger>
                     <button class="button is-hovered"><i class="far fa-calendar"></i></button>
                 </template>
 

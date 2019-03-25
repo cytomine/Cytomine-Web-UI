@@ -1,7 +1,7 @@
 <template>
 <div id="app" class="wrapper">
     <notifications position="top center" width="30%" :max="5">
-        <template v-slot:body="props">
+        <template #body="props">
             <div class="notification vue-notification" :class="props.item.type">
                 <button class="delete" @click="props.close"></button>
                 <strong class="notification-title">

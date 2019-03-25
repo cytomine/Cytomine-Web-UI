@@ -7,7 +7,7 @@
             <cytomine-multiselect v-else-if="options" v-model="internalValue" :options="options"
                 track-by="id" :label="param.uriPrintAttribut" :class="{'is-danger': displayErrors && errorMessage}"
                 :multiple="param.type == 'ListDomain'">
-                <template v-slot:option="{option}">
+                <template #option="{option}">
                     <div class="is-flex" v-if="annotationObjects">
                         <div class="thumb-wrapper">
                             <img class="thumb" :src="option.smallCropURL + '&draw=true&complete=true&increaseArea=1.25'">

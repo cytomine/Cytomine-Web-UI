@@ -56,7 +56,7 @@
             <b-table :data="filteredMembers" default-sort="username"
                     :paginated="true" :per-page="perPage" pagination-size="is-small">
 
-                <template v-slot:default="{row: member}">
+                <template #default="{row: member}">
                     <b-table-column field="username" :label="$t('username')" sortable width="100">
                         <username :user="member" :online="onlineIds ? onlineIds.includes(member.id) : null" 
                             :displayFullName="false">
@@ -102,13 +102,13 @@
                     </b-table-column>
                 </template>
 
-                <template v-slot:empty>
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-member-fitting-criteria")}}</p>
                     </div>
                 </template>
 
-                <template v-slot:footer v-if="isManager">
+                <template #footer v-if="isManager">
                     <p class="has-text-centered">
                         <router-link class="button is-link add-member" :to="`/project/${project.id}/configuration?tab=members`">
                             {{$t('button-manage-members')}}
@@ -116,7 +116,7 @@
                     </p>
                 </template>
 
-                <template v-slot:bottom-left>
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>

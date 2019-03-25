@@ -38,7 +38,7 @@
                        :multipleSelection="multiple"
                        @select="handleSelection()"
                        @setSelectedNodes="nodes => $emit('setSelectedNodes', nodes)">
-            <template v-slot:no-result>
+            <template #no-result>
                 <ul class="multiselect__content">
                     <li @click="selectAll()">
                         <span class="multiselect__option">

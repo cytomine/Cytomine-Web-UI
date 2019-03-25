@@ -15,7 +15,7 @@
                 </button>
             </div>
 
-            <template v-slot:popover>
+            <template #popover>
                 <annotation-details
                     v-click-outside="(event) => close(event, annot.id)"
                     :annotation="annot"

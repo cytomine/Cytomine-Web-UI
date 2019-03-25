@@ -3,7 +3,7 @@
     <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
 
     <quill-editor :value="value" @input="$emit('input', $event)" :options="editorOptions" ref="quillEditor">
-        <template v-slot:toolbar>
+        <template #toolbar>
             <div id="toolbar">
                 <span class="ql-formats">
                     <select class="ql-header">

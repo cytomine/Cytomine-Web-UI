@@ -25,7 +25,7 @@
             <b-table v-show="activeTab == 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'projects'">
 
-                <template v-slot:default="props">
+                <template #default="props">
                     <b-table-column :label="$t('name')" width="100">
                         <router-link :to="`/project/${props.row.id}`">
                             {{ props.row.name }}
@@ -39,7 +39,7 @@
                     </b-table-column>
                 </template>
 
-                <template v-slot:empty>
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-project")}}</p>
                     </div>
@@ -49,7 +49,7 @@
             <b-table v-show="activeTab == 'images'" :data="filteredImages" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'images'">
 
-                <template v-slot:default="props">
+                <template #default="props">
                     <b-table-column :label="$t('name')" width="100">
                         <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
                             {{ props.row.originalFilename }}
@@ -69,7 +69,7 @@
                     </b-table-column>
                 </template>
 
-                <template v-slot:empty>
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-image")}}</p>
                     </div>

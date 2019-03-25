@@ -9,7 +9,7 @@
                 <td colspan="2">
                     <strong>{{$t("terms")}}</strong>
                     <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="true" :allowEdition="true">
-                        <template v-slot:no-result>
+                        <template #no-result>
                             <em class="has-text-grey">{{$t('no-term')}}</em>
                         </template>
                     </ontology-tree>

@@ -16,7 +16,7 @@
                 :per-page="perPage"
                 pagination-size="is-small">
 
-            <template v-slot:default="{row: software}">
+            <template #default="{row: software}">
                 <b-table-column field="name" :label="$t('name')" sortable width="100">
                     {{software.name}}
                 </b-table-column>
@@ -34,13 +34,13 @@
                 </b-table-column>
             </template>
 
-            <template v-slot:empty>
+            <template #empty>
                 <div class="content has-text-grey has-text-centered">
                     <p>{{$t("no-algorithm")}}</p>
                 </div>
             </template>
 
-            <template v-slot:bottom-left>
+            <template #bottom-left>
                 <b-select v-model="perPage" size="is-small">
                     <option value="10">10 {{$t("per-page")}}</option>
                     <option value="25">25 {{$t("per-page")}}</option>

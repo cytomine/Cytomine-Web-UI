@@ -14,7 +14,7 @@
                     </b-message>
                     <b-table v-else :data="recentProjects">
 
-                        <template v-slot:default="{row: project}">
+                        <template #default="{row: project}">
                             <b-table-column :label="$t('project')" width="100" centered>
                                 <router-link class="project-name" :to="`/project/${project.id}`">
                                     {{ project.name }}
@@ -26,7 +26,7 @@
                             </b-table-column>
                         </template>
 
-                        <template v-slot:empty>
+                        <template #empty>
                             <div class="content has-text-grey has-text-centered">
                                 <p>{{$t("no-recent-project")}}</p>
                             </div>

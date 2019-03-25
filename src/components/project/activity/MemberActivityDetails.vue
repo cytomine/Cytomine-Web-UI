@@ -62,7 +62,7 @@
                     :paginated="true" :per-page="connectionsPerPage" pagination-size="is-small"
                     detailed detail-key="id">
 
-                    <template v-slot:default="{row: connection}">
+                    <template #default="{row: connection}">
                         <b-table-column :label="$t('date')" field="created" sortable>
                             {{ Number(connection.created) | moment("ll LT") }}
                         </b-table-column>
@@ -81,17 +81,17 @@
                         </b-table-column>
                     </template>
 
-                    <template v-slot:empty>
+                    <template #empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-project-connection")}}</p>
                         </div>
                     </template>
 
-                    <template v-slot:detail="{row: connection}">
+                    <template #detail="{row: connection}">
                         <project-connection-details :connection="connection" :key="connection.id"></project-connection-details>
                     </template>
 
-                    <template v-slot:footer>
+                    <template #footer>
                         <p class="has-text-centered">
                             <a class="button is-link" :href="connections.downloadURL" target="_self">
                                 {{$t("button-export-as-csv")}}
@@ -99,7 +99,7 @@
                         </p>
                     </template>
 
-                    <template v-slot:bottom-left>
+                    <template #bottom-left>
                         <b-select v-model="connectionsPerPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>
@@ -155,7 +155,7 @@
 
                 <b-table :data="consultations.array" :paginated="true" :per-page="consultationsPerPage" pagination-size="is-small">
 
-                    <template v-slot:default="{row: consultation}">
+                    <template #default="{row: consultation}">
                         <b-table-column :label="$t('overview')" field="created">
                             <router-link :to="`/project/${project.id}/image/${consultation.image}`">
                                 <img :src="consultation.imageThumb" class="image-overview">
@@ -189,13 +189,13 @@
                         </b-table-column>
                     </template>
 
-                    <template v-slot:empty>
+                    <template #empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-image-consultation")}}</p>
                         </div>
                     </template>
 
-                    <template v-slot:footer>
+                    <template #footer>
                         <p class="has-text-centered">
                             <a class="button is-link" :href="consultations.downloadURL" target="_self">
                                 {{$t("button-export-as-csv")}}
@@ -203,7 +203,7 @@
                         </p>
                     </template>
 
-                    <template v-slot:bottom-left>
+                    <template #bottom-left>
                         <b-select v-model="consultationsPerPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>

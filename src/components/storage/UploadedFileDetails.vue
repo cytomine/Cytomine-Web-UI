@@ -8,17 +8,17 @@
         <p> {{ $t("unexpected-error-info-message") }} </p>
     </b-message>
     <sl-vue-tree v-else v-model="nodes" :allowMultiselect="false">
-        <template v-slot:toggle="{node}">
+        <template #toggle="{node}">
             <template v-if="!node.isLeaf">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
             </template>
         </template>
 
-        <template v-slot:title="{node}">
+        <template #title="{node}">
             <p :class="{'target-element': node.data.id == file.id}">{{node.title}}</p>
         </template>
 
-        <template v-slot:sidebar="{node}">
+        <template #sidebar="{node}">
             <div class="filesize">
                 {{filesize(node.data.size)}}
             </div>
