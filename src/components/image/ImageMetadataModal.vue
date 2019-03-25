@@ -5,22 +5,28 @@
             <p class="modal-card-title">{{$t("image-metadata")}}</p>
         </header>
         <section class="modal-card-body">
-            <p v-if="abstractImage && abstractImage.macroURL" :style="styleImagePreview" class="image-preview">
-                <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
-            </p>
-            <div class="buttons is-centered are-small">
-                <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
-                <button class="button" @click="rotate(90)"><i class="fas fa-undo mirror"></i></button>
-            </div>
+            <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+                <h2> {{ $t("error") }} </h2>
+                <p> {{ $t("unexpected-error-info-message") }} </p>
+            </b-message>
+            <template v-else>
+                <p v-if="abstractImage && abstractImage.macroURL" :style="styleImagePreview" class="image-preview">
+                    <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
+                </p>
+                <div class="buttons is-centered are-small">
+                    <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
+                    <button class="button" @click="rotate(90)"><i class="fas fa-undo mirror"></i></button>
+                </div>
 
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')"
-                type="search" icon="search" size="is-small">
-            </b-input>
-            <ul>
-                <li v-for="prop in filteredProps" :key="prop.id">
-                    <strong>{{prop.key}}</strong>: {{prop.value}}
-                </li>
-            </ul>
+                <b-input v-model="searchString" :placeholder="$t('search-placeholder')"
+                    type="search" icon="search" size="is-small">
+                </b-input>
+                <ul>
+                    <li v-for="prop in filteredProps" :key="prop.id">
+                        <strong>{{prop.key}}</strong>: {{prop.value}}
+                    </li>
+                </ul>
+            </template>
         </section>
         <footer class="modal-card-foot">
             <button class="button" type="button" @click="$emit('update:active', false)">
@@ -41,6 +47,7 @@ export default {
     ],
     data() {
         return {
+            error: false,
             abstractImage: null,
             properties: [],
             searchString: "",
@@ -85,7 +92,7 @@ export default {
         }
         catch(error) {
             console.log(error);
-            // TODO
+            this.error = true;
         }
     }
 };
