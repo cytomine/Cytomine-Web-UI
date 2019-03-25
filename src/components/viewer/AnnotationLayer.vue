@@ -198,7 +198,7 @@ export default {
             if(isFeatureSelected) {
                 if(this.ongoingEdit) {
                     // if feature is selected and under modification, updating it may lead to conflict
-                    console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`)
+                    console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
                     return;
                 }
                 console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
