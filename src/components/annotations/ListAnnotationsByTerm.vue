@@ -86,7 +86,7 @@ export default {
                 noTerm: this.noTerm,
                 users: this.usersIds,
                 reviewed: this.reviewed,
-                reviewUsers: this.reviewUsersIds, // TODO: fix in backend
+                reviewUsers: this.reviewUsersIds,
                 multipleTerm: this.multipleTerms, 
                 showTerm: true,
                 showGIS: true,
@@ -111,7 +111,8 @@ export default {
     methods: {
         async fetchPage(numPage) {
             this.currentPage = numPage;
-            if(this.imagesIds.length == 0 || (!this.reviewed && this.usersIds.length == 0)) {
+            if(this.imagesIds.length === 0 || (!this.reviewed && this.usersIds.length === 0)
+                    || (this.reviewed && this.reviewUsersIds.length === 0)) {
                 this.annotations = [];
                 return;
             }

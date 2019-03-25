@@ -239,7 +239,7 @@ export default {
                 images: this.selectedImagesIds,
                 users: this.selectedUsersIds,
                 reviewed: this.reviewed,
-                reviewUsers: this.reviewUsersIds, // TODO: fix in backend
+                reviewUsers: this.reviewUsersIds,
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
