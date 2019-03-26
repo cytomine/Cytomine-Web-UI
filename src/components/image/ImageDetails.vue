@@ -52,8 +52,8 @@
                     <attached-files :object="image"></attached-files>
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('thumbnail')">
-                <td class="prop-label">{{$t("thumbnail")}}</td>
+            <tr v-if="isPropDisplayed('slidePreview')">
+                <td class="prop-label">{{$t("slide-preview")}}</td>
                 <td class="prop-content">
                     <a @click="isMetadataModalActive = true">
                         <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview"> <!-- TODO in backend: do not return anything when thumb not available instead of returning overview? -->

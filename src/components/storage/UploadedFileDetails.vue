@@ -1,5 +1,5 @@
 <template>
-<div class="uploaded-file-details-wrapper">
+<div>
     <h2>
         {{$t("file-tree")}}
     </h2>
@@ -23,7 +23,7 @@
                 {{filesize(node.data.size)}}
             </div>
             <div class="status">
-                <uploaded-file-status :file="node.data" :iconOnly="true"></uploaded-file-status>
+                <uploaded-file-status :file="node.data" :iconOnly="true" />
             </div>
             <div class="buttons">
                 <a class="button is-small is-link" :href="node.data.downloadURL">
@@ -33,20 +33,31 @@
                     {{$t("button-delete")}}
                 </button>
             </div>
-            <div class="preview">
-                <a v-if="node.data.thumbURL" @click="preview = node.data">
-                    {{$t("see-preview")}}
+            <p class="preview">
+                <a v-if="node.data.thumbURL" @click="samplePreview = node.data">
+                    {{$t("sample-preview")}}
                 </a>
-            </div>
+                <span v-if="node.data.thumbURL && node.data.macroURL">/</span>
+                <a v-if="node.data.macroURL" @click="slidePreview = node.data">
+                    {{$t("slide-preview")}}
+                </a>
+            </p>
         </template>
     </sl-vue-tree>
 
-    <template v-if="preview">
+    <template v-if="samplePreview">
         <h2>
-            {{$t("preview-of", {filename: preview.originalFilename})}}
-            <button class="button is-small" @click="preview = null">{{$t("button-hide")}}</button>
+            {{$t("sample-preview-of", {filename: samplePreview.originalFilename})}}
+            <button class="button is-small" @click="samplePreview = null">{{$t("button-hide")}}</button>
         </h2>
-        <img :src="preview.thumbURL">
+        <img :src="samplePreview.thumbURL">
+    </template>
+    <template v-else-if="slidePreview">
+        <h2>
+            {{$t("slide-preview-of", {filename: slidePreview.originalFilename})}}
+            <button class="button is-small" @click="slidePreview = null">{{$t("button-hide")}}</button>
+        </h2>
+        <img :src="slidePreview.macroURL">
     </template>
 </div>
 </template>
@@ -63,16 +74,17 @@ export default {
         SlVueTree,
         UploadedFileStatus
     },
-    props: [
-        "file", // WARNING: the root of the tree will be the file or its direct parent
-        "revision" // change its value to force refresh
-    ],
+    props: {
+        file: Object, // WARNING: the root of the tree must be the file or its direct parent
+        revision: Number // change its value to force refresh
+    },
     data() {
         return {
             rootId: null,
             uploadedFiles: [],
             nodes: [],
-            preview: null,
+            slidePreview: null,
+            samplePreview: null,
             error: false
         };
     },
@@ -84,7 +96,17 @@ export default {
         revision() {
             this.findRoot();
             this.makeTree();
-        }
+        },
+        slidePreview(val) {
+            if(val) {
+                this.samplePreview = null; // if slide preview enabled, disable sample preview
+            }
+        },
+        samplePreview(val) {
+            if(val) {
+                this.slidePreview = null; // if sample preview enabled, disable slide preview
+            }
+        },
     },
     methods: {
         findRoot() {
@@ -161,7 +183,7 @@ export default {
 }
 
 .preview {
-    width: 100px;
+    width: 250px;
 }
 
 .buttons {
@@ -185,34 +207,31 @@ h2 .button {
     margin-left: 10px;
     text-transform: none;
 }
-</style>
 
-<style>
-.uploaded-file-details-wrapper .sl-vue-tree {
-    max-width: 900px;
+>>> .sl-vue-tree {
+    max-width: 1000px;
 }
 
-.uploaded-file-details-wrapper .sl-vue-tree-sidebar {
+>>> .sl-vue-tree-sidebar {
     display: flex;
     align-items: top;
     justify-content: flex-end;
 }
 
-.uploaded-file-details-wrapper .sl-vue-tree-gap {
+>>> .sl-vue-tree-gap {
     border: 0px dotted #bbb;
     border-left-width: 1px;
     position: relative;
     right: 11px;
     bottom: 17px;
-    /* background:red ; */
 }
 
-.uploaded-file-details-wrapper .sl-vue-tree-toggle {
+>>> .sl-vue-tree-toggle {
     background: #fafafa;
     z-index: 1;
 }
 
-.uploaded-file-details-wrapper .sl-vue-tree-gap:nth-last-child(3) {
+>>> .sl-vue-tree-gap:nth-last-child(3) {
     border-width: 0px 0px 1px 1px !important;
 }
 </style>

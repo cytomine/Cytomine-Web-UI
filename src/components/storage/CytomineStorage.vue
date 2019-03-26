@@ -169,7 +169,7 @@
                     </template>
 
                     <template #detail="{row: uFile}">
-                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()" />
+                        <uploaded-file-details :file="uFile" :key="uFile.id" :revision="revision" @update="updatedTree()" />
                     </template>
 
                     <template #empty>
