@@ -27,9 +27,7 @@
                     <strong>{{$t('storage')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id"
-                        :allow-empty="false">
-                    </cytomine-multiselect>
+                    <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false" />
                 </div>
             </div>
 
@@ -38,8 +36,7 @@
                     <strong>{{$t('link-with-project')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id">
-                    </cytomine-multiselect>
+                    <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id" />
                 </div>
             </div>
 
@@ -76,8 +73,7 @@
                                 </template>
                                 <template v-else>
                                     <td>
-                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile">
-                                        </uploaded-file-status>
+                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile" />
                                         <span v-else class="tag is-danger">
                                             {{$t("upload-error")}}
                                         </span>
@@ -131,11 +127,9 @@
             </b-message>
         </div>
         <div class="panel-block storage" v-else>
-            <b-loading :is-full-page="false" :active="loading"></b-loading>
+            <b-loading :is-full-page="false" :active="loading" />
             <template v-if="!loading">
-                <b-input v-model="searchString" class="search-uploaded-file"
-                    :placeholder="$t('search-placeholder')" icon="search">
-                </b-input>
+                <b-input v-model="searchString" class="search-uploaded-file" :placeholder="$t('search-placeholder')" icon="search" />
 
                 <b-table :data="filteredUploadedFiles" :paginated="true" :per-page="perPage"
                 pagination-size="is-small" detailed detail-key="id">
@@ -166,7 +160,7 @@
                         </b-table-column>
 
                         <b-table-column field="status" :label="$t('status')" sortable width="80">
-                            <uploaded-file-status :file="uFile"></uploaded-file-status>
+                            <uploaded-file-status :file="uFile" />
                         </b-table-column>
 
                         <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
@@ -175,7 +169,7 @@
                     </template>
 
                     <template #detail="{row: uFile}">
-                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()"></uploaded-file-details>
+                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()" />
                     </template>
 
                     <template #empty>
@@ -200,7 +194,7 @@
 </template>
 
 <script>
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFile, UploadedFileStatus} from "cytomine-client";
+import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from "cytomine-client";
 import axios from "axios";
 import filesize from "filesize";
 import constants from "@/utils/constants.js";
@@ -325,8 +319,7 @@ export default {
         },
         async fetchUploadedFiles() {
             try {
-                let {data} = await Cytomine.instance.api.get("uploadedfile.json?datatables=true&length=0"); // TODO: change in core
-                this.uploadedFiles = data.aaData;
+                this.uploadedFiles = (await UploadedFileCollection.fetchAll({detailed: true})).array;
             }
             catch(error) {
                 console.log(error);
