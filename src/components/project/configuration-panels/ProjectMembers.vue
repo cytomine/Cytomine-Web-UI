@@ -97,7 +97,7 @@
             
             <template #footer>
                 <div class="has-text-centered">
-                    <button class="button is-link">{{$t("button-export-as-csv")}}</button> <!-- TODO -->
+                    <a :href="exportURL" target="_self" class="button is-link">{{$t("button-export-as-csv")}}</a>
                 </div>
             </template>
 
@@ -144,7 +144,7 @@
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import AddMemberModal from "./AddMemberModal";
 import {fullName} from "@/utils/user-utils.js";
-import {ProjectRepresentative, ProjectRepresentativeCollection} from "cytomine-client";
+import {Cytomine, ProjectRepresentative, ProjectRepresentativeCollection} from "cytomine-client";
 
 export default {
     name: "projet-members",
@@ -210,6 +210,10 @@ export default {
             set(value) {
                 this.filteredMembers.forEach(member => member.selected = member.id != this.currentUser.id && value);
             }
+        },
+        exportURL() {
+            // TODO in core: should export only the filtered users
+            return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
         }
     },
     methods: {
