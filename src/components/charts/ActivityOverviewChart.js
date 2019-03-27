@@ -13,7 +13,7 @@ export default {
         return {
             projectConnections: [],
             imageConsultations: [],
-            annotationActions: [],
+            annotationSelections: [],
             chartData: null
         };
     },
@@ -47,19 +47,19 @@ export default {
         async fetchImageConsultations() {
             this.imageConsultations = await this.project.fetchImageConsultationsEvolution(this.queryParams);
         },
-        async fetchAnnotationActions() {
-            this.annotationActions = await this.project.fetchAnnotationActionsEvolution(this.queryParams);
+        async fetchAnnotationSelections() {
+            this.annotationSelections = await this.project.fetchAnnotationActionsEvolution({action: "select", ...this.queryParams});
         },
         async fetchData() {
             await Promise.all([
                 this.fetchProjectConnections(),
                 this.fetchImageConsultations(),
-                this.fetchAnnotationActions()
+                this.fetchAnnotationSelections()
             ]);
 
             this.chartData.datasets[0].data = this.projectConnections.map(item => item.size);
             this.chartData.datasets[1].data = this.imageConsultations.map(item => item.size);
-            this.chartData.datasets[2].data = this.annotationActions.map(item => item.size);
+            this.chartData.datasets[2].data = this.annotationSelections.map(item => item.size);
             this.updateLabels();
         },
         updateLabels() {
@@ -90,7 +90,7 @@ export default {
                     borderWidth: 0
                 },
                 {
-                    label: this.$t("annotation-actions"),
+                    label: this.$t("annotation-selections"),
                     data: [],
                     backgroundColor: "#ffa500",
                     borderWidth: 0

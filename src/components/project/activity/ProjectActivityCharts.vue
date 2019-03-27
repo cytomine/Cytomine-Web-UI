@@ -22,8 +22,8 @@
                         :project="project" 
                         :startDate="startDate" 
                         :endDate="endDate"
-                        :daysRange="daysRange">
-                    </activity-overview-chart>
+                        :daysRange="daysRange"
+                    />
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                         </v-popover>
                     </div>
                     <strong class="metric">{{nbProjectVisits != null ? nbProjectVisits : "?"}}</strong>
-                    <strong>{{$t("project-connections")}}</strong>  
+                    <strong>{{$t("project-connections")}}</strong>
                 </div>
             </div>
             <div class="tile is-parent">
@@ -54,7 +54,7 @@
                         </v-popover>
                     </div>
                     <strong class="metric">{{nbImageConsultations != null ? nbImageConsultations : "?"}}</strong>
-                    <strong>{{$t("image-consultations")}}</strong>    
+                    <strong>{{$t("image-consultations")}}</strong>
                 </div>
             </div>
             <div class="tile is-parent">
@@ -63,12 +63,12 @@
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
                             <template #popover>
-                                <p>{{$t("annotation-actions-info-message")}}</p>
+                                <p>{{$t("annotation-selections-info-message")}}</p>
                             </template>
                         </v-popover>
                     </div>
-                    <strong class="metric">{{nbAnnotationActions != null ? nbAnnotationActions : "?"}}</strong>
-                    <strong>{{$t("annotation-actions")}}</strong>    
+                    <strong class="metric">{{nbAnnotationSelections != null ? nbAnnotationSelections : "?"}}</strong>
+                    <strong>{{$t("annotation-selections")}}</strong>
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@
                     <strong class="metric">
                         {{ nbAnnotations[annotationTypes.USER] != null ? nbAnnotations[annotationTypes.USER] : "?" }}
                     </strong>
-                    <strong>{{$t("user-annotations")}}</strong>  
+                    <strong>{{$t("user-annotations")}}</strong>
                 </div>
             </div>
             <div class="tile is-parent">
@@ -121,7 +121,7 @@
                     <strong class="metric">
                         {{ nbAnnotations[annotationTypes.REVIEWED] != null ? nbAnnotations[annotationTypes.REVIEWED] : "?" }}
                     </strong>
-                    <strong>{{$t("reviewed-annotations")}}</strong>    
+                    <strong>{{$t("reviewed-annotations")}}</strong>
                 </div>
             </div>
         </div>
@@ -159,8 +159,8 @@
                         :startDate="startDate"
                         :endDate="endDate"
                         :daysRange="daysRange"
-                        :term="selectedTerms[0] || null"> <!-- If option "all term" (id 0) was selected, return null instead -->
-                    </number-annotations-chart>
+                        :term="selectedTerms[0] || null"
+                    /> <!-- If option "all term" (id 0) was selected, return null instead -->
                 </div>
             </div>
         </div>
@@ -186,8 +186,8 @@
                         :project="project"
                         :startDate="startDate"
                         :endDate="endDate"
-                        @nbElems="val => nbElemsAnnotationTermChart = val">
-                    </annotation-term-chart>
+                        @nbElems="val => nbElemsAnnotationTermChart = val"
+                    />
                 </div>
             </div>
         </div>
@@ -210,8 +210,8 @@
                         :project="project"
                         :startDate="startDate"
                         :endDate="endDate"
-                        @nbElems="val => nbElemsAnnotationContributorChart = val">
-                    </annotation-contributor-chart>
+                        @nbElems="val => nbElemsAnnotationContributorChart = val"
+                    />
                 </div>
             </div>
         </div>
@@ -246,7 +246,7 @@ export default {
             loading: true,
             nbProjectVisits: null,
             nbImageConsultations: null,
-            nbAnnotationActions: null,
+            nbAnnotationSelections: null,
             nbAnnotations: {
                 [AnnotationType.USER]: null,
                 [AnnotationType.ALGO]: null,
@@ -322,9 +322,9 @@ export default {
             this.nbImageConsultations = null;
             this.nbImageConsultations = await this.project.fetchNbImageConsultations(this.queryParams);
         },
-        async fetchNbAnnotationActions() {
-            this.nbAnnotationActions = null;
-            this.nbAnnotationActions = await this.project.fetchNbAnnotationActions(this.queryParams);
+        async fetchNbAnnotationSelections() {
+            this.nbAnnotationSelections = null;
+            this.nbAnnotationSelections = await this.project.fetchNbAnnotationActions({type: "select", ...this.queryParams});
         },
         async fetchNbAnnotations(type) {
             this.nbAnnotations[type] = null;
@@ -334,7 +334,7 @@ export default {
             await Promise.all([
                 this.fetchNbConnections(),
                 this.fetchNbImageConsultations(),
-                this.fetchNbAnnotationActions(),
+                this.fetchNbAnnotationSelections(),
                 this.fetchNbAnnotations(AnnotationType.USER),
                 this.fetchNbAnnotations(AnnotationType.ALGO),
                 this.fetchNbAnnotations(AnnotationType.REVIEWED)

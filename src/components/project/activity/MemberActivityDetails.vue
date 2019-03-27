@@ -36,20 +36,26 @@
                 <div class="level">
                     <div class="level-item has-text-centered">
                         <div>
-                        <p class="heading">{{$t("project-connections")}}</p>
-                        <p class="title">{{resumeActivity.totalConnections}}</p>
+                            <p class="heading">{{$t("project-connections")}}</p>
+                            <p class="title">{{resumeActivity.totalConnections}}</p>
                         </div>
                     </div>
                     <div class="level-item has-text-centered">
                         <div>
-                        <p class="heading">{{$t("image-consultations")}}</p>
-                        <p class="title">{{resumeActivity.totalConsultations}}</p>
+                            <p class="heading">{{$t("image-consultations")}}</p>
+                            <p class="title">{{resumeActivity.totalConsultations}}</p>
                         </div>
                     </div>
                     <div class="level-item has-text-centered">
                         <div>
-                        <p class="heading">{{$t("annotation-actions")}}</p>
-                        <p class="title">{{resumeActivity.totalAnnotationActions}}</p>
+                            <p class="heading">{{$t("annotation-selections")}}</p>
+                            <p class="title">{{resumeActivity.totalAnnotationSelections}}</p>
+                        </div>
+                    </div>
+                    <div class="level-item has-text-centered">
+                        <div>
+                            <p class="heading">{{$t("annotation-creations")}}</p>
+                            <p class="title">{{resumeActivity.totalAnnotations}}</p>
                         </div>
                     </div>
                 </div>
@@ -88,7 +94,7 @@
                     </template>
 
                     <template #detail="{row: connection}">
-                        <project-connection-details :connection="connection" :key="connection.id"></project-connection-details>
+                        <project-connection-details :connection="connection" :key="connection.id" />
                     </template>
 
                     <template #footer>
@@ -125,28 +131,27 @@
                     </div>
                     <div class="column is-narrow">
                         <b-field :label="$t('from')" horizontal>
-                            <cytomine-datepicker v-model="startDate" :resetButton="false" :maxDate="endDate || new Date()">
-                            </cytomine-datepicker>
+                            <cytomine-datepicker v-model="startDate" :resetButton="false" :maxDate="endDate || new Date()" />
                         </b-field>
                     </div>
                     <div class="column is-narrow">
                         <b-field :label="$t('to')" horizontal>
-                            <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()">
-                            </cytomine-datepicker>
+                            <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()" />
                         </b-field>
                     </div>
                 </div>
 
                 <div class="chart-container">
-                    <last-connections-chart css-classes="chart"
+                    <last-connections-chart
+                        css-classes="chart"
                         :project="project.id"
                         :user="idUser"
                         :period="period"
                         :startDate="startDate.getTime()"
                         :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null"
                         :showDates="true"
-                        :revision="chartRevision">
-                    </last-connections-chart>
+                        :revision="chartRevision"
+                    />
                 </div>
 
                 <hr>
