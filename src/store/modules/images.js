@@ -1,7 +1,7 @@
 import Vue from "vue";
 import router from "@/routes.js";
 
-import {ImageInstance, TermCollection, PropertyCollection, AbstractImage, AnnotationType} from "cytomine-client";
+import {ImageInstance, PropertyCollection, AbstractImage, AnnotationType, Term} from "cytomine-client";
 
 import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
     verticesStyle, reviewedStyles, reviewedSelectStyles, defaultColors} from "@/utils/style-utils.js";
@@ -208,9 +208,7 @@ export default {
         addTerm(state, {idViewer, term}) { // if a term is added, required to add it to all images as they belong to same project
             let maps = state.viewers[idViewer].maps;
             maps.forEach(map => {
-                let mapTerm = term.clone();
-                formatTerm(mapTerm, map.layersOpacity);
-                map.terms.push(mapTerm);
+                map.terms.push(formatTerm(term, map.layersOpacity));
             });
         },
 
@@ -219,8 +217,13 @@ export default {
         },
 
         setTermsNewAnnots(state, {idViewer, index, terms}) {
+            state.viewers[idViewer].maps[index].termsNewAnnots = terms;
+        },
+
+        filterTermsNewAnnots(state, {idViewer, index}) { // keep only the terms that still exist
             let wrapper = state.viewers[idViewer].maps[index];
-            wrapper.termsNewAnnots = terms;
+            let idTerms = wrapper.terms.map(term => term.id);
+            wrapper.termsNewAnnots = wrapper.termsNewAnnots.filter(id => idTerms.includes(id));
         },
 
         toggleTermVisibility(state, {idViewer, index, indexTerm}) {
@@ -468,12 +471,13 @@ export default {
             }));
         },
 
-        async addMap({commit, dispatch}, {idViewer, image}) {
-            let [fetchedImage, terms, propertiesKeys] = await Promise.all([
+        async addMap({commit, dispatch, getters}, {idViewer, image}) {
+            let [fetchedImage, propertiesKeys] = await Promise.all([
                 fetchImage(image.id),
-                fetchTerms(image.project, initialLayersOpacity),
                 fetchPropertiesKeys(image.id)
             ]);
+
+            let terms = formatTerms(getters.terms, initialLayersOpacity);
 
             let wrapper = {
                 imageInstance: fetchedImage,
@@ -539,16 +543,18 @@ export default {
             dispatch("changePath", idViewer);
         },
 
-        async refreshData({state, commit, dispatch}, idViewer) {
+        async refreshData({state, commit, dispatch, getters}, idViewer) {
             await Promise.all(state.viewers[idViewer].maps.map(async (map, index) => {
-                let [image, terms] = await Promise.all([
+                let [image] = await Promise.all([
                     fetchImage(map.imageInstance.id),
-                    fetchTerms(map.imageInstance.project, map.opacity, map.terms),
                     dispatch("refreshProperties", {idViewer, index})
                 ]);
 
+                let terms = formatTerms(getters.terms, map.opacity, map.terms);
+
                 commit("setImageInstance", {idViewer, index, image});
                 commit("setTerms", {idViewer, index, terms});
+                commit("filterTermsNewAnnots", {idViewer, index});
             }));
             dispatch("changePath", idViewer);
         },
@@ -751,26 +757,21 @@ async function fetchPropertiesKeys(idImage) {
     return data;
 }
 
-async function fetchTerms(idProject, layersOpacity, previousTerms=[]) {
-    // TODO: fetch in another store module since common to all images of the project?
-    let terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: idProject})).array;
-
+function formatTerms(terms, layersOpacity, previousTerms=[]) {
+    let result = [];
     let nbTerms = terms.length;
     for(let i = 0; i < nbTerms; i++) {
         let term = terms[i];
         let prevTerm = previousTerms.find(prevTerm => prevTerm.id == term.id);
-        if(prevTerm != null) {
-            terms[i] = prevTerm;
-        }
-        else {
-            formatTerm(term, layersOpacity);
-        }
+        result.push(prevTerm ? prevTerm : formatTerm(term, layersOpacity));
     }
-    return terms;
+    return result;
 }
 
 function formatTerm(term, layersOpacity) {
-    term.opacity = initialTermsOpacity;
-    term.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
-    term.visible = true;
+    let result = new Term(term);
+    result.opacity = initialTermsOpacity;
+    result.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+    result.visible = true;
+    return result;
 }

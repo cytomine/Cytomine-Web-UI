@@ -1,5 +1,6 @@
 import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
+import {getAllTerms} from "@/utils/ontology-utils";
 
 export default {
     state: {
@@ -14,6 +15,7 @@ export default {
         logout(state) {
             state.project = null;
             state.configUI = {};
+            state.ontology = null;
             state.managers = [];
             state.members = [];
         },
@@ -105,6 +107,10 @@ export default {
         contributors: (state) => {
             let idsManagers = state.managers.map(user => user.id);
             return state.members.filter(user => !idsManagers.includes(user.id));
+        },
+
+        terms: (state) => {
+            return getAllTerms(state.ontology);
         }
     }
 };

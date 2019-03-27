@@ -55,6 +55,7 @@
 <script>
 import OntologyTree from "./OntologyTree";
 import CytomineTerm from "./CytomineTerm";
+import {getAllTerms} from "@/utils/ontology-utils";
 
 export default {
     name: "ontology-tree-multiselect",
@@ -86,7 +87,7 @@ export default {
                 return [];
             }
             let terms = this.additionalNodes.map(node => node);
-            terms.push(...this.getAllTerms(this.ontology.children.array));
+            terms.push(...getAllTerms(this.ontology));
             return terms;
         },
         allSelected() {
@@ -109,17 +110,6 @@ export default {
         }
     },
     methods: {
-        getAllTerms(terms) {
-            let result = [];
-            terms.forEach(term => {
-                if(term.children) {
-                    result.push(...this.getAllTerms(term.children));
-                }
-                result.push(term);
-            });
-            return result;
-        },
-
         selectAll() {
             this.$emit("setSelectedNodes", this.allSelected ? [] : this.allTerms.map(term => term.id));
         },

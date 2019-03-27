@@ -183,7 +183,7 @@ import OntologyTreeMultiselect from "@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 
-import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
 import {defaultColors} from "@/utils/style-utils.js";
@@ -215,12 +215,10 @@ export default {
             images: [],
             selectedImages: [],
 
-            terms: [],
             noTermOption: {id: 0, name: this.$t("no-term")},
             multipleTermsOption: {id: -1, name: this.$t("multiple-terms")},
             selectedTermsIds: [],
 
-            members: [],
             selectedMembers: [],
             
             userJobs: [],
@@ -259,6 +257,9 @@ export default {
         allUsers() {
             return this.users.concat(this.userJobs);
         },
+        members() {
+            return this.$store.state.project.members;
+        },
         collection() {
             return new AnnotationCollection({
                 project: this.project.id,
@@ -270,6 +271,9 @@ export default {
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
+        },
+        terms() {
+            return this.$store.getters.terms;
         },
         additionalNodes() {
             let additionalNodes = [this.noTermOption];
@@ -288,10 +292,6 @@ export default {
         }
     },
     methods: {
-        async fetchTerms() {
-            this.terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.selectedTermsIds = this.termsOptions.map(term => term.id);
-        },
         async fetchImages() {
             this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
             this.selectedImages = this.images;
@@ -301,13 +301,6 @@ export default {
             this.users.forEach(user => {
                 user.fullName = fullName(user);
             });
-        },
-        async fetchMembers() {
-            this.members = (await this.project.fetchUsers()).array;
-            this.members.forEach(member => {
-                member.fullName = fullName(member);
-            });
-            this.selectedMembers = this.members;
         },
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
@@ -341,12 +334,13 @@ export default {
 
         this.selectedColor = this.colors[0];
 
+        this.selectedTermsIds = this.termsOptions.map(term => term.id);
+        this.selectedMembers = this.members;
+
         try {
             await Promise.all([
-                this.fetchTerms(),
                 this.fetchImages(), 
                 this.fetchUsers(),
-                this.fetchMembers(),
                 this.fetchUserJobs()
             ]);
         }
