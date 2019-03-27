@@ -83,7 +83,9 @@ export default {
         CytomineMultiselect,
         JobParameterRow
     },
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             softwares: [],
@@ -141,7 +143,7 @@ export default {
 
             for(let param of this.selectedSoftware.parameters) {
                 this.$set(param, "value", param.defaultParamValue);
-                this.$set(param, "valid", !param.required || !param.hasDefault);
+                this.$set(param, "valid", !param.required || param.defaultParamValue != null);
             }
         }
     },
