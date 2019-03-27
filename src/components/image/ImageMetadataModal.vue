@@ -41,10 +41,10 @@
 import {AbstractImage, PropertyCollection} from "cytomine-client";
 export default {
     name: "image-metadata-modal",
-    props: [
-        "active",
-        "idAbstractImage"
-    ],
+    props: {
+        active: Boolean,
+        idAbstractImage: Number
+    },
     data() {
         return {
             error: false,
@@ -75,7 +75,8 @@ export default {
             let height = this.$refs.image.clientHeight + "px";
             return {
                 width: reverse ? height : width,
-                height: reverse ? width : height 
+                height: reverse ? width : height,
+                textAlign: "unset"
             };
         }
     },
@@ -122,12 +123,10 @@ export default {
 
         &.rotate-180 {
             transform: rotate(180deg) translate(-100%,-100%);
-            writing-mode: vertical-lr;
         }
 
         &.rotate-270 {
             transform: rotate(270deg) translateX(-100%);
-            writing-mode: vertical-lr;
         }
     }
 
