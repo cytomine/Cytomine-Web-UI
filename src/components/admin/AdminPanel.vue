@@ -20,7 +20,7 @@
 
     <div class="box">
         <keep-alive>
-            <component :is="activeComponent"></component>
+            <component :is="activeComponent" />
         </keep-alive>
     </div>
 </div>

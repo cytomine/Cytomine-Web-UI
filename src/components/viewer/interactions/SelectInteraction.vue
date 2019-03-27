@@ -8,7 +8,7 @@
                        ref="interactionSelect">
 
 
-    <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
+    <vl-style-func :factory="styleFunctionFactory" />
     
 </vl-interaction-select>
 </template>
@@ -19,10 +19,10 @@ import {never, shiftKeyOnly} from "ol/events/condition";
 
 export default {
     name: "select-interaction",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     computed: {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];

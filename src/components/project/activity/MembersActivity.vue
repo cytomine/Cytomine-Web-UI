@@ -14,7 +14,7 @@
 
             <div class="columns">
                 <div class="column is-one-quarter">
-                    <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+                    <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
                 </div>
 
                 <div class="column">
@@ -46,8 +46,7 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                                :searchable="false">
-                            </cytomine-multiselect>
+                                :searchable="false" />
                         </div>
                     </div>
                 </div>

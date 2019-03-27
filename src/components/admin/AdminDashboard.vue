@@ -1,6 +1,6 @@
 <template>
 <div class="admin-dashboard-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
         <h2>{{$t("currently")}}</h2>
         <b-message v-if="!currentStats" type="is-danger" has-icon icon-size="is-small">
@@ -118,10 +118,11 @@
         </div>
 
         <div class="chart-container">
-            <last-connections-chart css-classes="chart"
+            <last-connections-chart
+                css-classes="chart"
                 :startDate="selectedChartOption.startDate"
-                :period="selectedChartOption.period">
-            </last-connections-chart>
+                :period="selectedChartOption.period"
+           />
         </div>
 
     </template>

@@ -13,7 +13,7 @@
                 <i v-if="prop.superscript" class="superscript" :class="prop.superscript"></i>
                 <span class="icon" v-if="prop.icon || prop.iconComponent">
                     <i v-if="prop.icon" :class="prop.icon"></i>
-                    <component v-else :is="prop.iconComponent"></component>
+                    <component v-else :is="prop.iconComponent" />
                 </span>
                 {{$t(prop.label)}}
             </td>

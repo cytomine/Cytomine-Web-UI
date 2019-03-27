@@ -21,12 +21,13 @@
         </div>
 
         <div class="ontology-tree-container" v-show="showTermSelector">
-            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small"></b-input>
-            <ontology-tree class="ontology-tree"
+            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
+            <ontology-tree
+                class="ontology-tree"
                 v-model="termsToAssociate"
                 :ontology="ontology"
-                :searchString="searchStringTerm">
-            </ontology-tree>
+                :searchString="searchStringTerm"
+            />
         </div>
     </div>
 
@@ -170,10 +171,10 @@ export default {
         IconPolygonFreeHand,
         IconLineFreeHand
     },
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             showTermSelector: false,

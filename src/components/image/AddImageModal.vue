@@ -6,7 +6,7 @@
                 <p class="modal-card-title">{{$t("add-images")}}</p>
             </header>
             <section class="modal-card-body">
-                <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
+                <b-loading :is-full-page="false" :active="loading" class="small" />
                 <template v-if="!loading">
                     <b-message v-if="images == null" type="is-danger" has-icon icon-size="is-small">
                         <h2> {{ $t("error") }} </h2>
@@ -14,7 +14,7 @@
                     </b-message>
                     <template v-else>
                         <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                        type="search" icon="search"></b-input>
+                        type="search" icon="search" />
 
                         <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
                         pagination-size="is-small">
@@ -74,7 +74,9 @@ import {AbstractImageCollection, ImageInstance} from "cytomine-client";
 
 export default {
     name: "add-image-modal",
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             loading: true,

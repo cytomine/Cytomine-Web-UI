@@ -6,25 +6,25 @@
         <tr>
             <td class="name">{{ $t("brightness") }}</td>
             <td>
-                <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders"></cytomine-slider>
+                <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders" />
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("contrast") }}</td>
             <td>
-                <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders"></cytomine-slider>
+                <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders" />
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("saturation") }}</td>
             <td>
-                <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders"></cytomine-slider>
+                <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders" />
             </td>
         </tr>
         <tr>
             <td class="name">{{ $t("hue") }}</td>
             <td>
-                <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders"></cytomine-slider>
+                <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders" />
             </td>
         </tr>
     </table>
@@ -43,10 +43,10 @@ const debounceDelay = 500;
 export default {
     name: "color-manipulation",
     components: {CytomineSlider},
-    props: [
-        "idViewer",
-        "index",
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             revisionSliders: 0

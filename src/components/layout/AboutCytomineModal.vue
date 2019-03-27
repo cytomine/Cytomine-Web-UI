@@ -80,7 +80,9 @@ import constants from "@/utils/constants.js";
 
 export default {
     name: "about-cytomine-wrapper",
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             version: null,

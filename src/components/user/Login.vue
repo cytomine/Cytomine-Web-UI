@@ -8,7 +8,7 @@
             <div class="panel-block">
                 <form>
                     <b-field :label="$t('email')">
-                        <b-input v-model="email"></b-input>
+                        <b-input v-model="email" />
                     </b-field>
 
                     <div class="buttons">
@@ -26,7 +26,7 @@
             <div class="panel-block">
                 <form>
                     <b-field :label="$t('username')">
-                        <b-input v-model="username"></b-input>
+                        <b-input v-model="username" />
                     </b-field>
 
                     <div class="buttons">
@@ -44,11 +44,11 @@
             <div class="panel-block">
                 <form>
                     <b-field :label="$t('username')">
-                        <b-input v-model="username"></b-input>
+                        <b-input v-model="username" />
                     </b-field>
 
                     <b-field :label="$t('password')">
-                        <b-input type="password" v-model="password"></b-input>
+                        <b-input type="password" v-model="password" />
                     </b-field>
 
                     <div class="columns">

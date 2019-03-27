@@ -3,12 +3,12 @@ import {Bar} from "vue-chartjs";
 export default {
     name: "activity-overview-chart",
     extends: Bar,
-    props: [
-        "project",
-        "startDate",
-        "endDate",
-        "daysRange"
-    ],
+    props: {
+        project: Object,
+        startDate: Number,
+        endDate: Number,
+        daysRange: Number
+    },
     data() {
         return {
             projectConnections: [],

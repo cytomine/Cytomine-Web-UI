@@ -1,6 +1,6 @@
 <template>
 <div class="list-members-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t("error") }} </h2>
         <p> {{ $t("unexpected-error-info-message") }} </p>
@@ -8,7 +8,7 @@
     <template v-else-if="!loading">
         <div class="columns">
             <div class="column is-one-quarter">
-                <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+                <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
             </div>
 
             <div class="column filter is-one-quarter">
@@ -17,8 +17,7 @@
                 </div>
                 <div class="filter-body">
                     <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                        :searchable="false">
-                    </cytomine-multiselect>
+                        :searchable="false" />
                 </div>
             </div>
             <div class="column is-one-half has-text-right-desktop buttons">
@@ -135,7 +134,7 @@
             </p>
         </div>
         
-        <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()"></add-member-modal>
+        <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()" />
     </template>
 </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="columns">
         <div class="column is-one-quarter">
             <div class="panel">
@@ -11,9 +11,13 @@
                     </button>
                 </p>
                 <div class="panel-block">
-                    <b-input size="is-small" v-model="searchString" type="search" icon="search" 
-                        :placeholder="$t('search-placeholder')">
-                    </b-input>
+                    <b-input
+                        size="is-small"
+                        v-model="searchString"
+                        type="search"
+                        icon="search"
+                        :placeholder="$t('search-placeholder')"
+                    />
                 </div>
                 <div class="panel-main-content">
                     <a v-for="ontology in filteredOntologies" :key="ontology.id" @click="selectOntology(ontology)"
@@ -33,16 +37,17 @@
                     {{selectedOntology.name}}
                 </p>
                 <div class="panel-block panel-main-content">
-                    <ontology-details :ontology="selectedOntology" 
+                    <ontology-details
+                        :ontology="selectedOntology"
                         @delete="deleteOntology()"
-                        @rename="renameOntology">
-                    </ontology-details>
+                        @rename="renameOntology"
+                    />
                 </div>
             </div>
         </div>
     </div>
 
-    <add-ontology-modal :active.sync="creationModal" @newOntology="addOntology"></add-ontology-modal>
+    <add-ontology-modal :active.sync="creationModal" @newOntology="addOntology" />
 </div>    
 </template>
 

@@ -1,7 +1,7 @@
 <template>
 <div class="columns" v-if="images && images.length">
     <div class="column" v-for="image in images" :key="image.image">
-        <image-preview :image="image"></image-preview>
+        <image-preview :image="image" />
     </div>
     <div class="column vertical-center">
         <router-link class="button" :to="`/project/${idProject}/images`">{{$t("button-view-all")}}</router-link>

@@ -11,8 +11,7 @@
                         <strong>{{$t("algorithm")}}</strong>
                     </div>
                     <div class="column">
-                        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name">
-                        </cytomine-multiselect>
+                        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name" />
                     </div>
                 </div>
                 <template v-if="selectedSoftware">
@@ -25,8 +24,8 @@
                         </thead>
                         <tbody>
                             <job-parameter-row v-for="param in paramsMandatoryNoDefault" :displayErrors="displayErrors"
-                                :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                            </job-parameter-row>
+                                :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                            />
 
                             <tr class="row-separator" v-if="optionalParams.length > 0">
                                 <td colspan="2">
@@ -38,8 +37,8 @@
                             </tr>
                             <template v-if="showOptional">
                                 <job-parameter-row v-for="param in optionalParams" :displayErrors="displayErrors"
-                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                                </job-parameter-row>
+                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                                />
                             </template>
 
                             <tr class="row-separator" v-if="prefilledParams.length > 0">
@@ -52,8 +51,8 @@
                             </tr>
                             <template v-if="showPrefilled">
                                 <job-parameter-row v-for="param in prefilledParams" :displayErrors="displayErrors"
-                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                                </job-parameter-row>
+                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                                />
                             </template>
                         </tbody>
                     </table>

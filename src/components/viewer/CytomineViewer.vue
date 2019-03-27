@@ -4,19 +4,21 @@
     <p>{{ $t("error-loading-image") }}</p>
 </div>
 <div v-else class="cytomine-viewer">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="maps-wrapper">
         <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-                :style="`height:${elementHeight}%; width:${elementWidth}%;`">
-            <cytomine-image v-if="idx <= nbMaps"
+            :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+        >
+            <cytomine-image
+                v-if="idx <= nbMaps"
                 :idViewer="idViewer"
                 :index="idx-1"
                 :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
-                @close="closeMap(idx-1)">
-            </cytomine-image>
+                @close="closeMap(idx-1)"
+            />
         </div>
 
-        <image-selector :idViewer="idViewer"></image-selector>
+        <image-selector :idViewer="idViewer" />
     </div>
 </div>
 </template>

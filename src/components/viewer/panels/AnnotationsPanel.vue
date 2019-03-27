@@ -58,11 +58,11 @@ import {ProjectDefaultLayerCollection} from "cytomine-client";
 
 export default {
     name: "annotations-panel",
-    props: [
-        "idViewer",
-        "index",
-        "layersToPreload"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        layersToPreload: Array
+    },
     data() {
         return {
             error: false,

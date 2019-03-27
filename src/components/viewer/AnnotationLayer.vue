@@ -7,7 +7,7 @@
                       :loader-factory="loaderFactory" 
                       :strategy-factory="strategyFactory"
                       url="-"> <!-- HACK because loader factory not used if URL not specified -->
-        <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
+        <vl-style-func :factory="styleFunctionFactory" />
     </vl-source-vector>
 
 </vl-layer-vector>
@@ -20,11 +20,11 @@ import {AnnotationCollection, AnnotationType} from "cytomine-client";
 
 export default {
     name: "annotation-layer",
-    props: [
-        "idViewer",
-        "index",
-        "layer"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        layer: Object
+    },
     data() {
         return {
             format: new WKT(),

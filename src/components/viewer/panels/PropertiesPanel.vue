@@ -27,10 +27,10 @@ import {defaultColors} from "@/utils/style-utils.js";
 
 export default {
     name: "properties-panel",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     computed: {
         colors() {
             return defaultColors;

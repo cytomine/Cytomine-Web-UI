@@ -2,8 +2,7 @@
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
     <b-field class="no-margin" :type="error ? 'is-danger' : null">
         <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
-            icon="search" @click.native="activate()" :loading="loading" :disabled="error">
-        </b-input>
+            icon="search" @click.native="activate()" :loading="loading" :disabled="error" />
         <p class="control">
             <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
         </p>
@@ -12,18 +11,27 @@
     <div class="navbar-dropdown search-results" v-show="true">
         <h2>Projects ({{filteredProjects.length}})</h2>
         <template v-if="filteredProjects.length > 0">
-            <router-link v-for="project in subsetProjects" :key="project.id" :to="`/project/${project.id}`"
-            class="navbar-item" v-html="highlightedName(project.name)" @click.native="deactivate"></router-link>
+            <router-link
+                v-for="project in subsetProjects"
+                :key="project.id"
+                :to="`/project/${project.id}`"
+                class="navbar-item"
+                v-html="highlightedName(project.name)"
+                @click.native="deactivate"
+            />
             <a v-if="moreProjects" class="navbar-item">...</a>
         </template>
         <span v-else class="navbar-item no-result">{{$t("no-project")}}</span>
 
         <h2>Images ({{filteredImages.length}})</h2>
         <template v-if="filteredImages.length > 0">
-            <router-link v-for="img in subsetImages" :key="img.id" :to="`/project/${img.project}/image/${img.id}`"
-            class="navbar-item" @click.native="deactivate"
-            v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(${$t('in-project', {projectName: img.projectName})})</span>`">
-            </router-link>
+            <router-link
+                v-for="img in subsetImages"
+                :key="img.id"
+                :to="`/project/${img.project}/image/${img.id}`"
+                class="navbar-item" @click.native="deactivate"
+                v-html="htmlImageName(img)"
+            />
             <a v-if="moreImages" class="navbar-item">...</a>
         </template>
         <span v-else class="navbar-item no-result">{{$t("no-image")}}</span>
@@ -123,6 +131,10 @@ export default {
             let regex = new RegExp(`(${this.lowCaseSearchString})`, "gi");
             return value.replace(regex, "<strong>$1</strong>");
         },
+        htmlImageName(img) {
+            let inProject = `<span class="in-project">(${this.$t("in-project", {projectName: img.projectName})})</span>`;
+            return `${this.highlightedName(img.originalFilename)} ${inProject}`;
+        }
     }
 };
 </script>

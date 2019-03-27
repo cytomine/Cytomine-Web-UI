@@ -1,11 +1,11 @@
 <template>
 <div>
     <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
-        <b-loading :is-full-page="false" :active="loading"></b-loading>
+        <b-loading :is-full-page="false" :active="loading" />
         <template v-if="!loading">
             <div class="header">
                 <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                        type="search" icon="search"></b-input>
+                        type="search" icon="search" />
                 <button class="delete" @click="imageSelectorEnabled = false"></button>
             </div>
             <div class="content-wrapper" v-if="error">
@@ -47,7 +47,9 @@ import {ImageInstanceCollection} from "cytomine-client";
 
 export default {
     name: "image-selector",
-    props: ["idViewer"],
+    props: {
+        idViewer: String
+    },
     data() {
         return {
             images: [],

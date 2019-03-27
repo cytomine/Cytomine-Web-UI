@@ -1,14 +1,15 @@
 <template>
 <div class="annotation-details-playground" ref="playground">
-    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && reload"
-                            v-show="displayAnnotDetails"
-                            class="draggable"
-                            :parent="true" 
-                            :resizable="false" 
-                            drag-handle=".drag"
-                            @dragstop="dragStop"
-                            :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y">
-
+    <vue-draggable-resizable
+        v-if="selectedFeature && selectedFeature.properties && reload"
+        v-show="displayAnnotDetails"
+        class="draggable"
+        :parent="true"
+        :resizable="false"
+        drag-handle=".drag"
+        @dragstop="dragStop"
+        :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    >
         <div class="actions">
             <h1>{{$t("current-selection")}}</h1>
             <button class="drag button is-small close">
@@ -20,18 +21,19 @@
         </div>
 
         <div class="annotation-details-container">
-            <annotation-details :annotation="selectedFeature.properties.annot"
-                                :terms="imageWrapper.terms"
-                                :users="allUsers"
-                                :showImageInfo="false"
-                                :key="selectedFeature.id"
-                                :showComments="showComments"
-                                @addTerm="addTerm"
-                                @updateTerms="updateTerms()"
-                                @updateProperties="updateProperties()"
-                                @centerView="centerViewOnAnnot()"
-                                @deletion="handleDeletion()">
-            </annotation-details>
+            <annotation-details
+                :annotation="selectedFeature.properties.annot"
+                :terms="imageWrapper.terms"
+                :users="allUsers"
+                :showImageInfo="false"
+                :key="selectedFeature.id"
+                :showComments="showComments"
+                @addTerm="addTerm"
+                @updateTerms="updateTerms()"
+                @updateProperties="updateProperties()"
+                @centerView="centerViewOnAnnot()"
+                @deletion="handleDeletion()"
+            />
         </div>
     </vue-draggable-resizable>
 </div>
@@ -49,11 +51,11 @@ import WKT from "ol/format/WKT";
 export default {
     name: "annotations-details-container",
     components: {VueDraggableResizable, AnnotationDetails},
-    props: [
-        "idViewer",
-        "index",
-        "view"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        view: Object
+    },
     data() {
         return {
             width: 350,

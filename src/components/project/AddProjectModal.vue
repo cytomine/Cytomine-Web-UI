@@ -9,7 +9,7 @@
                 <b-field :label="$t('name')"
                          :type="!validName && displayErrors ? 'is-danger' : null"
                          :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                    <b-input v-model="name"></b-input>
+                    <b-input v-model="name" />
                 </b-field>
 
                 <div class="field">
@@ -55,7 +55,9 @@ import {Project, Ontology, OntologyCollection} from "cytomine-client";
 
 export default {
     name: "add-project-modal",
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             name: "",

@@ -108,10 +108,10 @@ import {quillEditor} from "vue-quill-editor";
 export default {
     name: "cytomine-quill-editor",
     components: {quillEditor},
-    props: [
-        "value",
-        "placeholder"
-    ],
+    props: {
+        value: String,
+        placeholder: String
+    },
     data() {
         return {
             editorOptions: {

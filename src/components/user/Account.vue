@@ -9,7 +9,7 @@
             <div class="panel-block">
                 <form>
                     <b-field :label="$t('username')" horizontal>
-                        <b-input :value="currentUser.username" disabled></b-input>
+                        <b-input :value="currentUser.username" disabled />
                     </b-field>
 
                     <b-field :label="$t('role')" horizontal>
@@ -17,15 +17,15 @@
                     </b-field>
 
                     <b-field :label="$t('lastname')" horizontal>
-                        <b-input v-model="updatedUser.lastname"></b-input>
+                        <b-input v-model="updatedUser.lastname" />
                     </b-field>
 
                     <b-field :label="$t('firstname')" horizontal>
-                        <b-input v-model="updatedUser.firstname"></b-input>
+                        <b-input v-model="updatedUser.firstname" />
                     </b-field>
 
                     <b-field :label="$t('email')" horizontal>
-                        <b-input v-model="updatedUser.email"></b-input>
+                        <b-input v-model="updatedUser.email" />
                     </b-field>
 
                     <b-field grouped position="is-right">
@@ -51,17 +51,16 @@
                     </b-message>
 
                     <b-field v-else :label="$t('password-current')" :type="typeCurrentPassword" horizontal>
-                        <b-input type="password" v-model="currentPassword" :loading="isCheckingPassword"></b-input>
+                        <b-input type="password" v-model="currentPassword" :loading="isCheckingPassword" />
                     </b-field>
 
                     <b-field :label="$t('password-new')" horizontal>
                         <b-input type="password" v-model="newPassword"
-                            :disabled="!correctPassword && !currentUser.passwordExpired">
-                        </b-input>
+                            :disabled="!correctPassword && !currentUser.passwordExpired" />
                     </b-field>
 
                     <b-field :label="$t('password-confirm')" horizontal>
-                        <b-input type="password" v-model="confirmPassword" :disabled="newPassword === ''"></b-input>
+                        <b-input type="password" v-model="confirmPassword" :disabled="newPassword === ''" />
                     </b-field>
 
                     <b-field grouped position="is-right">
@@ -83,11 +82,11 @@
             <div class="panel-block">
 
                 <b-field :label="$t('public-key')" horizontal>
-                    <b-input :value="currentUser.publicKey" readonly></b-input>
+                    <b-input :value="currentUser.publicKey" readonly />
                 </b-field>
 
                 <b-field :label="$t('private-key')" horizontal>
-                    <b-input :value="currentUser.privateKey" readonly></b-input>
+                    <b-input :value="currentUser.privateKey" readonly />
                 </b-field>
 
                 <b-field grouped position="is-right">

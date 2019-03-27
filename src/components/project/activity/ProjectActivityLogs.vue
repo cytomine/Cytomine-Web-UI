@@ -52,10 +52,10 @@ import _ from "lodash";
 
 export default {
     name: "project-activity-logs",
-    props: [
-        "startDate",
-        "endDate"
-    ],
+    props: {
+        startDate: Number,
+        endDate: Number
+    },
     data() {
         return {
             loading: true,

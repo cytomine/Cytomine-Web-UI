@@ -11,7 +11,7 @@
     <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
         <div class="navbar-start">
             <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbViewers > 0" :title="$t('viewers')">
-                <navigation-tree></navigation-tree>
+                <navigation-tree />
             </navbar-dropdown>
             <router-link to="/projects" class="navbar-item">
                 <i class="fas fa-list-alt"></i>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="navbar-end">
-            <cytomine-searcher></cytomine-searcher>
+            <cytomine-searcher />
 
             <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
                              :title="currentUserFullInfo"
@@ -70,8 +70,8 @@
         </div>
     </div>
 
-    <hotkeys-modal :active.sync="hotkeysModal"></hotkeys-modal>
-    <about-cytomine-modal :active.sync="aboutModal"></about-cytomine-modal>
+    <hotkeys-modal :active.sync="hotkeysModal" />
+    <about-cytomine-modal :active.sync="aboutModal" />
 </nav>
 </template>
 

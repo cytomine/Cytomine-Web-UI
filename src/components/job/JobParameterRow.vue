@@ -3,7 +3,7 @@
     <td>{{param.name}}</td>
     <td>
          <b-field :type="displayErrors && errorMessage ? 'is-danger': ''" :message="displayErrors ? errorMessage : ''">
-            <b-input v-if="loading" loading disabled></b-input>
+            <b-input v-if="loading" loading disabled />
             <cytomine-multiselect v-else-if="options" v-model="internalValue" :options="options"
                 track-by="id" :label="param.uriPrintAttribut" :class="{'is-danger': displayErrors && errorMessage}"
                 :multiple="param.type == 'ListDomain'">
@@ -27,7 +27,7 @@
                 </template>
             </cytomine-multiselect>
             <input type="checkbox" v-model="internalValue" v-else-if="param.type == 'Boolean'">
-            <b-input v-else v-model="internalValue"></b-input>
+            <b-input v-else v-model="internalValue" />
         </b-field>
     </td>
 </tr>
@@ -40,10 +40,10 @@ import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 export default {
     name: "job-parameter-row",
     components: {CytomineMultiselect},
-    props: [
-        "param",
-        "displayErrors"
-    ],
+    props: {
+        param: Object,
+        displayErrors: Boolean
+    },
     data() {
         return {
             internalValue: null,

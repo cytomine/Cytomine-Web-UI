@@ -133,7 +133,7 @@
     </b-field>
 
     <h2>Actions</h2>
-    <project-actions :project="project" size="is-normal" @delete="deleteProject()"></project-actions>
+    <project-actions :project="project" size="is-normal" @delete="deleteProject()" />
 </div>    
 </template>
 

@@ -10,7 +10,9 @@ import jobStatusLabelMapping from "@/utils/job-utils";
 
 export default {
     name: "job-status",
-    props: ["status"],
+    props: {
+        status: Number
+    },
     computed: {
         labels() {
             return jobStatusLabelMapping;

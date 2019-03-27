@@ -23,11 +23,11 @@
 <script>
 export default {
     name: "scale-line",
-    props: [
-        "image",
-        "zoom",
-        "mousePosition"
-    ],
+    props: {
+        image: Object,
+        zoom: Number,
+        mousePosition: Array
+    },
     data() {
         return {
             scaleLineLength: 100

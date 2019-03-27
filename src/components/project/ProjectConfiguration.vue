@@ -28,7 +28,7 @@
 
     <div class="box tab-content">
         <keep-alive>
-            <component :is="activeComponent"></component>
+            <component :is="activeComponent" />
         </keep-alive>
     </div>
 </div>

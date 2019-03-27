@@ -1,65 +1,65 @@
 <template>
     <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
-        <vl-map :data-projection="projectionName"
-                :load-tiles-while-animating="true"
-                :load-tiles-while-interacting="true"
-                :keyboard-event-target="document"
-                @pointermove="projectedMousePosition = $event.coordinate"
-                @mounted="updateKeyboardInteractions"
-                ref="map">
+        <vl-map
+            :data-projection="projectionName"
+            :load-tiles-while-animating="true"
+            :load-tiles-while-interacting="true"
+            :keyboard-event-target="document"
+            @pointermove="projectedMousePosition = $event.coordinate"
+            @mounted="updateKeyboardInteractions"
+            ref="map"
+        >
 
-            <vl-view :center.sync="center"
-                     :zoom.sync="zoom"
-                     :rotation.sync="rotation"
-                     :max-zoom="maxZoom"
-                     :max-resolution="Math.pow(2, image.depth)"
-                     :extent="extent"
-                     :projection="projectionName"
-                     @mounted="viewMounted()"
-                     ref="view">
-            </vl-view>
+            <vl-view
+                :center.sync="center"
+                :zoom.sync="zoom"
+                :rotation.sync="rotation"
+                :max-zoom="maxZoom"
+                :max-resolution="Math.pow(2, image.depth)"
+                :extent="extent"
+                :projection="projectionName"
+                @mounted="viewMounted()"
+                ref="view"
+            />
 
             <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-                <vl-source-zoomify :projection="projectionName"
-                                   :urls="baseLayerURLs"
-                                   :size="imageSize"
-                                   :extent="extent"
-                                   crossOrigin="Anonymous"
-                                   ref="baseSource"
-                                   @mounted="setBaseSource()">
-                </vl-source-zoomify>
+                <vl-source-zoomify
+                    :projection="projectionName"
+                    :urls="baseLayerURLs"
+                    :size="imageSize"
+                    :extent="extent"
+                    crossOrigin="Anonymous"
+                    ref="baseSource"
+                    @mounted="setBaseSource()"
+                />
             </vl-layer-tile>
 
             <vl-layer-image>
-                <vl-source-raster v-if="baseSource != null && colorManipulationOn"
-                                  :sources="[baseSource]"
-                                  :operation="operation"
-                                  :lib="lib">
-                </vl-source-raster>
+                <vl-source-raster
+                    v-if="baseSource != null && colorManipulationOn"
+                    :sources="[baseSource]"
+                    :operation="operation"
+                    :lib="lib"
+                />
             </vl-layer-image>
 
-            <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
-                              :idViewer="idViewer"
-                              :index="index"
-                              :layer="layer">
-            </annotation-layer>
+            <annotation-layer
+                v-for="layer in selectedLayers"
+                :key="'layer-'+layer.id"
+                :idViewer="idViewer"
+                :index="index"
+                :layer="layer"
+            />
 
-            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
-            </select-interaction>
-
-            <draw-interaction v-if="activeTool != 'select'"
-                :idViewer="idViewer" :index="index">
-            </draw-interaction>
-
-            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null"
-                :idViewer="idViewer" :index="index">
-            </modify-interaction>
+            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index" />
+            <draw-interaction v-if="activeTool != 'select'" :idViewer="idViewer" :index="index" />
+            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null" :idViewer="idViewer" :index="index" />
 
         </vl-map>
 
         <div v-if="configUI['project-tools-main']" class="draw-tools">
-            <draw-tools :idViewer="idViewer" :index="index"></draw-tools>
+            <draw-tools :idViewer="idViewer" :index="index" />
         </div>
 
         <div class="panels">
@@ -76,8 +76,8 @@
                             <i class="fas fa-info"></i>
                         </a>
                         <information-panel class="panel-options" v-show="activePanel == 'info'"
-                            :idViewer="idViewer" :index="index">
-                        </information-panel>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('digital-zoom')">
@@ -85,8 +85,8 @@
                             <i class="fas fa-search"></i>
                         </a>
                         <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
-                            :idViewer="idViewer" :index="index">
-                        </digital-zoom>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
@@ -94,8 +94,8 @@
                             <i class="fas fa-link"></i>
                         </a>
                         <link-panel class="panel-options" v-show="activePanel == 'link'"
-                            :idViewer="idViewer" :index="index">
-                        </link-panel>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('colors')">
@@ -103,8 +103,8 @@
                             <i class="fas fa-adjust"></i>
                         </a>
                         <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
-                            :idViewer="idViewer" :index="index">
-                        </color-manipulation>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('image-layers')">
@@ -112,8 +112,8 @@
                             <i class="fas fa-copy"></i>
                         </a>
                         <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
-                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
-                        </annotations-panel>
+                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('ontology') && terms.length > 0">
@@ -121,8 +121,8 @@
                             <i class="fas fa-hashtag"></i>
                         </a>
                         <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
-                            :idViewer="idViewer" :index="index">
-                        </ontology-panel>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li  v-if="isPanelDisplayed('property')">
@@ -130,8 +130,8 @@
                             <i class="fas fa-tag"></i>
                         </a>
                         <properties-panel class="panel-options" v-show="activePanel == 'properties'"
-                            :idViewer="idViewer" :index="index">
-                        </properties-panel>
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('follow')">
@@ -139,8 +139,8 @@
                             <i class="fas fa-street-view"></i>
                         </a>
                         <follow-panel class="panel-options" v-show="activePanel == 'follow'"
-                            :idViewer="idViewer" :index="index" :view="$refs.view">
-                        </follow-panel>
+                            :idViewer="idViewer" :index="index" :view="$refs.view"
+                        />
                     </li>
                 </template>
             </ul>
@@ -150,15 +150,13 @@
             <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
 
-        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index">
-        </rotation-selector>
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
 
-        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
-        </scale-line>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
         <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
-            :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotation-details-container>
+            :idViewer="idViewer" :index="index" :view="$refs.view"
+        />
 
         <div class="custom-overview" ref="overview">
             <p class="image-name" :class="{hidden: overviewCollapsed}">{{image.instanceFilename}}</p>
@@ -205,10 +203,10 @@ import constants from "@/utils/constants.js";
 
 export default {
     name: "cytomine-image",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     components: {
         AnnotationLayer,
 

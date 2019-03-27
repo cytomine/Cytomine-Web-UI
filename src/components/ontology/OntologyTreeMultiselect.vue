@@ -10,7 +10,7 @@
             <strong v-if="allSelected"> {{$t("all")}} </strong>
             <template v-else>
                 <span v-for="(term, index) in displayedSelectedTerms" :key="term.id">
-                    <cytomine-term :term="term"></cytomine-term>
+                    <cytomine-term :term="term" />
                     <span class="comma" v-if="index < displayedSelectedTerms.length - 1">,</span>
                 </span>
                 <strong v-if="countNotDisplayed > 0">

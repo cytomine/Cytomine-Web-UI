@@ -1,6 +1,6 @@
 <template>
 <div class="list-projects-wrapper content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div class="box error" v-if="error">
         <h2> {{ $t("error") }} </h2>
         <p>{{ $t("unexpected-error-info-message") }}</p>
@@ -15,7 +15,7 @@
         <div class="panel-block">
             <div class="search-block">
                 <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                    type="search" icon="search" />
                 <button class="button" @click="toggleFilterDisplay()">
                     <span class="icon">
                         <i class="fas fa-filter"></i>
@@ -33,8 +33,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedOntologies" :options="ontologies"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
+                                    label="name" track-by="id" :multiple="true" />
                             </div>
                         </div>
 
@@ -44,8 +43,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                                    :searchable="false">
-                                </cytomine-multiselect>
+                                    :searchable="false" />
                             </div>
                         </div>
 
@@ -58,8 +56,7 @@
                                 {{$t("members")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsMembers" :max="maxNbMembers"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" :show="initSliders" />
                             </div>
                         </div>
 
@@ -68,8 +65,7 @@
                                 {{$t("images")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsImages" :max="maxNbImages"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsImages" :max="maxNbImages" :show="initSliders" />
                             </div>
                         </div>
 
@@ -82,8 +78,7 @@
                                 {{$t("user-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -92,8 +87,7 @@
                                 {{$t("analysis-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -102,8 +96,7 @@
                                 {{$t("reviewed-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
                             </div>
                         </div>
                     </div>
@@ -165,10 +158,11 @@
                 </template>
 
                 <template #detail="{row: project}">
-                    <project-details :project="project"
+                    <project-details
+                        :project="project"
                         :excluded-properties="excludedProperties"
-                        @delete="deleteProject(project)">
-                    </project-details>
+                        @delete="deleteProject(project)"
+                    />
                 </template>
 
                 <template #empty>

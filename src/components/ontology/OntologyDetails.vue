@@ -60,7 +60,7 @@
                     <b-field :label="$t('new-name')"
                              :type="emptyNewName ? 'is-danger' : null"
                              :message="emptyNewName ? $t('field-cannot-be-empty') : ''">
-                        <b-input v-model="newName"></b-input>
+                        <b-input v-model="newName" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">
@@ -84,7 +84,9 @@ import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "ontology-details",
-    props: ["ontology"],
+    props: {
+        ontology: Object
+    },
     components: {OntologyTree},
     data() {
         return {

@@ -20,13 +20,13 @@
             {{$t("core-cannot-be-reached")}}
         </div>
 
-        <login v-else-if="currentUser == null"></login>
+        <login v-else-if="currentUser == null" />
 
         <template v-else>
-            <cytomine-navbar></cytomine-navbar>
+            <cytomine-navbar />
             <div class="bottom">
                 <keep-alive include="cytomine-storage">
-                    <router-view v-if="currentUser"></router-view>
+                    <router-view v-if="currentUser" />
                 </keep-alive>
             </div>
         </template>

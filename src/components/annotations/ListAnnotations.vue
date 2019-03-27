@@ -8,7 +8,7 @@
     <p>{{ $t("error-load-annotations-filters") }}</p>
 </div>
 <div v-else class="list-annotations-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading">
         <div class="box">
             <h2> {{ $t("display") }} </h2>
@@ -19,10 +19,14 @@
                             {{$t("preview-size")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
-                                label="label" track-by="size"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedSize"
+                                :options="allowedSizes"
+                                label="label"
+                                track-by="size"
+                                :allow-empty="false"
+                                :searchable="false"
+                           />
                         </div>
                     </div>
                     <div class="column filter">
@@ -30,9 +34,12 @@
                             {{$t("number-per-page")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="nbPerPage"
+                                :options="[10, 25, 50, 100]"
+                                :allow-empty="false"
+                                :searchable="false"
+                           />
                         </div>
                     </div>
                     <div class="column filter">
@@ -40,10 +47,14 @@
                             {{$t("outline-color")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedColor" :options="colors"
-                                label="label" track-by="name"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedColor"
+                                :options="colors"
+                                label="label"
+                                track-by="name"
+                                :allow-empty="false"
+                                :searchable="false"
+                           />
                         </div>
                     </div>
                 </div>
@@ -57,9 +68,12 @@
                             {{$t("annotation-type")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedAnnotationType"
+                                :options="annotationTypes"
+                                :allow-empty="false"
+                                :searchable="false"
+                           />
                         </div>
                     </div>
 
@@ -68,9 +82,13 @@
                             {{$t("analyses")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
-                                label="fullName" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedUserJobs"
+                                :options="userJobs"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                           />
                         </div>
                     </div>
 
@@ -79,9 +97,13 @@
                             {{$t(reviewed ? "reviewers" : "members")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedMembers" :options="members"
-                                label="fullName" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedMembers"
+                                :options="members"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                           />
                         </div>
                     </div>
                 </div>
@@ -92,9 +114,13 @@
                             {{$t("images")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedImages" :options="images"
-                                label="instanceFilename" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedImages"
+                                :options="images"
+                                label="instanceFilename"
+                                track-by="id"
+                                :multiple="true"
+                           />
                         </div>
                     </div>
 
@@ -103,10 +129,11 @@
                             {{$t("terms")}}
                         </div>
                         <div class="filter-body">
-                            <ontology-tree-multiselect :ontology="ontology"
+                            <ontology-tree-multiselect
+                                :ontology="ontology"
                                 :additionalNodes="additionalNodes"
-                                v-model="selectedTermsIds">
-                            </ontology-tree-multiselect>
+                                v-model="selectedTermsIds"
+                           />
                         </div>
                     </div>
 
@@ -139,13 +166,13 @@
             :reviewed="reviewed"
             :reviewUsersIds="reviewUsersIds"
 
-            :forceUpdate="forceUpdate"
+            :revision="revision"
 
             v-show="selectedTermsIds.includes(term.id)"
 
             @addTerm="addTerm"
-            @update="forceUpdate = []"> <!-- assigning a new array will be considered as a change in children components -->
-        </list-annotations-by-term>
+            @update="revision++"
+       />
     </div>
 </div>
 </template>
@@ -172,7 +199,7 @@ export default {
         return {
             loading: true,
             error: false,
-            forceUpdate: [],
+            revision: 0,
             users: [],
 
             allowedSizes: [],

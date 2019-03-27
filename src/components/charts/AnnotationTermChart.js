@@ -8,11 +8,11 @@ const defaultColor = "#eee";
 export default {
     name: "annotation-term-chart",
     extends: HorizontalBar,
-    props: [
-        "project",
-        "startDate",
-        "endDate"
-    ],
+    props: {
+        project: Object,
+        startDate: Number,
+        endDate: Number
+    },
     data() {
         return {
             chartData: null

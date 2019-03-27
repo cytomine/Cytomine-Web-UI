@@ -3,15 +3,15 @@ import {Bar} from "vue-chartjs";
 import {AnnotationType} from "cytomine-client";
 
 export default {
-    name: "annotation-term-chart",
+    name: "number-annotations-chart",
     extends: Bar,
-    props: [
-        "project",
-        "term",
-        "startDate",
-        "endDate",
-        "daysRange"
-    ],
+    props: {
+        project: Object,
+        term: Number,
+        startDate: Number,
+        endDate: Number,
+        daysRange: Number
+    },
     data() {
         return {
             annotationsEvolution: {

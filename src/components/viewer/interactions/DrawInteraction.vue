@@ -1,18 +1,19 @@
 <template>
 <div>
     <vl-layer-vector>
-        <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget"></vl-source-vector>
+        <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
     </vl-layer-vector>
 
-    <vl-interaction-draw v-if="nbActiveLayers > 0"
-                        ref="olDrawInteraction" 
-                        :source="drawSourceName"
-                        :type="drawType"
-                        :freehand="drawFreehand" 
-                        :freehand-condition="undefined"
-                        :geometry-function="drawGeometryFunction" 
-                        @drawend="drawEndHandler">
-    </vl-interaction-draw>
+    <vl-interaction-draw
+        v-if="nbActiveLayers > 0"
+        ref="olDrawInteraction"
+        :source="drawSourceName"
+        :type="drawType"
+        :freehand="drawFreehand"
+        :freehand-condition="undefined"
+        :geometry-function="drawGeometryFunction"
+        @drawend="drawEndHandler"
+    />
 </div>
 </template>
 
@@ -24,10 +25,10 @@ import {Annotation} from "cytomine-client";
 
 export default {
     name: "draw-interaction",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             format: new WKT()

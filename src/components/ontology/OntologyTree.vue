@@ -14,7 +14,7 @@
                    v-if="allowSelection"
                    :class="classNames(node)">
                 </i>
-                <cytomine-term :term="node.data"></cytomine-term>
+                <cytomine-term :term="node.data" />
             </div>
             <div v-else></div>
         </template>

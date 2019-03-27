@@ -1,9 +1,11 @@
 <template>
-<p v-if="users && users.length">
-    <span v-for="(user, index) in usersToDisplay" v-if="user != null" :key="user.id">
-            <username :user="user" :online="isOnline(user.id)"></username><template v-if="index < usersToDisplay.length - 1">, </template>
+<p v-if="filteredUsers.length">
+    <span v-for="(user, index) in usersToDisplay" :key="user.id">
+        <username :user="user" :online="isOnline(user.id)" /><template v-if="index < usersToDisplay.length - 1">, </template>
     </span>
-    <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">{{ expanded ? $t("button-less") : $t("button-more")}}</button>
+    <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">
+        {{ expanded ? $t("button-less") : $t("button-more")}}
+    </button>
 </p>
 <p v-else>
     -
@@ -16,12 +18,8 @@ export default {
     name: "list-usernames",
     components: {Username},
     props: {
-        users: {
-            type: Array
-        },
-        onlines: {
-            type: Array
-        },
+        users: Array,
+        onlines: Array,
         nbDisplayed: {
             type: Number,
             default: 5
@@ -33,15 +31,18 @@ export default {
         };
     },
     computed: {
+        filteredUsers() {
+            return this.users.filter(user => user); // Filter null users
+        },
         tooManyUsers() {
-            return this.users && this.users.length > this.nbDisplayed;
+            return this.filteredUsers && this.filteredUsers.length > this.nbDisplayed;
         },
         usersToDisplay() {
             if(!this.tooManyUsers || this.expanded || this.nbDisplayed == 0) {
-                return this.users;
+                return this.filteredUsers;
             }
             else {
-                return this.users.slice(0, this.nbDisplayed);
+                return this.filteredUsers.slice(0, this.nbDisplayed);
             }
         }
     },

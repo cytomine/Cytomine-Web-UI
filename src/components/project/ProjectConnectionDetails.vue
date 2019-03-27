@@ -1,6 +1,6 @@
 <template>
 <table class="table">
-    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" />
     <tbody v-if="!loading">
         <tr>
             <td>{{$t("operating-system")}}</td>
@@ -44,7 +44,9 @@ import ImagePreview from "@/components/image/ImagePreview";
 export default {
     name: "project-connection-details",
     components: {ImagePreview},
-    props: ["connection"],
+    props: {
+        connection: Object
+    },
     data() {
         return {
             loading: true,

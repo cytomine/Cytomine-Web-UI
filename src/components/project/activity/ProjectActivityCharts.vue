@@ -139,8 +139,8 @@
                             :additionalNodes="[{id: 0, name: this.$t('all')}]"
                             :startWithAdditionalNodes="true"
                             :multiple="false"
-                            v-model="selectedTerms">
-                        </ontology-tree-multiselect>
+                            v-model="selectedTerms"
+                        />
                     </div>
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
@@ -230,10 +230,10 @@ import {AnnotationType} from "cytomine-client";
 
 export default {
     name: "project-activity-charts",
-    props: [
-        "startDate",
-        "endDate"
-    ],
+    props: {
+        startDate: Number,
+        endDate: Number
+    },
     components: {
         NumberAnnotationsChart,
         AnnotationTermChart,

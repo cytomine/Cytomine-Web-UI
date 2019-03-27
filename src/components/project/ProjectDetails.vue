@@ -4,7 +4,7 @@
     <p> {{ $t("unexpected-error-info-message") }} </p>
 </b-message>
 <table v-else class="table">
-    <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" class="small" />
     <tbody v-if="!loading">
         <tr v-if="isPropDisplayed('name')">
             <td class="prop-label">{{$t("name")}}</td>
@@ -51,13 +51,13 @@
         <tr v-if="isPropDisplayed('description')">
             <td class="prop-label">{{$t("description")}}</td>
             <td class="prop-content">
-                <cytomine-description :object="project"></cytomine-description>
+                <cytomine-description :object="project" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('attachedFiles')">
             <td class="prop-label">{{$t("attached-files")}}</td>
             <td class="prop-content">
-                <attached-files :object="project"></attached-files>
+                <attached-files :object="project" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('ontology')">
@@ -75,37 +75,37 @@
         <tr v-if="isPropDisplayed('creator')">
             <td class="prop-label">{{$t("creator")}}</td>
             <td class="prop-content">
-                <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
+                <list-usernames :users="[creator]" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('representatives')">
             <td class="prop-label">{{$t("representatives")}} ({{representatives.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="representatives" :onlines="onlines"></list-usernames>
+                <list-usernames :users="representatives" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('managers')">
             <td class="prop-label">{{$t("managers")}} ({{managers.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="managers" :onlines="onlines"></list-usernames>
+                <list-usernames :users="managers" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('contributors')">
             <td class="prop-label">{{$t("contributors")}} ({{contributors.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
+                <list-usernames :users="contributors" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="!excludedProperties.includes('imagesPreview')">
             <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
-                <list-images-preview :idProject="project.id"></list-images-preview>
+                <list-images-preview :idProject="project.id" />
             </td>
         </tr>
         <tr>
             <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
-                <project-actions :project="project" @delete="$emit('delete')"></project-actions>
+                <project-actions :project="project" @delete="$emit('delete')" />
             </td>
         </tr>
     </tbody>

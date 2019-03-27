@@ -4,11 +4,11 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 export default {
     name: "annotation-contributor-chart",
     extends: HorizontalBar,
-    props: [
-        "project",
-        "startDate",
-        "endDate"
-    ],
+    props: {
+        project: Object,
+        startDate: Number,
+        endDate: Number
+    },
     data() {
         return {
             chartData: null

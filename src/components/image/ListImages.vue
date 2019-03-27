@@ -8,7 +8,7 @@
     <p>{{ $t("unexpected-error-info-message") }}</p>
 </div>
 <div v-else class="list-images-wrapper content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
@@ -19,7 +19,7 @@
         <div class="panel-block">
             <div class="search-block">
                 <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                    type="search" icon="search" />
                 <button class="button" @click="toggleFilterDisplay()">
                     <span class="icon">
                         <i class="fas fa-filter"></i>
@@ -36,8 +36,7 @@
                                 {{$t("format")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true">
-                                </cytomine-multiselect>
+                                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true" />
                             </div>
                         </div>
 
@@ -46,8 +45,7 @@
                                 {{$t("vendor")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true">
-                                </cytomine-multiselect>
+                                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true" />
                             </div>
                         </div>
                     </div>
@@ -59,8 +57,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect :multiple="true" :searchable="false"
-                                    v-model="selectedMagnifications" :options="availableMagnifications">
-                                </cytomine-multiselect>
+                                    v-model="selectedMagnifications" :options="availableMagnifications" />
                             </div>
                         </div>
 
@@ -70,8 +67,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect :multiple="true" :searchable="false"
-                                    v-model="selectedResolutions" :options="availableResolutions">
-                                </cytomine-multiselect>
+                                    v-model="selectedResolutions" :options="availableResolutions" />
                             </div>
                         </div>
 
@@ -80,8 +76,7 @@
                                 {{$t("width")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsWidth" :max="maxWidth"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsWidth" :max="maxWidth" :show="initSliders" />
                             </div>
                         </div>
 
@@ -90,8 +85,7 @@
                                 {{$t("height")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsHeight" :max="maxHeight"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsHeight" :max="maxHeight" :show="initSliders" />
                             </div>
                         </div>
                     </div>
@@ -102,8 +96,7 @@
                                 {{$t("user-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -112,8 +105,7 @@
                                 {{$t("analysis-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -122,8 +114,7 @@
                                 {{$t("reviewed-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -178,11 +169,13 @@
                 </template>
 
                 <template #detail="{row: image}">
-                    <image-details :image="image" :excludedProperties="excludedProperties"
-                                   @delete="deleteImage(image.id)"
-                                   @setResolution="(event) => setResolution(image, event)"
-                                   @setMagnification="(event) => setMagnification(image, event)">
-                    </image-details>
+                    <image-details
+                        :image="image"
+                        :excludedProperties="excludedProperties"
+                        @delete="deleteImage(image.id)"
+                        @setResolution="(event) => setResolution(image, event)"
+                        @setMagnification="(event) => setMagnification(image, event)"
+                    />
                 </template>
 
                 <template #empty>
@@ -203,7 +196,7 @@
         </div>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="addImage"></add-image-modal>
+    <add-image-modal :active.sync="addImageModal" @addImage="addImage" />
 </div>
 </template>
 

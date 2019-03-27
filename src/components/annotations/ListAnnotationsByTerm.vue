@@ -25,9 +25,9 @@
                     @addTerm="term => $emit('addTerm', term)"
                     @updateTerms="$emit('update', annot.id)"
                     @deletion="$emit('update', annot.id)"
-                    v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
-                    (prevents fetching unnecessary information) -->
-                </annotation-details>
+                    v-if="openedAnnot == annot.id"
+                /> <!-- Display component only if it is the currently displayed annotation
+                        (prevents fetching unnecessary information) -->
             </template>
         </v-popover>
         
@@ -36,8 +36,8 @@
             :current="currentPage"
             size="is-small"
             :per-page="nbPerPage"
-            @change="fetchPage">
-        </b-pagination>
+            @change="fetchPage"
+        />
     </template>
 </div> 
 </template>
@@ -50,25 +50,25 @@ import {AnnotationCollection} from "cytomine-client";
 export default {
     name: "list-annotations-by-term",
     components: {AnnotationDetails},
-    props: [
-        "nbPerPage",
-        "size",
-        "color",
+    props: {
+        nbPerPage: Number,
+        size: Number,
+        color: String,
 
-        "term", 
-        "multipleTerms", 
-        "noTerm", 
-        "imagesIds", 
-        "usersIds",
-        "reviewed",
-        "reviewUsersIds",
+        term: Object,
+        multipleTerms: Boolean,
+        noTerm: Boolean,
+        imagesIds: Array,
+        usersIds: Array,
+        reviewed: Boolean,
+        reviewUsersIds: Array,
 
-        "allTerms", 
-        "allUsers", 
-        "allImages",
+        allTerms: Array,
+        allUsers: Array,
+        allImages: Array,
         
-        "forceUpdate"
-    ],
+        revision: Number
+    },
     data() {
         return {
             annotations: [],
@@ -79,7 +79,7 @@ export default {
     },
     computed: {
         collection() {
-            this.forceUpdate; // to ensure that collection is reloaded if forceUpdate prop changes
+            this.revision; // to ensure that collection is reloaded if revision changes
             return new AnnotationCollection({
                 images: this.imagesIds,
                 term: this.multipleTerms || this.noTerm ? null : this.term.id,

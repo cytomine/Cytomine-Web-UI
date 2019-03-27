@@ -14,7 +14,7 @@
 
                     <b-field :type="fieldType" :message="fieldMessage" :label="$t('resolution')">
                         <b-field :type="fieldType">
-                            <b-input v-model="calibrationField" expanded></b-input>
+                            <b-input v-model="calibrationField" expanded />
                             <b-select v-model="calibrationFactor">
                                 <option :value="0.001"> {{ $t('nm-per-pixel') }}</option>
                                 <option :value="1">{{ $t('um-per-pixel') }}</option>

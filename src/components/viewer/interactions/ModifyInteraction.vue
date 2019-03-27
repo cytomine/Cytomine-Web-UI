@@ -29,10 +29,10 @@ import WKT from "ol/format/WKT";
 
 export default {
     name: "modify-interaction",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             format: new WKT(),

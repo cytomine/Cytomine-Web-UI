@@ -1,6 +1,6 @@
 <template>
 <div>
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
         <b-message v-if="users == null" type="is-danger" has-icon icon-size="is-small">
             <h2> {{ $t("error") }} </h2>
@@ -9,7 +9,7 @@
         <template v-else>
             <div class="columns">
                 <div class="column is-one-quarter">
-                    <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+                    <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
                 </div>
 
                 <div class="column is-one-half has-text-right-desktop">
@@ -85,8 +85,7 @@
                 </template>
             </b-table>
 
-            <user-modal :active.sync="modal" :user="editedUser" @addUser="addUser" @updateUser="updateUser">
-            </user-modal>
+            <user-modal :active.sync="modal" :user="editedUser" @addUser="addUser" @updateUser="updateUser" />
         </template>
     </template>
 </div>

@@ -13,10 +13,10 @@ import constants from "@/utils/constants";
 
 export default {
     name: "digital-zoom",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     computed: {
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];

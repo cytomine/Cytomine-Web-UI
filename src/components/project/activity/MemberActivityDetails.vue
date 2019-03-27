@@ -1,6 +1,6 @@
 <template>
 <div class="user-activity-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div class="content-wrapper" v-if="!loading">
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>

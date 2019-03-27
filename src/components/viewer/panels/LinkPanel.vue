@@ -17,10 +17,10 @@
 <script>
 export default {
     name: "link-panel",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             revisionCheckboxes: 1

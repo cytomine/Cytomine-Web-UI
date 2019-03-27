@@ -22,7 +22,7 @@
             </div>
             <button class="delete is-small" @click="expanded=false"></button>
         </div>
-        <cytomine-slider v-model="degreesRotation" :max="360" :show="expanded" :revision="revisionSlider"></cytomine-slider>
+        <cytomine-slider v-model="degreesRotation" :max="360" :show="expanded" :revision="revisionSlider" />
     </div>
 </div>
 </template>
@@ -33,10 +33,10 @@ import CytomineSlider from "@/components/form/CytomineSlider";
 export default {
     name: "rotation-selector",
     components: {CytomineSlider},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             expanded: false,

@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" />
 
     <template v-if="!loading">
         <div v-if="welcomeMessage" class="box" v-html="welcomeMessage"></div>
@@ -22,7 +22,7 @@
                             </b-table-column>
 
                             <b-table-column :label="$t('images')" width="400">
-                                <list-images-preview :idProject="project.id"></list-images-preview>
+                                <list-images-preview :idProject="project.id" />
                             </b-table-column>
                         </template>
 
@@ -70,9 +70,12 @@
 
                 <div class="box last-image">
                     <h2> {{ $t("last-opened-image") }} </h2>
-                    <image-preview v-if="lastOpenedImage" :image="lastOpenedImage" 
-                        :fullHeightCard="false" :showProject="true">
-                    </image-preview>
+                    <image-preview
+                        v-if="lastOpenedImage"
+                        :image="lastOpenedImage"
+                        :fullHeightCard="false"
+                        :showProject="true"
+                    />
                     <div class="has-text-grey has-text-centered" v-else>
                         {{$t("no-recent-image")}}
                     </div>

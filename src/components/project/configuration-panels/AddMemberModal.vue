@@ -6,10 +6,10 @@
                 <p class="modal-card-title">{{$t("add-members-to-project")}}</p>
             </header>
             <section class="modal-card-body">
-                <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
+                <b-loading :is-full-page="false" :active="loading" class="small" />
                 <template v-if="!loading">
                     <b-field>
-                        <user-taginput v-model="selectedUsers" :users="notMemberUsers"></user-taginput>
+                        <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
                     </b-field>
                 </template>
             </section>
@@ -34,7 +34,9 @@ import {fullName} from "@/utils/user-utils.js";
 export default {
     name: "add-member-modal",
     components: {UserTaginput},
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             loading: true,

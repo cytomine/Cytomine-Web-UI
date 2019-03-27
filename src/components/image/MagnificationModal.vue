@@ -13,7 +13,7 @@
                     </div>
 
                     <b-field :label="$t('magnification')" :type="fieldType" :message="errorMessage">
-                        <b-input v-model="newMagnification"></b-input>
+                        <b-input v-model="newMagnification" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">

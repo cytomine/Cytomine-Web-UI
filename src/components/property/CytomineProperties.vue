@@ -1,6 +1,6 @@
 <template>
 <div class="properties-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">    
         <b-field grouped group-multiline>
             <em v-if="error">{{$t("error-fetch-properties")}}</em>
@@ -27,8 +27,8 @@
         </b-field>
 
         <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
-            <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')"></b-input>
-            <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')"></b-input>
+            <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')" />
+            <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')" />
             <button class="button is-small" type="submit" @click="saveProp(idx)">
                 {{prop.id ? $t("button-save") : $t("button-add")}}
             </button>

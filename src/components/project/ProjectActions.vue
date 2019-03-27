@@ -10,7 +10,7 @@
                     <b-field :label="$t('new-name')"
                              :type="emptyNewName ? 'is-danger' : null"
                              :message="emptyNewName ? $t('field-cannot-be-empty') : ''">
-                        <b-input v-model="newName"></b-input>
+                        <b-input v-model="newName" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">

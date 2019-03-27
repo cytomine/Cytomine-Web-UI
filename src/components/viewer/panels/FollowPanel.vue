@@ -21,7 +21,7 @@
             <h3>{{$t("online-managers")}}</h3>
             <div class="field" v-for="user in onlineManagers" :key="user.id">
                 <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
-                    <username :user="user"></username>
+                    <username :user="user" />
                 </b-radio>
             </div>
         </template>
@@ -30,7 +30,7 @@
             <h3>{{$t("online-contributors")}}</h3>
             <div class="field" v-for="user in onlineContributors" :key="user.id">
                 <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
-                    <username :user="user"></username>
+                    <username :user="user" />
                 </b-radio>
             </div>
         </template>
@@ -49,11 +49,11 @@ import constants from "@/utils/constants.js";
 export default {
     name: "follow-panel",
     components: {Username},
-    props: [
-        "idViewer",
-        "index",
-        "view"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        view: Object
+    },
     data() {
         return {
             onlineUsers: [],

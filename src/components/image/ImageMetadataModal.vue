@@ -18,9 +18,13 @@
                     <button class="button" @click="rotate(90)"><i class="fas fa-undo mirror"></i></button>
                 </div>
 
-                <b-input v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search" size="is-small">
-                </b-input>
+                <b-input
+                    v-model="searchString"
+                    :placeholder="$t('search-placeholder')"
+                    type="search"
+                    icon="search"
+                    size="is-small"
+                />
                 <ul>
                     <li v-for="prop in filteredProps" :key="prop.id">
                         <strong>{{prop.key}}</strong>: {{prop.value}}

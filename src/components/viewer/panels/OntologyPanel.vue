@@ -3,7 +3,7 @@
     <h1>{{ $t("terms") }}</h1>
     <div class="ontology-tree-wrapper">
         <div class="header-tree">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded></b-input>
+            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded />
 
             <div class="sidebar-tree">
                 <div class="visibility">
@@ -55,10 +55,10 @@ import OntologyTree from "@/components/ontology/OntologyTree";
 export default {
     name: "ontology-panel",
     components: {OntologyTree},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             searchString: ""

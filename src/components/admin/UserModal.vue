@@ -16,8 +16,8 @@
                 :message="getError(field) && displayErrors ? getError(field) : ''">
                     <b-input v-model="internalUser[field]"
                         :type="field === 'password' ? 'password': 'text'"
-                        :password-reveal="field == 'password'">
-                    </b-input>
+                        :password-reveal="field == 'password'"
+                    />
                 </b-field>
 
                 <b-field :label="$t('role')" horizontal>
@@ -48,10 +48,10 @@ const defaultRole = "ROLE_GUEST";
 
 export default {
     name: "user-modal",
-    props: [
-        "active",
-        "user"
-    ],
+    props: {
+        active: Boolean,
+        user: Object
+    },
     data() {
         return {
             internalUser: {},

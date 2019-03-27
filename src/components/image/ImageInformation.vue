@@ -4,7 +4,7 @@
     <p> {{ $t(permissionError ?  "insufficient-permission" : "not-found-error") }} </p>
 </div>
 <div class="content-wrapper" v-else>
-    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" />
     <div class="box" v-if="!loading">
         <i18n path="detailed-image-information" tag="h1">
             <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
@@ -12,11 +12,13 @@
             </router-link>
         </i18n>
 
-        <image-details v-if="image" :image="image" 
+        <image-details
+            v-if="image"
+            :image="image"
             @setResolution="resolution => image.resolution = resolution"
             @setMagnification="magnification => image.magnification = magnification"
-            @delete="deleteImage()">
-        </image-details>
+            @delete="deleteImage()"
+        />
     </div>
 </div>
 </template>

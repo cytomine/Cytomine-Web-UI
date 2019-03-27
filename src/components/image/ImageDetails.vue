@@ -37,19 +37,19 @@
             <tr v-if="isPropDisplayed('description')">
                 <td class="prop-label">{{$t("description")}}</td>
                 <td class="prop-content">
-                    <cytomine-description :object="image"></cytomine-description>
+                    <cytomine-description :object="image" />
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('properties')">
                 <td class="prop-label">{{$t("properties")}}</td>
                 <td class="prop-content">
-                    <cytomine-properties :object="image"></cytomine-properties>
+                    <cytomine-properties :object="image" />
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('attachedFiles')">
                 <td class="prop-label">{{$t("attached-files")}}</td>
                 <td class="prop-content">
-                    <attached-files :object="image"></attached-files>
+                    <attached-files :object="image" />
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('slidePreview')">
@@ -135,7 +135,7 @@
                     <b-field :label="$t('enter-new-name-of-image')"
                              :type="emptyNewName ? 'is-danger' : null"
                              :message="emptyNewName ? $t('field-cannot-be-empty') : ''">
-                        <b-input v-model="newName"></b-input>
+                        <b-input v-model="newName" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">

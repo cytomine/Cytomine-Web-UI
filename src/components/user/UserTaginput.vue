@@ -9,17 +9,17 @@
     :placeholder="$t('search-user')"
     @typing="val => searchString = val"
     @add="searchString = ''"
-    :allow-duplicates="false">
-</b-taginput>
+    :allow-duplicates="false"
+/>
 </template>
 
 <script>
 export default {
     name: "user-taginput",
-    props: [
-        "value",
-        "users"
-    ],
+    props: {
+        value: Array,
+        users: Array
+    },
     data() {
         return {
             searchString: ""

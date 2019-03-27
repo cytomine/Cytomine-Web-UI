@@ -1,13 +1,12 @@
 <template>
 <div class="project-image-filters-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t("error") }} </h2>
         <p> {{ $t("unexpected-error-info-message") }} </p>
     </b-message>
     <template v-else-if="!loading">
-        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search">
-        </b-input>
+        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
 
         <b-table :data="filteredImageFilters"
                 default-sort="selected"

@@ -15,10 +15,8 @@
                         </li>
                     </ul>
                 </div>
-                <a class="delete is-small" @click.stop.prevent="close(viewer.id)">
-                </a>
+                <a class="delete is-small" @click.stop.prevent="close(viewer.id)"></a>
             </router-link>
-            <template></template>
         </template>
         <hr v-if="index < nbNavigationProjects - 1" class="navbar-divider">
     </div>

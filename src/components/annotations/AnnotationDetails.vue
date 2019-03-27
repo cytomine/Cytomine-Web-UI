@@ -26,7 +26,7 @@
             <tr v-if="isPropDisplayed('description')">
                 <td colspan="2">
                     <h5>{{$t("description")}}</h5>
-                    <cytomine-description :object="annotation" :canEdit="canEdit"></cytomine-description>
+                    <cytomine-description :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 
@@ -36,31 +36,33 @@
                     <h5>{{$t("terms")}}</h5>
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
                     :title="`${$t('associated-by')} ${user.fullName}`">
-                        <cytomine-term :term="term"></cytomine-term>
+                        <cytomine-term :term="term" />
                         <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
                             @click="removeTerm(term.id)">
                         </button>
                     </b-tag>
                     <div class="add-term-wrapper" v-if="canEditTerms" v-click-outside="() => showTermSelector = false">
                         <b-field>
-                            <b-input size="is-small"
-                                    expanded
-                                    :placeholder="$t('add-term')"
-                                    v-model="addTermString"
-                                    @focus="showTermSelector = true">
-                            </b-input>
+                            <b-input
+                                size="is-small"
+                                expanded
+                                :placeholder="$t('add-term')"
+                                v-model="addTermString"
+                                @focus="showTermSelector = true"
+                            />
                         </b-field>
 
                         <div class="ontology-tree-container" v-show="showTermSelector">
-                            <ontology-tree class="ontology-tree"
+                            <ontology-tree
+                                class="ontology-tree"
                                 :ontology="ontology"
                                 :searchString="addTermString"
                                 :selectedNodes="associatedTermsIds"
                                 :allowNew="true"
                                 @newTerm="newTerm"
                                 @select="addTerm"
-                                @unselect="removeTerm">
-                            </ontology-tree>
+                                @unselect="removeTerm"
+                            />
                         </div>
                     </div>
                     <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
@@ -71,15 +73,14 @@
             <tr v-if="isPropDisplayed('properties')">
                 <td colspan="2">
                     <h5>{{$t("properties")}}</h5>
-                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')">
-                    </cytomine-properties>
+                    <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
                 </td>
             </tr>
 
             <tr v-if="isPropDisplayed('attached-files')">
                 <td colspan="2">
                     <h5>{{$t("attached-files")}}</h5>
-                    <attached-files :object="annotation" :canEdit="canEdit"></attached-files>
+                    <attached-files :object="annotation" :canEdit="canEdit" />
                 </td>
             </tr>
 

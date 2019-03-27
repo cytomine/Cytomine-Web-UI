@@ -28,10 +28,10 @@
 
                 <b-dropdown-item custom>
                     <b-field :label="$t('from')" horizontal>
-                        <cytomine-datepicker v-model="startDate" :maxDate="endDate || new Date()"></cytomine-datepicker>
+                        <cytomine-datepicker v-model="startDate" :maxDate="endDate || new Date()" />
                     </b-field>
                     <b-field :label="$t('to')" horizontal>
-                        <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()"></cytomine-datepicker>
+                        <cytomine-datepicker v-model="endDate" :minDate="startDate" :maxDate="new Date()" />
                     </b-field>
                 </b-dropdown-item>
             </b-dropdown>
@@ -40,10 +40,11 @@
 
     <div class="component-wrapper">
         <keep-alive>
-            <component :is="activeComponent"
-                       :startDate="startDate ? startDate.getTime() : null"
-                       :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null">
-            </component>
+            <component
+                :is="activeComponent"
+                :startDate="startDate ? startDate.getTime() : null"
+                :endDate="endDate ? endDate.setHours(23, 59, 59, 999) : null"
+            />
         </keep-alive>
     </div>
 </div>

@@ -4,11 +4,11 @@
         <p> {{ $t(permissionError ?  "insufficient-permission" : "not-found-error") }} </p>
     </div>
     <div v-else class="project-container">
-        <project-sidebar v-if="project" :key="idProject"></project-sidebar>
+        <project-sidebar v-if="project" :key="idProject" />
 
         <div class="app-content">
-            <b-loading :is-full-page="false" :active="loading"></b-loading>
-            <router-view v-if="!loading"></router-view>
+            <b-loading :is-full-page="false" :active="loading" />
+            <router-view v-if="!loading" />
         </div>
     </div>
 </template>

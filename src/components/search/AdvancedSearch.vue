@@ -9,7 +9,7 @@
             {{$t("advanced-search")}}
         </p>
         <div class="panel-block">
-            <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+            <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
         </div>
         <p class="panel-tabs">
             <a :class="{'is-active': activeTab == 'projects'}" @click="activeTab = 'projects'">
@@ -20,7 +20,7 @@
             </a>
         </p>
         <div class="panel-block">
-            <b-loading :is-full-page="false" :active="loading"></b-loading>
+            <b-loading :is-full-page="false" :active="loading" />
 
             <b-table v-show="activeTab == 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'projects'">

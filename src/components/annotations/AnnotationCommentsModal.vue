@@ -45,7 +45,7 @@
                 </label>
                 <div v-if="!sendToAllMembers">
                     <b-field :type="errorSelectedMembers ? 'is-danger' : null" :message="errorSelectedMembers">
-                        <user-taginput v-model="selectedMembers" :users="members"></user-taginput>
+                        <user-taginput v-model="selectedMembers" :users="members" />
                     </b-field>
                 </div>
             </div>
@@ -80,10 +80,10 @@ export default {
     components: {
         UserTaginput
     },
-    props: [
-        "annotation",
-        "comments"
-    ],
+    props: {
+        annotation: Object,
+        comments: Array
+    },
     data() {
         return {
             addingComment: false,

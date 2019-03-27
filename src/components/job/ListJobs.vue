@@ -8,7 +8,7 @@
     <p>{{ $t("unexpected-error-info-message") }}</p>
 </div>
 <div v-else class="list-jobs-wrapper content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("analysis")}}
@@ -25,8 +25,7 @@
                             {{$t("algorithm")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true" />
                         </div>
                     </div>
 
@@ -35,8 +34,7 @@
                             {{$t("launcher")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true" />
                         </div>
                     </div>
 
@@ -45,8 +43,7 @@
                             {{$t("execution-date")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-datepicker v-model="selectedDate" :placeholder="$t('all')" :maxDate="new Date()">
-                            </cytomine-datepicker>
+                            <cytomine-datepicker v-model="selectedDate" :placeholder="$t('all')" :maxDate="new Date()" />
                         </div>
                     </div>
 
@@ -56,8 +53,7 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedStatus" :options="availableStatus"
-                                label="label" track-by="status" :multiple="true">
-                            </cytomine-multiselect>
+                                label="label" track-by="status" :multiple="true" />
                         </div>
                     </div>
                 </div>
@@ -84,7 +80,7 @@
                     </b-table-column>
 
                     <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
-                        <job-status :status="job.status"></job-status>
+                        <job-status :status="job.status" />
                     </b-table-column>
                 </template>
 
@@ -115,7 +111,7 @@
         </div>
     </div>
 
-    <add-job-modal :active.sync="launchModal" @add="addJob"></add-job-modal>
+    <add-job-modal :active.sync="launchModal" @add="addJob" />
 </div>
 </template>
 

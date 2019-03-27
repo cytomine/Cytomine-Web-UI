@@ -54,10 +54,11 @@
         </tbody>
     </table>
 
-    <calibration-modal :image="image"
-                       :active.sync="calibrationModal"
-                       @setResolution="setResolution">
-    </calibration-modal>
+    <calibration-modal
+        :image="image"
+        :active.sync="calibrationModal"
+        @setResolution="setResolution"
+    />
 </div>
 </template>
 
@@ -67,10 +68,10 @@ import CalibrationModal from "@/components/image/CalibrationModal";
 export default {
     name: "information-panel",
     components: {CalibrationModal},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             calibrationModal: false,

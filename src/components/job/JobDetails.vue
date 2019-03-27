@@ -1,6 +1,6 @@
 <template>
 <div class="job-details-wrapper">
-    <b-loading :is-full-page="false" :active.sync="loading" class="small"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" class="small" />
 
     <template v-if="!loading">
         <table class="table">
