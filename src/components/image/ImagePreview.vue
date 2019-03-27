@@ -1,6 +1,6 @@
 <template>
 <div class="card" :class="{'full-height-card': fullHeightCard}">
-    <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${(image.id || idImage)}`">
+    <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${idImage}`">
         <figure class="image is-5by3" :style="figureStyle">
         </figure>
     </router-link>
