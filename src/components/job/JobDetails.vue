@@ -84,19 +84,23 @@
                         <em v-else class="has-text-grey">{{$t("no-result-file")}}</em>
                     </td>
                 </tr>
-                <tr v-if="!job.dataDeleted">
-                    <td>{{$t("actions")}}</td>
-                    <td>
-                        <div class="buttons are-small">
-                            <button class="button" @click="deletionModal = true">{{$t("delete-data")}}</button>
-                            <button class="button is-danger" @click="confirmJobDeletion()">{{$t("button-delete")}}</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-else>
+                <tr v-if="job.dataDeleted">
                     <td>{{$t("data")}}</td>
                     <td>
                         {{$t("deleted-analysis-data")}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{$t("actions")}}</td>
+                    <td>
+                        <div class="buttons are-small">
+                            <button v-if="!job.dataDeleted" class="button" @click="deletionModal = true">
+                                {{$t("delete-data")}}
+                            </button>
+                            <button class="button is-danger" @click="confirmJobDeletion()">
+                                {{$t("button-delete")}}
+                            </button>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -152,7 +156,9 @@ const REFRESH_INTERVAL_DELETION_TASK = constants.JOB_DELETION_TASK_REFRESH_INTER
 
 export default {
     name: "job-details",
-    props: ["job"],
+    props: {
+        job: Object
+    },
     data() {
         return {
             loading: true,
