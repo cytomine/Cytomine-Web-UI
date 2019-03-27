@@ -43,6 +43,8 @@ import Login from "./components/user/Login.vue";
 import {Cytomine} from "cytomine-client";
 
 import constants from "@/utils/constants.js";
+import ifvisible from "ifvisible";
+ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
     name: "app",
@@ -60,6 +62,9 @@ export default {
     }),
     methods: {
         async ping() {
+            if(!ifvisible.now()){
+                return; // window not visible or inactive user => stop pinging
+            }
             try {
                 let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
                 if(this.currentUser != null && !authenticated) {
@@ -85,6 +90,7 @@ export default {
         }
         this.loading = false;
         this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
+        ifvisible.on("wakeup", this.ping);
     }
 };
 </script>
