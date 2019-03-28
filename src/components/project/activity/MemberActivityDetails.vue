@@ -25,7 +25,9 @@
                 <h1>{{$t("activity-of-user", {username: user.fullName})}}</h1>
 
                 <ul>
-                    <li><strong>{{$t("email")}}:</strong>&nbsp;<a :href="`mailto:${user.email}`">{{user.email}}</a></li>
+                    <li v-if="currentUser.adminByNow">
+                        <strong>{{$t("email")}}:</strong>&nbsp;<a :href="`mailto:${user.email}`">{{user.email}}</a>
+                    </li>
                     <li><strong>{{$t("registration-date")}}:</strong> {{Number(user.created) | moment("ll LTS")}}</li>
                     <li><strong>{{$t("first-project-connection")}}:</strong> {{Number(resumeActivity.firstConnection) | moment("ll LTS")}}</li>
                     <li><strong>{{$t("last-project-connection")}}:</strong> {{Number(resumeActivity.lastConnection) | moment("ll LTS")}}</li>
@@ -265,6 +267,9 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         idUser() {
             return Number(this.$route.params.idUser);
         },

@@ -71,10 +71,6 @@
                     </span>
                 </b-table-column>
 
-                <b-table-column field="email" :label="$t('email')" sortable width="200">
-                    <a :href="`mailto:${member.email}`">{{ member.email }}</a>
-                </b-table-column>
-
                 <b-table-column field="LDAP" :label="$t('source')" centered sortable width="50">
                     <span class="tag ldap is-rounded is-info" :class="{ldap: member.LDAP}">
                         {{$t(member.LDAP ? "LDAP" : "manual")}}

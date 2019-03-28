@@ -70,10 +70,6 @@
                         <i class="fas fa-cog" :title="$t('manager-icon-label')" v-if="member.role === managerRole"></i>
                     </b-table-column>
 
-                    <b-table-column field="email" :label="$t('email')" sortable width="200">
-                        <a :href="`mailto:${member.email}`">{{ member.email }}</a>
-                    </b-table-column>
-
                     <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
                         <template v-if="member.lastImageId">
                             <router-link :to="`project/${project.id}/image/${member.lastImageId}`">
