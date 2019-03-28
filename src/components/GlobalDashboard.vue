@@ -47,22 +47,50 @@
                             <tr>
                                 <td>{{projects ? projects.length : "?"}}</td>
                                 <td>{{$t("projects")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-projects-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
-                                <td>{{images ? images.length : "?"}}</td>
+                                <td>{{nbImages ? nbImages : "?"}}</td>
                                 <td>{{$t("images")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-images-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{nbUserAnnots != null ? nbUserAnnots : "?"}}</td>
                                 <td>{{$t("user-annotations")}}</td>
-                            </tr>
-                            <tr>
-                                <td>{{nbJobAnnots != null ? nbJobAnnots : "?"}}</td>
-                                <td>{{$t("analysis-annotations")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-annotations-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{nbReviewed != null ? nbReviewed : "?"}}</td>
                                 <td>{{$t("reviewed-annotations")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-reviewed-annotations-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -112,18 +140,25 @@ export default {
         return {
             projects: null,
             recentProjectsId: null,
-            images: null,
             recentImages: [],
             nbUserAnnots: null,
-            nbJobAnnots: null, // TODO
             nbReviewed: null,
             welcomeMessage: null,
             loading: true
         };
     },
     computed: {
+        nbImages() {
+            if(!this.projects) {
+                return;
+            }
+
+            return this.projects.array.reduce((count, project) => {
+                return count + project.numberOfImages;
+            }, 0);
+        },
         recentProjects() {
-            if(!this.recentProjectsId) {
+            if(!this.recentProjectsId || !this.projects) {
                 return;
             }
 
@@ -137,7 +172,7 @@ export default {
             return array;
         },
         lastOpenedImage() {
-            if(this.recentImages && this.recentImages.length > 0) {
+            if(this.recentImages && this.recentImages.length > 0 && this.projects) {
                 let lastOpened = this.recentImages[0];
                 let project = this.projects.array.find(project => project.id == lastOpened.project);
                 if(project) {
@@ -149,9 +184,6 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
-        async fetchImages() {
-            this.images = await ImageInstanceCollection.fetchAllLight();
-        },
         async fetchProjects() {
             this.projects = await ProjectCollection.fetchAll();
         },
@@ -179,7 +211,6 @@ export default {
     },
     async created() {
         await Promise.all([
-            this.fetchImages(),
             this.fetchProjects(),
             this.fetchNbAnnots(),
             this.fetchNbReviewedAnnots(),
