@@ -9,7 +9,7 @@
         :open="openedAnnot == annot.id" :auto-hide="false"> 
             <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click.stop="toggle(annot.id)">
+            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="toggle(annot.id)">
                 <button class="button is-small">
                     <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
                 </button>
@@ -17,7 +17,7 @@
 
             <template #popover>
                 <annotation-details
-                    v-click-outside="(event) => close(event, annot.id)"
+                    v-click-outside.capture="(event) => close(event, annot.id)"
                     :annotation="annot"
                     :terms="allTerms"
                     :users="allUsers"
