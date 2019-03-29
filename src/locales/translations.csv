@@ -50,6 +50,7 @@ notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite
 annotation-layers,Annotation layers,
 select-layer,Select a layer,
 button-add,Add,
+button-added,Added,
 layers-opacity,Layers opacity,
 terms,Terms,
 no-term,No term,

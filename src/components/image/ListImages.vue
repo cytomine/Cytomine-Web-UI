@@ -194,9 +194,9 @@
                 </template>
             </b-table>
         </div>
-    </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="addImage" />
+        <add-image-modal :active.sync="addImageModal" :idsImages="idsAbstractImages" @addImage="addImage" />
+    </div>
 </div>
 </template>
 
@@ -265,6 +265,9 @@ export default {
         },
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        idsAbstractImages() {
+            return this.images.map(i => i.baseImage);
         },
         filteredImages() {
             let filtered = this.images;

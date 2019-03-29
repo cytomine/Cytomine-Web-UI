@@ -33,12 +33,15 @@
                                 </b-table-column>
 
                                 <b-table-column label=" " centered>
-                                    <button v-if="!image.inProject" class="button is-small is-link" @click="addImage(image)">
-                                        {{$t("button-add")}}
+                                    <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
+                                        {{$t("button-added")}}
                                     </button>
-                                    <span v-else>
+                                    <span v-else-if="isInProject(image)">
                                         {{$t("already-in-project")}}
                                     </span>
+                                    <button v-else class="button is-small is-link" @click="addImage(image)">
+                                        {{$t("button-add")}}
+                                    </button>
                                 </b-table-column>
                             </template>
 
@@ -75,14 +78,16 @@ import {AbstractImageCollection, ImageInstance} from "cytomine-client";
 export default {
     name: "add-image-modal",
     props: {
-        active: Boolean
+        active: Boolean,
+        idsImages: Array
     },
     data() {
         return {
             loading: true,
             images: null,
             perPage: 10,
-            searchString: ""
+            searchString: "",
+            idsAddedImages: []
         };
     },
     computed: {
@@ -102,11 +107,19 @@ export default {
             return filtered;
         }
     },
+    watch: {
+        active(val) {
+            if(val) {
+                this.idsAddedImages = [];
+            }
+        }
+    },
     methods: {
         async addImage(abstractImage) {
             let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
             try {
                 let image = await new ImageInstance({baseImage: abstractImage.id, project: this.project.id}).save();
+                this.idsAddedImages.push(abstractImage.id);
                 this.$emit("addImage", image);
                 this.$notify({
                     type: "success",
@@ -120,11 +133,17 @@ export default {
                     text: this.$t("notif-error-add-image", propsTranslation)
                 });
             }
+        },
+        isInProject(image) {
+            return this.idsImages.includes(image.id);
+        },
+        wasAdded(image) {
+            return this.idsAddedImages.includes(image.id);
         }
     },
     async created() {
         try {
-            this.images = (await AbstractImageCollection.fetchAll({project: this.project.id})).array;
+            this.images = (await AbstractImageCollection.fetchAll()).array;
         }
         catch(error) {
             console.log(error);
