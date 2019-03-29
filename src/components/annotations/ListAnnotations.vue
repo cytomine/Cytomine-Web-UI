@@ -26,7 +26,7 @@
                                 track-by="size"
                                 :allow-empty="false"
                                 :searchable="false"
-                           />
+                            />
                         </div>
                     </div>
                     <div class="column filter">
@@ -39,7 +39,7 @@
                                 :options="[10, 25, 50, 100]"
                                 :allow-empty="false"
                                 :searchable="false"
-                           />
+                            />
                         </div>
                     </div>
                     <div class="column filter">
@@ -54,7 +54,7 @@
                                 track-by="name"
                                 :allow-empty="false"
                                 :searchable="false"
-                           />
+                            />
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                                 :options="annotationTypes"
                                 :allow-empty="false"
                                 :searchable="false"
-                           />
+                            />
                         </div>
                     </div>
 
@@ -88,22 +88,37 @@
                                 label="fullName"
                                 track-by="id"
                                 :multiple="true"
-                           />
+                            />
+                        </div>
+                    </div>
+
+                    <div v-else-if="selectedAnnotationType == userAnnotationOption" class="column filter">
+                        <div class="filter-label">
+                            {{$t("members")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect
+                                v-model="selectedMembers"
+                                :options="filteredMembers"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                            />
                         </div>
                     </div>
 
                     <div v-else class="column filter">
                         <div class="filter-label">
-                            {{$t(reviewed ? "reviewers" : "members")}}
+                            {{$t("reviewers")}}
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect
-                                v-model="selectedMembers"
+                                v-model="selectedReviewers"
                                 :options="members"
                                 label="fullName"
                                 track-by="id"
                                 :multiple="true"
-                           />
+                            />
                         </div>
                     </div>
                 </div>
@@ -120,7 +135,7 @@
                                 label="instanceFilename"
                                 track-by="id"
                                 :multiple="true"
-                           />
+                            />
                         </div>
                     </div>
 
@@ -133,7 +148,7 @@
                                 :ontology="ontology"
                                 :additionalNodes="additionalNodes"
                                 v-model="selectedTermsIds"
-                           />
+                            />
                         </div>
                     </div>
 
@@ -142,7 +157,7 @@
 
             <h2 class="has-text-right"> {{ $t("download-results") }} </h2>
             <div class="buttons download-buttons">
-                <!-- TODO in core: change URLs returned in column "View annotation on image" -->
+                <!-- TODOv2: change URLs returned in column "View annotation on image" -->
                 <a class="button is-link" :href="downloadURL('pdf')">{{$t("download-PDF")}}</a>
                 <a class="button is-link" :href="downloadURL('csv')">{{$t("download-CSV")}}</a>
                 <a class="button is-link" :href="downloadURL('xls')">{{$t("download-excel")}}</a>
@@ -172,7 +187,7 @@
 
             @addTerm="addTerm"
             @update="revision++"
-       />
+        />
     </div>
 </div>
 </template>
@@ -220,6 +235,7 @@ export default {
             selectedTermsIds: [],
 
             selectedMembers: [],
+            selectedReviewers: [],
             
             userJobs: [],
             selectedUserJobs: [],
@@ -228,8 +244,14 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         project() {
             return this.$store.state.project.project;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
         },
         ontology() {
             return this.$store.state.project.ontology;
@@ -252,13 +274,27 @@ export default {
             return users.map(user => user.id);
         },
         reviewUsersIds() {
-            return this.reviewed ? this.selectedMembers.map(u => u.id) : null;
+            return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
         },
         allUsers() {
             return this.users.concat(this.userJobs);
         },
         members() {
             return this.$store.state.project.members;
+        },
+        filteredMembers() { // filter the members so as to return only those whose annotations can be seen by current user
+            if(this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
+                return this.members;
+            }
+
+            let idManagers = this.$store.state.project.managers.map(m => m.id);
+            return this.members.filter(member => {
+                if(this.currentUser.id === member.id) {
+                    return true;
+                }
+                let isManager = idManagers.includes(member.id);
+                return isManager ? !this.project.hideAdminsLayers : !this.project.hideUsersLayers;
+            });
         },
         collection() {
             return new AnnotationCollection({
@@ -335,7 +371,8 @@ export default {
         this.selectedColor = this.colors[0];
 
         this.selectedTermsIds = this.termsOptions.map(term => term.id);
-        this.selectedMembers = this.members;
+        this.selectedMembers = this.filteredMembers;
+        this.selectedReviewers = this.members;
 
         try {
             await Promise.all([
