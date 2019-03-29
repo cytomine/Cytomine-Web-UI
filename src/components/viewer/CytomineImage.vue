@@ -159,7 +159,9 @@
         />
 
         <div class="custom-overview" ref="overview">
-            <p class="image-name" :class="{hidden: overviewCollapsed}">{{image.instanceFilename}}</p>
+            <p class="image-name" :class="{hidden: overviewCollapsed}">
+                <image-name :image="image" />
+            </p>
         </div>
     </div>
 </template>
@@ -167,6 +169,7 @@
 <script>
 import _ from "lodash";
 
+import ImageName from "@/components/image/ImageName";
 import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
@@ -208,6 +211,8 @@ export default {
         index: Number
     },
     components: {
+        ImageName,
+
         AnnotationLayer,
 
         RotationSelector,

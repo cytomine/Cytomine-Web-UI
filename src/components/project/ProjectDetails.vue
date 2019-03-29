@@ -99,7 +99,7 @@
         <tr v-if="!excludedProperties.includes('imagesPreview')">
             <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
-                <list-images-preview :idProject="project.id" />
+                <list-images-preview :project="project" />
             </td>
         </tr>
         <tr v-if="canManageProject">

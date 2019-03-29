@@ -8,7 +8,8 @@
         <div class="content">
             <p>
                 <router-link :to="`/project/${image.project}/image/${idImage}`">
-                    {{ image.instanceFilename || image.imageName }}
+                    <span v-if="blindMode" class="blind-indication">[{{this.$t("blinded-name-indication")}}]</span>
+                    {{ image.blindedName || image.instanceFilename || image.imageName }}
                     <span v-if="showProject" class="in-project">({{$t("in-project", {projectName: image.projectName})}})</span>
                 </router-link>
             </p>
@@ -24,7 +25,8 @@ export default {
     props: {
         image: {type: Object},
         fullHeightCard: {type: Boolean, default: true},
-        showProject: {type: Boolean, default: false} 
+        showProject: {type: Boolean, default: false},
+        blindMode: {type: Boolean, default: false},
     },
     computed: {
         idImage() {
@@ -57,5 +59,10 @@ export default {
 
 .card-content a {
     font-weight: 600;
+}
+
+.blind-indication {
+    font-size: 0.9em;
+    text-transform: uppercase;
 }
 </style>

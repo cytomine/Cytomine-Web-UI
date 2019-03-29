@@ -6,7 +6,7 @@
                 <td><strong>{{$t("image")}}</strong></td>
                 <td>
                     <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
-                        {{ image.instanceFilename }}
+                        <image-name :image="image" />
                     </router-link>
                 </td>
             </tr>
@@ -148,6 +148,7 @@
 <script>
 import {AnnotationTerm, AnnotationType, AnnotationCommentCollection} from "cytomine-client";
 import copyToClipboard from "copy-to-clipboard";
+import ImageName from "@/components/image/ImageName";
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import CytomineTerm from "@/components/ontology/CytomineTerm";
@@ -158,6 +159,7 @@ import AnnotationCommentsModal from "./AnnotationCommentsModal";
 export default {
     name: "annotations-details",
     components: {
+        ImageName,
         CytomineDescription,
         CytomineTerm,
         OntologyTree,

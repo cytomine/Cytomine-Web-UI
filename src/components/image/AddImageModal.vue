@@ -21,7 +21,7 @@
 
                             <template #default="{row: image}">
                                 <b-table-column :label="$t('overview')">
-                                    <img :src="image.preview" :alt="image.originalFilename" class="image-overview">
+                                    <img :src="image.preview" class="image-overview">
                                 </b-table-column>
 
                                 <b-table-column field="originalFilename" :label="$t('name')" sortable>

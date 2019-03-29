@@ -7,7 +7,7 @@
         <tbody>
             <tr>
                 <td><strong>{{$t("filename")}}</strong></td>
-                <td>{{image.instanceFilename}}</td>
+                <td><image-name :image="image" /></td>
             </tr>
             <tr>
                 <td><strong>{{$t("width")}}</strong></td>
@@ -63,11 +63,15 @@
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
 import CalibrationModal from "@/components/image/CalibrationModal";
 
 export default {
     name: "information-panel",
-    components: {CalibrationModal},
+    components: {
+        ImageName,
+        CalibrationModal
+    },
     props: {
         idViewer: String,
         index: Number

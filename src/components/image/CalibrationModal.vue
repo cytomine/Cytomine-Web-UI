@@ -52,6 +52,9 @@ export default {
         };
     },
     computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        },
         validField() {
             return !isNaN(this.calibrationField) && +this.calibrationField > 0;
         },
@@ -77,6 +80,7 @@ export default {
     },
     methods: {
         async setResolution() {
+            let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
             try {
                 let updateImage = this.image.clone();
                 updateImage.resolution = this.calibrationField*this.calibrationFactor;
@@ -86,14 +90,14 @@ export default {
 
                 this.$notify({
                     type: "success",
-                    text: this.$t("notif-success-image-calibration", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-success-image-calibration", {imageName})
                 });
             }
             catch(error) {
                 console.log(error);
                 this.$notify({
                     type: "error",
-                    text: this.$t("notif-error-image-calibration", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-error-image-calibration", {imageName})
                 });
             }
             this.$emit("update:active", false);

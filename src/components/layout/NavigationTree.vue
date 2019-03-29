@@ -7,11 +7,17 @@
                 <div class="viewer-name">
                     <span>
                         <i class="fas fa-caret-right"></i>
+                        <template v-if="viewer.maps.length == 1">
+                            <image-name :image="viewer.maps[0].imageInstance" />
+                        </template>
+                        <template v-else>
+                            {{$t("viewer-group", {nbImages: viewer.maps.length})}}
+                        </template>
                         {{viewer.name}}
                     </span>
                     <ul class="viewer-details" v-if="viewer.maps.length > 1">
                         <li v-for="(map, index) in viewer.maps" :key="index">
-                            {{map.imageInstance.instanceFilename}}
+                            <image-name :image="map.imageInstance" />
                         </li>
                     </ul>
                 </div>
@@ -24,8 +30,11 @@
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
+
 export default {
     name: "navigation-tree",
+    components: {ImageName},
     computed: {
         navigationObject() {
             let data = {};
@@ -43,7 +52,6 @@ export default {
 
                 data[viewer.idProject].viewers.push({
                     id,
-                    name: nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename : this.$t("viewer-group", {nbImages: nbMaps}),
                     path: this.$store.getters.pathViewer({idViewer: id}),
                     maps: viewer.maps
                 });

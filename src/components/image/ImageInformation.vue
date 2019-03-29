@@ -8,7 +8,7 @@
     <div class="box" v-if="!loading">
         <i18n path="detailed-image-information" tag="h1">
             <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
-                {{ image.instanceFilename }}
+                <image-name :image="image" />
             </router-link>
         </i18n>
 
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import ImageName from "./ImageName";
 import ImageDetails from "./ImageDetails";
 
 import {ImageInstance} from "cytomine-client";
@@ -31,7 +32,10 @@ import vendorFromMime from "@/utils/vendor";
 
 export default {
     name: "image-information",
-    components: {ImageDetails},
+    components: {
+        ImageName,
+        ImageDetails
+    },
     data() {
         return {
             loading: true,

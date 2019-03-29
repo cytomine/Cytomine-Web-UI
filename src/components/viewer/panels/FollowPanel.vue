@@ -77,6 +77,9 @@ export default {
         currentUser() {
             return this.$store.state.currentUser.user;
         },
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        },
         viewerWrapper() {
             return this.$store.state.images.viewers[this.idViewer];
         },
@@ -198,7 +201,7 @@ export default {
                     type: "info",
                     text: this.$t("end-tracking-user-no-longer-broadcasting", {
                         username: this.trackedUserFullName,
-                        imageName: this.image.instanceFilename
+                        imageName: this.blindMode ? this.image.blindedName : this.image.instanceFilename
                     })
                 });
                 this.trackedUser = null;

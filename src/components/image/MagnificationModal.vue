@@ -44,6 +44,9 @@ export default {
         };
     },
     computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        },
         errorMessage() {
             if(this.displayErrors && this.newMagnification != "" && (isNaN(this.newMagnification) || +this.newMagnification <= 0)) {
                 return this.$t("must-be-positive-number");
@@ -68,6 +71,7 @@ export default {
     },
     methods: {
         async setMagnification() {
+            let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
             try {
                 let updateImage = this.image.clone();
                 updateImage.magnification = this.newMagnification;
@@ -77,14 +81,14 @@ export default {
 
                 this.$notify({
                     type: "success",
-                    text: this.$t("notif-success-magnification-update", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-success-magnification-update", {imageName})
                 });
             }
             catch(error) {
                 console.log(error);
                 this.$notify({
                     type: "error",
-                    text: this.$t("notif-error-magnification-update", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-error-magnification-update", {imageName})
                 });
             }
             this.$emit("update:active", false);

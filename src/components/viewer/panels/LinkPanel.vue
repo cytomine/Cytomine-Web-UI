@@ -8,15 +8,18 @@
             <input type="checkbox"
                :checked="revisionCheckboxes && linkedIndexes.includes(idx)"
                @change="event => handleCheckboxChange(idx, event.target.checked)">
-            {{$t("viewer-view")}} {{idx + 1}} ({{map.imageInstance.instanceFilename}})
+            {{$t("viewer-view")}} {{idx + 1}} (<image-name :image="map.imageInstance" />)
         </label>
     </p>
 </div>
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
+
 export default {
     name: "link-panel",
+    components: {ImageName},
     props: {
         idViewer: String,
         index: Number
@@ -36,7 +39,6 @@ export default {
         linkedIndexes() {
             return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
         },
-
         trackedUser() {
             return this.viewerWrapper.maps[this.index].trackedUser;
         },

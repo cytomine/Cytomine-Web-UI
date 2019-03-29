@@ -7,7 +7,7 @@
     <h2> {{ $t("error") }} </h2>
     <p>{{ $t("unexpected-error-info-message") }}</p>
 </div>
-<div v-else class="list-images-wrapper content-wrapper">
+<div v-else class="content-wrapper">
     <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
@@ -129,14 +129,22 @@
                 <template #default="{row: image}">
                     <b-table-column :label="$t('overview')" width="100">
                         <router-link :to="`/project/${image.project}/image/${image.id}`">
-                            <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
+                            <img :src="image.thumb" class="image-overview">
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="instanceFilename" :label="$t('name')" sortable width="400">
+                    <b-table-column
+                        :field="blindMode ? 'blindedName' : 'instanceFilename'"
+                        :label="$t('name')"
+                        sortable
+                        width="400"
+                    >
                         <router-link :to="`/project/${image.project}/image/${image.id}`">
-                            {{ image.instanceFilename }}
+                            <image-name :image="image" />
                         </router-link>
+                        <p v-if="canManageProject && blindMode" class="true-name">
+                            {{image.instanceFilename}} <!-- if user is a manager, also display the true name of the image -->
+                        </p>
                     </b-table-column>
 
                     <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
@@ -203,6 +211,7 @@
 <script>
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import CytomineSlider from "@/components/form/CytomineSlider";
+import ImageName from "./ImageName";
 import ImageDetails from "./ImageDetails";
 import AddImageModal from "./AddImageModal";
 
@@ -214,6 +223,7 @@ import {ImageInstanceCollection} from "cytomine-client";
 export default {
     name: "list-images",
     components: {
+        ImageName,
         ImageDetails,
         CytomineMultiselect,
         CytomineSlider,
@@ -263,6 +273,12 @@ export default {
         project() {
             return this.$store.state.project.project;
         },
+        blindMode() {
+            return this.project.blindMode;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
+        },
         configUI() {
             return this.$store.state.project.configUI;
         },
@@ -275,27 +291,22 @@ export default {
             if(this.searchString != "") {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(image => {
-                    return image.instanceFilename.toLowerCase().indexOf(str) >= 0;
+                    return image.instanceFilename.toLowerCase().indexOf(str) >= 0 ||
+                        (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
                 });
             }
 
-            filtered = filtered.filter(image => this.selectedFormats.includes(image.extension));
-            filtered = filtered.filter(image => this.selectedVendors.includes(image.vendorFormatted));
-
-            filtered = filtered.filter(image => this.selectedMagnifications.includes(image.magnificationFormatted));
-            filtered = filtered.filter(image => this.selectedResolutions.includes(image.resolutionFormatted));
-
-            filtered = filtered.filter(image => isBetweenBounds(image.width, this.boundsWidth));
-            filtered = filtered.filter(image => isBetweenBounds(image.height, this.boundsHeight));
-
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations));
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations));
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
-
-            return filtered;
+            return filtered.filter(image => {
+                return this.selectedFormats.includes(image.extension) &&
+                    this.selectedVendors.includes(image.vendorFormatted) &&
+                    this.selectedMagnifications.includes(image.magnificationFormatted) &&
+                    this.selectedResolutions.includes(image.resolutionFormatted) &&
+                    isBetweenBounds(image.width, this.boundsWidth) &&
+                    isBetweenBounds(image.height, this.boundsHeight) &&
+                    isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
+                    isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+                    isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+            });
         },
         availableFormats() {
             let formats = [];
@@ -482,15 +493,19 @@ export default {
 .search-block {
     display: flex;
 }
-</style>
 
-<style>
-.search-images {
+.true-name {
+    margin-top: 0.2em;
+    font-size: 0.9em;
+    color: #888;
+}
+
+>>> .search-images {
     max-width: 300px;
     margin-right: 10px;
 }
 
-.list-images-wrapper td, .list-images-wrapper th {
+>>> td, >>> th {
     vertical-align: middle !important;
 }
 </style>

@@ -17,7 +17,7 @@
             <td>
                 <div v-if="consultations.length > 0" class="columns is-multiline">
                     <div class="column" v-for="consultation in consultations" :key="consultation.id">
-                        <image-preview :image="consultation">
+                        <image-preview :image="consultation" :blindMode="blindMode">
                             <div class="details">
                                 <p>
                                     <strong>{{$t("duration")}}:</strong>
@@ -52,6 +52,11 @@ export default {
             loading: true,
             consultations: null
         };
+    },
+    computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        }
     },
     async created() {
         try {

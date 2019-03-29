@@ -132,7 +132,7 @@
                             <cytomine-multiselect
                                 v-model="selectedImages"
                                 :options="images"
-                                label="instanceFilename"
+                                :label="blindMode ? 'blindedName' : 'instanceFilename'"
                                 track-by="id"
                                 :multiple="true"
                             />
@@ -249,6 +249,9 @@ export default {
         },
         project() {
             return this.$store.state.project.project;
+        },
+        blindMode() {
+            return this.project.blindMode;
         },
         canManageProject() {
             return this.$store.getters.canManageProject;

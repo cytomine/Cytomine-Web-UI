@@ -22,7 +22,7 @@
                             </b-table-column>
 
                             <b-table-column :label="$t('images')" width="400">
-                                <list-images-preview :idProject="project.id" />
+                                <list-images-preview :project="project" />
                             </b-table-column>
                         </template>
 
@@ -103,6 +103,7 @@
                         :image="lastOpenedImage"
                         :fullHeightCard="false"
                         :showProject="true"
+                        :blindMode="lastOpenedImage.blindMode"
                     />
                     <div class="has-text-grey has-text-centered" v-else>
                         {{$t("no-recent-image")}}
@@ -177,6 +178,7 @@ export default {
                 let project = this.projects.array.find(project => project.id == lastOpened.project);
                 if(project) {
                     lastOpened.projectName = project.name;
+                    lastOpened.blindMode = project.blindMode;
                 }
                 return lastOpened;
             }

@@ -6,7 +6,7 @@
                 <td class="prop-label">{{$t("overview")}}</td>
                 <td class="prop-content">
                     <router-link :to="`/project/${image.project}/image/${image.id}`">
-                        <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
+                        <img :src="image.thumb" class="image-overview">
                     </router-link>
                 </td>
             </tr>
@@ -56,11 +56,11 @@
                 <td class="prop-label">{{$t("slide-preview")}}</td>
                 <td class="prop-content">
                     <a @click="isMetadataModalActive = true">
-                        <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview"> <!-- TODO in backend: do not return anything when thumb not available instead of returning overview? -->
+                        <img :src="image.macroURL" class="image-overview"> <!-- TODOv2 in backend: do not return anything when thumb not available instead of returning overview? -->
                     </a>
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('originalFilename')">
+            <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
                 <td class="prop-label">{{$t("originalFilename")}}</td>
                 <td class="prop-content">
                     {{image.originalFilename}}
@@ -105,7 +105,11 @@
                 <td class="prop-label">{{$t("actions")}}</td>
                 <td class="prop-content">
                     <div class="buttons">
-                        <button class="button is-small" @click="isRenameModalActive = true">
+                        <button
+                            v-if="!blindMode || canManageProject"
+                            class="button is-small"
+                            @click="isRenameModalActive = true"
+                        >
                             {{$t("button-rename")}}
                         </button>
                         <button class="button is-small" @click="isMetadataModalActive = true">
@@ -203,8 +207,17 @@ export default {
         };
     },
     computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
+        },
         emptyNewName() {
             return this.newName.length == 0;
+        },
+        imageNameNotif() {
+            return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
         }
     },
     watch: {
@@ -242,7 +255,7 @@ export default {
         confirmDeletion() {
             this.$dialog.confirm({
                 title: this.$t("delete-image"),
-                message: this.$t("delete-image-confirmation-message", {imageName: this.image.instanceFilename}),
+                message: this.$t("delete-image-confirmation-message", {imageName: this.imageNameNotif}),
                 type: "is-danger",
                 confirmText: this.$t("button-confirm"),
                 cancelText: this.$t("button-cancel"),
@@ -254,7 +267,7 @@ export default {
                 await ImageInstance.delete(this.image.id);
                 this.$notify({
                     type: "success",
-                    text: this.$t("notif-success-image-deletion", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-success-image-deletion", {imageName: this.imageNameNotif})
                 });
                 this.$emit("delete");
             }
@@ -262,7 +275,7 @@ export default {
                 console.log(err);
                 this.$notify({
                     type: "error",
-                    text: this.$t("notif-error-image-deletion", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-error-image-deletion", {imageName: this.imageNameNotif})
                 });
             }
         }

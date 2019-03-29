@@ -1,10 +1,10 @@
 <template>
 <div class="columns" v-if="images && images.length">
     <div class="column" v-for="image in images" :key="image.image">
-        <image-preview :image="image" />
+        <image-preview :image="image" :blindMode="project.blindMode" />
     </div>
     <div class="column vertical-center">
-        <router-link class="button" :to="`/project/${idProject}/images`">{{$t("button-view-all")}}</router-link>
+        <router-link class="button" :to="`/project/${this.project.id}/images`">{{$t("button-view-all")}}</router-link>
     </div>
 </div>
 <div v-else>
@@ -23,9 +23,7 @@ export default {
     name: "list-images-preview",
     components: {ImagePreview},
     props: {
-        idProject: {
-            type: Number
-        },
+        project: Object,
         nbRecent: {
             type: Number,
             default: 3
@@ -42,7 +40,7 @@ export default {
     async created() {
         this.images = await ImageInstanceCollection.fetchLastOpened({
             max: this.nbRecent,
-            project: this.idProject,
+            project: this.project.id,
             user: this.currentUser.id
         });
     }

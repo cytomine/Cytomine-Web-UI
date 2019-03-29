@@ -19,8 +19,8 @@
                     <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
                     <div class="card-content">
                         <div class="content">
-                            <a @click="addMap(image)" :title="image.instanceFilename">
-                                {{ image.instanceFilename }}
+                            <a @click="addMap(image)">
+                                <image-name :image="image" />
                             </a>
                         </div>
                     </div>
@@ -43,10 +43,12 @@
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
 import {ImageInstanceCollection} from "cytomine-client";
 
 export default {
     name: "image-selector",
+    components: {ImageName},
     props: {
         idViewer: String
     },
