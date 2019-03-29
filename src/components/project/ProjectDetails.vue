@@ -102,7 +102,7 @@
                 <list-images-preview :idProject="project.id" />
             </td>
         </tr>
-        <tr>
+        <tr v-if="canManageProject">
             <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
                 <project-actions :project="project" @delete="$emit('delete')" />
@@ -145,6 +145,12 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        canManageProject() {
+            return this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id);
+        },
         managersIds() {
             return this.managers.map(manager => manager.id);
         },
