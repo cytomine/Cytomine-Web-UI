@@ -28,6 +28,14 @@
                         <b-input v-model="updatedUser.email" />
                     </b-field>
 
+                    <b-field :label="$t('language')" horizontal>
+                        <b-select v-model="updatedUser.language">
+                            <option v-for="{value, name} in languages" :key="value" :value="value">
+                                {{name}}
+                            </option>
+                        </b-select>
+                    </b-field>
+
                     <b-field grouped position="is-right">
                         <div class="control">
                             <button class="button is-link" @click="editDetails()"> {{$t("button-save")}}</button>
@@ -116,7 +124,11 @@ export default {
             isCheckingPassword: false,
             correctPassword: false,
             newPassword: "",
-            confirmPassword: ""
+            confirmPassword: "",
+            languages: [
+                {value: "EN", name:"English"},
+                {value: "FR", name:"Français"}
+            ],
         };
     },
     computed: {

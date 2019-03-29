@@ -54,18 +54,9 @@
                 </a>
             </navbar-dropdown>
 
-            <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
+            <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
                 <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
                 <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
-            </navbar-dropdown>
-
-            <navbar-dropdown :title="currentLanguage" :classes="['is-right']">
-                <a v-for="lang in languages"
-                    class="navbar-item language" :class="{selected: (lang.value == currentLanguage)}"
-                    :key="lang.value"
-                    @click="changeLanguage(lang.value)">
-                {{ lang.name }}
-                </a>
             </navbar-dropdown>
         </div>
     </div>
@@ -76,8 +67,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 import NavbarDropdown from "./NavbarDropdown";
 import NavigationTree from "./NavigationTree";
 import HotkeysModal from "./HotkeysModal";
@@ -98,33 +87,22 @@ export default {
     data() {
         return {
             openedTopMenu: false,
-            openedLanguagePanel: false,
-            visibleSideBar: true,
-            languages: [
-                {value: "en", name:"English"},
-                {value: "fr", name:"Français"}
-            ],
             hotkeysModal: false,
             aboutModal: false
         };
     },
     computed: {
-        currentLanguage() {
-            return this.$i18n.locale;
+        currentUser() {
+            return this.$store.state.currentUser.user;
         },
         currentUserFullInfo() {
             return fullName(this.currentUser);
         },
         nbViewers() {
             return Object.keys(this.$store.state.images.viewers).length;
-        },
-        ...mapState({currentUser: state => state.currentUser.user})
+        }
     },
     methods: {
-        changeLanguage(newLocale) {
-            this.$i18n.locale = newLocale;
-            this.$moment.locale(newLocale);
-        },
         async openAdminSession() {
             try {
                 await this.$store.dispatch("openAdminSession");

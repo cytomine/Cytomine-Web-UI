@@ -35,8 +35,6 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
-
 import CytomineNavbar from "./components/layout/CytomineNavbar.vue";
 import Login from "./components/user/Login.vue";
 
@@ -56,10 +54,24 @@ export default {
             timeout: null
         };
     },
-    computed: mapState({
-        currentUser: state => state.currentUser.user,
-        project: state => state.project.project
-    }),
+    computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        language() {
+            return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
+        },
+        project() {
+            return this.$store.state.project.project;
+        }
+    },
+    watch: {
+        language() {
+            let locale = this.language.toLowerCase();
+            this.$i18n.locale = locale;
+            this.$moment.locale(locale);
+        }
+    },
     methods: {
         async ping() {
             if(!ifvisible.now()){

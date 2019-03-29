@@ -1,8 +1,9 @@
 <template>
-    <div class="navbar-item has-dropdown"
+<div class="navbar-item has-dropdown"
     :class="{'is-active': opened}"
     @mouseover="opened = true;"
-    @mouseout="opened = false;">
+    @mouseout="opened = false;"
+>
     <a class="navbar-link" :class="{'is-active': isActive}">
         <i v-if="icon != null" :class="[iconPack, icon]"></i>
         {{title}}
