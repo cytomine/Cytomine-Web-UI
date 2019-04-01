@@ -22,6 +22,7 @@ import Polygon, {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import WKT from "ol/format/WKT";
 
 import {Annotation} from "cytomine-client";
+import {Action} from "@/utils/annotation-utils.js";
 
 export default {
     name: "draw-interaction",
@@ -169,7 +170,12 @@ export default {
                         this.$eventBus.$emit("selectAnnotation", {idViewer: this.idViewer, index: this.index, annot});
                     }
 
-                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot: null});
+                    this.$store.commit("addAction", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        annot,
+                        type: Action.CREATE
+                    });
                 }
                 catch(err) {
                     console.log(err);

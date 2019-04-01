@@ -1,7 +1,7 @@
 import Vue from "vue";
 import router from "@/routes.js";
 
-import {ImageInstance, PropertyCollection, AbstractImage, AnnotationType, Term} from "cytomine-client";
+import {Cytomine, ImageInstance, PropertyCollection, AbstractImage, AnnotationType, Term} from "cytomine-client";
 
 import {isCluster, createColorStyle, createTextStyle, changeOpacity, selectStyles,
     verticesStyle, reviewedStyles, reviewedSelectStyles, defaultColors} from "@/utils/style-utils.js";
@@ -434,8 +434,8 @@ export default {
             wrapper.undoneActions = [];
         },
 
-        addAction(state, {idViewer, index, annot, oldAnnot}) {
-            let action = {annot, oldAnnot};
+        addAction(state, {idViewer, index, annot, type}) {
+            let action = {annot, type, command: Cytomine.instance.lastCommand};
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.actions.push(action);
             wrapper.undoneActions = [];

@@ -43,8 +43,9 @@
 import VueDraggableResizable from "vue-draggable-resizable";
 
 import AnnotationDetails from "@/components/annotations/AnnotationDetails";
-import {AnnotationTermCollection, UserCollection, UserJobCollection} from "cytomine-client";
+import {UserCollection, UserJobCollection} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
+import {Action, updateTermProperties} from "@/utils/annotation-utils.js";
 
 import WKT from "ol/format/WKT";
 
@@ -143,12 +144,8 @@ export default {
         },
 
         async updateTerms() {
-            // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
-            let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});
-            updatedAnnot.userByTerm = annotTerms.array.map(({term, user}) => {
-                return {term, user: [user]};
-            });
+            await updateTermProperties(updatedAnnot);
 
             this.$eventBus.$emit("editAnnotation", updatedAnnot);
             this.$store.commit("changeAnnotSelectedFeature", {
@@ -167,8 +164,8 @@ export default {
             this.$store.commit("addAction", {
                 idViewer: this.idViewer,
                 index: this.index,
-                annot: null,
-                oldAnnot: this.annot
+                annot: this.annot,
+                type: Action.DELETE
             });
             this.$eventBus.$emit("deleteAnnotation", this.annot);
         },

@@ -26,6 +26,7 @@
 
 <script>
 import WKT from "ol/format/WKT";
+import {Action} from "@/utils/annotation-utils.js";
 
 export default {
     name: "modify-interaction",
@@ -74,7 +75,12 @@ export default {
                     annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
                     await annot.save();
                     this.$eventBus.$emit("editAnnotation", annot);
-                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
+                    this.$store.commit("addAction", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        annot,
+                        type: Action.UPDATE
+                    });
                 }
                 catch(err) {
                     console.log(err);

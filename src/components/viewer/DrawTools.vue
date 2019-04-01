@@ -48,7 +48,7 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
                 @click="activateTool('freehand-line')">
             <span class="icon is-small">
-                <icon-line-free-hand></icon-line-free-hand>
+                <icon-line-free-hand />
             </span>
         </button>
 
@@ -80,7 +80,7 @@
                 class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
                 @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
             <span class="icon is-small">
-                <icon-polygon-free-hand></icon-polygon-free-hand>
+                <icon-polygon-free-hand />
             </span>
         </button>
     </div>
@@ -162,7 +162,8 @@ import IconLineFreeHand from "@/components/icons/IconLineFreeHand";
 
 import WKT from "ol/format/WKT";
 
-import {Annotation} from "cytomine-client";
+import {Cytomine, Annotation} from "cytomine-client";
+import {Action, updateTermProperties} from "@/utils/annotation-utils.js";
 
 export default {
     name: "draw-tools",
@@ -320,12 +321,16 @@ export default {
 
             this.activateEditTool(null);
             let annot = feature.properties.annot.clone();
-            let oldAnnot = annot.clone();
 
             try {
                 await annot.fill();
                 this.$eventBus.$emit("editAnnotation", annot);
-                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
+                this.$store.commit("addAction", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    annot,
+                    type: Action.UPDATE
+                });
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-fill")});
@@ -347,8 +352,8 @@ export default {
                 this.$store.commit("addAction", {
                     idViewer: this.idViewer,
                     index: this.index,
-                    annot: null,
-                    oldAnnot: annot
+                    annot: annot,
+                    type: Action.DELETE
                 });
             }
             catch(err) {
@@ -374,7 +379,7 @@ export default {
         async undo() {
             let action = this.actions[this.actions.length - 1];
             try {
-                let opposedAction = await this.reverseAction(action);
+                let opposedAction = await this.reverseAction(action, true);
                 this.$store.commit("undoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
@@ -385,7 +390,7 @@ export default {
         async redo() {
             let action = this.undoneActions[this.undoneActions.length - 1];
             try {
-                let opposedAction = await this.reverseAction(action);
+                let opposedAction = await this.reverseAction(action, false);
                 this.$store.commit("redoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
@@ -393,29 +398,43 @@ export default {
                 this.$notify({type: "error", text: this.$t("notif-error-redo")});
             }
         },
-        async reverseAction({annot, oldAnnot}) {
-            // TODO: take into account prop/term/description/attached files when recreating annotation 
-            // (or use backend system for undo/redo ; https://github.com/cytomine/Cytomine-core/issues/1145)
-            let newAnnot = null;
+        async reverseAction({annot, type, command}, undo) {
+            let newType = type;
 
-            if(oldAnnot == null) { // annotation was created
+            if(type === Action.CREATE) {
                 await Annotation.delete(annot.id);
                 this.$eventBus.$emit("deleteAnnotation", annot);
+                newType = Action.DELETE;
+                command = Cytomine.instance.lastCommand;
             }
-            else if(annot == null) { // annotation was deleted
-                newAnnot = oldAnnot.clone();
-                newAnnot.id = null; // set ID to null in order to force creation of a new annotation
-                await newAnnot.save();
+            else if(type === Action.DELETE) {
+                let collection = await Cytomine.instance.undo(command); // always undo if annotation was deleted
+                let newAnnot = await this.getUpdatedAnnotation(collection);
                 this.$eventBus.$emit("addAnnotation", newAnnot);
+                newType = Action.CREATE;
             }
             else { // annotation was updated
-                newAnnot = annot.clone();
-                newAnnot.location = oldAnnot.location; // TODO: fix
-                await newAnnot.save();
+                let collection;
+                if(undo) {
+                    collection = await Cytomine.instance.undo(command);
+                }
+                else {
+                    collection = await Cytomine.instance.redo(command);
+                }
+                let newAnnot = await this.getUpdatedAnnotation(collection);
                 this.$eventBus.$emit("editAnnotation", newAnnot);
             }
 
-            return {annot: newAnnot, oldAnnot: annot};
+            return {annot, command, type: newType};
+        },
+        async getUpdatedAnnotation(collection) {
+            for(let model of collection) {
+                if(model.annotation) {
+                    let annot = new Annotation(model.annotation);
+                    await updateTermProperties(annot);
+                    return annot;
+                }
+            }
         }
     }
 };
