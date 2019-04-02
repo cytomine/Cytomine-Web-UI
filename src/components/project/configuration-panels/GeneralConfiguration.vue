@@ -344,7 +344,7 @@ th, td {
     padding: 10px !important;
 }
 
->>> select, >>> input {
+>>> select, >>> input[type=text] {
     width: 300px;
 }
 </style>
