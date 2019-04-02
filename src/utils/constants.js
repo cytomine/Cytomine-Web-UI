@@ -15,5 +15,6 @@ export default Object.freeze({
     TRACKING_REFRESH_INTERVAL: 500,
     // ---
     IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
-    CONFIG_KEY_WELCOME: "WELCOME"
+    CONFIG_KEY_WELCOME: "WELCOME",
+    DEFAULT_PROPERTY_KEY: "DEFAULT_PROPERTY"
 });

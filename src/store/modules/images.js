@@ -471,13 +471,20 @@ export default {
             }));
         },
 
-        async addMap({commit, dispatch, getters}, {idViewer, image}) {
-            let [fetchedImage, propertiesKeys] = await Promise.all([
+        async addMap({commit, dispatch, getters, rootState}, {idViewer, image}) {
+            let [fetchedImage, propertiesKeys, projectProperties] = await Promise.all([
                 fetchImage(image.id),
-                fetchPropertiesKeys(image.id)
+                fetchPropertiesKeys(image.id),
+                PropertyCollection.fetchAll({object: rootState.project.project})
             ]);
 
             let terms = formatTerms(getters.terms, initialLayersOpacity);
+
+            let selectedPropertyKey = null;
+            let defaultPropertyProp = projectProperties.array.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
+            if(defaultPropertyProp && propertiesKeys.includes(defaultPropertyProp.value)) {
+                selectedPropertyKey = defaultPropertyProp.value;
+            }
 
             let wrapper = {
                 imageInstance: fetchedImage,
@@ -502,7 +509,7 @@ export default {
                 noTermOpacity: initialTermsOpacity,
 
                 propertiesKeys,
-                selectedPropertyKey: null, // TODO: allow to select default property (https://github.com/cytomine/Cytomine-core/issues/1142)
+                selectedPropertyKey,
                 selectedPropertyColor: defaultColors[0],
                 selectedPropertyValues: {},
 
@@ -596,7 +603,7 @@ export default {
             let wrapper = state.viewers[idViewer].maps[index];
             let idImage = wrapper.imageInstance.id;
             let properties = {};
-            if(value != null) {
+            if(value != null && wrapper.selectedLayers) {
                 for(let layer of wrapper.selectedLayers) {
                     let layerValues = await fetchLayerPropertiesValues(layer.id, idImage, value);
                     properties = {...properties, ...layerValues};

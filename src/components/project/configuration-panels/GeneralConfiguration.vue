@@ -1,5 +1,5 @@
 <template>
-<div class="project-general-configuration">
+<div>
     <h2>{{$t("editing-mode")}}</h2>
     <p class="explanation">{{$t("editing-mode-explanation")}}</p>
 
@@ -124,13 +124,8 @@
         </tbody>
     </table>
 
-    <!-- TODO in core (https://github.com/cytomine/Cytomine-core/issues/1142) -->
     <h2>{{$t("default-property")}}</h2>
-    <b-field>
-        <b-select size="is-small">
-            <option :value="null">{{$t("no-default-property")}}</option>
-        </b-select>
-    </b-field>
+    <default-property />
 
     <h2>Actions</h2>
     <project-actions :project="project" size="is-normal" @delete="deleteProject()" />
@@ -139,12 +134,16 @@
 
 <script>
 import ProjectActions from "../ProjectActions";
+import DefaultProperty from "./DefaultProperty";
 import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "general-configuration",
-    components: {ProjectActions},
+    components: {
+        ProjectActions,
+        DefaultProperty
+    },
     data() {
         return {
             editingMode: "",
@@ -299,7 +298,7 @@ export default {
             }
         }
     },
-    created() {
+    async created() {
         this.initData();
         this.fetchDefaultLayers();
     }
@@ -340,14 +339,12 @@ h2:first-child {
 th, td {
     padding: 0.5em 25px !important;
 }
-</style>
 
-<style>
-.project-general-configuration .message-body {
+>>> .message-body {
     padding: 10px !important;
 }
 
-.project-general-configuration select {
+>>> select, >>> input {
     width: 300px;
 }
 </style>
