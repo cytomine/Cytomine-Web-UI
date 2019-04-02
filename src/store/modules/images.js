@@ -28,6 +28,7 @@ export default {
                 maps: [],
                 idProject: project.id,
                 nameProject: project.name,
+                blindProject: project.blindMode,
                 links: [],
                 imageSelector: false,
                 activeMap: 0

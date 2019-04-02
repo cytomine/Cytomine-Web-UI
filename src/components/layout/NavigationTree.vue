@@ -8,7 +8,7 @@
                     <span>
                         <i class="fas fa-caret-right"></i>
                         <template v-if="viewer.maps.length == 1">
-                            <image-name :image="viewer.maps[0].imageInstance" />
+                            <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
                         </template>
                         <template v-else>
                             {{$t("viewer-group", {nbImages: viewer.maps.length})}}
@@ -47,7 +47,7 @@ export default {
                 }
 
                 if(!(viewer.idProject in data)) {
-                    data[viewer.idProject] = {name: viewer.nameProject, viewers: []};
+                    data[viewer.idProject] = {name: viewer.nameProject, blind: viewer.blindProject, viewers: []};
                 }
 
                 data[viewer.idProject].viewers.push({
