@@ -5,7 +5,7 @@
     </vl-layer-vector>
 
     <vl-interaction-draw
-        v-if="nbActiveLayers > 0"
+        v-if="nbActiveLayers > 0 || drawCorrection"
         ref="olDrawInteraction"
         :source="drawSourceName"
         :type="drawType"
@@ -54,6 +54,15 @@ export default {
         activeTool() {
             return this.imageWrapper.activeTool;
         },
+        activeEditTool() {
+            return this.imageWrapper.activeEditTool;
+        },
+        selectedFeature() {
+            let selectedFeatures = this.imageWrapper.selectedFeatures;
+            if(selectedFeatures && selectedFeatures.length == 1) {
+                return selectedFeatures[0];
+            }
+        },
         drawType() {
             switch(this.activeTool) {
                 case "point":
@@ -66,13 +75,12 @@ export default {
                     return "Circle";
                 case "polygon": 
                 case "freehand-polygon":
-                case "correct-add": 
-                case "correct-remove":
+                case "select": // correct mode
                     return "Polygon";
             }
         },
         drawCorrection() {
-            return this.activeTool == "correct-add" || this.activeTool == "correct-remove";
+            return this.activeTool == "select";
         },
         drawFreehand() {
             return this.activeTool == "freehand-polygon" || this.activeTool == "freehand-line" || this.drawCorrection;
@@ -134,13 +142,11 @@ export default {
         },
 
         async drawEndHandler({feature}) {
-            if(this.nbActiveLayers > 0) {
-                if(this.drawCorrection) {
-                    await this.endCorrection(feature);
-                }
-                else {
-                    await this.endDraw(feature);
-                }
+            if(this.drawCorrection) {
+                await this.endCorrection(feature);
+            }
+            else if(this.nbActiveLayers > 0) {
+                await this.endDraw(feature);
             }
 
             this.clearDrawnFeatures();
@@ -185,21 +191,33 @@ export default {
         },
 
         async endCorrection(feature) {
-            let remove = (this.activeTool == "correct-remove");
-            let review = false; // TODO: handle
-            let geom = this.getWktLocation(feature);
-            let idLayers = this.activeLayers.map(layer => layer.id);
-            try {
-                let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, idLayers);
-                if(correctedAnnot != null) {
-                    // TODO: add action for undo/redo system (currently not possible because core does not return the list of affected annotations)
-                    this.$store.commit("resetActions", {idViewer: this.idViewer, index: this.index});
+            if(!this.selectedFeature) {
+                return;
+            }
 
-                    // refresh the sources because several annotations might have been modified
-                    this.$eventBus.$emit("reloadAnnotations", this.image.id);
+            let remove = (this.activeEditTool == "correct-remove");
+            let review = false; // TODO: handle
+            let location = this.getWktLocation(feature);
+            try {
+                let correctedAnnot = await Annotation.correctAnnotations({
+                    location,
+                    review,
+                    remove,
+                    annotation: this.selectedFeature.id
+                });
+                if(correctedAnnot != null) {
+                    correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
+                    this.$store.commit("addAction", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        annot: correctedAnnot,
+                        type: Action.UPDATE
+                    });
+                    this.$eventBus.$emit("editAnnotation", correctedAnnot);
                 }
             }
             catch(err) {
+                console.log(err);
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-correction")});
             }
         },

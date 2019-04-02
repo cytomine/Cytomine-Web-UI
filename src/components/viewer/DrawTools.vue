@@ -85,22 +85,6 @@
         </button>
     </div>
 
-    <div class="buttons has-addons">
-        <!-- TODO: would be better if correct add and correct remove were targeted on a previously selected annot
-        backend modif required (https://github.com/cytomine/Cytomine-core/issues/1141) -->
-        <button v-if="isToolDisplayed('union')" :disabled="disabledDraw" v-tooltip="$t('freehand-correct-add')"
-                class="button is-small" :class="{'is-selected': activeTool == 'correct-add'}"
-                @click="activateTool('correct-add')">
-            <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
-        </button>
-
-        <button v-if="isToolDisplayed('diff')" :disabled="disabledDraw" v-tooltip="$t('freehand-correct-remove')"
-                class="button is-small" :class="{'is-selected': activeTool == 'correct-remove'}"
-                @click="activateTool('correct-remove')">
-            <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
-        </button>
-    </div>
-
     <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons">
         <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
             <span class="icon is-small"><i class="fas fa-info"></i></span>
@@ -118,6 +102,20 @@
                 class="button is-small" :class="{'is-selected': activeEditTool == 'modify'}"
                 @click="activateEditTool('modify')">
             <span class="icon is-small"><i class="fas fa-edit"></i></span>
+        </button>
+
+        <button v-if="isToolDisplayed('union')" :disabled="isToolDisabled('correct-add')"
+                v-tooltip="$t('freehand-correct-add')"
+                class="button is-small" :class="{'is-selected': activeEditTool == 'correct-add'}"
+                @click="activateEditTool('correct-add')">
+            <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
+        </button>
+
+        <button v-if="isToolDisplayed('diff')" :disabled="isToolDisabled('correct-remove')"
+                v-tooltip="$t('freehand-correct-remove')"
+                class="button is-small" :class="{'is-selected': activeEditTool == 'correct-remove'}"
+                @click="activateEditTool('correct-remove')">
+            <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('move')" :disabled="isToolDisabled('move')" v-tooltip="$t('move')"
@@ -268,6 +266,11 @@ export default {
             if(value) {
                 this.activeTool = "select";
             }
+        },
+        selectedFeature(feature) {
+            if(feature == null && ["correct-add", "correct-remove"].includes(this.activeEditTool)) {
+                this.activeEditTool = null;
+            }
         }
     },
     methods: {
@@ -288,8 +291,8 @@ export default {
             if(geomType == "Point") {
                 return (tool != "move" && tool != "delete"); // disable all tools except move and delete for points
             }
-            else if(geomType == "Line") {
-                return (tool == "fill"); // disable fill tool for lines
+            else if(geomType == "LineString") {
+                return ["fill", "correct-add", "correct-remove"].includes(tool); // disable fill and correct tools for lines
             }
             else {
                 return false;

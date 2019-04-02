@@ -52,9 +52,9 @@
                 :layer="layer"
             />
 
-            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index" />
-            <draw-interaction v-if="activeTool != 'select'" :idViewer="idViewer" :index="index" />
-            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null" :idViewer="idViewer" :index="index" />
+            <select-interaction v-if="activeSelectInteraction" :idViewer="idViewer" :index="index" />
+            <draw-interaction v-if="activeDrawInteraction" :idViewer="idViewer" :index="index" />
+            <modify-interaction v-if="activeModifyInteraction" :idViewer="idViewer" :index="index" />
 
         </vl-map>
 
@@ -368,6 +368,19 @@ export default {
 
         overviewCollapsed() {
             return this.overview ? this.overview.getCollapsed() : null;
+        },
+
+        correction() {
+            return ["correct-add", "correct-remove"].includes(this.activeEditTool);
+        },
+        activeSelectInteraction() {
+            return this.activeTool === "select";
+        },
+        activeDrawInteraction() {
+            return !this.activeSelectInteraction || this.correction;
+        },
+        activeModifyInteraction() {
+            return this.activeSelectInteraction && this.activeEditTool != null && !this.correction;
         }
     },
     watch: {
