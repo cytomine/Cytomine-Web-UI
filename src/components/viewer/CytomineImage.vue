@@ -98,7 +98,7 @@
                         />
                     </li>
 
-                    <li v-if="isPanelDisplayed('colors')">
+                    <li v-if="isPanelDisplayed('color-manipulation')">
                         <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
                             <i class="fas fa-adjust"></i>
                         </a>
