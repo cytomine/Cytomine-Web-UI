@@ -99,6 +99,12 @@ export default {
             return getters.canEditLayer(idLayer);
         },
 
+        canEditImage: (state, getters, rootState) => image => {
+            let currentUser = rootState.currentUser.user;
+            let project = state.project;
+            return getters.canManageProject || (!project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+        },
+
         canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
             let currentUser = rootState.currentUser.user || {};
             return currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id);

@@ -12,7 +12,7 @@
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
-            <button v-if="!currentUser.guestByNow" class="button is-link" @click="addImageModal = true">
+            <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
                 {{$t('button-add-image')}}
             </button>
         </p>
@@ -278,6 +278,9 @@ export default {
         },
         canManageProject() {
             return this.$store.getters.canManageProject;
+        },
+        canAddImage() {
+            return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
         },
         configUI() {
             return this.$store.state.project.configUI;

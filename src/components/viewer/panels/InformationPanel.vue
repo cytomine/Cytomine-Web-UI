@@ -28,7 +28,7 @@
             <tr>
                 <td colspan="2">
                     <div class="buttons">
-                        <button class="button is-small" @click="calibrationModal = true">
+                        <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
                             {{$t("button-set-calibration")}}
                         </button>
                         <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
@@ -97,7 +97,10 @@ export default {
         },
         magnification() {
             return this.image.magnification || this.$t("unknown");
-        }
+        },
+        canEdit() {
+            return this.$store.getters.canEditImage(this.image);
+        },
     },
     methods: {
         setResolution(resolution) {

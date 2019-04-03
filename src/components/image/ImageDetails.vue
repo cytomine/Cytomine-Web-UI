@@ -105,24 +105,30 @@
                 <td class="prop-label">{{$t("actions")}}</td>
                 <td class="prop-content">
                     <div class="buttons">
-                        <button
-                            v-if="!blindMode || canManageProject"
-                            class="button is-small"
-                            @click="isRenameModalActive = true"
-                        >
-                            {{$t("button-rename")}}
-                        </button>
                         <button class="button is-small" @click="isMetadataModalActive = true">
                             {{$t("button-metadata")}}
                         </button>
-                        <button class="button is-small" @click="isCalibrationModalActive = true">
-                            {{$t("button-set-calibration")}}
-                        </button>
-                        <button class="button is-small" @click="isMagnificationModalActive = true">
-                            {{$t("button-set-magnification")}}
-                        </button>
-                        <a class="button is-small" :href="image.downloadURL">{{$t("button-download")}}</a>
-                        <button class="button is-danger is-small" @click="confirmDeletion()">{{$t("button-delete")}}</button>
+                        <template v-if="canEdit">
+                            <button
+                                v-if="!blindMode || canManageProject"
+                                class="button is-small"
+                                @click="isRenameModalActive = true"
+                            >
+                                {{$t("button-rename")}}
+                            </button>
+                            <button class="button is-small" @click="isCalibrationModalActive = true">
+                                {{$t("button-set-calibration")}}
+                            </button>
+                            <button class="button is-small" @click="isMagnificationModalActive = true">
+                                {{$t("button-set-magnification")}}
+                            </button>
+                            <a class="button is-small" :href="image.downloadURL">
+                                {{$t("button-download")}}
+                            </a>
+                            <button class="button is-danger is-small" @click="confirmDeletion()">
+                                {{$t("button-delete")}}
+                            </button>
+                        </template>
                     </div>
                 </td>
             </tr>
@@ -212,6 +218,9 @@ export default {
         },
         canManageProject() {
             return this.$store.getters.canManageProject;
+        },
+        canEdit() {
+            return this.$store.getters.canEditImage(this.image);
         },
         emptyNewName() {
             return this.newName.length == 0;
