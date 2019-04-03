@@ -156,7 +156,18 @@ export default {
             }
             catch(error) {
                 console.log(error);
-                this.$notify({type: "error", text: error.response.data.errors}); // TODO: translate (core should return data to populate translation)
+                let errorValues = error.response.data.errorValues;
+                let text;
+                if(errorValues && errorValues.projectNames && errorValues.imageNames) {
+                    text = this.$t("notif-error-delete-used-uploaded-file", {
+                        projects: errorValues.projectNames.join(", "),
+                        names: errorValues.imageNames.join(", ")
+                    });
+                }
+                else {
+                    text = this.$t("notif-error-delete-uploaded-file");
+                }
+                this.$notify({type: "error", text});
             }
         }
     },
