@@ -59,6 +59,14 @@ export default {
             await Promise.all(promises);
         },
 
+        async updateProject({state, dispatch, commit}, updatedProject) {
+            let reloadOntology = state.project.ontology !== updatedProject.ontology;
+            commit("setProject", updatedProject);
+            if(reloadOntology) {
+                await dispatch("fetchOntology");
+            }
+        },
+
         async fetchUIConfig({state, commit}) {
             let config = await Cytomine.instance.fetchUIConfigCurrentUser(state.project.id);
             commit("setConfigUI", config);
@@ -78,7 +86,7 @@ export default {
         },
 
         async fetchOntology({state, commit}) {
-            let ontology = await Ontology.fetch(state.project.ontology);
+            let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
             commit("setOntology", ontology);
         }
     },
@@ -116,7 +124,7 @@ export default {
         },
 
         terms: (state) => {
-            return getAllTerms(state.ontology);
+            return state.ontology ? getAllTerms(state.ontology) : null;
         }
     }
 };

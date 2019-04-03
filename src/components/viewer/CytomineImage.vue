@@ -116,7 +116,7 @@
                         />
                     </li>
 
-                    <li v-if="isPanelDisplayed('ontology') && terms.length > 0">
+                    <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
                         <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
                             <i class="fas fa-hashtag"></i>
                         </a>

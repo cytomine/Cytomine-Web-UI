@@ -123,3 +123,21 @@ $loadingColor: #bbb;
         }
     }
 }
+
+/* Message */
+
+.message.is-warning {
+    background: rgba(255, 69, 0, 0.05) !important;
+
+    .message-body {
+        border-color: rgb(255, 120, 0);
+    }
+
+    .icon {
+        color: rgb(255, 120, 0);
+    }
+}
+
+.message {
+    font-size: 1em;
+}

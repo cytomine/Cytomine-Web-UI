@@ -128,7 +128,7 @@
     <default-property />
 
     <h2>Actions</h2>
-    <project-actions :project="project" size="is-normal" @delete="deleteProject()" />
+    <project-actions :project="project" size="is-normal" @update="externalProjectUpdate" @delete="deleteProject()" />
 </div>    
 </template>
 
@@ -278,6 +278,10 @@ export default {
                 console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-default-layer-delete")});
             }
+        },
+
+        externalProjectUpdate(updatedProject) {
+            this.$store.dispatch("updateProject", updatedProject);
         },
 
         async deleteProject() {

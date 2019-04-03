@@ -15,18 +15,24 @@
                 <div class="field">
                     <label class="label">{{$t("ontology")}}</label>
                     <label class="radio">
-                        <input type="radio" v-model="newOntology" :value="true">
+                        <input type="radio" v-model="ontology" value="NO">
+                        {{$t("no-ontology")}}
+                    </label>
+                </div>
+                <div class="field">
+                    <label class="radio">
+                        <input type="radio" v-model="ontology" value="NEW">
                         {{$t("create-ontology-for-project")}}
                     </label>
                 </div>
                 <div class="field">
                     <label class="radio">
-                        <input type="radio" v-model="newOntology" :value="false">
+                        <input type="radio" v-model="ontology" value="EXISTING">
                         {{$t("use-existing-ontology")}}
                     </label>
                 </div>
 
-                <b-collapse class="panel" :open="!newOntology">
+                <b-collapse class="panel" :open="ontology == 'EXISTING'">
                 <b-field :type="!validOntology && displayErrors ? 'is-danger' : null"
                          :message="!validOntology && displayErrors ? $t('ontology-must-be-selected') : ''">
                     <b-select size="is-small" v-model="selectedOntology" :placeholder="$t('select-ontology')">
@@ -61,7 +67,7 @@ export default {
     data() {
         return {
             name: "",
-            newOntology: true,
+            ontology: "NO",
             ontologies: [],
             selectedOntology: null,
             displayErrors: false
@@ -72,14 +78,14 @@ export default {
             return this.name.length > 0;
         },
         validOntology() {
-            return this.newOntology || this.selectedOntology != null;
+            return this.ontology !== "EXISTING" || this.selectedOntology != null;
         }
     },
     watch: {
         active(val) {
             if(val) {
                 this.name = "";
-                this.newOntology = true;
+                this.ontology = "NO";
                 this.selectedOntology = null;
                 this.displayErrors = false;
             }
@@ -93,10 +99,13 @@ export default {
             }
 
             try {
-                let idOntology = this.selectedOntology;
-                if(this.newOntology) {
+                let idOntology;
+                if(this.ontology === "NEW") {
                     let ontology = await new Ontology({name: this.name}).save();
                     idOntology = ontology.id;
+                }
+                else if(this.ontology === "EXISTING") {
+                    idOntology = this.selectedOntology.id;
                 }
 
                 let project = await new Project({name: this.name, ontology: idOntology}).save();
@@ -111,6 +120,7 @@ export default {
     },
     async created() {
         this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+        this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
     }
 };
 </script>

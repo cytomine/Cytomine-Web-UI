@@ -223,7 +223,8 @@ export default {
 
         filterTermsNewAnnots(state, {idViewer, index}) { // keep only the terms that still exist
             let wrapper = state.viewers[idViewer].maps[index];
-            let idTerms = wrapper.terms.map(term => term.id);
+            let terms = wrapper.terms || [];
+            let idTerms = terms.map(term => term.id);
             wrapper.termsNewAnnots = wrapper.termsNewAnnots.filter(id => idTerms.includes(id));
         },
 
@@ -321,7 +322,9 @@ export default {
         setLayersOpacity(state, {idViewer, index, opacity}) {
             let wrapper = state.viewers[idViewer].maps[index];
             wrapper.layersOpacity = opacity;
-            wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
+            if(wrapper.terms) {
+                wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
+            }
             changeOpacity(wrapper.noTermStyle, opacity*wrapper.noTermOpacity);
             changeOpacity(wrapper.multipleTermsStyle, opacity);
             changeOpacity(wrapper.defaultStyle, opacity);
@@ -504,7 +507,7 @@ export default {
 
                 selectedLayers: null,
 
-                terms: terms,
+                terms,
                 termsNewAnnots: [],
                 displayNoTerm: true,
                 noTermOpacity: initialTermsOpacity,
@@ -558,7 +561,7 @@ export default {
                     dispatch("refreshProperties", {idViewer, index})
                 ]);
 
-                let terms = formatTerms(getters.terms, map.opacity, map.terms);
+                let terms = formatTerms(getters.terms, map.layersOpacity, map.terms);
 
                 commit("setImageInstance", {idViewer, index, image});
                 commit("setTerms", {idViewer, index, terms});
@@ -659,16 +662,22 @@ export default {
             let styles = [];
 
             let nbTerms = annot.term.length;
+            let terms = imageWrapper.terms;
 
-            if(nbTerms == 1) {
-                let wrappedTerm = imageWrapper.terms.find(term => term.id == annot.term[0]);
-                if(!wrappedTerm.visible) {
-                    return; // do not display annot
+            if(terms && nbTerms == 1) {
+                let wrappedTerm = terms.find(term => term.id == annot.term[0]);
+                if(wrappedTerm) {
+                    if(!wrappedTerm.visible) {
+                        return; // do not display annot
+                    }
+                    styles.push(wrappedTerm.olStyle);
                 }
-                styles.push(wrappedTerm.olStyle);
+                else {
+                    styles.push(imageWrapper.noTermStyle); // could not find term => display no term style
+                }
             }
-            else if(nbTerms > 1) {
-                let hasTermsToDisplay = imageWrapper.terms.some(term => term.visible && annot.term.includes(term.id));
+            else if(terms && nbTerms > 1) {
+                let hasTermsToDisplay = terms.some(term => term.visible && annot.term.includes(term.id));
                 if(!hasTermsToDisplay) {
                     return; // do not display
                 }
@@ -766,6 +775,10 @@ async function fetchPropertiesKeys(idImage) {
 }
 
 function formatTerms(terms, layersOpacity, previousTerms=[]) {
+    if(!terms) {
+        return;
+    }
+
     let result = [];
     let nbTerms = terms.length;
     for(let i = 0; i < nbTerms; i++) {

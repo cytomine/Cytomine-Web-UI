@@ -130,18 +130,20 @@
             <div class="tile is-child box chart-box">
                 <div class="columns">
                     <h2 class="column">{{$t("number-annotations")}}</h2>
-                    <div class="column has-text-right">
-                        <div class="filter-label">{{$t("term")}}</div>
-                    </div>
-                    <div class="column is-one-third">
-                        <ontology-tree-multiselect 
-                            :ontology="ontology"
-                            :additionalNodes="[{id: 0, name: this.$t('all')}]"
-                            :startWithAdditionalNodes="true"
-                            :multiple="false"
-                            v-model="selectedTerms"
-                        />
-                    </div>
+                    <template v-if="ontology">
+                        <div class="column has-text-right">
+                            <div class="filter-label">{{$t("term")}}</div>
+                        </div>
+                        <div class="column is-one-third">
+                            <ontology-tree-multiselect
+                                :ontology="ontology"
+                                :additionalNodes="[{id: 0, name: this.$t('all')}]"
+                                :startWithAdditionalNodes="true"
+                                :multiple="false"
+                                v-model="selectedTerms"
+                            />
+                        </div>
+                    </template>
                     <div class="column is-narrow is-info-circle">
                         <v-popover>
                             <i class="fas fa-info-circle"></i>
@@ -167,7 +169,7 @@
     </div>
 
     <div class="tile annotation-repartition">
-        <div class="tile is-6 is-parent is-vertical">
+        <div v-if="ontology" class="tile is-6 is-parent is-vertical">
             <div class="tile is-child box chart-box no-grow">
                 <div class="columns">
                     <h2 class="column">{{$t("manual-annotations-vs-term")}}</h2>

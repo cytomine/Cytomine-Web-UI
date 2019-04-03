@@ -63,7 +63,10 @@
         <tr v-if="isPropDisplayed('ontology')">
             <td class="prop-label">{{$t("ontology")}}</td>
             <td class="prop-content">
-                <router-link :to="`/ontology/${project.ontology}`">{{project.ontologyName}}</router-link>
+                <router-link v-if="project.ontology" :to="`/ontology/${project.ontology}`">
+                    {{project.ontologyName}}
+                </router-link>
+                <em v-else>{{$t("no-ontology")}}</em>
             </td>
         </tr>
         <tr v-if="isPropDisplayed('created')">
@@ -105,7 +108,7 @@
         <tr v-if="canManageProject">
             <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
-                <project-actions :project="project" @delete="$emit('delete')" />
+                <project-actions :project="project" @update="$emit('update', $event)" @delete="$emit('delete')" />
             </td>
         </tr>
     </tbody>

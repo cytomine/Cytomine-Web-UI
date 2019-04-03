@@ -124,7 +124,7 @@
                 </div>
 
                 <div class="columns">
-                    <div class="column filter">
+                    <div class="column filter is-half">
                         <div class="filter-label">
                             {{$t("images")}}
                         </div>
@@ -139,7 +139,7 @@
                         </div>
                     </div>
 
-                    <div class="column filter">
+                    <div v-if="ontology" class="column filter">
                         <div class="filter-label">
                             {{$t("terms")}}
                         </div>
@@ -312,7 +312,7 @@ export default {
             });
         },
         terms() {
-            return this.$store.getters.terms;
+            return this.$store.getters.terms || [];
         },
         additionalNodes() {
             let additionalNodes = [this.noTermOption];

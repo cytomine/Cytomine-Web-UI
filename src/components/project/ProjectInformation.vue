@@ -4,7 +4,12 @@
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
 <div v-else class="box">
-    <project-details :project="project" :excluded-properties="['imagesPreview']" @delete="deleteProject()" />
+    <project-details
+        :project="project"
+        :excluded-properties="['imagesPreview']"
+        @update="updateProject"
+        @delete="deleteProject()"
+    />
 </div>
 </template>
 
@@ -24,6 +29,9 @@ export default {
         }
     },
     methods: {
+        updateProject(updatedProject) {
+            this.$store.dispatch("updateProject", updatedProject);
+        },
         async deleteProject() {
             try {
                 await Project.delete(this.project.id);

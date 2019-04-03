@@ -31,7 +31,7 @@
             </tr>
 
             <!-- TERMS -->
-            <tr v-if="isPropDisplayed('terms')">
+            <tr v-if="isPropDisplayed('terms') && ontology">
                 <td colspan="2">
                     <h5>{{$t("terms")}}</h5>
                     <b-tag v-for="{term, user} in associatedTerms" :key="term.id"

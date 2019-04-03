@@ -54,12 +54,15 @@ export default {
         ongoingEdit() {
             return this.imageWrapper.ongoingEdit;
         },
+        terms() {
+            return this.imageWrapper.terms || [];
+        },
         styleFunctionFactory() {
             // Force computed property update when one of those properties change (leading to new style function =>
             // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => {
+            this.terms.forEach(term => {
                 term.visible;
                 term.opacity;
             });

@@ -7,10 +7,9 @@
                     <p class="modal-card-title">{{$t("calibrate-image")}}</p>
                 </header>
                 <section class="modal-card-body">
-                    <div class="modal-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        {{ $t("warning-change-applies-in-project-only") }}
-                    </div>
+                    <b-message type="is-warning" has-icon icon-size="is-small">
+                         {{ $t("warning-change-applies-in-project-only") }}
+                    </b-message>
 
                     <b-field :type="fieldType" :message="fieldMessage" :label="$t('resolution')">
                         <b-field :type="fieldType">
@@ -105,21 +104,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.modal-warning {
-    display: flex;
-    margin-bottom: 15px;
-    align-items: center;
-    padding: 5px;
-    border-left: 3px solid rgb(255, 120, 0);
-    border-radius: 4px;
-    background: rgba(255, 69, 0, 0.05);
-}
-.modal-warning .fas {
-    margin-left: 10px;
-    margin-right: 20px;
-    font-size: 16px;
-    color: rgb(255, 120, 0);
-}
-</style>

@@ -39,10 +39,13 @@ export default {
                 });
             }
         },
+        terms() {
+            return this.imageWrapper.terms || [];
+        },
         styleFunctionFactory() {
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => {
+            this.terms.forEach(term => {
                 term.visible;
                 term.opacity;
             });

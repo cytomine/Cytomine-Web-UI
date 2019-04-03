@@ -161,6 +161,7 @@
                     <project-details
                         :project="project"
                         :excluded-properties="excludedProperties"
+                        @update="updateProject"
                         @delete="deleteProject(project)"
                     />
                 </template>
@@ -316,6 +317,12 @@ export default {
         toggleFilterDisplay() {
             this.filtersOpened = !this.filtersOpened;
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
+        },
+        updateProject(updatedProject) {
+            let project = this.projects.find(project => project.id === updatedProject.id);
+            if(project) {
+                project.populate({...updatedProject});
+            }
         },
         async deleteProject(projectToDelete) {
             try {

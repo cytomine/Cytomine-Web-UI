@@ -8,8 +8,12 @@
         </button>
     </div>
 
-    <div class="buttons has-addons term-selection" :class="{'has-preview': termsToAssociate.length > 0}"
-         v-click-outside="() => showTermSelector = false">
+    <div
+        v-if="terms && terms.length > 0"
+        class="buttons has-addons term-selection"
+        :class="{'has-preview': termsToAssociate.length > 0}"
+        v-click-outside="() => showTermSelector = false"
+    >
         <button v-tooltip="$t('terms-new-annotation')" 
                 class="button is-small" :disabled="disabledDraw" 
                 @click="showTermSelector = !showTermSelector">
