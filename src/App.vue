@@ -73,6 +73,16 @@ export default {
         }
     },
     methods: {
+        async loginWithToken() {
+            try {
+                await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+                await this.$store.dispatch("fetchUser");
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("invalid-token")});
+            }
+        },
         async ping() {
             if(!ifvisible.now()){
                 return; // window not visible or inactive user => stop pinging
@@ -93,12 +103,17 @@ export default {
         }
     },
     async created() {
-        try {
-            await this.$store.dispatch("fetchUser");
+        if(this.$route.query.token && this.$route.query.username) {
+            await this.loginWithToken();
         }
-        catch(error) {
-            console.log(error);
-            this.communicationError = true;
+        else {
+            try {
+                await this.$store.dispatch("fetchUser");
+            }
+            catch(error) {
+                console.log(error);
+                this.communicationError = true;
+            }
         }
         this.loading = false;
         this.ping();
