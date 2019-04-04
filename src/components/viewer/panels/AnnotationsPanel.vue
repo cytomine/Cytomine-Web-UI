@@ -221,24 +221,36 @@ export default {
             return;
         }
 
+        let layersToAdd = [];
+        if(this.layersToPreload) {
+            this.layersToPreload.forEach(id => layersToAdd.push({id, visible: true}));
+        }
+
         if(!this.imageWrapper.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-            await this.addLayerById(this.currentUser.id);
+            if(!this.layersToPreload || !this.layersToPreload.includes(this.currentUser.id)) {
+                layersToAdd.push({id: this.currentUser.id, visible: true});
+            }
 
             try {
                 let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
                     filterKey: "project",
                     filterValue: this.project.id
                 });
-                defaultLayers.array.forEach(({user, hideByDefault}) => this.addLayerById(user, !hideByDefault));
+
+                let addedIds = layersToAdd.map(layer => layer.id);
+
+                defaultLayers.array.forEach(({user, hideByDefault}) => {
+                    if(!addedIds.includes(user)) {
+                        layersToAdd.push({id: user, visible: !hideByDefault});
+                    }
+                });
             }
             catch(error) {
                 console.log(error);
             }
         }
 
-        if(this.layersToPreload) {
-            this.layersToPreload.forEach(id => this.addLayerById(id));
-        }
+        layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
     },
     mounted() {
         this.$eventBus.$on(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
