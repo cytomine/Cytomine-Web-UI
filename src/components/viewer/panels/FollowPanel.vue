@@ -40,7 +40,6 @@
 
 <script>
 import Username from "@/components/user/Username";
-import {fullName} from "@/utils/user-utils.js";
 
 import {UserPosition} from "cytomine-client";
 
