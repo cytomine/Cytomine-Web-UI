@@ -67,7 +67,7 @@
                     </b-table-column>
 
                     <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-                        <i class="fas fa-cog" :title="$t('manager-icon-label')" v-if="member.role === managerRole"></i>
+                        <i class="fas fa-cog" :title="$t('project-manager')" v-if="member.role === managerRole"></i>
                     </b-table-column>
 
                     <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
