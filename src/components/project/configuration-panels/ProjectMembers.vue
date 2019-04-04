@@ -25,7 +25,7 @@
                     {{$t('button-add-members')}}
                 </button>
 
-                <button class="button is-danger" @click="confirmMembersRemoval()" :disabled="selectedMembers.length == 0">
+                <button class="button is-danger" @click="confirmMembersRemoval()" :disabled="selectedMembers.length === 0">
                     {{$t('button-remove-selected-members')}}
                 </button>
             </div>
@@ -39,15 +39,15 @@
                 pagination-size="is-small">
 
             <template #header="{column}">
-                <template v-if="column.label == 'SELECTOR'">
-                    <input type="checkbox" v-model="selectAll" :disabled="filteredMembers.length == 0">
+                <template v-if="column.label === 'SELECTOR'">
+                    <input type="checkbox" v-model="selectAll" :disabled="filteredMembers.length === 0">
                 </template>
                 <template v-else>{{ column.label }}</template>
             </template>
 
             <template #default="{row: member}">
                 <b-table-column label="SELECTOR" width="20">
-                    <input type="checkbox" v-model="member.selected" :disabled="member.id == currentUser.id">
+                    <input type="checkbox" v-model="member.selected" :disabled="member.id === currentUser.id">
                 </b-table-column>
 
                 <b-table-column field="username" :label="$t('username')" sortable width="100">
@@ -61,10 +61,10 @@
                 <b-table-column field="indexRole" :label="$t('role')" sortable width="50">
                     <span class="icons">
                         <a @click="confirmToggleManager(member)">
-                            <i class="fas fa-cog" :class="{disabled: member.role == contributorRole}"></i>
+                            <i class="fas fa-cog" :class="{disabled: member.role === contributorRole}"></i>
                         </a>
-                        <a v-if="member.role != contributorRole" @click="toggleRepresentative(member)">
-                            <i class="fas fa-cog" :class="{disabled: member.representativeId == null}">
+                        <a v-if="member.role !== contributorRole" @click="toggleRepresentative(member)">
+                            <i class="fas fa-cog" :class="{disabled: !member.representativeId}">
                                 <i class="superscript fas fa-plus"></i>
                             </i>
                         </a>
@@ -182,7 +182,7 @@ export default {
         filteredMembers() {
             let filtered = this.allMembers;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(member => {
                     return member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0;
@@ -199,11 +199,13 @@ export default {
         selectAll: {
             get() {
                 return this.filteredMembers.length > 0 && this.filteredMembers.every(member => {
-                    return member.selected || member.id == this.currentUser.id;
+                    return member.selected || member.id === this.currentUser.id;
                 });
             },
             set(value) {
-                this.filteredMembers.forEach(member => member.selected = member.id != this.currentUser.id && value);
+                this.filteredMembers.forEach(member => {
+                    member.selected = (member.id !== this.currentUser.id && value);
+                });
             }
         },
         exportURL() {
@@ -229,8 +231,8 @@ export default {
                     member.indexRole = 0; // to allow sorting
                 }
 
-                let representative = this.representatives.find(r => r.user == member.id);
-                if(representative != null) {
+                let representative = this.representatives.find(r => r.user === member.id);
+                if(representative) {
                     member.representativeId = representative.id;
                     member.indexRole = 2; // to allow sorting
                 }
@@ -279,7 +281,7 @@ export default {
         },
 
         confirmToggleManager(member) {
-            if(member.id == this.currentUser.id && member.role != this.contributorRole) {
+            if(member.id === this.currentUser.id && member.role !== this.contributorRole) {
                 this.$dialog.confirm({
                     title: this.$t("remove-yourself-from-manager"),
                     message: this.$tc("remove-yourself-from-manager-confirmation-message"),
@@ -295,8 +297,8 @@ export default {
         },
         async toggleManager(member) {
             try {
-                if(member.role != this.contributorRole) {
-                    if(member.representativeId != null) {
+                if(member.role !== this.contributorRole) {
+                    if(member.representativeId) {
                         await ProjectRepresentative.delete(member.representativeId, this.project.id);
                         await this.fetchRepresentatives();
                     }
@@ -307,7 +309,7 @@ export default {
                 }
                 await this.refreshMembers();
 
-                if(member.id == this.currentUser.id) {
+                if(member.id === this.currentUser.id) {
                     await this.$store.dispatch("fetchUIConfig");
                     if(!this.$store.state.project.configUI["project-configuration-tab"]) {
                         this.$router.push(`/project/${this.project.id}`);
@@ -321,7 +323,7 @@ export default {
         },
         async toggleRepresentative(member) {
             try {
-                if(member.representativeId != null) {
+                if(member.representativeId) {
                     await ProjectRepresentative.delete(member.representativeId, this.project.id);
                 }
                 else {

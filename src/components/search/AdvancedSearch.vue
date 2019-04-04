@@ -12,17 +12,17 @@
             <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
         </div>
         <p class="panel-tabs">
-            <a :class="{'is-active': activeTab == 'projects'}" @click="activeTab = 'projects'">
+            <a :class="{'is-active': activeTab === 'projects'}" @click="activeTab = 'projects'">
                 {{$t("projects")}} ({{filteredProjects.length}})
             </a>
-            <a :class="{'is-active': activeTab == 'images'}" @click="activeTab = 'images'">
+            <a :class="{'is-active': activeTab === 'images'}" @click="activeTab = 'images'">
                 {{$t("images")}} ({{filteredImages.length}})
             </a>
         </p>
         <div class="panel-block">
             <b-loading :is-full-page="false" :active="loading" />
 
-            <b-table v-show="activeTab == 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
+            <b-table v-show="activeTab === 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'projects'">
 
                 <template #default="props">
@@ -46,7 +46,7 @@
                 </template>
             </b-table>
 
-            <b-table v-show="activeTab == 'images'" :data="filteredImages" :paginated="true" :per-page="perPage"
+            <b-table v-show="activeTab === 'images'" :data="filteredImages" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'images'">
 
                 <template #default="props">
@@ -119,7 +119,7 @@ export default {
     },
     watch: {
         pathSearchString(val) {
-            if(val != null) {
+            if(val) {
                 this.searchString = val;
             }
         }

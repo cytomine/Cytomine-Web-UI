@@ -3,7 +3,7 @@
     <h1>{{$t("link-images")}}</h1>
 
     <p>{{$t("link-view-with")}}</p>
-    <p v-for="(map, idx) in maps" v-if="idx != index" :key="idx">
+    <p v-for="(map, idx) in maps" v-if="idx !== index" :key="idx">
         <label>
             <input type="checkbox"
                :checked="revisionCheckboxes && linkedIndexes.includes(idx)"
@@ -46,7 +46,7 @@ export default {
     methods: {
         handleCheckboxChange(indexLinked, checked) {
             if(checked) {
-                if(this.trackedUser != null) {
+                if(this.trackedUser) {
                     this.$dialog.confirm({
                         title: this.$t("possible-conflict"),
                         message: this.$t("confirm-untrack-to-link-view"),

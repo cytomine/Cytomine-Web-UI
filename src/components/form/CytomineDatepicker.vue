@@ -4,7 +4,7 @@
             :month-names="moment.months()" :day-names="moment.weekdaysMin()"
             :date-formatter="date => moment(date).format('ll')" size="is-small">
     <div v-if="resetButton" class="has-text-centered">
-        <button class="button is-small is-link" :disabled="value === null" @click="$emit('input', null)">
+        <button class="button is-small is-link" :disabled="!value" @click="$emit('input', null)">
             {{$t("button-reset")}}
         </button>
     </div>

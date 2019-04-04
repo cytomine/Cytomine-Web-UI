@@ -136,7 +136,7 @@ export default {
     methods: {
         insertSpecialCharacter(char) {
             let range = this.quill.getSelection(true);
-            if(range.length != 0) {
+            if(range.length > 0) {
                 this.quill.deleteText(range.index, range.length, "user");
             }
             this.quill.insertText(range.index, char, "user");

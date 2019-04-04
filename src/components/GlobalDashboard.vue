@@ -57,7 +57,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>{{nbImages ? nbImages : "?"}}</td>
+                                <td>{{nbImages != null ? nbImages : "?"}}</td>
                                 <td>{{$t("images")}}</td>
                                 <td>
                                     <v-popover>
@@ -165,8 +165,8 @@ export default {
 
             let array = [];
             this.recentProjectsId.forEach(id => {
-                let project = this.projects.array.find(project => project.id == id);
-                if(project != null) {
+                let project = this.projects.array.find(project => project.id === id);
+                if(project) {
                     array.push(project);
                 }
             });
@@ -175,7 +175,7 @@ export default {
         lastOpenedImage() {
             if(this.recentImages && this.recentImages.length > 0 && this.projects) {
                 let lastOpened = this.recentImages[0];
-                let project = this.projects.array.find(project => project.id == lastOpened.project);
+                let project = this.projects.array.find(project => project.id === lastOpened.project);
                 if(project) {
                     lastOpened.projectName = project.name;
                     lastOpened.blindMode = project.blindMode;

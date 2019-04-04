@@ -115,8 +115,8 @@ export default {
             let softwareProjects = (await promiseSoftwareProjects).array;
 
             softwares.forEach(software => {
-                software.softwareProject = softwareProjects.find(sp => sp.software == software.id);
-                software.selected = software.softwareProject != null;
+                software.softwareProject = softwareProjects.find(sp => sp.software === software.id);
+                software.selected = (software.softwareProject !== undefined);
             });
 
             this.softwares = softwares;

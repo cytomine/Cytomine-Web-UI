@@ -24,7 +24,7 @@ export default {
     methods: {
         async save() {
             try {
-                if(this.welcomeConfig.value.length === 0) {
+                if(!this.welcomeConfig.value) {
                     await this.welcomeConfig.delete();
                 }
                 else {

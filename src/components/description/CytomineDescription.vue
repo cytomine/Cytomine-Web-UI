@@ -45,12 +45,12 @@ export default {
             return !this.description.isNew();
         },
         previewDescription() {
-            if(this.description == null) {
+            if(!this.description) {
                 return null;
             }
 
             let posStop = this.description.data.indexOf(constants.STOP_PREVIEW_KEYWORD);
-            if(posStop != -1) {
+            if(posStop !== -1) {
                 return this.description.data.substring(0, posStop);
             }
             else if(this.description.data.length > 250) {

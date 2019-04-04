@@ -12,7 +12,7 @@
                     {{ layerName(layer) }}
                 </option>
             </b-select>
-            <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("button-add") }}</button>
+            <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t("button-add") }}</button>
         </b-field>
         <table class="table layers-table">
             <thead>
@@ -124,12 +124,12 @@ export default {
     },
     methods: {
         annotationEventHandler(annot) {
-            if(annot.image == this.image.id) {
+            if(annot.image === this.image.id) {
                 this.fetchIndexLayers();
             }
         },
         reloadAnnotationsHandler(idImage) {
-            if(idImage == null || idImage == this.image.id) {
+            if(!idImage || idImage === this.image.id) {
                 this.fetchIndexLayers();
             }
         },
@@ -141,7 +141,7 @@ export default {
 
             let name = fullName(layer);
 
-            let indexLayer = this.indexLayers.find(index => index.user == layer.id) || {};
+            let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
             return `${name} (${indexLayer.countAnnotation || 0})`;
         },
 
@@ -150,8 +150,8 @@ export default {
         },
 
         addLayerById(id, visible) {
-            let layer = this.layers.find(layer => layer.id == id);
-            if(layer != null) {
+            let layer = this.layers.find(layer => layer.id === id);
+            if(layer) {
                 this.addLayer(layer, visible);
             }
         },
@@ -162,7 +162,7 @@ export default {
             }
 
             layer.visible = visible;
-            layer.drawOn = (layer.id == this.currentUser.id && this.canDraw(layer));
+            layer.drawOn = (layer.id === this.currentUser.id && this.canDraw(layer));
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -195,7 +195,7 @@ export default {
 
         async fetchLayers() {
             this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
-            if(this.image.inReview || this.image.reviewer) {
+            if(this.image.inReview || this.image.reviewed) {
                 this.layers.push({
                     id: -1,
                     isReview: true
@@ -204,7 +204,7 @@ export default {
         },
 
         async fetchIndexLayers(force=false) {
-            if(!force && this.activePanel != "layers") {
+            if(!force && this.activePanel !== "layers") {
                 return;
             }
             this.indexLayers = await this.image.fetchAnnotationsIndex();
@@ -221,8 +221,8 @@ export default {
             return;
         }
 
-        if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-            this.addLayerById(this.currentUser.id);
+        if(!this.imageWrapper.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+            await this.addLayerById(this.currentUser.id);
 
             try {
                 let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
@@ -236,7 +236,7 @@ export default {
             }
         }
 
-        if(this.layersToPreload != null) {
+        if(this.layersToPreload) {
             this.layersToPreload.forEach(id => this.addLayerById(id));
         }
     },

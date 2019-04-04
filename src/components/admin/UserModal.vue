@@ -16,7 +16,7 @@
                 :message="getError(field) && displayErrors ? getError(field) : ''">
                     <b-input v-model="internalUser[field]"
                         :type="field === 'password' ? 'password': 'text'"
-                        :password-reveal="field == 'password'"
+                        :password-reveal="field === 'password'"
                     />
                 </b-field>
 
@@ -65,14 +65,14 @@ export default {
             return rolesMapping;
         },
         editionMode() {
-            return this.user != null;
+            return Boolean(this.user);
         },
         editableFields() {
             let fields = ["firstname", "lastname", "username", "email", "password"];
             return fields;
         },
         validForm() {
-            return this.editableFields.every(field => this.getError(field) == null);
+            return this.editableFields.every(field => !this.getError(field));
         },
         idRole() {
             return this.rolesWithIds.find(role => role.authority === this.selectedRole).id;
@@ -81,7 +81,7 @@ export default {
     watch: {
         active(val) {
             if(val) {
-                if(this.rolesWithIds == null) {
+                if(!this.rolesWithIds) {
                     this.$notify({type: "error", text: this.$t("notif-unexpected-error")});
                     this.$emit("update:active", false);
                     return;
@@ -95,19 +95,19 @@ export default {
     methods: {
         getError(field) {
             let value = this.internalUser[field];
-            if(field === "password" && this.editionMode && (value == null || value.length === 0)) {
+            if(field === "password" && this.editionMode && !value) {
                 return;
             }
 
-            if(value == null || value.length === 0) {
+            if(!value) {
                 return this.$t("field-cannot-be-empty");
             }
 
-            if(field == "password" && value.length < 4) {
+            if(field === "password" && value.length < 4) {
                 return this.$t("field-not-enough-characters", {minLength: 4});
             }
             
-            if(field == "email") {
+            if(field === "email") {
                 var regex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/; // source: https://gist.github.com/gregseth/5582254
                 if(!regex.test(String(value).toLowerCase())) {
                     return this.$t("field-invalid-email-address");
@@ -128,8 +128,9 @@ export default {
                     await this.internalUser.defineRole(this.idRole);
                     this.internalUser.role = this.selectedRole; // for correct rendering in list
                 }
-                if(this.editionMode && this.internalUser.password != null && this.internalUser.password.length > 0) {
+                if(this.editionMode && this.internalUser.password) {
                     await this.internalUser.savePassword(this.internalUser.password);
+                    this.internalUser.password = ""; // reinitialize password so that if modal reopened, field empty
                 }
                 this.$notify({type: "success", text: this.$t("notif-success-user-" + labelTranslation)});
                 this.$emit("update:active", false);

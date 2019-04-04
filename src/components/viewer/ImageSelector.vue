@@ -76,7 +76,7 @@ export default {
         filteredImages() { // TODO: in backend
             let filtered = this.images;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered =  filtered.filter(image => {
                     return image.instanceFilename.toLowerCase().indexOf(str) >= 0;

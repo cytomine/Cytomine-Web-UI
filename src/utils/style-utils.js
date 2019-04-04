@@ -6,7 +6,7 @@ import {asArray as hexToRgb} from "ol/color";
 
 export function isCluster(feature) {
     let annot = feature.get("annot");
-    if(annot == null) {
+    if(!annot) {
         return;
     }
     return annot.count != null;

@@ -291,7 +291,7 @@ export default {
         filteredImages() {
             let filtered = this.images;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(image => {
                     return image.instanceFilename.toLowerCase().indexOf(str) >= 0 ||
@@ -373,7 +373,7 @@ export default {
         },
 
         async deleteImage(idDeleted) {
-            this.images = this.images.filter(image => image.id != idDeleted);
+            this.images = this.images.filter(image => image.id !== idDeleted);
         },
 
         addImage(image) {
@@ -384,8 +384,8 @@ export default {
             let addVendor = !this.availableVendors.includes(image.vendorFormatted);
             let addMagnification = !this.availableMagnifications.includes(image.magnificationFormatted);
             let addResolution = !this.availableResolutions.includes(image.resolutionFormatted);
-            let updateMaxWidth = this.boundsWidth[1] == this.maxWidth && image.width > this.maxWidth;
-            let updateMaxHeight = this.boundsHeight[1] == this.maxHeight && image.height > this.maxHeight;
+            let updateMaxWidth = this.boundsWidth[1] === this.maxWidth && image.width > this.maxWidth;
+            let updateMaxHeight = this.boundsHeight[1] === this.maxHeight && image.height > this.maxHeight;
             // ---
 
             this.images.unshift(image);
@@ -444,7 +444,7 @@ export default {
         },
 
         formatResolution(resolution) {
-            return (resolution != null) ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
+            return resolution ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
         },
 
         formatVendor(vendor) {

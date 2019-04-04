@@ -47,7 +47,7 @@ export default {
             return this.$store.state.project.project.blindMode;
         },
         errorMessage() {
-            if(this.displayErrors && this.newMagnification != "" && (isNaN(this.newMagnification) || +this.newMagnification <= 0)) {
+            if(this.displayErrors && this.newMagnification && (isNaN(this.newMagnification) || +this.newMagnification <= 0)) {
                 return this.$t("must-be-positive-number");
             }
         },
@@ -63,7 +63,7 @@ export default {
             }
         },
         newMagnification() {
-            if(this.newMagnification != this.image.magnification) {
+            if(this.newMagnification !== this.image.magnification) {
                 this.displayErrors = true;
             }
         }

@@ -110,8 +110,8 @@ export default {
             let filtersProject = (await promiseFiltersProjects).array;
 
             filters.forEach(filter => {
-                filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter == filter.id);
-                filter.selected = filter.imageFilterProject != null;
+                filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter === filter.id);
+                filter.selected = (filter.imageFilterProject !== undefined);
             });
 
             this.imageFilters = filters;

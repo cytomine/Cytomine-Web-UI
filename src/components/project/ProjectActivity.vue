@@ -97,7 +97,7 @@ export default {
             this.changeTab();
         },
         activeTab() {
-            if(this.activeTab != defaultTab || this.queriedTab != null) {
+            if(this.activeTab !== defaultTab || this.queriedTab) {
                 this.$router.push(`?tab=${this.activeTab}`);
             }
         }
@@ -105,7 +105,7 @@ export default {
     methods: {
         changeTab() {
             this.activeTab = this.queriedTab || defaultTab;
-            if(this.activeComponent == null) {
+            if(!this.activeComponent) {
                 this.activeTab = defaultTab;
             }
         }

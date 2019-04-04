@@ -1,11 +1,11 @@
 <template>
     <div class="scale-line" :class="{'interpolation': interpolation}">
-        <template v-if="resolution != null">
+        <template v-if="resolution">
             <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}">
                 {{scaleLength}}
             </div>
             <div class="scale-line-bottom">
-                <span v-show="magnification != 0">
+                <span v-show="magnification">
                     {{$t("magnification")}}: {{magnification}}X
                 </span>
             </div>
@@ -13,7 +13,7 @@
 
         <div v-else-if="interpolation" class="interpolation-warning">{{$t("digital-zoom")}}</div>
 
-        <div class="scale-line-position" v-if="mousePosition != null">
+        <div class="scale-line-position" v-if="mousePosition">
             <div style="float: left;">x: {{Math.round(mousePosition[0])}}</div>
             <div style="float: right;">y: {{Math.round(mousePosition[1])}}</div>
         </div>
@@ -39,12 +39,12 @@ export default {
             return Math.round(magnification * 100) / 100;
         },
         resolution() {
-            if(this.image.resolution != null) {
+            if(this.image.resolution) {
                 return Math.pow(2, this.image.depth - this.zoom) * this.image.resolution;
             }
         },
         scaleLength() {
-            if (this.resolution != null && this.resolution != 0) {
+            if (this.resolution) {
                 let length = this.scaleLineLength * this.resolution;
                 let unit = this.$t("um");
                 if (length > 1000) {

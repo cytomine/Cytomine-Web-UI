@@ -1,7 +1,7 @@
 <template>
 <div>
     <vl-interaction-modify
-        v-if="activeEditTool == 'modify'"
+        v-if="activeEditTool === 'modify'"
         ref="olModifyInteraction"
         :source="`select-target-${idViewer}-${index}`"
         @modifystart="startEdit"
@@ -9,14 +9,14 @@
     />
 
     <vl-interaction-translate
-        v-if="activeEditTool == 'translate'"
+        v-if="activeEditTool === 'translate'"
         :source="`select-target-${idViewer}-${index}`"
         @translatestart="startEdit"
         @translateend="endEdit"
     />
 
     <vl-interaction-rotate
-        v-if="activeEditTool == 'rotate'"
+        v-if="activeEditTool === 'rotate'"
         :source="`select-target-${idViewer}-${index}`"
         @rotatestart="startEdit"
         @rotateend="endEdit"
@@ -64,12 +64,12 @@ export default {
         },
         async endEdit({features}) {
             features.forEach(async feature => {
-                let annot = feature.get("annot").clone();
-                if(annot == null) {
+                if(!feature.get("annot")) {
                     return;
                 }
 
-                let oldAnnot = annot.clone();
+                let annot = feature.get("annot").clone();
+                let oldLocation = annot.location;
                 try {
                     annot.location = this.format.writeFeature(feature);
                     annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
@@ -85,7 +85,7 @@ export default {
                 catch(err) {
                     console.log(err);
                     this.$notify({type: "error", text: this.$t("notif-error-annotation-update")});
-                    annot.location = oldAnnot.location;
+                    annot.location = oldLocation;
                     feature.setGeometry(this.format.readGeometry(annot.location));
                 }
             });

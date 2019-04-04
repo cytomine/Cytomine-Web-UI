@@ -92,7 +92,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="selectedAnnotationType == userAnnotationOption" class="column filter">
+                    <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter">
                         <div class="filter-label">
                             {{$t("members")}}
                         </div>
@@ -174,8 +174,8 @@
             :allImages="images"
 
             :term="term"
-            :multipleTerms="term == multipleTermsOption"
-            :noTerm="term == noTermOption"
+            :multipleTerms="term === multipleTermsOption"
+            :noTerm="term === noTermOption"
             :imagesIds="selectedImagesIds"
             :usersIds="selectedUsersIds"
             :reviewed="reviewed"
@@ -266,13 +266,13 @@ export default {
             return this.selectedImages.map(img => img.id);
         },
         reviewed() {
-            return this.selectedAnnotationType == this.reviewedAnnotationOption;
+            return this.selectedAnnotationType === this.reviewedAnnotationOption;
         },
         selectedUsersIds() {
             if(this.reviewed) {
                 return null;
             }
-            let users = (this.selectedAnnotationType == this.jobAnnotationOption) ? this.selectedUserJobs 
+            let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.selectedUserJobs 
                 : this.selectedMembers;
             return users.map(user => user.id);
         },
@@ -343,7 +343,7 @@ export default {
         },
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
+            this.userJobs = this.userJobs.filter(uj => uj.id); // HACK because some returned jobs are empty objects
             this.userJobs.forEach(userJob => {
                 userJob.fullName = fullName(userJob);
             });
@@ -360,8 +360,8 @@ export default {
     },
     async created() {
         this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
-        this.selectedAnnotationType = (this.$route.query.type == "algo") ? this.jobAnnotationOption
-            : (this.$route.query.type == "reviewed") ? this.reviewedAnnotationOption : this.userAnnotationOption;
+        this.selectedAnnotationType = (this.$route.query.type === "algo") ? this.jobAnnotationOption
+            : (this.$route.query.type === "reviewed") ? this.reviewedAnnotationOption : this.userAnnotationOption;
 
         this.allowedSizes = [
             {label: this.$t("small"), size: 85},
@@ -389,16 +389,16 @@ export default {
             return;
         }
 
-        if(this.$route.query.image != null) {
-            let queriedImage = this.images.find(image => image.id == this.$route.query.image);
-            if(queriedImage != null) {
+        if(this.$route.query.image) {
+            let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
+            if(queriedImage) {
                 this.selectedImages = [queriedImage];
             }
         }
 
-        if(this.$route.query.userJob != null) {
-            let queriedUserJob = this.userJobs.find(uj => uj.id == this.$route.query.userJob);
-            if(queriedUserJob != null) {
+        if(this.$route.query.userJob) {
+            let queriedUserJob = this.userJobs.find(uj => uj.id === Number(this.$route.query.userJob));
+            if(queriedUserJob) {
                 this.selectedAnnotationType = this.jobAnnotationOption;
                 this.selectedUserJobs = [queriedUserJob];
             }

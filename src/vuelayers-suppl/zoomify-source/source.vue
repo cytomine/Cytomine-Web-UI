@@ -73,7 +73,7 @@ function created() { // source: https://github.com/openlayers/openlayers/blob/v5
 
 const methods = {
     createSource() {
-        if(this.url == null && this.urls == null) {
+        if(!this.url && !this.urls) {
             throw new Error("Either url or urls properties must be set for ZoomifySource");
         }
 

@@ -83,7 +83,7 @@ export default {
     },
     computed: {
         allTerms() {
-            if(this.ontology == null) {
+            if(!this.ontology) {
                 return [];
             }
             let terms = this.additionalNodes.map(node => node);
@@ -91,11 +91,11 @@ export default {
             return terms;
         },
         allSelected() {
-            return this.allTerms.length == this.selectedNodes.length;
+            return this.allTerms.length === this.selectedNodes.length;
         },
         displayedSelectedTerms() {
             let ids = this.selectedNodes.slice(0, this.maxNbDisplayed);
-            return ids.map(id => this.allTerms.find(term => term.id == id));
+            return ids.map(id => this.allTerms.find(term => term.id === id));
         },
         countNotDisplayed() {
             return this.selectedNodes.length - this.maxNbDisplayed;

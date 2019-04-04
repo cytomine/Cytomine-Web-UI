@@ -12,7 +12,7 @@
                 {{connection.browser}} <span v-if="connection.browserVersion">{{connection.browserVersion}}</span>
             </td>
         </tr>
-        <tr v-if="consultations != null">
+        <tr v-if="consultations">
             <td>{{$t("image-consultations")}}</td>
             <td>
                 <div v-if="consultations.length > 0" class="columns is-multiline">

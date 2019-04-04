@@ -68,6 +68,9 @@ export default {
         };
     },
     computed: {
+        projectMembers() {
+            return this.$store.state.project.members;
+        },
         projectManagers() {
             return this.$store.state.project.managers;
         },
@@ -90,7 +93,7 @@ export default {
             return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
         },
         linkedIndexTracking() { // true if current view is linked with another view with tracking enabled
-            return this.linkedIndexes.any(idx => idx != this.index && this.maps[idx].trackedUser != null);
+            return this.linkedIndexes.some(idx => idx !== this.index && this.maps[idx].trackedUser);
         },
         imageWrapper() {
             return this.viewerWrapper.maps[this.index];
@@ -129,16 +132,15 @@ export default {
             return this.projectContributors.filter(({id}) => this.onlineUsers.includes(id));
         },
         trackedUserFullName() {
-            let allUsers = this.projectManagers.concat(this.projectContributors);
-            let trackedUser = allUsers.find(user => user.id == this.trackedUser);
-            if(trackedUser != null) {
-                return fullName(trackedUser);
+            let trackedUser = this.projectMembers.find(user => user.id === this.trackedUser);
+            if(trackedUser) {
+                return trackedUser.fullName;
             }
         }
     },
     watch: {
         activePanel(panel) {
-            if(panel == "follow") {
+            if(panel === "follow") {
                 this.fetchOnline();
             }
         },
@@ -168,7 +170,7 @@ export default {
 
         trackedUserModel(value) {
             // if map is linked to another map on which tracking is already enabled, possible conflict
-            if(value && this.linkedIndexes.some(idx => idx != this.index && this.maps[idx].trackedUser != null)) {
+            if(value && this.linkedIndexTracking) {
                 this.$dialog.confirm({
                     title: this.$t("possible-conflict"),
                     message: this.$t("confirm-unlink-view-to-track"),
@@ -189,14 +191,14 @@ export default {
         trackedUser(id) {
             this.trackedUserModel = id;
 
-            if(id != null) {
+            if(id) {
                 this.track();
                 this.fetchOnline();
             }
         },
 
         onlineUsers(onlines) {
-            if(this.trackedUser != null && !onlines.includes(this.trackedUser)) {
+            if(this.trackedUser && !onlines.includes(this.trackedUser)) {
                 this.$notify({
                     type: "info",
                     text: this.$t("end-tracking-user-no-longer-broadcasting", {
@@ -211,13 +213,13 @@ export default {
     },
     methods: {
         async track() {
-            if(this.trackedUser == null) {
+            if(!this.trackedUser) {
                 return;
             }
 
             try {
                 let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
-                if(pos.id == null || !pos.broadcast) {
+                if(!pos.id || !pos.broadcast) {
                     return;
                 }
 
@@ -238,12 +240,12 @@ export default {
         },
 
         async fetchOnline() {
-            if(this.trackedUser == null && this.activePanel != "follow") {
+            if(!this.trackedUser && this.activePanel !== "follow") { // if panel not opened and no tracking ongoing, no need to refresh the data
                 return;
             }
 
             let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting users
-            this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
+            this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
 
             clearTimeout(this.timeoutOnlineUsers);
             this.timeoutOnlineUsers = setTimeout(this.fetchOnline, constants.BROADCASTING_USERS_REFRESH_INTERVAL);

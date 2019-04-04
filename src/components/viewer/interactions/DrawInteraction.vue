@@ -59,7 +59,7 @@ export default {
         },
         selectedFeature() {
             let selectedFeatures = this.imageWrapper.selectedFeatures;
-            if(selectedFeatures && selectedFeatures.length == 1) {
+            if(selectedFeatures && selectedFeatures.length === 1) {
                 return selectedFeatures[0];
             }
         },
@@ -80,13 +80,13 @@ export default {
             }
         },
         drawCorrection() {
-            return this.activeTool == "select";
+            return this.activeTool === "select";
         },
         drawFreehand() {
-            return this.activeTool == "freehand-polygon" || this.activeTool == "freehand-line" || this.drawCorrection;
+            return this.activeTool === "freehand-polygon" || this.activeTool === "freehand-line" || this.drawCorrection;
         },
         drawGeometryFunction() {
-            if(this.activeTool == "rectangle") {
+            if(this.activeTool === "rectangle") {
                 return (coordinates, geometry) => {
                     let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
 
@@ -172,7 +172,7 @@ export default {
                     // ----
 
                     this.$eventBus.$emit("addAnnotation", annot);
-                    if(idx == this.nbActiveLayers - 1) {
+                    if(idx === this.nbActiveLayers - 1) {
                         this.$eventBus.$emit("selectAnnotation", {idViewer: this.idViewer, index: this.index, annot});
                     }
 
@@ -195,7 +195,7 @@ export default {
                 return;
             }
 
-            let remove = (this.activeEditTool == "correct-remove");
+            let remove = (this.activeEditTool === "correct-remove");
             let review = false; // TODO: handle
             let location = this.getWktLocation(feature);
             try {
@@ -205,7 +205,7 @@ export default {
                     remove,
                     annotation: this.selectedFeature.id
                 });
-                if(correctedAnnot != null) {
+                if(correctedAnnot) {
                     correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
                     this.$store.commit("addAction", {
                         idViewer: this.idViewer,
@@ -225,7 +225,7 @@ export default {
         getWktLocation(feature) {
             // transform circle to circular polygon
             let geometry = feature.getGeometry();
-            if (geometry.getType() == "Circle") {
+            if (geometry.getType() === "Circle") {
                 feature.setGeometry(polygonFromCircle(geometry));
             }
             return this.format.writeFeature(feature);

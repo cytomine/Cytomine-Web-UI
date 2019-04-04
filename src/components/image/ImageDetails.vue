@@ -223,7 +223,7 @@ export default {
             return this.$store.getters.canEditImage(this.image);
         },
         emptyNewName() {
-            return this.newName.length == 0;
+            return !this.newName;
         },
         imageNameNotif() {
             return this.blindMode ? this.image.blindedName : this.image.instanceFilename;

@@ -68,7 +68,7 @@
                     </b-field>
 
                     <b-field :label="$t('password-confirm')" horizontal>
-                        <b-input type="password" v-model="confirmPassword" :disabled="newPassword === ''" />
+                        <b-input type="password" v-model="confirmPassword" :disabled="!newPassword" />
                     </b-field>
 
                     <b-field grouped position="is-right">
@@ -137,10 +137,10 @@ export default {
             return rolesMapping[key];
         },
         savePasswordDisabled() {
-            return !(this.newPassword == this.confirmPassword && this.newPassword != "");
+            return !this.newPassword || this.newPassword !== this.confirmPassword;
         },
         typeCurrentPassword() {
-            if(this.currentPassword.length === 0) {
+            if(!this.currentPassword) {
                 return;
             }
             return this.correctPassword ? "is-success" : "is-danger";
@@ -165,7 +165,7 @@ export default {
         },
 
         async savePassword() {
-            if(this.newPassword != this.confirmPassword) {
+            if(this.newPassword !== this.confirmPassword) {
                 this.$notify({type: "error", text: "The provided passwords are not identical"});
                 return;
             }

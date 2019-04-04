@@ -50,7 +50,7 @@
                             <tr v-for="(wrapper, idx) in dropFiles" :key="idx">
                                 <td>{{wrapper.file.name}}</td>
                                 <td>{{filesize(wrapper.file.size)}}</td>
-                                <template v-if="wrapper.uploadedFile == null">
+                                <template v-if="wrapper.uploadedFile === null">
                                     <td>
                                         <progress class="progress is-info" :value="wrapper.progress" max="100">
                                             {{wrapper.progress}}%
@@ -106,7 +106,7 @@
                         <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">
                             {{$t("start-upload")}}
                         </button>
-                        <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload">
+                        <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
                             {{$t("cancel-upload")}}
                         </button>
                     </div>
@@ -244,7 +244,7 @@ export default {
             return this.dropFiles.some(wrapper => wrapper.uploading);
         },
         filesPendingUpload() {
-            return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadResult == null);
+            return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile === null);
         },
         overallProgress() {
             let nbUploads = 0;
@@ -274,7 +274,7 @@ export default {
             return this.dropFiles.map(wrapper => wrapper.file);
         },
         filteredUploadedFiles() {
-            if(this.searchString == "") {
+            if(!this.searchString) {
                 return this.uploadedFiles;
             }
 
@@ -302,7 +302,7 @@ export default {
         async fetchStorages() {
             try {
                 this.storages = (await StorageCollection.fetchAll()).array;
-                this.selectedStorage = this.storages.find(storage => storage.user == this.currentUser.id);
+                this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
             }
             catch(error) {
                 console.log(error);
@@ -354,7 +354,7 @@ export default {
 
                         await wrapper.uploadedFile.fetch();
                         let status = wrapper.uploadedFile.status;
-                        if(status != oldStatus) {
+                        if(status !== oldStatus) {
                             statusChange = true;
                         }
                         if(pendingStatus.includes(status)) {
@@ -397,7 +397,7 @@ export default {
         },
 
         startUpload(fileWrapper) {
-            if(fileWrapper.uploading || fileWrapper.uploadedFile != null) {
+            if(fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
                 return;
             }
 
@@ -445,7 +445,7 @@ export default {
             let nbFiles = this.dropFiles.length;
             let idx = 0;
             for(let i = 0; i < nbFiles; i++) {
-                if(this.dropFiles[idx].uploadedFile != null) {
+                if(this.dropFiles[idx].uploadedFile !== null) {
                     idx++;
                 }
                 else {

@@ -8,7 +8,7 @@
             <section class="modal-card-body">
                 <b-loading :is-full-page="false" :active="loading" class="small" />
                 <template v-if="!loading">
-                    <b-message v-if="images == null" type="is-danger" has-icon icon-size="is-small">
+                    <b-message v-if="!images" type="is-danger" has-icon icon-size="is-small">
                         <h2> {{ $t("error") }} </h2>
                         <p> {{ $t("unexpected-error-info-message") }} </p>
                     </b-message>
@@ -97,7 +97,7 @@ export default {
         filteredImages() {
             let filtered = this.images;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(image => {
                     return image.originalFilename.toLowerCase().indexOf(str) >= 0;

@@ -5,13 +5,12 @@
     @mouseout="opened = false;"
 >
     <a class="navbar-link" :class="{'is-active': isActive}">
-        <i v-if="icon != null" :class="[iconPack, icon]"></i>
+        <i v-if="icon" :class="[iconPack, icon]"></i>
         {{title}}
         <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
     </a>
     <div class="navbar-dropdown" :class="classes" @click="opened = false;">
-        <slot>
-        </slot>
+        <slot></slot>
     </div>
 </div>
 </template>

@@ -2,7 +2,7 @@
 <div>
     <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
-        <b-message v-if="users == null" type="is-danger" has-icon icon-size="is-small">
+        <b-message v-if="!users" type="is-danger" has-icon icon-size="is-small">
             <h2> {{ $t("error") }} </h2>
             <p> {{ $t("unexpected-error-info-message") }} </p>
         </b-message>
@@ -115,7 +115,7 @@ export default {
             return rolesMapping;
         },
         filteredUsers() {
-            if(this.searchString === "") {
+            if(!this.searchString) {
                 return this.users;
             }
 

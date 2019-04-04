@@ -80,13 +80,13 @@ export default {
             this.findIdViewer();
         },
         idViewer(_, old) {
-            if(old != null) {
+            if(old) {
                 this.loading = true;
                 this.loadViewer();
             }
         },
         viewer() {
-            if(this.viewer == null) {
+            if(!this.viewer) {
                 console.log("Viewer closed from external source");
                 this.$router.push(`/project/${this.$route.params.idProject}`);
             }
@@ -97,13 +97,14 @@ export default {
     },
     methods: {
         findIdViewer() {
-            if(this.paramIdViewer != null) {
+            if(this.paramIdViewer) {
                 this.idViewer = this.paramIdViewer;
                 return;
             }
 
             for(let id in this.viewers) {
-                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") == this.$route.params.idImages) {
+                // if viewer containing the targetted images, and only them, store its id
+                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") === this.$route.params.idImages) {
                     this.idViewer = id;
                     return;
                 }
@@ -113,7 +114,7 @@ export default {
         },
 
         closeMap(index) {
-            if(this.nbMaps == 1) {
+            if(this.nbMaps === 1) {
                 this.$store.commit("removeViewer", this.idViewer);
                 this.$router.push(`/project/${this.$route.params.idProject}`);
             }
@@ -124,7 +125,7 @@ export default {
 
         async loadViewer() {
             try {
-                if(this.viewer == null) {
+                if(!this.viewer) {
                     await this.$store.dispatch("addViewer", {
                         idViewer: this.idViewer,
                         idImages: this.idImages

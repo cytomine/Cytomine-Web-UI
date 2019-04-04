@@ -88,7 +88,7 @@ export default {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index].imageInstance;
         },
         resolution() {
-            if(this.image.resolution != null) {
+            if(this.image.resolution) {
                 return this.image.resolution.toFixed(3);
             }
             else {
@@ -111,7 +111,7 @@ export default {
         async previousImage() {
             try {
                 let prev = await this.image.fetchPrevious();
-                if(prev.id == null) {
+                if(!prev.id) {
                     this.$notify({type: "error", text: this.$t("notif-error-first-image")});
                     this.isFirstImage = true;
                 }
@@ -131,7 +131,7 @@ export default {
         async nextImage() {
             try {
                 let next = await this.image.fetchNext();
-                if(next.id == null) {
+                if(!next.id) {
                     this.$notify({type: "error", text: this.$t("notif-error-last-image")});
                     this.isLastImage = true;
                 }

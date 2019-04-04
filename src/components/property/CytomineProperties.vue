@@ -23,7 +23,7 @@
             <button v-if="canEdit" class="button is-small add-prop" @click="addNewProp()" key="showForm">
                 {{$t("button-add")}}
             </button>
-            <em v-else-if="properties.length == 0">{{$t("no-properties")}}</em>
+            <em v-else-if="properties.length === 0">{{$t("no-properties")}}</em>
         </b-field>
 
         <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">

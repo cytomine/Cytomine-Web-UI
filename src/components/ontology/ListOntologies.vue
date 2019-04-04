@@ -21,9 +21,9 @@
                 </div>
                 <div class="panel-main-content">
                     <a v-for="ontology in filteredOntologies" :key="ontology.id" @click="selectOntology(ontology)"
-                    class="panel-block" :class="{'is-active': selectedOntology.id == ontology.id}">
+                    class="panel-block" :class="{'is-active': selectedOntology.id === ontology.id}">
                         <span class="panel-icon">
-                            <i v-if="selectedOntology.id == ontology.id" class="fas fa-caret-right" aria-hidden="true"></i>
+                            <i v-if="selectedOntology.id === ontology.id" class="fas fa-caret-right" aria-hidden="true"></i>
                         </span>
                         {{ontology.name}}
                     </a>
@@ -73,7 +73,7 @@ export default {
     },
     computed: {
         idTargetOntology() {
-            return this.$route.params.idOntology;
+            return Number(this.$route.params.idOntology);
         },
         filteredOntologies() {
             if(this.searchString.length > 0) {
@@ -85,11 +85,11 @@ export default {
     },
     watch: {
         idTargetOntology() {
-            if(this.idTargetOntology == null) {
+            if(!this.idTargetOntology) {
                 this.selectedOntology = this.ontologies[0];
                 return;
             }
-            if(this.selectedOntology != null && this.selectedOntology.id === this.idTargetOntology) {
+            if(this.selectedOntology && this.selectedOntology.id === this.idTargetOntology) {
                 return;
             }
             this.selectTargetOntology();
@@ -101,8 +101,8 @@ export default {
             this.$router.push(`/ontology/${this.selectedOntology.id}`);
         },
         selectTargetOntology() {
-            this.selectedOntology = this.ontologies.find(ontology => ontology.id == this.idTargetOntology);
-            if(this.selectedOntology == null) {
+            this.selectedOntology = this.ontologies.find(ontology => ontology.id === this.idTargetOntology);
+            if(!this.selectedOntology) {
                 this.error = true;
             }
         },
@@ -119,7 +119,7 @@ export default {
             this.sortOntologies();
         },
         async deleteOntology() {
-            let index = this.ontologies.findIndex(ontology => ontology.id == this.selectedOntology.id);
+            let index = this.ontologies.findIndex(ontology => ontology.id === this.selectedOntology.id);
             try {
                 await this.selectedOntology.delete();
                 this.ontologies.splice(index, 1);

@@ -22,7 +22,7 @@
                         <router-link :to="`/project/${project.id}`">{{project.name}}</router-link>
                         <span v-if="index < nbProjects - 1">, </span>
                     </span>
-                    <em class="has-text-grey" v-if="nbProjects == 0">
+                    <em class="has-text-grey" v-if="nbProjects === 0">
                         {{$t("not-used-in-any-project")}}
                     </em>
                 </td>
@@ -41,7 +41,7 @@
                             {{$t("button-rename")}}
                         </button>
                         <button class="button is-danger" @click="confirmDeletion()" :disabled="nbProjects > 0" 
-                             :title="nbProjects > 0 ? $t('cannot-delete-ontology-with-projects') : ''">
+                             :title="nbProjects ? $t('cannot-delete-ontology-with-projects') : ''">
                             {{$t("button-delete")}}
                         </button>
                     </div>
@@ -105,7 +105,7 @@ export default {
             return this.fullOntology.projects.length;
         },
         emptyNewName() {
-            return this.newName.length == 0;
+            return !this.newName;
         }
     },
     watch: {

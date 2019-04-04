@@ -95,7 +95,7 @@ export default {
             return this.imageWrapper.selectedFeatures;
         },
         selectedFeature() {
-            if(this.selectedFeatures && this.selectedFeatures.length == 1) {
+            if(this.selectedFeatures && this.selectedFeatures.length === 1) {
                 return this.selectedFeatures[0];
             }
         },
@@ -113,10 +113,10 @@ export default {
     },
     watch: {
         selectedFeature() {
-            if(this.selectedFeature != null) {
+            if(this.selectedFeature) {
                 this.displayAnnotDetails = true;
                 let targetAnnot = this.imageWrapper.showComments;
-                this.showComments = targetAnnot == this.annot.id;
+                this.showComments = (targetAnnot === this.annot.id);
                 if(targetAnnot !== null) {
                     this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot: null});
                 }

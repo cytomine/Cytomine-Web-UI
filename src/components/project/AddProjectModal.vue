@@ -32,15 +32,15 @@
                     </label>
                 </div>
 
-                <b-collapse class="panel" :open="ontology == 'EXISTING'">
-                <b-field :type="!validOntology && displayErrors ? 'is-danger' : null"
-                         :message="!validOntology && displayErrors ? $t('ontology-must-be-selected') : ''">
-                    <b-select size="is-small" v-model="selectedOntology" :placeholder="$t('select-ontology')">
-                        <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
-                            {{ontology.name}}
-                        </option>
-                    </b-select>
-                </b-field>
+                <b-collapse class="panel" :open="ontology === 'EXISTING'">
+                    <b-field :type="!validOntology && displayErrors ? 'is-danger' : null"
+                            :message="!validOntology && displayErrors ? $t('ontology-must-be-selected') : ''">
+                        <b-select size="is-small" v-model="selectedOntology" :placeholder="$t('select-ontology')">
+                            <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
+                                {{ontology.name}}
+                            </option>
+                        </b-select>
+                    </b-field>
                 </b-collapse>
             </section>
             <footer class="modal-card-foot">
@@ -78,7 +78,7 @@ export default {
             return this.name.length > 0;
         },
         validOntology() {
-            return this.ontology !== "EXISTING" || this.selectedOntology != null;
+            return this.ontology !== "EXISTING" || this.selectedOntology;
         }
     },
     watch: {

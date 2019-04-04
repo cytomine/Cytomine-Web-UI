@@ -66,7 +66,7 @@ export default {
             }
             catch(error) {
                 console.log(error);
-                if(error.response.status == 403) {
+                if(error.response.status === 403) {
                     this.permissionError = true;
                 }
                 else {

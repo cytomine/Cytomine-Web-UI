@@ -78,18 +78,18 @@ export default {
 
         linkMaps(state, {idViewer, indexes}) {
             let links = state.viewers[idViewer].links;
-            let groups = indexes.map(index => links.findIndex(group => group.includes(index)));
+            let groups = indexes.map(index => links.findIndex(group => group.includes(index))); // find to which link group (if any) each map belongs
 
-            if(groups[0] != -1) {
-                if(groups[1] == -1) {
+            if(groups[0] !== -1) { // if first map belongs to a link group
+                if(groups[1] === -1) {
                     links[groups[0]].push(indexes[1]);
                 }
-                else if(groups[0] != groups[1]) { // merge the groups
+                else if(groups[0] !== groups[1]) { // merge the groups
                     links[groups[0]].push(...links[groups[1]]);
                     links.splice(groups[1], 1);
                 }
             }
-            else if(groups[1] != -1) {
+            else if(groups[1] !== -1) { // if second map belongs to a link group
                 links[groups[1]].push(indexes[0]);
             }
             else { // create new group linking the maps
@@ -102,9 +102,9 @@ export default {
             for(let i = links.length - 1; i >= 0; i--) {
                 let group = links[i];
                 for(let j = group.length - 1; j >= 0; j--) {
-                    if(group[j] == index) {
+                    if(group[j] === index) { // found the group of the map to unlink
                         group.splice(j, 1);
-                        if(group.length == 1) { // if group no longer contains several maps, delete it
+                        if(group.length === 1) { // if group no longer contains several maps, delete it
                             links.splice(i, 1);
                             break;
                         }
@@ -262,7 +262,7 @@ export default {
                     let feature = selectedFeatures[index];
                     let annot = feature.properties.annot;
 
-                    if(annot.term.length == 0) {
+                    if(annot.term.length === 0) {
                         selectedFeatures.splice(index, 1);
                     }
                 }
@@ -296,7 +296,7 @@ export default {
 
         addLayer(state, {idViewer, index, layer, propValues}) {
             let wrapper = state.viewers[idViewer].maps[index];
-            if(wrapper.selectedLayers == null) {
+            if(!wrapper.selectedLayers) {
                 wrapper.selectedLayers = [];
             }
 
@@ -375,7 +375,7 @@ export default {
             for(let index = selectedFeatures.length - 1; index >= 0; index--) {
                 let feature = selectedFeatures[index];
                 let annot = feature.properties.annot;
-                if(annot.user == idLayer) {
+                if(annot.user === idLayer) {
                     selectedFeatures.splice(index, 1);
                     if(cache) {
                         wrapper.annotsToSelect.push(annot);
@@ -384,7 +384,7 @@ export default {
             }
 
             if(!cache) {
-                wrapper.annotsToSelect = wrapper.annotsToSelect.filter(annot => annot.user != idLayer);
+                wrapper.annotsToSelect = wrapper.annotsToSelect.filter(annot => annot.user !== idLayer);
             }
         },
 
@@ -413,8 +413,9 @@ export default {
         // ----- Calibration
 
         setResolution(state, {idViewer, idImage, resolution}) {
+            // change the resolution for all instances of the affected image in the viewer
             state.viewers[idViewer].maps.forEach(({imageInstance}) => {
-                if(imageInstance.id == idImage) {
+                if(imageInstance.id === idImage) {
                     imageInstance.resolution = resolution;
                 }
             });
@@ -591,7 +592,8 @@ export default {
         },
 
         activateTool({state, commit}, {idViewer, index, tool}) {
-            if(state.viewers[idViewer].maps[index].activeTool == "select" && tool != "select") {
+            let previousTool = state.viewers[idViewer].maps[index].activeTool;
+            if(previousTool === "select" && tool !== "select") {
                 commit("clearSelectedFeatures", {idViewer, index});
                 commit("activateEditTool", {idViewer, index, tool: null});
             }
@@ -607,7 +609,7 @@ export default {
             let wrapper = state.viewers[idViewer].maps[index];
             let idImage = wrapper.imageInstance.id;
             let properties = {};
-            if(value != null && wrapper.selectedLayers) {
+            if(value && wrapper.selectedLayers) {
                 for(let layer of wrapper.selectedLayers) {
                     let layerValues = await fetchLayerPropertiesValues(layer.id, idImage, value);
                     properties = {...properties, ...layerValues};
@@ -623,7 +625,7 @@ export default {
             let idImage = wrapper.imageInstance.id;
             let key = wrapper.selectedPropertyKey;
             let propValues = {};
-            if(key != null) {
+            if(key) {
                 propValues = await fetchLayerPropertiesValues(layer.id, idImage, key);
             }
             commit("addLayer", {idViewer, index, layer, propValues});
@@ -644,7 +646,7 @@ export default {
     getters: {
         genStyleFunction: state => (idViewer, index) => (feature) => {
             let annot = feature.get("annot");
-            if(annot == null) {
+            if(!annot) {
                 return;
             }
 
@@ -664,8 +666,8 @@ export default {
             let nbTerms = annot.term.length;
             let terms = imageWrapper.terms;
 
-            if(terms && nbTerms == 1) {
-                let wrappedTerm = terms.find(term => term.id == annot.term[0]);
+            if(terms && nbTerms === 1) {
+                let wrappedTerm = terms.find(term => term.id === annot.term[0]);
                 if(wrappedTerm) {
                     if(!wrappedTerm.visible) {
                         return; // do not display annot
@@ -697,7 +699,7 @@ export default {
                 styles.push(...isReviewed ? reviewedSelectStyles : selectStyles);
 
                 // if in modify mode, display vertices
-                if(imageWrapper.activeEditTool == "modify") {
+                if(imageWrapper.activeEditTool === "modify") {
                     styles.push(verticesStyle);
                 }
             }
@@ -707,7 +709,7 @@ export default {
 
             // Properties
             let propValue = imageWrapper.selectedPropertyValues[annot.id];
-            if (propValue != null) {
+            if (propValue) {
                 let color = imageWrapper.selectedPropertyColor;
                 let fontSize = "34px";
                 if(imageWrapper.zoom <= 3) {
@@ -744,9 +746,10 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
         key
     );
 
+    // if several properties with target key for an annotation, concatenate their values
     let properties = {};
     propertiesValues.forEach(propVal => {
-        if(properties[propVal.idAnnotation] == null) {
+        if(!properties[propVal.idAnnotation]) {
             properties[propVal.idAnnotation] = propVal.value;
         }
         else {
@@ -764,7 +767,7 @@ async function fetchImage(idImage) {
 }
 
 async function fetchImageServers(image) {
-    if(image.imageServerURLs == null) {
+    if(!image.imageServerURLs) {
         image.imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
     }
 }
@@ -783,7 +786,7 @@ function formatTerms(terms, layersOpacity, previousTerms=[]) {
     let nbTerms = terms.length;
     for(let i = 0; i < nbTerms; i++) {
         let term = terms[i];
-        let prevTerm = previousTerms.find(prevTerm => prevTerm.id == term.id);
+        let prevTerm = previousTerms.find(prevTerm => prevTerm.id === term.id);
         result.push(prevTerm ? prevTerm : formatTerm(term, layersOpacity));
     }
     return result;

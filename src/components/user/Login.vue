@@ -98,11 +98,11 @@ export default {
             try {
                 let successMessage = this.$t("notif-success-login");
                 await this.$store.dispatch("login", {username: this.username, password: this.password, rememberMe: this.rememberMe});
-                if(this.$store.state.currentUser.user == null) {
-                    this.$notify({type: "error", text: this.$t("notif-unexpected-error")});
+                if(this.$store.state.currentUser.user) {
+                    this.$notify({type: "success", text: successMessage});
                 }
                 else {
-                    this.$notify({type: "success", text: successMessage});
+                    this.$notify({type: "error", text: this.$t("notif-unexpected-error")});
                 }
             }
             catch(error) {

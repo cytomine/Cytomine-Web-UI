@@ -7,7 +7,7 @@
                 <div class="viewer-name">
                     <span>
                         <i class="fas fa-caret-right"></i>
-                        <template v-if="viewer.maps.length == 1">
+                        <template v-if="viewer.maps.length === 1">
                             <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
                         </template>
                         <template v-else>
@@ -42,7 +42,7 @@ export default {
             for(let id in viewers) {
                 let viewer = viewers[id];
                 let nbMaps = viewer.maps.length;
-                if(nbMaps == 0) {
+                if(nbMaps === 0) {
                     return;
                 }
 

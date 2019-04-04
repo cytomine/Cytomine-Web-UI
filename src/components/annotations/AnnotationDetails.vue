@@ -65,7 +65,7 @@
                             />
                         </div>
                     </div>
-                    <em v-else-if="associatedTerms.length == 0">{{$t("no-term")}}</em>
+                    <em v-else-if="!associatedTerms.length">{{$t("no-term")}}</em>
                 </td>
             </tr>
 
@@ -191,14 +191,14 @@ export default {
             return this.$store.state.project.ontology;
         },
         creator() {
-            return this.users.find(user => user.id == this.annotation.user) || {};
+            return this.users.find(user => user.id === this.annotation.user) || {};
         },
         isReview() {
             return this.annotation.type === AnnotationType.REVIEWED;
         },
         reviewer() {
             if(this.isReview) {
-                return this.users.find(user => user.id == this.annotation.reviewUser) || {};
+                return this.users.find(user => user.id === this.annotation.reviewUser) || {};
             }
         },
         canEdit() {
@@ -210,16 +210,16 @@ export default {
             return this.canEdit && this.annotation.type === AnnotationType.USER;
         },
         image() {
-            return this.images.find(image => image.id == this.annotation.image) || {};
+            return this.images.find(image => image.id === this.annotation.image) || {};
         },
         annotationURL() {
             return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
         },
         associatedTerms() {
-            if(this.annotation.userByTerm != null) {
+            if(this.annotation.userByTerm) {
                 return this.annotation.userByTerm.map(ubt => {
-                    let term = this.terms.find(term => ubt.term == term.id);
-                    let user = this.users.find(user => user.id == ubt.user[0]) || {}; // QUESTION: can we have several users?
+                    let term = this.terms.find(term => ubt.term === term.id);
+                    let user = this.users.find(user => user.id === ubt.user[0]) || {}; // QUESTION: can we have several users?
                     return {term, user};
                 });
             }
@@ -248,7 +248,7 @@ export default {
             this.addTerm(term.id);
         },
         async addTerm(idTerm) {
-            if(idTerm != null) {
+            if(idTerm) {
                 try {
                     // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
                     await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();

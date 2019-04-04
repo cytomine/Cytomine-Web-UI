@@ -2,7 +2,7 @@
 <div class="draw-tools-wrapper">
     <div class="buttons has-addons" v-if="isToolDisplayed('select')">
         <button v-tooltip="$t('select')"
-                class="button is-small" :class="{'is-selected': activeTool == 'select'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'select'}"
                 @click="activateTool('select')" v-shortkey.once="['s']" @shortkey="activateTool('select')">
             <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
@@ -37,19 +37,19 @@
 
     <div class="buttons has-addons">
         <button v-if="isToolDisplayed('point')" :disabled="disabledDraw" v-tooltip="$t('point')"
-                class="button is-small" :class="{'is-selected': activeTool == 'point'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'point'}"
                 @click="activateTool('point')" v-shortkey.once="['o']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('line')" :disabled="disabledDraw" v-tooltip="$t('line')"
-                class="button is-small" :class="{'is-selected': activeTool == 'line'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'line'}"
                 @click="activateTool('line')">
             <span class="icon is-small"><i class="fas fa-minus"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('freehand-line')" :disabled="disabledDraw" v-tooltip="$t('freehand-line')"
-                class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'freehand-line'}"
                 @click="activateTool('freehand-line')">
             <span class="icon is-small">
                 <icon-line-free-hand />
@@ -58,30 +58,30 @@
 
         <!-- QUESTION: redefine expected behaviour
         <button class="button is-small" :disabled="disabledDraw" title="Arrow"
-                @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
+                @click="activateTool('arrow')" :class="{'is-selected': activeTool === 'arrow'}">
             <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
         </button> -->
 
         <button v-if="isToolDisplayed('rectangle')" :disabled="disabledDraw" v-tooltip="$t('rectangle')"
-                class="button is-small" :class="{'is-selected': activeTool == 'rectangle'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'rectangle'}"
                 @click="activateTool('rectangle')">
             <span class="icon is-small"><i class="far fa-square"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('circle')" :disabled="disabledDraw" v-tooltip="$t('circle')"
-                class="button is-small" :class="{'is-selected': activeTool == 'circle'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'circle'}"
                 @click="activateTool('circle')">
             <span class="icon is-small"><i class="far fa-circle"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('polygon')" :disabled="disabledDraw" v-tooltip="$t('polygon')"
-                class="button is-small" :class="{'is-selected': activeTool == 'polygon'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'polygon'}"
                 @click="activateTool('polygon')">
             <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('freehand-polygon')" :disabled="disabledDraw" v-tooltip="$t('freehand-polygon')"
-                class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'freehand-polygon'}"
                 @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
             <span class="icon is-small">
                 <icon-polygon-free-hand />
@@ -90,7 +90,9 @@
     </div>
 
     <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons">
-        <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
+        <button class="button is-small" :disabled="!selectedFeature" v-tooltip="$t('display-annot-details')"
+                :class="{'is-selected': displayAnnotDetails && selectedFeature}"
+                @click="displayAnnotDetails = !displayAnnotDetails">
             <span class="icon is-small"><i class="fas fa-info"></i></span>
         </button>
     </div>
@@ -103,33 +105,33 @@
         </button>
 
         <button v-if="isToolDisplayed('edit')" :disabled="isToolDisabled('edit')" v-tooltip="$t('modify')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'modify'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'modify'}"
                 @click="activateEditTool('modify')">
             <span class="icon is-small"><i class="fas fa-edit"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('union')" :disabled="isToolDisabled('correct-add')"
                 v-tooltip="$t('freehand-correct-add')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'correct-add'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'correct-add'}"
                 @click="activateEditTool('correct-add')">
             <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('diff')" :disabled="isToolDisabled('correct-remove')"
                 v-tooltip="$t('freehand-correct-remove')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'correct-remove'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'correct-remove'}"
                 @click="activateEditTool('correct-remove')">
             <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('move')" :disabled="isToolDisabled('move')" v-tooltip="$t('move')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'translate'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'translate'}"
                 @click="activateEditTool('translate')">
             <span class="icon is-small"><i class="fas fa-arrows-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('rotate')" :disabled="isToolDisabled('rotate')" v-tooltip="$t('rotate')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'rotate'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'rotate'}"
                 @click="activateEditTool('rotate')">
             <span class="icon is-small"><i class="fas fa-sync-alt"></i></span>
         </button>
@@ -142,13 +144,13 @@
     </div>
 
     <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons">
-        <button :disabled="actions.length == 0" v-tooltip="$t('undo')"
+        <button :disabled="actions.length === 0" v-tooltip="$t('undo')"
             class="button is-small"
             @click="undo()" v-shortkey.once="['ctrl', 'z']" @shortkey="undo()">
             <span class="icon is-small"><i class="fas fa-undo"></i></span>
         </button>
 
-        <button :disabled="undoneActions.length == 0" v-tooltip="$t('redo')"
+        <button :disabled="undoneActions.length === 0" v-tooltip="$t('redo')"
                 class="button is-small"
                 @click="redo()" v-shortkey.once="['ctrl', 'y']" @shortkey="redo()">
             <span class="icon is-small"><i class="fas fa-redo"></i></span>
@@ -210,8 +212,8 @@ export default {
             }
         },
         backgroundTermsNewAnnot() {
-            if(this.termsToAssociate.length == 1) {
-                return this.terms.find(term => this.termsToAssociate[0] == term.id).color;
+            if(this.termsToAssociate.length === 1) {
+                return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
             }
             else {
                 return "#e2e2e2";
@@ -245,7 +247,7 @@ export default {
             return this.imageWrapper.selectedFeatures;
         },
         selectedFeature() {
-            if(this.selectedFeatures.length == 1) {
+            if(this.selectedFeatures.length === 1) {
                 return this.selectedFeatures[0];
             }
         },
@@ -253,7 +255,7 @@ export default {
             return this.imageWrapper.selectedLayers || [];
         },
         noActiveLayer() {
-            return (this.layers.find(layer => layer.drawOn) == null);
+            return !this.layers.find(layer => layer.drawOn);
         },
         disabledDraw() {
             return this.noActiveLayer;
@@ -272,7 +274,8 @@ export default {
             }
         },
         selectedFeature(feature) {
-            if(feature == null && ["correct-add", "correct-remove"].includes(this.activeEditTool)) {
+            // disable correct tools if no feature is selected
+            if(!feature && ["correct-add", "correct-remove"].includes(this.activeEditTool)) {
                 this.activeEditTool = null;
             }
         }
@@ -283,7 +286,7 @@ export default {
         },
 
         isToolDisabled(tool) {
-            if(this.selectedFeature == null) {
+            if(!this.selectedFeature) {
                 return true; // no feature selected -> all edit tools disabled
             }
 
@@ -292,10 +295,10 @@ export default {
             }
 
             let geomType = this.selectedFeature.geometry.type;
-            if(geomType == "Point") {
-                return (tool != "move" && tool != "delete"); // disable all tools except move and delete for points
+            if(geomType === "Point") {
+                return (tool !== "move" && tool !== "delete"); // disable all tools except move and delete for points
             }
-            else if(geomType == "LineString") {
+            else if(geomType === "LineString") {
                 return ["fill", "correct-add", "correct-remove"].includes(tool); // disable fill and correct tools for lines
             }
             else {
@@ -309,7 +312,7 @@ export default {
 
         activateEditTool(tool) {
             this.activeTool = "select";
-            this.activeEditTool = (this.activeEditTool == tool) ? null : tool; // toggle behaviour
+            this.activeEditTool = (this.activeEditTool === tool) ? null : tool; // toggle behaviour
         },
 
         toggleTerm(indexTerm) {
@@ -322,7 +325,7 @@ export default {
 
         async fill() {
             let feature = this.selectedFeature;
-            if(feature == null) {
+            if(!feature) {
                 return;
             }
 
@@ -346,7 +349,7 @@ export default {
 
         async deleteAnnot() {
             let feature = this.selectedFeature;
-            if(feature == null) {
+            if(!feature) {
                 return;
             }
 
@@ -368,7 +371,7 @@ export default {
             }
         },
         confirmDeletion() {
-            if(this.selectedFeature == null) {
+            if(!this.selectedFeature) {
                 return;
             }
 

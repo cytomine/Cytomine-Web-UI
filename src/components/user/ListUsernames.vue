@@ -38,7 +38,7 @@ export default {
             return this.filteredUsers && this.filteredUsers.length > this.nbDisplayed;
         },
         usersToDisplay() {
-            if(!this.tooManyUsers || this.expanded || this.nbDisplayed == 0) {
+            if(!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
                 return this.filteredUsers;
             }
             else {
@@ -48,11 +48,11 @@ export default {
     },
     methods: {
         isOnline(id) {
-            if(this.onlines == null) {
+            if(!this.onlines) {
                 return null;
             }
 
-            return this.onlines.some(online => online.id == id);
+            return this.onlines.some(online => online.id === id);
         }
     }
 };

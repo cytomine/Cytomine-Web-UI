@@ -100,7 +100,7 @@
             </option>
         </b-select>
 
-        <button class="button is-small" :disabled="layerToAdd == null" @click="addDefaultLayer()">
+        <button class="button is-small" :disabled="!layerToAdd" @click="addDefaultLayer()">
             {{$t("button-add")}}
         </button>
     </b-field>
@@ -168,7 +168,7 @@ export default {
 
         selectedLayers() {
             return this.defaultLayers.map(defaultLayer => {
-                let layer = this.layers.find(layer => layer.id == defaultLayer.user);
+                let layer = this.layers.find(layer => layer.id === defaultLayer.user);
                 return {...defaultLayer, ...layer};
             });
         },
@@ -179,28 +179,28 @@ export default {
     },
     watch: {
         editingMode(mode) {
-            if(mode == this.currentEditingMode) {
+            if(mode === this.currentEditingMode) {
                 return;
             }
-            this.updateProject({isReadOnly: mode == "READ-ONLY", isRestricted: mode == "RESTRICTED"});
+            this.updateProject({isReadOnly: mode === "READ-ONLY", isRestricted: mode === "RESTRICTED"});
         },
 
         blindMode() {
-            if(this.blindMode == this.project.blindMode) {
+            if(this.blindMode === this.project.blindMode) {
                 return;
             }
             this.updateProject({blindMode: this.blindMode});
         },
 
         hideManagersLayers() {
-            if(this.hideManagersLayers == this.project.hideAdminsLayers) {
+            if(this.hideManagersLayers === this.project.hideAdminsLayers) {
                 return;
             }
             this.updateProject({hideAdminsLayers: this.hideManagersLayers});
         },
 
         hideContributorsLayers() {
-            if(this.hideContributorsLayers == this.project.hideUsersLayers) {
+            if(this.hideContributorsLayers === this.project.hideUsersLayers) {
                 return;
             }
             this.updateProject({hideUsersLayers: this.hideContributorsLayers});
@@ -240,7 +240,7 @@ export default {
         },
 
         async addDefaultLayer() {
-            if(this.layerToAdd == null) {
+            if(!this.layerToAdd) {
                 return;
             }
 

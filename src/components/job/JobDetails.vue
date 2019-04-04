@@ -179,13 +179,13 @@ export default {
             return this.$store.state.project.project;
         },
         isRunning() {
-            return this.job.status == JobStatus.RUNNING;
+            return this.job.status === JobStatus.RUNNING;
         },
         isSuccessful() {
-            return this.job.status == JobStatus.SUCCESS;
+            return this.job.status === JobStatus.SUCCESS;
         },
         isFinished() {
-            return this.isSuccessful || this.job.status == JobStatus.FAILED;
+            return this.isSuccessful || this.job.status === JobStatus.FAILED;
         },
         hasAnnotationResult() {
             return this.allData.annotations > 0;
@@ -239,7 +239,7 @@ export default {
             }
         },
         async refreshDeletionTask() {
-            if(this.deletionTask == null) {
+            if(!this.deletionTask) {
                 return;
             }
             await this.deletionTask.fetch();

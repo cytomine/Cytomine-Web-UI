@@ -1,10 +1,10 @@
 <template>
-<div class="modal-card annotation-comments-modal">
+<div class="modal-card">
     <header class="modal-card-head">
         <p class="modal-card-title">{{$t("annotation-comments")}}</p>
     </header>
     <section class="modal-card-body">
-        <div v-if="!comments || comments.length === 0">
+        <div v-if="!comments || !comments.length">
             <em class="has-text-grey">
                 {{$t("no-annotation-comments")}}
             </em>
@@ -49,10 +49,9 @@
                     </b-field>
                 </div>
             </div>
-            <textarea class="textarea" :class="{'is-danger': errorComment}" v-model="text"
-                :placeholder="$t('enter-comment')" rows="2">
-            </textarea>
-            <p v-if="errorComment" class="help is-danger">{{errorComment}}</p>
+            <b-field :type="errorComment ? 'is-danger' : null" :message="errorComment">
+                <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" />
+            </b-field>
             <p class="buttons is-right are-small">
                 <button class="button" @click="addingComment = false" :disabled="loading">
                     {{$t("button-cancel")}}
@@ -106,12 +105,12 @@ export default {
             return `${window.location.origin}/#/${uri}`;
         },
         errorComment() {
-            if(this.displayErrors && this.text.length === 0) {
+            if(this.displayErrors && !this.text) {
                 return this.$t("field-cannot-be-empty");
             }
         },
         errorSelectedMembers() {
-            if(this.displayErrors && !this.sendToAllMembers && this.selectedMembers.length === 0) {
+            if(this.displayErrors && !this.sendToAllMembers && !this.selectedMembers.length) {
                 return this.$t("field-cannot-be-empty");
             }
         }
@@ -158,7 +157,7 @@ export default {
 </script>
 
 <style scoped>
-.annotation-comments-modal {
+.modal-card {
     max-height: 80vh;
 }
 
@@ -182,17 +181,15 @@ export default {
     margin-bottom: 0.5em;
 }
 
-textarea {
-    margin: 0.5em 0;
+>>> textarea {
+    margin: 0.75em 0 0;
 }
 
 hr {
     margin: 0.75em 0px !important;
 }
-</style>
 
-<style>
-.annotation-comments-modal .dropdown-content {
+>>> .dropdown-content {
     max-height: 7em !important;
 }
 </style>

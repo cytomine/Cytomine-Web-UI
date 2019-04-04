@@ -43,7 +43,7 @@ export default {
 
     actions: {
         async loadProject({state, dispatch, commit}, idProject) {
-            let projectChange = state.project == null || state.project.id != idProject;
+            let projectChange = !state.project || state.project.id !== idProject;
             let project = await Project.fetch(idProject);
             commit("setProject", project);
 
@@ -95,7 +95,7 @@ export default {
         canEditLayer: (state, getters, rootState) => idLayer => {
             let currentUser = rootState.currentUser.user;
             let project = state.project;
-            return getters.canManageProject || (!project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted));
+            return getters.canManageProject || (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
         },
 
         canEditAnnot: (_, getters, rootState) => annot => {
@@ -115,7 +115,7 @@ export default {
 
         canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
             let currentUser = rootState.currentUser.user || {};
-            return currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id);
+            return currentUser.adminByNow || state.managers.some(user => user.id === currentUser.id);
         },
 
         contributors: (state) => {

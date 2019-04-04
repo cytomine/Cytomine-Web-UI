@@ -20,7 +20,7 @@
             {{$t("core-cannot-be-reached")}}
         </div>
 
-        <login v-else-if="currentUser == null" />
+        <login v-else-if="!currentUser" />
 
         <template v-else>
             <cytomine-navbar />
@@ -89,7 +89,7 @@ export default {
             }
             try {
                 let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
-                if(this.currentUser != null && !authenticated) {
+                if(this.currentUser && !authenticated) {
                     await this.$store.dispatch("logout");
                 }
             }

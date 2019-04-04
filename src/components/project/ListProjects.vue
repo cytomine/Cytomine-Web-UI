@@ -257,7 +257,7 @@ export default {
         filteredProjects() {
             let filtered = this.projects;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
             }
@@ -327,7 +327,7 @@ export default {
         async deleteProject(projectToDelete) {
             try {
                 await projectToDelete.delete();
-                this.projects = this.projects.filter(project => project.id != projectToDelete.id);
+                this.projects = this.projects.filter(project => project.id !== projectToDelete.id);
                 this.$notify({
                     type: "success",
                     text: this.$t("notif-success-project-deletion", {projectName: projectToDelete.name})

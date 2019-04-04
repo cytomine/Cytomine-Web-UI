@@ -65,7 +65,7 @@ export default {
         updateLabels() {
             this.chartData.labels = this.projectConnections.map(item => {
                 let moment = this.$options.filters.moment;
-                return this.daysRange == 1 ? moment(Number(item.date), "ll")
+                return this.daysRange === 1 ? moment(Number(item.date), "ll")
                     : [moment(Number(item.date), "ll") + " - ",  moment(Number(item.endDate), "ll")];
             });
         },

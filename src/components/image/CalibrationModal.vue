@@ -72,7 +72,7 @@ export default {
             }
         },
         calibrationField() {
-            if(this.calibrationField != this.image.resolution) {
+            if(this.calibrationField !== this.image.resolution) {
                 this.displayErrors = true;
             }
         }

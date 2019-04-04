@@ -84,8 +84,8 @@ export default {
             for(let i = 0; i < this.actions.length; i++) {
                 let action = this.actions[i];
                 let date = moment(Number(action.created));
-                if(lastDate == null || !date.isSame(lastDate, "day")) {
-                    if(lastDate == null || !date.isSame(lastDate, "month")) {
+                if(!lastDate || !date.isSame(lastDate, "day")) {
+                    if(!lastDate || !date.isSame(lastDate, "month")) {
                         results.push({
                             refDate: Number(action.created),
                             days: []
@@ -120,7 +120,7 @@ export default {
     methods: {
         scrollHandler: _.debounce(function() {
             let scrollBlock = this.$refs.listActions;
-            let bottom = scrollBlock.scrollTop + scrollBlock.clientHeight === scrollBlock.scrollHeight;
+            let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight === scrollBlock.scrollHeight);
 
             if (bottom && !this.loadedAllActions) {
                 this.loadActions();
@@ -166,7 +166,7 @@ export default {
 
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
+            this.userJobs = this.userJobs.filter(uj => uj.id); // HACK because some returned jobs are empty objects
             this.userJobs.forEach(uJob => uJob.fullName = fullName(uJob));
         }
     },

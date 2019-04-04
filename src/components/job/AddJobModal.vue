@@ -102,13 +102,13 @@ export default {
             return this.selectedSoftware ? this.selectedSoftware.parameters.array : [];
         },
         optionalParams() {
-            return this.params.filter(param => !param.required);
+            return this.params.filter(param => !param.required && !param.defaultParamValue);
         },
         prefilledParams() {
-            return this.params.filter(param => param.defaultParamValue != null);
+            return this.params.filter(param => param.defaultParamValue);
         },
         paramsMandatoryNoDefault() {
-            return this.params.filter(param => param.required && param.defaultParamValue == null);
+            return this.params.filter(param => param.required && !param.defaultParamValue);
         },
         validForm() {
             return this.params.every(param => param.valid);
@@ -136,13 +136,13 @@ export default {
             }
         },
         async selectedSoftware() {
-            if(this.selectedSoftware == null) {
+            if(!this.selectedSoftware) {
                 return;
             }
 
             for(let param of this.selectedSoftware.parameters) {
                 this.$set(param, "value", param.defaultParamValue);
-                this.$set(param, "valid", !param.required || param.defaultParamValue != null);
+                this.$set(param, "valid", !param.required || param.defaultParamValue);
             }
         }
     },

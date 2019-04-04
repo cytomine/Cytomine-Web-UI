@@ -6,7 +6,7 @@
             <b-input v-if="loading" loading disabled />
             <cytomine-multiselect v-else-if="options" v-model="internalValue" :options="options"
                 track-by="id" :label="param.uriPrintAttribut" :class="{'is-danger': displayErrors && errorMessage}"
-                :multiple="param.type == 'ListDomain'">
+                :multiple="param.type === 'ListDomain'">
                 <template #option="{option}">
                     <div class="is-flex" v-if="annotationObjects">
                         <div class="thumb-wrapper">
@@ -26,7 +26,7 @@
                     </div>
                 </template>
             </cytomine-multiselect>
-            <input type="checkbox" v-model="internalValue" v-else-if="param.type == 'Boolean'">
+            <input type="checkbox" v-model="internalValue" v-else-if="param.type === 'Boolean'">
             <b-input v-else v-model="internalValue" />
         </b-field>
     </td>
@@ -70,16 +70,16 @@ export default {
             }
         },
         empty() {
-            return this.internalValue == null || this.internalValue.length === 0;
+            return !this.internalValue;
         },
         validNumber() {
             return !isNaN(this.internalValue);
         },
         errorMessage() {
-            if(this.empty) {
+            if(this.empty && this.param.type !== "Boolean") {
                 return this.param.required ? this.$t("mandatory-parameter") : null;
             }
-            if(this.param.type == "Number" && !this.validNumber) {
+            if(this.param.type === "Number" && !this.validNumber) {
                 return this.$t("must-be-number");
             }
         },
@@ -97,7 +97,7 @@ export default {
     watch: {
         internalValue() {
             if(this.internalValue !== this.param.value) {
-                this.$emit("changeValue", {value: this.internalValue, valid: this.errorMessage == null});
+                this.$emit("changeValue", {value: this.internalValue, valid: !this.errorMessage});
             }
         },
         "param.value": function() {
@@ -107,8 +107,8 @@ export default {
     methods: {
         getInitialValue() {
             if(this.param.defaultParamValue) {
-                if(this.param.type == "Boolean") {
-                    return this.param.defaultParamValue.toLowerCase() == "true";
+                if(this.param.type === "Boolean") {
+                    return this.param.defaultParamValue.toLowerCase() === "true";
                 }
                 return this.param.defaultParamValue;
             }

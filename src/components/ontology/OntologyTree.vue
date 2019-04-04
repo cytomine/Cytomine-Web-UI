@@ -108,7 +108,7 @@ export default {
     },
     methods: {
         makeTree() {
-            if(this.ontology == null) {
+            if(!this.ontology) {
                 this.treeNodes = [];
                 return;
             }
@@ -199,7 +199,7 @@ export default {
             }
 
             this.applyToAllNodes(node => {
-                node.isSelected = this.internalSelectedNodes.some(id => id == node.data.id);
+                node.isSelected = this.internalSelectedNodes.some(id => id === node.data.id);
             });
         },
         clickOnTreeSelector(elem) {
@@ -252,12 +252,12 @@ export default {
 
         drop(nodes, position) {
             nodes.forEach(async node => {
-                let idParent = (position.placement == "inside") ? position.node.data.id : position.node.data.parent;
+                let idParent = (position.placement === "inside") ? position.node.data.id : position.node.data.parent;
                 if(node.data.parent !== idParent) {
                     try {
                         await new Term(node.data).changeParent(idParent);
                         this.applyToAllNodes(tmp => {
-                            if(tmp.data.id == node.data.id) {
+                            if(tmp.data.id === node.data.id) {
                                 tmp.data.parent = idParent;
                             }
                         });

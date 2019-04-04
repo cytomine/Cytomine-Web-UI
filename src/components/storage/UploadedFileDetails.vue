@@ -15,7 +15,7 @@
         </template>
 
         <template #title="{node}">
-            <p :class="{'target-element': node.data.id == file.id}">{{node.title}}</p>
+            <p :class="{'target-element': node.data.id === file.id}">{{node.title}}</p>
         </template>
 
         <template #sidebar="{node}">
@@ -123,12 +123,12 @@ export default {
             }
         },
         createNodes(idParent) {
-            let directChildren = this.uploadedFiles.filter(file => file.parentId == idParent);
+            let directChildren = this.uploadedFiles.filter(file => file.parentId === idParent);
             return directChildren.map(file => {
                 let children = this.createNodes(file.id);
                 return {
                     title: file.originalFilename,
-                    isLeaf: children.length == 0,
+                    isLeaf: children.length === 0,
                     isDraggable: false,
                     isExpanded: true,
                     data: {downloadURL: file.downloadURL, ...file}, // data converted to object by sl-vue-tree => need to define downloadURL as property

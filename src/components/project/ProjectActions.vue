@@ -119,7 +119,7 @@ export default {
     },
     computed: {
         emptyNewName() {
-            return this.newName.length == 0;
+            return !this.newName;
         }
     },
     watch: {

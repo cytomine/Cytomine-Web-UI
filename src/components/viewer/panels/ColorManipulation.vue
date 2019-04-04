@@ -95,7 +95,7 @@ export default {
     },
     watch: {
         activePanel(panel) {
-            if(panel == "colors") {
+            if(panel === "colors") {
                 this.revisionSliders++;
             }
         }

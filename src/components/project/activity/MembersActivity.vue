@@ -72,7 +72,7 @@
 
                     <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
                         <template v-if="member.lastImageId">
-                            <router-link :to="`project/${project.id}/image/${member.lastImageId}`">
+                            <router-link :to="`/project/${project.id}/image/${member.lastImageId}`">
                                 {{member.lastImageName}}
                             </router-link>
                         </template>
@@ -180,7 +180,7 @@ export default {
         },
         filteredMembers() {
             let str = this.searchString.toLowerCase();
-            let statusKnown = this.onlineIds != null; // whether or not the info regarding online users could be fetched
+            let statusKnown = Boolean(this.onlineIds); // whether or not the info regarding online users could be fetched
             let includeOnline = this.selectedStatus.includes(this.onlineStatus);
             let includeOffline = this.selectedStatus.includes(this.offlineStatus);
             return this.members.filter(member => {

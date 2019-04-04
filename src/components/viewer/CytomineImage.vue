@@ -37,7 +37,7 @@
 
             <vl-layer-image>
                 <vl-source-raster
-                    v-if="baseSource != null && colorManipulationOn"
+                    v-if="baseSource && colorManipulationOn"
                     :sources="[baseSource]"
                     :operation="operation"
                     :lib="lib"
@@ -72,73 +72,73 @@
 
                 <template v-if="isPanelDisplayed('hide-tools')">
                     <li v-if="isPanelDisplayed('info')">
-                        <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
+                        <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
                             <i class="fas fa-info"></i>
                         </a>
-                        <information-panel class="panel-options" v-show="activePanel == 'info'"
+                        <information-panel class="panel-options" v-show="activePanel === 'info'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('digital-zoom')">
-                        <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                        <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
                             <i class="fas fa-search"></i>
                         </a>
-                        <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
+                        <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
-                        <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
+                        <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
                             <i class="fas fa-link"></i>
                         </a>
-                        <link-panel class="panel-options" v-show="activePanel == 'link'"
+                        <link-panel class="panel-options" v-show="activePanel === 'link'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('color-manipulation')">
-                        <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
+                        <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
                             <i class="fas fa-adjust"></i>
                         </a>
-                        <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
+                        <color-manipulation class="panel-options" v-show="activePanel === 'colors'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('image-layers')">
-                        <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
+                        <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
                             <i class="fas fa-copy"></i>
                         </a>
-                        <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
+                        <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
                             :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
-                        <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
+                        <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
                             <i class="fas fa-hashtag"></i>
                         </a>
-                        <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
+                        <ontology-panel class="panel-options" v-show="activePanel === 'ontology'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li  v-if="isPanelDisplayed('property')">
-                        <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
+                        <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
                             <i class="fas fa-tag"></i>
                         </a>
-                        <properties-panel class="panel-options" v-show="activePanel == 'properties'"
+                        <properties-panel class="panel-options" v-show="activePanel === 'properties'"
                             :idViewer="idViewer" :index="index"
                         />
                     </li>
 
                     <li v-if="isPanelDisplayed('follow')">
-                        <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
+                        <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
                             <i class="fas fa-street-view"></i>
                         </a>
-                        <follow-panel class="panel-options" v-show="activePanel == 'follow'"
+                        <follow-panel class="panel-options" v-show="activePanel === 'follow'"
                             :idViewer="idViewer" :index="index" :view="$refs.view"
                         />
                     </li>
@@ -277,7 +277,7 @@ export default {
         },
         isActiveMap: {
             get() {
-                return this.viewerWrapper.activeMap == this.index;
+                return this.viewerWrapper.activeMap === this.index;
             },
             set(value) {
                 if(value) {
@@ -344,8 +344,8 @@ export default {
         },
 
         colorManipulationOn() {
-            return this.imageWrapper.brightness != 0 || this.imageWrapper.contrast != 0
-                || this.imageWrapper.hue != 0 || this.imageWrapper.saturation != 0;
+            return this.imageWrapper.brightness !== 0 || this.imageWrapper.contrast !== 0
+                || this.imageWrapper.hue !== 0 || this.imageWrapper.saturation !== 0;
         },
         operation() {
             return operation;
@@ -361,7 +361,7 @@ export default {
         },
 
         layersToPreload() {
-            if(this.routedAnnotation != null) {
+            if(this.routedAnnotation) {
                 return this.routedAnnotation.type === AnnotationType.REVIEWED ? [-1] : [this.routedAnnotation.user];
             }
         },
@@ -380,7 +380,7 @@ export default {
             return !this.activeSelectInteraction || this.correction;
         },
         activeModifyInteraction() {
-            return this.activeSelectInteraction && this.activeEditTool != null && !this.correction;
+            return this.activeSelectInteraction && this.activeEditTool && !this.correction;
         }
     },
     watch: {
@@ -412,13 +412,13 @@ export default {
         async viewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
 
-            if(this.routedAnnotation != null) { // center view on annotation
+            if(this.routedAnnotation) { // center view on annotation
                 let annot = this.routedAnnotation;
                 let geometry = new WKT().readGeometry(annot.location);
                 this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
 
                 // HACK: center set by view.fit() is incorrect => reset it manually
-                this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
+                this.center = (geometry.getType() === "Point") ? geometry.getFirstCoordinate()
                     : [annot.centroid.x, annot.centroid.y];
                 // ---
             }
@@ -488,7 +488,7 @@ export default {
         }
     },
     async created() {
-        if(getProj(this.projectionName) == null) { // if image opened for the first time
+        if(!getProj(this.projectionName)) { // if image opened for the first time
             let projection = createProj({code: this.projectionName, units: "pixels", extent: this.extent});
             addProj(projection);
         }
@@ -506,13 +506,13 @@ export default {
 
         // Actions related to query parameters should be executed only once, for first image of viewer
         let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
-            return map.imageInstance.id == this.$route.params.idImages;
+            return map.imageInstance.id === Number(this.$route.params.idImages);
         });
-        if(this.index == firstIndexTargettedImage) {
+        if(this.index === firstIndexTargettedImage) {
             let idRoutedAnnot = this.$route.params.idAnnotation;
-            if(idRoutedAnnot != null) {
+            if(idRoutedAnnot) {
                 let annot = await Annotation.fetch(idRoutedAnnot);
-                if(annot.image == this.image.id) {
+                if(annot.image === this.image.id) {
                     this.routedAnnotation = annot;
                     if(this.$route.query.action === "comments") {
                         this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot});

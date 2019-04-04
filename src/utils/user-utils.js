@@ -1,7 +1,7 @@
 import moment from "moment";
 
 export function fullName(user) {
-    if(user == null) {
+    if(!user) {
         return "";
     }
 

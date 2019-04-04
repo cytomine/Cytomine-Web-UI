@@ -60,7 +60,7 @@ export default {
     },
     computed: {
         filteredProps() {
-            if(this.searchString.length === 0) {
+            if(!this.searchString) {
                 return this.properties;
             }
             let str = this.searchString.toLowerCase();
@@ -74,7 +74,7 @@ export default {
                 return;
             }
 
-            let reverse = (this.rotationAngle == 90 || this.rotationAngle == 270);
+            let reverse = (this.rotationAngle === 90 || this.rotationAngle === 270);
             let width = this.$refs.image.clientWidth + "px";
             let height = this.$refs.image.clientHeight + "px";
             return {
