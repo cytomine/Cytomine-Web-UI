@@ -25,10 +25,8 @@ export default {
 
     actions: {
         async fetchUser({commit}) {
-            // need to perform a ping first because if user is not authenticated, fetchCurrent() returns 302 instead of error
-            let {authenticated} = await Cytomine.instance.ping();
-            if(authenticated) {
-                let user = await User.fetchCurrent();
+            let user = await User.fetchCurrent();
+            if(user.id) { // fetchCurrent() redirects to home page if user not authenticated => check that id is set
                 commit("setUser", user);
             }
             else {

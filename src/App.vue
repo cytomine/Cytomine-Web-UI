@@ -101,7 +101,7 @@ export default {
             this.communicationError = true;
         }
         this.loading = false;
-        this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
+        this.ping();
         ifvisible.on("wakeup", this.ping);
     }
 };
