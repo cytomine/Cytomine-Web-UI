@@ -1,6 +1,6 @@
 <template>
 <b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-    <form>
+    <form @submit.prevent="createProject()">
         <div class="modal-card add-image-modal">
             <header class="modal-card-head">
                 <p class="modal-card-title">{{$t("create-project")}}</p>
@@ -43,7 +43,7 @@
                 <button class="button" type="button" @click="$emit('update:active', false)">
                     {{$t("button-cancel")}}
                 </button>
-                <button class="button is-link" :disabled="(!validName || !validOntology) && displayErrors" @click="createProject()">
+                <button class="button is-link" :disabled="(!validName || !validOntology) && displayErrors">
                     {{$t("button-save")}}
                 </button>
             </footer>

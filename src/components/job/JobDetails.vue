@@ -107,40 +107,38 @@
         </table>
 
         <b-modal :active="deletionModal" has-modal-card @close="deletionModal = false">
-            <form>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">{{$t("delete-analysis-data")}}</p>
-                    </header>
-                    <section class="modal-card-body">
-                        <p>{{$t("confirm-deletion-analysis-data")}}</p>
-                        <ul>
-                            <li>{{$tc("count-annotations", allData.annotations, {count: allData.annotations})}}</li>
-                            <li>{{$tc("count-reviewed-annotations", allData.reviewed, {count: allData.reviewed})}}</li>
-                            <li>{{$tc("count-annotation-terms", allData.annotationsTerm, {count: allData.annotationsTerm})}}</li>
-                            <li>{{$tc("count-files", allData.jobDatas, {count: allData.jobDatas})}}</li>
-                        </ul>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{$t("delete-analysis-data")}}</p>
+                </header>
+                <section class="modal-card-body">
+                    <p>{{$t("confirm-deletion-analysis-data")}}</p>
+                    <ul>
+                        <li>{{$tc("count-annotations", allData.annotations, {count: allData.annotations})}}</li>
+                        <li>{{$tc("count-reviewed-annotations", allData.reviewed, {count: allData.reviewed})}}</li>
+                        <li>{{$tc("count-annotation-terms", allData.annotationsTerm, {count: allData.annotationsTerm})}}</li>
+                        <li>{{$tc("count-files", allData.jobDatas, {count: allData.jobDatas})}}</li>
+                    </ul>
 
-                        <p class="has-margin-top">{{$t("remark-long-operation")}}</p>
+                    <p class="has-margin-top">{{$t("remark-long-operation")}}</p>
 
-                        <template v-if="deletionTask">
-                            <hr>
-                            <progress class="progress is-info" :value="deletionTask.progress" max="100">
-                                {{deletionTask.progress}}%
-                            </progress>
-                            <p v-if="lastCommentDeletionTask">{{lastCommentDeletionTask}}</p> <!-- WARNING: not translated -->
-                        </template>
-                    </section>
-                    <footer class="modal-card-foot">
-                        <button class="button" type="button" @click="deletionModal = false">
-                            {{$t("button-cancel")}}
-                        </button>
-                        <button class="button is-danger" @click="deleteData()">
-                            {{$t("button-confirm")}}
-                        </button>
-                    </footer>
-                </div>
-            </form>
+                    <template v-if="deletionTask">
+                        <hr>
+                        <progress class="progress is-info" :value="deletionTask.progress" max="100">
+                            {{deletionTask.progress}}%
+                        </progress>
+                        <p v-if="lastCommentDeletionTask">{{lastCommentDeletionTask}}</p> <!-- WARNING: not translated -->
+                    </template>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button" type="button" @click="deletionModal = false">
+                        {{$t("button-cancel")}}
+                    </button>
+                    <button class="button is-danger" @click="deleteData()">
+                        {{$t("button-confirm")}}
+                    </button>
+                </footer>
+            </div>
         </b-modal>
     </template>
 </div>

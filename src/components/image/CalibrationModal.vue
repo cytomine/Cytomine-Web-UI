@@ -1,7 +1,7 @@
 <template>
 <div class="image-calibration-wrapper">
     <b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-        <form>
+        <form @submit.prevent="setResolution()">
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{$t("calibrate-image")}}</p>
@@ -26,7 +26,7 @@
                     <button class="button" type="button" @click="$emit('update:active', false)">
                         {{$t("button-cancel")}}
                     </button>
-                    <button class="button is-link" :disabled="!validField" @click="setResolution()">
+                    <button class="button is-link" :disabled="!validField">
                         {{$t("button-save")}}
                     </button>
                 </footer>

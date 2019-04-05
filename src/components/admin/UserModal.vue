@@ -1,6 +1,6 @@
 <template>
-<b-modal class="user-modal" :active="active" @close="$emit('update:active', false)" :has-modal-card="true" :width="960">
-    <form name="user-modal-form">
+<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
+    <form @submit.prevent="save()">
         <div class="modal-card add-image-modal">
             <header class="modal-card-head">
                 <p class="modal-card-title">{{$t(editionMode ? "update-user" : "create-user")}}</p>
@@ -32,7 +32,7 @@
                 <button class="button" type="button" @click="$emit('update:active', false)">
                     {{$t("button-cancel")}}
                 </button>
-                <button class="button is-link" :disabled="!validForm && displayErrors" @click="save()">
+                <button class="button is-link" :disabled="!validForm && displayErrors">
                     {{$t("button-save")}}
                 </button>
             </footer>
@@ -157,11 +157,8 @@ export default {
 .hidden {
     display: none;
 }
-</style>
 
-
-<style>
-.user-modal .modal-card, .user-modal .modal-card-body {
+.modal-card, .modal-card-body {
     width: 100vw;
     max-width: 800px;
 }

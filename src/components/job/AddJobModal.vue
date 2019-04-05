@@ -1,6 +1,6 @@
 <template>
 <b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true" class="add-job-modal">
-    <form>
+    <form @submit.prevent="createJob()">
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">{{$t("launch-new-analysis")}}</p>
@@ -62,7 +62,7 @@
                 <button class="button" type="button" @click="$emit('update:active', false)">
                     {{$t("button-cancel")}}
                 </button>
-                <button class="button is-link" :disabled="!validForm && displayErrors" @click="createJob()">
+                <button class="button is-link" :disabled="!validForm && displayErrors">
                     {{$t("button-launch-new-analysis")}}
                 </button>
             </footer>

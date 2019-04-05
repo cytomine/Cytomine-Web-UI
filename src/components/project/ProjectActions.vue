@@ -1,7 +1,7 @@
 <template>
 <div class="project-actions-wrapper">
     <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
-        <form>
+        <form @submit.prevent="rename()">
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{$t("rename-project")}}</p>
@@ -17,7 +17,7 @@
                     <button class="button" type="button" @click="isRenameModalActive = false">
                         {{$t("button-cancel")}}
                     </button>
-                    <button class="button is-link" @click="rename()" :disabled="emptyNewName">
+                    <button class="button is-link" :disabled="emptyNewName">
                         {{$t("button-save")}}
                     </button>
                 </footer>
@@ -26,7 +26,7 @@
     </b-modal>
 
     <b-modal :active="isOntologyModalActive" has-modal-card @close="isOntologyModalActive = false">
-        <form>
+        <form @submit.prevent="saveOntology()">
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{$t("change-ontology")}}</p>
@@ -70,7 +70,6 @@
                         v-if="!errorOntologies"
                         class="button is-link"
                         :class="{'is-loading': savingOntology}"
-                        @click="saveOntology()"
                         :disabled="loadingOntologies || savingOntology"
                     >
                         {{$t("button-save")}}

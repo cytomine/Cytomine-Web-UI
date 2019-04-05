@@ -26,13 +26,13 @@
             <em v-else-if="properties.length === 0">{{$t("no-properties")}}</em>
         </b-field>
 
-        <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
+        <form @submit.prevent="saveProp(idx)" class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
             <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')" />
             <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')" />
-            <button class="button is-small" type="submit" @click="saveProp(idx)">
+            <button class="button is-small">
                 {{prop.id ? $t("button-save") : $t("button-add")}}
             </button>
-            <button class="button is-small" @click="cancelPropEdition(idx)">
+            <button class="button is-small" type="button" @click="cancelPropEdition(idx)">
                 {{$t("button-cancel")}}
             </button>
         </form>

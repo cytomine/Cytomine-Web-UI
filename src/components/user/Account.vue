@@ -7,7 +7,7 @@
                 {{ $t("profile") }}
             </p>
             <div class="panel-block">
-                <form>
+                <form @submit.prevent="editDetails()">
                     <b-field :label="$t('username')" horizontal>
                         <b-input :value="currentUser.username" disabled />
                     </b-field>
@@ -38,7 +38,7 @@
 
                     <b-field grouped position="is-right">
                         <div class="control">
-                            <button class="button is-link" @click="editDetails()"> {{$t("button-save")}}</button>
+                            <button class="button is-link"> {{$t("button-save")}}</button>
                         </div>
                     </b-field>
                 </form>
@@ -51,7 +51,7 @@
                 {{ $t("password") }}
             </p>
             <div class="panel-block">
-                <form>
+                <form @submit.prevent="savePassword()">
                     <input id="password" class="hidden" type="password"> <!-- HACK: fake field to prevent autofill -->
 
                     <b-message v-if="currentUser.passwordExpired" type="is-danger" has-icon icon-size="is-small">
@@ -73,7 +73,7 @@
 
                     <b-field grouped position="is-right">
                         <div class="control">
-                            <button class="button is-link" :disabled="savePasswordDisabled" @click="savePassword()">
+                            <button class="button is-link" :disabled="savePasswordDisabled">
                                 {{$t("button-save")}}
                             </button>
                         </div>

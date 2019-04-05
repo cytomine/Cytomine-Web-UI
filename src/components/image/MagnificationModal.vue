@@ -1,7 +1,7 @@
 <template>
 <div class="image-magnification-wrapper">
     <b-modal :active="active" has-modal-card @close="$emit('update:active', false)">
-        <form>
+        <form @submit.prevent="setMagnification()">
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{$t("set-magnification")}}</p>
@@ -19,7 +19,7 @@
                     <button class="button" type="button" @click="$emit('update:active', false)">
                         {{$t("button-cancel")}}
                     </button>
-                    <button class="button is-link" :disabled="errorMessage" @click="setMagnification()">
+                    <button class="button is-link" :disabled="errorMessage">
                         {{$t("button-save")}}
                     </button>
                 </footer>

@@ -1,6 +1,6 @@
 <template>
 <div class="modal-card term-modal">
-    <form>
+    <form @submit.prevent="save()">
         <header class="modal-card-head">
             <p class="modal-card-title">{{$t(term ? "update-term" : "create-term")}}</p>
         </header>
@@ -20,7 +20,7 @@
             <button class="button" type="button" @click="$parent.close()">
                 {{$t("button-cancel")}}
             </button>
-            <button class="button is-link" :disabled="!validName && displayErrors" @click="save()">
+            <button class="button is-link" :disabled="!validName && displayErrors">
                 {{$t("button-save")}}
             </button>
         </footer>

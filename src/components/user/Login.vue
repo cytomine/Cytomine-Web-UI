@@ -6,14 +6,14 @@
                 {{$t("forgot-username")}}
             </p>
             <div class="panel-block">
-                <form>
+                <form @submit.prevent="sendUsername">
                     <b-field :label="$t('email')">
                         <b-input v-model="email" />
                     </b-field>
 
                     <div class="buttons">
                         <button class="button" type="button" @click="forgotUsername = false"> {{$t("button-cancel")}}</button>
-                        <button class="button is-link" @click="sendUsername()"> {{$t("button-get-username")}}</button>
+                        <button class="button is-link"> {{$t("button-get-username")}}</button>
                     </div>
                 </form>
             </div>
@@ -24,14 +24,14 @@
                 {{$t("forgot-password")}}
             </p>
             <div class="panel-block">
-                <form>
+                <form @submit.prevent="resetPassword()">
                     <b-field :label="$t('username')">
                         <b-input v-model="username" />
                     </b-field>
 
                     <div class="buttons">
                         <button class="button" type="button" @click="forgotPassword = false"> {{$t("button-cancel")}}</button>
-                        <button class="button is-link" @click="resetPassword()"> {{$t("button-reset-password")}}</button>
+                        <button class="button is-link"> {{$t("button-reset-password")}}</button>
                     </div>
                 </form>
             </div>
@@ -42,7 +42,7 @@
                 {{$t("login")}}
             </p>
             <div class="panel-block">
-                <form>
+                <form @submit.prevent="login()">
                     <b-field :label="$t('username')">
                         <b-input v-model="username" />
                     </b-field>
@@ -61,7 +61,7 @@
                         <div class="column">
                             <b-field grouped position="is-right">
                                 <div class="control">
-                                    <button class="button is-link" @click="login()"> {{$t("button-login")}}</button>
+                                    <button class="button is-link"> {{$t("button-login")}}</button>
                                 </div>
                             </b-field>
                         </div>

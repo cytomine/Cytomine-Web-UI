@@ -51,7 +51,7 @@
     </table>
 
     <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
-        <form>
+        <form @submit.prevent="rename()">
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{$t("rename-ontology")}}</p>
@@ -67,7 +67,7 @@
                     <button class="button" type="button" @click="isRenameModalActive = false">
                         {{$t("button-cancel")}}
                     </button>
-                    <button class="button is-link" @click="rename()" :disabled="emptyNewName">
+                    <button class="button is-link" :disabled="emptyNewName">
                         {{$t("button-save")}}
                     </button>
                 </footer>
