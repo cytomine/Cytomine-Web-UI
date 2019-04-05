@@ -374,6 +374,9 @@ export default {
 
         async deleteImage(idDeleted) {
             this.images = this.images.filter(image => image.id !== idDeleted);
+            if(!this.filtersOpened) { // deleting an image may change the sliders bounds => need to reinitialize them
+                this.initSliders = false;
+            }
         },
 
         addImage(image) {
@@ -403,10 +406,13 @@ export default {
                 this.selectedResolutions.push(image.resolutionFormatted);
             }
             if(updateMaxWidth) {
-                this.boundsWidth[1] = image.width;
+                this.boundsWidth = [this.boundsWidth[0], image.width];
             }
             if(updateMaxHeight) {
-                this.boundsHeight[1] = image.height;
+                this.boundsHeight = [this.boundsHeight[0], image.height];
+            }
+            if(!this.filtersOpened && (updateMaxWidth || updateMaxHeight)) { // need to reinitialize the sliders if they are not currently displayed
+                this.initSliders = false;
             }
         },
 
