@@ -10,13 +10,15 @@
                 <p> {{ $t("unexpected-error-info-message") }} </p>
             </b-message>
             <template v-else>
-                <p v-if="abstractImage && abstractImage.macroURL" :style="styleImagePreview" class="image-preview">
-                    <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
-                </p>
-                <div class="buttons is-centered are-small">
-                    <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
-                    <button class="button" @click="rotate(90)"><i class="fas fa-undo mirror"></i></button>
-                </div>
+                <template v-if="abstractImage && abstractImage.macroURL">
+                    <p :style="styleImagePreview" class="image-preview">
+                        <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
+                    </p>
+                    <div class="buttons is-centered are-small">
+                        <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
+                        <button class="button" @click="rotate(90)"><i class="fas fa-undo mirror"></i></button>
+                    </div>
+                </template>
 
                 <b-input
                     v-model="searchString"

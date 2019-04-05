@@ -55,9 +55,12 @@
             <tr v-if="isPropDisplayed('slidePreview')">
                 <td class="prop-label">{{$t("slide-preview")}}</td>
                 <td class="prop-content">
-                    <a @click="isMetadataModalActive = true">
-                        <img :src="image.macroURL" class="image-overview"> <!-- TODOv2 in backend: do not return anything when thumb not available instead of returning overview? -->
+                    <a v-if="image.macroURL" @click="isMetadataModalActive = true">
+                        <img :src="image.macroURL" class="image-overview">
                     </a>
+                    <em v-else>
+                        {{$t("slide-preview-not-available")}}
+                    </em>
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
