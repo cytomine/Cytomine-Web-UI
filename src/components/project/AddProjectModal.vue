@@ -12,25 +12,21 @@
                     <b-input v-model="name" />
                 </b-field>
 
-                <div class="field">
-                    <label class="label">{{$t("ontology")}}</label>
-                    <label class="radio">
-                        <input type="radio" v-model="ontology" value="NO">
+                <b-field :label="$t('ontology')">
+                    <b-radio v-model="ontology" native-value="NO">
                         {{$t("no-ontology")}}
-                    </label>
-                </div>
-                <div class="field">
-                    <label class="radio">
-                        <input type="radio" v-model="ontology" value="NEW">
+                    </b-radio>
+                </b-field>
+                <b-field>
+                    <b-radio v-model="ontology" native-value="NEW">
                         {{$t("create-ontology-for-project")}}
-                    </label>
-                </div>
-                <div class="field">
-                    <label class="radio">
-                        <input type="radio" v-model="ontology" value="EXISTING">
+                    </b-radio>
+                </b-field>
+                <b-field>
+                    <b-radio v-model="ontology" native-value="EXISTING">
                         {{$t("use-existing-ontology")}}
-                    </label>
-                </div>
+                    </b-radio>
+                </b-field>
 
                 <b-collapse class="panel" :open="ontology === 'EXISTING'">
                     <b-field :type="!validOntology && displayErrors ? 'is-danger' : null"

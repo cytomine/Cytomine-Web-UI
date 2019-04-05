@@ -19,12 +19,14 @@
             <template #custom-sidebar="{term}">
                 <div class="sidebar-tree">
                     <div class="visibility">
-                        <input v-if="term.id"
-                            type="checkbox"
-                            :checked="terms[termsMapping[term.id]].visible"
-                            @change="toggleTermVisibility(termsMapping[term.id])">
+                        <b-checkbox
+                            v-if="term.id"
+                            size="is-small"
+                            :value="terms[termsMapping[term.id]].visible"
+                            @input="toggleTermVisibility(termsMapping[term.id])"
+                        />
 
-                        <input v-else type="checkbox" v-model="displayNoTerm">
+                        <b-checkbox v-else size="is-small" v-model="displayNoTerm" />
                     </div>
 
                     <div class="opacity">
@@ -173,14 +175,12 @@ input[type="range"].slider {
     width: 80px;
     display: block;
 }
-</style>
 
-<style>
-.ontology-panel .checkbox .control-label {
+>>> .checkbox .control-label {
     padding: 0px !important;
 }
 
-.ontology-panel .ontology-tree .sl-vue-tree-node-item, .ontology-panel .ontology-tree .no-result {
+>>> .ontology-tree .sl-vue-tree-node-item, >>> .ontology-tree .no-result {
     line-height: 2;
     font-size: 0.9em;
 }

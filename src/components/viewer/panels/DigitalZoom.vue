@@ -1,10 +1,9 @@
 <template>
 <div>
     <h1>{{$t("digital-zoom")}}</h1>
-    <label class="checkbox">
-        <input type="checkbox" v-model="digitalZoom" name="digital-zoom" id="digital-zoom">
+    <b-checkbox v-model="digitalZoom">
         {{$t("digital-zoom-checkbox-label")}}
-    </label>
+    </b-checkbox>
 </div>
 </template>
 

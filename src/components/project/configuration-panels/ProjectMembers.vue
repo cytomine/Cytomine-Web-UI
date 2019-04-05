@@ -40,14 +40,14 @@
 
             <template #header="{column}">
                 <template v-if="column.label === 'SELECTOR'">
-                    <input type="checkbox" v-model="selectAll" :disabled="filteredMembers.length === 0">
+                    <b-checkbox v-model="selectAll" :disabled="filteredMembers.length === 0" />
                 </template>
                 <template v-else>{{ column.label }}</template>
             </template>
 
             <template #default="{row: member}">
                 <b-table-column label="SELECTOR" width="20">
-                    <input type="checkbox" v-model="member.selected" :disabled="member.id === currentUser.id">
+                    <b-checkbox v-model="member.selected" :disabled="member.id === currentUser.id" />
                 </b-table-column>
 
                 <b-table-column field="username" :label="$t('username')" sortable width="100">

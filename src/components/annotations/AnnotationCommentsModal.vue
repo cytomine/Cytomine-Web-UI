@@ -32,23 +32,19 @@
             <b-message type="is-info" has-icon size="is-small">
                 {{$t("comment-will-be-sent-by-email")}}
             </b-message>
-            <p>
-                <label>
-                    <input type="radio" v-model="sendToAllMembers" :value="true">
+            <b-field>
+                <b-radio v-model="sendToAllMembers" :native-value="true">
                     {{$t("send-to-all-project-members")}}
-                </label>
-            </p>
-            <div>
-                <label>
-                    <input type="radio" v-model="sendToAllMembers" :value="false">
+                </b-radio>
+            </b-field>
+            <b-field>
+                <b-radio v-model="sendToAllMembers" :native-value="false">
                     {{$t("send-to-some-members")}}
-                </label>
-                <div v-if="!sendToAllMembers">
-                    <b-field :type="errorSelectedMembers ? 'is-danger' : null" :message="errorSelectedMembers">
-                        <user-taginput v-model="selectedMembers" :users="members" />
-                    </b-field>
-                </div>
-            </div>
+                </b-radio>
+            </b-field>
+            <b-field v-if="!sendToAllMembers" :type="errorSelectedMembers ? 'is-danger' : null" :message="errorSelectedMembers">
+                <user-taginput v-model="selectedMembers" :users="members" />
+            </b-field>
             <b-field :type="errorComment ? 'is-danger' : null" :message="errorComment">
                 <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" />
             </b-field>

@@ -5,10 +5,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="radio" value="CLASSIC" v-model="editingMode">
+            <b-radio v-model="editingMode" native-value="CLASSIC">
                 {{$t("classic")}}
-            </label> 
+            </b-radio>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -19,10 +18,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="radio" value="RESTRICTED" v-model="editingMode">
+            <b-radio v-model="editingMode" native-value="RESTRICTED">
                 {{$t("restricted")}}
-            </label> 
+            </b-radio>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -33,10 +31,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="radio" value="READ-ONLY" v-model="editingMode">
+            <b-radio v-model="editingMode" native-value="READ-ONLY">
                 {{$t("read-only")}}
-            </label> 
+            </b-radio>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -49,10 +46,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="checkbox" v-model="blindMode">
+            <b-checkbox v-model="blindMode">
                 {{$t("blind-mode")}}
-            </label> 
+            </b-checkbox>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -65,10 +61,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="checkbox" v-model="hideManagersLayers">
+            <b-checkbox v-model="hideManagersLayers">
                 {{$t("hide-managers-layers")}}
-            </label> 
+            </b-checkbox>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -79,10 +74,9 @@
 
     <div class="columns">
         <div class="column is-one-quarter">
-            <label>
-                <input type="checkbox" v-model="hideContributorsLayers">
+            <b-checkbox v-model="hideContributorsLayers">
                 {{$t("hide-contributors-layers")}}
-            </label> 
+            </b-checkbox>
         </div>
         <div class="column">
             <b-message type="is-info" has-icon size="is-small">
@@ -115,7 +109,7 @@
             <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
                 <td>{{fullName(layer)}}</td>
                 <td class="is-centered">
-                    <input type="checkbox" v-model="defaultLayers[idx].hideByDefault" @change="saveDefaultLayer(idx)">
+                    <b-checkbox v-model="defaultLayers[idx].hideByDefault" size="is-small" @input="saveDefaultLayer(idx)" />
                 </td>
                 <td>
                     <button class="button is-small" @click="deleteDefaultLayer(idx)"> {{$t("button-remove")}}</button>

@@ -26,7 +26,7 @@
                     </div>
                 </template>
             </cytomine-multiselect>
-            <input type="checkbox" v-model="internalValue" v-else-if="param.type === 'Boolean'">
+            <b-checkbox v-model="internalValue" v-else-if="param.type === 'Boolean'" />
             <b-input v-else v-model="internalValue" />
         </b-field>
     </td>

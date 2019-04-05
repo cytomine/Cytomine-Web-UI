@@ -4,12 +4,12 @@
 
     <p>{{$t("link-view-with")}}</p>
     <p v-for="(map, idx) in maps" v-if="idx !== index" :key="idx">
-        <label>
-            <input type="checkbox"
-               :checked="revisionCheckboxes && linkedIndexes.includes(idx)"
-               @change="event => handleCheckboxChange(idx, event.target.checked)">
+        <b-checkbox
+            :value="revisionCheckboxes && linkedIndexes.includes(idx)"
+            @input="value => handleCheckboxChange(idx, value)"
+        >
             {{$t("viewer-view")}} {{idx + 1}} (<image-name :image="map.imageInstance" />)
-        </label>
+        </b-checkbox>
     </p>
 </div>
 </template>

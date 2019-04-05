@@ -14,7 +14,7 @@
             </b-select>
             <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t("button-add") }}</button>
         </b-field>
-        <table class="table layers-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th class="checkbox-column"><span class="far fa-eye"></span></th>
@@ -26,10 +26,10 @@
             <tbody>
                 <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
                     <td class="checkbox-column">
-                        <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
+                        <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(index)" />
                     </td>
                     <td class="checkbox-column">
-                        <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
+                        <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(index)" />
                     </td>
 
                     <td class="name-column">
@@ -263,52 +263,51 @@ export default {
 };
 </script>
 
-<style>
-
-.layers select {
+<style scoped>
+>>> select {
     width: 220px;
 }
 
-.layers-table {
+.table {
     margin-bottom: 10px !important;
     font-size: 0.9em;
 }
 
-.layers-table tbody {
+.table tbody {
     display:block;
     overflow:auto;
     max-height: 100px;
 }
 
-.layers-table thead tr {
+.table thead tr {
    display: block;
 }
 
-.layers .table td, .layers .table th {
+td, th {
     padding: 3px !important;
     vertical-align: middle !important;
 }
 
-.layers td .button {
+td .button {
     width: 17px;
     height: 17px;
     padding: 0px;
 }
 
-th.checkbox-column, td.checkbox-column {
+.checkbox-column {
     width: 25px;
     text-align: center !important;
 }
 
-th.name-column, td.name-column {
+.name-column {
     width: 200px;
 }
 
-.layers .checkbox .control-label {
+>>> .checkbox .control-label {
     padding: 0px !important;
 }
 
-.layers input[type="range"].slider {
+>>> input[type="range"].slider {
     margin: 0px;
 }
 
