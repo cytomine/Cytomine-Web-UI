@@ -18,11 +18,16 @@
       <tr>
         <td><strong>{{$t('projects')}}</strong></td>
         <td>
-          <span v-for="(project, index) in fullOntology.projects.array" :key="project.id">
-            <router-link :to="`/project/${project.id}`">{{project.name}}</router-link>
-            <span v-if="index < nbProjects - 1">, </span>
-          </span>
-          <em class="has-text-grey" v-if="nbProjects === 0">
+          <template v-if="projects.length">
+            <span v-for="(project, index) in projects" :key="project.id">
+              <router-link :to="`/project/${project.id}`">{{project.name}}</router-link>
+              <span v-if="index < projects.length - 1">, </span>
+            </span>
+          </template>
+          <em class="has-text-grey" v-else-if="nbProjects > 0">
+            {{$t('used-in-project-no-access')}}
+          </em>
+          <em class="has-text-grey" v-else>
             {{$t('not-used-in-any-project')}}
           </em>
         </td>
@@ -40,7 +45,10 @@
             <button class="button" @click="isRenameModalActive = true">
               {{$t('button-rename')}}
             </button>
-            <button class="button is-danger" @click="confirmDeletion()" :disabled="nbProjects > 0"
+            <button
+              class="button is-danger"
+              @click="confirmDeletion()"
+              :disabled="nbProjects > 0"
               :title="nbProjects ? $t('cannot-delete-ontology-with-projects') : ''"
             >
               {{$t('button-delete')}}
@@ -81,7 +89,7 @@
 </template>
 
 <script>
-import {Ontology, User} from 'cytomine-client';
+import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
 import {fullName} from '@/utils/user-utils.js';
 
@@ -97,6 +105,7 @@ export default {
       error: false,
 
       fullOntology: {},
+      projects: [],
       creatorFullname: null,
 
       isRenameModalActive: false,
@@ -128,6 +137,10 @@ export default {
 
       try {
         this.fullOntology = await Ontology.fetch(this.ontology.id);
+
+        // projects prop of ontology contains all projects, including those that the current user cannot see => need to refetch the collection
+        this.projects = (await ProjectCollection.fetchAll({filterKey: 'ontology', filterValue: this.ontology.id})).array;
+        // ---
       }
       catch(error) {
         console.log(error);
