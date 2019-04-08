@@ -1,176 +1,176 @@
 <template>
 <div v-if="error" class="box error">
-    <h2> {{ $t("error") }} </h2>
-    <p>{{ $t("error-loading-image") }}</p>
+  <h2> {{ $t('error') }} </h2>
+  <p>{{ $t('error-loading-image') }}</p>
 </div>
 <div v-else class="cytomine-viewer">
-    <b-loading :is-full-page="false" :active="loading" />
-    <div v-if="!loading" class="maps-wrapper">
-        <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-            :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-        >
-            <cytomine-image
-                v-if="idx <= nbMaps"
-                :idViewer="idViewer"
-                :index="idx-1"
-                :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
-                @close="closeMap(idx-1)"
-            />
-        </div>
-
-        <image-selector :idViewer="idViewer" />
+  <b-loading :is-full-page="false" :active="loading" />
+  <div v-if="!loading" class="maps-wrapper">
+    <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
+      :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+    >
+      <cytomine-image
+        v-if="idx <= nbMaps"
+        :idViewer="idViewer"
+        :index="idx-1"
+        :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
+        @close="closeMap(idx-1)"
+      />
     </div>
+
+    <image-selector :idViewer="idViewer" />
+  </div>
 </div>
 </template>
 
 <script>
-import CytomineImage from "./CytomineImage";
-import ImageSelector from "./ImageSelector";
+import CytomineImage from './CytomineImage';
+import ImageSelector from './ImageSelector';
 
-import constants from "@/utils/constants.js";
+import constants from '@/utils/constants.js';
 
 export default {
-    name: "cytomine-viewer",
-    components: {
-        CytomineImage,
-        ImageSelector
+  name: 'cytomine-viewer',
+  components: {
+    CytomineImage,
+    ImageSelector
+  },
+  data() {
+    return {
+      error: false,
+      loading: true,
+      reloadInterval: null,
+      idViewer: null
+    };
+  },
+  computed: {
+    viewers() {
+      return this.$store.state.images.viewers;
     },
-    data() {
-        return {
-            error: false,
-            loading: true,
-            reloadInterval: null,
-            idViewer: null
-        };
+    idImages() {
+      return this.$route.params.idImages.split('-');
     },
-    computed: {
-        viewers() {
-            return this.$store.state.images.viewers;
-        },
-        idImages() {
-            return this.$route.params.idImages.split("-");
-        },
-        paramIdViewer() {
-            return this.$route.query.viewer;
-        },
-        viewer() {
-            return this.viewers[this.idViewer];
-        },
-        nbMaps() {
-            return this.viewer ? this.viewer.maps.length : 0;
-        },
-        imageSelector() {
-            return this.viewer ? this.viewer.imageSelector : false;
-        },
-        nbHorizontalCells() {
-            return Math.ceil(Math.sqrt(this.nbMaps));
-        },
-        nbVerticalCells() {
-            return this.nbHorizontalCells ? Math.ceil(this.nbMaps/this.nbHorizontalCells) : 0;
-        },
-        elementHeight() {
-            return 100/this.nbVerticalCells;
-        },
-        elementWidth() {
-            return 100/this.nbHorizontalCells;
-        }
+    paramIdViewer() {
+      return this.$route.query.viewer;
     },
-    watch: {
-        paramIdViewer() {
-            this.findIdViewer();
-        },
-        idViewer(_, old) {
-            if(old) {
-                this.loading = true;
-                this.loadViewer();
-            }
-        },
-        viewer() {
-            if(!this.viewer) {
-                console.log("Viewer closed from external source");
-                this.$router.push(`/project/${this.$route.params.idProject}`);
-            }
-        },
-        nbMaps() {
-            this.$eventBus.$emit("updateMapSize");
-        }
+    viewer() {
+      return this.viewers[this.idViewer];
     },
-    methods: {
-        findIdViewer() {
-            if(this.paramIdViewer) {
-                this.idViewer = this.paramIdViewer;
-                return;
-            }
-
-            for(let id in this.viewers) {
-                // if viewer containing the targetted images, and only them, store its id
-                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") === this.$route.params.idImages) {
-                    this.idViewer = id;
-                    return;
-                }
-            }
-
-            this.idViewer = "_" + Math.random().toString(36).substr(2, 9); // TODO: change the ways IDs are generated (discuss with team)
-        },
-
-        closeMap(index) {
-            if(this.nbMaps === 1) {
-                this.$store.commit("removeViewer", this.idViewer);
-                this.$router.push(`/project/${this.$route.params.idProject}`);
-            }
-            else {
-                this.$store.dispatch("removeMap", {idViewer: this.idViewer, index});
-            }
-        },
-
-        async loadViewer() {
-            try {
-                if(!this.viewer) {
-                    await this.$store.dispatch("addViewer", {
-                        idViewer: this.idViewer,
-                        idImages: this.idImages
-                    });
-                }
-                else {
-                    await this.$store.dispatch("refreshData", this.idViewer);
-                }
-                this.loading = false;
-            }
-            catch(err) {
-                console.log(err);
-                this.error = true;
-            }
-        }
+    nbMaps() {
+      return this.viewer ? this.viewer.maps.length : 0;
     },
-    async created() {
-        this.findIdViewer();
-        await this.loadViewer();
-        this.reloadInterval = setInterval(
-            () => this.$eventBus.$emit("reloadAnnotations"),
-            constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
-        );
+    imageSelector() {
+      return this.viewer ? this.viewer.imageSelector : false;
     },
-    beforeDestroy() {
-        clearInterval(this.reloadInterval);
+    nbHorizontalCells() {
+      return Math.ceil(Math.sqrt(this.nbMaps));
+    },
+    nbVerticalCells() {
+      return this.nbHorizontalCells ? Math.ceil(this.nbMaps/this.nbHorizontalCells) : 0;
+    },
+    elementHeight() {
+      return 100/this.nbVerticalCells;
+    },
+    elementWidth() {
+      return 100/this.nbHorizontalCells;
     }
+  },
+  watch: {
+    paramIdViewer() {
+      this.findIdViewer();
+    },
+    idViewer(_, old) {
+      if(old) {
+        this.loading = true;
+        this.loadViewer();
+      }
+    },
+    viewer() {
+      if(!this.viewer) {
+        console.log('Viewer closed from external source');
+        this.$router.push(`/project/${this.$route.params.idProject}`);
+      }
+    },
+    nbMaps() {
+      this.$eventBus.$emit('updateMapSize');
+    }
+  },
+  methods: {
+    findIdViewer() {
+      if(this.paramIdViewer) {
+        this.idViewer = this.paramIdViewer;
+        return;
+      }
+
+      for(let id in this.viewers) {
+        // if viewer containing the targetted images, and only them, store its id
+        if(this.viewers[id].maps.map(map => map.imageInstance.id).join('-') === this.$route.params.idImages) {
+          this.idViewer = id;
+          return;
+        }
+      }
+
+      this.idViewer = '_' + Math.random().toString(36).substr(2, 9); // TODO: change the ways IDs are generated (discuss with team)
+    },
+
+    closeMap(index) {
+      if(this.nbMaps === 1) {
+        this.$store.commit('removeViewer', this.idViewer);
+        this.$router.push(`/project/${this.$route.params.idProject}`);
+      }
+      else {
+        this.$store.dispatch('removeMap', {idViewer: this.idViewer, index});
+      }
+    },
+
+    async loadViewer() {
+      try {
+        if(!this.viewer) {
+          await this.$store.dispatch('addViewer', {
+            idViewer: this.idViewer,
+            idImages: this.idImages
+          });
+        }
+        else {
+          await this.$store.dispatch('refreshData', this.idViewer);
+        }
+        this.loading = false;
+      }
+      catch(err) {
+        console.log(err);
+        this.error = true;
+      }
+    }
+  },
+  async created() {
+    this.findIdViewer();
+    await this.loadViewer();
+    this.reloadInterval = setInterval(
+      () => this.$eventBus.$emit('reloadAnnotations'),
+      constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
+    );
+  },
+  beforeDestroy() {
+    clearInterval(this.reloadInterval);
+  }
 };
 </script>
 
 <style scoped>
 .cytomine-viewer {
-    height: 100%;
+  height: 100%;
 }
 
 .maps-wrapper {
-    height: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    position: relative;
-    overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
 }
 
 .map-cell {
-    border-top: 3px solid #222;
-    overflow: hidden;
+  border-top: 3px solid #222;
+  overflow: hidden;
 }
 </style>

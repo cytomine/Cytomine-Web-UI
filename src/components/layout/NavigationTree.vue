@@ -1,110 +1,110 @@
 <template>
 <div class="navigation-tree-wrapper">
-    <div v-for="(project, idProject, index) in navigationObject" :key="idProject">
-        <div class="navbar-item project-item">{{project.name}}</div>
-        <template v-for="viewer in project.viewers">
-            <router-link class="navbar-item viewer-item" :to="viewer.path" :key="viewer.id" exact>
-                <div class="viewer-name">
-                    <span>
-                        <i class="fas fa-caret-right"></i>
-                        <template v-if="viewer.maps.length === 1">
-                            <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
-                        </template>
-                        <template v-else>
-                            {{$t("viewer-group", {nbImages: viewer.maps.length})}}
-                        </template>
-                        {{viewer.name}}
-                    </span>
-                    <ul class="viewer-details" v-if="viewer.maps.length > 1">
-                        <li v-for="(map, index) in viewer.maps" :key="index">
-                            <image-name :image="map.imageInstance" />
-                        </li>
-                    </ul>
-                </div>
-                <a class="delete is-small" @click.stop.prevent="close(viewer.id)"></a>
-            </router-link>
-        </template>
-        <hr v-if="index < nbNavigationProjects - 1" class="navbar-divider">
-    </div>
+  <div v-for="(project, idProject, index) in navigationObject" :key="idProject">
+    <div class="navbar-item project-item">{{project.name}}</div>
+    <template v-for="viewer in project.viewers">
+      <router-link class="navbar-item viewer-item" :to="viewer.path" :key="viewer.id" exact>
+        <div class="viewer-name">
+          <span>
+            <i class="fas fa-caret-right"></i>
+            <template v-if="viewer.maps.length === 1">
+              <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
+            </template>
+            <template v-else>
+              {{$t('viewer-group', {nbImages: viewer.maps.length})}}
+            </template>
+            {{viewer.name}}
+          </span>
+          <ul class="viewer-details" v-if="viewer.maps.length > 1">
+            <li v-for="(map, index) in viewer.maps" :key="index">
+              <image-name :image="map.imageInstance" />
+            </li>
+          </ul>
+        </div>
+        <a class="delete is-small" @click.stop.prevent="close(viewer.id)"></a>
+      </router-link>
+    </template>
+    <hr v-if="index < nbNavigationProjects - 1" class="navbar-divider">
+  </div>
 </div>
 </template>
 
 <script>
-import ImageName from "@/components/image/ImageName";
+import ImageName from '@/components/image/ImageName';
 
 export default {
-    name: "navigation-tree",
-    components: {ImageName},
-    computed: {
-        navigationObject() {
-            let data = {};
-            let viewers = this.$store.state.images.viewers;
-            for(let id in viewers) {
-                let viewer = viewers[id];
-                let nbMaps = viewer.maps.length;
-                if(nbMaps === 0) {
-                    return;
-                }
-
-                if(!(viewer.idProject in data)) {
-                    data[viewer.idProject] = {name: viewer.nameProject, blind: viewer.blindProject, viewers: []};
-                }
-
-                data[viewer.idProject].viewers.push({
-                    id,
-                    path: this.$store.getters.pathViewer({idViewer: id}),
-                    maps: viewer.maps
-                });
-            }
-            return data;
-        },
-        nbNavigationProjects() {
-            return Object.keys(this.navigationObject).length;
+  name: 'navigation-tree',
+  components: {ImageName},
+  computed: {
+    navigationObject() {
+      let data = {};
+      let viewers = this.$store.state.images.viewers;
+      for(let id in viewers) {
+        let viewer = viewers[id];
+        let nbMaps = viewer.maps.length;
+        if(nbMaps === 0) {
+          return;
         }
+
+        if(!(viewer.idProject in data)) {
+          data[viewer.idProject] = {name: viewer.nameProject, blind: viewer.blindProject, viewers: []};
+        }
+
+        data[viewer.idProject].viewers.push({
+          id,
+          path: this.$store.getters.pathViewer({idViewer: id}),
+          maps: viewer.maps
+        });
+      }
+      return data;
     },
-    methods: {
-        close(id) {
-            this.$store.commit("removeViewer", id);
-        }
+    nbNavigationProjects() {
+      return Object.keys(this.navigationObject).length;
     }
+  },
+  methods: {
+    close(id) {
+      this.$store.commit('removeViewer', id);
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-@import "~bulma/sass/utilities/mixins.sass";
+@import '~bulma/sass/utilities/mixins.sass';
 
 .project-item {
-    font-size: 0.9em;
-    color: #333;
+  font-size: 0.9em;
+  color: #333;
 }
 
 .viewer-item {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-    position: relative;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  position: relative;
 }
 
 .viewer-item ul {
-    color: #888;
-    font-weight: normal;
-    margin-left: 1rem;
-    font-size: 0.85em;
+  color: #888;
+  font-weight: normal;
+  margin-left: 1rem;
+  font-size: 0.85em;
 }
 
 .viewer-name {
-    padding-right: 2rem;
+  padding-right: 2rem;
 }
 
 .viewer-item .delete {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
 }
 
 .navigation-tree-wrapper {
-    @include desktop {
-        max-height: 70vh;
-        overflow: auto;
-    }
+  @include desktop {
+    max-height: 70vh;
+    overflow: auto;
+  }
 }
 </style>

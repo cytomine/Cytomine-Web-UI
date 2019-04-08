@@ -1,67 +1,67 @@
 <template>
 <p v-if="filteredUsers.length">
-    <span v-for="(user, index) in usersToDisplay" :key="user.id">
-        <username :user="user" :online="isOnline(user.id)" /><template v-if="index < usersToDisplay.length - 1">, </template>
-    </span>
-    <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">
-        {{ expanded ? $t("button-less") : $t("button-more")}}
-    </button>
+  <span v-for="(user, index) in usersToDisplay" :key="user.id">
+    <username :user="user" :online="isOnline(user.id)" /><template v-if="index < usersToDisplay.length - 1">, </template>
+  </span>
+  <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">
+    {{ expanded ? $t('button-less') : $t('button-more')}}
+  </button>
 </p>
 <p v-else>
-    -
+  -
 </p>
 </template>
 
 <script>
-import Username from "./Username";
+import Username from './Username';
 export default {
-    name: "list-usernames",
-    components: {Username},
-    props: {
-        users: Array,
-        onlines: Array,
-        nbDisplayed: {
-            type: Number,
-            default: 5
-        }
-    },
-    data() {
-        return {
-            expanded: false
-        };
-    },
-    computed: {
-        filteredUsers() {
-            return this.users.filter(user => user); // Filter null users
-        },
-        tooManyUsers() {
-            return this.filteredUsers && this.filteredUsers.length > this.nbDisplayed;
-        },
-        usersToDisplay() {
-            if(!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
-                return this.filteredUsers;
-            }
-            else {
-                return this.filteredUsers.slice(0, this.nbDisplayed);
-            }
-        }
-    },
-    methods: {
-        isOnline(id) {
-            if(!this.onlines) {
-                return null;
-            }
-
-            return this.onlines.some(online => online.id === id);
-        }
+  name: 'list-usernames',
+  components: {Username},
+  props: {
+    users: Array,
+    onlines: Array,
+    nbDisplayed: {
+      type: Number,
+      default: 5
     }
+  },
+  data() {
+    return {
+      expanded: false
+    };
+  },
+  computed: {
+    filteredUsers() {
+      return this.users.filter(user => user); // Filter null users
+    },
+    tooManyUsers() {
+      return this.filteredUsers && this.filteredUsers.length > this.nbDisplayed;
+    },
+    usersToDisplay() {
+      if(!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
+        return this.filteredUsers;
+      }
+      else {
+        return this.filteredUsers.slice(0, this.nbDisplayed);
+      }
+    }
+  },
+  methods: {
+    isOnline(id) {
+      if(!this.onlines) {
+        return null;
+      }
+
+      return this.onlines.some(online => online.id === id);
+    }
+  }
 };
 </script>
 
 <style scoped>
 .button {
-    line-height: initial;
-    height: initial;
-    margin-left: 5px;
+  line-height: initial;
+  height: initial;
+  margin-left: 5px;
 }
 </style>

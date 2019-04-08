@@ -1,143 +1,143 @@
 $primary: #61b2e8;
-@import "~bulma";
-@import "~buefy/src/scss/buefy";
-@import "~bulma-slider/dist/css/bulma-slider.min.css";
+@import '~bulma';
+@import '~buefy/src/scss/buefy';
+@import '~bulma-slider/dist/css/bulma-slider.min.css';
 
 $loadingColor: #bbb;
 
 /* Table */
 
 .table tbody tr:last-child td {
-    border-bottom-width: 1px !important;
+  border-bottom-width: 1px !important;
 }
 
 .table tbody tr:last-child th {
-    border-bottom-width: 2px !important;
+  border-bottom-width: 2px !important;
 }
 
 .table tbody > tr:last-child > td, .table tbody > tr:last-child > th {
-    border-bottom-width: 0 !important;
+  border-bottom-width: 0 !important;
 }
 
 .b-table .table th.is-sortable:not(.is-current-sort) .th-wrap::after {
-    font-family: "Font Awesome 5 Free";
-    content: "\f0dc";
-    position: relative;
-    color: rgba(0, 0, 0, 0.2);
-    left: 8px;
-    top: 1px;
+  font-family: "Font Awesome 5 Free";
+  content: "\f0dc";
+  position: relative;
+  color: rgba(0, 0, 0, 0.2);
+  left: 8px;
+  top: 1px;
 }
 
 .b-table .table th.is-current-sort {
-    font-weight: 600 !important;
+  font-weight: 600 !important;
 }
 
 .b-table .table th .button {
-    font-weight: 400;
+  font-weight: 400;
 }
 
 /* Panel */
 
 .panel-heading {
-    border-radius: 8px 8px 0px 0px;
-    font-weight: 400 !important;
+  border-radius: 8px 8px 0px 0px;
+  font-weight: 400 !important;
 }
 
 .panel-block {
-    background: #fff;
-    display: block;
+  background: #fff;
+  display: block;
 
-    &:last-of-type {
-        border-radius: 0px 0px 8px 8px;
-    }
+  &:last-of-type {
+    border-radius: 0px 0px 8px 8px;
+  }
 }
 
 /* Modal */
 
 .modal .animation-content {
-    max-width: unset !important;
+  max-width: unset !important;
 }
 
 .modal {
-    z-index: 2000;
+  z-index: 2000;
 }
 
 .modal-background {
-    background-color: rgba(10, 10, 10, 0.7);
+  background-color: rgba(10, 10, 10, 0.7);
 }
 
 .modal-card {
-    max-height: 80vh;
+  max-height: 80vh;
 }
 
 .modal .modal-card-head {
-    padding: 15px !important;
+  padding: 15px !important;
 }
 
 .modal .modal-card-title {
-    font-size: 1.2rem !important;
-    font-weight: normal !important;
+  font-size: 1.2rem !important;
+  font-weight: normal !important;
 }
 
 .modal .modal-card-body {
-    line-height: 1.5;
+  line-height: 1.5;
 }
 
 .modal .modal-card-foot {
-    padding: 10px !important;
-    justify-content: flex-end;
+  padding: 10px !important;
+  justify-content: flex-end;
 }
 
 .modal .modal-card-foot button {
-    font-size: 14px;
-    font-weight: normal !important;
+  font-size: 14px;
+  font-weight: normal !important;
 }
 
 /* Loading */
 
 .loading-overlay .loading-icon::after {
-    width: 5em;
-    height: 5em;
-    border-left-color: $loadingColor;
-    border-bottom-color: $loadingColor;
+  width: 5em;
+  height: 5em;
+  border-left-color: $loadingColor;
+  border-bottom-color: $loadingColor;
 }
 
 .loading-overlay.small .loading-icon::after {
-    width: 2em;
-    height: 2em;
-    border-left-color: $loadingColor;
-    border-bottom-color: $loadingColor;
+  width: 2em;
+  height: 2em;
+  border-left-color: $loadingColor;
+  border-bottom-color: $loadingColor;
 }
 
 /* Radio button */
 
 .radio-buttons-fullwidth .control {
-    flex: 1;
+  flex: 1;
 
-    .b-radio {
-        width: 100%;
-        border-color: #b5b5b5;
+  .b-radio {
+    width: 100%;
+    border-color: #b5b5b5;
 
-        &:hover:not(.is-link) {
-            background: #f5f5f5;
-        }
+    &:hover:not(.is-link) {
+      background: #f5f5f5;
     }
+  }
 }
 
 /* Message */
 
 .message.is-warning {
-    background: rgba(255, 69, 0, 0.05) !important;
+  background: rgba(255, 69, 0, 0.05) !important;
 
-    .message-body {
-        border-color: rgb(255, 120, 0);
-    }
+  .message-body {
+    border-color: rgb(255, 120, 0);
+  }
 
-    .icon {
-        color: rgb(255, 120, 0);
-    }
+  .icon {
+    color: rgb(255, 120, 0);
+  }
 }
 
 .message {
-    font-size: 1em;
+  font-size: 1em;
 }
