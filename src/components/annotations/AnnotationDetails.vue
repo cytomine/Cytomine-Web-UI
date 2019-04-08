@@ -35,10 +35,10 @@
         <td colspan="2">
           <h5>{{$t('terms')}}</h5>
           <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
-          :title="`${$t('associated-by')} ${user.fullName}`">
+          :title="$t('associated-by', {username: user.fullName})">
             <cytomine-term :term="term" />
             <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
-              @click="removeTerm(term.id)">
+              @click="removeTerm(term.id, user.id)">
             </button>
           </b-tag>
           <div class="add-term-wrapper" v-if="canEditTerms" v-click-outside="() => showTermSelector = false">
@@ -244,11 +244,12 @@ export default {
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
     },
 
-    async newTerm(term) {
+    async newTerm(term) { // a new term was added to the ontology
       this.$emit('addTerm', term);
       this.$store.dispatch('fetchOntology');
       this.addTerm(term.id);
     },
+
     async addTerm(idTerm) {
       if(idTerm) {
         try {
@@ -266,16 +267,29 @@ export default {
         }
       }
     },
-    async removeTerm(idTerm) {
+    async removeTerm(idTerm, idUser) {
+      idUser = idUser || this.findUserByTerm(idTerm); // if term removed from ontology tree, idUser not set => find it manually
+      if(!idUser) {
+        return;
+      }
+
       try {
-        // TODO decide who can delete what, and adapt accordingly
         // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
-        await AnnotationTerm.delete(this.annotation.id, idTerm);
+        await AnnotationTerm.delete(this.annotation.id, idTerm, Number(idUser));
         this.$emit('updateTerms');
       }
       catch(error) {
+        console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-term')});
         this.revTerms++;
+      }
+    },
+    findUserByTerm(idTerm) {
+      if(this.annotation.userByTerm) {
+        let match = this.annotation.userByTerm.find(ubt => ubt.term === idTerm);
+        if(match) {
+          return match.user[0];
+        }
       }
     },
 
