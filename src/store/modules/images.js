@@ -503,7 +503,7 @@ export default {
 
         broadcast: false,
         trackedUser: null,
-        
+
         activePanel: null,
 
         selectedLayers: null,
@@ -740,6 +740,10 @@ export default {
 // Helper functions
 
 async function fetchLayerPropertiesValues(idLayer, idImage, key) {
+  if(idLayer === -1) {
+    return []; // currently not possible to retrieve properties of review layer (TODO in core)
+  }
+
   let propertiesValues = await PropertyCollection.fetchPropertiesValuesAndPositions(
     idLayer,
     idImage,
