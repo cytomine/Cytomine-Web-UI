@@ -82,7 +82,10 @@ export default {
   },
   methods: {
     annotBelongsToLayer(annot) {
-      return this.layer.isReview ? annot.type === AnnotationType.REVIEWED : annot.user === this.layer.id;
+      if(annot.image !== this.image.id) {
+        return false;
+      }
+      return this.layer.isReview ? (annot.type === AnnotationType.REVIEWED) : (annot.user === this.layer.id);
     },
 
     addAnnotationHandler(annot) {
