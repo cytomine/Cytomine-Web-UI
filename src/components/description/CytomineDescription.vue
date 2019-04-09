@@ -94,6 +94,11 @@ export default {
   position: relative;
 }
 
+.description-wrapper .ql-editor {
+  padding: 0px;
+  white-space: normal;
+}
+
 .description-wrapper.loading {
   min-height: 3em;
 }
