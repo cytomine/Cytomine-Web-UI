@@ -1,56 +1,79 @@
 <template>
 <div class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
-  <div v-if="!loading" class="columns">
-    <div class="column is-one-quarter">
-      <div class="panel">
-          <p class="panel-heading">
-            {{$t('ontologies')}}
-            <button class="button is-link" @click="creationModal = true">
-              {{$t('new-ontology')}}
-            </button>
-          </p>
-          <div class="panel-block">
-            <b-input
-              size="is-small"
-              v-model="searchString"
-              type="search"
-              icon="search"
-              :placeholder="$t('search-placeholder')"
-            />
-          </div>
-          <div class="panel-main-content">
-            <a
-              v-for="ontology in filteredOntologies"
-              :key="ontology.id"
-              @click="selectOntology(ontology)"
-              class="panel-block"
-              :class="{'is-active': selectedOntology.id === ontology.id}"
-            >
-              <span class="panel-icon">
-                <i v-if="selectedOntology.id === ontology.id" class="fas fa-caret-right" aria-hidden="true"></i>
-              </span>
-              {{ontology.name}}
-            </a>
-          </div>
-      </div>
+
+  <template v-if="!loading">
+    <div class="box error" v-if="!ontologies">
+      <h2> {{ $t('error') }} </h2>
+      <p>{{ $t('unexpected-error-info-message') }}</p>
     </div>
 
-    <div class="column">
-      <div class="panel">
-        <p class="panel-heading">
-          {{selectedOntology.name}}
-        </p>
-        <div class="panel-block panel-main-content">
-          <ontology-details
-            :ontology="selectedOntology"
-            @delete="deleteOntology()"
-            @rename="renameOntology"
-          />
+    <div v-else-if="ontologies.length > 0" class="columns">
+      <div class="column is-one-quarter">
+        <div class="panel">
+            <p class="panel-heading">
+              {{$t('ontologies')}}
+              <button class="button is-link" @click="creationModal = true" v-if="!currentUser.guestByNow">
+                {{$t('new-ontology')}}
+              </button>
+            </p>
+            <div class="panel-block">
+              <b-input
+                size="is-small"
+                v-model="searchString"
+                type="search"
+                icon="search"
+                :placeholder="$t('search-placeholder')"
+              />
+            </div>
+            <div class="panel-main-content">
+              <a
+                v-for="ontology in filteredOntologies"
+                :key="ontology.id"
+                @click="selectOntology(ontology)"
+                class="panel-block"
+                :class="{'is-active': isSelected(ontology)}"
+              >
+                <span class="panel-icon">
+                  <i v-if="isSelected(ontology)" class="fas fa-caret-right" aria-hidden="true"></i>
+                </span>
+                {{ontology.name}}
+              </a>
+            </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="panel">
+          <p class="panel-heading">
+            {{selectedOntology ? selectedOntology.name : $t('not-found')}}
+          </p>
+          <div class="panel-block panel-main-content">
+            <ontology-details
+              v-if="selectedOntology"
+              :ontology="selectedOntology"
+              @delete="deleteOntology()"
+              @rename="renameOntology"
+            />
+            <b-message type="is-danger" has-icon icon-size="is-small" v-else>
+              {{ $t('not-found-error') }}
+            </b-message>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="box error" v-else>
+      <div class="columns">
+        <p class="column">{{$t('dont-have-access-to-any-ontology')}}</p>
+        <p class="column has-text-right">
+          <button class="button is-link" @click="creationModal = true" v-if="!currentUser.guestByNow">
+            {{$t('new-ontology')}}
+          </button>
+        </p>
+      </div>
+    </div>
+  </template>
 
   <add-ontology-modal :active.sync="creationModal" @newOntology="addOntology" />
 </div>
@@ -70,13 +93,16 @@ export default {
   data() {
     return {
       loading: true,
-      ontologies: [],
+      ontologies: null,
       selectedOntology: null,
       searchString: '',
       creationModal: false
     };
   },
   computed: {
+    currentUser() {
+      return this.$store.state.currentUser.user;
+    },
     idTargetOntology() {
       return Number(this.$route.params.idOntology);
     },
@@ -107,9 +133,9 @@ export default {
     },
     selectTargetOntology() {
       this.selectedOntology = this.ontologies.find(ontology => ontology.id === this.idTargetOntology);
-      if(!this.selectedOntology) {
-        this.error = true;
-      }
+    },
+    isSelected(ontology) {
+      return this.selectedOntology && this.selectedOntology.id === ontology.id;
     },
     sortOntologies() {
       this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
@@ -141,7 +167,14 @@ export default {
     }
   },
   async created() {
-    this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+    try {
+      this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+    }
+    catch(error) {
+      console.log(error);
+      this.loading = false;
+      return;
+    }
     this.sortOntologies();
 
     if(this.idTargetOntology) {
@@ -184,5 +217,9 @@ export default {
 .panel-main-content {
   overflow: auto;
   flex-grow: 1;
+}
+
+.box.error .columns {
+  align-items: center;
 }
 </style>
