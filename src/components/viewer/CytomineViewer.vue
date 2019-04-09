@@ -19,6 +19,9 @@
     </div>
 
     <image-selector :idViewer="idViewer" />
+
+    <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+    <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
   </div>
 </div>
 </template>
@@ -73,6 +76,16 @@ export default {
     },
     elementWidth() {
       return 100/this.nbHorizontalCells;
+    },
+    shortkeysMapping() {
+      // for shortkeys composed of a single key, return the key as srcKey
+      let mapping = ['s', 'o', 'f', 'd', 'p', 'n'].reduce((object, key) => {
+        object[key] = [key];
+        return object;
+      }, {});
+      mapping.ctrlZ = ['ctrl', 'z']; // special handling because combination of keys should trigger the function
+      mapping.ctrlY = ['ctrl', 'y']; // idem
+      return mapping;
     }
   },
   watch: {
@@ -140,6 +153,10 @@ export default {
         console.log(err);
         this.error = true;
       }
+    },
+
+    shortkeyEvent(event) {
+      this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     }
   },
   async created() {
@@ -172,5 +189,9 @@ export default {
 .map-cell {
   border-top: 3px solid #222;
   overflow: hidden;
+}
+
+.hidden {
+  display: none;
 }
 </style>

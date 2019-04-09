@@ -40,22 +40,10 @@
       <tr>
         <td colspan="2">
           <div class="buttons navigation has-addons">
-            <button
-              class="button is-small"
-              @click="previousImage()"
-              :disabled="isFirstImage"
-              v-shortkey.once="['p']"
-              @shortkey="previousImage()"
-            >
+            <button class="button is-small" @click="previousImage()" :disabled="isFirstImage">
               <i class="fas fa-angle-left fa-lg"></i> {{$t('button-previous-image')}}
             </button>
-            <button
-              class="button is-small"
-              @click="nextImage()"
-              :disabled="isLastImage"
-              v-shortkey.once="['n']"
-              @shortkey="nextImage()"
-            >
+            <button class="button is-small" @click="nextImage()" :disabled="isLastImage">
               {{$t('button-next-image')}} <i class="fas fa-angle-right fa-lg"></i>
             </button>
           </div>
@@ -94,8 +82,11 @@ export default {
     };
   },
   computed: {
+    viewerWrapper() {
+      return this.$store.state.images.viewers[this.idViewer];
+    },
     image() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index].imageInstance;
+      return this.viewerWrapper.maps[this.index].imageInstance;
     },
     resolution() {
       if(this.image.resolution) {
@@ -111,6 +102,9 @@ export default {
     canEdit() {
       return this.$store.getters.canEditImage(this.image);
     },
+    isActiveMap() {
+      return this.viewerWrapper.activeMap === this.index;
+    }
   },
   methods: {
     setResolution(resolution) {
@@ -157,7 +151,26 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
+    },
+
+    shortkeyHandler(key) {
+      if(!this.isActiveMap) { // shortkey should only be applied to active map
+        return;
+      }
+
+      if(key === 'n') {
+        this.nextImage();
+      }
+      else if(key === 'p') {
+        this.previousImage();
+      }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

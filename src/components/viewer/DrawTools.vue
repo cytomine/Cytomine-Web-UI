@@ -6,8 +6,6 @@
       class="button is-small"
       :class="{'is-selected': activeTool === 'select'}"
       @click="activateTool('select')"
-      v-shortkey.once="['s']"
-      @shortkey="activateTool('select')"
     >
       <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
     </button>
@@ -51,8 +49,6 @@
       class="button is-small"
       :class="{'is-selected': activeTool === 'point'}"
       @click="activateTool('point')"
-      v-shortkey.once="['o']"
-      @shortkey="activateTool('point')"
     >
       <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
     </button>
@@ -127,8 +123,6 @@
       class="button is-small"
       :class="{'is-selected': activeTool === 'freehand-polygon'}"
       @click="activateTool('freehand-polygon')"
-      v-shortkey.once="['f']"
-      @shortkey="activateTool('freehand-polygon')"
     >
       <span class="icon is-small">
         <icon-polygon-free-hand />
@@ -219,8 +213,6 @@
       v-tooltip="$t('delete')"
       class="button is-small"
       @click="confirmDeletion()"
-      v-shortkey.once="['d']"
-      @shortkey="confirmDeletion()"
     >
       <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
     </button>
@@ -232,8 +224,6 @@
       v-tooltip="$t('undo')"
       class="button is-small"
       @click="undo()"
-      v-shortkey.once="['ctrl', 'z']"
-      @shortkey="undo()"
     >
       <span class="icon is-small"><i class="fas fa-undo"></i></span>
     </button>
@@ -243,8 +233,6 @@
       v-tooltip="$t('redo')"
       class="button is-small"
       @click="redo()"
-      v-shortkey.once="['ctrl', 'y']"
-      @shortkey="redo()"
     >
       <span class="icon is-small"><i class="fas fa-redo"></i></span>
     </button>
@@ -287,8 +275,11 @@ export default {
     ontology() {
       return this.$store.state.project.ontology;
     },
+    viewerWrapper() {
+      return this.$store.state.images.viewers[this.idViewer];
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.viewerWrapper.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -358,6 +349,9 @@ export default {
     },
     undoneActions() {
       return this.imageWrapper.undoneActions;
+    },
+    isActiveMap() {
+      return this.viewerWrapper.activeMap === this.index;
     }
   },
   watch: {
@@ -480,6 +474,10 @@ export default {
 
 
     async undo() {
+      if(this.actions.length === 0) {
+        return;
+      }
+
       let action = this.actions[this.actions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, true);
@@ -491,6 +489,10 @@ export default {
       }
     },
     async redo() {
+      if(this.undoneActions.length === 0) {
+        return;
+      }
+
       let action = this.undoneActions[this.undoneActions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, false);
@@ -538,7 +540,40 @@ export default {
           return annot;
         }
       }
+    },
+
+    shortkeyHandler(key) {
+      if(!this.isActiveMap) { // shortkey should only be applied to active map
+        return;
+      }
+
+      switch(key) {
+        case 's':
+          this.activateTool('select');
+          return;
+        case 'o':
+          this.activateTool('point');
+          return;
+        case 'f':
+          this.activateTool('freehand-polygon');
+          return;
+        case 'd':
+          this.confirmDeletion();
+          return;
+        case 'ctrlZ':
+          this.undo();
+          return;
+        case 'ctrlY':
+          this.redo();
+          return;
+      }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>
