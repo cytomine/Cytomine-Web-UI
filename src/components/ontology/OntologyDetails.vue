@@ -8,7 +8,7 @@
       <tr>
         <td colspan="2">
           <strong>{{$t('terms')}}</strong>
-          <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="true" :allowEdition="true">
+          <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
             <template #no-result>
               <em class="has-text-grey">{{$t('no-term')}}</em>
             </template>
@@ -38,7 +38,7 @@
           {{creatorFullname || $t('unknown')}}
         </td>
       </tr>
-      <tr>
+      <tr v-if="canEdit">
         <td><strong>{{$t('actions')}}</strong></td>
         <td>
           <div class="buttons">
@@ -113,6 +113,12 @@ export default {
     };
   },
   computed: {
+    currentUser() {
+      return this.$store.state.currentUser.user;
+    },
+    canEdit() {
+      return this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user;
+    },
     nbProjects() {
       return this.fullOntology.projects.length;
     },
