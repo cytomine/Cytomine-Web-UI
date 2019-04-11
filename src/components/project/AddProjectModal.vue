@@ -105,7 +105,7 @@ export default {
           idOntology = ontology.id;
         }
         else if(this.ontology === 'EXISTING') {
-          idOntology = this.selectedOntology.id;
+          idOntology = this.selectedOntology;
         }
 
         let project = await new Project({name: this.name, ontology: idOntology}).save();
