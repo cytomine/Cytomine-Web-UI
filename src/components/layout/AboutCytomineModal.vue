@@ -1,73 +1,71 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">{{$t('about-cytomine')}}</p>
-    </header>
-    <section v-if="!loading" class="modal-card-body">
-      <dl>
-        <dt>{{$t('version')}}</dt>
-        <dd>{{version || "?"}}</dd>
+<div class="modal-card">
+  <header class="modal-card-head">
+    <p class="modal-card-title">{{$t('about-cytomine')}}</p>
+  </header>
+  <section v-if="!loading" class="modal-card-body">
+    <dl>
+      <dt>{{$t('version')}}</dt>
+      <dd>{{version || '?'}}</dd>
 
-        <dt>{{$t('sponsors')}}</dt>
-        <dd>
-          <a href="https://cytomine.coop" target="_blank">
-            <img src="@/assets/sponsors/logo-cytomine-coop.png" class="sponsor">
-          </a>
-          <a href="https://www.uliege.be" target="_blank">
-            <img src="@/assets/sponsors/logo-uliege.png" class="sponsor">
-          </a>
-          <a href="https://www.wallonie.be/" target="_blank">
-            <img src="@/assets/sponsors/logo-wallonie.png" class="sponsor">
-          </a>
-        </dd>
+      <dt>{{$t('sponsors')}}</dt>
+      <dd>
+        <a href="https://cytomine.coop" target="_blank">
+          <img src="@/assets/sponsors/logo-cytomine-coop.png" class="sponsor">
+        </a>
+        <a href="https://www.uliege.be" target="_blank">
+          <img src="@/assets/sponsors/logo-uliege.png" class="sponsor">
+        </a>
+        <a href="https://www.wallonie.be/" target="_blank">
+          <img src="@/assets/sponsors/logo-wallonie.png" class="sponsor">
+        </a>
+      </dd>
 
-        <dt>{{$t('description')}}</dt>
-        <dd>
-          <i18n path="cytomine-sponsors-info">
-            <a place="cytomineCompanyLink" href="https://cytomine.coop" target="_blank">
-              {{$t('cytomine-company')}}</a>
-          </i18n>
-        </dd>
+      <dt>{{$t('description')}}</dt>
+      <dd>
+        <i18n path="cytomine-sponsors-info">
+          <a place="cytomineCompanyLink" href="https://cytomine.coop" target="_blank">
+            {{$t('cytomine-company')}}</a>
+        </i18n>
+      </dd>
 
-        <dt>{{$t('website')}}</dt>
-        <dd>
-          <i18n path="cytomine-website-info">
-            <a place="websiteLink" href="https://cytomine.coop" target="_blank">cytomine.org</a>
-          </i18n>
-        </dd>
+      <dt>{{$t('website')}}</dt>
+      <dd>
+        <i18n path="cytomine-website-info">
+          <a place="websiteLink" href="https://cytomine.coop" target="_blank">cytomine.org</a>
+        </i18n>
+      </dd>
 
-        <dt>{{$t('source-code')}}</dt>
-        <dd>
-          <i18n path="source-code-info">
-            <a place="githubLink" href="http://github.com/cytomine/" target="_blank">
-              {{$t('github-repository')}}</a>
-          </i18n>
-        </dd>
+      <dt>{{$t('source-code')}}</dt>
+      <dd>
+        <i18n path="source-code-info">
+          <a place="githubLink" href="http://github.com/cytomine/" target="_blank">
+            {{$t('github-repository')}}</a>
+        </i18n>
+      </dd>
 
-        <dt>{{$t('documentation')}}</dt>
-        <dd>
-          <i18n path="documentation-info">
-            <a place="docLink" href="https://doc.cytomine.be/" target="_blank">{{$t('here')}}</a>
-            <a place="apiDocLink" :href="apiDocLink" target="_blank">{{$t('here')}}</a>
-          </i18n>
-        </dd>
+      <dt>{{$t('documentation')}}</dt>
+      <dd>
+        <i18n path="documentation-info">
+          <a place="docLink" href="https://doc.cytomine.be/" target="_blank">{{$t('here')}}</a>
+          <a place="apiDocLink" :href="apiDocLink" target="_blank">{{$t('here')}}</a>
+        </i18n>
+      </dd>
 
-        <dt>{{$t('contact')}}</dt>
-        <dd>
-          <i18n path="contact-info">
-            <a place="contactMail" href="mailto:info@cytomine.org">info@cytomine.org</a>
-          </i18n>
-        </dd>
-      </dl>
-    </section>
-    <footer class="modal-card-foot">
-      <button class="button" type="button" @click="$emit('update:active', false)">
-        {{$t('button-close')}}
-      </button>
-    </footer>
-  </div>
-</b-modal>
+      <dt>{{$t('contact')}}</dt>
+      <dd>
+        <i18n path="contact-info">
+          <a place="contactMail" href="mailto:info@cytomine.org">info@cytomine.org</a>
+        </i18n>
+      </dd>
+    </dl>
+  </section>
+  <footer class="modal-card-foot">
+    <button class="button" type="button" @click="$parent.close()">
+      {{$t('button-close')}}
+    </button>
+  </footer>
+</div>
 </template>
 
 <script>
@@ -76,9 +74,6 @@ import constants from '@/utils/constants.js';
 
 export default {
   name: 'about-cytomine-wrapper',
-  props: {
-    active: Boolean
-  },
   data() {
     return {
       version: null,

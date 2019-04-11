@@ -328,8 +328,8 @@ export default {
 
 <style scoped>
 h1 {
-  text-transform: unset;
-  letter-spacing: unset;
+  text-transform: initial;
+  letter-spacing: initial;
   font-weight: 400;
   font-size: 22px;
   margin-bottom: 1rem;

@@ -175,12 +175,8 @@ em {
 </style>
 
 <style>
-.properties-wrapper .control {
+.properties-wrapper .control, .properties-wrapper .tags {
   margin-bottom: 0px !important;
-}
-
-.properties-wrapper .tags {
-  margin-bottom: unset !important;
 }
 
 .properties-wrapper .tag {

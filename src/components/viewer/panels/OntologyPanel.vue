@@ -140,6 +140,7 @@ export default {
 
 input[type="range"].slider {
   margin: 0px;
+  padding: 0px;
 }
 
 .header-tree {
@@ -174,7 +175,7 @@ input[type="range"].slider {
 }
 
 .header-tree .visibility {
-  height: unset;
+  height: auto;
 }
 
 .opacity {

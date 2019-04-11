@@ -28,7 +28,6 @@ import constants from '@/utils/constants.js';
 
 export default {
   name: 'cytomine-description',
-  components: {DescriptionModal},
   props: {
     object: {type: Object},
     canEdit: {type: Boolean, default: true}

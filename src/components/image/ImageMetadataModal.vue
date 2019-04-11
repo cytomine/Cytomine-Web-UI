@@ -81,8 +81,7 @@ export default {
       let height = this.$refs.image.clientHeight + 'px';
       return {
         width: reverse ? height : width,
-        height: reverse ? width : height,
-        textAlign: 'unset'
+        height: reverse ? width : height
       };
     }
   },
@@ -121,7 +120,7 @@ export default {
 
   img {
     transform-origin: top left;
-    max-width: unset;
+    max-width: initial;
 
     &.rotate-90 {
       transform: rotate(90deg) translateY(-100%);

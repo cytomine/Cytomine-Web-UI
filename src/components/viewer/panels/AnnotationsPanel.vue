@@ -309,6 +309,7 @@ td .button {
 
 >>> input[type="range"].slider {
   margin: 0px;
+  padding: 0px;
 }
 
 .opacity {

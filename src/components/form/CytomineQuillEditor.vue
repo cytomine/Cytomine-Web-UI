@@ -159,6 +159,10 @@ export default {
   display: flex;
   flex-direction: column;
 
+  .ql-toolbar {
+    flex-shrink: 0;
+  }
+
   .ql-bold svg, .ql-italic svg, .ql-underline svg {
     display: none;
   }

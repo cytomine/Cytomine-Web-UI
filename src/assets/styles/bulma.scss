@@ -54,12 +54,13 @@ $loadingColor: #bbb;
 
 /* Modal */
 
-.modal .animation-content {
-  max-width: unset !important;
+.modal {
+  z-index: 3000 !important;
 }
 
-.modal {
-  z-index: 2000;
+.modal .animation-content {
+  max-width: none !important;
+  z-index: 2000 !important;
 }
 
 .modal-background {
@@ -140,4 +141,19 @@ $loadingColor: #bbb;
 
 .message {
   font-size: 1em;
+}
+
+/* Change for IE compatibility */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+  /* Upload button (incorrect handling of z-index: -1 */
+  .upload.control input[type=file] {
+    z-index: auto;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .tile {
+    flex-basis: auto !important;
+  }
 }

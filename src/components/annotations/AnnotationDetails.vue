@@ -353,8 +353,9 @@ export default {
 .table {
   width: 100%;
   margin-bottom: 10px !important;
-  background: unset;
+  background: transparent;
 }
+
 .table th, .table td {
   vertical-align: middle;
 }
@@ -373,8 +374,8 @@ h5 {
   box-sizing: border-box;
 }
 
-button.is-fullwidth {
-  width: unset;
+a.is-fullwidth {
+  width: auto;
 }
 
 .autocomplete-term-option {

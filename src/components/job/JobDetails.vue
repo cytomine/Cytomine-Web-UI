@@ -288,7 +288,7 @@ td:not(:first-child) {
 }
 
 .inline-table {
-  width: unset !important;
+  width: auto !important;
 }
 
 .inline-table td:first-child {
@@ -296,7 +296,7 @@ td:not(:first-child) {
 }
 
 .inline-table td:not(:first-child) {
-  width: unset;
+  width: auto;
 }
 
 ul {

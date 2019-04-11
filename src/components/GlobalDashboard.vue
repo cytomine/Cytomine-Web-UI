@@ -96,7 +96,7 @@
           </table>
         </div>
 
-        <div class="box last-image">
+        <div class="box">
           <h2> {{ $t('last-opened-image') }} </h2>
           <image-preview
             v-if="lastOpenedImage"
@@ -252,9 +252,5 @@ td:first-child {
   font-weight: 600;
   text-align: right;
   width: 25%;
-}
-
-.last-image {
-  flex: 1;
 }
 </style>

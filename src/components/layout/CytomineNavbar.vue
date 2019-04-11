@@ -57,14 +57,11 @@
       </navbar-dropdown>
 
       <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
-        <a class="navbar-item" @click="hotkeysModal = true">{{$t('hotkeys')}}</a>
-        <a class="navbar-item" @click="aboutModal = true">{{$t('about-cytomine')}}</a>
+        <a class="navbar-item" @click="openHotkeysModal()">{{$t('hotkeys')}}</a>
+        <a class="navbar-item" @click="openAboutModal()">{{$t('about-cytomine')}}</a>
       </navbar-dropdown>
     </div>
   </div>
-
-  <hotkeys-modal :active.sync="hotkeysModal" />
-  <about-cytomine-modal :active.sync="aboutModal" />
 </nav>
 </template>
 
@@ -82,8 +79,6 @@ export default {
   components: {
     NavbarDropdown,
     NavigationTree,
-    HotkeysModal,
-    AboutCytomineModal,
     CytomineSearcher
   },
   data() {
@@ -105,6 +100,23 @@ export default {
     }
   },
   methods: {
+    // required to use programmatic modal for correct display in IE11
+    openHotkeysModal() {
+      this.$modal.open({
+        parent: this,
+        component: HotkeysModal,
+        hasModalCard: true
+      });
+    },
+    openAboutModal() {
+      this.$modal.open({
+        parent: this,
+        component: AboutCytomineModal,
+        hasModalCard: true
+      });
+    },
+    // ---
+
     async openAdminSession() {
       try {
         await this.$store.dispatch('openAdminSession');
@@ -123,6 +135,7 @@ export default {
         console.log(error);
       }
     },
+
     async logout() {
       try {
         await this.$store.dispatch('logout');
@@ -143,6 +156,14 @@ export default {
   font-size: 2em;
   font-weight: lighter;
   line-height: 1em;
+}
+
+/* Special styling for IE */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  #logo {
+    height: 40px !important;
+    max-height: none !important;
+  }
 }
 
 .navbar {

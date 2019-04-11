@@ -658,13 +658,13 @@ $sizePositioningLineSize: 2px;
 
 .panels li:nth-child(-n+3) .panel-options {
   top: -20px;
-  bottom: unset;
+  bottom: auto;
   min-height: 100px;
 }
 
 .panels li:nth-child(4) .panel-options {
   top: -50px;
-  bottom: unset;
+  bottom: auto;
 }
 
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */

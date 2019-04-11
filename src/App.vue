@@ -141,7 +141,7 @@ body {
   font: 14px/1 'Open Sans', sans-serif;
   color: #333;
   background: #d4d4d4;
-  line-height: unset;
+  line-height: inherit;
 }
 
 .wrapper {
@@ -233,5 +233,12 @@ strong, .label {
 
 .filter-label .no-uppercase {
   text-transform: none;
+}
+
+/* For correct display of svg images on IE > 10 */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  img[src$=".svg"] {
+    width: 100%;
+  }
 }
 </style>

@@ -95,7 +95,7 @@ export default {
 }
 
 .rotation-selector-wrapper.expanded .ol-control button {
-  cursor: unset;
+  cursor: initial;
 }
 
 .rotation-selector-wrapper .ol-control {
@@ -103,7 +103,7 @@ export default {
 }
 
 .rotation-selector-wrapper.expanded .ol-control button {
-  box-shadow: unset;
+  box-shadow: none;
 }
 
 .ol-rotate.ol-control {
