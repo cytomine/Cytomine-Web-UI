@@ -511,18 +511,31 @@ export default {
     if(this.index === firstIndexTargettedImage) {
       let idRoutedAnnot = this.$route.params.idAnnotation;
       if(idRoutedAnnot) {
-        let annot = await Annotation.fetch(idRoutedAnnot);
-        if(annot.image === this.image.id) {
-          this.routedAnnotation = annot;
-          if(this.$route.query.action === 'comments') {
-            this.$store.commit('setShowComments', {idViewer: this.idViewer, index: this.index, annot});
+        try {
+          let annot = await Annotation.fetch(idRoutedAnnot);
+          if(annot.image === this.image.id) {
+            this.routedAnnotation = annot;
+            if(this.$route.query.action === 'comments') {
+              this.$store.commit('setShowComments', {idViewer: this.idViewer, index: this.index, annot});
+            }
+            this.$store.commit('setAnnotToSelect', {idViewer: this.idViewer, index: this.index, annot});
           }
-          this.$store.commit('setAnnotToSelect', {idViewer: this.idViewer, index: this.index, annot});
+        }
+        catch(error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
         }
       }
     }
 
-    await new ImageConsultation({image: this.image.id}).save();
+    try {
+      await new ImageConsultation({image: this.image.id}).save();
+    }
+    catch(error) {
+      console.log(error);
+      this.$notify({type: 'error', text: this.$t('notif-error-save-image-consultation')});
+    }
+
     this.loading = false;
   },
   mounted() {
