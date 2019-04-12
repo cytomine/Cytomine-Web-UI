@@ -6,7 +6,7 @@
 <div v-else class="project-activity-wrapper content-wrapper">
   <div class="columns">
     <div class="column">
-      <b-field class="radio-buttons-fullwidth is-hovered">
+      <b-field v-if="canManageProject" class="radio-buttons-fullwidth is-hovered">
         <b-radio-button v-model="activeTab" native-value="charts" type="is-link">
           {{$t('activity-charts')}}
         </b-radio-button>
@@ -75,6 +75,9 @@ export default {
     configUI() {
       return this.$store.state.project.configUI;
     },
+    canManageProject() {
+      return this.$store.getters.canManageProject;
+    },
     moment() {
       return moment;
     },
@@ -82,6 +85,10 @@ export default {
       return this.$route.query.tab;
     },
     activeComponent() {
+      if(!this.canManageProject) { // contributor can only view charts tab
+        return ProjectActivityCharts;
+      }
+
       switch(this.activeTab) {
         case 'charts':
           return ProjectActivityCharts;
