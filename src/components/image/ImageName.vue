@@ -2,10 +2,12 @@
 <span v-if="image.blindedName">
   <span class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
   {{image.blindedName}}
-  <br>
-  <span v-if="image.instanceFilename && showBothNames" class="true-name">
-    {{image.instanceFilename}} <!-- backend will return this prop iff user is allowed to view it (admin or project manager) -->
-  </span>
+  <template v-if="image.instanceFilename && showBothNames">
+    <br>
+    <span class="true-name">
+      {{image.instanceFilename}} <!-- backend will return this prop iff user is allowed to view it (admin or project manager) -->
+    </span>
+  </template>
 </span>
 <span v-else>{{image.instanceFilename}}</span>
 </template>
