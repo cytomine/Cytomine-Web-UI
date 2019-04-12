@@ -3,12 +3,12 @@
   <h1>{{$t('link-images')}}</h1>
 
   <p>{{$t('link-view-with')}}</p>
-  <p v-for="(map, idx) in maps" v-if="idx !== index" :key="idx">
+  <p v-for="{image, index} in otherMaps" :key="index">
     <b-checkbox
-      :value="revisionCheckboxes && linkedIndexes.includes(idx)"
-      @input="value => handleCheckboxChange(idx, value)"
+      :value="revisionCheckboxes && linkedIndexes.includes(index)"
+      @input="value => handleCheckboxChange(index, value)"
     >
-      {{$t('viewer-view')}} {{idx + 1}} (<image-name :image="map.imageInstance" />)
+      {{$t('viewer-view', {number: index + 1})}} (<image-name :image="image" />)
     </b-checkbox>
   </p>
 </div>
@@ -35,6 +35,17 @@ export default {
     },
     maps() {
       return this.viewerWrapper.maps;
+    },
+    otherMaps() {
+      return this.maps.reduce((arr, map, index) => {
+        if(this.index !== index) {
+          arr.push({
+            index,
+            image: map.imageInstance
+          });
+        }
+        return arr;
+      }, []);
     },
     linkedIndexes() {
       return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
