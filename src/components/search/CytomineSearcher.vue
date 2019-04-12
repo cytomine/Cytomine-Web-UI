@@ -18,7 +18,7 @@
 
   <div class="navbar-dropdown search-results" v-show="true">
     <h2>{{$t('project')}} ({{filteredProjects.length}})</h2>
-    <template v-if="filteredProjects.length > 0">
+    <p v-if="filteredProjects.length > 0">
       <router-link
         v-for="project in subsetProjects"
         :key="project.id"
@@ -28,20 +28,21 @@
         @click.native="deactivate"
       />
       <a v-if="moreProjects" class="navbar-item">...</a>
-    </template>
+    </p>
     <span v-else class="navbar-item no-result">{{$t('no-project')}}</span>
 
     <h2>{{$t('images')}} ({{filteredImages.length}})</h2>
-    <template v-if="filteredImages.length > 0">
+    <p v-if="filteredImages.length > 0">
       <router-link
         v-for="img in subsetImages"
         :key="img.id"
         :to="`/project/${img.project}/image/${img.id}`"
-        class="navbar-item" @click.native="deactivate"
+        class="navbar-item"
+        @click.native="deactivate"
         v-html="htmlImageName(img)"
       />
       <a v-if="moreImages" class="navbar-item">...</a>
-    </template>
+    </p>
     <span v-else class="navbar-item no-result">{{$t('no-image')}}</span>
 
     <div v-if="moreImages || moreProjects" class="search-view-all">
@@ -78,6 +79,10 @@ export default {
       return this.searchString.toLowerCase();
     },
     filteredProjects() {
+      if(!this.searchString) {
+        return this.projects;
+      }
+
       return this.projects.filter(project => {
         return project.name.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
       });
@@ -89,8 +94,12 @@ export default {
       return this.filteredProjects > this.subsetProjects;
     },
     filteredImages() {
+      if(!this.searchString) {
+        return this.images;
+      }
+
       return this.images.filter(image => {
-        return image.originalFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+        return this.imageName(image).toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
       });
     },
     subsetImages() {
@@ -135,13 +144,17 @@ export default {
     deactivate() {
       this.isActive = false;
     },
+    imageName(image) {
+      return String(image.blindedName || image.instanceFilename);
+    },
     highlightedName(value) {
       let regex = new RegExp(`(${this.lowCaseSearchString})`, 'gi');
       return value.replace(regex, '<strong>$1</strong>');
     },
     htmlImageName(img) {
+      let blindIndication = img.blindedName ? `<span class="blind">[${this.$t('blinded-name-indication')}] </span>` : '';
       let inProject = `<span class="in-project">(${this.$t('in-project', {projectName: img.projectName})})</span>`;
-      return `${this.highlightedName(img.originalFilename)} ${inProject}`;
+      return `${blindIndication}${this.highlightedName(this.imageName(img))} ${inProject}`;
     }
   }
 };
@@ -166,6 +179,7 @@ export default {
 .navbar-dropdown.search-results .navbar-item {
   font-weight: normal;
   padding: 3px 10px 3px 20px;
+  white-space: pre;
 }
 
 .search-view-all {
@@ -176,6 +190,11 @@ export default {
 
 .no-result {
   color: grey;
+}
+
+>>> .blind {
+  font-size: 0.9em;
+  text-transform: uppercase;
 }
 </style>
 

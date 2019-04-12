@@ -198,7 +198,6 @@ h1.page-title {
 .in-project {
   color: grey;
   font-size: 11px;
-  margin-left: 5px;
 }
 
 .input[readonly] {

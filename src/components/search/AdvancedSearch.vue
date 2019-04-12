@@ -3,7 +3,7 @@
   <h2> {{ $t('error') }} </h2>
   <p>{{ $t('unexpected-error-info-message') }}</p>
 </div>
-<div v-else class="advanced-search-results">
+<div v-else class="content-wrapper">
   <div class="panel">
     <p class="panel-heading">
       {{$t('advanced-search')}}
@@ -30,15 +30,15 @@
         pagination-size="is-small"
         :key="'projects'"
       >
-        <template #default="props">
+        <template #default="{row: project}">
           <b-table-column :label="$t('name')" width="100">
-            <router-link :to="`/project/${props.row.id}`">
-              {{ props.row.name }}
+            <router-link :to="`/project/${project.id}`">
+              {{ project.name }}
             </router-link>
           </b-table-column>
 
           <b-table-column label="" width="150" numeric>
-            <router-link :to="`/project/${props.row.id}`" class="button is-small is-link">
+            <router-link :to="`/project/${project.id}`" class="button is-small is-link">
               {{$t('button-open')}}
             </router-link>
           </b-table-column>
@@ -58,21 +58,21 @@
         pagination-size="is-small"
         :key="'images'"
       >
-        <template #default="props">
+        <template #default="{row: image}">
           <b-table-column :label="$t('name')" width="100">
-            <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
-              {{ props.row.originalFilename }}
+            <router-link :to="`/project/${image.project}/image/${image.id}`">
+              <image-name :image="image" showBothNames />
             </router-link>
           </b-table-column>
 
           <b-table-column :label="$t('project')" width="100">
-            <router-link :to="`/project/${props.row.project}`">
-              {{ props.row.projectName }}
+            <router-link :to="`/project/${image.project}`">
+              {{ image.projectName }}
             </router-link>
           </b-table-column>
 
           <b-table-column label="" width="150" numeric>
-            <router-link :to="`/project/${props.row.project}/image/${props.row.id}`" class="button is-small is-link">
+            <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
               {{$t('button-open')}}
             </router-link>
           </b-table-column>
@@ -91,10 +91,12 @@
 
 <script>
 import { mapState } from 'vuex';
+import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
 export default {
   name: 'advanced-search',
+  components: {ImageName},
   data() {
     return {
       loading: true,
@@ -121,7 +123,8 @@ export default {
     },
     filteredImages() {
       return this.images.filter(image => {
-        return image.originalFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+        return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0) ||
+          (image.blindedName && String(image.blindedName).toLowerCase().indexOf(this.lowCaseSearchString) >= 0);
       });
     },
     ...mapState({currentUser: state => state.currentUser.user})
@@ -162,13 +165,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.advanced-search-results {
-  padding: 30px 50px 50px 50px;
-}
-
-.panel-tabs {
-  background: white;
-}
-</style>
