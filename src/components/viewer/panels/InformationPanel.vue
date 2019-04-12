@@ -6,8 +6,8 @@
   <table class="table">
     <tbody>
       <tr>
-        <td><strong>{{$t('filename')}}</strong></td>
-        <td><image-name :image="image" /></td>
+        <td><strong>{{$t('name')}}</strong></td>
+        <td><image-name :image="image" showBothNames /></td>
       </tr>
       <tr>
         <td><strong>{{$t('width')}}</strong></td>

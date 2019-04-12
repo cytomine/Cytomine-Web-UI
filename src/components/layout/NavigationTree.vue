@@ -8,7 +8,7 @@
           <span>
             <i class="fas fa-caret-right"></i>
             <template v-if="viewer.maps.length === 1">
-              <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
+              <image-name :image="viewer.maps[0].imageInstance" />
             </template>
             <template v-else>
               {{$t('viewer-group', {nbImages: viewer.maps.length})}}

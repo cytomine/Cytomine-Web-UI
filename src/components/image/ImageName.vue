@@ -1,7 +1,11 @@
 <template>
-<span v-if="resolvedBlindMode">
+<span v-if="image.blindedName">
   <span class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
   {{image.blindedName}}
+  <br>
+  <span v-if="image.instanceFilename && showBothNames" class="true-name">
+    {{image.instanceFilename}} <!-- backend will return this prop iff user is allowed to view it (admin or project manager) -->
+  </span>
 </span>
 <span v-else>{{image.instanceFilename}}</span>
 </template>
@@ -11,18 +15,7 @@ export default {
   name: 'image-name',
   props: {
     image: Object,
-    blindMode: { // if not set, the mode of the project saved in store will be used
-      type: Boolean,
-      default: null
-    }
-  },
-  computed: {
-    defaultBlindMode() {
-      return this.$store.state.project.project.blindMode;
-    },
-    resolvedBlindMode() {
-      return this.blindMode != null ? this.blindMode : this.defaultBlindMode;
-    }
+    showBothNames: {type: Boolean, default: false}
   }
 };
 </script>
@@ -31,5 +24,11 @@ export default {
 .blind-indication {
   font-size: 0.9em;
   text-transform: uppercase;
+}
+
+.true-name {
+  margin-top: 0.2em;
+  font-size: 0.9em;
+  color: #888;
 }
 </style>

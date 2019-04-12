@@ -151,11 +151,8 @@
             width="400"
           >
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-name :image="image" />
+              <image-name :image="image" showBothNames />
             </router-link>
-            <p v-if="canManageProject && blindMode" class="true-name">
-              {{image.instanceFilename}} <!-- if user is a manager, also display the true name of the image -->
-            </p>
           </b-table-column>
 
           <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
@@ -305,21 +302,21 @@ export default {
       if(this.searchString) {
         let str = this.searchString.toLowerCase();
         filtered = filtered.filter(image => {
-          return image.instanceFilename.toLowerCase().indexOf(str) >= 0 ||
-                        (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
+          return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
+            (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
         });
       }
 
       return filtered.filter(image => {
         return this.selectedFormats.includes(image.extension) &&
-                    this.selectedVendors.includes(image.vendorFormatted) &&
-                    this.selectedMagnifications.includes(image.magnificationFormatted) &&
-                    this.selectedResolutions.includes(image.resolutionFormatted) &&
-                    isBetweenBounds(image.width, this.boundsWidth) &&
-                    isBetweenBounds(image.height, this.boundsHeight) &&
-                    isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
-                    isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
-                    isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+          this.selectedVendors.includes(image.vendorFormatted) &&
+          this.selectedMagnifications.includes(image.magnificationFormatted) &&
+          this.selectedResolutions.includes(image.resolutionFormatted) &&
+          isBetweenBounds(image.width, this.boundsWidth) &&
+          isBetweenBounds(image.height, this.boundsHeight) &&
+          isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
+          isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+          isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
       });
     },
     availableFormats() {
@@ -512,12 +509,6 @@ export default {
 
 .search-block {
   display: flex;
-}
-
-.true-name {
-  margin-top: 0.2em;
-  font-size: 0.9em;
-  color: #888;
 }
 
 >>> .search-images {
