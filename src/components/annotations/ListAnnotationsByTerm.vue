@@ -151,7 +151,9 @@ export default {
       // do not close the popover if click was performed in modal or in notification
       let el = event.target;
       let isModal = false;
-      while(el && !(isModal = el.classList.contains('modal') || el.classList.contains('notifications'))) {
+      while(el && !(isModal = (el.classList.contains('modal') || el.classList.contains('notifications')
+        || el.classList.contains('annot-preview')))
+      ) {
         el = el.parentElement;
       }
 
