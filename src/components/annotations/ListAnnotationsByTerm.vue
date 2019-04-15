@@ -13,8 +13,8 @@
       :auto-hide="false"
     > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-      <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="toggle(annot.id)">
-        <button class="button is-small">
+      <div class="annot-preview" :style="styleAnnotDetails(annot)" @click.self="viewAnnot(annot)">
+        <button class="button is-small" @click="toggle(annot.id)">
           <i :class="['fas', openedAnnot === annot.id ? 'fa-minus' : 'fa-plus']"></i>
         </button>
       </div>
@@ -143,6 +143,9 @@ export default {
           )
         });
       }
+    },
+    viewAnnot(annot) {
+      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
     },
     toggle(id) {
       this.openedAnnot = this.openedAnnot === id ? 0 : id;
