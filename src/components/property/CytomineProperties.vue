@@ -42,6 +42,7 @@
 
 <script>
 import {Property, PropertyCollection} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'cytomine-properties',
@@ -92,6 +93,16 @@ export default {
     },
     async saveProp(idx) {
       let prop = this.editedProperties[idx];
+
+      // prevent user from saving a property whose key starts with the internal prefix (would be hidden aftewards)
+      if(prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)) {
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-invalid-key-prefix', {prefix: constants.PREFIX_HIDDEN_PROPERTY_KEY})
+        });
+        return;
+      }
+
       let newProp = prop.isNew();
       try {
         await prop.save();
@@ -115,7 +126,8 @@ export default {
   },
   async created() {
     try {
-      this.properties = (await PropertyCollection.fetchAll({object: this.object})).array;
+      let props = (await PropertyCollection.fetchAll({object: this.object})).array;
+      this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
     }
     catch(error) {
       console.log(error);

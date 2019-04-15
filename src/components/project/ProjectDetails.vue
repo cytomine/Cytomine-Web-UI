@@ -54,6 +54,12 @@
         <cytomine-description :object="project" />
       </td>
     </tr>
+    <tr v-if="isPropDisplayed('properties')">
+      <td class="prop-label">{{$t('properties')}}</td>
+      <td class="prop-content">
+        <cytomine-properties :object="project" />
+      </td>
+    </tr>
     <tr v-if="isPropDisplayed('attachedFiles')">
       <td class="prop-label">{{$t('attached-files')}}</td>
       <td class="prop-content">
@@ -120,6 +126,7 @@ import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ListUsernames from '@/components/user/ListUsernames';
 import ProjectActions from './ProjectActions';
 import CytomineDescription from '@/components/description/CytomineDescription';
+import CytomineProperties from '@/components/property/CytomineProperties';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 
 export default {
@@ -129,6 +136,7 @@ export default {
     ListUsernames,
     ProjectActions,
     CytomineDescription,
+    CytomineProperties,
     AttachedFiles
   },
   props: {
