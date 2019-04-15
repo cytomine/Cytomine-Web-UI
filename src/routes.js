@@ -25,23 +25,14 @@ const routes = [
   {
     path: '/',
     component: GlobalDashboard, // Alternative: component: require("./components/GlobalDashboard.vue").default
-    meta: {
-      title: 'Cytomine, your virtual microscope'
-    }
   },
   {
     path: '/projects',
     component: ListProjects,
-    meta: {
-      title: 'Cytomine - Projects'
-    }
   },
   {
     path: '/storage',
     component: CytomineStorage,
-    meta: {
-      title: 'Cytomine - Storage'
-    }
   },
   {
     path: '/ontology/:idOntology?',
@@ -54,16 +45,10 @@ const routes = [
   {
     path: '/account',
     component: Account,
-    meta: {
-      title: 'Cytomine - Account'
-    }
   },
   {
     path: '/project/:idProject',
     component: CytomineProject,
-    meta: {
-      title: 'Cytomine - Project'
-    },
     children: [
       {
         path: '',
@@ -162,16 +147,6 @@ const routes = [
 const router = new VueRouter({
   routes: routes,
   linkActiveClass: 'is-active'
-});
-
-router.beforeEach((to, from, next) => {
-  if(to.meta.title) {
-    document.title = to.meta.title;
-  }
-  else {
-    document.title = 'Cytomine';
-  }
-  next();
 });
 
 export default router;
