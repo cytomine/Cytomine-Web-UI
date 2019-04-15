@@ -35,30 +35,41 @@
       <cytomine-searcher />
 
       <navbar-dropdown
-        :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
+        :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
         :title="currentUserFullInfo"
+        :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account']"
       >
         <router-link to="/account" class="navbar-item">
-          {{$t('account')}}
+          <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
         </router-link>
         <template v-if="currentUser.admin">
           <a v-if="!currentUser.adminByNow" class="navbar-item" @click="openAdminSession()">
-            {{$t('open-admin-session')}}
+            <span class="icon"><i class="fas fa-star fa-xs"></i></span> {{$t('open-admin-session')}}
           </a>
           <a v-else class="navbar-item" @click="closeAdminSession()">
-            {{$t('close-admin-session')}}
+            <span class="icon"><i class="far fa-star fa-xs"></i></span> {{$t('close-admin-session')}}
+          </a>
+        </template>
+        <template v-if="currentUser.isSwitched">
+          <a class="navbar-item has-text-dark-primary" @click="stopSwitchUser()">
+            <span class="icon"><i class="fas fa-exchange-alt fa-xs"></i></span>
+            {{$t('switch-back-to-user', {username: currentUser.realUser})}}
           </a>
         </template>
         <a class="navbar-item" @click="logout()">
-          {{ $t('logout') }}
+          <span class="icon"><i class="fas fa-power-off fa-xs"></i></span> {{ $t('logout') }}
         </a>
       </navbar-dropdown>
 
       <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
-        <a class="navbar-item" @click="openHotkeysModal()">{{$t('hotkeys')}}</a>
-        <a class="navbar-item" @click="openAboutModal()">{{$t('about-cytomine')}}</a>
+        <a class="navbar-item" @click="openHotkeysModal()">
+          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('hotkeys')}}
+        </a>
+        <a class="navbar-item" @click="openAboutModal()">
+          <span class="icon"><i class="fas fa-info-circle fa-xs"></i></span> {{$t('about-cytomine')}}
+        </a>
       </navbar-dropdown>
     </div>
   </div>
@@ -72,6 +83,7 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
+import {Cytomine} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
@@ -133,6 +145,18 @@ export default {
       }
       catch(error) {
         console.log(error);
+      }
+    },
+
+    async stopSwitchUser() {
+      try {
+        await Cytomine.instance.stopSwitchUser();
+        await this.$store.dispatch('fetchUser');
+        this.$router.push('/');
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-switch-back-as-real-user')});
       }
     },
 

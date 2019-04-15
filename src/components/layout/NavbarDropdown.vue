@@ -4,7 +4,7 @@
   @mouseover="opened = true"
   @mouseout="opened = false"
 >
-  <a class="navbar-link" :class="{'is-active': isActive}">
+  <a class="navbar-link" :class="{'is-active': isActive, ...linkClasses}">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
@@ -24,6 +24,7 @@ export default {
     title: String,
     tag: Object,
     classes: Array,
+    linkClasses: Object,
     listPathes: Array
   },
   data() {

@@ -19,7 +19,15 @@
         </div>
       </div>
 
-      <b-table :data="filteredUsers" default-sort="username" :paginated="true" :per-page="perPage" pagination-size="is-small">
+      <b-table
+        :data="filteredUsers"
+        default-sort="username"
+        :paginated="true"
+        :per-page="perPage"
+        pagination-size="is-small"
+        detailed
+        detail-key="id"
+      >
 
         <template #default="{row: user}">
 
@@ -54,7 +62,7 @@
             <template v-else>-</template>
           </b-table-column>
 
-          <b-table-column label="" width="75">
+          <b-table-column label="" width="100">
             <div class="buttons">
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
@@ -67,6 +75,10 @@
               </button>
             </div>
           </b-table-column>
+        </template>
+
+        <template #detail="{row: user}">
+          <user-details :user="user" />
         </template>
 
         <template #empty>
@@ -94,11 +106,15 @@
 <script>
 import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
+import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
 
 export default {
   name: 'admin-users',
-  components: {UserModal},
+  components: {
+    UserModal,
+    UserDetails
+  },
   data() {
     return {
       loading: true,
