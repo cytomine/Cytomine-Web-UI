@@ -7,7 +7,7 @@
   <h2> {{ $t('error') }} </h2>
   <p>{{ $t('error-load-annotations-filters') }}</p>
 </div>
-<div v-else class="list-annotations-wrapper">
+<div v-else class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
   <div v-if="!loading">
     <div class="box">
@@ -409,7 +409,7 @@ export default {
 </script>
 
 <style scoped>
-.box {
+.box.error {
   margin: 20px 50px 20px 50px;
 }
 

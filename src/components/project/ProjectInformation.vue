@@ -3,13 +3,15 @@
   <h2> {{ $t('access-denied') }} </h2>
   <p>{{ $t('insufficient-permission') }}</p>
 </div>
-<div v-else class="box">
-  <project-details
-    :project="project"
-    :excluded-properties="['imagesPreview']"
-    @update="updateProject"
-    @delete="deleteProject()"
-  />
+<div v-else class="content-wrapper">
+  <div class="box">
+    <project-details
+      :project="project"
+      :excluded-properties="['imagesPreview']"
+      @update="updateProject"
+      @delete="deleteProject()"
+    />
+  </div>
 </div>
 </template>
 
@@ -54,7 +56,7 @@ export default {
 </script>
 
 <style scoped>
-.box {
+.box.error {
   margin: 20px 50px 20px 50px;
 }
 </style>
