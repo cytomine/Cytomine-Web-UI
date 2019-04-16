@@ -1,168 +1,169 @@
 <template>
-<div class="map-container" v-if="!loading" @click="isActiveMap = true">
+<div class="map-container" @click="isActiveMap = true" ref="container">
+  <template v-if="!loading && zoom !== null">
+    <vl-map
+      :data-projection="projectionName"
+      :load-tiles-while-animating="true"
+      :load-tiles-while-interacting="true"
+      :keyboard-event-target="document"
+      @pointermove="projectedMousePosition = $event.coordinate"
+      @mounted="updateKeyboardInteractions"
+      ref="map"
+    >
 
-  <vl-map
-    :data-projection="projectionName"
-    :load-tiles-while-animating="true"
-    :load-tiles-while-interacting="true"
-    :keyboard-event-target="document"
-    @pointermove="projectedMousePosition = $event.coordinate"
-    @mounted="updateKeyboardInteractions"
-    ref="map"
-  >
-
-    <vl-view
-      :center.sync="center"
-      :zoom.sync="zoom"
-      :rotation.sync="rotation"
-      :max-zoom="maxZoom"
-      :max-resolution="Math.pow(2, image.depth)"
-      :extent="extent"
-      :projection="projectionName"
-      @mounted="viewMounted()"
-      ref="view"
-    />
-
-    <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-      <vl-source-zoomify
-        :projection="projectionName"
-        :urls="baseLayerURLs"
-        :size="imageSize"
+      <vl-view
+        :center.sync="center"
+        :zoom.sync="zoom"
+        :rotation.sync="rotation"
+        :max-zoom="maxZoom"
+        :max-resolution="Math.pow(2, image.depth)"
         :extent="extent"
-        crossOrigin="Anonymous"
-        ref="baseSource"
-        @mounted="setBaseSource()"
+        :projection="projectionName"
+        @mounted="viewMounted()"
+        ref="view"
       />
-    </vl-layer-tile>
 
-    <vl-layer-image>
-      <vl-source-raster
-        v-if="baseSource && colorManipulationOn"
-        :sources="[baseSource]"
-        :operation="operation"
-        :lib="lib"
+      <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
+        <vl-source-zoomify
+          :projection="projectionName"
+          :urls="baseLayerURLs"
+          :size="imageSize"
+          :extent="extent"
+          crossOrigin="Anonymous"
+          ref="baseSource"
+          @mounted="setBaseSource()"
+        />
+      </vl-layer-tile>
+
+      <vl-layer-image>
+        <vl-source-raster
+          v-if="baseSource && colorManipulationOn"
+          :sources="[baseSource]"
+          :operation="operation"
+          :lib="lib"
+        />
+      </vl-layer-image>
+
+      <annotation-layer
+        v-for="layer in selectedLayers"
+        :key="'layer-'+layer.id"
+        :idViewer="idViewer"
+        :index="index"
+        :layer="layer"
       />
-    </vl-layer-image>
 
-    <annotation-layer
-      v-for="layer in selectedLayers"
-      :key="'layer-'+layer.id"
-      :idViewer="idViewer"
-      :index="index"
-      :layer="layer"
+      <select-interaction v-if="activeSelectInteraction" :idViewer="idViewer" :index="index" />
+      <draw-interaction v-if="activeDrawInteraction" :idViewer="idViewer" :index="index" />
+      <modify-interaction v-if="activeModifyInteraction" :idViewer="idViewer" :index="index" />
+
+    </vl-map>
+
+    <div v-if="configUI['project-tools-main']" class="draw-tools">
+      <draw-tools :idViewer="idViewer" :index="index" />
+    </div>
+
+    <div class="panels">
+      <ul>
+        <li>
+          <a @click="$emit('close')" class="close">
+            <i class="fas fa-times-circle"></i>
+          </a>
+        </li>
+
+        <template v-if="isPanelDisplayed('hide-tools')">
+          <li v-if="isPanelDisplayed('info')">
+            <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
+              <i class="fas fa-info"></i>
+            </a>
+            <information-panel class="panel-options" v-show="activePanel === 'info'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('digital-zoom')">
+            <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
+              <i class="fas fa-search"></i>
+            </a>
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
+            <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
+              <i class="fas fa-link"></i>
+            </a>
+            <link-panel class="panel-options" v-show="activePanel === 'link'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('color-manipulation')">
+            <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
+              <i class="fas fa-adjust"></i>
+            </a>
+            <color-manipulation class="panel-options" v-show="activePanel === 'colors'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('image-layers')">
+            <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
+              <i class="fas fa-copy"></i>
+            </a>
+            <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
+              :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
+            <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
+              <i class="fas fa-hashtag"></i>
+            </a>
+            <ontology-panel class="panel-options" v-show="activePanel === 'ontology'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li  v-if="isPanelDisplayed('property')">
+            <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
+              <i class="fas fa-tag"></i>
+            </a>
+            <properties-panel class="panel-options" v-show="activePanel === 'properties'"
+              :idViewer="idViewer" :index="index"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('follow')">
+            <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
+              <i class="fas fa-street-view"></i>
+            </a>
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'"
+              :idViewer="idViewer" :index="index" :view="$refs.view"
+            />
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="broadcast" v-if="imageWrapper.broadcast">
+      <i class="fas fa-circle"></i> {{$t('live')}}
+    </div>
+
+    <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
+
+    <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+
+    <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
+      :idViewer="idViewer" :index="index" :view="$refs.view"
     />
 
-    <select-interaction v-if="activeSelectInteraction" :idViewer="idViewer" :index="index" />
-    <draw-interaction v-if="activeDrawInteraction" :idViewer="idViewer" :index="index" />
-    <modify-interaction v-if="activeModifyInteraction" :idViewer="idViewer" :index="index" />
-
-  </vl-map>
-
-  <div v-if="configUI['project-tools-main']" class="draw-tools">
-    <draw-tools :idViewer="idViewer" :index="index" />
-  </div>
-
-  <div class="panels">
-    <ul>
-      <li>
-        <a @click="$emit('close')" class="close">
-          <i class="fas fa-times-circle"></i>
-        </a>
-      </li>
-
-      <template v-if="isPanelDisplayed('hide-tools')">
-        <li v-if="isPanelDisplayed('info')">
-          <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
-            <i class="fas fa-info"></i>
-          </a>
-          <information-panel class="panel-options" v-show="activePanel === 'info'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('digital-zoom')">
-          <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
-            <i class="fas fa-search"></i>
-          </a>
-          <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
-          <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
-            <i class="fas fa-link"></i>
-          </a>
-          <link-panel class="panel-options" v-show="activePanel === 'link'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('color-manipulation')">
-          <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
-            <i class="fas fa-adjust"></i>
-          </a>
-          <color-manipulation class="panel-options" v-show="activePanel === 'colors'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('image-layers')">
-          <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
-            <i class="fas fa-copy"></i>
-          </a>
-          <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
-            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
-          <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
-            <i class="fas fa-hashtag"></i>
-          </a>
-          <ontology-panel class="panel-options" v-show="activePanel === 'ontology'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li  v-if="isPanelDisplayed('property')">
-          <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
-            <i class="fas fa-tag"></i>
-          </a>
-          <properties-panel class="panel-options" v-show="activePanel === 'properties'"
-            :idViewer="idViewer" :index="index"
-          />
-        </li>
-
-        <li v-if="isPanelDisplayed('follow')">
-          <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
-            <i class="fas fa-street-view"></i>
-          </a>
-          <follow-panel class="panel-options" v-show="activePanel === 'follow'"
-            :idViewer="idViewer" :index="index" :view="$refs.view"
-          />
-        </li>
-      </template>
-    </ul>
-  </div>
-
-  <div class="broadcast" v-if="imageWrapper.broadcast">
-    <i class="fas fa-circle"></i> {{$t('live')}}
-  </div>
-
-  <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
-
-  <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
-
-  <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
-    :idViewer="idViewer" :index="index" :view="$refs.view"
-  />
-
-  <div class="custom-overview" ref="overview">
-    <p class="image-name" :class="{hidden: overviewCollapsed}">
-      <image-name :image="image" />
-    </p>
-  </div>
+    <div class="custom-overview" ref="overview">
+      <p class="image-name" :class="{hidden: overviewCollapsed}">
+        <image-name :image="image" />
+      </p>
+    </div>
+  </template>
 </div>
 </template>
 
@@ -389,6 +390,23 @@ export default {
     },
   },
   methods: {
+    setInitialZoom() {
+      if(this.zoom !== null) {
+        return; // not the first time the viewer is opened => zoom was already initialized
+      }
+
+      let container = this.$refs.container;
+      let mapWidth = this.image.width;
+      let mapHeight = this.image.height;
+      let idealZoom = this.image.depth;
+      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
+        mapWidth /= 2;
+        mapHeight /= 2;
+        idealZoom --;
+      }
+      this.zoom = idealZoom;
+    },
+
     async updateMapSize() {
       await this.$nextTick();
       if(this.$refs.map) {
@@ -540,6 +558,7 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
+    this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);

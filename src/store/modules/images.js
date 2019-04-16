@@ -497,7 +497,7 @@ export default {
         maxZoom: image.depth + constants.DIGITAL_ZOOM_INCREMENT,
         digitalZoom: true,
 
-        zoom: 0,
+        zoom: null, // will be initialized to appropriate value (depending on container size) in CytomineImage
         center: [image.width/2, image.height/2],
         rotation: 0,
 
