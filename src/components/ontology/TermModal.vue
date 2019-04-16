@@ -69,6 +69,9 @@ export default {
     }
   },
   methods: {
+    randomColor() {
+      return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+    },
     async save() {
       if(!this.validName) {
         this.displayErrors = true;
@@ -112,7 +115,7 @@ export default {
   },
   created() {
     this.name = this.term ? this.term.name : '';
-    this.color = {hex: this.term ? this.term.color : "#" + Math.random().toString(16).slice(2, 8)}; // in case of new term, random color
+    this.color = {hex: this.term ? this.term.color : this.randomColor()};
     this.displayErrors = false;
   }
 };
