@@ -50,6 +50,11 @@ $loadingColor: #bbb;
   font-weight: 400;
 }
 
+.detail-container {
+  padding: 5px !important;
+  font-size: 0.9rem !important;
+}
+
 /* Panel */
 
 .panel-heading {
@@ -108,7 +113,7 @@ $loadingColor: #bbb;
 }
 
 .modal .modal-card-foot button {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: normal !important;
 }
 

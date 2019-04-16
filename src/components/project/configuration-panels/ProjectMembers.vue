@@ -62,12 +62,10 @@
         <b-table-column field="indexRole" :label="$t('role')" sortable width="50">
           <span class="icons">
             <a @click="confirmToggleManager(member)">
-              <i class="fas fa-cog" :class="{disabled: member.role === contributorRole}"></i>
+              <i class="fas fa-user-cog" :class="{disabled: member.role === contributorRole}"></i>
             </a>
             <a v-if="member.role !== contributorRole" @click="toggleRepresentative(member)">
-              <i class="fas fa-cog" :class="{disabled: !member.representativeId}">
-                <i class="superscript fas fa-plus"></i>
-              </i>
+              <i class="fas fa-flag" :class="{disabled: !member.representativeId}"></i>
             </a>
           </span>
         </b-table-column>
@@ -111,21 +109,21 @@
       <h2>{{$t('legend')}}</h2>
       <p>
         <span class="icons">
-          <i class="fas fa-cog disabled"></i>
+          <i class="fas fa-user-cog disabled"></i>
         </span>
         {{$t('project-contributor')}}
       </p>
       <p>
         <span class="icons">
-          <i class="fas fa-cog"></i>
-          <i class="fas fa-cog disabled"><i class="superscript disabled fas fa-plus"></i></i>
+          <i class="fas fa-user-cog"></i>
+          <i class="fas fa-flag disabled"></i>
         </span>
         {{$t('project-manager')}}
       </p>
       <p>
         <span class="icons">
-          <i class="fas fa-cog"></i>
-          <i class="fas fa-cog"><i class="superscript fas fa-plus"></i></i>
+          <i class="fas fa-user-cog"></i>
+          <i class="fas fa-flag"></i>
         </span>
         {{$t('project-representative')}}
       </p>
@@ -417,23 +415,18 @@ a:hover .fas.disabled, a:hover .disabled .fas {
 
 .fas {
   color: black;
-}
-
-.fas.fa-cog {
   width: 20px;
   position: relative;
+}
+
+.fas.fa-flag {
+  font-size: 0.8em;
+  bottom: 0.5em;
 }
 
 .fas.disabled, .disabled .fas {
   color: rgba(0, 0, 0, 0.1);
 }
-
-.superscript {
-  font-size: 8px;
-  position: absolute;
-  top: -3px;
-}
-
 </style>
 
 <style>

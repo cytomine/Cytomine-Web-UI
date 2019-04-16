@@ -121,10 +121,10 @@
           <b-table-column :visible="showRole" field="roleIndex" label="" centered width="1" sortable>
             <i
               v-if="project.currentUserRoles.admin"
-              class="fas fa-cog"
+              class="fas fa-user-cog"
               :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')"
             >
-              <i v-if="project.currentUserRoles.representative" class="superscript fas fa-plus"></i>
+              <i v-if="project.currentUserRoles.representative" class="superscript fas fa-flag"></i>
             </i>
           </b-table-column>
 
@@ -198,9 +198,9 @@
 
       <div class="legend" v-if="showRole">
           <h2>{{$t('legend')}}</h2>
-          <p><i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}</p>
-          <p><i class="fas fa-cog">
-            <i class="superscript fas fa-plus"></i>
+          <p><i class="fas fa-user-cog"></i> : {{$t('manager-icon-label')}}</p>
+          <p><i class="fas fa-user-cog">
+            <i class="superscript fas fa-flag"></i>
           </i> : {{$t('representative-icon-label')}}</p>
       </div>
     </div>
@@ -419,15 +419,17 @@ export default {
   margin-bottom: 10px;
 }
 
-.fas.fa-cog {
-  width: 25px;
+.fas.fa-user-cog {
+  width: 20px;
   position: relative;
+  text-align: center;
 }
 
 .superscript {
   font-size: 8px;
   position: absolute;
-  top: -3px;
+  top: -4px;
+  right: 0px;
 }
 </style>
 
@@ -439,11 +441,6 @@ export default {
 
 .table-projects {
   margin-top: 15px;
-}
-
-.detail-container {
-  padding: 5px !important;
-  font-size: 14px;
 }
 
 .list-projects-wrapper td, .list-projects-wrapper th {

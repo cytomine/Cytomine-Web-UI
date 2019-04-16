@@ -68,7 +68,7 @@
           </b-table-column>
 
           <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-            <i class="fas fa-cog" :title="$t('project-manager')" v-if="member.role === managerRole"></i>
+            <i class="fas fa-user-cog" :title="$t('project-manager')" v-if="member.role === managerRole"></i>
           </b-table-column>
 
           <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
@@ -125,7 +125,7 @@
       <div class="legend">
         <h2>{{$t('legend')}}</h2>
         <p>
-          <i class="fas fa-cog"></i>: {{$t('project-manager')}}
+          <i class="fas fa-user-cog"></i>: {{$t('project-manager')}}
         </p>
       </div>
     </template>
@@ -257,5 +257,9 @@ export default {
 
 .legend p {
   padding-bottom: 5px;
+}
+
+.fas.fa-user-cog {
+  width: 20px;
 }
 </style>
