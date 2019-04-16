@@ -26,7 +26,7 @@
       <tr v-if="isPropDisplayed('description')">
         <td colspan="2">
           <h5>{{$t('description')}}</h5>
-          <cytomine-description :object="annotation" :canEdit="canEdit" />
+          <cytomine-description :object="annotation" :canEdit="canEdit" :maxPreviewLength="300" />
         </td>
       </tr>
 
@@ -135,7 +135,7 @@
 
       <button v-if="isPropDisplayed('comments') && comments" class="level-item button is-small"
         @click="openCommentsModal()"
-    >
+      >
         {{ $t('button-comments') }} ({{comments.length}})
       </button>
 

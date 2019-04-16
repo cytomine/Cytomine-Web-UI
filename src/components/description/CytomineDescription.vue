@@ -30,7 +30,8 @@ export default {
   name: 'cytomine-description',
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
+    maxPreviewLength: {type: Number, default: 0} // if set to 0, the description preview is not limited unless stop preview keyword is present
   },
   data() {
     return {
@@ -52,8 +53,8 @@ export default {
       if(posStop !== -1) {
         return this.description.data.substring(0, posStop);
       }
-      else if(this.description.data.length > 250) {
-        return this.description.data.substring(0, 250) + '...';
+      else if(this.maxPreviewLength && this.description.data.length > this.maxPreviewLength) {
+        return this.description.data.substring(0, this.maxPreviewLength) + '...';
       }
       else {
         return this.description.data;
