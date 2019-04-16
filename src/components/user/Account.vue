@@ -87,11 +87,27 @@
     </p>
     <div class="panel-block">
       <b-field :label="$t('public-key')" horizontal>
-        <b-input :value="currentUser.publicKey" readonly />
+        <b-field>
+          <b-input :value="currentUser.publicKey" readonly expanded />
+          <p class="control">
+            <button class="button" @click="copy(currentUser.publicKey)">
+              <span class="icon"><i class="far fa-clipboard"></i></span>
+              <span>{{$t('button-copy')}}</span>
+            </button>
+          </p>
+        </b-field>
       </b-field>
 
       <b-field :label="$t('private-key')" horizontal>
-        <b-input :value="currentUser.privateKey" readonly />
+        <b-field>
+          <b-input :value="currentUser.privateKey" readonly expanded />
+          <p class="control">
+            <button class="button" @click="copy(currentUser.privateKey)">
+              <span class="icon"><i class="far fa-clipboard"></i></span>
+              <span>{{$t('button-copy')}}</span>
+            </button>
+          </p>
+        </b-field>
       </b-field>
 
       <b-field grouped position="is-right">
@@ -109,6 +125,7 @@ import { mapState } from 'vuex';
 import _ from 'lodash';
 import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
+import copyToClipboard from 'copy-to-clipboard';
 
 export default {
   name: 'Account',
@@ -187,6 +204,11 @@ export default {
       }
       this.isCheckingPassword = false;
     }, 500),
+
+    copy(value) {
+      copyToClipboard(value);
+      this.$notify({type: 'success', text: this.$t('notif-success-key-copied')});
+    },
 
     async regenerateKeys() {
       try {
