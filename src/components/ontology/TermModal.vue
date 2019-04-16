@@ -34,8 +34,6 @@
 import {Term} from 'cytomine-client';
 import {Sketch} from 'vue-color';
 
-const defaultColor = {hex: '#4480c4'};
-
 export default {
   name: 'term-modal',
   components: {'sketch-picker': Sketch},
@@ -46,7 +44,7 @@ export default {
   data() {
     return {
       name: '',
-      color: defaultColor,
+      color: null,
       displayErrors: false
     };
   },
@@ -114,7 +112,7 @@ export default {
   },
   created() {
     this.name = this.term ? this.term.name : '';
-    this.color = this.term ? {hex: this.term.color} : defaultColor;
+    this.color = {hex: this.term ? this.term.color : "#" + Math.random().toString(16).slice(2, 8)}; // in case of new term, random color
     this.displayErrors = false;
   }
 };
