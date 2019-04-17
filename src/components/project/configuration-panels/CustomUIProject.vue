@@ -163,7 +163,7 @@ export default {
 
 <style scoped>
 .button {
-  padding: 0px 40px;
+  padding: 0 3em;
 }
 
 td, th {
@@ -173,16 +173,16 @@ td, th {
 .icon {
   width: 20px;
   text-align: center;
-  margin-right: 10px;
+  margin-right: 1em;
 }
 
 .superscript {
   position: relative;
-  font-size: 8px;
-  width: 0px;
-  bottom: 10px;
+  font-size: 0.7em;
+  width: 0;
+  bottom: 0.75em;
   right: 4px;
-  margin-right: 0px;
+  margin-right: 0;
 }
 </style>
 

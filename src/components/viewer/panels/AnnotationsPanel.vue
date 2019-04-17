@@ -265,18 +265,18 @@ export default {
 
 <style scoped>
 >>> select {
-  width: 220px;
+  width: 21em;
 }
 
 .table {
-  margin-bottom: 10px !important;
+  margin-bottom: 1em !important;
   font-size: 0.9em;
 }
 
 .table tbody {
-  display:block;
-  overflow:auto;
-  max-height: 100px;
+  display: block;
+  overflow: auto;
+  max-height: 10em;
 }
 
 .table thead tr {
@@ -284,32 +284,33 @@ export default {
 }
 
 td, th {
-  padding: 3px !important;
+  padding: 0.25em !important;
   vertical-align: middle !important;
 }
 
 td .button {
-  width: 17px;
-  height: 17px;
-  padding: 0px;
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 0.9em;
+  padding: 0;
 }
 
 .checkbox-column {
-  width: 25px;
+  min-width: 2.2em;
   text-align: center !important;
 }
 
 .name-column {
-  width: 200px;
+  width: 100%;
 }
 
 >>> .checkbox .control-label {
-  padding: 0px !important;
+  padding: 0 !important;
 }
 
 >>> input[type="range"].slider {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 .opacity {
@@ -319,7 +320,7 @@ td .button {
 
 .opacity label {
   text-transform: uppercase;
-  font-size: 11px;
-  width: 150px;
+  font-size: 0.8em;
+  width: 15em;
 }
 </style>

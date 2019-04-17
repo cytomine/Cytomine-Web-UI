@@ -182,7 +182,7 @@ export default {
 }
 
 hr {
-  margin: 0.75em 0px !important;
+  margin: 0.75em 0 !important;
 }
 
 >>> .dropdown-content {

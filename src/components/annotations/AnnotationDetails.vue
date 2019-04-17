@@ -348,11 +348,12 @@ export default {
 <style scoped>
 .annotation-details {
   position: relative;
+  font-size: 0.85rem;
 }
 
 .table {
   width: 100%;
-  margin-bottom: 10px !important;
+  margin-bottom: 0.7em !important;
   background: transparent;
 }
 
@@ -362,11 +363,11 @@ export default {
 
 h5 {
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0.6em;
 }
 
 .actions {
-  margin-bottom: 5px;
+  margin-bottom: 0.5em;
 }
 
 .actions .button {
@@ -378,10 +379,6 @@ a.is-fullwidth {
   width: auto;
 }
 
-.autocomplete-term-option {
-  font-size: 13px;
-}
-
 .add-term-wrapper {
   position: relative;
 }
@@ -389,7 +386,7 @@ a.is-fullwidth {
 .ontology-tree-container {
   position: absolute;
   top: 100%;
-  left: 0px;
+  left: 0;
   z-index: 500;
   padding-top: 5px;
   background: white;
@@ -399,6 +396,10 @@ a.is-fullwidth {
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border-radius: 4px;
   margin-top: 4px;
+}
+
+>>> .sl-vue-tree-node-item {
+  font-size: 0.9em;
 }
 
 >>> .tag {

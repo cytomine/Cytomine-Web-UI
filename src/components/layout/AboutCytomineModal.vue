@@ -108,22 +108,21 @@ export default {
 
 dt {
   float: left;
-  width: 160px;
+  width: 12rem;
   text-align: right;
-  padding-right: 20px;
+  padding-right: 1rem;
   clear: both;
   font-weight: 600;
 }
 
 dd {
-  margin-left: 180px;
+  margin-left: 14rem;
   background-color: #fff;
-  margin-bottom: 10px;
+  margin-bottom: 0.75rem;
 }
 
 img.sponsor {
-  max-height: 100px;
-  margin-left: 15px;
-  margin-right: 15px;
+  max-height: 7rem;
+  margin-right: 1rem;
 }
 </style>

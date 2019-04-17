@@ -93,7 +93,7 @@ export default {
 }
 
 .filename .fas {
-  margin-right: 10px;
+  margin-right: 0.5em;
 }
 
 >>> .upload-draggable {

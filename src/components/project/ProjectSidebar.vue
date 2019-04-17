@@ -111,15 +111,15 @@ $arrowColor: #888;
   background: $background;
   overflow: hidden;
   transition: width .2s linear;
-  width: 55px;
+  width: 4rem;
 }
 
 .sidebar-wrapper.expanded {
-  width:218px;
+  width:16rem;
 }
 
 .sidebar {
-  width: 200px;
+  width: 16rem;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -127,16 +127,15 @@ $arrowColor: #888;
 }
 
 .project-name {
-  padding: 10px 0px 10px;
-  width: 200px !important;
-  line-height: 20px;
+  padding: 0.8em 0em 0.8em;
+  width: 14.5rem !important;
+  line-height: 1.8rem;
   text-align: center;
   color: $background;
-  font-size: 1.1em;
+  font-size: 1rem;
   margin: 0;
-  letter-spacing: 2px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: 16px;
   text-align: center;
   font-weight: 600;
 }
@@ -150,19 +149,19 @@ ul {
 }
 
 li {
-  height: 4em;
+  height: 3.5rem;
 }
 
 .bottom-menu {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
+  bottom: 0;
+  left: 0;
 }
 
 a {
   position: relative;
   display: block;
-  font-size: 14px;
+  font-size: 0.85rem;
   height: 100%;
   font-weight: 600;
   color: $color;
@@ -172,8 +171,8 @@ a {
 }
 
 .fas, .far {
-  font-size: 16px;
-  width: 55px;
+  font-size: 1.25rem;
+  width: 4rem;
   text-align: center;
   flex-shrink: 0;
 }
@@ -190,7 +189,7 @@ li.is-active a {
 }
 
 .arrow-sidebar {
-  width: 18px;
+  width: 1.5rem;
   border-left: 1px solid $border;
   background: $arrowBackground;
   justify-content: center;
@@ -202,8 +201,8 @@ li.is-active a {
   border: solid $arrowColor;
   border-width: 0 2px 2px 0;
   display: inline-block;
-  padding: 3px;
+  padding: 0.25rem;
   transform: rotate(135deg);
-  margin-left: 3px;
+  margin-left: 0.25rem;
 }
 </style>

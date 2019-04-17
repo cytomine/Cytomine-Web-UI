@@ -136,9 +136,9 @@ export default {
 <style scoped>
 .panel {
   width: 100%;
-  max-width: 600px;
+  max-width: 40em;
   margin: auto;
-  margin-top: 50px;
+  margin-top: 3em;
 }
 
 .columns, .buttons {

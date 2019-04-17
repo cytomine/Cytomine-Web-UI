@@ -503,8 +503,8 @@ export default {
 }
 
 .image-overview {
-  max-height: 45px;
-  max-width: 128px;
+  max-height: 4rem;
+  max-width: 10rem;
 }
 
 .search-block {
@@ -512,8 +512,8 @@ export default {
 }
 
 >>> .search-images {
-  max-width: 300px;
-  margin-right: 10px;
+  max-width: 30rem;
+  margin-right: 1rem;
 }
 
 >>> td, >>> th {

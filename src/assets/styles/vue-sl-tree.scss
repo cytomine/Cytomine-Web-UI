@@ -18,10 +18,10 @@
 
 .sl-vue-tree-node-item {
   position: relative;
-  padding-left: 22px;
+  padding-left: 1.5em;
   width: 100%;
   line-height: 2.2;
-  font-size: 14px;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: row;
 }
@@ -31,19 +31,18 @@
   display: flex;
   align-items: top;
   overflow-wrap: break-word;
-  min-width: 0px; /* to allow correct handling of overflow-wrap */
+  min-width: 0; /* to allow correct handling of overflow-wrap */
 }
 
 .sl-vue-tree .tree-toggle.fas {
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 20px;
+  width: 1.5em;
+  padding-left: 0.25em;
   cursor: pointer;
 }
 
 .sl-vue-tree-node-is-folder > .sl-vue-tree-title {
   position: relative;
-  right: 20px;
+  right: 1.5em;
 }
 
 .sl-vue-tree-node-item {
@@ -53,7 +52,7 @@
 }
 
 .sl-vue-tree-gap {
-  width: 20px;
+  width: 1.5em;
   min-height: 1px;
   flex-shrink: 0;
 }

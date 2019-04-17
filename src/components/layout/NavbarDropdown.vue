@@ -51,8 +51,6 @@ export default {
 
 <style>
 .navbar-item .tag {
-  margin-left: 7px;
-  position: relative;
-  top: 1px;
+  margin-left: 0.5rem;
 }
 </style>

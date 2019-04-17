@@ -204,10 +204,10 @@ export default {
 
 <style>
 .ontology-details-wrapper .ontology-tree {
-  max-width: 500px;
+  max-width: 40em;
 }
 
 .ontology-details-wrapper td:first-child {
-  width: 100px;
+  width: 8em;
 }
 </style>

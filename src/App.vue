@@ -138,10 +138,9 @@ html, body {
 }
 
 body {
-  font: 14px/1 'Open Sans', sans-serif;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, sans-serif;
   color: #333;
   background: #d4d4d4;
-  line-height: inherit;
 }
 
 .wrapper {
@@ -153,13 +152,13 @@ body {
 }
 
 .box.error {
-  width: 50%;
+  max-width: 600px;
   margin: auto;
-  margin-top: 50px;
+  margin-top: 3rem;
 }
 
 .notifications {
-  margin-top: 10px;
+  margin-top: 1em;
 }
 
 .notification.info {
@@ -174,30 +173,23 @@ body {
 
 h1 {
   text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 16px;
+  letter-spacing: 0.1rem;
+  font-size: 1.25rem;
   text-align: center;
-  padding: 10px;
+  padding: 0.9rem;
 }
 
 h2 {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 15px;
-}
-
-h1.page-title {
-  flex-shrink: 0;
-  padding: 20px;
-  font-size: 20px;
-  margin-bottom: 20px;
+  letter-spacing: 0.08rem;
+  margin-bottom: 1rem;
 }
 
 .in-project {
   color: grey;
-  font-size: 11px;
+  font-size: 0.8em;
 }
 
 .input[readonly] {
@@ -218,16 +210,16 @@ strong, .label {
 
 .filters {
   background: #f8f8f8;
-  margin-top: 20px;
+  margin-top: 1.2rem;
   border-radius: 10px;
-  padding: 20px;
+  padding: 1rem;
 }
 
 .filter-label {
   text-transform: uppercase;
-  font-size: 12px;
-  margin-bottom: 5px;
-  margin-left: 15px;
+  font-size: 0.8em;
+  margin-bottom: 0.5em;
+  margin-left: 1em;
 }
 
 .filter-label .no-uppercase {

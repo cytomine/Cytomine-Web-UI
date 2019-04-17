@@ -225,13 +225,13 @@ export default {
 
 <style scoped>
 .panel {
-  max-width: 1200px;
+  max-width: 80em;
   margin-left: auto;
-  margin-right:auto;
+  margin-right: auto;
 }
 
 .fas {
-  margin-right: 5px;
+  margin-right: 0.3em;
 }
 
 input.hidden {

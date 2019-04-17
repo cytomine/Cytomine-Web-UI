@@ -265,13 +265,14 @@ export default {
 
 <style scoped>
 h2 {
-  margin-top: 10px;
-  margin-bottom: 5px;
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  font-size: 1em;
 }
 
 h3 {
-  margin-top: 10px;
-  margin-bottom: 5px;
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
   font-weight: 600;
 }
 
@@ -280,7 +281,7 @@ h3 {
 }
 
 .follow-panel-content {
-  max-height: 150px;
+  max-height: 14em;
   overflow: auto;
 }
 </style>

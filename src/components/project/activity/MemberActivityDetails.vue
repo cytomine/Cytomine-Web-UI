@@ -331,8 +331,8 @@ h1 {
   text-transform: initial;
   letter-spacing: initial;
   font-weight: 400;
-  font-size: 22px;
-  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  margin-bottom: 0.7rem;
 }
 
 li {
@@ -340,8 +340,8 @@ li {
 }
 
 .image-overview {
-  max-height: 45px;
-  max-width: 128px;
+  max-height: 4rem;
+  max-width: 10rem;
 }
 
 .box {
@@ -368,7 +368,7 @@ li {
 <style lang="scss">
 .user-activity-wrapper {
   .table-wrapper {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 
   .chart {
@@ -383,7 +383,7 @@ li {
 
   .field-label {
     margin-right: 1em !important;
-    padding-top: 0px !important;
+    padding-top: 0 !important;
   }
 }
 </style>

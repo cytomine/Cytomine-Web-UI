@@ -168,23 +168,22 @@ export default {
 .navbar-dropdown.search-results h2 {
   background: #f1f1f1;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 0.9em;
   font-weight: 600;
-  padding: 2px 0px 3px 30px;
+  padding: 0.2em 0 0.3em 3em;
   border-top: 1px solid #e3e3e3;
-  margin-bottom: 0px;
-  /* border-bottom: 1px solid #e3e3e3; */
+  margin-bottom: 0;
 }
 
 .navbar-dropdown.search-results .navbar-item {
   font-weight: normal;
-  padding: 3px 10px 3px 20px;
+  padding: 0.2em 1em 0.2em 1.75em;
   white-space: pre;
 }
 
 .search-view-all {
   border-top: 1px solid #e3e3e3;
-  padding-top: 5px;
+  padding-top: 0.5em;
   text-align: center;
 }
 
@@ -200,10 +199,10 @@ export default {
 
 <style>
 .global-search {
-  max-width: 200px;
+  max-width: 15em;
 }
 
 .no-margin {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 </style>

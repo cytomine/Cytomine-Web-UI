@@ -4,25 +4,25 @@
   <h1>{{$t('colors')}}</h1>
   <table>
     <tr>
-      <td class="name">{{ $t('brightness') }}</td>
+      <td>{{ $t('brightness') }}</td>
       <td>
         <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders" />
       </td>
     </tr>
     <tr>
-      <td class="name">{{ $t('contrast') }}</td>
+      <td>{{ $t('contrast') }}</td>
       <td>
         <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders" />
       </td>
     </tr>
     <tr>
-      <td class="name">{{ $t('saturation') }}</td>
+      <td>{{ $t('saturation') }}</td>
       <td>
         <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders" />
       </td>
     </tr>
     <tr>
-      <td class="name">{{ $t('hue') }}</td>
+      <td>{{ $t('hue') }}</td>
       <td>
         <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders" />
       </td>
@@ -139,34 +139,23 @@ td, tr {
   vertical-align: middle !important;
 }
 
-td.name {
+td:first-child {
   font-weight: 600;
   text-align: right;
-  padding: 4px;
+  padding: 0.35em 0.5em;
 }
 
-td:not(.name) {
+td:last-child {
   width: 100%;
 }
 
-.metrics {
-  width: 48px;
-}
-
-input[type="range"].slider {
-  margin-top: 3px;
-  margin-bottom: 3px;
-}
-
 .actions {
-  margin-top: 10px;
+  margin-top: 1em;
   text-align: right;
 }
-</style>
 
-<style>
-.color-manipulation .vue-slider {
-  margin-left: 5px;
-  margin-right: 50px;
+>>> .vue-slider {
+  margin-left: 0.4em;
+  margin-right: 4em;
 }
 </style>

@@ -583,7 +583,7 @@ export default {
   float:left;
   margin-left: 1px;
   margin-right: 1px;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .button {
@@ -592,9 +592,9 @@ export default {
 
 .superscript {
   position: relative;
-  bottom: 5px;
+  bottom: 0.65em;
   left: 1px;
-  font-size: 8px;
+  font-size: 0.7em;
 }
 
 :focus {outline:none;}
@@ -605,19 +605,19 @@ export default {
 }
 
 .term-selection.has-preview i.fas {
-  font-size: 11px;
   position: relative;
-  right: 3px;
-  top: 2px;
+  right: 0.25em;
+  top: 0.2em;
+  font-size: 0.9em;
 }
 
 .term-selection .ontology-tree-container {
   position: absolute;
   top: 100%;
-  left: -20px;
+  left: -1.5em;
   margin-top: 5px;
   background: white;
-  min-width: 250px;
+  min-width: 18em;
   max-width: 20vw;
   max-height: 40vh;
   overflow: auto;
@@ -630,19 +630,19 @@ export default {
 }
 
 .color-preview {
-  width: 11px;
-  height: 11px;
+  width: 1em;
+  height: 1em;
   display: inline-block;
-  border-radius: 5px;
+  border-radius: 0.45em;
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 0.25em;
+  right: 0.25em;
   z-index: 1000;
   pointer-events: none;
-  font-size: 10px;
+  font-size: 0.7em;
   font-weight: 600;
   text-align:center;
-  line-height: 10px;
+  line-height: 0.9em;
   font-family: Arial;
 }
 </style>
@@ -655,12 +655,12 @@ $colorActiveIcon: #fff;
   .term-selection .ontology-tree-container {
 
     .control {
-      margin: 10px;
-      margin-bottom: 0px;
+      margin: 0.75em;
+      margin-bottom: 0;
     }
 
     .ontology-tree {
-      padding: 10px 0px;
+      padding: 0.75em 0;
     }
   }
 

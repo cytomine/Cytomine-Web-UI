@@ -248,15 +248,11 @@ export default {
 
 <style scoped>
 .legend {
-  margin-top: 10px;
-  margin-bottom: 15px;
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
   border-radius: 10px;
-  padding: 20px;
+  padding: 1.4em;
   background: #f8f8f8;
-}
-
-.legend p {
-  padding-bottom: 5px;
 }
 
 .fas.fa-user-cog {

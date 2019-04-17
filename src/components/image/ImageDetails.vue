@@ -301,7 +301,7 @@ export default {
 .table {
   background: none;
   position: relative;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 td.prop-label {
@@ -318,12 +318,12 @@ td.prop-content {
 }
 
 .vendor-img {
-  max-height: 40px;
-  max-width: 150px;
+  max-height: 4rem;
+  max-width: 12rem;
 }
 
 .image-overview {
-  max-height: 200px;
+  max-height: 18rem;
   max-width: 50vw;
 }
 </style>

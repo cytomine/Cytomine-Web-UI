@@ -127,19 +127,20 @@ export default {
 <style scoped>
 .image-selector-wrapper {
   position: absolute;
-  left: 0px;
-  bottom: 0px;
+  left: 0;
+  bottom: 0;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
   width: 100%;
-  height: 270px;
+  height: 20em;
   z-index: 150;
 }
 
 .header {
-  padding: 10px 10px 0px 10px;
+  padding: 0.75em;
+  padding-bottom: 0;
   display: flex;
   justify-content: space-between;
 }
@@ -154,16 +155,16 @@ export default {
 
 .card {
   display: inline-block;
-  min-width: 160px;
+  min-width: 12em;
   flex: 0;
   box-sizing: border-box;
-  margin: 10px;
+  margin: 0.75em;
 }
 
 .card-image {
   display: inline-block;
   width: 100%;
-  height: 120px;
+  height: 9.5em;
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -172,30 +173,30 @@ export default {
 }
 
 .card-content {
-  padding: 10px;
-  font-size: 12px;
+  padding: 0.75em;
+  font-size: 0.8rem;
   overflow-wrap: break-word;
   overflow: hidden;
-  height: 60px;
+  height: 5em;
 }
 
 .space {
-  margin-left: 5px;
+  margin-left: 0.5em;
 }
 
 .image-selector-button {
   background: #95b5db;
-  border: 4px solid white;
+  border: 0.35rem solid white;
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 48px;
-  height: 48px;
-  border-radius: 25px;
+  bottom: 1rem;
+  right: 1rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
   text-align: center;
-  line-height: 40px;
+  line-height: 2.8rem;
   color: white;
-  font-size: 22px;
+  font-size: 1.8rem;
   box-sizing: border-box;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   z-index: 100;

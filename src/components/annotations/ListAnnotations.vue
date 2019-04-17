@@ -409,12 +409,8 @@ export default {
 </script>
 
 <style scoped>
-.box.error {
-  margin: 20px 50px 20px 50px;
-}
-
 .filters:not(:last-child) {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .download-buttons {

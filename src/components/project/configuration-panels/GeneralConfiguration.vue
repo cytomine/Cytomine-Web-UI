@@ -307,11 +307,11 @@ export default {
 h2 {
   color: #444;
   border-bottom: 1px solid #ddd;
-  margin-top: 20px;
+  margin-top: 1.5em;
 }
 
 h2:first-child {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .columns {
@@ -319,15 +319,15 @@ h2:first-child {
 }
 
 .column {
-  padding: 10px;
+  padding: 0.8em;
 }
 
 .column:first-child {
-  padding-left: 50px;
+  padding-left: 3.5em;
 }
 
 .explanation {
-  margin-bottom: 20px;
+  margin-bottom: 1.4em;
 }
 
 .is-centered {
@@ -335,14 +335,14 @@ h2:first-child {
 }
 
 th, td {
-  padding: 0.5em 25px !important;
+  padding: 0.5em 2em !important;
 }
 
 >>> .message-body {
-  padding: 10px !important;
+  padding: 1em !important;
 }
 
 >>> select, >>> input[type=text] {
-  width: 300px;
+  width: 26em;
 }
 </style>

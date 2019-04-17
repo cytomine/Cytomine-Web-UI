@@ -87,8 +87,8 @@ td:last-child {
 }
 
 .column {
-  min-width: 230px;
-  max-width: 230px;
+  min-width: 18em;
+  max-width: 18em;
 }
 
 .details {

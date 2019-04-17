@@ -59,11 +59,11 @@ export default {
 }
 
 .key {
-  min-width: 40px;
-  height: 30px;
+  min-width: 3rem;
+  height: 2.25rem;
   border: 1px solid #ddd;
-  padding: 5px 10px !important;
-  margin: 0px 10px 8px 0px;
+  padding: 0.5em 1em !important;
+  margin: 0 0.9em 0.7em 0;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -71,10 +71,6 @@ export default {
   color: #888;
   background: #f8f8f8;
   font-weight: 600;
-}
-
-.key.fas {
-  font-size: 16px;
 }
 </style>
 

@@ -59,7 +59,7 @@ export default {
   },
   data() {
     return {
-      width: 350,
+      width: 320,
       height: 500,
       users: [],
       userJobs: [],
@@ -209,10 +209,10 @@ export default {
 <style scoped>
 .annotation-details-playground {
   position: absolute;
-  left: 50px;
-  top: 50px;
-  right: 70px;
-  bottom: 20px;
+  left: 3.5rem;
+  top: 3.5rem;
+  right: 4.5rem;
+  bottom: 2em;
   pointer-events: none; /* to allow selection of elements below it */
   /* background: rgba(255, 255, 255, 0.2);
   border: 2px dashed rgba(0, 0, 0, 0.5); */
@@ -228,32 +228,31 @@ export default {
 }
 
 .actions {
-  padding: 5px;
+  padding: 0.35em;
   text-align: right;
   background-color: #e5e5e5;
   border-bottom: 1px solid #b5b5b5;
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 5px 5px 0 0;
   display: flex;
   align-items: center;
 }
 
 h1 {
-  font-size: 14px;
-  padding: 0px;
+  font-size: 0.9rem;
+  padding: 0;
   flex: 1;
-  text-align:left;
-  margin-left: 5px;
+  text-align: left;
+  margin-left: 0.4em;
 }
 
 .actions .button {
-  margin-left: 3px;
-  width: 27px;
+  margin-left: 0.25rem;
+  width: 1.75rem;
 }
 
 .annotation-details-container {
-  padding: 10px;
+  padding: 0.6em;
   overflow: auto;
-  border-radius: 5px;
   height: 100%;
 }
 </style>

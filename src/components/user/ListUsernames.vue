@@ -62,6 +62,6 @@ export default {
 .button {
   line-height: initial;
   height: initial;
-  margin-left: 5px;
+  margin-left: 0.5em;
 }
 </style>

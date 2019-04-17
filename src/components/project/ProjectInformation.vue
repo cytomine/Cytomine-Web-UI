@@ -54,9 +54,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.box.error {
-  margin: 20px 50px 20px 50px;
-}
-</style>

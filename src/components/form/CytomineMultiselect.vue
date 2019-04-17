@@ -119,7 +119,7 @@ export default {
 
 .multiselect__option {
   padding: 6px 5px 5px 30px !important;
-  font-size: 14px !important;
+  font-size: 1rem !important;
   min-height: 30px !important;
 }
 
@@ -139,7 +139,7 @@ export default {
   margin-bottom: 8px;
   line-height: 20px;
   vertical-align: top;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 .multiselect__tags-wrap :first-child {
@@ -149,11 +149,11 @@ export default {
 .multiselect__placeholder, .multiselect__single {
   padding-left: 5px;
   position: relative;
-  padding-top: 0px !important;
+  padding-top: 0 !important;
 }
 
 .multiselect__input {
-  font-size: 14px !important;
+  font-size: 1rem !important;
 }
 
 .is-danger .multiselect__tags {

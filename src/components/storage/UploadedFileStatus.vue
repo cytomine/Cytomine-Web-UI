@@ -77,6 +77,6 @@ export default {
 
 <style scoped>
 .fas {
-  font-size: 18px;
+  font-size: 1.3em;
 }
 </style>

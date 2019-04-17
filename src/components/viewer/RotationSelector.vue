@@ -83,15 +83,15 @@ export default {
 <style scoped>
 .rotation-selector-wrapper {
   border-radius: 2px;
-  box-shadow: 0px 0px 1px #777;
+  box-shadow: 0 0 1px #777;
   background: white;
   margin-left: 2px;
 }
 
 .rotation-selector-wrapper.expanded {
-  min-width: 200px;
-  padding-top: 5px;
-  min-height: 75px;
+  min-width: 16.5em;
+  padding-top: 0.4em;
+  min-height: 6em;
 }
 
 .rotation-selector-wrapper.expanded .ol-control button {
@@ -99,7 +99,7 @@ export default {
 }
 
 .rotation-selector-wrapper .ol-control {
-  padding: 0px;
+  padding: 0;
 }
 
 .rotation-selector-wrapper.expanded .ol-control button {
@@ -107,14 +107,12 @@ export default {
 }
 
 .ol-rotate.ol-control {
-  left: 0px !important;
-  top: 0px !important;
+  left: 0 !important;
+  top: 0 !important;
 }
 
 .top {
-  margin-left: 20px;
-  margin-right: 5px;
-  margin-bottom: 8px;
+  margin: 0em 0.4em 0.75em 1.8em;
   display: flex;
 }
 
@@ -122,15 +120,15 @@ export default {
   flex: 1;
   display: flex;
   justify-content: center;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 7px;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-top: 0.5em;
 }
 </style>
 
 <style>
 .rotation-selector-wrapper .vue-slider {
-  margin-left: 10px;
-  margin-right: 50px;
+  margin-left: 1em;
+  margin-right: 4em;
 }
 </style>

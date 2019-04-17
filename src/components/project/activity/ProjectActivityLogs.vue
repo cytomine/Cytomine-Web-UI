@@ -198,11 +198,11 @@ export default {
 
 .list-actions {
   overflow: auto;
-  margin-top: 15px;
+  margin-top: 1em;
 }
 
 .no-result {
-  margin-top: 15px;
+  margin-top: 1em;
 }
 
 h3 {
@@ -211,25 +211,25 @@ h3 {
 }
 
 .list-actions div:not(:first-child) h3 {
-  padding: 5px 0px;
-  margin-top: 15px;
+  padding: 0.5em 0;
+  margin-top: 1em;
   border-top: rgba(0, 0, 0, 0.1) 2px solid;
 }
 
 h4 {
-  padding: 10px 15px 10px;
+  padding: 0.9em 1.2em 0.9em;
   color: #aaa;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 0.9rem;
 }
 
 ul {
-  margin-left: 30px;
+  margin-left: 2.5em;
 }
 
 li {
-  margin-bottom: 7px;
+  margin-bottom: 0.6em;
 }
 
 .button {

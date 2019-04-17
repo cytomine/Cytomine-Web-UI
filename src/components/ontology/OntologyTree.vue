@@ -312,13 +312,13 @@ export default {
 
 <style>
 .ontology-tree {
-  padding: 0px 0px 2px 0px;
+  padding: 0 0 2px 0;
 }
 
 .ontology-tree .tree-checkbox {
-  font-size: 16px;
   margin-right: 10px;
-  color: rgba(0, 0, 0, 0.2);;
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 1rem;
 }
 
 .ontology-tree.selector .sl-vue-tree-node-item:hover {
@@ -344,7 +344,7 @@ export default {
 }
 
 .ontology-tree .tree-selector {
-  min-width: 0px; /* to allow correct handling of overflow-wrap */
+  min-width: 0; /* to allow correct handling of overflow-wrap */
 }
 
 .ontology-tree .tree-selector:hover .tree-checkbox {
@@ -353,12 +353,12 @@ export default {
 
 .ontology-tree .no-result {
   margin-left: 20px;
-  line-height: 2.2;
-  font-size: 14px;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
 .ontology-tree .buttons, .ontology-tree .button {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .ontology-tree.editable .sl-vue-tree-sidebar {

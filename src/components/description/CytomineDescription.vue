@@ -95,7 +95,7 @@ export default {
 }
 
 .description-wrapper .ql-editor {
-  padding: 0px;
+  padding: 0;
   white-space: normal;
 }
 

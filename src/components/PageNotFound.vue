@@ -1,5 +1,5 @@
 <template>
-  <h1 class="page-title">
+  <h1>
     {{$t('page-not-found')}}
   </h1>
 </template>
@@ -10,3 +10,11 @@ export default {
   name: 'page-not-found'
 };
 </script>
+
+<style scoped>
+h1 {
+  padding: 2rem;
+  font-size: 1.5rem !important;
+}
+</style>
+

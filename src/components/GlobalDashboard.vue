@@ -232,11 +232,11 @@ td {
 
 a.project-name {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1.1rem;
 }
 
 .all-projects {
-  margin-top: 10px;
+  margin-top: 1rem;
 }
 
 .right-column {
@@ -245,12 +245,16 @@ a.project-name {
 }
 
 .stats {
-  padding-bottom: 40px;
+  padding-bottom: 2.5rem;
 }
 
 td:first-child {
   font-weight: 600;
   text-align: right;
   width: 25%;
+}
+
+.fas.fa-info-circle {
+  cursor: pointer;
 }
 </style>

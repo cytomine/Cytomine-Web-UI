@@ -63,6 +63,6 @@ export default {
 
 <style>
 .properties-panel select {
-  width: 150px;
+  width: 15em;
 }
 </style>

@@ -175,7 +175,7 @@ export default {
 
 <style lang="scss">
 #logo {
-  height: 35px;
+  height: 2rem;
   font-family: "cytomine";
   font-size: 2em;
   font-weight: lighter;
@@ -195,16 +195,7 @@ export default {
   z-index: 500 !important;
 
   .fas, .far {
-    padding-right: 7px;
-  }
-}
-
-.navbar-item.language {
-  font-size: 13px;
-  font-weight: normal;
-
-  &.selected {
-    font-weight: 600;
+    padding-right: 0.5rem;
   }
 }
 </style>

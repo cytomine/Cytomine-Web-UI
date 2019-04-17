@@ -134,12 +134,6 @@ export default {
   flex: 1;
   min-height: 20em;
 }
-
-td:first-child {
-  font-weight: 600;
-  padding-right: 20px;
-  text-align: right;
-}
 </style>
 
 <style>

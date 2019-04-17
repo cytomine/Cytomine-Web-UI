@@ -181,46 +181,46 @@ export default {
 <style scoped>
 .target-element {
   font-weight: 600;
-  min-width: 0px; /* to allow correct handling of overflow-wrap */
+  min-width: 0; /* to allow correct handling of overflow-wrap */
 }
 
 .filesize {
-  width: 100px;
-  margin-left: 15px;
+  width: 8em;
+  margin-left: 1em;
 }
 
 .status {
-  width: 60px;
+  width: 5em;
 }
 
 .preview {
-  width: 250px;
+  width: 20em;
 }
 
 .buttons {
-  margin-right: 20px;
-  margin-bottom: 0px !important;
+  margin-right: 2em;
+  margin-bottom: 0 !important;
 }
 
 .buttons .button {
-  margin-bottom: 5px !important;
-  margin-top: 2px !important;
+  margin-bottom: 0.5em !important;
+  margin-top: 0.2em !important;
 }
 
 h2:not(:first-child) {
-  margin-top: 15px;
+  margin-top: 1em;
   border-bottom: 2px solid #ddd;
 }
 
 h2 .button {
   position: relative;
   bottom: 3px;
-  margin-left: 10px;
+  margin-left: 0.8em;
   text-transform: none;
 }
 
 >>> .sl-vue-tree {
-  max-width: 1000px;
+  max-width: 80em;
 }
 
 >>> .sl-vue-tree-sidebar {
@@ -230,11 +230,11 @@ h2 .button {
 }
 
 >>> .sl-vue-tree-gap {
-  border: 0px dotted #bbb;
+  border: 0 dotted #bbb;
   border-left-width: 1px;
   position: relative;
-  right: 11px;
-  bottom: 17px;
+  right: 0.95em;
+  bottom: 1.25em;
 }
 
 >>> .sl-vue-tree-toggle {
@@ -243,6 +243,6 @@ h2 .button {
 }
 
 >>> .sl-vue-tree-gap:nth-last-child(3) {
-  border-width: 0px 0px 1px 1px !important;
+  border-width: 0 0 1px 1px !important;
 }
 </style>

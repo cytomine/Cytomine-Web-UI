@@ -394,7 +394,7 @@ export default {
 
 <style scoped>
 .panel-block {
-  padding-top: 10px;
+  padding-top: 0.8em;
 }
 
 .panel-heading {
@@ -408,15 +408,15 @@ export default {
 }
 
 .legend {
-  margin-top: 10px;
-  margin-bottom: 15px;
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
   border-radius: 10px;
-  padding: 20px;
+  padding: 1rem 1.5em;
   background: #f8f8f8;
 }
 
 .legend p:not(:last-child) {
-  margin-bottom: 10px;
+  margin-bottom: 0.4em;
 }
 
 .fas.fa-user-cog {
@@ -429,18 +429,18 @@ export default {
   font-size: 8px;
   position: absolute;
   top: -4px;
-  right: 0px;
+  right: 0;
 }
 </style>
 
 <style>
 .search-projects {
-  max-width: 300px;
-  margin-right: 10px;
+  max-width: 25em;
+  margin-right: 1em;
 }
 
 .table-projects {
-  margin-top: 15px;
+  margin-top: 1rem;
 }
 
 .list-projects-wrapper td, .list-projects-wrapper th {

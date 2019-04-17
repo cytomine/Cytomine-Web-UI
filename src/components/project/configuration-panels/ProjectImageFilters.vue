@@ -129,20 +129,20 @@ export default {
 
 <style scoped>
 .project-image-filters-wrapper {
-  min-height: 200px;
+  min-height: 40vh;
 }
 </style>
 
 <style>
 .project-image-filters-wrapper .search-field {
-  max-width: 300px;
+  max-width: 25em;
 }
 
 .project-image-filters-wrapper .table {
-  margin-top: 20px;
+  margin-top: 1.5em;
 }
 
 .project-image-filters-wrapper .table .button {
-  padding: 0px 40px;
+  padding: 0 3em;
 }
 </style>

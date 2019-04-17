@@ -27,10 +27,10 @@
 .tooltip .tooltip-inner {
   background: white;
   border-radius: 20px;
-  padding: 5px 10px 4px;
+  padding: 0.5rem 1rem 0.4rem;
   box-shadow: 0 0 3px hsla(0,0%,4%,.1),0 0 0 1px hsla(0,0%,4%,.1);
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 0.85rem;
   max-width: 50vw; /* TODO: special design for mobile ; modal? */
   max-height: 80vh;
   overflow: auto;
@@ -38,7 +38,7 @@
 
 .popover .popover-inner {
   min-width: 50px;
-  min-height: 50px;
+  min-height: 2rem;
 }
 
 .tooltip .tooltip-arrow {

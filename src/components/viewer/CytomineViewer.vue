@@ -187,7 +187,7 @@ export default {
 }
 
 .map-cell {
-  border-top: 3px solid #222;
+  border-top: 0.2em solid #222;
   overflow: hidden;
 }
 

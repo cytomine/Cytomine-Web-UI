@@ -23,11 +23,11 @@ export default {
 
 <style scoped>
 .online-dot, .offline-dot {
-  height: 10px;
-  width: 10px;
+  height: 0.8em;
+  width: 0.8em;
   border-radius: 50%;
   display: inline-block;
-  margin-right: 2px;
+  margin-right: 0.2em;
 }
 
 .online-dot {

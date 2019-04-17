@@ -367,7 +367,7 @@ export default {
 
 .filter-label {
   margin-right: 1em;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .filter-body {
@@ -375,11 +375,11 @@ export default {
 }
 
 .list-members-wrapper {
-  min-height: 200px;
+  min-height: 40vh;
 }
 
 .tag {
-  font-size: 11px !important;
+  font-size: 0.75em !important;
   font-weight: 600;
 }
 
@@ -388,21 +388,21 @@ export default {
 }
 
 .legend {
-  margin-top: 10px;
-  margin-bottom: 15px;
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
   border-radius: 10px;
-  padding: 20px;
+  padding: 1rem 1.5em;
   background: #f8f8f8;
 }
 
 .legend p {
-  padding-bottom: 5px;
+  padding-bottom: 0.4em;
 }
 
 .legend .icons {
   display: inline-block;
   width: 40px;
-  margin-right: 10px;
+  margin-right: 0.7em;
 }
 
 a:hover .fas {
@@ -431,6 +431,6 @@ a:hover .fas.disabled, a:hover .disabled .fas {
 
 <style>
 .table-members {
-  margin-top: 20px;
+  margin-top: 1.2em;
 }
 </style>

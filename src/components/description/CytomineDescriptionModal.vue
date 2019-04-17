@@ -91,7 +91,7 @@ export default {
 
 .description-modal {
   .ql-editor.preview {
-    padding: 0px 0px 10px 0px;
+    padding: 0 0 1em 0;
     text-align: justify;
     white-space: normal;
   }

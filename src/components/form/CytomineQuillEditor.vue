@@ -185,7 +185,7 @@ export default {
   .ql-picker.ql-special-characters .ql-picker-label::before {
     content: "\03A9"; /* Omega */
     font-weight: 600;
-    margin-right: 20px;
+    margin-right: 1.5em;
   }
 
   .ql-picker.ql-special-characters .ql-picker-options  {
@@ -205,8 +205,8 @@ export default {
     position: absolute;
     left: 1em;
     right: 1em;
-    top: 0px;
-    bottom: 0px;
+    top: 0;
+    bottom: 0;
     pointer-events: none; /* to allow selection of elements below it */
   }
 

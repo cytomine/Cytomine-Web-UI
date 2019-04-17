@@ -65,32 +65,35 @@ export default {
 .scale-line {
   background: white;
   position: absolute;
-  padding: 5px 10px 5px 10px;
+  padding: 0.4em 0.8em;
   display: block;
-  right: 70px;
-  bottom: 15px;
+  right: 4rem;
+  bottom: 1rem;
   font-size: 9px;
   font-family: Helvetica;
-  min-width: 120px;
+  min-width: 100px;
 }
+
 .scale-line-top {
-  margin-top: 5px;
+  margin-top: 0.5em;
   box-sizing: content-box;
   border: 2px solid black;
   border-top: none;
   text-align: center;
-  padding-bottom: 2px;
+  padding-bottom: 0.2em;
 }
+
 .scale-line-bottom {
   box-sizing: content-box;
   border: 2px solid black;
   border-top: none;
   border-bottom: none;
   text-align: center;
-  padding-top: 2px;
-  margin-bottom: 10px;
-  min-height: 10px;
+  padding-top: 0.2em;
+  margin-bottom: 1em;
+  min-height: 1em;
 }
+
 .interpolation {
   color: red;
 }
@@ -101,14 +104,13 @@ export default {
 
 .scale-line-position {
   text-align: center;
-  padding: 0px 5px 0 5px;
+  padding: 0 0.5em;
   color: black !important;
 }
 
 .interpolation-warning {
   text-align: center;
   font-size: 11px;
-  margin-bottom: 5px;
-  letter-spacing: 1px;
+  margin-bottom: 0.5em;
 }
 </style>

@@ -131,11 +131,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.comma {
-  position: relative;
-  right: 3px;
-  margin-right: 3px;
-}
-</style>

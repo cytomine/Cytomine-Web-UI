@@ -16,13 +16,13 @@ export default {
 
 <style scoped>
 .color-preview {
-  width: 12px;
-  height: 12px;
+  width: 1em;
+  height: 1em;
   display: inline-block;
-  margin-right: 3px;
-  border-radius: 3px;
-  box-shadow: 0px 0px 1px #777;
+  margin-right: 0.25em;
+  border-radius: 0.25em;
+  box-shadow: 0 0 1px #777;
   position: relative;
-  top: 2px;
+  top: 0.2em;
 }
 </style>

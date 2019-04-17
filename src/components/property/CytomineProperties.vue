@@ -140,23 +140,18 @@ export default {
 
 <style scoped>
 .new-prop-form {
-  margin-bottom: 5px;
-  margin-top: 5px;
+  margin-bottom: 0.45em;
+  margin-top: 0.45em;
 }
 
 .new-prop-form .button {
-  margin: 0px;
-  margin-right: 5px;
+  margin: 0;
+  margin-right: 0.45em;
 }
 
 .new-prop-form .control {
-  margin-right: 10px;
+  margin-right: 0.5em;
   display: inline-block;
-}
-
-.tag button.edit, .tag button.delete {
-  position: relative;
-  top: 1px;
 }
 
 .tag button.edit {
@@ -164,17 +159,18 @@ export default {
   width: 16px;
   background-color: rgba(10, 10, 10, 0.2);
   border: none;
-  border-radius: 290486px;
+  border-radius: 8px;
   cursor: pointer;
   pointer-events: auto;
   display: inline-block;
   font-size: 8px;
-  padding: 0px;
+  padding: 0;
   outline: none;
   position: relative;
   vertical-align: top;
   color: white;
-  margin-left: 5px;
+  margin-left: 0.5em;
+  line-height: 17px;
 }
 
 .tag button.edit:hover {
@@ -188,12 +184,12 @@ em {
 
 <style>
 .properties-wrapper .control, .properties-wrapper .tags {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .properties-wrapper .tag {
-  margin-right: 5px;
-  margin-bottom: 5px !important;
+  margin-right: 0.5em;
+  margin-bottom: 0.3em !important;
   background-color: rgba(0, 0, 0, 0.04);
 }
 
@@ -203,6 +199,6 @@ em {
 }
 
 .properties-wrapper .field.is-grouped.is-grouped-multiline {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 </style>

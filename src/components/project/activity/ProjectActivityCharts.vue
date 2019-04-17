@@ -130,7 +130,7 @@
         <div class="columns">
           <h2 class="column">{{$t("number-annotations")}}</h2>
           <template v-if="ontology">
-            <div class="column has-text-right">
+            <div class="column is-narrow has-text-right">
               <div class="filter-label">{{$t("term")}}</div>
             </div>
             <div class="column is-one-third">
@@ -351,13 +351,13 @@ export default {
 
 <style scoped>
 h2 {
-  font-size: 16px;
+  font-size: 1.2rem;
   margin-bottom: 0.5em;
 }
 
 .single-metrics {
   flex-grow: 0;
-  min-width: 250px;
+  min-width: 20em;
 }
 
 .single-metric strong {
@@ -366,7 +366,7 @@ h2 {
 }
 
 .single-metric .metric {
-  font-size: 20px;
+  font-size: 1.5em;
 }
 
 .chart-box {
@@ -383,7 +383,7 @@ h2 {
 }
 
 .chart-container.big {
-  min-height: 220px;
+  min-height: 20em;
 }
 
 .columns {
@@ -391,11 +391,11 @@ h2 {
 }
 
 .filter-label {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .column.is-info-circle {
-  padding-top: 0px;
+  padding-top: 0;
   margin-top: -1em;
   margin-left: 1em;
 }

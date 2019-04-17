@@ -1,5 +1,5 @@
 <template>
-<div class="ontology-panel">
+<div>
   <h1>{{ $t('terms') }}</h1>
   <div class="ontology-tree-wrapper">
     <div class="header-tree">
@@ -127,49 +127,45 @@ export default {
 </script>
 
 <style scoped>
-.ontology-panel h1 {
-  padding-bottom: 10px !important;
-}
-
 .ontology-tree-wrapper {
-  max-height: 185px;
+  max-height: 17em;
   overflow: auto;
-  margin-bottom: 5px !important;
+  margin-bottom: 0.4em !important;
 }
 
 
 input[type="range"].slider {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 .header-tree {
   display: flex;
   justify-content: right;
   position: sticky;
-  top: 0px;
+  top: 0;
   z-index: 5;
-  padding-bottom: 3px;
+  padding-bottom: 0.3em;
   background: #f2f2f2;
   border: 2px solid #DBDBDB;
-  border-width: 0px 0px 2px !important;
+  border-width: 0 0 2px !important;
 }
 
 .header-tree .opacity {
   text-align: center;
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 0.8em;
 }
 
 .sidebar-tree {
-  padding-right: 5px;
+  padding-right: 0.4em;
   display: flex;
   align-items: center;
 }
 
 .visibility {
-  width: 30px;
-  height: 25px;
+  width: 2.8em;
+  height: 2.1em;
   display: flex;
   justify-content: center;
 }
@@ -179,12 +175,12 @@ input[type="range"].slider {
 }
 
 .opacity {
-  width: 80px;
+  width: 6em;
   display: block;
 }
 
 >>> .checkbox .control-label {
-  padding: 0px !important;
+  padding: 0 !important;
 }
 
 >>> .ontology-tree .sl-vue-tree-node-item, >>> .ontology-tree .no-result {

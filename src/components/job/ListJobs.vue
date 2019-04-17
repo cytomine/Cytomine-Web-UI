@@ -258,7 +258,7 @@ export default {
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 5px;
   border: 1px solid #e8e8e8;
-  font-size: 14px;
+  font-size: 1rem;
   font-family: inherit;
 
   &::placeholder {

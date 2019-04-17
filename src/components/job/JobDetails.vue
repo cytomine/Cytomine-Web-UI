@@ -275,7 +275,7 @@ export default {
 .table {
   background: none;
   position: relative;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 td:first-child {

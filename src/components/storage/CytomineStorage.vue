@@ -483,7 +483,7 @@ export default {
 
 .upload-table  {
   position: relative;
-  bottom: 7px;
+  bottom: 0.4em;
 }
 
 .upload-table td {
@@ -495,7 +495,7 @@ export default {
 }
 
 .upload-table td:nth-child(2) {
-  width: 125px;
+  width: 10em;
 }
 
 .upload-table td:nth-child(3) {
@@ -510,20 +510,12 @@ export default {
   text-align: right;
 }
 
-.warnings {
-  margin-top: 10px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  padding: 20px;
-  background: #f5f5f5;
-}
-
 .column.flex-column {
   flex-direction: column;
 }
 
 .progress:not(:last-child) {
-  margin-bottom: 10px;
+  margin-bottom: 0.75em;
 }
 
 .column:first-child {
@@ -536,30 +528,29 @@ export default {
 }
 
 .image-overview {
-  max-height: 50px;
-  max-width: 80px;
+  max-height: 4em;
+  max-width: 6em;
 }
 
 .panel-block.storage {
-  min-height: 200px;
+  min-height: 20vh;
   position: relative;
 }
 </style>
 
 <style>
 .storage-wrapper .upload-draggable .button {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .storage-wrapper .upload-draggable {
-  margin-right: 8px;
+  margin-right: 0.75em;
   position: relative;
   bottom: 4px;
 }
 
 .search-uploaded-file {
-  max-width: 300px;
-  margin-right: 10px;
+  max-width: 25em;
 }
 </style>
 

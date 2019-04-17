@@ -121,19 +121,18 @@ export default {
   flex: 1;
 }
 
-.vue-slider {
-  margin-left: 50px;
-  margin-right: 70px;
+.vue-slider-component .vue-slider-tooltip {
+  font-size: 0.9rem;
 }
 
-.value-slider {
-  max-width: 60px;
-
+.vue-slider {
+  margin-left: 4rem;
+  margin-right: 6rem;
 }
 
 .vue-slider-tooltip input {
-  width: 50px;
-  height: 20px;
-  font-size: 11px;
+  width: 4rem;
+  height: 1.4rem;
+  font-size: 0.85rem;
 }
 </style>

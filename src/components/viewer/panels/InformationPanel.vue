@@ -177,7 +177,7 @@ export default {
 
 <style scoped>
 .table {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
   width: 100%;
   table-layout: fixed;
 }
@@ -187,7 +187,7 @@ td {
 }
 
 td:first-child {
-  width: 120px;
+  width: 10em;
 }
 
 .buttons {
@@ -195,16 +195,16 @@ td:first-child {
 }
 
 .buttons.navigation {
-  margin-top: 10px;
-  margin-bottom: 0px;
-  border-width: 0px;
+  margin-top: 0.7em;
+  margin-bottom: 0;
+  border-width: 0;
 }
 
 .fa-angle-left {
-  margin-right: 5px;
+  margin-right: 0.4em;
 }
 
 .fa-angle-right {
-  margin-left: 5px;
+  margin-left: 0.4em;
 }
 </style>

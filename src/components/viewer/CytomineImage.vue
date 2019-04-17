@@ -571,16 +571,12 @@ export default {
 @import '~vuelayers/lib/style.css';
 
 $backgroundPanelBar: #555;
-$widthPanelBar: 38px;
+$widthPanelBar: 2.8rem;
 $backgroundPanel: #f2f2f2;
 $colorPanelLink: #eee;
 $colorHoverPanelLink: white;
 $colorBorderPanelLink: #222;
 $colorOpenedPanelLink: #6c95c8;
-
-$colorPositioningHelper: rgba(0, 0, 0, 0.5);
-$sizePositioningHelperCenter: 50px;
-$sizePositioningLineSize: 2px;
 
 .map-container {
   display:flex;
@@ -595,31 +591,32 @@ $sizePositioningLineSize: 2px;
 
 .draw-tools {
   position: absolute;
-  top: 10px;
-  left: 50px;
+  top: 0.7em;
+  left: 3.5rem;
   z-index: 10;
 }
 
 .broadcast {
   position: absolute;
-  right: 60px;
-  top: 10px;
+  right: 4.5rem;
+  top: 0.7em;
   text-transform: uppercase;
   font-weight: 600;
   background-color: #EE4242;
   color: white;
-  padding: 5px;
+  padding: 0.25em 0.75em 0.25em 0.55em;
   border-radius: 5px;
   border: 2px solid white;
 
   i.fas {
-    margin-right: 5px;
+    margin-right: 0.3em;
   }
 }
 
 .panels {
   background: $backgroundPanelBar;
   display: flex;
+  font-size: 0.9em;
 
   > ul {
     padding: 0;
@@ -632,10 +629,8 @@ $sizePositioningLineSize: 2px;
         position: relative;
         display: block;
         width: $widthPanelBar;
-        padding: 10px;
-        padding-top: 7px;
-        padding-bottom: 7px;
-        font-size: 18px;
+        padding: 0.5rem 0.8rem;
+        font-size: 1.25rem;
         color: $colorPanelLink;
         border-bottom: 1px solid $colorBorderPanelLink;
         text-decoration: none;
@@ -663,18 +658,19 @@ $sizePositioningLineSize: 2px;
 
 .panel-options {
   position: absolute;
-  bottom: -20px;
+  bottom: -1.75em;
   right: $widthPanelBar;
-  width: 300px;
-  min-height: 100px;
+  width: 24em;
+  min-height: 10em;
   background: $backgroundPanel;
-  padding: 10px;
-  border-radius: 5px 0px 0px 5px;
+  padding: 0.75em;
+  border-radius: 5px 0 0 5px;
   z-index: 100;
 
   h1 {
-    padding-top: 5px !important;
-    padding-bottom: 15px !important;
+    font-size: 1.1rem;
+    padding-top: 0.3rem !important;
+    padding-bottom: 1rem !important;
   }
 
   table {
@@ -684,18 +680,18 @@ $sizePositioningLineSize: 2px;
 }
 
 .panels li:nth-child(-n+7) .panel-options {
-  bottom: -90px;
-  min-height: 160px;
+  bottom: -7.5em;
+  min-height: 13em;
 }
 
 .panels li:nth-child(-n+3) .panel-options {
-  top: -20px;
+  top: -1.75em;
   bottom: auto;
-  min-height: 100px;
+  min-height: 7.5em;
 }
 
 .panels li:nth-child(4) .panel-options {
-  top: -50px;
+  top: -5.5em;
   bottom: auto;
 }
 
@@ -713,10 +709,10 @@ $sizePositioningLineSize: 2px;
   background: white !important;
   color: black !important;
   border-radius: 2px !important;
-  box-shadow: 0px 0px 1px #777;
+  box-shadow: 0 0 1px #777;
 
   &:hover {
-    box-shadow: 0px 0px 1px black;
+    box-shadow: 0 0 1px black;
     cursor: pointer;
   }
 }
@@ -729,7 +725,7 @@ $sizePositioningLineSize: 2px;
 .rotation-selector-wrapper {
   position: absolute;
   left: .5em;
-  top: 70px;
+  top: 5rem;
 }
 
 .custom-overview {
@@ -739,7 +735,7 @@ $sizePositioningLineSize: 2px;
   background: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
-  border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0 0;
 
   .ol-overviewmap {
     position: static;

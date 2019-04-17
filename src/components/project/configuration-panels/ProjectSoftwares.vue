@@ -132,20 +132,20 @@ export default {
 
 <style scoped>
 .project-softwares-wrapper {
-  min-height: 200px;
+  min-height: 40vh;
 }
 </style>
 
 <style>
 .project-softwares-wrapper .search-field {
-  max-width: 300px;
+  max-width: 25em;
 }
 
 .project-softwares-wrapper .table {
-  margin-top: 20px;
+  margin-top: 1.5em;
 }
 
 .project-softwares-wrapper .table .button {
-  padding: 0px 40px;
+  padding: 0 3em;
 }
 </style>

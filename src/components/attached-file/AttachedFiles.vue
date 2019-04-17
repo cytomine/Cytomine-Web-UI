@@ -104,17 +104,17 @@ export default {
 }
 
 .file-item {
-  margin-right: 5px;
+  margin-right: 0.5em;
 }
 
 .file-item .delete {
-  margin-left: 5px;
-  margin-right: 2px;
+  margin-left: 0.4rem;
+  margin-right: 0.1rem;
   position: relative;
   top: 2px;
 }
 
 .button {
-  margin-left: 5px;
+  margin-left: 0.5em;
 }
 </style>
