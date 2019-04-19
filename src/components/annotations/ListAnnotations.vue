@@ -247,7 +247,7 @@ export default {
       return this.$store.state.currentUser.user;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     blindMode() {
       return this.project.blindMode;
@@ -256,10 +256,10 @@ export default {
       return this.$store.getters.canManageProject;
     },
     ontology() {
-      return this.$store.state.project.ontology;
+      return this.$store.state.currentProject.ontology;
     },
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
@@ -282,14 +282,14 @@ export default {
       return this.users.concat(this.userJobs);
     },
     members() {
-      return this.$store.state.project.members;
+      return this.$store.state.currentProject.members;
     },
     filteredMembers() { // filter the members so as to return only those whose annotations can be seen by current user
       if(this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
         return this.members;
       }
 
-      let idManagers = this.$store.state.project.managers.map(m => m.id);
+      let idManagers = this.$store.state.currentProject.managers.map(m => m.id);
       return this.members.filter(member => {
         if(this.currentUser.id === member.id) {
           return true;

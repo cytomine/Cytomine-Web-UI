@@ -49,7 +49,6 @@ export default {
   name: 'follow-panel',
   components: {Username},
   props: {
-    idViewer: String,
     index: Number,
     view: Object
   },
@@ -68,10 +67,10 @@ export default {
   },
   computed: {
     projectMembers() {
-      return this.$store.state.project.members;
+      return this.$store.state.currentProject.members;
     },
     projectManagers() {
-      return this.$store.state.project.managers;
+      return this.$store.state.currentProject.managers;
     },
     projectContributors() {
       return this.$store.getters.contributors;
@@ -80,10 +79,13 @@ export default {
       return this.$store.state.currentUser.user;
     },
     blindMode() {
-      return this.$store.state.project.project.blindMode;
+      return this.$store.state.currentProject.project.blindMode;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     viewerWrapper() {
-      return this.$store.state.images.viewers[this.idViewer];
+      return this.$store.getters.currentViewer;
     },
     maps() {
       return this.viewerWrapper.maps;
@@ -108,7 +110,7 @@ export default {
         return this.imageWrapper.broadcast;
       },
       set(value) {
-        this.$store.commit('setBroadcast', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setBroadcast', {index: this.index, value});
       }
     },
     alreadyBroadcastingImage() {
@@ -121,7 +123,7 @@ export default {
         return this.imageWrapper.trackedUser;
       },
       set(value) {
-        this.$store.commit('setTrackedUser', {idViewer: this.idViewer, index: this.index, idUser: value});
+        this.$store.commit(this.viewerModule + 'setTrackedUser', {index: this.index, idUser: value});
       }
     },
     onlineManagers() {
@@ -176,7 +178,7 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            this.$store.commit('unlinkMap', {idViewer: this.idViewer, index: this.index});
+            this.$store.commit(this.viewerModule + 'unlinkMap', this.index);
             this.trackedUser = value;
           },
           onCancel: () => this.trackedUserModel = null
@@ -252,6 +254,7 @@ export default {
   },
   created() {
     this.trackedUserModel = this.trackedUser;
+    this.broadcastModel = this.broadcast;
 
     this.fetchOnline();
     this.track();

@@ -94,7 +94,7 @@ export default {
       return this.$store.state.currentUser.user;
     },
     members() { // all project members except current user
-      return this.$store.state.project.members.filter(member => member.id !== this.currentUser.id);
+      return this.$store.state.currentProject.members.filter(member => member.id !== this.currentUser.id);
     },
     annotationURL() {
       let uri = `project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;

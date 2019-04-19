@@ -1,9 +1,23 @@
 <template>
 <div class="navigation-tree-wrapper">
-  <div v-for="(project, idProject, index) in navigationObject" :key="idProject">
-    <div class="navbar-item project-item">{{project.name}}</div>
+  <div v-for="(project, id, index) in projects" :key="project.id">
+
+    <router-link
+      class="navbar-item project-item"
+      :to="`/project/${project.id}`"
+    >
+      {{project.name}}
+      <a class="delete is-small" @click.stop.prevent="closeProject(project)"></a>
+    </router-link>
+
     <template v-for="viewer in project.viewers">
-      <router-link class="navbar-item viewer-item" :to="viewer.path" :key="viewer.id" exact>
+      <router-link
+        v-if="viewer.maps.length"
+        class="navbar-item viewer-item"
+        :to="viewerPath(project.id, viewer.id)"
+        :key="viewer.id"
+        exact
+      >
         <div class="viewer-name">
           <span>
             <i class="fas fa-caret-right"></i>
@@ -16,15 +30,15 @@
             {{viewer.name}}
           </span>
           <ul class="viewer-details" v-if="viewer.maps.length > 1">
-            <li v-for="(map, index) in viewer.maps" :key="index">
+            <li v-for="(map, idx) in viewer.maps" :key="idx">
               <image-name :image="map.imageInstance" />
             </li>
           </ul>
         </div>
-        <a class="delete is-small" @click.stop.prevent="close(viewer.id)"></a>
+        <a class="delete is-small" @click.stop.prevent="closeViewer(project.id, viewer.id)"></a>
       </router-link>
     </template>
-    <hr v-if="index < nbNavigationProjects - 1" class="navbar-divider">
+    <hr v-if="index < projects.length - 1" class="navbar-divider">
   </div>
 </div>
 </template>
@@ -36,35 +50,37 @@ export default {
   name: 'navigation-tree',
   components: {ImageName},
   computed: {
-    navigationObject() {
-      let data = {};
-      let viewers = this.$store.state.images.viewers;
-      for(let id in viewers) {
-        let viewer = viewers[id];
-        let nbMaps = viewer.maps.length;
-        if(nbMaps === 0) {
-          return;
-        }
-
-        if(!(viewer.idProject in data)) {
-          data[viewer.idProject] = {name: viewer.nameProject, blind: viewer.blindProject, viewers: []};
-        }
-
-        data[viewer.idProject].viewers.push({
-          id,
-          path: this.$store.getters.pathViewer({idViewer: id}),
-          maps: viewer.maps
-        });
-      }
-      return data;
-    },
-    nbNavigationProjects() {
-      return Object.keys(this.navigationObject).length;
+    projects() {
+      return this.$store.state.projects;
     }
   },
   methods: {
-    close(id) {
-      this.$store.commit('removeViewer', id);
+    viewerPath(idProject, idViewer) {
+      return this.$store.getters[`projects/${idProject}/viewers/${idViewer}/pathViewer`]();
+    },
+    closeProject(project) {
+      let nbViewers = Object.keys(project.viewers).length;
+      if(nbViewers) {
+        this.$dialog.confirm({
+          title: this.$t('confirm-close-project'),
+          message: this.$t(
+            'confirm-close-project-message',
+            {viewers: this.$tc('count-viewers', nbViewers, {count: nbViewers})}
+          ),
+          type: 'is-danger',
+          confirmText: this.$t('button-confirm'),
+          cancelText: this.$t('button-cancel'),
+          onConfirm: () => this.doCloseProject(project)
+        });
+        return;
+      }
+      this.doCloseProject(project);
+    },
+    doCloseProject(project) {
+      this.$store.unregisterModule(['projects', project.id]);
+    },
+    closeViewer(idProject, idViewer) {
+      this.$store.unregisterModule(['projects', idProject, 'viewers', idViewer]);
     }
   }
 };
@@ -74,7 +90,6 @@ export default {
 @import '~bulma/sass/utilities/mixins.sass';
 
 .project-item {
-  font-size: 0.9em;
   color: #333;
 }
 
@@ -95,7 +110,7 @@ export default {
   padding-right: 2rem;
 }
 
-.viewer-item .delete {
+.delete {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;

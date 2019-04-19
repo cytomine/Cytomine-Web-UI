@@ -73,7 +73,7 @@ export default {
   },
   computed: {
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
     canManageProject() {
       return this.$store.getters.canManageProject;

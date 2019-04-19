@@ -170,13 +170,13 @@ export default {
       return this.$store.state.currentUser.user;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     unformattedMembers() {
-      return this.$store.state.project.members;
+      return this.$store.state.currentProject.members;
     },
     idManagers() {
-      return this.$store.state.project.managers.map(manager => manager.id);
+      return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
     filteredMembers() {
       let filtered = this.allMembers;
@@ -310,7 +310,7 @@ export default {
 
         if(member.id === this.currentUser.id) {
           await this.$store.dispatch('fetchUIConfig');
-          if(!this.$store.state.project.configUI['project-configuration-tab']) {
+          if(!this.$store.state.currentProject.configUI['project-configuration-tab']) {
             this.$router.push(`/project/${this.project.id}`);
           }
         }

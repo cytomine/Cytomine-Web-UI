@@ -53,9 +53,6 @@ import {ImageInstanceCollection} from 'cytomine-client';
 export default {
   name: 'image-selector',
   components: {ImageName},
-  props: {
-    idViewer: String
-  },
   data() {
     return {
       images: [],
@@ -67,14 +64,17 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     imageSelectorEnabled: {
       get() {
-        return this.$store.state.images.viewers[this.idViewer].imageSelector;
+        return this.$store.getters.currentViewer.imageSelector;
       },
       set(value) {
-        this.$store.commit('setImageSelector', {idViewer: this.idViewer, value});
+        this.$store.commit(this.viewerModule + 'setImageSelector', value);
       }
     },
     filteredImages() { // TODO: in backend
@@ -96,7 +96,7 @@ export default {
   methods: {
     async addMap(image) {
       try {
-        await this.$store.dispatch('addMap', {idViewer: this.idViewer, image});
+        await this.$store.dispatch(this.viewerModule + 'addMap', image);
       }
       catch(error) {
         console.log(error);

@@ -151,10 +151,10 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     layers() {
-      return this.$store.state.project.members;
+      return this.$store.state.currentProject.members;
     },
     currentEditingMode() {
       return this.project.isReadOnly ? 'READ-ONLY' : this.project.isRestricted ? 'RESTRICTED' : 'CLASSIC';

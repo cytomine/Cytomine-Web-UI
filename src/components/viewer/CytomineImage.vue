@@ -47,19 +47,18 @@
       <annotation-layer
         v-for="layer in selectedLayers"
         :key="'layer-'+layer.id"
-        :idViewer="idViewer"
         :index="index"
         :layer="layer"
       />
 
-      <select-interaction v-if="activeSelectInteraction" :idViewer="idViewer" :index="index" />
-      <draw-interaction v-if="activeDrawInteraction" :idViewer="idViewer" :index="index" />
-      <modify-interaction v-if="activeModifyInteraction" :idViewer="idViewer" :index="index" />
+      <select-interaction v-if="activeSelectInteraction" :index="index" />
+      <draw-interaction v-if="activeDrawInteraction" :index="index" />
+      <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :idViewer="idViewer" :index="index" />
+      <draw-tools :index="index" />
     </div>
 
     <div class="panels">
@@ -75,36 +74,28 @@
             <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
               <i class="fas fa-info"></i>
             </a>
-            <information-panel class="panel-options" v-show="activePanel === 'info'"
-              :idViewer="idViewer" :index="index"
-            />
+            <information-panel class="panel-options" v-show="activePanel === 'info'" :index="index" />
           </li>
 
           <li v-if="isPanelDisplayed('digital-zoom')">
             <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
               <i class="fas fa-search"></i>
             </a>
-            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'"
-              :idViewer="idViewer" :index="index"
-            />
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
           </li>
 
           <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
             <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
               <i class="fas fa-link"></i>
             </a>
-            <link-panel class="panel-options" v-show="activePanel === 'link'"
-              :idViewer="idViewer" :index="index"
-            />
+            <link-panel class="panel-options" v-show="activePanel === 'link'" :index="index" />
           </li>
 
           <li v-if="isPanelDisplayed('color-manipulation')">
             <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
               <i class="fas fa-adjust"></i>
             </a>
-            <color-manipulation class="panel-options" v-show="activePanel === 'colors'"
-              :idViewer="idViewer" :index="index"
-            />
+            <color-manipulation class="panel-options" v-show="activePanel === 'colors'" :index="index" />
           </li>
 
           <li v-if="isPanelDisplayed('image-layers')">
@@ -112,7 +103,7 @@
               <i class="fas fa-copy"></i>
             </a>
             <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
-              :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
+              :index="index" :layers-to-preload="layersToPreload"
             />
           </li>
 
@@ -120,27 +111,21 @@
             <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
               <i class="fas fa-hashtag"></i>
             </a>
-            <ontology-panel class="panel-options" v-show="activePanel === 'ontology'"
-              :idViewer="idViewer" :index="index"
-            />
+            <ontology-panel class="panel-options" v-show="activePanel === 'ontology'" :index="index" />
           </li>
 
           <li  v-if="isPanelDisplayed('property')">
             <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
               <i class="fas fa-tag"></i>
             </a>
-            <properties-panel class="panel-options" v-show="activePanel === 'properties'"
-              :idViewer="idViewer" :index="index"
-            />
+            <properties-panel class="panel-options" v-show="activePanel === 'properties'" :index="index" />
           </li>
 
           <li v-if="isPanelDisplayed('follow')">
             <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
               <i class="fas fa-street-view"></i>
             </a>
-            <follow-panel class="panel-options" v-show="activePanel === 'follow'"
-              :idViewer="idViewer" :index="index" :view="$refs.view"
-            />
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
           </li>
         </template>
       </ul>
@@ -150,13 +135,11 @@
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
 
-    <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
+    <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
-      :idViewer="idViewer" :index="index" :view="$refs.view"
-    />
+    <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -208,7 +191,6 @@ import constants from '@/utils/constants.js';
 export default {
   name: 'cytomine-image',
   props: {
-    idViewer: String,
     index: Number
   },
   components: {
@@ -256,10 +238,13 @@ export default {
       return document;
     },
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     viewerWrapper() {
-      return this.$store.state.images.viewers[this.idViewer];
+      return this.$store.getters.currentViewer;
     },
     imageWrapper() {
       return this.viewerWrapper.maps[this.index];
@@ -283,7 +268,7 @@ export default {
       set(value) {
         if(value) {
           if(this.viewerWrapper) {
-            this.$store.commit('setActiveMap', {idViewer: this.idViewer, index: this.index});
+            this.$store.commit(this.viewerModule + 'setActiveMap', this.index);
           }
         }
         else {
@@ -309,7 +294,7 @@ export default {
         return this.imageWrapper.center;
       },
       set(value) {
-        this.$store.commit('setCenter', {idViewer: this.idViewer, index: this.index, center: value});
+        this.$store.commit(this.viewerModule + 'setCenter', {index: this.index, center: value});
       }
     },
     zoom: {
@@ -317,7 +302,7 @@ export default {
         return this.imageWrapper.zoom;
       },
       set(value) {
-        this.$store.commit('setZoom', {idViewer: this.idViewer, index: this.index, zoom: Number(value)});
+        this.$store.commit(this.viewerModule + 'setZoom', {index: this.index, zoom: Number(value)});
       }
     },
     rotation: {
@@ -325,7 +310,7 @@ export default {
         return this.imageWrapper.rotation;
       },
       set(value) {
-        this.$store.commit('setRotation', {idViewer: this.idViewer, index: this.index, rotation: Number(value)});
+        this.$store.commit(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
       }
     },
 
@@ -468,7 +453,7 @@ export default {
     },
 
     togglePanel(panel) {
-      this.$store.commit('togglePanel', {idViewer: this.idViewer, index: this.index, panel});
+      this.$store.commit(this.viewerModule + 'togglePanel', {index: this.index, panel});
     },
 
     savePosition: _.debounce(async function() {
@@ -514,8 +499,7 @@ export default {
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit('removeLayerFromSelectedFeatures', {
-        idViewer: this.idViewer,
+      this.$store.commit(this.viewerModule + 'removeLayerFromSelectedFeatures', {
         index: this.index,
         idLayer: layer.id,
         cache: true
@@ -534,9 +518,9 @@ export default {
           if(annot.image === this.image.id) {
             this.routedAnnotation = annot;
             if(this.$route.query.action === 'comments') {
-              this.$store.commit('setShowComments', {idViewer: this.idViewer, index: this.index, annot});
+              this.$store.commit(this.viewerModule + 'setShowComments', {index: this.index, annot});
             }
-            this.$store.commit('setAnnotToSelect', {idViewer: this.idViewer, index: this.index, annot});
+            this.$store.commit(this.viewerModule + 'setAnnotToSelect', {index: this.index, annot});
           }
         }
         catch(error) {

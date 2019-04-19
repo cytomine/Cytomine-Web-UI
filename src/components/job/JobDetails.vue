@@ -174,7 +174,7 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     isRunning() {
       return this.job.status === JobStatus.RUNNING;

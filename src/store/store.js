@@ -2,15 +2,16 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import currentUser from './modules/current-user.js';
-import images from './modules/images.js';
-import project from './modules/project.js';
+import currentProject from './modules/current-project.js';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     currentUser,
-    images,
-    project
+    currentProject,
+    projects: {
+      namespaced: true
+    }
   },
   strict: process.env.NODE_ENV !== 'production'
 });

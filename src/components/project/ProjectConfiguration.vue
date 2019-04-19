@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
     queriedTab() {
       return this.$route.query.tab;

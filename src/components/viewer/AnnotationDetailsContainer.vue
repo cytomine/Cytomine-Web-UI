@@ -53,7 +53,6 @@ export default {
   name: 'annotations-details-container',
   components: {VueDraggableResizable, AnnotationDetails},
   props: {
-    idViewer: String,
     index: Number,
     view: Object
   },
@@ -69,8 +68,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -80,7 +82,7 @@ export default {
         return this.imageWrapper.displayAnnotDetails;
       },
       set(value) {
-        this.$store.commit('setDisplayAnnotDetails', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setDisplayAnnotDetails', {index: this.index, value});
       }
     },
     positionAnnotDetails: {
@@ -88,7 +90,7 @@ export default {
         return this.imageWrapper.positionAnnotDetails;
       },
       set(value) {
-        this.$store.commit('setPositionAnnotDetails', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setPositionAnnotDetails', {index: this.index, value});
       }
     },
     selectedFeatures() {
@@ -118,7 +120,7 @@ export default {
         let targetAnnot = this.imageWrapper.showComments;
         this.showComments = (targetAnnot === this.annot.id);
         if(targetAnnot !== null) {
-          this.$store.commit('setShowComments', {idViewer: this.idViewer, index: this.index, annot: null});
+          this.$store.commit(this.viewerModule + 'setShowComments', {index: this.index, annot: null});
         }
       }
     }
@@ -140,7 +142,7 @@ export default {
     },
 
     addTerm(term) {
-      this.$store.commit('addTerm', {idViewer: this.idViewer, term});
+      this.$store.commit(this.viewerModule + 'addTerm', term);
     },
 
     async updateTerms() {
@@ -148,8 +150,7 @@ export default {
       await updateTermProperties(updatedAnnot);
 
       this.$eventBus.$emit('editAnnotation', updatedAnnot);
-      this.$store.commit('changeAnnotSelectedFeature', {
-        idViewer: this.idViewer,
+      this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
         index: this.index,
         indexFeature: 0,
         annot: updatedAnnot
@@ -157,12 +158,11 @@ export default {
     },
 
     updateProperties() {
-      this.$store.dispatch('refreshProperties', {idViewer: this.idViewer, index: this.index});
+      this.$store.dispatch(this.viewerModule + 'refreshProperties', this.index);
     },
 
     handleDeletion() {
-      this.$store.commit('addAction', {
-        idViewer: this.idViewer,
+      this.$store.commit(this.viewerModule + 'addAction', {
         index: this.index,
         annot: this.annot,
         type: Action.DELETE

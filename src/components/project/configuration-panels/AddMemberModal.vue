@@ -45,10 +45,10 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     projectMembersIds() {
-      let projectMembers = this.$store.state.project.members;
+      let projectMembers = this.$store.state.currentProject.members;
       let excluded = projectMembers.concat(this.selectedUsers);
       return excluded.map(u => u.id);
     },

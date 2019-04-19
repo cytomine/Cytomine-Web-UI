@@ -71,7 +71,6 @@ export default {
     CalibrationModal
   },
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -82,8 +81,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     viewerWrapper() {
-      return this.$store.state.images.viewers[this.idViewer];
+      return this.$store.getters.currentViewer;
     },
     image() {
       return this.viewerWrapper.maps[this.index].imageInstance;
@@ -108,7 +110,7 @@ export default {
   },
   methods: {
     setResolution(resolution) {
-      this.$store.commit('setResolution', {idViewer: this.idViewer, idImage: this.image.id, resolution});
+      this.$store.commit(this.viewerModule + 'setResolution', {idImage: this.image.id, resolution});
       // refresh the sources to update perimeter/area
       this.$eventBus.$emit('reloadAnnotations', this.image.id);
     },
@@ -120,8 +122,7 @@ export default {
           this.isFirstImage = true;
         }
         else {
-          await this.$store.dispatch('setImageInstance', {
-            idViewer: this.idViewer,
+          await this.$store.dispatch(this.viewerModule + 'setImageInstance', {
             index: this.index,
             image: prev
           });
@@ -140,8 +141,7 @@ export default {
           this.isLastImage = true;
         }
         else {
-          await this.$store.dispatch('setImageInstance', {
-            idViewer: this.idViewer,
+          await this.$store.dispatch(this.viewerModule + 'setImageInstance', {
             index: this.index,
             image: next
           });

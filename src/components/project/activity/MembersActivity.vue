@@ -171,13 +171,13 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     isManager() {
       return this.$store.getters.canManageProject;
     },
     idManagers() {
-      return this.$store.state.project.managers.map(manager => manager.id);
+      return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
     filteredMembers() {
       let str = this.searchString.toLowerCase();

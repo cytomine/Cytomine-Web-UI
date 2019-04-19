@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
 
     filteredSoftwares() {

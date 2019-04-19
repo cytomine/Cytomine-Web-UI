@@ -24,10 +24,10 @@ export default {
   components: {ProjectDetails},
   computed: {
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     }
   },
   methods: {

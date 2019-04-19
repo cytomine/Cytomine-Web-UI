@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     blindMode() {
-      return this.$store.state.project.project.blindMode;
+      return this.$store.state.currentProject.project.blindMode;
     },
     validField() {
       return !isNaN(this.calibrationField) && +this.calibrationField > 0;

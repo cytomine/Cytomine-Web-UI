@@ -13,12 +13,14 @@ import constants from '@/utils/constants';
 export default {
   name: 'digital-zoom',
   props: {
-    idViewer: String,
     index: Number
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -29,8 +31,7 @@ export default {
         return this.imageWrapper.digitalZoom;
       },
       set(value) {
-        this.$store.commit('setDigitalZoom', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'setDigitalZoom', {
           index: this.index,
           digitalZoom: Boolean(value)
         });
@@ -42,8 +43,7 @@ export default {
         return this.imageWrapper.maxZoom;
       },
       set(value) {
-        this.$store.commit('setMaxZoom', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'setMaxZoom', {
           index: this.index,
           maxZoom: Number(value)
         });

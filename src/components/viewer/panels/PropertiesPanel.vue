@@ -28,22 +28,24 @@ import {defaultColors} from '@/utils/style-utils.js';
 export default {
   name: 'properties-panel',
   props: {
-    idViewer: String,
     index: Number
   },
   computed: {
     colors() {
       return defaultColors;
     },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     selectedPropertyKey: {
       get() {
         return this.imageWrapper.selectedPropertyKey;
       },
       set(value) {
-        this.$store.dispatch('setSelectedPropertyKey', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.dispatch(this.viewerModule + 'setSelectedPropertyKey', {index: this.index, value});
       }
     },
     selectedPropertyColor: {
@@ -51,7 +53,7 @@ export default {
         return this.imageWrapper.selectedPropertyColor;
       },
       set(value) {
-        this.$store.commit('setSelectedPropertyColor', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setSelectedPropertyColor', {index: this.index, value});
       }
     },
     propertiesKeys() {

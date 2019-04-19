@@ -187,10 +187,10 @@ export default {
   },
   computed: {
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
     ontology() {
-      return this.$store.state.project.ontology;
+      return this.$store.state.currentProject.ontology;
     },
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};

@@ -3,21 +3,21 @@
   <vl-interaction-modify
     v-if="activeEditTool === 'modify'"
     ref="olModifyInteraction"
-    :source="`select-target-${idViewer}-${index}`"
+    :source="`select-target-${index}`"
     @modifystart="startEdit"
     @modifyend="endEdit"
   />
 
   <vl-interaction-translate
     v-if="activeEditTool === 'translate'"
-    :source="`select-target-${idViewer}-${index}`"
+    :source="`select-target-${index}`"
     @translatestart="startEdit"
     @translateend="endEdit"
   />
 
   <vl-interaction-rotate
     v-if="activeEditTool === 'rotate'"
-    :source="`select-target-${idViewer}-${index}`"
+    :source="`select-target-${index}`"
     @rotatestart="startEdit"
     @rotateend="endEdit"
   />
@@ -31,7 +31,6 @@ import {Action} from '@/utils/annotation-utils.js';
 export default {
   name: 'modify-interaction',
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -40,8 +39,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -54,7 +56,7 @@ export default {
         return this.imageWrapper.activeEditTool;
       },
       set(value) {
-        this.$store.commit('setOngoingEdit', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setOngoingEdit', {index: this.index, value});
       }
     },
   },
@@ -75,8 +77,7 @@ export default {
           annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
           await annot.save();
           this.$eventBus.$emit('editAnnotation', annot);
-          this.$store.commit('addAction', {
-            idViewer: this.idViewer,
+          this.$store.commit(this.viewerModule + 'addAction', {
             index: this.index,
             annot,
             type: Action.UPDATE

@@ -21,7 +21,6 @@ export default {
   name: 'link-panel',
   components: {ImageName},
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -30,8 +29,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     viewerWrapper() {
-      return this.$store.state.images.viewers[this.idViewer];
+      return this.$store.getters.currentViewer;
     },
     maps() {
       return this.viewerWrapper.maps;
@@ -64,7 +66,7 @@ export default {
             confirmText: this.$t('button-confirm'),
             cancelText: this.$t('button-cancel'),
             onConfirm: () => {
-              this.$store.commit('setTrackedUser', {idViewer: this.idViewer, index: this.index, idUser: null});
+              this.$store.commit(this.viewerModule + 'setTrackedUser', {index: this.index, idUser: null});
               this.linkMaps(indexLinked);
             },
             onCancel: () => this.revisionCheckboxes++ // To force the update of the checkbox state
@@ -75,12 +77,12 @@ export default {
         }
       }
       else {
-        this.$store.commit('unlinkMap', {idViewer: this.idViewer, index: this.index});
+        this.$store.commit(this.viewerModule + 'unlinkMap', this.index);
       }
     },
 
     linkMaps(indexLinked) {
-      this.$store.commit('linkMaps', {idViewer: this.idViewer, indexes: [this.index, indexLinked]});
+      this.$store.commit(this.viewerModule + 'linkMaps', [this.index, indexLinked]);
     }
   }
 };

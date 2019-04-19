@@ -64,7 +64,6 @@ export default {
   name: 'ontology-panel',
   components: {OntologyTree},
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -74,10 +73,13 @@ export default {
   },
   computed: {
     ontology() {
-      return this.$store.state.project.ontology;
+      return this.$store.state.currentProject.ontology;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     terms() {
       return this.imageWrapper.terms;
@@ -95,7 +97,7 @@ export default {
         return this.imageWrapper.displayNoTerm;
       },
       set(value) {
-        this.$store.commit('setDisplayNoTerm', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setDisplayNoTerm', {index: this.index, value});
       }
     },
     noTermOpacity: {
@@ -103,8 +105,7 @@ export default {
         return this.imageWrapper.noTermOpacity;
       },
       set(value) {
-        this.$store.commit('setNoTermOpacity', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'setNoTermOpacity', {
           index: this.index,
           opacity: Number(value)
         });
@@ -113,14 +114,14 @@ export default {
   },
   methods: {
     toggleTermVisibility(index) {
-      this.$store.commit('toggleTermVisibility', {idViewer: this.idViewer, index: this.index, indexTerm: index});
+      this.$store.commit(this.viewerModule + 'toggleTermVisibility', {index: this.index, indexTerm: index});
     },
     changeOpacity(index, event) {
       let opacity = event.target.value;
-      this.$store.commit('setTermOpacity', {idViewer: this.idViewer, index: this.index, indexTerm: index, opacity});
+      this.$store.commit(this.viewerModule + 'setTermOpacity', {index: this.index, indexTerm: index, opacity});
     },
     resetOpacities() {
-      this.$store.commit('resetTermOpacities', {idViewer: this.idViewer, index: this.index});
+      this.$store.commit(this.viewerModule + 'resetTermOpacities', {index: this.index});
     }
   }
 };

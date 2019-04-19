@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import router from '@/routes.js';
 
 import {Cytomine, ImageInstance, PropertyCollection, AbstractImage, AnnotationType, Term} from 'cytomine-client';
@@ -13,59 +12,48 @@ let initialLayersOpacity = 0.5;
 let initialTermsOpacity = 1;
 
 export default {
-  state: {
-    viewers: {}
+  namespaced: true,
+
+  state() {
+    return {
+      id: null,
+      maps: [],
+      links: [],
+      imageSelector: false,
+      activeMap: 0
+    };
   },
 
   mutations: {
 
-    logout(state) {
-      state.viewers = {};
+    setId(state, id) {
+      state.id = id;
     },
 
-    addViewer(state, {id, project}) {
-      Vue.set(state.viewers, id, {
-        maps: [],
-        idProject: project.id,
-        nameProject: project.name,
-        blindProject: project.blindMode,
-        links: [],
-        imageSelector: false,
-        activeMap: 0
-      });
+    setImageSelector(state, value) {
+      state.imageSelector = value;
     },
 
-    removeViewer(state, idViewer) {
-      Vue.delete(state.viewers, idViewer);
+    addMap(state, wrapper) {
+      state.maps.push(wrapper);
+      state.imageSelector = false;
+      state.activeMap = state.maps.length - 1;
     },
 
-    setImageSelector(state, {idViewer, value}) {
-      state.viewers[idViewer].imageSelector = value;
+    removeMap(state, index) {
+      state.maps.splice(index, 1);
     },
 
-    addMap(state, {idViewer, wrapper}) {
-      let viewerWrapper = state.viewers[idViewer];
-      viewerWrapper.maps.push(wrapper);
-      viewerWrapper.imageSelector = false;
-      viewerWrapper.activeMap = viewerWrapper.maps.length - 1;
+    setActiveMap(state, index) {
+      state.activeMap = index;
     },
 
-    removeMap(state, {idViewer, index}) {
-      let viewerWrapper = state.viewers[idViewer];
-      viewerWrapper.maps.splice(index, 1);
+    setImageInstance(state, {index, image}) {
+      state.maps[index].imageInstance = image;
     },
 
-    setActiveMap(state, {idViewer, index}) {
-      state.viewers[idViewer].activeMap = index;
-    },
-
-    setImageInstance(state, {idViewer, index, image}) {
-      let viewerWrapper = state.viewers[idViewer];
-      viewerWrapper.maps[index].imageInstance = image;
-    },
-
-    togglePanel(state, {idViewer, index, panel}) {
-      let imageWrapper = state.viewers[idViewer].maps[index];
+    togglePanel(state, {index, panel}) {
+      let imageWrapper = state.maps[index];
       if(imageWrapper.activePanel === panel) {
         imageWrapper.activePanel = null;
       }
@@ -76,8 +64,8 @@ export default {
 
     // ----- View links
 
-    linkMaps(state, {idViewer, indexes}) {
-      let links = state.viewers[idViewer].links;
+    linkMaps(state, indexes) {
+      let links = state.links;
       let groups = indexes.map(index => links.findIndex(group => group.includes(index))); // find to which link group (if any) each map belongs
 
       if(groups[0] !== -1) { // if first map belongs to a link group
@@ -97,8 +85,8 @@ export default {
       }
     },
 
-    unlinkMap(state, {idViewer, index, deletion=false}) {
-      let links = state.viewers[idViewer].links;
+    unlinkMap(state, {index, deletion=false}) {
+      let links = state.links;
       for(let i = links.length - 1; i >= 0; i--) {
         let group = links[i];
         for(let j = group.length - 1; j >= 0; j--) {
@@ -119,117 +107,114 @@ export default {
 
     // ----- Tracking
 
-    setBroadcast(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].broadcast = value;
+    setBroadcast(state, {index, value}) {
+      state.maps[index].broadcast = value;
     },
 
-    setTrackedUser(state, {idViewer, index, idUser}) {
-      state.viewers[idViewer].maps[index].trackedUser = idUser;
+    setTrackedUser(state, {index, idUser}) {
+      state.maps[index].trackedUser = idUser;
     },
 
     // ----- View properties
 
-    setCenter(state, {idViewer, index, center}) {
-      let viewerWrapper = state.viewers[idViewer];
-      let refImageWrapper = viewerWrapper.maps[index];
+    setCenter(state, {index, center}) {
+      let refImageWrapper = state.maps[index];
       let increments = refImageWrapper.center.map((val, i) => center[i] - val);
       let refZoom = refImageWrapper.imageInstance.depth - refImageWrapper.zoom;
 
       // find all indexes that should be updated (if map is not linked to other, update only it)
-      let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+      let mapIndexesToUpdate = state.links.find(group => group.includes(index)) || [index];
       mapIndexesToUpdate.forEach(idx => {
-        let imageWrapper = viewerWrapper.maps[idx];
+        let imageWrapper = state.maps[idx];
         let diffZoom = imageWrapper.imageInstance.depth - imageWrapper.zoom - refZoom;
         let zoomFactor = Math.pow(2, diffZoom);
-        viewerWrapper.maps[idx].center = viewerWrapper.maps[idx].center.map((val, i) => {
+        state.maps[idx].center = state.maps[idx].center.map((val, i) => {
           return val + increments[i]*zoomFactor;
         });
       });
     },
 
-    setZoom(state, {idViewer, index, zoom}) {
-      let viewerWrapper = state.viewers[idViewer];
-      let zoomIncrement = zoom - viewerWrapper.maps[index].zoom;
+    setZoom(state, {index, zoom}) {
+      let zoomIncrement = zoom - state.maps[index].zoom;
 
       // find all indexes that should be updated (if map is not linked to other, update only it)
-      let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+      let mapIndexesToUpdate = state.links.find(group => group.includes(index)) || [index];
       mapIndexesToUpdate.forEach(idx => {
-        viewerWrapper.maps[idx].zoom += zoomIncrement;
+        state.maps[idx].zoom += zoomIncrement;
       });
     },
 
-    setRotation(state, {idViewer, index, rotation}) {
-      let viewerWrapper = state.viewers[idViewer];
-      let rotationInc = rotation - viewerWrapper.maps[index].rotation + 2*Math.PI;
+    setRotation(state, {index, rotation}) {
+      let rotationInc = rotation - state.maps[index].rotation + 2*Math.PI;
 
       // find all indexes that should be updated (if map is not linked to other, update only it)
-      let mapIndexesToUpdate = viewerWrapper.links.find(group => group.includes(index)) || [index];
+      let mapIndexesToUpdate = state.links.find(group => group.includes(index)) || [index];
       mapIndexesToUpdate.forEach(idx => {
-        viewerWrapper.maps[idx].rotation = (viewerWrapper.maps[idx].rotation + rotationInc) % (2*Math.PI);
+        state.maps[idx].rotation = (state.maps[idx].rotation + rotationInc) % (2*Math.PI);
       });
     },
 
     // ----- Color manipulation
 
-    setBrightness(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].brightness = value;
+    setBrightness(state, {index, value}) {
+      state.maps[index].brightness = value;
     },
 
-    setContrast(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].contrast = value;
+    setContrast(state, {index, value}) {
+      state.maps[index].contrast = value;
     },
 
-    setHue(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].hue = value;
+    setHue(state, {index, value}) {
+      state.maps[index].hue = value;
     },
 
-    setSaturation(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].saturation = value;
+    setSaturation(state, {index, value}) {
+      state.maps[index].saturation = value;
     },
 
-    resetColorManipulation(state, {idViewer, index}) {
-      state.viewers[idViewer].maps[index].brightness = 0;
-      state.viewers[idViewer].maps[index].contrast = 0;
-      state.viewers[idViewer].maps[index].hue = 0;
-      state.viewers[idViewer].maps[index].saturation = 0;
+    resetColorManipulation(state, {index}) {
+      state.maps[index].brightness = 0;
+      state.maps[index].contrast = 0;
+      state.maps[index].hue = 0;
+      state.maps[index].saturation = 0;
     },
 
     // ----- Digital zoom
 
-    setMaxZoom(state, {idViewer, index, maxZoom}) {
-      state.viewers[idViewer].maps[index].maxZoom = maxZoom;
+    setMaxZoom(state, {index, maxZoom}) {
+      state.maps[index].maxZoom = maxZoom;
     },
 
-    setDigitalZoom(state, {idViewer, index, digitalZoom}) {
-      state.viewers[idViewer].maps[index].digitalZoom = digitalZoom;
+    setDigitalZoom(state, {index, digitalZoom}) {
+      state.maps[index].digitalZoom = digitalZoom;
     },
 
     // ----- Terms
 
-    addTerm(state, {idViewer, term}) { // if a term is added, required to add it to all images as they belong to same project
-      let maps = state.viewers[idViewer].maps;
+    addTerm(state, term) { // if a term is added, required to add it to all images as they belong to same project
+      let maps = state.maps;
       maps.forEach(map => {
         map.terms.push(formatTerm(term, map.layersOpacity));
       });
     },
 
-    setTerms(state, {idViewer, index, terms}) {
-      state.viewers[idViewer].maps[index].terms = terms;
+    setTerms(state, {index, terms}) {
+      state.maps[index].terms = terms;
     },
 
-    setTermsNewAnnots(state, {idViewer, index, terms}) {
-      state.viewers[idViewer].maps[index].termsNewAnnots = terms;
+    setTermsNewAnnots(state, {index, terms}) {
+      state.maps[index].termsNewAnnots = terms;
     },
 
-    filterTermsNewAnnots(state, {idViewer, index}) { // keep only the terms that still exist
-      let wrapper = state.viewers[idViewer].maps[index];
+    filterTermsNewAnnots(state, {index}) { // keep only the terms that still exist
+      let wrapper = state.maps[index];
       let terms = wrapper.terms || [];
       let idTerms = terms.map(term => term.id);
       wrapper.termsNewAnnots = wrapper.termsNewAnnots.filter(id => idTerms.includes(id));
     },
 
-    toggleTermVisibility(state, {idViewer, index, indexTerm}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    toggleTermVisibility(state, {index, indexTerm}) {
+      let wrapper = state.maps[index];
       let term = wrapper.terms[indexTerm];
       term.visible = !term.visible;
 
@@ -252,8 +237,8 @@ export default {
       }
     },
 
-    setDisplayNoTerm(state, {idViewer, index, value}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    setDisplayNoTerm(state, {index, value}) {
+      let wrapper = state.maps[index];
       wrapper.displayNoTerm = value;
 
       if(!value) { // unselect annotation if it is no longer displayed
@@ -269,21 +254,21 @@ export default {
       }
     },
 
-    setTermOpacity(state, {idViewer, index, indexTerm, opacity}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    setTermOpacity(state, {index, indexTerm, opacity}) {
+      let wrapper = state.maps[index];
       let term = wrapper.terms[indexTerm];
       term.opacity = opacity;
       changeOpacity(term.olStyle, wrapper.layersOpacity*opacity);
     },
 
-    setNoTermOpacity(state, {idViewer, index, opacity}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    setNoTermOpacity(state, {index, opacity}) {
+      let wrapper = state.maps[index];
       wrapper.noTermOpacity = opacity;
       changeOpacity(wrapper.noTermStyle, wrapper.layersOpacity*opacity);
     },
 
-    resetTermOpacities(state, {idViewer, index}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    resetTermOpacities(state, index) {
+      let wrapper = state.maps[index];
       wrapper.terms.forEach(term => {
         term.opacity = initialTermsOpacity;
         changeOpacity(term.olStyle, wrapper.layersOpacity*initialTermsOpacity);
@@ -294,8 +279,8 @@ export default {
 
     // ----- Selected layers
 
-    addLayer(state, {idViewer, index, layer, propValues}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    addLayer(state, {index, layer, propValues}) {
+      let wrapper = state.maps[index];
       if(!wrapper.selectedLayers) {
         wrapper.selectedLayers = [];
       }
@@ -304,23 +289,23 @@ export default {
       wrapper.selectedLayers.push({...layer});
     },
 
-    removeLayer(state, {idViewer, index, indexLayer}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    removeLayer(state, {index, indexLayer}) {
+      let wrapper = state.maps[index];
       wrapper.selectedLayers.splice(indexLayer, 1);
     },
 
-    toggleLayerVisibility(state, {idViewer, index, indexLayer}) {
-      let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+    toggleLayerVisibility(state, {index, indexLayer}) {
+      let layer = state.maps[index].selectedLayers[indexLayer];
       layer.visible = !layer.visible;
     },
 
-    toggleLayerDrawOn(state, {idViewer, index, indexLayer}) {
-      let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+    toggleLayerDrawOn(state, {index, indexLayer}) {
+      let layer = state.maps[index].selectedLayers[indexLayer];
       layer.drawOn = !layer.drawOn;
     },
 
-    setLayersOpacity(state, {idViewer, index, opacity}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    setLayersOpacity(state, {index, opacity}) {
+      let wrapper = state.maps[index];
       wrapper.layersOpacity = opacity;
       if(wrapper.terms) {
         wrapper.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
@@ -332,44 +317,44 @@ export default {
 
     // ----- Properties
 
-    setPropertiesKeys(state, {idViewer, index, keys}) {
-      state.viewers[idViewer].maps[index].propertiesKeys = keys;
+    setPropertiesKeys(state, {index, keys}) {
+      state.maps[index].propertiesKeys = keys;
     },
 
-    setSelectedPropertyKey(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].selectedPropertyKey = value;
+    setSelectedPropertyKey(state, {index, value}) {
+      state.maps[index].selectedPropertyKey = value;
     },
 
-    setSelectedPropertyValues(state, {idViewer, index, properties}) {
-      state.viewers[idViewer].maps[index].selectedPropertyValues = properties;
+    setSelectedPropertyValues(state, {index, properties}) {
+      state.maps[index].selectedPropertyValues = properties;
     },
 
-    setSelectedPropertyColor(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].selectedPropertyColor = value;
+    setSelectedPropertyColor(state, {index, value}) {
+      state.maps[index].selectedPropertyColor = value;
     },
 
     // ----- Selected features
 
-    setSelectedFeatures(state, {idViewer, index, selectedFeatures}) {
-      state.viewers[idViewer].maps[index].selectedFeatures = selectedFeatures;
+    setSelectedFeatures(state, {index, selectedFeatures}) {
+      state.maps[index].selectedFeatures = selectedFeatures;
     },
 
-    clearSelectedFeatures(state, {idViewer, index}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    clearSelectedFeatures(state, index) {
+      let wrapper = state.maps[index];
       wrapper.selectedFeatures = [];
       wrapper.annotsToSelect = [];
     },
 
-    selectFeature(state, {idViewer, index, feature}) {
-      state.viewers[idViewer].maps[index].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
+    selectFeature(state, {index, feature}) {
+      state.maps[index].selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
     },
 
-    changeAnnotSelectedFeature(state, {idViewer, index, indexFeature, annot}) {
-      state.viewers[idViewer].maps[index].selectedFeatures[indexFeature].properties.annot = annot;
+    changeAnnotSelectedFeature(state, {index, indexFeature, annot}) {
+      state.maps[index].selectedFeatures[indexFeature].properties.annot = annot;
     },
 
-    removeLayerFromSelectedFeatures(state, {idViewer, index, idLayer, cache=false}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    removeLayerFromSelectedFeatures(state, {index, idLayer, cache=false}) {
+      let wrapper = state.maps[index];
 
       let selectedFeatures = wrapper.selectedFeatures;
       for(let index = selectedFeatures.length - 1; index >= 0; index--) {
@@ -388,33 +373,33 @@ export default {
       }
     },
 
-    setAnnotToSelect(state, {idViewer, index, annot}) {
-      state.viewers[idViewer].maps[index].annotsToSelect = [annot];
+    setAnnotToSelect(state, {index, annot}) {
+      state.maps[index].annotsToSelect = [annot];
     },
 
-    setShowComments(state, {idViewer, index, annot}) {
-      state.viewers[idViewer].maps[index].showComments = annot ? annot.id : null;
+    setShowComments(state, {index, annot}) {
+      state.maps[index].showComments = annot ? annot.id : null;
     },
 
     // ----- Draw tools and associated interactions
 
-    activateTool(state, {idViewer, index, tool}) {
-      state.viewers[idViewer].maps[index].activeTool = tool;
+    activateTool(state, {index, tool}) {
+      state.maps[index].activeTool = tool;
     },
 
-    activateEditTool(state, {idViewer, index, tool}) {
-      state.viewers[idViewer].maps[index].activeEditTool = tool;
+    activateEditTool(state, {index, tool}) {
+      state.maps[index].activeEditTool = tool;
     },
 
-    setOngoingEdit(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].ongoingEdit = value;
+    setOngoingEdit(state, {index, value}) {
+      state.maps[index].ongoingEdit = value;
     },
 
     // ----- Calibration
 
-    setResolution(state, {idViewer, idImage, resolution}) {
+    setResolution(state, {idImage, resolution}) {
       // change the resolution for all instances of the affected image in the viewer
-      state.viewers[idViewer].maps.forEach(({imageInstance}) => {
+      state.maps.forEach(({imageInstance}) => {
         if(imageInstance.id === idImage) {
           imageInstance.resolution = resolution;
         }
@@ -423,37 +408,37 @@ export default {
 
     // ----- Annotation details
 
-    setDisplayAnnotDetails(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].displayAnnotDetails = value;
+    setDisplayAnnotDetails(state, {index, value}) {
+      state.maps[index].displayAnnotDetails = value;
     },
 
-    setPositionAnnotDetails(state, {idViewer, index, value}) {
-      state.viewers[idViewer].maps[index].positionAnnotDetails = value;
+    setPositionAnnotDetails(state, {index, value}) {
+      state.maps[index].positionAnnotDetails = value;
     },
 
     // ----- Undo/Redo
 
-    resetActions(state, {idViewer, index}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    resetActions(state, index) {
+      let wrapper = state.maps[index];
       wrapper.actions = [];
       wrapper.undoneActions = [];
     },
 
-    addAction(state, {idViewer, index, annot, type}) {
+    addAction(state, {index, annot, type}) {
       let action = {annot, type, command: Cytomine.instance.lastCommand};
-      let wrapper = state.viewers[idViewer].maps[index];
+      let wrapper = state.maps[index];
       wrapper.actions.push(action);
       wrapper.undoneActions = [];
     },
 
-    undoAction(state, {idViewer, index, opposedAction}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    undoAction(state, {index, opposedAction}) {
+      let wrapper = state.maps[index];
       wrapper.actions.pop();
       wrapper.undoneActions.push(opposedAction);
     },
 
-    redoAction(state, {idViewer, index, opposedAction}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    redoAction(state, {index, opposedAction}) {
+      let wrapper = state.maps[index];
       wrapper.undoneActions.pop();
       wrapper.actions.push(opposedAction);
     },
@@ -462,28 +447,20 @@ export default {
   },
 
   actions: {
-    changePath({getters}, idViewer) {
+    changePath({getters}) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
       let action = router.currentRoute.query.action;
-      router.replace(getters.pathViewer({idViewer, idAnnotation, action}));
+      router.replace(getters.pathViewer({idAnnotation, action}));
     },
 
-    async addViewer({commit, dispatch, rootState}, {idViewer, idImages}) {
-      commit('addViewer', {id: idViewer, project: rootState.project.project});
-      await Promise.all(idImages.map(async id => {
-        let image = await ImageInstance.fetch(id);
-        dispatch('addMap', {idViewer, image});
-      }));
-    },
-
-    async addMap({commit, dispatch, getters, rootState}, {idViewer, image}) {
+    async addMap({commit, dispatch, rootGetters, rootState}, image) {
       let [fetchedImage, propertiesKeys, projectProperties] = await Promise.all([
         fetchImage(image.id),
         fetchPropertiesKeys(image.id),
-        PropertyCollection.fetchAll({object: rootState.project.project})
+        PropertyCollection.fetchAll({object: rootState.currentProject.project})
       ]);
 
-      let terms = formatTerms(getters.terms, initialLayersOpacity);
+      let terms = formatTerms(rootGetters.terms, initialLayersOpacity);
 
       let selectedPropertyKey = null;
       let defaultPropertyProp = projectProperties.array.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
@@ -542,71 +519,70 @@ export default {
         actions: [],
         undoneActions: []
       };
-      commit('addMap', {idViewer, wrapper});
-      dispatch('changePath', idViewer);
+      commit('addMap', wrapper);
+      dispatch('changePath');
     },
 
-    async setImageInstance({commit, dispatch}, {idViewer, index, image}) {
+    async setImageInstance({commit, dispatch}, {index, image}) {
       await fetchImageServers(image);
-      commit('setImageInstance', {idViewer, index, image});
-      commit('clearSelectedFeatures', {idViewer, index});
-      commit('resetActions', {idViewer, index});
-      await dispatch('refreshProperties', {idViewer, index});
-      dispatch('changePath', idViewer);
+      commit('setImageInstance', {index, image});
+      commit('clearSelectedFeatures', index);
+      commit('resetActions', index);
+      await dispatch('refreshProperties', index);
+      dispatch('changePath');
     },
 
-    async refreshData({state, commit, dispatch, getters}, idViewer) {
-      await Promise.all(state.viewers[idViewer].maps.map(async (map, index) => {
+    async refreshData({state, commit, dispatch, rootGetters}) {
+      await Promise.all(state.maps.map(async (map, index) => {
         let [image] = await Promise.all([
           fetchImage(map.imageInstance.id),
-          dispatch('refreshProperties', {idViewer, index})
+          dispatch('refreshProperties', index)
         ]);
+        let terms = formatTerms(rootGetters.terms, map.layersOpacity, map.terms);
 
-        let terms = formatTerms(getters.terms, map.layersOpacity, map.terms);
-
-        commit('setImageInstance', {idViewer, index, image});
-        commit('setTerms', {idViewer, index, terms});
-        commit('filterTermsNewAnnots', {idViewer, index});
+        commit('setImageInstance', {index, image});
+        commit('setTerms', {index, terms});
+        commit('filterTermsNewAnnots', {index});
       }));
-      dispatch('changePath', idViewer);
+      dispatch('changePath');
     },
 
-    removeMap({commit, dispatch}, {idViewer, index}) {
-      commit('unlinkMap', {idViewer, index, deletion: true});
-      commit('removeMap', {idViewer, index});
-      dispatch('changePath', idViewer);
+    removeMap({commit, dispatch}, index) {
+      commit('unlinkMap', {index, deletion: true});
+      commit('removeMap', index);
+      dispatch('changePath');
     },
 
-    removeLayer({state, commit}, {idViewer, index, indexLayer, cacheSelectedFeatures}) {
-      let idLayer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer].id;
-      commit('removeLayer', {idViewer, index, indexLayer});
-      commit('removeLayerFromSelectedFeatures', {idViewer, index, idLayer, cache: cacheSelectedFeatures});
+    removeLayer({state, commit}, {index, indexLayer, cacheSelectedFeatures}) {
+      let idLayer = state.maps[index].selectedLayers[indexLayer].id;
+      commit('removeLayer', {index, indexLayer});
+      commit('removeLayerFromSelectedFeatures', {index, idLayer, cache: cacheSelectedFeatures});
     },
 
-    toggleLayerVisibility({state, commit}, {idViewer, index, indexLayer}) {
-      commit('toggleLayerVisibility', {idViewer, index, indexLayer});
-      let layer = state.viewers[idViewer].maps[index].selectedLayers[indexLayer];
+    toggleLayerVisibility({state, commit}, {index, indexLayer}) {
+      commit('toggleLayerVisibility', {index, indexLayer});
+      let layer = state.maps[index].selectedLayers[indexLayer];
       if(!layer.visible) {
-        commit('removeLayerFromSelectedFeatures', {idViewer, index, idLayer: layer.id});
+        commit('removeLayerFromSelectedFeatures', {index, idLayer: layer.id});
       }
     },
 
-    activateTool({state, commit}, {idViewer, index, tool}) {
-      let previousTool = state.viewers[idViewer].maps[index].activeTool;
+    activateTool({state, commit}, {index, tool}) {
+      let previousTool = state.maps[index].activeTool;
       if(previousTool === 'select' && tool !== 'select') {
-        commit('clearSelectedFeatures', {idViewer, index});
-        commit('activateEditTool', {idViewer, index, tool: null});
+        commit('clearSelectedFeatures', index);
+        commit('activateEditTool', {index, tool: null});
       }
-      commit('activateTool', {idViewer, index, tool});
+      commit('activateTool', {index, tool});
     },
 
-    selectFeature({commit}, {idViewer, index, feature}) {
-      commit('clearSelectedFeatures', {idViewer, index});
-      commit('selectFeature', {idViewer, index, feature});
+    selectFeature({commit}, {index, feature}) {
+      commit('clearSelectedFeatures', index);
+      commit('selectFeature', {index, feature});
     },
 
-    async setSelectedPropertyKey({state, commit}, {idViewer, index, value}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    async setSelectedPropertyKey({state, commit}, {index, value}) {
+      let wrapper = state.maps[index];
       let idImage = wrapper.imageInstance.id;
       let properties = {};
       if(value && wrapper.selectedLayers) {
@@ -616,41 +592,41 @@ export default {
         }
       }
 
-      commit('setSelectedPropertyValues', {idViewer, index, properties});
-      commit('setSelectedPropertyKey', {idViewer, index, value});
+      commit('setSelectedPropertyValues', {index, properties});
+      commit('setSelectedPropertyKey', {index, value});
     },
 
-    async addLayer({state, commit}, {idViewer, index, layer}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    async addLayer({state, commit}, {index, layer}) {
+      let wrapper = state.maps[index];
       let idImage = wrapper.imageInstance.id;
       let key = wrapper.selectedPropertyKey;
       let propValues = {};
       if(key) {
         propValues = await fetchLayerPropertiesValues(layer.id, idImage, key);
       }
-      commit('addLayer', {idViewer, index, layer, propValues});
+      commit('addLayer', {index, layer, propValues});
     },
 
-    async refreshProperties({state, commit, dispatch}, {idViewer, index}) {
-      let wrapper = state.viewers[idViewer].maps[index];
+    async refreshProperties({state, commit, dispatch}, index) {
+      let wrapper = state.maps[index];
       let idImage = wrapper.imageInstance.id;
       let keys = await fetchPropertiesKeys(idImage);
-      commit('setPropertiesKeys', {idViewer, index, keys});
+      commit('setPropertiesKeys', {index, keys});
 
       let currentKey = wrapper.selectedPropertyKey;
       let newKey = keys.includes(currentKey) ? currentKey : null;
-      dispatch('setSelectedPropertyKey', {idViewer, index, value: newKey});
+      dispatch('setSelectedPropertyKey', {index, value: newKey});
     }
   },
 
   getters: {
-    genStyleFunction: state => (idViewer, index) => (feature) => {
+    genStyleFunction: state => (index) => (feature) => {
       let annot = feature.get('annot');
       if(!annot) {
         return;
       }
 
-      let imageWrapper = state.viewers[idViewer].maps[index];
+      let imageWrapper = state.maps[index];
 
       // QUESTION: what to do with clusters (returned count does not take into account the selected terms) ?
       // Possible solutions:
@@ -727,12 +703,12 @@ export default {
       return styles;
     },
 
-    pathViewer: state => ({idViewer, idAnnotation, action}) => {
-      let viewerWrapper = state.viewers[idViewer];
-      let imagesIds = viewerWrapper.maps.map(map => map.imageInstance.id);
+    pathViewer: state => ({idAnnotation, action}={}) => {
+      let idProject = state.maps[0].imageInstance.project;
+      let imagesIds = state.maps.map(map => map.imageInstance.id);
       let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
       let actionStr = action ? '&action=' + action : '';
-      return `/project/${viewerWrapper.idProject}/image/${imagesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
+      return `/project/${idProject}/image/${imagesIds.join('-')}${annot}?viewer=${state.id}${actionStr}`;
     }
   }
 };

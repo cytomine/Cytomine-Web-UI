@@ -164,10 +164,10 @@ export default {
       return this.$store.state.currentUser.user;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     },
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
 
     availableSoftwares() {

@@ -258,7 +258,6 @@ export default {
     IconLineFreeHand
   },
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -270,13 +269,16 @@ export default {
   },
   computed: {
     configUI() {
-      return this.$store.state.project.configUI;
+      return this.$store.state.currentProject.configUI;
     },
     ontology() {
-      return this.$store.state.project.ontology;
+      return this.$store.state.currentProject.ontology;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     viewerWrapper() {
-      return this.$store.state.images.viewers[this.idViewer];
+      return this.$store.getters.currentViewer;
     },
     imageWrapper() {
       return this.viewerWrapper.maps[this.index];
@@ -292,7 +294,7 @@ export default {
         return this.imageWrapper.termsNewAnnots;
       },
       set(terms) {
-        this.$store.commit('setTermsNewAnnots', {idViewer: this.idViewer, index: this.index, terms});
+        this.$store.commit(this.viewerModule + 'setTermsNewAnnots', {index: this.index, terms});
       }
     },
     backgroundTermsNewAnnot() {
@@ -308,7 +310,7 @@ export default {
         return this.imageWrapper.activeTool;
       },
       set(tool) {
-        this.$store.dispatch('activateTool', {idViewer: this.idViewer, index: this.index, tool});
+        this.$store.dispatch(this.viewerModule + 'activateTool', {index: this.index, tool});
       }
     },
     displayAnnotDetails: {
@@ -316,7 +318,7 @@ export default {
         return this.imageWrapper.displayAnnotDetails;
       },
       set(value) {
-        this.$store.commit('setDisplayAnnotDetails', {idViewer: this.idViewer, index: this.index, value});
+        this.$store.commit(this.viewerModule + 'setDisplayAnnotDetails', {index: this.index, value});
       }
     },
     activeEditTool: {
@@ -324,7 +326,7 @@ export default {
         return this.imageWrapper.activeEditTool;
       },
       set(tool) {
-        this.$store.commit('activateEditTool', {idViewer: this.idViewer, index: this.index, tool});
+        this.$store.commit(this.viewerModule + 'activateEditTool', {index: this.index, tool});
       }
     },
     selectedFeatures() {
@@ -377,11 +379,12 @@ export default {
         return true; // no feature selected -> all edit tools disabled
       }
 
-      if(!this.$store.getters.canEditAnnot(this.selectedFeature.properties.annot)) {
+      let ftr = this.selectedFeature;
+      if(!this.$store.getters.canEditAnnot(ftr.properties.annot)) {
         return true;
       }
 
-      let geomType = this.selectedFeature.geometry.type;
+      let geomType = ftr.geometry.type;
       if(geomType === 'Point') {
         return (tool !== 'move' && tool !== 'delete'); // disable all tools except move and delete for points
       }
@@ -403,8 +406,7 @@ export default {
     },
 
     toggleTerm(indexTerm) {
-      this.$store.commit('toggleAssociateTermToNewAnnot', {
-        idViewer: this.idViewer,
+      this.$store.commit(this.viewerModule + 'toggleAssociateTermToNewAnnot', {
         index: this.index,
         indexTerm: indexTerm
       });
@@ -422,8 +424,7 @@ export default {
       try {
         await annot.fill();
         this.$eventBus.$emit('editAnnotation', annot);
-        this.$store.commit('addAction', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'addAction', {
           index: this.index,
           annot,
           type: Action.UPDATE
@@ -446,8 +447,7 @@ export default {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
         this.$eventBus.$emit('deleteAnnotation', annot);
-        this.$store.commit('addAction', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'addAction', {
           index: this.index,
           annot: annot,
           type: Action.DELETE
@@ -481,7 +481,7 @@ export default {
       let action = this.actions[this.actions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, true);
-        this.$store.commit('undoAction', {idViewer: this.idViewer, index: this.index, opposedAction});
+        this.$store.commit(this.viewerModule + 'undoAction', {index: this.index, opposedAction});
       }
       catch(err) {
         console.log(err);
@@ -496,7 +496,7 @@ export default {
       let action = this.undoneActions[this.undoneActions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, false);
-        this.$store.commit('redoAction', {idViewer: this.idViewer, index: this.index, opposedAction});
+        this.$store.commit(this.viewerModule + 'redoAction', {index: this.index, opposedAction});
       }
       catch(err) {
         console.log(err);

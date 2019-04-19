@@ -4,7 +4,7 @@
     <p> {{ $t(permissionError ? 'insufficient-permission' : 'not-found-error') }} </p>
   </div>
   <div v-else class="project-container">
-    <project-sidebar v-if="project" :key="idProject" />
+    <project-sidebar v-if="!loading" :key="idProject" />
 
     <div class="app-content">
       <b-loading :is-full-page="false" :active="loading" />
@@ -15,6 +15,7 @@
 
 <script>
 import ProjectSidebar from './ProjectSidebar.vue';
+import projectModuleModel from '@/store/modules/project';
 
 export default {
   name: 'cytomine-project',
@@ -31,18 +32,30 @@ export default {
       return this.$route.params.idProject;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
+    },
+    projectModule() {
+      return this.$store.state.projects[this.idProject];
     }
   },
   watch: {
     async idProject() {
       this.loading = true;
       await this.loadProject();
+    },
+    projectModule() {
+      if(!this.projectModule) {
+        console.log('Project closed from external source');
+        this.$router.push('/projects');
+      }
     }
   },
   methods: {
     async loadProject() {
       try {
+        if(!this.$store.state.projects[this.idProject]) { // module does not exist yet
+          this.$store.registerModule(['projects', this.idProject], projectModuleModel);
+        }
         await this.$store.dispatch('loadProject', this.idProject);
         this.loading = false;
       }

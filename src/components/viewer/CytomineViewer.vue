@@ -11,14 +11,13 @@
     >
       <cytomine-image
         v-if="idx <= nbMaps"
-        :idViewer="idViewer"
         :index="idx-1"
-        :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
+        :key="`${idx}-${viewer.maps[idx-1].imageInstance.id}`"
         @close="closeMap(idx-1)"
       />
     </div>
 
-    <image-selector :idViewer="idViewer" />
+    <image-selector />
 
     <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
     <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
@@ -30,7 +29,11 @@
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
 
+import viewerModuleModel from '@/store/modules/project_modules/viewer';
+
 import constants from '@/utils/constants.js';
+
+import {ImageInstance} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -47,14 +50,20 @@ export default {
     };
   },
   computed: {
+    project() {
+      return this.$store.state.currentProject.project;
+    },
     viewers() {
-      return this.$store.state.images.viewers;
+      return this.$store.state.projects[this.project.id].viewers;
     },
     idImages() {
       return this.$route.params.idImages.split('-');
     },
     paramIdViewer() {
       return this.$route.query.viewer;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     viewer() {
       return this.viewers[this.idViewer];
@@ -128,24 +137,27 @@ export default {
 
     closeMap(index) {
       if(this.nbMaps === 1) {
-        this.$store.commit('removeViewer', this.idViewer);
+        this.$store.unregisterModule(['projects', this.project.id, 'viewers', this.idViewer]);
         this.$router.push(`/project/${this.$route.params.idProject}`);
       }
       else {
-        this.$store.dispatch('removeMap', {idViewer: this.idViewer, index});
+        this.$store.dispatch(this.viewerModule + 'removeMap', index);
       }
     },
 
     async loadViewer() {
       try {
+        this.$store.commit('setCurrentViewer', this.idViewer);
         if(!this.viewer) {
-          await this.$store.dispatch('addViewer', {
-            idViewer: this.idViewer,
-            idImages: this.idImages
-          });
+          this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
+          this.$store.commit(this.viewerModule + 'setId', this.idViewer);
+          await Promise.all(this.idImages.map(async id => {
+            let image = await ImageInstance.fetch(id);
+            await this.$store.dispatch(this.viewerModule + 'addMap', image);
+          }));
         }
         else {
-          await this.$store.dispatch('refreshData', this.idViewer);
+          await this.$store.dispatch(this.viewerModule + 'refreshData');
         }
         this.loading = false;
       }

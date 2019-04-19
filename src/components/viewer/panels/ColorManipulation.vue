@@ -44,7 +44,6 @@ export default {
   name: 'color-manipulation',
   components: {CytomineSlider},
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -53,8 +52,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     activePanel() {
       return this.imageWrapper.activePanel;
@@ -102,23 +104,23 @@ export default {
   },
   methods: {
     reset() {
-      this.$store.commit('resetColorManipulation', {idViewer: this.idViewer, index: this.index});
+      this.$store.commit(this.viewerModule + 'resetColorManipulation', {index: this.index});
     },
 
     setBrightness: _.debounce(function(value) {
-      this.$store.commit('setBrightness', {idViewer: this.idViewer, index: this.index, value});
+      this.$store.commit(this.viewerModule + 'setBrightness', {index: this.index, value});
     }, debounceDelay),
 
     setContrast: _.debounce(function(value) {
-      this.$store.commit('setContrast', {idViewer: this.idViewer, index: this.index, value});
+      this.$store.commit(this.viewerModule + 'setContrast', {index: this.index, value});
     }, debounceDelay),
 
     setHue: _.debounce(function(value) {
-      this.$store.commit('setHue', {idViewer: this.idViewer, index: this.index, value});
+      this.$store.commit(this.viewerModule + 'setHue', {index: this.index, value});
     }, debounceDelay),
 
     setSaturation: _.debounce(function(value) {
-      this.$store.commit('setSaturation', {idViewer: this.idViewer, index: this.index, value});
+      this.$store.commit(this.viewerModule + 'setSaturation', {index: this.index, value});
     }, debounceDelay),
 
     updateMapSize() {

@@ -25,7 +25,6 @@ import {AnnotationCollection, AnnotationType} from 'cytomine-client';
 export default {
   name: 'annotation-layer',
   props: {
-    idViewer: String,
     index: Number,
     layer: Object
   },
@@ -40,8 +39,11 @@ export default {
     };
   },
   computed: {
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -76,7 +78,7 @@ export default {
       this.imageWrapper.selectedPropertyColor;
 
       return () => {
-        return this.$store.getters.genStyleFunction(this.idViewer, this.index);
+        return this.$store.getters[this.viewerModule + 'genStyleFunction'](this.index);
       };
     }
   },
@@ -93,14 +95,14 @@ export default {
         this.$refs.olSource.addFeature(this.createFeature(annot));
       }
     },
-    selectAnnotationHandler({annot, idViewer, index}) {
-      if(idViewer === this.idViewer && index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
+    selectAnnotationHandler({annot, index}) {
+      if(index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if(!olFeature) {
-          this.$store.commit('setAnnotToSelect', {idViewer: this.idViewer, index: this.index, annot});
+          this.$store.commit(this.currentViewerModule + 'setAnnotToSelect', {index: this.index, annot});
         }
         else {
-          this.$store.dispatch('selectFeature', {idViewer: this.idViewer, index: this.index, feature: olFeature});
+          this.$store.dispatch(this.viewerModule + 'selectFeature', {index: this.index, feature: olFeature});
         }
       }
     },
@@ -120,8 +122,7 @@ export default {
 
         let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === annot.id);
         if(indexSelectedFeature >= 0) {
-          this.$store.commit('changeAnnotSelectedFeature', {
-            idViewer: this.idViewer,
+          this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
             index: this.index,
             indexFeature: indexSelectedFeature,
             annot
@@ -139,7 +140,7 @@ export default {
         this.$refs.olSource.removeFeature(olFeature);
 
         if(this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
-          this.$store.commit('clearSelectedFeatures', {idViewer: this.idViewer, index: this.index});
+          this.$store.commit(this.viewerModule + 'clearSelectedFeatures', this.index);
         }
       }
     },
@@ -194,7 +195,7 @@ export default {
         console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
         if(isFeatureSelected) {
-          this.$store.commit('clearSelectedFeatures', {idViewer: this.idViewer, index: this.index});
+          this.$store.commit(this.viewerModule + 'clearSelectedFeatures', this.index);
         }
         return;
       }
@@ -212,8 +213,7 @@ export default {
           return;
         }
         console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
-        this.$store.commit('changeAnnotSelectedFeature', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
           index: this.index,
           indexFeature: indexSelectedFeature,
           annot
@@ -262,8 +262,7 @@ export default {
       let seenAnnots = [];
 
       if(wasClustered !== this.clustered) {
-        this.$store.commit('removeLayerFromSelectedFeatures', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'removeLayerFromSelectedFeatures', {
           index: this.index,
           idLayer: this.layer.id,
           cache: true
@@ -298,7 +297,7 @@ export default {
       feature.set('annot', annot);
 
       if(this.annotsIdsToSelect.includes(annot.id)) {
-        this.$store.dispatch('selectFeature', {idViewer: this.idViewer, index: this.index, feature});
+        this.$store.dispatch(this.viewerModule + 'selectFeature', {index: this.index, feature});
       }
 
       return feature;

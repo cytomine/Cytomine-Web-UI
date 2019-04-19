@@ -27,7 +27,6 @@ import {Action} from '@/utils/annotation-utils.js';
 export default {
   name: 'draw-interaction',
   props: {
-    idViewer: String,
     index: Number
   },
   data() {
@@ -39,8 +38,11 @@ export default {
     currentUser() {
       return this.$store.state.currentUser.user;
     },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
+    },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     rotation() {
       return this.imageWrapper.rotation;
@@ -120,7 +122,7 @@ export default {
       return this.activeLayers.length;
     },
     drawSourceName() {
-      return `draw-target-${this.idViewer}-${this.index}`;
+      return `draw-target-${this.index}`;
     }
   },
 
@@ -173,11 +175,10 @@ export default {
 
           this.$eventBus.$emit('addAnnotation', annot);
           if(idx === this.nbActiveLayers - 1) {
-            this.$eventBus.$emit('selectAnnotation', {idViewer: this.idViewer, index: this.index, annot});
+            this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
 
-          this.$store.commit('addAction', {
-            idViewer: this.idViewer,
+          this.$store.commit(this.viewerModule + 'addAction', {
             index: this.index,
             annot,
             type: Action.CREATE
@@ -207,8 +208,7 @@ export default {
         });
         if(correctedAnnot) {
           correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
-          this.$store.commit('addAction', {
-            idViewer: this.idViewer,
+          this.$store.commit(this.viewerModule + 'addAction', {
             index: this.index,
             annot: correctedAnnot,
             type: Action.UPDATE

@@ -1,10 +1,14 @@
 import {Cytomine, User} from 'cytomine-client';
 
-export default {
-  state: {
+function getDefaultState() {
+  return {
     user: null,
     expandedSidebar: true
-  },
+  };
+}
+
+export default {
+  state: getDefaultState(),
 
   mutations: {
     setUser(state, user) {
@@ -13,14 +17,12 @@ export default {
     setAdminByNow(state, value) {
       state.user.adminByNow = value;
     },
-
-    logout(state) {
-      state.user = null;
-      state.expandedSidebar = true;
-    },
     setExpandedSidebar(state, val) {
       state.expandedSidebar = val;
-    }
+    },
+    logout(state) {
+      Object.assign(state, getDefaultState());
+    },
   },
 
   actions: {
@@ -57,11 +59,6 @@ export default {
     async login({dispatch}, payload) {
       await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
       await dispatch('fetchUser');
-    },
-
-    async logout({commit}) {
-      await Cytomine.instance.logout();
-      commit('logout');
     }
   }
 };

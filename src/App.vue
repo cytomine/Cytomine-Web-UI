@@ -62,7 +62,7 @@ export default {
       return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     }
   },
   watch: {

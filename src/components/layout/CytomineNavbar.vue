@@ -10,7 +10,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbViewers > 0" :title="$t('viewers')">
+      <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbActiveProjects > 0" :title="$t('viewers')">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">
@@ -107,8 +107,8 @@ export default {
     currentUserFullInfo() {
       return fullName(this.currentUser);
     },
-    nbViewers() {
-      return Object.keys(this.$store.state.images.viewers).length;
+    nbActiveProjects() {
+      return Object.keys(this.$store.state.projects).length;
     }
   },
   methods: {
@@ -162,7 +162,12 @@ export default {
 
     async logout() {
       try {
-        await this.$store.dispatch('logout');
+        await Cytomine.instance.logout();
+        for(let key in this.$store.state.projects) {
+          this.$store.unregisterModule(['projects', key]);
+        }
+        this.$store.commit('logout');
+        this.$router.push('/');
       }
       catch(error) {
         console.log(error);

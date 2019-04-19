@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     blindMode() {
-      return this.$store.state.project.project.blindMode;
+      return this.$store.state.currentProject.project.blindMode;
     },
     errorMessage() {
       if(this.displayErrors && this.newMagnification && (isNaN(this.newMagnification) || +this.newMagnification <= 0)) {

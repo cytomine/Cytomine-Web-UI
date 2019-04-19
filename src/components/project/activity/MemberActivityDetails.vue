@@ -277,7 +277,7 @@ export default {
       return Number(this.$route.params.idUser);
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
     }
   },
   methods: {

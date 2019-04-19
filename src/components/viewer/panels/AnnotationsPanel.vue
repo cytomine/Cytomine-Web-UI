@@ -59,7 +59,6 @@ import {ProjectDefaultLayerCollection} from 'cytomine-client';
 export default {
   name: 'annotations-panel',
   props: {
-    idViewer: String,
     index: Number,
     layersToPreload: Array
   },
@@ -77,10 +76,13 @@ export default {
       return this.$store.state.currentUser.user;
     },
     project() {
-      return this.$store.state.project.project;
+      return this.$store.state.currentProject.project;
+    },
+    viewerModule() {
+      return this.$store.getters.currentViewerModule;
     },
     imageWrapper() {
-      return this.$store.state.images.viewers[this.idViewer].maps[this.index];
+      return this.$store.getters.currentViewer.maps[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -93,8 +95,7 @@ export default {
         return this.imageWrapper.layersOpacity;
       },
       set(value) {
-        this.$store.commit('setLayersOpacity', {
-          idViewer: this.idViewer,
+        this.$store.commit(this.viewerModule + 'setLayersOpacity', {
           index: this.index,
           opacity: Number(value)
         });
@@ -163,14 +164,13 @@ export default {
 
       layer.visible = visible;
       layer.drawOn = (layer.id === this.currentUser.id && this.canDraw(layer));
-      this.$store.dispatch('addLayer', {idViewer: this.idViewer, index: this.index, layer});
+      this.$store.dispatch(this.viewerModule + 'addLayer', {index: this.index, layer});
 
       this.selectedLayer = null;
     },
 
     removeLayer(index, cacheSelectedFeatures=false) {
-      this.$store.dispatch('removeLayer', {
-        idViewer: this.idViewer,
+      this.$store.dispatch(this.viewerModule + 'removeLayer', {
         index: this.index,
         indexLayer: index,
         cacheSelectedFeatures
@@ -178,16 +178,14 @@ export default {
     },
 
     toggleLayerVisibility(index) {
-      this.$store.dispatch('toggleLayerVisibility', {
-        idViewer: this.idViewer,
+      this.$store.dispatch(this.viewerModule + 'toggleLayerVisibility', {
         index: this.index,
         indexLayer: index
       });
     },
 
     toggleLayerDrawOn(index) {
-      this.$store.commit('toggleLayerDrawOn', {
-        idViewer: this.idViewer,
+      this.$store.commit(this.viewerModule + 'toggleLayerDrawOn', {
         index: this.index,
         indexLayer: index
       });
