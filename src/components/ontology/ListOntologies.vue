@@ -95,7 +95,6 @@ export default {
       loading: true,
       ontologies: null,
       selectedOntology: null,
-      searchString: '',
       creationModal: false
     };
   },
@@ -104,7 +103,7 @@ export default {
       return this.$store.state.currentUser.user;
     },
     idTargetOntology() {
-      return Number(this.$route.params.idOntology);
+      return Number(this.$route.params.idOntology) || this.$store.state.ontologies.selectedOntology;
     },
     filteredOntologies() {
       if(this.searchString.length > 0) {
@@ -112,6 +111,14 @@ export default {
         return this.ontologies.filter(ontology => ontology.name.toLowerCase().indexOf(str) >= 0);
       }
       return this.ontologies;
+    },
+    searchString: {
+      get() {
+        return this.$store.state.ontologies.searchString;
+      },
+      set(value) {
+        this.$store.commit('setOntologySearchString', value);
+      }
     }
   },
   watch: {
@@ -124,6 +131,9 @@ export default {
         return;
       }
       this.selectTargetOntology();
+    },
+    selectedOntology(ontology) {
+      this.$store.commit('setSelectedOntology', ontology.id);
     }
   },
   methods: {

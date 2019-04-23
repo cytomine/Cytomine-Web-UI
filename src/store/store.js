@@ -3,12 +3,14 @@ import Vuex from 'vuex';
 
 import currentUser from './modules/current-user.js';
 import currentProject from './modules/current-project.js';
+import ontologies from './modules/ontologies.js';
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
   modules: {
     currentUser,
     currentProject,
+    ontologies,
     projects: {
       namespaced: true
     }
