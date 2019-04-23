@@ -25,7 +25,7 @@ import {AnnotationCollection, AnnotationType} from 'cytomine-client';
 export default {
   name: 'annotation-layer',
   props: {
-    index: Number,
+    index: String,
     layer: Object
   },
   data() {
@@ -39,46 +39,46 @@ export default {
     };
   },
   computed: {
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
     },
     annotsIdsToSelect() {
-      return this.imageWrapper.annotsToSelect.map(annot => annot.id);
+      return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
     },
     imageExtent() {
       return [0, 0, this.image.width, this.image.height];
     },
     selectedFeatures() {
-      return this.imageWrapper.selectedFeatures;
+      return this.imageWrapper.selectedFeatures.selectedFeatures;
     },
     ongoingEdit() {
-      return this.imageWrapper.ongoingEdit;
+      return this.imageWrapper.draw.ongoingEdit;
     },
     terms() {
-      return this.imageWrapper.terms || [];
+      return this.imageWrapper.style.terms || [];
     },
     styleFunctionFactory() {
       // Force computed property update when one of those properties change (leading to new style function =>
       // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
-      this.imageWrapper.selectedFeatures;
-      this.imageWrapper.layersOpacity;
+      this.imageWrapper.selectedFeatures.selectedFeatures;
+      this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
         term.visible;
         term.opacity;
       });
-      this.imageWrapper.displayNoTerm;
-      this.imageWrapper.noTermOpacity;
-      this.imageWrapper.selectedPropertyKey;
-      this.imageWrapper.selectedPropertyColor;
+      this.imageWrapper.style.displayNoTerm;
+      this.imageWrapper.style.noTermOpacity;
+      this.imageWrapper.properties.selectedPropertyKey;
+      this.imageWrapper.properties.selectedPropertyColor;
 
       return () => {
-        return this.$store.getters[this.viewerModule + 'genStyleFunction'](this.index);
+        return this.$store.getters[this.imageModule + 'genStyleFunction'];
       };
     }
   },
@@ -99,10 +99,10 @@ export default {
       if(index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if(!olFeature) {
-          this.$store.commit(this.currentViewerModule + 'setAnnotToSelect', {index: this.index, annot});
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         }
         else {
-          this.$store.dispatch(this.viewerModule + 'selectFeature', {index: this.index, feature: olFeature});
+          this.$store.dispatch(this.imageModule + 'selectFeature', olFeature);
         }
       }
     },
@@ -122,8 +122,7 @@ export default {
 
         let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === annot.id);
         if(indexSelectedFeature >= 0) {
-          this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
-            index: this.index,
+          this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
             indexFeature: indexSelectedFeature,
             annot
           });
@@ -140,7 +139,7 @@ export default {
         this.$refs.olSource.removeFeature(olFeature);
 
         if(this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
-          this.$store.commit(this.viewerModule + 'clearSelectedFeatures', this.index);
+          this.$store.commit(this.imageModule + 'clearSelectedFeatures');
         }
       }
     },
@@ -195,7 +194,7 @@ export default {
         console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
         if(isFeatureSelected) {
-          this.$store.commit(this.viewerModule + 'clearSelectedFeatures', this.index);
+          this.$store.commit(this.imageModule + 'clearSelectedFeatures');
         }
         return;
       }
@@ -213,8 +212,7 @@ export default {
           return;
         }
         console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
-        this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
-          index: this.index,
+        this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
           indexFeature: indexSelectedFeature,
           annot
         });
@@ -228,7 +226,7 @@ export default {
     async loader(extent=this.lastExtent, resolution=this.resolution) {
       this.resolution = resolution;
 
-      if(!this.layer.visible || !this.$refs.olSource || !extent) {
+      if(!this.layer.visible || !extent) {
         return;
       }
 
@@ -245,7 +243,7 @@ export default {
         return;
       }
 
-      if(arrayAnnots.length === 0) {
+      if(arrayAnnots.length === 0 || !this.$refs.olSource) {
         return;
       }
 
@@ -262,8 +260,7 @@ export default {
       let seenAnnots = [];
 
       if(wasClustered !== this.clustered) {
-        this.$store.commit(this.viewerModule + 'removeLayerFromSelectedFeatures', {
-          index: this.index,
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {
           idLayer: this.layer.id,
           cache: true
         });
@@ -297,7 +294,7 @@ export default {
       feature.set('annot', annot);
 
       if(this.annotsIdsToSelect.includes(annot.id)) {
-        this.$store.dispatch(this.viewerModule + 'selectFeature', {index: this.index, feature});
+        this.$store.dispatch(this.imageModule + 'selectFeature', feature);
       }
 
       return feature;

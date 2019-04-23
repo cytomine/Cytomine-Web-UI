@@ -59,7 +59,7 @@ import {ProjectDefaultLayerCollection} from 'cytomine-client';
 export default {
   name: 'annotations-panel',
   props: {
-    index: Number,
+    index: String,
     layersToPreload: Array
   },
   data() {
@@ -78,11 +78,11 @@ export default {
     project() {
       return this.$store.state.currentProject.project;
     },
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -92,13 +92,10 @@ export default {
     },
     layersOpacity: {
       get() {
-        return this.imageWrapper.layersOpacity;
+        return this.imageWrapper.style.layersOpacity;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setLayersOpacity', {
-          index: this.index,
-          opacity: Number(value)
-        });
+        this.$store.commit(this.imageModule + 'setLayersOpacity', Number(value));
       }
     },
     layersIds() {
@@ -108,7 +105,7 @@ export default {
       // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
       // may not be relevant for the current image => filter them
       let layersIds = this.layers.map(layer => layer.id);
-      let selectedLayers = this.imageWrapper.selectedLayers || [];
+      let selectedLayers = this.imageWrapper.layers.selectedLayers || [];
       return selectedLayers.filter(layer => layersIds.includes(layer.id));
     },
     selectedLayersIds() {
@@ -164,31 +161,21 @@ export default {
 
       layer.visible = visible;
       layer.drawOn = (layer.id === this.currentUser.id && this.canDraw(layer));
-      this.$store.dispatch(this.viewerModule + 'addLayer', {index: this.index, layer});
+      this.$store.dispatch(this.imageModule + 'addLayer', layer);
 
       this.selectedLayer = null;
     },
 
     removeLayer(index, cacheSelectedFeatures=false) {
-      this.$store.dispatch(this.viewerModule + 'removeLayer', {
-        index: this.index,
-        indexLayer: index,
-        cacheSelectedFeatures
-      });
+      this.$store.dispatch(this.imageModule + 'removeLayer', {indexLayer: index, cacheSelectedFeatures});
     },
 
     toggleLayerVisibility(index) {
-      this.$store.dispatch(this.viewerModule + 'toggleLayerVisibility', {
-        index: this.index,
-        indexLayer: index
-      });
+      this.$store.dispatch(this.imageModule + 'toggleLayerVisibility', index);
     },
 
     toggleLayerDrawOn(index) {
-      this.$store.commit(this.viewerModule + 'toggleLayerDrawOn', {
-        index: this.index,
-        indexLayer: index
-      });
+      this.$store.commit(this.imageModule + 'toggleLayerDrawOn', index);
     },
 
     async fetchLayers() {
@@ -224,7 +211,7 @@ export default {
       this.layersToPreload.forEach(id => layersToAdd.push({id, visible: true}));
     }
 
-    if(!this.imageWrapper.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+    if(!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
       if(!this.layersToPreload || !this.layersToPreload.includes(this.currentUser.id)) {
         layersToAdd.push({id: this.currentUser.id, visible: true});
       }

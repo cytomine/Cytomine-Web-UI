@@ -64,7 +64,7 @@ export default {
   name: 'ontology-panel',
   components: {OntologyTree},
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -75,14 +75,14 @@ export default {
     ontology() {
       return this.$store.state.currentProject.ontology;
     },
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     terms() {
-      return this.imageWrapper.terms;
+      return this.imageWrapper.style.terms;
     },
     termsMapping() {
       let mapping = {};
@@ -94,34 +94,31 @@ export default {
     },
     displayNoTerm: {
       get() {
-        return this.imageWrapper.displayNoTerm;
+        return this.imageWrapper.style.displayNoTerm;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setDisplayNoTerm', {index: this.index, value});
+        this.$store.dispatch(this.imageModule + 'setDisplayNoTerm', value);
       }
     },
     noTermOpacity: {
       get() {
-        return this.imageWrapper.noTermOpacity;
+        return this.imageWrapper.style.noTermOpacity;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setNoTermOpacity', {
-          index: this.index,
-          opacity: Number(value)
-        });
+        this.$store.commit(this.imageModule + 'setNoTermOpacity', Number(value));
       }
     },
   },
   methods: {
     toggleTermVisibility(index) {
-      this.$store.commit(this.viewerModule + 'toggleTermVisibility', {index: this.index, indexTerm: index});
+      this.$store.dispatch(this.imageModule + 'toggleTermVisibility', index);
     },
     changeOpacity(index, event) {
-      let opacity = event.target.value;
-      this.$store.commit(this.viewerModule + 'setTermOpacity', {index: this.index, indexTerm: index, opacity});
+      let opacity = Number(event.target.value);
+      this.$store.commit(this.imageModule + 'setTermOpacity', {indexTerm: index, opacity});
     },
     resetOpacities() {
-      this.$store.commit(this.viewerModule + 'resetTermOpacities', {index: this.index});
+      this.$store.commit(this.imageModule + 'resetTermOpacities');
     }
   }
 };

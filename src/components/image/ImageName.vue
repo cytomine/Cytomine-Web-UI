@@ -1,15 +1,17 @@
 <template>
-<span v-if="image.blindedName">
-  <span class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
-  {{image.blindedName}}
-  <template v-if="image.instanceFilename && showBothNames">
-    <br>
-    <span class="true-name">
-      {{image.instanceFilename}} <!-- backend will return this prop iff user is allowed to view it (admin or project manager) -->
-    </span>
+<span v-if="image">
+  <template v-if="image.blindedName">
+    <span class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
+    {{image.blindedName}}
+    <template v-if="image.instanceFilename && showBothNames">
+      <br>
+      <span class="true-name">
+        {{image.instanceFilename}} <!-- backend will return this prop iff user is allowed to view it (admin or project manager) -->
+      </span>
+    </template>
   </template>
+  <template v-else>{{image.instanceFilename}}</template>
 </span>
-<span v-else>{{image.instanceFilename}}</span>
 </template>
 
 <script>

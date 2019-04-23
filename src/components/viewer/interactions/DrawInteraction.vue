@@ -27,7 +27,7 @@ import {Action} from '@/utils/annotation-utils.js';
 export default {
   name: 'draw-interaction',
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -38,32 +38,29 @@ export default {
     currentUser() {
       return this.$store.state.currentUser.user;
     },
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     rotation() {
-      return this.imageWrapper.rotation;
+      return this.imageWrapper.view.rotation;
     },
     termsToAssociate() {
-      return this.imageWrapper.termsNewAnnots;
+      return this.imageWrapper.draw.termsNewAnnots;
     },
     image() {
       return this.imageWrapper.imageInstance;
     },
     activeTool() {
-      return this.imageWrapper.activeTool;
+      return this.imageWrapper.draw.activeTool;
     },
     activeEditTool() {
-      return this.imageWrapper.activeEditTool;
+      return this.imageWrapper.draw.activeEditTool;
     },
     selectedFeature() {
-      let selectedFeatures = this.imageWrapper.selectedFeatures;
-      if(selectedFeatures && selectedFeatures.length === 1) {
-        return selectedFeatures[0];
-      }
+      return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     drawType() {
       switch(this.activeTool) {
@@ -113,7 +110,7 @@ export default {
       }
     },
     layers() {
-      return this.imageWrapper.selectedLayers || [];
+      return this.imageWrapper.layers.selectedLayers || [];
     },
     activeLayers() {
       return this.layers.filter(layer => layer.drawOn);
@@ -178,11 +175,7 @@ export default {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
 
-          this.$store.commit(this.viewerModule + 'addAction', {
-            index: this.index,
-            annot,
-            type: Action.CREATE
-          });
+          this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
         }
         catch(err) {
           console.log(err);
@@ -208,11 +201,7 @@ export default {
         });
         if(correctedAnnot) {
           correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
-          this.$store.commit(this.viewerModule + 'addAction', {
-            index: this.index,
-            annot: correctedAnnot,
-            type: Action.UPDATE
-          });
+          this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
         }
       }

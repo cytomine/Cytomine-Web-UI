@@ -49,7 +49,7 @@ export default {
   name: 'follow-panel',
   components: {Username},
   props: {
-    index: Number,
+    index: String,
     view: Object
   },
   data() {
@@ -84,20 +84,23 @@ export default {
     viewerModule() {
       return this.$store.getters.currentViewerModule;
     },
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
+    },
     viewerWrapper() {
       return this.$store.getters.currentViewer;
     },
-    maps() {
-      return this.viewerWrapper.maps;
+    images() {
+      return this.viewerWrapper.images;
     },
     linkedIndexes() {
       return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
     },
     linkedIndexTracking() { // true if current view is linked with another view with tracking enabled
-      return this.linkedIndexes.some(idx => idx !== this.index && this.maps[idx].trackedUser);
+      return this.linkedIndexes.some(idx => idx !== this.index && this.images[idx].tracking.trackedUser);
     },
     imageWrapper() {
-      return this.viewerWrapper.maps[this.index];
+      return this.viewerWrapper.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -107,23 +110,25 @@ export default {
     },
     broadcast: {
       get() {
-        return this.imageWrapper.broadcast;
+        return this.imageWrapper.tracking.broadcast;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setBroadcast', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setBroadcast', value);
       }
     },
     alreadyBroadcastingImage() {
-      return this.maps.some((map, index) => {
-        return index !== this.index && map.imageInstance.id === this.image.id && map.broadcast;
+      return Object.keys(this.images).some(index => {
+        let image = this.images[index];
+        return index !== this.index && image.imageInstance
+          && image.imageInstance.id === this.image.id && image.tracking.broadcast;
       });
     },
     trackedUser: {
       get() {
-        return this.imageWrapper.trackedUser;
+        return this.imageWrapper.tracking.trackedUser;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setTrackedUser', {index: this.index, idUser: value});
+        this.$store.commit(this.imageModule + 'setTrackedUser', value);
       }
     },
     onlineManagers() {
@@ -178,7 +183,7 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            this.$store.commit(this.viewerModule + 'unlinkMap', this.index);
+            this.$store.commit(this.viewerModule + 'unlinkImage', this.index);
             this.trackedUser = value;
           },
           onCancel: () => this.trackedUserModel = null

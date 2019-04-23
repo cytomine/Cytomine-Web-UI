@@ -1,6 +1,6 @@
 <template>
 <div class="navigation-tree-wrapper">
-  <div v-for="(project, id, index) in projects" :key="project.id">
+  <div v-for="(project, _, index) in projects" :key="project.id">
 
     <router-link
       class="navbar-item project-item"
@@ -10,32 +10,32 @@
       <a class="delete is-small" @click.stop.prevent="closeProject(project)"></a>
     </router-link>
 
-    <template v-for="viewer in project.viewers">
+    <template v-for="(viewer, idViewer) in project.viewers">
       <router-link
-        v-if="viewer.maps.length"
+        v-if="nbImages(viewer)"
         class="navbar-item viewer-item"
-        :to="viewerPath(project.id, viewer.id)"
-        :key="viewer.id"
+        :to="viewerPath(project.id, idViewer)"
+        :key="idViewer"
         exact
       >
         <div class="viewer-name">
           <span>
             <i class="fas fa-caret-right"></i>
-            <template v-if="viewer.maps.length === 1">
-              <image-name :image="viewer.maps[0].imageInstance" />
+            <template v-if="nbImages(viewer) === 1">
+              <image-name :image="Object.values(viewer.images)[0].imageInstance" />
             </template>
             <template v-else>
-              {{$t('viewer-group', {nbImages: viewer.maps.length})}}
+              {{$t('viewer-group', {nbImages: nbImages(viewer)})}}
             </template>
             {{viewer.name}}
           </span>
-          <ul class="viewer-details" v-if="viewer.maps.length > 1">
-            <li v-for="(map, idx) in viewer.maps" :key="idx">
-              <image-name :image="map.imageInstance" />
+          <ul class="viewer-details" v-if="nbImages(viewer) > 1">
+            <li v-for="(image, idx) in viewer.images" :key="idx">
+              <image-name :image="image.imageInstance" />
             </li>
           </ul>
         </div>
-        <a class="delete is-small" @click.stop.prevent="closeViewer(project.id, viewer.id)"></a>
+        <a class="delete is-small" @click.stop.prevent="closeViewer(project.id, idViewer)"></a>
       </router-link>
     </template>
     <hr v-if="index < projects.length - 1" class="navbar-divider">
@@ -55,6 +55,9 @@ export default {
     }
   },
   methods: {
+    nbImages(viewer) {
+      return Object.keys(viewer.images).length;
+    },
     viewerPath(idProject, idViewer) {
       return this.$store.getters[`projects/${idProject}/viewers/${idViewer}/pathViewer`]();
     },

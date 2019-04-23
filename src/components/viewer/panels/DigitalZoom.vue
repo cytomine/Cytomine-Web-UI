@@ -8,52 +8,25 @@
 </template>
 
 <script>
-import constants from '@/utils/constants';
-
 export default {
   name: 'digital-zoom',
   props: {
-    index: Number
+    index: String
   },
   computed: {
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
-    image() {
-      return this.imageWrapper.imageInstance;
-    },
-
     digitalZoom: {
       get() {
-        return this.imageWrapper.digitalZoom;
+        return this.imageWrapper.view.digitalZoom;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setDigitalZoom', {
-          index: this.index,
-          digitalZoom: Boolean(value)
-        });
+        this.$store.commit(this.imageModule + 'setDigitalZoom', Boolean(value));
       }
-    },
-
-    maxZoom: {
-      get() {
-        return this.imageWrapper.maxZoom;
-      },
-      set(value) {
-        this.$store.commit(this.viewerModule + 'setMaxZoom', {
-          index: this.index,
-          maxZoom: Number(value)
-        });
-      }
-    },
-  },
-  watch: {
-    digitalZoom() {
-      let increment = this.digitalZoom ? constants.DIGITAL_ZOOM_INCREMENT : 0;
-      this.maxZoom = this.image.depth + increment;
     }
   }
 };

@@ -17,10 +17,10 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addMap(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
           <div class="card-content">
             <div class="content">
-              <a @click="addMap(image)">
+              <a @click="addImage(image)">
                 <image-name :image="image" />
               </a>
             </div>
@@ -94,9 +94,10 @@ export default {
     }
   },
   methods: {
-    async addMap(image) {
+    async addImage(image) {
       try {
-        await this.$store.dispatch(this.viewerModule + 'addMap', image);
+        await image.fetch(); // refetch image to ensure we have latest version
+        await this.$store.dispatch(this.viewerModule + 'addImage', image);
       }
       catch(error) {
         console.log(error);

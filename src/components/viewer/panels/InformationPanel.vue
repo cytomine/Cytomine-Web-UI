@@ -71,7 +71,7 @@ export default {
     CalibrationModal
   },
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -84,11 +84,14 @@ export default {
     viewerModule() {
       return this.$store.getters.currentViewerModule;
     },
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
+    },
     viewerWrapper() {
       return this.$store.getters.currentViewer;
     },
     image() {
-      return this.viewerWrapper.maps[this.index].imageInstance;
+      return this.viewerWrapper.images[this.index].imageInstance;
     },
     resolution() {
       if(this.image.resolution) {
@@ -104,15 +107,14 @@ export default {
     canEdit() {
       return this.$store.getters.canEditImage(this.image);
     },
-    isActiveMap() {
-      return this.viewerWrapper.activeMap === this.index;
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
     }
   },
   methods: {
     setResolution(resolution) {
-      this.$store.commit(this.viewerModule + 'setResolution', {idImage: this.image.id, resolution});
-      // refresh the sources to update perimeter/area
-      this.$eventBus.$emit('reloadAnnotations', this.image.id);
+      this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
+      this.$eventBus.$emit('reloadAnnotations', this.image.id); // refresh the sources to update perimeter/area
     },
     async previousImage() {
       try {
@@ -122,10 +124,7 @@ export default {
           this.isFirstImage = true;
         }
         else {
-          await this.$store.dispatch(this.viewerModule + 'setImageInstance', {
-            index: this.index,
-            image: prev
-          });
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', prev);
         }
       }
       catch(error) {
@@ -141,10 +140,7 @@ export default {
           this.isLastImage = true;
         }
         else {
-          await this.$store.dispatch(this.viewerModule + 'setImageInstance', {
-            index: this.index,
-            image: next
-          });
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', next);
         }
       }
       catch(error) {
@@ -154,7 +150,7 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveMap) { // shortkey should only be applied to active map
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 

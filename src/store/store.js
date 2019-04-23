@@ -5,7 +5,7 @@ import currentUser from './modules/current-user.js';
 import currentProject from './modules/current-project.js';
 
 Vue.use(Vuex);
-export default new Vuex.Store({
+let store = new Vuex.Store({
   modules: {
     currentUser,
     currentProject,
@@ -15,3 +15,13 @@ export default new Vuex.Store({
   },
   strict: process.env.NODE_ENV !== 'production'
 });
+
+export default store;
+
+export function getModuleNamespace(state) { // to update if https://github.com/vuejs/vuex/issues/1244 is implemented
+  let pathes = Object.keys(store._modulesNamespaceMap);
+  let moduleNamespace = pathes.find(path => store._modulesNamespaceMap[path].context.state === state);
+  if(typeof moduleNamespace === 'string') {
+    return moduleNamespace.slice(0, -1).split('/');
+  }
+}

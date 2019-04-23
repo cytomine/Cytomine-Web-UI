@@ -146,6 +146,13 @@ export default {
         return null;
       }
       return `projects/${state.project.id}/viewers/${state.currentViewer}/`;
+    },
+
+    imageModule: (state) => index => {
+      if(!state.project) {
+        return null;
+      }
+      return `projects/${state.project.id}/viewers/${state.currentViewer}/images/${index}/`;
     }
   }
 };

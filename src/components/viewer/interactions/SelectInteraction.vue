@@ -19,44 +19,41 @@ import {never, shiftKeyOnly} from 'ol/events/condition';
 export default {
   name: 'select-interaction',
   props: {
-    index: Number
+    index: String
   },
   computed: {
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     selectedFeatures: {
       get() {
-        return this.imageWrapper.selectedFeatures;
+        return this.imageWrapper.selectedFeatures.selectedFeatures;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setSelectedFeatures', {
-          index: this.index,
-          selectedFeatures: value
-        });
+        this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
     terms() {
-      return this.imageWrapper.terms || [];
+      return this.imageWrapper.style.terms || [];
     },
     styleFunctionFactory() {
-      this.imageWrapper.selectedFeatures;
-      this.imageWrapper.layersOpacity;
+      this.imageWrapper.selectedFeatures.selectedFeatures;
+      this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
         term.visible;
         term.opacity;
       });
-      this.imageWrapper.displayNoTerm;
-      this.imageWrapper.noTermOpacity;
-      this.imageWrapper.activeEditTool; // style is different in edit mode (vertices displayed)
-      this.imageWrapper.selectedPropertyValues;
-      this.imageWrapper.selectedPropertyColor;
+      this.imageWrapper.style.displayNoTerm;
+      this.imageWrapper.style.noTermOpacity;
+      this.imageWrapper.draw.activeEditTool; // style is different in edit mode (vertices displayed)
+      this.imageWrapper.properties.selectedPropertyValues;
+      this.imageWrapper.properties.selectedPropertyColor;
 
       return () => {
-        return this.$store.getters[this.viewerModule + 'genStyleFunction'](this.index);
+        return this.$store.getters[this.imageModule + 'genStyleFunction'];
       };
     },
     filterFunction() {

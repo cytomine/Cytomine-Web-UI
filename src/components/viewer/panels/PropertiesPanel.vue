@@ -28,36 +28,36 @@ import {defaultColors} from '@/utils/style-utils.js';
 export default {
   name: 'properties-panel',
   props: {
-    index: Number
+    index: String
   },
   computed: {
     colors() {
       return defaultColors;
     },
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     selectedPropertyKey: {
       get() {
-        return this.imageWrapper.selectedPropertyKey;
+        return this.imageWrapper.properties.selectedPropertyKey;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setSelectedPropertyKey', {index: this.index, value});
+        this.$store.dispatch(this.imageModule + 'setSelectedPropertyKey', value);
       }
     },
     selectedPropertyColor: {
       get() {
-        return this.imageWrapper.selectedPropertyColor;
+        return this.imageWrapper.properties.selectedPropertyColor;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setSelectedPropertyColor', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setSelectedPropertyColor', value);
       }
     },
     propertiesKeys() {
-      return this.imageWrapper.propertiesKeys;
+      return this.imageWrapper.properties.propertiesKeys;
     }
   }
 };

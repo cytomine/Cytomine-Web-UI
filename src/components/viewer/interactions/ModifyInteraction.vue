@@ -31,7 +31,7 @@ import {Action} from '@/utils/annotation-utils.js';
 export default {
   name: 'modify-interaction',
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -39,24 +39,24 @@ export default {
     };
   },
   computed: {
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
     },
     activeEditTool() {
-      return this.imageWrapper.activeEditTool;
+      return this.imageWrapper.draw.activeEditTool;
     },
     ongoingEdit: {
       get() {
-        return this.imageWrapper.activeEditTool;
+        return this.imageWrapper.draw.ongoingEdit;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setOngoingEdit', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setOngoingEdit', value);
       }
     },
   },
@@ -77,17 +77,13 @@ export default {
           annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
           await annot.save();
           this.$eventBus.$emit('editAnnotation', annot);
-          this.$store.commit(this.viewerModule + 'addAction', {
-            index: this.index,
-            annot,
-            type: Action.UPDATE
-          });
+          this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
         }
         catch(err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-update')});
           annot.location = oldLocation;
-          feature.setGeometry(this.format.readGeometry(annot.location));
+          feature.setGeometry(this.format.readGeometry(annot.location)); // TODO: use store mutation?
         }
       });
       this.ongoingEdit = false;

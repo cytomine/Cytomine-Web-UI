@@ -1,5 +1,5 @@
 <template>
-<div class="map-container" @click="isActiveMap = true" ref="container">
+<div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">
     <vl-map
       :data-projection="projectionName"
@@ -84,7 +84,7 @@
             <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
           </li>
 
-          <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
+          <li v-if="isPanelDisplayed('link') && nbImages > 1">
             <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
               <i class="fas fa-link"></i>
             </a>
@@ -131,7 +131,7 @@
       </ul>
     </div>
 
-    <div class="broadcast" v-if="imageWrapper.broadcast">
+    <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
 
@@ -191,7 +191,7 @@ import constants from '@/utils/constants.js';
 export default {
   name: 'cytomine-image',
   props: {
-    index: Number
+    index: String
   },
   components: {
     ImageName,
@@ -243,11 +243,17 @@ export default {
     viewerModule() {
       return this.$store.getters.currentViewerModule;
     },
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
+    },
     viewerWrapper() {
       return this.$store.getters.currentViewer;
     },
+    nbImages() {
+      return Object.keys(this.viewerWrapper.images).length;
+    },
     imageWrapper() {
-      return this.viewerWrapper.maps[this.index];
+      return this.viewerWrapper.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -256,19 +262,19 @@ export default {
       return `CYTO-${this.image.id}`;
     },
     terms() {
-      return this.imageWrapper.terms;
+      return this.$store.getters.terms;
     },
     selectedLayers() {
-      return this.imageWrapper.selectedLayers || [];
+      return this.imageWrapper.layers.selectedLayers || [];
     },
-    isActiveMap: {
+    isActiveImage: {
       get() {
-        return this.viewerWrapper.activeMap === this.index;
+        return this.viewerWrapper.activeImage === this.index;
       },
       set(value) {
         if(value) {
           if(this.viewerWrapper) {
-            this.$store.commit(this.viewerModule + 'setActiveMap', this.index);
+            this.$store.commit(this.viewerModule + 'setActiveImage', this.index);
           }
         }
         else {
@@ -280,37 +286,37 @@ export default {
       return this.imageWrapper.activePanel;
     },
     activeTool() {
-      return this.imageWrapper.activeTool;
+      return this.imageWrapper.draw.activeTool;
     },
     activeEditTool() {
-      return this.imageWrapper.activeEditTool;
+      return this.imageWrapper.draw.activeEditTool;
     },
     maxZoom() {
-      return this.imageWrapper.maxZoom;
+      return this.$store.getters[this.imageModule + 'maxZoom'];
     },
 
     center: {
       get() {
-        return this.imageWrapper.center;
+        return this.imageWrapper.view.center;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setCenter', {index: this.index, center: value});
+        this.$store.dispatch(this.viewerModule + 'setCenter', {index: this.index, center: value});
       }
     },
     zoom: {
       get() {
-        return this.imageWrapper.zoom;
+        return this.imageWrapper.view.zoom;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setZoom', {index: this.index, zoom: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setZoom', {index: this.index, zoom: Number(value)});
       }
     },
     rotation: {
       get() {
-        return this.imageWrapper.rotation;
+        return this.imageWrapper.view.rotation;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
       }
     },
 
@@ -330,8 +336,8 @@ export default {
     },
 
     colorManipulationOn() {
-      return this.imageWrapper.brightness !== 0 || this.imageWrapper.contrast !== 0
-                || this.imageWrapper.hue !== 0 || this.imageWrapper.saturation !== 0;
+      return this.imageWrapper.colors.brightness !== 0 || this.imageWrapper.colors.contrast !== 0
+                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
     },
     operation() {
       return operation;
@@ -339,10 +345,10 @@ export default {
     lib() {
       return {
         ...constLib,
-        brightness: this.imageWrapper.brightness,
-        contrast: this.imageWrapper.contrast,
-        saturation: this.imageWrapper.saturation,
-        hue: this.imageWrapper.hue
+        brightness: this.imageWrapper.colors.brightness,
+        contrast: this.imageWrapper.colors.contrast,
+        saturation: this.imageWrapper.colors.saturation,
+        hue: this.imageWrapper.colors.hue
       };
     },
 
@@ -405,8 +411,10 @@ export default {
       this.$refs.map.$map.getInteractions().forEach(interaction => {
         if(interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
           interaction.condition_ = (mapBrowserEvent) => {
-            return noModifierKeys(mapBrowserEvent) && targetNotEditable(mapBrowserEvent)
-                            && this.isActiveMap && !mapBrowserEvent.originalEvent.target.classList.contains('ql-editor');
+            return noModifierKeys(mapBrowserEvent)
+              && targetNotEditable(mapBrowserEvent)
+              && this.isActiveImage
+              && !mapBrowserEvent.originalEvent.target.classList.contains('ql-editor');
           };
         }
       });
@@ -453,7 +461,7 @@ export default {
     },
 
     togglePanel(panel) {
-      this.$store.commit(this.viewerModule + 'togglePanel', {index: this.index, panel});
+      this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
 
     savePosition: _.debounce(async function() {
@@ -473,7 +481,7 @@ export default {
             topLeftY: Math.round(extent[3]),
             topRightX: Math.round(extent[2]),
             topRightY: Math.round(extent[3]),
-            broadcast: this.imageWrapper.broadcast
+            broadcast: this.imageWrapper.tracking.broadcast
           });
         }
         catch(error) {
@@ -499,34 +507,24 @@ export default {
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit(this.viewerModule + 'removeLayerFromSelectedFeatures', {
-        index: this.index,
-        idLayer: layer.id,
-        cache: true
-      });
+      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {idLayer: layer.id, cache: true});
     });
 
-    // Actions related to query parameters should be executed only once, for first image of viewer
-    let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
-      return map.imageInstance.id === Number(this.$route.params.idImages);
-    });
-    if(this.index === firstIndexTargettedImage) {
-      let idRoutedAnnot = this.$route.params.idAnnotation;
-      if(idRoutedAnnot) {
-        try {
-          let annot = await Annotation.fetch(idRoutedAnnot);
-          if(annot.image === this.image.id) {
-            this.routedAnnotation = annot;
-            if(this.$route.query.action === 'comments') {
-              this.$store.commit(this.viewerModule + 'setShowComments', {index: this.index, annot});
-            }
-            this.$store.commit(this.viewerModule + 'setAnnotToSelect', {index: this.index, annot});
+    let idRoutedAnnot = this.$route.params.idAnnotation;
+    if(idRoutedAnnot) {
+      try {
+        let annot = await Annotation.fetch(idRoutedAnnot);
+        if(annot.image === this.image.id) {
+          this.routedAnnotation = annot;
+          if(this.$route.query.action === 'comments') {
+            this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         }
-        catch(error) {
-          console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
-        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
     }
 

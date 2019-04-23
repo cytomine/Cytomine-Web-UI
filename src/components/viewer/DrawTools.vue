@@ -258,7 +258,7 @@ export default {
     IconLineFreeHand
   },
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -274,27 +274,27 @@ export default {
     ontology() {
       return this.$store.state.currentProject.ontology;
     },
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     viewerWrapper() {
       return this.$store.getters.currentViewer;
     },
     imageWrapper() {
-      return this.viewerWrapper.maps[this.index];
+      return this.viewerWrapper.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
     },
     terms() {
-      return this.imageWrapper.terms;
+      return this.$store.getters.terms;
     },
     termsToAssociate: {
       get() {
-        return this.imageWrapper.termsNewAnnots;
+        return this.imageWrapper.draw.termsNewAnnots;
       },
       set(terms) {
-        this.$store.commit(this.viewerModule + 'setTermsNewAnnots', {index: this.index, terms});
+        this.$store.commit(this.imageModule + 'setTermsNewAnnots', terms);
       }
     },
     backgroundTermsNewAnnot() {
@@ -307,38 +307,33 @@ export default {
     },
     activeTool: {
       get() {
-        return this.imageWrapper.activeTool;
+        return this.imageWrapper.draw.activeTool;
       },
       set(tool) {
-        this.$store.dispatch(this.viewerModule + 'activateTool', {index: this.index, tool});
+        this.$store.dispatch(this.imageModule + 'activateTool', tool);
       }
     },
     displayAnnotDetails: {
       get() {
-        return this.imageWrapper.displayAnnotDetails;
+        return this.imageWrapper.selectedFeatures.displayAnnotDetails;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setDisplayAnnotDetails', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setDisplayAnnotDetails', value);
       }
     },
     activeEditTool: {
       get() {
-        return this.imageWrapper.activeEditTool;
+        return this.imageWrapper.draw.activeEditTool;
       },
       set(tool) {
-        this.$store.commit(this.viewerModule + 'activateEditTool', {index: this.index, tool});
+        this.$store.commit(this.imageModule + 'activateEditTool', tool);
       }
-    },
-    selectedFeatures() {
-      return this.imageWrapper.selectedFeatures;
     },
     selectedFeature() {
-      if(this.selectedFeatures.length === 1) {
-        return this.selectedFeatures[0];
-      }
+      return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     layers() {
-      return this.imageWrapper.selectedLayers || [];
+      return this.imageWrapper.layers.selectedLayers || [];
     },
     noActiveLayer() {
       return !this.layers.find(layer => layer.drawOn);
@@ -347,13 +342,13 @@ export default {
       return this.noActiveLayer;
     },
     actions() {
-      return this.imageWrapper.actions;
+      return this.imageWrapper.undoRedo.actions;
     },
     undoneActions() {
-      return this.imageWrapper.undoneActions;
+      return this.imageWrapper.undoRedo.undoneActions;
     },
-    isActiveMap() {
-      return this.viewerWrapper.activeMap === this.index;
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
     }
   },
   watch: {
@@ -405,13 +400,6 @@ export default {
       this.activeEditTool = (this.activeEditTool === tool) ? null : tool; // toggle behaviour
     },
 
-    toggleTerm(indexTerm) {
-      this.$store.commit(this.viewerModule + 'toggleAssociateTermToNewAnnot', {
-        index: this.index,
-        indexTerm: indexTerm
-      });
-    },
-
     async fill() {
       let feature = this.selectedFeature;
       if(!feature) {
@@ -424,11 +412,7 @@ export default {
       try {
         await annot.fill();
         this.$eventBus.$emit('editAnnotation', annot);
-        this.$store.commit(this.viewerModule + 'addAction', {
-          index: this.index,
-          annot,
-          type: Action.UPDATE
-        });
+        this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
       }
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-fill')});
@@ -447,11 +431,7 @@ export default {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
         this.$eventBus.$emit('deleteAnnotation', annot);
-        this.$store.commit(this.viewerModule + 'addAction', {
-          index: this.index,
-          annot: annot,
-          type: Action.DELETE
-        });
+        this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
@@ -481,7 +461,7 @@ export default {
       let action = this.actions[this.actions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, true);
-        this.$store.commit(this.viewerModule + 'undoAction', {index: this.index, opposedAction});
+        this.$store.commit(this.imageModule + 'undoAction', opposedAction);
       }
       catch(err) {
         console.log(err);
@@ -496,7 +476,7 @@ export default {
       let action = this.undoneActions[this.undoneActions.length - 1];
       try {
         let opposedAction = await this.reverseAction(action, false);
-        this.$store.commit(this.viewerModule + 'redoAction', {index: this.index, opposedAction});
+        this.$store.commit(this.imageModule + 'redoAction', opposedAction);
       }
       catch(err) {
         console.log(err);
@@ -543,7 +523,7 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveMap) { // shortkey should only be applied to active map
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 

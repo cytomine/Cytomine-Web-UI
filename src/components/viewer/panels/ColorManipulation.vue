@@ -44,7 +44,7 @@ export default {
   name: 'color-manipulation',
   components: {CytomineSlider},
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -52,11 +52,11 @@ export default {
     };
   },
   computed: {
-    viewerModule() {
-      return this.$store.getters.currentViewerModule;
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     activePanel() {
       return this.imageWrapper.activePanel;
@@ -64,7 +64,7 @@ export default {
 
     brightness: {
       get() {
-        return this.imageWrapper.brightness;
+        return this.imageWrapper.colors.brightness;
       },
       set(value) {
         this.setBrightness(value);
@@ -72,7 +72,7 @@ export default {
     },
     contrast: {
       get() {
-        return this.imageWrapper.contrast;
+        return this.imageWrapper.colors.contrast;
       },
       set(value) {
         this.setContrast(value);
@@ -80,7 +80,7 @@ export default {
     },
     hue: {
       get() {
-        return this.imageWrapper.hue;
+        return this.imageWrapper.colors.hue;
       },
       set(value) {
         this.setHue(value);
@@ -88,7 +88,7 @@ export default {
     },
     saturation: {
       get() {
-        return this.imageWrapper.saturation;
+        return this.imageWrapper.colors.saturation;
       },
       set(value) {
         this.setSaturation(value);
@@ -104,23 +104,23 @@ export default {
   },
   methods: {
     reset() {
-      this.$store.commit(this.viewerModule + 'resetColorManipulation', {index: this.index});
+      this.$store.commit(this.imageModule + 'resetColorManipulation');
     },
 
     setBrightness: _.debounce(function(value) {
-      this.$store.commit(this.viewerModule + 'setBrightness', {index: this.index, value});
+      this.$store.commit(this.imageModule + 'setBrightness', value);
     }, debounceDelay),
 
     setContrast: _.debounce(function(value) {
-      this.$store.commit(this.viewerModule + 'setContrast', {index: this.index, value});
+      this.$store.commit(this.imageModule + 'setContrast', value);
     }, debounceDelay),
 
     setHue: _.debounce(function(value) {
-      this.$store.commit(this.viewerModule + 'setHue', {index: this.index, value});
+      this.$store.commit(this.imageModule + 'setHue', value);
     }, debounceDelay),
 
     setSaturation: _.debounce(function(value) {
-      this.$store.commit(this.viewerModule + 'setSaturation', {index: this.index, value});
+      this.$store.commit(this.imageModule + 'setSaturation', value);
     }, debounceDelay),
 
     updateMapSize() {

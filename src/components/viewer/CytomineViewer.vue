@@ -6,14 +6,16 @@
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
   <div v-if="!loading" class="maps-wrapper">
-    <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
+    <div class="map-cell"
+      v-for="(cell, i) in cells"
+      :key="i"
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="idx <= nbMaps"
-        :index="idx-1"
-        :key="`${idx}-${viewer.maps[idx-1].imageInstance.id}`"
-        @close="closeMap(idx-1)"
+        v-if="cell && cell.image"
+        :index="cell.index"
+        :key="`${cell.index}-${cell.image.id}`"
+        @close="closeMap(cell.index)"
       />
     </div>
 
@@ -68,17 +70,26 @@ export default {
     viewer() {
       return this.viewers[this.idViewer];
     },
-    nbMaps() {
-      return this.viewer ? this.viewer.maps.length : 0;
+    indexImages() {
+      return this.viewer ? Object.keys(this.viewer.images) : [];
     },
-    imageSelector() {
-      return this.viewer ? this.viewer.imageSelector : false;
+    nbImages() {
+      return this.indexImages.length;
     },
     nbHorizontalCells() {
-      return Math.ceil(Math.sqrt(this.nbMaps));
+      return Math.ceil(Math.sqrt(this.nbImages));
     },
     nbVerticalCells() {
-      return this.nbHorizontalCells ? Math.ceil(this.nbMaps/this.nbHorizontalCells) : 0;
+      return this.nbHorizontalCells ? Math.ceil(this.nbImages/this.nbHorizontalCells) : 0;
+    },
+    cells() {
+      let cells = new Array(this.nbHorizontalCells*this.nbVerticalCells);
+      for(let i = 0; i < this.nbImages; i++) {
+        let index = this.indexImages[i];
+        let image = this.viewer.images[index].imageInstance;
+        cells[i] = {index, image};
+      }
+      return cells;
     },
     elementHeight() {
       return 100/this.nbVerticalCells;
@@ -113,7 +124,7 @@ export default {
         this.$router.push(`/project/${this.$route.params.idProject}`);
       }
     },
-    nbMaps() {
+    nbImages() {
       this.$eventBus.$emit('updateMapSize');
     }
   },
@@ -126,7 +137,8 @@ export default {
 
       for(let id in this.viewers) {
         // if viewer containing the targetted images, and only them, store its id
-        if(this.viewers[id].maps.map(map => map.imageInstance.id).join('-') === this.$route.params.idImages) {
+        let imagesViewer = Object.values(this.viewers[id].images).map(img => img.imageInstance.id).join('-');
+        if(imagesViewer === this.$route.params.idImages) {
           this.idViewer = id;
           return;
         }
@@ -136,12 +148,12 @@ export default {
     },
 
     closeMap(index) {
-      if(this.nbMaps === 1) {
+      if(this.nbImages === 1) {
         this.$store.unregisterModule(['projects', this.project.id, 'viewers', this.idViewer]);
         this.$router.push(`/project/${this.$route.params.idProject}`);
       }
       else {
-        this.$store.dispatch(this.viewerModule + 'removeMap', index);
+        this.$store.dispatch(this.viewerModule + 'removeImage', index);
       }
     },
 
@@ -150,10 +162,9 @@ export default {
         this.$store.commit('setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          this.$store.commit(this.viewerModule + 'setId', this.idViewer);
           await Promise.all(this.idImages.map(async id => {
             let image = await ImageInstance.fetch(id);
-            await this.$store.dispatch(this.viewerModule + 'addMap', image);
+            await this.$store.dispatch(this.viewerModule + 'addImage', image);
           }));
         }
         else {

@@ -3,12 +3,12 @@
   <h1>{{$t('link-images')}}</h1>
 
   <p>{{$t('link-view-with')}}</p>
-  <p v-for="{image, index} in otherMaps" :key="index">
+  <p v-for="{image, index, count} in otherImages" :key="index">
     <b-checkbox
       :value="revisionCheckboxes && linkedIndexes.includes(index)"
       @input="value => handleCheckboxChange(index, value)"
     >
-      {{$t('viewer-view', {number: index + 1})}} (<image-name :image="image" />)
+      {{$t('viewer-view', {number: count})}} (<image-name :image="image" />)
     </b-checkbox>
   </p>
 </div>
@@ -21,7 +21,7 @@ export default {
   name: 'link-panel',
   components: {ImageName},
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -32,28 +32,34 @@ export default {
     viewerModule() {
       return this.$store.getters.currentViewerModule;
     },
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
+    },
     viewerWrapper() {
       return this.$store.getters.currentViewer;
     },
-    maps() {
-      return this.viewerWrapper.maps;
+    images() {
+      return this.viewerWrapper.images;
     },
-    otherMaps() {
-      return this.maps.reduce((arr, map, index) => {
+    otherImages() {
+      let count = 1;
+      return Object.keys(this.images).reduce((arr, index) => {
         if(this.index !== index) {
           arr.push({
+            count,
             index,
-            image: map.imageInstance
+            image: this.images[index].imageInstance
           });
         }
+        count++;
         return arr;
       }, []);
     },
     linkedIndexes() {
-      return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
+      return this.$store.getters[this.viewerModule + 'getLinkedIndexes'](this.index);
     },
     trackedUser() {
-      return this.viewerWrapper.maps[this.index].trackedUser;
+      return this.viewerWrapper.images[this.index].tracking.trackedUser;
     },
   },
   methods: {
@@ -66,7 +72,7 @@ export default {
             confirmText: this.$t('button-confirm'),
             cancelText: this.$t('button-cancel'),
             onConfirm: () => {
-              this.$store.commit(this.viewerModule + 'setTrackedUser', {index: this.index, idUser: null});
+              this.$store.commit(this.imageModule + 'setTrackedUser', null);
               this.linkMaps(indexLinked);
             },
             onCancel: () => this.revisionCheckboxes++ // To force the update of the checkbox state
@@ -77,12 +83,12 @@ export default {
         }
       }
       else {
-        this.$store.commit(this.viewerModule + 'unlinkMap', this.index);
+        this.$store.commit(this.viewerModule + 'unlinkImage', this.index);
       }
     },
 
     linkMaps(indexLinked) {
-      this.$store.commit(this.viewerModule + 'linkMaps', [this.index, indexLinked]);
+      this.$store.commit(this.viewerModule + 'linkImages', [this.index, indexLinked]);
     }
   }
 };

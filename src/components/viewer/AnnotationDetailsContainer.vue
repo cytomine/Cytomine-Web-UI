@@ -23,7 +23,7 @@
     <div class="annotation-details-container">
       <annotation-details
         :annotation="selectedFeature.properties.annot"
-        :terms="imageWrapper.terms"
+        :terms="terms"
         :users="allUsers"
         :showImageInfo="false"
         :key="selectedFeature.id"
@@ -53,7 +53,7 @@ export default {
   name: 'annotations-details-container',
   components: {VueDraggableResizable, AnnotationDetails},
   props: {
-    index: Number,
+    index: String,
     view: Object
   },
   data() {
@@ -71,56 +71,54 @@ export default {
     viewerModule() {
       return this.$store.getters.currentViewerModule;
     },
+    imageModule() {
+      return this.$store.getters.imageModule(this.index);
+    },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
     },
     displayAnnotDetails: {
       get() {
-        return this.imageWrapper.displayAnnotDetails;
+        return this.imageWrapper.selectedFeatures.displayAnnotDetails;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setDisplayAnnotDetails', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setDisplayAnnotDetails', value);
       }
     },
     positionAnnotDetails: {
       get() {
-        return this.imageWrapper.positionAnnotDetails;
+        return this.imageWrapper.selectedFeatures.positionAnnotDetails;
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setPositionAnnotDetails', {index: this.index, value});
+        this.$store.commit(this.imageModule + 'setPositionAnnotDetails', value);
       }
-    },
-    selectedFeatures() {
-      return this.imageWrapper.selectedFeatures;
     },
     selectedFeature() {
-      if(this.selectedFeatures && this.selectedFeatures.length === 1) {
-        return this.selectedFeatures[0];
-      }
+      return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     allUsers() {
       let allUsers = this.users.concat(this.userJobs);
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
-    layers() {
-      return this.imageWrapper.selectedLayers || [];
-    },
     annot() {
       return this.selectedFeature ? this.selectedFeature.properties.annot : {};
+    },
+    terms() {
+      return this.$store.getters.terms || [];
     }
   },
   watch: {
     selectedFeature() {
       if(this.selectedFeature) {
         this.displayAnnotDetails = true;
-        let targetAnnot = this.imageWrapper.showComments;
+        let targetAnnot = this.imageWrapper.selectedFeatures.showComments;
         this.showComments = (targetAnnot === this.annot.id);
         if(targetAnnot !== null) {
-          this.$store.commit(this.viewerModule + 'setShowComments', {index: this.index, annot: null});
+          this.$store.commit(this.imageModule + 'setShowComments', null);
         }
       }
     }
@@ -142,7 +140,7 @@ export default {
     },
 
     addTerm(term) {
-      this.$store.commit(this.viewerModule + 'addTerm', term);
+      this.$store.dispatch(this.viewerModule + 'addTerm', term);
     },
 
     async updateTerms() {
@@ -150,23 +148,15 @@ export default {
       await updateTermProperties(updatedAnnot);
 
       this.$eventBus.$emit('editAnnotation', updatedAnnot);
-      this.$store.commit(this.viewerModule + 'changeAnnotSelectedFeature', {
-        index: this.index,
-        indexFeature: 0,
-        annot: updatedAnnot
-      });
+      this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
     },
 
     updateProperties() {
-      this.$store.dispatch(this.viewerModule + 'refreshProperties', this.index);
+      this.$store.dispatch(this.imageModule + 'refreshProperties', this.index);
     },
 
     handleDeletion() {
-      this.$store.commit(this.viewerModule + 'addAction', {
-        index: this.index,
-        annot: this.annot,
-        type: Action.DELETE
-      });
+      this.$store.commit(this.imageModule + 'addAction', {annot: this.annot, type: Action.DELETE});
       this.$eventBus.$emit('deleteAnnotation', this.annot);
     },
 

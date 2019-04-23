@@ -34,7 +34,7 @@ export default {
   name: 'rotation-selector',
   components: {CytomineSlider},
   props: {
-    index: Number
+    index: String
   },
   data() {
     return {
@@ -47,17 +47,17 @@ export default {
       return this.$store.getters.currentViewerModule;
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.maps[this.index];
+      return this.$store.getters.currentViewer.images[this.index];
     },
     rotation() {
-      return this.imageWrapper.rotation;
+      return this.imageWrapper.view.rotation;
     },
     degreesRotation: {
       get() {
         return Math.round(this.rotation * 180 / Math.PI);
       },
       set(value) {
-        this.$store.commit(this.viewerModule + 'setRotation', {
+        this.$store.dispatch(this.viewerModule + 'setRotation', {
           index: this.index,
           rotation: Number(value) / 180 * Math.PI
         });
