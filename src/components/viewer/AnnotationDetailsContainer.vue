@@ -69,13 +69,13 @@ export default {
   },
   computed: {
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.images[this.index];
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -108,7 +108,7 @@ export default {
       return this.selectedFeature ? this.selectedFeature.properties.annot : {};
     },
     terms() {
-      return this.$store.getters.terms || [];
+      return this.$store.getters['currentProject/terms'] || [];
     }
   },
   watch: {

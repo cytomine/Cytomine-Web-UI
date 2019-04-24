@@ -79,10 +79,10 @@ export default {
       return this.$store.state.currentProject.project;
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.images[this.index];
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -144,7 +144,7 @@ export default {
     },
 
     canDraw(layer) {
-      return !layer.isReview && this.$store.getters.canEditLayer(layer.id);
+      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
     },
 
     addLayerById(id, visible) {

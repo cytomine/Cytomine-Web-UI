@@ -174,7 +174,7 @@ export default {
       return this.$store.state.currentProject.project;
     },
     isManager() {
-      return this.$store.getters.canManageProject;
+      return this.$store.getters['currentProject/canManageProject'];
     },
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);

@@ -8,6 +8,8 @@ function getDefaultState() {
 }
 
 export default {
+  namespaced: true,
+
   state: getDefaultState(),
 
   mutations: {
@@ -59,6 +61,13 @@ export default {
     async login({dispatch}, payload) {
       await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
       await dispatch('fetchUser');
+    },
+
+    logout: {
+      root: true,
+      handler({commit}) {
+        commit('logout');
+      }
     }
   }
 };

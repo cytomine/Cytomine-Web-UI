@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     updateProject(updatedProject) {
-      this.$store.dispatch('updateProject', updatedProject);
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
     async deleteProject() {
       try {

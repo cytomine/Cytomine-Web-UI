@@ -14,6 +14,8 @@ function getDefaultState() {
 }
 
 export default {
+  namespaced: true,
+
   state: getDefaultState(),
 
   mutations: {
@@ -95,6 +97,13 @@ export default {
     async fetchOntology({state, commit}) {
       let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
       commit('setOntology', ontology);
+    },
+
+    logout: {
+      root: true,
+      handler({commit}) {
+        commit('logout');
+      }
     }
   },
 

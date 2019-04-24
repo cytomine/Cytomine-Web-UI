@@ -73,7 +73,7 @@ export default {
       return this.$store.state.currentProject.managers;
     },
     projectContributors() {
-      return this.$store.getters.contributors;
+      return this.$store.getters['currentProject/contributors'];
     },
     currentUser() {
       return this.$store.state.currentUser.user;
@@ -82,13 +82,13 @@ export default {
       return this.$store.state.currentProject.project.blindMode;
     },
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     viewerWrapper() {
-      return this.$store.getters.currentViewer;
+      return this.$store.getters['currentProject/currentViewer'];
     },
     images() {
       return this.viewerWrapper.images;

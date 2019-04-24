@@ -309,7 +309,7 @@ export default {
         await this.refreshMembers();
 
         if(member.id === this.currentUser.id) {
-          await this.$store.dispatch('fetchUIConfig');
+          await this.$store.dispatch('currentProject/fetchUIConfig');
           if(!this.$store.state.currentProject.configUI['project-configuration-tab']) {
             this.$router.push(`/project/${this.project.id}`);
           }
@@ -339,7 +339,7 @@ export default {
 
     async refreshMembers() {
       try {
-        await this.$store.dispatch('fetchProjectMembers');
+        await this.$store.dispatch('currentProject/fetchProjectMembers');
         await this.fetchRepresentatives();
         this.formatMembers();
       }

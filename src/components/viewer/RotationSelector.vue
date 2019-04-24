@@ -44,10 +44,10 @@ export default {
   },
   computed: {
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.images[this.index];
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
     rotation() {
       return this.imageWrapper.view.rotation;

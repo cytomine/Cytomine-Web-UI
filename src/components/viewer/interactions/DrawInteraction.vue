@@ -39,10 +39,10 @@ export default {
       return this.$store.state.currentUser.user;
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.images[this.index];
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
     rotation() {
       return this.imageWrapper.view.rotation;

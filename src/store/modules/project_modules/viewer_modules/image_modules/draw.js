@@ -44,7 +44,7 @@ export default {
     },
 
     refreshData({commit, rootGetters}) {
-      commit('filterTermsNewAnnots', rootGetters.terms || []);
+      commit('filterTermsNewAnnots', rootGetters['currentProject/terms'] || []);
     }
   }
 };

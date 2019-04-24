@@ -65,7 +65,7 @@ export default {
       return this.$route.query.viewer;
     },
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     viewer() {
       return this.viewers[this.idViewer];
@@ -159,7 +159,7 @@ export default {
 
     async loadViewer() {
       try {
-        this.$store.commit('setCurrentViewer', this.idViewer);
+        this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
           await Promise.all(this.idImages.map(async id => {

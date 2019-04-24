@@ -204,7 +204,7 @@ export default {
       }
     },
     canEdit() {
-      return this.$store.getters.canEditAnnot(this.annotation);
+      return this.$store.getters['currentProject/canEditAnnot'](this.annotation);
     },
     canEditTerms() {
       // HACK: because core prevents from modifying term of algo annot (https://github.com/cytomine/Cytomine-core/issues/1138 & 1139)
@@ -246,7 +246,7 @@ export default {
 
     async newTerm(term) { // a new term was added to the ontology
       this.$emit('addTerm', term);
-      this.$store.dispatch('fetchOntology');
+      this.$store.dispatch('currentProject/fetchOntology');
       this.addTerm(term.id);
     },
 

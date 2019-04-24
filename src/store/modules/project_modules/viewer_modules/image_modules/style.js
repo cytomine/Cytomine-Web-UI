@@ -70,7 +70,7 @@ export default {
 
   actions: {
     async initialize({commit, rootGetters}) {
-      let terms = formatTerms(rootGetters.terms, initialLayersOpacity);
+      let terms = formatTerms(rootGetters['currentProject/terms'], initialLayersOpacity);
       commit('setTerms', terms);
     },
 
@@ -90,7 +90,7 @@ export default {
     },
 
     async refreshData({state, commit, rootGetters}) {
-      let terms = formatTerms(rootGetters.terms, state.layersOpacity, state.terms);
+      let terms = formatTerms(rootGetters['currentProject/terms'], state.layersOpacity, state.terms);
       commit('setTerms', terms);
     }
   }

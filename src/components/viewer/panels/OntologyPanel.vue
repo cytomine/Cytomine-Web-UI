@@ -76,10 +76,10 @@ export default {
       return this.$store.state.currentProject.ontology;
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
-      return this.$store.getters.currentViewer.images[this.index];
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
     terms() {
       return this.imageWrapper.style.terms;

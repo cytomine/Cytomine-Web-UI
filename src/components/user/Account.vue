@@ -168,7 +168,7 @@ export default {
   methods: {
     async editDetails() {
       try {
-        await this.$store.dispatch('updateUser', this.updatedUser);
+        await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
       catch(err) {
@@ -185,7 +185,7 @@ export default {
       let userNewPassword = this.currentUser.clone();
       userNewPassword.password = this.newPassword;
       try {
-        await this.$store.dispatch('updateUser', userNewPassword);
+        await this.$store.dispatch('currentUser/updateUser', userNewPassword);
         this.$notify({type: 'success', text: this.$t('notif-success-password-saved')});
         this.currentPassword = '';
         this.newPassword = '';
@@ -212,7 +212,7 @@ export default {
 
     async regenerateKeys() {
       try {
-        await this.$store.dispatch('regenerateKeys');
+        await this.$store.dispatch('currentUser/regenerateKeys');
         this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
       }
       catch(err) {

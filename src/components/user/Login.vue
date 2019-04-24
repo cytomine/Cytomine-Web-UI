@@ -97,7 +97,11 @@ export default {
     async login() {
       try {
         let successMessage = this.$t('notif-success-login');
-        await this.$store.dispatch('login', {username: this.username, password: this.password, rememberMe: this.rememberMe});
+        await this.$store.dispatch('currentUser/login', {
+          username: this.username,
+          password: this.password,
+          rememberMe: this.rememberMe
+        });
         if(this.$store.state.currentUser.user) {
           this.$notify({type: 'success', text: successMessage});
         }

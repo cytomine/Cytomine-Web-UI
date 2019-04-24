@@ -82,13 +82,13 @@ export default {
   },
   computed: {
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     viewerWrapper() {
-      return this.$store.getters.currentViewer;
+      return this.$store.getters['currentProject/currentViewer'];
     },
     image() {
       return this.viewerWrapper.images[this.index].imageInstance;
@@ -105,7 +105,7 @@ export default {
       return this.image.magnification || this.$t('unknown');
     },
     canEdit() {
-      return this.$store.getters.canEditImage(this.image);
+      return this.$store.getters['currentProject/canEditImage'](this.image);
     },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;

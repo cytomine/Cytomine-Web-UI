@@ -76,7 +76,7 @@ export default {
     async loginWithToken() {
       try {
         await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
-        await this.$store.dispatch('fetchUser');
+        await this.$store.dispatch('currentUser/fetchUser');
       }
       catch(error) {
         console.log(error);
@@ -108,7 +108,7 @@ export default {
     }
     else {
       try {
-        await this.$store.dispatch('fetchUser');
+        await this.$store.dispatch('currentUser/fetchUser');
       }
       catch(error) {
         console.log(error);

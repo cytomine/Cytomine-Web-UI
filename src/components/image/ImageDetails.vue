@@ -222,10 +222,10 @@ export default {
       return this.$store.state.currentProject.project.blindMode;
     },
     canManageProject() {
-      return this.$store.getters.canManageProject;
+      return this.$store.getters['currentProject/canManageProject'];
     },
     canEdit() {
-      return this.$store.getters.canEditImage(this.image);
+      return this.$store.getters['currentProject/canEditImage'](this.image);
     },
     emptyNewName() {
       return !this.newName;

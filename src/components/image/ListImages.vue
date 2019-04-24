@@ -289,7 +289,7 @@ export default {
       return this.project.blindMode;
     },
     canManageProject() {
-      return this.$store.getters.canManageProject;
+      return this.$store.getters['currentProject/canManageProject'];
     },
     canAddImage() {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);

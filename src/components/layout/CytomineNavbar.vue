@@ -131,7 +131,7 @@ export default {
 
     async openAdminSession() {
       try {
-        await this.$store.dispatch('openAdminSession');
+        await this.$store.dispatch('currentUser/openAdminSession');
         this.$router.push('/admin');
       }
       catch(error) {
@@ -140,7 +140,7 @@ export default {
     },
     async closeAdminSession() {
       try {
-        await this.$store.dispatch('closeAdminSession');
+        await this.$store.dispatch('currentUser/closeAdminSession');
         this.$router.push('/');
       }
       catch(error) {
@@ -151,7 +151,7 @@ export default {
     async stopSwitchUser() {
       try {
         await Cytomine.instance.stopSwitchUser();
-        await this.$store.dispatch('fetchUser');
+        await this.$store.dispatch('currentUser/fetchUser');
         this.$router.push('/');
       }
       catch(error) {
@@ -163,10 +163,10 @@ export default {
     async logout() {
       try {
         await Cytomine.instance.logout();
+        this.$store.dispatch('logout');
         for(let key in this.$store.state.projects) {
           this.$store.unregisterModule(['projects', key]);
         }
-        this.$store.commit('logout');
         this.$router.push('/');
       }
       catch(error) {

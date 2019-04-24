@@ -253,7 +253,7 @@ export default {
       return this.project.blindMode;
     },
     canManageProject() {
-      return this.$store.getters.canManageProject;
+      return this.$store.getters['currentProject/canManageProject'];
     },
     ontology() {
       return this.$store.state.currentProject.ontology;
@@ -311,7 +311,7 @@ export default {
       });
     },
     terms() {
-      return this.$store.getters.terms || [];
+      return this.$store.getters['currentProject/terms'] || [];
     },
     additionalNodes() {
       let additionalNodes = [this.noTermOption];

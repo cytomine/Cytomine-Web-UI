@@ -76,7 +76,7 @@ export default {
       return this.$store.state.currentProject.configUI;
     },
     canManageProject() {
-      return this.$store.getters.canManageProject;
+      return this.$store.getters['currentProject/canManageProject'];
     },
     moment() {
       return moment;

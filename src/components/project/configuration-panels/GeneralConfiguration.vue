@@ -224,7 +224,7 @@ export default {
       updatedProject.populate(newProps);
       try {
         await updatedProject.save();
-        this.$store.commit('setProject', updatedProject);
+        this.$store.commit('currentProject/setProject', updatedProject);
       }
       catch(error) {
         console.log(error);
@@ -275,7 +275,7 @@ export default {
     },
 
     externalProjectUpdate(updatedProject) {
-      this.$store.dispatch('updateProject', updatedProject);
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
 
     async deleteProject() {

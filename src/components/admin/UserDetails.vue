@@ -111,7 +111,7 @@ export default {
     async switchUser() {
       try {
         await Cytomine.instance.switchUser(this.user.username);
-        await this.$store.dispatch('fetchUser');
+        await this.$store.dispatch('currentUser/fetchUser');
         this.$router.push('/');
       }
       catch(error) {

@@ -241,13 +241,13 @@ export default {
       return this.$store.state.currentProject.configUI;
     },
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     viewerWrapper() {
-      return this.$store.getters.currentViewer;
+      return this.$store.getters['currentProject/currentViewer'];
     },
     nbImages() {
       return Object.keys(this.viewerWrapper.images).length;
@@ -262,7 +262,7 @@ export default {
       return `CYTO-${this.image.id}`;
     },
     terms() {
-      return this.$store.getters.terms;
+      return this.$store.getters['currentProject/terms'];
     },
     selectedLayers() {
       return this.imageWrapper.layers.selectedLayers || [];

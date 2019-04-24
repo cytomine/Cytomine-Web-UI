@@ -138,7 +138,7 @@ export default {
       try {
         this.customUI[prop][userType] = !this.customUI[prop][userType];
         this.customUI = await this.project.saveUIConfig(this.customUI);
-        this.$store.dispatch('fetchUIConfig');
+        this.$store.dispatch('currentProject/fetchUIConfig');
       }
       catch(error) {
         console.log(error);

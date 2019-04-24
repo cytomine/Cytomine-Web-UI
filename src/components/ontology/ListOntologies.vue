@@ -117,7 +117,7 @@ export default {
         return this.$store.state.ontologies.searchString;
       },
       set(value) {
-        this.$store.commit('setOntologySearchString', value);
+        this.$store.commit('ontologies/setSearchString', value);
       }
     }
   },
@@ -133,7 +133,7 @@ export default {
       this.selectTargetOntology();
     },
     selectedOntology(ontology) {
-      this.$store.commit('setSelectedOntology', ontology.id);
+      this.$store.commit('ontologies/setSelectedOntology', ontology.id);
     }
   },
   methods: {

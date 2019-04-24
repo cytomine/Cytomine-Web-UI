@@ -275,10 +275,10 @@ export default {
       return this.$store.state.currentProject.ontology;
     },
     imageModule() {
-      return this.$store.getters.imageModule(this.index);
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
     viewerWrapper() {
-      return this.$store.getters.currentViewer;
+      return this.$store.getters['currentProject/currentViewer'];
     },
     imageWrapper() {
       return this.viewerWrapper.images[this.index];
@@ -287,7 +287,7 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     terms() {
-      return this.$store.getters.terms;
+      return this.$store.getters['currentProject/terms'];
     },
     termsToAssociate: {
       get() {
@@ -375,7 +375,7 @@ export default {
       }
 
       let ftr = this.selectedFeature;
-      if(!this.$store.getters.canEditAnnot(ftr.properties.annot)) {
+      if(!this.$store.getters['currentProject/canEditAnnot'](ftr.properties.annot)) {
         return true;
       }
 

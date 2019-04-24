@@ -67,11 +67,11 @@ export default {
       return this.$store.state.currentProject.project;
     },
     viewerModule() {
-      return this.$store.getters.currentViewerModule;
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageSelectorEnabled: {
       get() {
-        return this.$store.getters.currentViewer.imageSelector;
+        return this.$store.getters['currentProject/currentViewer'].imageSelector;
       },
       set(value) {
         this.$store.commit(this.viewerModule + 'setImageSelector', value);

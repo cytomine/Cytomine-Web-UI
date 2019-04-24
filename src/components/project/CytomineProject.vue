@@ -56,7 +56,7 @@ export default {
         if(!this.$store.state.projects[this.idProject]) { // module does not exist yet
           this.$store.registerModule(['projects', this.idProject], projectModuleModel);
         }
-        await this.$store.dispatch('loadProject', this.idProject);
+        await this.$store.dispatch('currentProject/loadProject', this.idProject);
         this.loading = false;
       }
       catch(error) {

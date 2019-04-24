@@ -67,7 +67,7 @@ export default {
         return this.$store.state.currentUser.expandedSidebar;
       },
       set(val) {
-        this.$store.commit('setExpandedSidebar', val);
+        this.$store.commit('currentUser/setExpandedSidebar', val);
       }
     }
   },

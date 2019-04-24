@@ -1,4 +1,6 @@
 export default {
+  namespaced: true,
+
   state() {
     return {
       selectedOntology: null,
@@ -11,7 +13,7 @@ export default {
       state.selectedOntology = idOntology;
     },
 
-    setOntologySearchString(state, searchString) {
+    setSearchString(state, searchString) {
       state.searchString = searchString;
     }
   }
