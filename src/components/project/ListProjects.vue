@@ -117,10 +117,15 @@
         :data="filteredProjects"
         class="table-projects"
         :paginated="true"
+        :current-page.sync="currentPage"
         :per-page="perPage"
         pagination-size="is-small"
         detailed
         detail-key="id"
+        :opened-detailed.sync="openedDetails"
+        :default-sort="sort.field"
+        :default-sort-direction="sort.order"
+        @sort="updateSort"
       >
         <template #default="{row: project}">
           <b-table-column :visible="showRole" field="roleIndex" label="" centered width="1" sortable>
@@ -216,14 +221,13 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 
-import {isBetweenBounds, isBoundsFilterActive, boundsComputedHandler, multiselectComputedHandler} from '@/utils/filters';
+import {isBetweenBounds} from '@/utils/bounds';
+import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import {ProjectCollection} from 'cytomine-client';
 
@@ -241,7 +245,6 @@ export default {
       error: false,
 
       projects: [],
-      perPage: 10,
 
       initSliders: false,
       contributorLabel: this.$t('contributor'),
@@ -261,23 +264,10 @@ export default {
     };
   },
   computed: {
-    searchString: {
-      get() {
-        return this.$store.state.listProjects.searchString;
-      },
-      set(value) {
-        this.$store.commit('listProjects/setSearchString', value);
-      }
-    },
+    currentUser: get('currentUser/user'),
 
-    filtersOpened: {
-      get() {
-        return this.$store.state.listProjects.filtersOpened;
-      },
-      set(value) {
-        this.$store.commit('listProjects/setFiltersOpened', value);
-      }
-    },
+    searchString: sync('listProjects/searchString'),
+    filtersOpened: sync('listProjects/filtersOpened'),
 
     availableRoles() {
       return [this.contributorLabel, this.managerLabel];
@@ -309,13 +299,13 @@ export default {
       return ontologies;
     },
 
-    selectedOntologies: multiselectComputedHandler('listProjects', 'selectedOntologies', 'ontologies'),
-    selectedRoles: multiselectComputedHandler('listProjects', 'selectedRoles', 'availableRoles'),
-    boundsMembers: boundsComputedHandler('listProjects', 'boundsMembers', 'maxNbMembers'),
-    boundsImages: boundsComputedHandler('listProjects', 'boundsImages', 'maxNbImages'),
-    boundsUserAnnotations: boundsComputedHandler('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
-    boundsJobAnnotations: boundsComputedHandler('listProjects', 'boundsJobAnnotations', 'maxNbJobAnnotations'),
-    boundsReviewedAnnotations: boundsComputedHandler('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
+    selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'ontologies'),
+    selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
+    boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
+    boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
+    boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
+    boundsJobAnnotations: syncBoundsFilter('listProjects', 'boundsJobAnnotations', 'maxNbJobAnnotations'),
+    boundsReviewedAnnotations: syncBoundsFilter('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
     nbActiveFilters() {
       let filters = this.$store.state.listProjects.filters;
@@ -360,12 +350,25 @@ export default {
       return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
     },
 
-    ...mapState({currentUser: state => state.currentUser.user})
+    currentPage: sync('listProjects/currentPage'),
+    perPage: sync('listProjects/perPage'),
+    sort: sync('listProjects/sort'),
+    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
+      get() {
+        return this.$store.state.listProjects.openedDetails.slice();
+      },
+      set(value) {
+        this.$store.commit('listProjects/setOpenedDetails', value);
+      }
+    }
   },
   methods: {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
       this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
+    },
+    updateSort(field, order) {
+      this.sort = {field, order};
     },
     updateProject(updatedProject) {
       let project = this.projects.find(project => project.id === updatedProject.id);
@@ -406,6 +409,11 @@ export default {
 
       if(this.filtersOpened) {
         this.initSliders = true;
+      }
+
+      // if a project was deleted, the currentPage value might not be valid => reinitialize it
+      if((this.currentPage - 1)*this.perPage >= this.filteredProjects.length) {
+        this.currentPage = 1;
       }
     }
     catch(error) {

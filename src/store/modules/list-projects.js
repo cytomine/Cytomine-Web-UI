@@ -1,4 +1,3 @@
-
 function getDefaultState() {
   return {
     searchString: '',
@@ -12,7 +11,15 @@ function getDefaultState() {
       boundsUserAnnotations: null,
       boundsJobAnnotations: null,
       boundsReviewedAnnotations: null
-    }
+    },
+
+    currentPage: 1,
+    perPage: 10,
+    sort: {
+      field: 'lastActivity',
+      order: 'desc'
+    },
+    openedDetails: []
   };
 }
 
@@ -34,8 +41,24 @@ export default {
       state.filtersOpened = value;
     },
 
-    setFilter(state, {propName, propValue}) {
-      state.filters[propName] = propValue;
+    setFilter(state, {filterName, propValue}) {
+      state.filters[filterName] = propValue;
     },
+
+    setCurrentPage(state, page) {
+      state.currentPage = page;
+    },
+
+    setPerPage(state, perPage) {
+      state.perPage = perPage;
+    },
+
+    setSort(state, sort) {
+      state.sort = sort;
+    },
+
+    setOpenedDetails(state, value) {
+      state.openedDetails = value;
+    }
   }
 };
