@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
 
@@ -72,12 +74,8 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },

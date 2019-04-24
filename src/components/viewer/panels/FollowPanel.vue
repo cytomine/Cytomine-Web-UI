@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import Username from '@/components/user/Username';
 
 import {UserPosition} from 'cytomine-client';
@@ -66,20 +68,15 @@ export default {
     };
   },
   computed: {
-    projectMembers() {
-      return this.$store.state.currentProject.members;
-    },
-    projectManagers() {
-      return this.$store.state.currentProject.managers;
-    },
+    projectMembers: get('currentProject/members'),
+    projectManagers: get('currentProject/managers'),
     projectContributors() {
       return this.$store.getters['currentProject/contributors'];
     },
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
     blindMode() {
-      return this.$store.state.currentProject.project.blindMode;
+      return this.project.blindMode;
     },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];

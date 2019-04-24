@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import AdminDashboard from './AdminDashboard';
 import AdminUsers from './AdminUsers';
 import AdminConfiguration from './AdminConfiguration';
@@ -46,9 +48,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     queriedTab() {
       return this.$route.query.tab;
     },

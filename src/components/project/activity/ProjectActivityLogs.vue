@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {UserJobCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
@@ -73,9 +75,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     formattedActions() {
       let results = [];
       let lastDate = null;

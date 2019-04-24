@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {get} from '@/utils/store-helpers';
 
 import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ImagePreview from '@/components/image/ImagePreview';
@@ -149,6 +149,8 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
+
     nbImages() {
       if(!this.projects) {
         return;
@@ -182,8 +184,7 @@ export default {
         }
         return lastOpened;
       }
-    },
-    ...mapState({currentUser: state => state.currentUser.user})
+    }
   },
   methods: {
     async fetchProjects() {

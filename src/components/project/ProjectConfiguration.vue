@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import GeneralConfiguration from './configuration-panels/GeneralConfiguration';
 import ProjectMembers from './configuration-panels/ProjectMembers';
 import CustomUIProject from './configuration-panels/CustomUIProject';
@@ -51,9 +53,7 @@ export default {
     };
   },
   computed: {
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    configUI: get('currentProject/configUI'),
     queriedTab() {
       return this.$route.query.tab;
     },

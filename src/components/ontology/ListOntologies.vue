@@ -80,6 +80,8 @@
 </template>
 
 <script>
+import {get, sync} from '@/utils/store-helpers';
+
 import {OntologyCollection} from 'cytomine-client';
 import OntologyDetails from './OntologyDetails';
 import AddOntologyModal from './AddOntologyModal';
@@ -99,9 +101,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     idTargetOntology() {
       return Number(this.$route.params.idOntology) || this.$store.state.ontologies.selectedOntology;
     },
@@ -112,14 +112,7 @@ export default {
       }
       return this.ontologies;
     },
-    searchString: {
-      get() {
-        return this.$store.state.ontologies.searchString;
-      },
-      set(value) {
-        this.$store.commit('ontologies/setSearchString', value);
-      }
-    }
+    searchString: sync('ontologies/searchString')
   },
   watch: {
     idTargetOntology() {

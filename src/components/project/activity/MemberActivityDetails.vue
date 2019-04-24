@@ -229,6 +229,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {fullName} from '@/utils/user-utils.js';
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from 'cytomine-client';
 
@@ -270,15 +272,11 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     idUser() {
       return Number(this.$route.params.idUser);
     },
-    project() {
-      return this.$store.state.currentProject.project;
-    }
+    project: get('currentProject/project')
   },
   methods: {
     async fetchData() {

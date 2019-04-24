@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {UserCollection} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
 import {fullName} from '@/utils/user-utils.js';
@@ -44,9 +46,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     projectMembersIds() {
       let projectMembers = this.$store.state.currentProject.members;
       let excluded = projectMembers.concat(this.selectedUsers);

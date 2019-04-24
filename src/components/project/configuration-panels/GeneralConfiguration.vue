@@ -127,6 +127,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import ProjectActions from '../ProjectActions';
 import DefaultProperty from './DefaultProperty';
 import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from 'cytomine-client';
@@ -150,12 +152,9 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    layers() {
-      return this.$store.state.currentProject.members;
-    },
+    project: get('currentProject/project'),
+    layers: get('currentProject/members'),
+
     currentEditingMode() {
       return this.project.isReadOnly ? 'READ-ONLY' : this.project.isRestricted ? 'RESTRICTED' : 'CLASSIC';
     },

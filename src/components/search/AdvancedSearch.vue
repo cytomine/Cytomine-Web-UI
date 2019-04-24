@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
@@ -110,6 +110,8 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
+
     pathSearchString() {
       return this.$route.params.searchString;
     },
@@ -126,8 +128,7 @@ export default {
         return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0) ||
           (image.blindedName && String(image.blindedName).toLowerCase().indexOf(this.lowCaseSearchString) >= 0);
       });
-    },
-    ...mapState({currentUser: state => state.currentUser.user})
+    }
   },
   watch: {
     pathSearchString(val) {

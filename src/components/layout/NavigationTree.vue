@@ -44,15 +44,14 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 
 export default {
   name: 'navigation-tree',
   components: {ImageName},
   computed: {
-    projects() {
-      return this.$store.state.projects;
-    }
+    projects: get('projects')
   },
   methods: {
     nbImages(viewer) {

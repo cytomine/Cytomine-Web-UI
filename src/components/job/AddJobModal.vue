@@ -72,6 +72,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {SoftwareCollection, Job, JobParameter} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import JobParameterRow from './JobParameterRow';
@@ -95,9 +97,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     params() {
       return this.selectedSoftware ? this.selectedSoftware.parameters.array : [];
     },

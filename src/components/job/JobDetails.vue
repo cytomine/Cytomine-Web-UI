@@ -145,6 +145,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {Job, JobStatus, JobDataCollection, Task} from 'cytomine-client';
 import filesize from 'filesize';
 
@@ -173,9 +175,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     isRunning() {
       return this.job.status === JobStatus.RUNNING;
     },

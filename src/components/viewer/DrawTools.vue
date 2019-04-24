@@ -241,6 +241,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import OntologyTree from '@/components/ontology/OntologyTree';
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
@@ -268,12 +270,9 @@ export default {
     };
   },
   computed: {
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
+    configUI: get('currentProject/configUI'),
+    ontology: get('currentProject/ontology'),
+
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },

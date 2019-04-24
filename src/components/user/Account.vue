@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
@@ -144,6 +144,7 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     role() {
       let key = this.currentUser.guestByNow ? 'ROLE_GUEST' : this.currentUser.adminByNow ? 'ROLE_ADMIN' : 'ROLE_USER';
       return rolesMapping[key];
@@ -156,8 +157,7 @@ export default {
         return;
       }
       return this.correctPassword ? 'is-success' : 'is-danger';
-    },
-    ...mapState({currentUser: state => state.currentUser.user})
+    }
   },
   watch: {
     currentPassword() {

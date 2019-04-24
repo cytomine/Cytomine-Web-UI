@@ -77,6 +77,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import NavbarDropdown from './NavbarDropdown';
 import NavigationTree from './NavigationTree';
 import HotkeysModal from './HotkeysModal';
@@ -101,9 +103,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     currentUserFullInfo() {
       return fullName(this.currentUser);
     },

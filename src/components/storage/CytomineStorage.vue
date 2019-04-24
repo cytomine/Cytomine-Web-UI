@@ -198,6 +198,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
@@ -241,9 +243,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     ongoingUpload() {
       return this.dropFiles.some(wrapper => wrapper.uploading);
     },

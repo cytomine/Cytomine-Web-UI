@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import moment from 'moment';
 
 import ProjectActivityCharts from './activity/ProjectActivityCharts';
@@ -72,9 +73,7 @@ export default {
     };
   },
   computed: {
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    configUI: get('currentProject/configUI'),
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
     },

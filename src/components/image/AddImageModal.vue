@@ -78,6 +78,7 @@
 
 <script>
 // TODO: add endpoints in backend to allow backend pagination
+import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 
 export default {
@@ -96,9 +97,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     filteredImages() {
       let filtered = this.images;
 

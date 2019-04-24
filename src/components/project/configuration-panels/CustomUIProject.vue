@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
@@ -129,9 +131,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    }
+    project: get('currentProject/project')
   },
   methods: {
     async toggleProp(prop, userType) {

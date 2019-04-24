@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {Cytomine} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
@@ -58,12 +60,8 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
+    project: get('currentProject/project'),
+    ontology: get('currentProject/ontology'),
     processedUri() {
       if(this.param.uri_) {
         let result = this.param.uri_.replace(new RegExp('^' + Cytomine.instance.basePath), '');

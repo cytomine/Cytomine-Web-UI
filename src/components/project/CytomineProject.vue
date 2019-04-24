@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
 
@@ -31,9 +32,7 @@ export default {
     idProject() {
       return this.$route.params.idProject;
     },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     projectModule() {
       return this.$store.state.projects[this.idProject];
     }

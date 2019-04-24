@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
 import {fullName} from '@/utils/user-utils.js';
@@ -113,9 +115,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     canEdit() {
       return this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user;
     },

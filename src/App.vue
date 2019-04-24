@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineNavbar from './components/layout/CytomineNavbar.vue';
 import Login from './components/user/Login.vue';
 
@@ -55,15 +57,11 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     language() {
       return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
     },
-    project() {
-      return this.$store.state.currentProject.project;
-    }
+    project: get('currentProject/project')
   },
   watch: {
     language() {

@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import {ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection} from 'cytomine-client';
 
 export default {
@@ -65,9 +66,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
 
     filteredImageFilters() {
       let str = this.searchString.toLowerCase();

@@ -122,6 +122,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ListUsernames from '@/components/user/ListUsernames';
 import ProjectActions from './ProjectActions';
@@ -156,9 +158,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     canManageProject() {
       return this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id);
     },

@@ -133,6 +133,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import Username from '@/components/user/Username';
 
@@ -170,9 +172,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     isManager() {
       return this.$store.getters['currentProject/canManageProject'];
     },

@@ -222,6 +222,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
@@ -279,12 +281,8 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -294,9 +292,7 @@ export default {
     canAddImage() {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
     },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    configUI: get('currentProject/configUI'),
     idsAbstractImages() {
       return this.images.map(i => i.baseImage);
     },

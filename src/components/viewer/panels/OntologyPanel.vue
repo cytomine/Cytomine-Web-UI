@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import OntologyTree from '@/components/ontology/OntologyTree';
 
 export default {
@@ -72,9 +73,7 @@ export default {
     };
   },
   computed: {
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
+    ontology: get('currentProject/ontology'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },

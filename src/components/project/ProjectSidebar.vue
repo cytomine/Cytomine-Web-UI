@@ -53,23 +53,14 @@
 </template>
 
 <script>
+import {get, sync} from '@/utils/store-helpers';
+
 export default {
   name: 'project-sidebar',
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
-    expanded: {
-      get() {
-        return this.$store.state.currentUser.expandedSidebar;
-      },
-      set(val) {
-        this.$store.commit('currentUser/setExpandedSidebar', val);
-      }
-    }
+    project: get('currentProject/project'),
+    configUI: get('currentProject/configUI'),
+    expanded: sync('currentUser/expandedSidebar')
   },
   methods: {
     clickHandler(event) {

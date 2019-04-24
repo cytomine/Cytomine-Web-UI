@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {Property, PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 
@@ -42,9 +44,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     filteredKeys() {
       if(!this.searchString.length) {
         return this.keysAnnotationProps;

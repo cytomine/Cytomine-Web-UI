@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection} from 'cytomine-client';
 
@@ -63,9 +65,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },

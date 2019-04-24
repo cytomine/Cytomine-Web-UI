@@ -66,6 +66,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {AnnotationComment} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
 import {fullName} from '@/utils/user-utils.js';
@@ -90,11 +92,10 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
+    allMembers: get('currentProject/members'),
     members() { // all project members except current user
-      return this.$store.state.currentProject.members.filter(member => member.id !== this.currentUser.id);
+      return this.members.filter(member => member.id !== this.currentUser.id);
     },
     annotationURL() {
       let uri = `project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;

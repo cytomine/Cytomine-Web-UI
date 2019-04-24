@@ -148,6 +148,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {AnnotationTerm, AnnotationType, AnnotationCommentCollection} from 'cytomine-client';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
@@ -186,12 +188,8 @@ export default {
     };
   },
   computed: {
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
+    configUI: get('currentProject/configUI'),
+    ontology: get('currentProject/ontology'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },

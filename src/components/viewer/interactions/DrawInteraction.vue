@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
@@ -35,9 +37,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
+    currentUser: get('currentUser/user'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },

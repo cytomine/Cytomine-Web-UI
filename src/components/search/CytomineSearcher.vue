@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
 export default {
@@ -72,6 +72,8 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
+
     displayResults() {
       return this.isActive && !this.error && this.searchString.length > 0;
     },
@@ -110,8 +112,7 @@ export default {
     },
     totalNbResults() {
       return this.filteredImages.length + this.filteredProjects.length;
-    },
-    ...mapState({currentUser: state => state.currentUser.user})
+    }
   },
   methods: {
     async fetchImages() {

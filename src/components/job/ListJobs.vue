@@ -125,6 +125,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
@@ -160,15 +162,9 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
+    configUI: get('currentProject/configUI'),
 
     availableSoftwares() {
       return [...new Set(this.jobs.map(job => job.softwareName))];

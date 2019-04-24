@@ -192,6 +192,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
@@ -243,24 +245,16 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
     blindMode() {
       return this.project.blindMode;
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
     },
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    ontology: get('currentProject/ontology'),
+    configUI: get('currentProject/configUI'),
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
@@ -281,15 +275,14 @@ export default {
     allUsers() {
       return this.users.concat(this.userJobs);
     },
-    members() {
-      return this.$store.state.currentProject.members;
-    },
+    members: get('currentProject/members'),
+    managers: get('currentProject/managers'),
     filteredMembers() { // filter the members so as to return only those whose annotations can be seen by current user
       if(this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
         return this.members;
       }
 
-      let idManagers = this.$store.state.currentProject.managers.map(m => m.id);
+      let idManagers = this.managers.map(m => m.id);
       return this.members.filter(member => {
         if(this.currentUser.id === member.id) {
           return true;

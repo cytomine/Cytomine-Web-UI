@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import ProjectDetails from './ProjectDetails';
 import {Project} from 'cytomine-client';
 
@@ -23,12 +25,8 @@ export default {
   name: 'project-information',
   components: {ProjectDetails},
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    }
+    project: get('currentProject/project'),
+    configUI: get('currentProject/configUI')
   },
   methods: {
     updateProject(updatedProject) {

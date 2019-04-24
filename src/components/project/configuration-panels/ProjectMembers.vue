@@ -135,6 +135,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
@@ -166,15 +168,9 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    },
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    unformattedMembers() {
-      return this.$store.state.currentProject.members;
-    },
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
+    unformattedMembers: get('currentProject/members'),
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);
     },

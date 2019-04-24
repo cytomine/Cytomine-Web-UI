@@ -221,6 +221,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
 import AnnotationTermChart from '@/components/charts/AnnotationTermChart.js';
 import AnnotationContributorChart from '@/components/charts/AnnotationContributorChart.js';
@@ -259,12 +261,8 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
-    ontology() {
-      return this.$store.state.currentProject.ontology;
-    },
+    project: get('currentProject/project'),
+    ontology: get('currentProject/ontology'),
     queryParams() {
       return {
         startDate: this.startDate,

@@ -151,6 +151,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 
 import ImageName from '@/components/image/ImageName';
@@ -237,9 +238,7 @@ export default {
     document() {
       return document;
     },
-    configUI() {
-      return this.$store.state.currentProject.configUI;
-    },
+    configUI: get('currentProject/configUI'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },

@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {get} from '@/utils/store-helpers';
 
 import {ImageInstanceCollection} from 'cytomine-client';
 
@@ -35,7 +35,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({currentUser: state => state.currentUser.user})
+    currentUser: get('currentUser/user')
   },
   async created() {
     this.images = await ImageInstanceCollection.fetchLastOpened({

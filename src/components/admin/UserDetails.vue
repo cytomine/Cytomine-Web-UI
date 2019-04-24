@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import {Cytomine, ProjectCollection} from 'cytomine-client';
 
 export default {
@@ -85,9 +86,7 @@ export default {
     };
   },
   computed: {
-    currentUser() {
-      return this.$store.state.currentUser.user;
-    }
+    currentUser: get('currentUser/user')
   },
   methods: {
     async fetchProjects() {

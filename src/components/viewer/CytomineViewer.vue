@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
 
@@ -52,9 +54,7 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.state.currentProject.project;
-    },
+    project: get('currentProject/project'),
     viewers() {
       return this.$store.state.projects[this.project.id].viewers;
     },
