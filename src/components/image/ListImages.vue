@@ -228,7 +228,7 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 
-import {isBetweenBounds, isBoundsFilterActive} from '@/utils/bounds';
+import {isBetweenBounds, isBoundsFilterActive} from '@/utils/filters';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection} from 'cytomine-client';

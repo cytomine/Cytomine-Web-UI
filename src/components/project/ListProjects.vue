@@ -223,7 +223,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 
-import {isBetweenBounds, isBoundsFilterActive} from '@/utils/bounds';
+import {isBetweenBounds, isBoundsFilterActive, boundsComputedHandler, multiselectComputedHandler} from '@/utils/filters';
 
 import {ProjectCollection} from 'cytomine-client';
 
@@ -241,25 +241,13 @@ export default {
       error: false,
 
       projects: [],
-      searchString: '',
       perPage: 10,
 
-      // filters
-      filtersOpened: false,
       initSliders: false,
-      selectedOntologies: [],
-      availableRoles: [],
-      contributorLabel: null,
-      managerLabel: null,
-      selectedRoles: [],
-      boundsMembers: [0, 0],
-      boundsImages: [0, 0],
-      boundsUserAnnotations: [0, 0],
-      boundsJobAnnotations: [0, 0],
-      boundsReviewedAnnotations: [0, 0],
+      contributorLabel: this.$t('contributor'),
+      managerLabel: this.$t('manager'),
 
       creationModal: false,
-      nameNewProject: '',
 
       excludedProperties: [
         'name',
@@ -273,30 +261,26 @@ export default {
     };
   },
   computed: {
-    filteredProjects() {
-      let filtered = this.projects;
-
-      if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
+    searchString: {
+      get() {
+        return this.$store.state.listProjects.searchString;
+      },
+      set(value) {
+        this.$store.commit('listProjects/setSearchString', value);
       }
+    },
 
-      let includeContributor = this.selectedRoles.includes(this.contributorLabel);
-      let includeManager = this.selectedRoles.includes(this.managerLabel);
+    filtersOpened: {
+      get() {
+        return this.$store.state.listProjects.filtersOpened;
+      },
+      set(value) {
+        this.$store.commit('listProjects/setFiltersOpened', value);
+      }
+    },
 
-      filtered = filtered.filter(project => {
-        let managedProject = project.currentUserRoles.admin;
-        let roleIncluded = (includeContributor && !managedProject) || (includeManager && managedProject);
-        return this.selectedOntologiesIds.includes(project.ontology) &&
-                    roleIncluded &&
-                    isBetweenBounds(project.numberOfImages, this.boundsImages) &&
-                    isBetweenBounds(project.membersCount, this.boundsMembers) &&
-                    isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations) &&
-                    isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations) &&
-                    isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
-      });
-
-      return filtered;
+    availableRoles() {
+      return [this.contributorLabel, this.managerLabel];
     },
     maxNbMembers() {
       return Math.max(10, ...this.projects.map(project => project.membersCount));
@@ -313,9 +297,6 @@ export default {
     maxNbReviewedAnnotations() {
       return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
     },
-    showRole() { // show role iff the current user is manager or representative of at least one project
-      return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
-    },
     ontologies() {
       let seenIds = [];
       let ontologies = [];
@@ -327,18 +308,58 @@ export default {
       });
       return ontologies;
     },
+
+    selectedOntologies: multiselectComputedHandler('listProjects', 'selectedOntologies', 'ontologies'),
+    selectedRoles: multiselectComputedHandler('listProjects', 'selectedRoles', 'availableRoles'),
+    boundsMembers: boundsComputedHandler('listProjects', 'boundsMembers', 'maxNbMembers'),
+    boundsImages: boundsComputedHandler('listProjects', 'boundsImages', 'maxNbImages'),
+    boundsUserAnnotations: boundsComputedHandler('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
+    boundsJobAnnotations: boundsComputedHandler('listProjects', 'boundsJobAnnotations', 'maxNbJobAnnotations'),
+    boundsReviewedAnnotations: boundsComputedHandler('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
+
+    nbActiveFilters() {
+      let filters = this.$store.state.listProjects.filters;
+      let count = 0;
+      for(let key in filters) {
+        count += Number(filters[key] !== null);
+      }
+      return count;
+    },
+
     selectedOntologiesIds() {
       return this.selectedOntologies.map(ontology => ontology.id);
     },
-    nbActiveFilters() {
-      return Number(this.selectedOntologies.length !== this.ontologies.length)
-        + Number(this.availableRoles.length !== this.selectedRoles.length)
-        + Number(isBoundsFilterActive(this.boundsMembers, this.maxNbMembers))
-        + Number(isBoundsFilterActive(this.boundsImages, this.maxNbImages))
-        + Number(isBoundsFilterActive(this.boundsUserAnnotations, this.maxNbUserAnnotations))
-        + Number(isBoundsFilterActive(this.boundsJobAnnotations, this.maxNbJobAnnotations))
-        + Number(isBoundsFilterActive(this.boundsReviewedAnnotations, this.maxNbReviewedAnnotations));
+
+    filteredProjects() {
+      let filtered = this.projects;
+
+      if(this.searchString) {
+        let str = this.searchString.toLowerCase();
+        filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
+      }
+
+      let includeContributor = this.selectedRoles.includes(this.contributorLabel);
+      let includeManager = this.selectedRoles.includes(this.managerLabel);
+
+      filtered = filtered.filter(project => {
+        let managedProject = project.currentUserRoles.admin;
+        let roleIncluded = (includeContributor && !managedProject) || (includeManager && managedProject);
+        return this.selectedOntologiesIds.includes(project.ontology) &&
+          roleIncluded &&
+          isBetweenBounds(project.numberOfImages, this.boundsImages) &&
+          isBetweenBounds(project.membersCount, this.boundsMembers) &&
+          isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations) &&
+          isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+          isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+      });
+
+      return filtered;
     },
+
+    showRole() { // show role iff the current user is manager or representative of at least one project
+      return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
+    },
+
     ...mapState({currentUser: state => state.currentUser.user})
   },
   methods: {
@@ -377,24 +398,15 @@ export default {
         withCurrentUserRoles: true
       });
 
-      this.contributorLabel = this.$t('contributor');
-      this.managerLabel = this.$t('manager');
-      this.availableRoles = [this.contributorLabel, this.managerLabel];
-      this.selectedRoles = this.availableRoles;
-
       this.projects = projects.array.map(project => {
         let roles = project.currentUserRoles;
         project.roleIndex = Number(roles.admin) + Number(roles.representative); // to allow sorting
         return project;
       });
 
-      this.selectedOntologies = this.ontologies;
-
-      this.boundsMembers = [0, this.maxNbMembers];
-      this.boundsImages = [0, this.maxNbImages];
-      this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-      this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-      this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+      if(this.filtersOpened) {
+        this.initSliders = true;
+      }
     }
     catch(error) {
       console.log(error);

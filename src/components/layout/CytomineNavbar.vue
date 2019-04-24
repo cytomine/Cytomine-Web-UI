@@ -164,9 +164,6 @@ export default {
       try {
         await Cytomine.instance.logout();
         this.$store.dispatch('logout');
-        for(let key in this.$store.state.projects) {
-          this.$store.unregisterModule(['projects', key]);
-        }
         this.$router.push('/');
       }
       catch(error) {

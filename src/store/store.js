@@ -4,13 +4,26 @@ import Vuex from 'vuex';
 import currentUser from './modules/current-user.js';
 import currentProject from './modules/current-project.js';
 import ontologies from './modules/ontologies.js';
+import listProjects from './modules/list-projects.js';
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
+  actions: {
+    logout({state, commit}) {
+      commit('currentUser/resetState');
+      commit('currentProject/resetState');
+      commit('ontologies/resetState');
+      commit('listProjects/resetState');
+      for(let key in state.projects) {
+        this.unregisterModule(['projects', key]);
+      }
+    }
+  },
   modules: {
     currentUser,
     currentProject,
     ontologies,
+    listProjects,
     projects: {
       namespaced: true
     }

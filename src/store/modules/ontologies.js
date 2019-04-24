@@ -1,12 +1,14 @@
+function getDefaultState() {
+  return {
+    searchString: '',
+    selectedOntology: null
+  };
+}
+
 export default {
   namespaced: true,
 
-  state() {
-    return {
-      selectedOntology: null,
-      searchString: ''
-    };
-  },
+  state: getDefaultState(),
 
   mutations: {
     setSelectedOntology(state, idOntology) {
@@ -15,6 +17,10 @@ export default {
 
     setSearchString(state, searchString) {
       state.searchString = searchString;
+    },
+
+    resetState(state) {
+      Object.assign(state, getDefaultState());
     }
   }
 };

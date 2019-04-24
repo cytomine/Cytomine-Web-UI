@@ -19,7 +19,7 @@ export default {
   state: getDefaultState(),
 
   mutations: {
-    logout(state) {
+    resetState(state) {
       Object.assign(state, getDefaultState());
     },
 
@@ -97,13 +97,6 @@ export default {
     async fetchOntology({state, commit}) {
       let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
       commit('setOntology', ontology);
-    },
-
-    logout: {
-      root: true,
-      handler({commit}) {
-        commit('logout');
-      }
     }
   },
 
