@@ -1,18 +1,4 @@
-@import "~bulma/sass/utilities/_all";
-
-$primary: #61b2e8;
-$primary-invert: findColorInvert($primary);
-$dark-primary: #2778ad;
-$dark-primary-invert: findColorInvert($dark-primary);
-
-// Setup $colors to use as bulma classes (e.g. 'is-twitter')
-$custom_colors: (
-    "primary": ($primary, $primary-invert),
-    "dark-primary": ($dark-primary, $dark-primary-invert)
-);
-
-$colors: map-merge($colors, $custom_colors);
-
+@import './colors.scss';
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
 @import '~bulma-slider/dist/css/bulma-slider.min.css';

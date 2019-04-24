@@ -28,7 +28,12 @@
           <span class="icon">
             <i class="fas fa-filter"></i>
           </span>
-          <span>{{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}</span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+          <span v-if="nbActiveFilters" class="nb-active-filters">
+            {{nbActiveFilters}}
+          </span>
         </button>
       </div>
 
@@ -223,7 +228,7 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 
-import isBetweenBounds from '@/utils/is-between-bounds.js';
+import {isBetweenBounds, isBoundsFilterActive} from '@/utils/bounds';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection} from 'cytomine-client';
@@ -255,7 +260,6 @@ export default {
       selectedMagnifications: [],
       selectedResolutions: [],
 
-      boundsResolution: [0, 0],
       boundsWidth: [0, 0],
       boundsHeight: [0, 0],
       boundsUserAnnotations: [0, 0],
@@ -372,6 +376,17 @@ export default {
     },
     maxNbReviewedAnnotations() {
       return Math.max(100, ...this.images.map(image => image.numberOfReviewedAnnotations));
+    },
+    nbActiveFilters() {
+      return Number(this.selectedFormats.length !== this.availableFormats.length)
+        + Number(this.selectedVendors.length !== this.availableVendors.length)
+        + Number(this.selectedMagnifications.length !== this.availableMagnifications.length)
+        + Number(this.selectedResolutions.length !== this.availableResolutions.length)
+        + Number(isBoundsFilterActive(this.boundsWidth, this.maxWidth))
+        + Number(isBoundsFilterActive(this.boundsHeight, this.maxHeight))
+        + Number(isBoundsFilterActive(this.boundsUserAnnotations, this.maxNbUserAnnotations))
+        + Number(isBoundsFilterActive(this.boundsJobAnnotations, this.maxNbJobAnnotations))
+        + Number(isBoundsFilterActive(this.boundsReviewedAnnotations, this.maxNbReviewedAnnotations));
     }
   },
   methods: {

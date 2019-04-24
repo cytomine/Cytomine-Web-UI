@@ -24,7 +24,12 @@
           <span class="icon">
             <i class="fas fa-filter"></i>
           </span>
-          <span>{{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}</span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+          <span v-if="nbActiveFilters" class="nb-active-filters">
+            {{nbActiveFilters}}
+          </span>
         </button>
       </div>
 
@@ -206,7 +211,7 @@
     </div>
   </div>
 
-  <add-project-modal :active.sync="creationModal"></add-project-modal>
+  <add-project-modal :active.sync="creationModal" />
 </div>
 </template>
 
@@ -218,7 +223,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 
-import isBetweenBounds from '@/utils/is-between-bounds.js';
+import {isBetweenBounds, isBoundsFilterActive} from '@/utils/bounds';
 
 import {ProjectCollection} from 'cytomine-client';
 
@@ -316,7 +321,7 @@ export default {
       let ontologies = [];
       this.projects.forEach(project => {
         if(!seenIds.includes(project.ontology)) {
-          ontologies.push({id: project.ontology, name: project.ontologyName});
+          ontologies.push({id: project.ontology, name: project.ontologyName || this.$t('no-ontology')});
           seenIds.push(project.ontology);
         }
       });
@@ -324,6 +329,15 @@ export default {
     },
     selectedOntologiesIds() {
       return this.selectedOntologies.map(ontology => ontology.id);
+    },
+    nbActiveFilters() {
+      return Number(this.selectedOntologies.length !== this.ontologies.length)
+        + Number(this.availableRoles.length !== this.selectedRoles.length)
+        + Number(isBoundsFilterActive(this.boundsMembers, this.maxNbMembers))
+        + Number(isBoundsFilterActive(this.boundsImages, this.maxNbImages))
+        + Number(isBoundsFilterActive(this.boundsUserAnnotations, this.maxNbUserAnnotations))
+        + Number(isBoundsFilterActive(this.boundsJobAnnotations, this.maxNbJobAnnotations))
+        + Number(isBoundsFilterActive(this.boundsReviewedAnnotations, this.maxNbReviewedAnnotations));
     },
     ...mapState({currentUser: state => state.currentUser.user})
   },

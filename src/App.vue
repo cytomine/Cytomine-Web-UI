@@ -122,9 +122,9 @@ export default {
 };
 </script>
 
-<style lang="scss" src="./assets/styles/main.scss"></style>
+<style lang="scss">
+@import '@/assets/styles/main.scss';
 
-<style>
 @font-face {
   font-family: 'cytomine';
   src: url('assets/cytomine-font.woff') format('woff');
@@ -224,6 +224,23 @@ strong, .label {
 
 .filter-label .no-uppercase {
   text-transform: none;
+}
+
+.nb-active-filters {
+  display: inline-block;
+  background: $primary;
+  color: $primary-invert;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  margin-left: 0.5em;
+  font-size: 0.9em;
+  line-height: 1.25em;
+  padding: 0 0.25em;
+  position: absolute;
+  top: -0.3em;
+  right: -0.6em;
 }
 
 /* For correct display of svg images on IE > 10 */
