@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 export default {
   namespaced: true,
 
@@ -14,7 +16,9 @@ export default {
         userJobs: null,
         images: null,
         termsIds: null
-      }
+      },
+
+      currentPages: {} // mapping of type {idTerm: currentPage}
     };
   },
 
@@ -39,10 +43,15 @@ export default {
       state.filters[filterName] = propValue;
     },
 
-    resetFilters(state) {
+    resetPagesAndFilters(state) {
       for(let key in state.filters) {
         state.filters[key] = null;
       }
+      state.currentPages = {};
+    },
+
+    setCurrentPage(state, {term, page}) {
+      Vue.set(state.currentPages, term, page);
     }
   }
 };

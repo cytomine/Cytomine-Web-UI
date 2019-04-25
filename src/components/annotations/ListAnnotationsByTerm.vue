@@ -1,7 +1,12 @@
 <template>
 <div class="box">
   <h2> {{ title }} ({{nbAnnotations}}) </h2>
-  <template v-if="!annotations.length">
+  <template v-if="error">
+    <b-message type="is-danger" has-icon icon-size="is-small">
+      {{$t('failed-fetch-annots')}}
+    </b-message>
+  </template>
+  <template v-else-if="!annotations.length">
     <em class="no-result">{{ $t('no-annotation') }}</em>
   </template>
   <template v-else>
@@ -37,16 +42,17 @@
 
     <b-pagination
       :total="nbAnnotations"
-      :current="currentPage"
+      :current.sync="currentPage"
       size="is-small"
       :per-page="nbPerPage"
-      @change="fetchPage"
     />
   </template>
 </div>
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import AnnotationDetails from './AnnotationDetails';
 
 import {AnnotationCollection} from 'cytomine-client';
@@ -75,9 +81,9 @@ export default {
   },
   data() {
     return {
+      error: false,
       annotations: [],
       nbAnnotations: 0,
-      currentPage: 1,
       openedAnnot: 0
     };
   },
@@ -105,24 +111,39 @@ export default {
         return this.$t('no-term');
       }
       return this.term.name;
+    },
+    currentProject: get('currentProject/project'),
+    projectModule() {
+      return this.$store.getters['currentProject/currentProjectModule'];
+    },
+    currentPage: {
+      get() {
+        return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.term.id] || 1;
+      },
+      set(page) {
+        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {term: this.term.id, page});
+      }
     }
   },
   watch: {
+    currentPage() {
+      this.fetchPage();
+    },
     collection() {
-      this.fetchPage(1);
+      this.fetchPage();
     }
   },
   methods: {
-    async fetchPage(numPage) {
-      this.currentPage = numPage;
+    async fetchPage() {
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
                     || (this.reviewed && !this.reviewUsersIds.length)) {
         this.annotations = [];
+        this.nbAnnotations = 0;
         return;
       }
 
       try {
-        let data = await this.collection.fetchPage(numPage - 1);
+        let data = await this.collection.fetchPage(this.currentPage - 1);
         this.annotations = data.array;
         this.nbAnnotations = data.totalNbItems;
 
@@ -133,15 +154,14 @@ export default {
         }
       }
       catch(error) {
-        this.annotations = [];
+        if(this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page
+          this.currentPage = 1;
+          return;
+        }
+
+        console.log(error);
         this.nbAnnotations = 0;
-        this.$notify({
-          type: 'error',
-          text: this.$t(
-            'notif-error-fetch-annots',
-            {details: this.title}
-          )
-        });
+        this.error = true;
       }
     },
     viewAnnot(annot) {
@@ -177,7 +197,7 @@ export default {
     }
   },
   created() {
-    this.fetchPage(1);
+    this.fetchPage();
   }
 };
 </script>

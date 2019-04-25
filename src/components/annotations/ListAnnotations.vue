@@ -379,8 +379,8 @@ export default {
       this.terms.push(term);
       this.selectedTermsIds.push(term.id);
     },
-    resetFilters() {
-      this.$store.commit(this.storeModule + '/resetFilters');
+    resetPagesAndFilters() {
+      this.$store.commit(this.storeModule + '/resetPagesAndFilters');
     }
   },
   async created() {
@@ -412,14 +412,14 @@ export default {
     }
 
     if(this.targetAnnotationType) {
-      this.resetFilters(); // we want all annotations of this type => reset state
+      this.resetPagesAndFilters(); // we want all annotations of this type => reset state
       this.selectedAnnotationType = this.targetAnnotationType;
     }
 
     if(this.$route.query.image) {
       let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
       if(queriedImage) {
-        this.resetFilters(); // we want all annotations of the image => reset state
+        this.resetPagesAndFilters(); // we want all annotations of the image => reset state
         this.selectedImages = [queriedImage];
       }
     }
@@ -427,7 +427,7 @@ export default {
     if(this.$route.query.userJob) {
       let queriedUserJob = this.userJobs.find(uj => uj.id === Number(this.$route.query.userJob));
       if(queriedUserJob) {
-        this.resetFilters(); // we want all annotations of the job => reset state
+        this.resetPagesAndFilters(); // we want all annotations of the job => reset state
         this.selectedAnnotationType = this.jobAnnotationOption;
         this.selectedUserJobs = [queriedUserJob];
       }
