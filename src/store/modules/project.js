@@ -1,4 +1,5 @@
 import listImages from './project_modules/list-images.js';
+import listAnnotations from './project_modules/list-annotations.js';
 
 export default {
   namespaced: true,
@@ -21,6 +22,7 @@ export default {
     viewers: {
       namespaced: true
     },
-    listImages
+    listImages,
+    listAnnotations
   }
 };

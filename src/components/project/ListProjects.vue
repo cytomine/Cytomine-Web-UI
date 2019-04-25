@@ -153,7 +153,7 @@
           </b-table-column>
 
           <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations`">
+            <router-link :to="`/project/${project.id}/annotations?type=user`">
               {{ project.numberOfAnnotations }}
             </router-link>
           </b-table-column>

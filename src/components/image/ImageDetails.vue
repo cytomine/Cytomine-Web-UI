@@ -13,7 +13,7 @@
       <tr v-if="isPropDisplayed('numberOfAnnotations')">
         <td class="prop-label">{{$t('user-annotations')}}</td>
         <td class="prop-content">
-          <router-link :to="`/project/${image.project}/annotations?image=${image.id}`">
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
             {{ image.numberOfAnnotations }}
           </router-link>
         </td>

@@ -170,7 +170,7 @@
           </b-table-column>
 
           <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}`">
+            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
               {{ image.numberOfAnnotations }}
             </router-link>
           </b-table-column>

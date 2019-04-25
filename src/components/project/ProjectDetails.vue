@@ -27,7 +27,7 @@
     <tr v-if="isPropDisplayed('numberOfAnnotations')">
       <td class="prop-label">{{$t('user-annotations')}}</td>
       <td class="prop-content">
-        <router-link :to="`/project/${project.id}/annotations`">
+        <router-link :to="`/project/${project.id}/annotations?type=user`">
           {{ project.numberOfAnnotations }}
         </router-link>
       </td>

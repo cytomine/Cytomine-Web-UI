@@ -173,8 +173,8 @@
       :allImages="images"
 
       :term="term"
-      :multipleTerms="term === multipleTermsOption"
-      :noTerm="term === noTermOption"
+      :multipleTerms="term.id === multipleTermsOption.id"
+      :noTerm="term.id === noTermOption.id"
       :imagesIds="selectedImagesIds"
       :usersIds="selectedUsersIds"
       :reviewed="reviewed"
@@ -192,7 +192,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
@@ -203,6 +203,11 @@ import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCo
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
+
+// store options to use with store helpers to target projects/currentProject/listImages module
+const storeOptions = {rootModuleProp: 'storeModule'};
+// redefine helpers to use storeOptions and correct module path
+const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 
 export default {
   name: 'list-annotations',
@@ -216,32 +221,26 @@ export default {
       loading: true,
       error: false,
       revision: 0,
-      users: [],
 
-      allowedSizes: [],
-      selectedSize: null,
-      nbPerPage: 25,
+      users: [],
+      userJobs: [],
+
+      allowedSizes: [
+        {label: this.$t('small'), size: 85},
+        {label: this.$t('medium'), size: 125},
+        {label: this.$t('large'), size: 200},
+        {label: this.$t('huge'), size: 400},
+      ],
 
       userAnnotationOption: this.$t('user-annotations'),
       jobAnnotationOption: this.$t('analysis-annotations'),
       reviewedAnnotationOption: this.$t('reviewed-annotations'),
       annotationTypes: [],
-      selectedAnnotationType : '',
 
       images: [],
-      selectedImages: [],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
-      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
-      selectedTermsIds: [],
-
-      selectedMembers: [],
-      selectedReviewers: [],
-
-      userJobs: [],
-      selectedUserJobs: [],
-
-      selectedColor: null
+      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')}
     };
   },
   computed: {
@@ -255,23 +254,32 @@ export default {
     },
     ontology: get('currentProject/ontology'),
     configUI: get('currentProject/configUI'),
-    selectedImagesIds() {
-      return this.selectedImages.map(img => img.id);
+
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listAnnotations)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listAnnotations';
     },
-    reviewed() {
-      return this.selectedAnnotationType === this.reviewedAnnotationOption;
+
+    colors() {
+      let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
+      colors.push({label: this.$t('no-outline')});
+      return colors;
     },
-    selectedUsersIds() {
-      if(this.reviewed) {
-        return null;
+
+    selectedSize: sync('previewSize', storeOptions),
+    nbPerPage: sync('perPage', storeOptions),
+    selectedColor: sync('outlineColor', storeOptions),
+
+    targetAnnotationType() {
+      switch(this.$route.query.type) {
+        case 'user':
+          return this.userAnnotationOption;
+        case 'algo':
+          return this.jobAnnotationOption;
+        case 'reviewed':
+          return this.reviewedAnnotationOption;
       }
-      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.selectedUserJobs
-        : this.selectedMembers;
-      return users.map(user => user.id);
     },
-    reviewUsersIds() {
-      return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
-    },
+
     allUsers() {
       return this.users.concat(this.userJobs);
     },
@@ -291,18 +299,7 @@ export default {
         return isManager ? !this.project.hideAdminsLayers : !this.project.hideUsersLayers;
       });
     },
-    collection() {
-      return new AnnotationCollection({
-        project: this.project.id,
-        terms: this.selectedTermsIds,
-        images: this.selectedImagesIds,
-        users: this.selectedUsersIds,
-        reviewed: this.reviewed,
-        reviewUsers: this.reviewUsersIds,
-        noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
-        multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
-      });
-    },
+
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
     },
@@ -316,16 +313,51 @@ export default {
     termsOptions() {
       return this.terms.concat(this.additionalNodes);
     },
-    colors() {
-      let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
-      colors.push({label: this.$t('no-outline')});
-      return colors;
-    }
+    termOptionsIds() {
+      return this.termsOptions.map(option => option.id);
+    },
+
+    selectedAnnotationType: sync('annotationType', storeOptions),
+    selectedMembers: localSyncMultiselectFilter('members', 'filteredMembers'),
+    selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
+    selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
+    selectedImages: localSyncMultiselectFilter('images', 'images'),
+    selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
+
+    reviewed() {
+      return this.selectedAnnotationType === this.reviewedAnnotationOption;
+    },
+    selectedUsersIds() {
+      if(this.reviewed) {
+        return null;
+      }
+      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.selectedUserJobs : this.selectedMembers;
+      return users.map(user => user.id);
+    },
+    reviewUsersIds() {
+      return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
+    },
+
+    selectedImagesIds() {
+      return this.selectedImages.map(img => img.id);
+    },
+
+    collection() {
+      return new AnnotationCollection({
+        project: this.project.id,
+        terms: this.selectedTermsIds,
+        images: this.selectedImagesIds,
+        users: this.selectedUsersIds,
+        reviewed: this.reviewed,
+        reviewUsers: this.reviewUsersIds,
+        noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
+        multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
+      });
+    },
   },
   methods: {
     async fetchImages() {
       this.images = (await ImageInstanceCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      this.selectedImages = this.images;
     },
     async fetchUsers() {
       this.users = (await UserCollection.fetchAll()).array;
@@ -339,8 +371,6 @@ export default {
       this.userJobs.forEach(userJob => {
         userJob.fullName = fullName(userJob);
       });
-
-      this.selectedUserJobs = this.userJobs;
     },
     downloadURL(format) {
       return this.collection.getDownloadURL(format);
@@ -348,26 +378,25 @@ export default {
     addTerm(term) {
       this.terms.push(term);
       this.selectedTermsIds.push(term.id);
+    },
+    resetFilters() {
+      this.$store.commit(this.storeModule + '/resetFilters');
     }
   },
   async created() {
     this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
-    this.selectedAnnotationType = (this.$route.query.type === 'algo') ? this.jobAnnotationOption
-      : (this.$route.query.type === 'reviewed') ? this.reviewedAnnotationOption : this.userAnnotationOption;
 
-    this.allowedSizes = [
-      {label: this.$t('small'), size: 85},
-      {label: this.$t('medium'), size: 125},
-      {label: this.$t('large'), size: 200},
-      {label: this.$t('huge'), size: 400},
-    ];
-    this.selectedSize = this.allowedSizes[0];
-
-    this.selectedColor = this.colors[0];
-
-    this.selectedTermsIds = this.termsOptions.map(term => term.id);
-    this.selectedMembers = this.filteredMembers;
-    this.selectedReviewers = this.members;
+    // if store was not yet initialized, set default values
+    if(!this.selectedSize) {
+      this.selectedSize = this.allowedSizes[0];
+    }
+    if(!this.selectedColor) {
+      this.selectedColor = this.colors[0];
+    }
+    if(!this.selectedAnnotationType) {
+      this.selectedAnnotationType = this.userAnnotationOption;
+    }
+    // ---
 
     try {
       await Promise.all([
@@ -377,13 +406,20 @@ export default {
       ]);
     }
     catch(error) {
+      console.log(error);
       this.error = true;
       return;
+    }
+
+    if(this.targetAnnotationType) {
+      this.resetFilters(); // we want all annotations of this type => reset state
+      this.selectedAnnotationType = this.targetAnnotationType;
     }
 
     if(this.$route.query.image) {
       let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
       if(queriedImage) {
+        this.resetFilters(); // we want all annotations of the image => reset state
         this.selectedImages = [queriedImage];
       }
     }
@@ -391,6 +427,7 @@ export default {
     if(this.$route.query.userJob) {
       let queriedUserJob = this.userJobs.find(uj => uj.id === Number(this.$route.query.userJob));
       if(queriedUserJob) {
+        this.resetFilters(); // we want all annotations of the job => reset state
         this.selectedAnnotationType = this.jobAnnotationOption;
         this.selectedUserJobs = [queriedUserJob];
       }
