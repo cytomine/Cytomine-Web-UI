@@ -62,13 +62,16 @@
       <b-table
         :data="filteredJobs"
         ref="table"
-        default-sort="created"
-        default-sort-direction="desc"
         :paginated="true"
+        :current-page.sync="currentPage"
         :per-page="perPage"
         pagination-size="is-small"
         detailed
         detail-key="id"
+        :opened-detailed.sync="openedDetails"
+        :default-sort="sort.field"
+        :default-sort-direction="sort.order"
+        @sort="updateSort"
       >
 
         <template #default="{row: job}">
@@ -125,7 +128,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
@@ -135,6 +138,11 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import jobStatusLabelMapping from '@/utils/job-utils';
 import moment from 'moment';
+
+// store options to use with store helpers to target projects/currentProject/listJobs module
+const storeOptions = {rootModuleProp: 'storeModule'};
+// redefine helpers to use storeOptions and correct module path
+const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 
 export default {
   name: 'list-jobs',
@@ -149,16 +157,8 @@ export default {
     return {
       loading: true,
       error: false,
-
       jobs: [],
-      searchString: '',
-      perPage: 10,
-      launchModal: false,
-
-      selectedSoftwares: [],
-      selectedLaunchers: [],
-      selectedDate: null,
-      selectedStatus: [],
+      launchModal: false
     };
   },
   computed: {
@@ -178,6 +178,15 @@ export default {
       });
     },
 
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listJobs)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listJobs';
+    },
+
+    selectedSoftwares: localSyncMultiselectFilter('softwares', 'availableSoftwares'),
+    selectedLaunchers: localSyncMultiselectFilter('launchers', 'availableLaunchers'),
+    selectedDate: sync('executionDate', storeOptions),
+    selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
+
     filteredJobs() {
       let selectedStatusValues = this.selectedStatus.map(obj => Number(obj.status));
       return this.jobs.filter(job => {
@@ -188,8 +197,24 @@ export default {
                     selectedStatusValues.includes(job.status);
       });
     },
+
+    currentPage: sync('currentPage', storeOptions),
+    perPage: sync('perPage', storeOptions),
+    sort: sync('sort', storeOptions),
+    openedDetailsStore: get('openedDetails', storeOptions),
+    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
+      get() {
+        return this.openedDetailsStore.slice();
+      },
+      set(value) {
+        this.$store.commit(this.storeModule + '/setOpenedDetails', value);
+      }
+    }
   },
   methods: {
+    updateSort(field, order) {
+      this.sort = {field, order};
+    },
     addJob(job) {
       job.username = this.currentUser.username; // HACK because not correctly returned by core
       if(!this.availableSoftwares.includes(job.softwareName)) {
@@ -223,9 +248,12 @@ export default {
   async created() {
     try {
       this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-      this.selectedSoftwares = this.availableSoftwares.slice();
-      this.selectedLaunchers = this.availableLaunchers.slice();
-      this.selectedStatus = this.availableStatus.slice();
+
+      // if a job was deleted, the currentPage value might not be valid => reinitialize it
+      if((this.currentPage - 1)*this.perPage >= this.filteredJobs.length) {
+        this.currentPage = 1;
+      }
+
       this.loading = false;
     }
     catch(error) {
