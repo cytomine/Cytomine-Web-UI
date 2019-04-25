@@ -1,24 +1,12 @@
-import {isBoundsFilterActive} from './bounds';
-
 // Helpers for vuex (inspired by https://github.com/davestewart/vuex-pathify)
 
-function arrayPath(path) {
-  if(Array.isArray(path)) {
-    return path;
-  }
-  if(typeof path === 'string') {
-    return path.split('/');
-  }
-  throw new Error('Path must be a string or an array');
-}
+import {isBoundsFilterActive} from './bounds';
 
-function getValue(store, path) {
-  let obj = store.state;
-  for(let i = 0; i < path.length; i++) {
-    obj = obj[path[i]];
-  }
-  return obj;
-}
+/**
+ * @typedef {Object} Options
+ * @property {String|Array} rootModuleProp  The name of the component property containing the path to the root module to
+ *                                          use; this root path will be prefixed to the provided path
+ */
 
 /**
  * Getter for a computed property allowing to easily retrieve the value of a store property
@@ -28,22 +16,25 @@ function getValue(store, path) {
  *   myProp: get('myModule/myProp')
  * }
  *
+ * @example
+ * computed: {
+ *   myProp: sync('myProp', {rootModuleProp: 'modulePath'}),
+ *   modulePath() {
+ *     return 'myModule';
+ *   }
+ * }
+ *
  * @param {String|Array<String>} path Store path to the property
+ * @param {Options} [options] Options refining the way to get the property
  * @returns A computed getter for the targetted property
  */
-export function get(path) {
+export function get(path, options={}) {
   path = arrayPath(path);
   return {
     get() {
-      return getValue(this.$store, path);
+      return getValue(this.$store, fullPath(path, this, options));
     },
   };
-}
-
-function getMutationName(path) {
-  let variableName = path[path.length - 1];
-  let modulePath = path.slice(0, path.length -1);
-  return modulePath.join('/') + '/set' + variableName.charAt(0).toUpperCase() + variableName.slice(1);
 }
 
 /**
@@ -55,14 +46,15 @@ function getMutationName(path) {
  * }
  *
  * @param {String|Array<String>} path Store path to the property
+ * @param {Options} [options] Options refining the way to sync the property
  * @returns Computed getter and setter for the targetted property
  */
-export function sync(path) {
+export function sync(path, options={}) {
   path = arrayPath(path);
   return {
-    ...get(path),
+    ...get(path, options),
     set(value) {
-      this.$store.commit(getMutationName(path), value);
+      this.$store.commit(getMutationName(fullPath(path, this, options)), value);
     }
   };
 }
@@ -95,19 +87,21 @@ export function sync(path) {
  * @param {String|Array<String>} path Path to the store module containing the filters
  * @param {String} filterName The name of the filter property
  * @param {String} maxProp The name of the component property containing the max allowed value
+ * @param {Options} [options] Options refining the way to sync the filter
  * @returns Computed getter and setter for the targetted filter
  */
-export function syncBoundsFilter(modulePath, filterName, maxProp) {
+export function syncBoundsFilter(modulePath, filterName, maxProp, options={}) {
   modulePath = arrayPath(modulePath);
 
   return {
     get() {
-      let value = getValue(this.$store, modulePath).filters[filterName];
+      let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : [0, this[maxProp]];
     },
     set(bounds) {
+      let path = fullPath(modulePath, this, options);
       let propValue = isBoundsFilterActive(bounds, this[maxProp]) ? bounds : null;
-      this.$store.commit(modulePath.join('/') + '/setFilter', {filterName, propValue});
+      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
     }
   };
 }
@@ -139,19 +133,55 @@ export function syncBoundsFilter(modulePath, filterName, maxProp) {
  * @param {String|Array<String>} path Path to the store module containing the filters
  * @param {String} filterName The name of the filter property
  * @param {String} optionsProp The name of the component property containing the available options
+ * @param {Options} [options] Options refining the way to sync the filter
  * @returns Computed getter and setter for the targetted filter
  */
-export function syncMultiselectFilter(modulePath, filterName, optionsProp) {
+export function syncMultiselectFilter(modulePath, filterName, optionsProp, options={}) {
   modulePath = arrayPath(modulePath);
 
   return {
     get() {
-      let value = getValue(this.$store, modulePath).filters[filterName];
+      let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : this[optionsProp].slice();
     },
     set(selectedOptions) {
+      let path = fullPath(modulePath, this, options);
       let propValue = (selectedOptions.length === this[optionsProp].length) ? null : selectedOptions;
-      this.$store.commit(modulePath.join('/') + '/setFilter', {filterName, propValue});
+      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
     }
   };
+}
+
+function arrayPath(path) {
+  if(!path) {
+    return [];
+  }
+  if(Array.isArray(path)) {
+    return path;
+  }
+  if(typeof path === 'string') {
+    return path.split('/');
+  }
+  throw new Error('Path must be a string or an array');
+}
+
+function fullPath(path, component, options) {
+  if(options.rootModuleProp) {
+    path = arrayPath(component[options.rootModuleProp]).concat(path);
+  }
+  return path;
+}
+
+function getValue(store, path) {
+  let obj = store.state;
+  for(let i = 0; i < path.length; i++) {
+    obj = obj[path[i]];
+  }
+  return obj;
+}
+
+function getMutationName(path) {
+  let variableName = path[path.length - 1];
+  let modulePath = path.slice(0, path.length -1);
+  return modulePath.join('/') + '/set' + variableName.charAt(0).toUpperCase() + variableName.slice(1);
 }

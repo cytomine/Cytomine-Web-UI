@@ -1,3 +1,5 @@
+import listImages from './project_modules/list-images.js';
+
 export default {
   namespaced: true,
 
@@ -18,6 +20,7 @@ export default {
   modules: {
     viewers: {
       namespaced: true
-    }
+    },
+    listImages
   }
 };

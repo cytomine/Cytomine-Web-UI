@@ -136,6 +136,13 @@ export default {
       return state.ontology ? getAllTerms(state.ontology) : null;
     },
 
+    currentProjectModule: (state) => {
+      if(!state.project) {
+        return null;
+      }
+      return `projects/${state.project.id}/`;
+    },
+
     currentViewer: (state, _, rootState) => {
       if(!state.project) {
         return null;
@@ -143,18 +150,12 @@ export default {
       return rootState.projects[state.project.id].viewers[state.currentViewer];
     },
 
-    currentViewerModule: (state) => {
-      if(!state.project) {
-        return null;
-      }
-      return `projects/${state.project.id}/viewers/${state.currentViewer}/`;
+    currentViewerModule: (state, getters) => {
+      return `${getters.currentProjectModule}viewers/${state.currentViewer}/`;
     },
 
-    imageModule: (state) => index => {
-      if(!state.project) {
-        return null;
-      }
-      return `projects/${state.project.id}/viewers/${state.currentViewer}/images/${index}/`;
+    imageModule: (_, getters) => index => {
+      return `${getters.currentViewerModule}images/${index}/`;
     }
   }
 };

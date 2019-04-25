@@ -136,10 +136,15 @@
         :data="filteredImages"
         class="table-images"
         :paginated="true"
+        :current-page.sync="currentPage"
         :per-page="perPage"
         pagination-size="is-small"
         detailed
         detail-key="id"
+        :opened-detailed.sync="openedDetails"
+        :default-sort="sort.field"
+        :default-sort-direction="sort.order"
+        @sort="updateSort"
       >
 
         <template #default="{row: image}">
@@ -222,7 +227,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
@@ -230,10 +235,16 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 
-import {isBetweenBounds, isBoundsFilterActive} from '@/utils/bounds';
+import {isBetweenBounds} from '@/utils/bounds';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection} from 'cytomine-client';
+
+// store options to use with store helpers to target projects/currentProject/listImages module
+const storeOptions = {rootModuleProp: 'storeModule'};
+// redefine helpers to use storeOptions and correct module path
+const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
 
 export default {
   name: 'list-images',
@@ -248,28 +259,9 @@ export default {
     return {
       loading: true,
       error: false,
-
       images: [],
-      searchString: '',
-      perPage: 10,
-
-      // filters
-      filtersOpened: false,
       initSliders: false,
-
-      selectedFormats: [],
-      selectedVendors: [],
-      selectedMagnifications: [],
-      selectedResolutions: [],
-
-      boundsWidth: [0, 0],
-      boundsHeight: [0, 0],
-      boundsUserAnnotations: [0, 0],
-      boundsJobAnnotations: [0, 0],
-      boundsReviewedAnnotations: [0, 0],
-
       addImageModal: false,
-
       excludedProperties: [
         'overview',
         'instanceFilename',
@@ -282,6 +274,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
     blindMode() {
       return this.project.blindMode;
@@ -292,33 +285,17 @@ export default {
     canAddImage() {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
     },
-    configUI: get('currentProject/configUI'),
     idsAbstractImages() {
       return this.images.map(i => i.baseImage);
     },
-    filteredImages() {
-      let filtered = this.images;
 
-      if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(image => {
-          return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
-            (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
-        });
-      }
-
-      return filtered.filter(image => {
-        return this.selectedFormats.includes(image.extension) &&
-          this.selectedVendors.includes(image.vendorFormatted) &&
-          this.selectedMagnifications.includes(image.magnificationFormatted) &&
-          this.selectedResolutions.includes(image.resolutionFormatted) &&
-          isBetweenBounds(image.width, this.boundsWidth) &&
-          isBetweenBounds(image.height, this.boundsHeight) &&
-          isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
-          isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
-          isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
-      });
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
     },
+
+    searchString: sync('searchString', storeOptions),
+    filtersOpened: sync('filtersOpened', storeOptions),
+
     availableFormats() {
       let formats = [];
       this.images.forEach(image => {
@@ -373,16 +350,69 @@ export default {
     maxNbReviewedAnnotations() {
       return Math.max(100, ...this.images.map(image => image.numberOfReviewedAnnotations));
     },
+
+    selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
+    selectedVendors: localSyncMultiselectFilter('vendors', 'availableVendors'),
+    selectedMagnifications: localSyncMultiselectFilter('magnifications', 'availableMagnifications'),
+    selectedResolutions: localSyncMultiselectFilter('resolutions', 'availableResolutions'),
+    boundsWidth: localSyncBoundsFilter('boundsWidth', 'maxWidth'),
+    boundsHeight: localSyncBoundsFilter('boundsHeight', 'maxHeight'),
+    boundsUserAnnotations: localSyncBoundsFilter('boundsUserAnnotations', 'maxNbUserAnnotations'),
+    boundsJobAnnotations: localSyncBoundsFilter('boundsJobAnnotations', 'maxNbJobAnnotations'),
+    boundsReviewedAnnotations: localSyncBoundsFilter('boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
+
+    filteredImages() {
+      let filtered = this.images;
+
+      if(this.searchString) {
+        let str = this.searchString.toLowerCase();
+        filtered = filtered.filter(image => {
+          return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
+            (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
+        });
+      }
+
+      return filtered.filter(image => {
+        return this.selectedFormats.includes(image.extension) &&
+          this.selectedVendors.includes(image.vendorFormatted) &&
+          this.selectedMagnifications.includes(image.magnificationFormatted) &&
+          this.selectedResolutions.includes(image.resolutionFormatted) &&
+          isBetweenBounds(image.width, this.boundsWidth) &&
+          isBetweenBounds(image.height, this.boundsHeight) &&
+          isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
+          isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+          isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+      });
+    },
+
+    filters: get('filters', storeOptions),
     nbActiveFilters() {
-      return Number(this.selectedFormats.length !== this.availableFormats.length)
-        + Number(this.selectedVendors.length !== this.availableVendors.length)
-        + Number(this.selectedMagnifications.length !== this.availableMagnifications.length)
-        + Number(this.selectedResolutions.length !== this.availableResolutions.length)
-        + Number(isBoundsFilterActive(this.boundsWidth, this.maxWidth))
-        + Number(isBoundsFilterActive(this.boundsHeight, this.maxHeight))
-        + Number(isBoundsFilterActive(this.boundsUserAnnotations, this.maxNbUserAnnotations))
-        + Number(isBoundsFilterActive(this.boundsJobAnnotations, this.maxNbJobAnnotations))
-        + Number(isBoundsFilterActive(this.boundsReviewedAnnotations, this.maxNbReviewedAnnotations));
+      return Object.values(this.filters).filter(val => val).length; // count the number of not null values
+    },
+
+    currentPage: sync('currentPage', storeOptions),
+    perPage: sync('perPage', storeOptions),
+    sort: sync('sort', storeOptions),
+    openedDetailsStore: get('openedDetails', storeOptions),
+    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
+      get() {
+        return this.openedDetailsStore.slice();
+      },
+      set(value) {
+        this.$store.commit(this.storeModule + '/setOpenedDetails', value);
+      }
+    }
+  },
+  watch: {
+    maxWidth() {
+      if(!this.filtersOpened) { // change the sliders bounds => need to reinitialize them
+        this.initSliders = false;
+      }
+    },
+    maxHeight() {
+      if(!this.filtersOpened) { // change the sliders bounds => need to reinitialize them
+        this.initSliders = false;
+      }
     }
   },
   methods: {
@@ -398,65 +428,22 @@ export default {
       }
     },
 
+    updateSort(field, order) {
+      this.sort = {field, order};
+    },
+
     addImage(image) {
-      this.formatImage(image);
-
-      // check if it is needed to update filters so that new images are displayed
-      let addFormat = !this.availableFormats.includes(image.extension);
-      let addVendor = !this.availableVendors.includes(image.vendorFormatted);
-      let addMagnification = !this.availableMagnifications.includes(image.magnificationFormatted);
-      let addResolution = !this.availableResolutions.includes(image.resolutionFormatted);
-      let updateMaxWidth = this.boundsWidth[1] === this.maxWidth && image.width > this.maxWidth;
-      let updateMaxHeight = this.boundsHeight[1] === this.maxHeight && image.height > this.maxHeight;
-      // ---
-
-      this.images.unshift(image);
-
-      if(addFormat) {
-        this.selectedFormats.push(image.extension);
-      }
-      if(addVendor) {
-        this.selectedVendors.push(image.vendorFormatted);
-      }
-      if(addMagnification) {
-        this.selectedMagnifications.push(image.magnificationFormatted);
-      }
-      if(addResolution) {
-        this.selectedResolutions.push(image.resolutionFormatted);
-      }
-      if(updateMaxWidth) {
-        this.boundsWidth = [this.boundsWidth[0], image.width];
-      }
-      if(updateMaxHeight) {
-        this.boundsHeight = [this.boundsHeight[0], image.height];
-      }
-      if(!this.filtersOpened && (updateMaxWidth || updateMaxHeight)) { // need to reinitialize the sliders if they are not currently displayed
-        this.initSliders = false;
-      }
+      this.images.unshift(this.formatImage(image));
     },
 
     setResolution(image, resolution) {
       image.resolution = resolution;
-      // check if it is needed to update filters so that new images are displayed
-      let addResolution = !this.availableResolutions.includes(this.formatResolution(resolution));
-
       this.formatImage(image);
-
-      if(addResolution) {
-        this.selectedResolutions.push(image.resolutionFormatted);
-      }
     },
 
     setMagnification(image, magnification) {
       image.magnification = magnification;
-      // check if it is needed to update filters so that new images are displayed
-      let addMagnification = !this.availableMagnifications.includes(this.formatMagnification(magnification));
-
       this.formatImage(image);
-
-      if(addMagnification) {
-        this.selectedMagnifications.push(image.magnificationFormatted);
-      }
     },
 
     formatImage(image) {
@@ -485,16 +472,14 @@ export default {
       this.images = (await ImageInstanceCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
       this.images.forEach(image => this.formatImage(image));
 
-      this.selectedVendors = this.availableVendors;
-      this.selectedFormats = this.availableFormats;
-      this.selectedMagnifications = this.availableMagnifications;
-      this.selectedResolutions = this.availableResolutions;
+      if(this.filtersOpened) {
+        this.initSliders = true;
+      }
 
-      this.boundsWidth = [0, this.maxWidth];
-      this.boundsHeight = [0, this.maxHeight];
-      this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-      this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-      this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+      // if an image was deleted, the currentPage value might not be valid => reinitialize it
+      if((this.currentPage - 1)*this.perPage >= this.filteredImages.length) {
+        this.currentPage = 1;
+      }
 
       this.loading = false;
     }
