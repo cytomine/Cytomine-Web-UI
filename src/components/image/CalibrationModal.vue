@@ -11,9 +11,9 @@
             {{ $t('warning-change-applies-in-project-only') }}
           </b-message>
 
-          <b-field :type="fieldType" :message="fieldMessage" :label="$t('resolution')">
+          <b-field :label="$t('resolution')" :type="fieldType" :message="errors.first('resolution')">
             <b-field :type="fieldType">
-              <b-input v-model="calibrationField" expanded />
+              <b-input v-model="calibrationField" name="resolution" v-validate="'required|decimal|positive'" expanded />
               <b-select v-model="calibrationFactor">
                 <option :value="0.001"> {{ $t('nm-per-pixel') }}</option>
                 <option :value="1">{{ $t('um-per-pixel') }}</option>
@@ -26,7 +26,7 @@
           <button class="button" type="button" @click="$emit('update:active', false)">
             {{$t('button-cancel')}}
           </button>
-          <button class="button is-link" :disabled="!validField">
+          <button class="button is-link" :disabled="errors.any()">
             {{$t('button-save')}}
           </button>
         </footer>
@@ -39,6 +39,7 @@
 <script>
 export default {
   name: 'calibration-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     active: {type: Boolean},
     image: {type: Object}
@@ -46,43 +47,35 @@ export default {
   data() {
     return {
       calibrationField: '',
-      calibrationFactor: 1,
-      displayErrors: false
+      calibrationFactor: 1
     };
   },
   computed: {
     blindMode() {
       return this.$store.state.currentProject.project.blindMode;
     },
-    validField() {
-      return !isNaN(this.calibrationField) && +this.calibrationField > 0;
-    },
     fieldType() {
-      return !this.validField && this.displayErrors ? 'is-danger' : null;
-    },
-    fieldMessage() {
-      return !this.validField && this.displayErrors ? this.$t('must-be-positive-number') : '';
+      return {'is-danger': this.errors.has('resolution')};
     }
   },
   watch: {
     active(val) {
       if(val) {
         this.calibrationField = this.image.resolution;
-        this.displayErrors = false;
-      }
-    },
-    calibrationField() {
-      if(this.calibrationField !== this.image.resolution) {
-        this.displayErrors = true;
       }
     }
   },
   methods: {
     async setResolution() {
+      let result = await this.$validator.validateAll();
+      if(!result) {
+        return;
+      }
+
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();
-        updateImage.resolution = this.calibrationField*this.calibrationFactor;
+        updateImage.resolution = Number(this.calibrationField)*this.calibrationFactor;
         await updateImage.save();
 
         this.$emit('setResolution', updateImage.resolution);

@@ -5,24 +5,17 @@
       <p class="modal-card-title">{{$t(term ? 'update-term' : 'create-term')}}</p>
     </header>
     <section class="modal-card-body">
-      <b-field
-        :label="$t('name')"
-        :type="!validName && displayErrors ? 'is-danger' : null"
-        :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''"
-      >
-        <b-input v-model="name" />
+      <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+        <b-input v-model="name" name="name" v-validate="'required'" />
       </b-field>
 
-      <sketch-picker
-        v-model="color"
-        :presetColors="presetColors"
-      />
+      <sketch-picker v-model="color" :presetColors="presetColors" />
     </section>
     <footer class="modal-card-foot">
       <button class="button" type="button" @click="$parent.close()">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="!validName && displayErrors">
+      <button class="button is-link" :disabled="errors.any()">
         {{$t('button-save')}}
       </button>
     </footer>
@@ -37,6 +30,7 @@ import {Sketch} from 'vue-color';
 export default {
   name: 'term-modal',
   components: {'sketch-picker': Sketch},
+  $_veeValidate: {validator: 'new'},
   props: {
     term: Object,
     ontology: Object
@@ -44,14 +38,10 @@ export default {
   data() {
     return {
       name: '',
-      color: null,
-      displayErrors: false
+      color: null
     };
   },
   computed: {
-    validName() {
-      return this.name.length > 0;
-    },
     presetColors() {
       return [
         '#F44E3B',
@@ -73,8 +63,8 @@ export default {
       return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
     },
     async save() {
-      if(!this.validName) {
-        this.displayErrors = true;
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 
@@ -116,7 +106,6 @@ export default {
   created() {
     this.name = this.term ? this.term.name : '';
     this.color = {hex: this.term ? this.term.color : this.randomColor()};
-    this.displayErrors = false;
   }
 };
 </script>

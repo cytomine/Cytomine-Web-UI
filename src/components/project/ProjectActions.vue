@@ -7,19 +7,15 @@
           <p class="modal-card-title">{{$t('rename-project')}}</p>
         </header>
         <section class="modal-card-body">
-          <b-field
-            :label="$t('new-name')"
-            :type="emptyNewName ? 'is-danger' : null"
-            :message="emptyNewName ? $t('field-cannot-be-empty') : ''"
-          >
-            <b-input v-model="newName" />
+          <b-field :label="$t('new-name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+            <b-input v-model="newName" name="name" v-validate="'required'" />
           </b-field>
         </section>
         <footer class="modal-card-foot">
           <button class="button" type="button" @click="isRenameModalActive = false">
             {{$t('button-cancel')}}
           </button>
-          <button class="button is-link" :disabled="emptyNewName">
+          <button class="button is-link" :disabled="errors.any()">
             {{$t('button-save')}}
           </button>
         </footer>
@@ -100,6 +96,7 @@ import {OntologyCollection} from 'cytomine-client';
 
 export default {
   name: 'project-actions',
+  $_veeValidate: {validator: 'new'},
   props: {
     project: {type: Object},
     size: {type: String, default: 'is-small'}
@@ -117,11 +114,6 @@ export default {
       cannotDeleteOntology: false,
       savingOntology: false
     };
-  },
-  computed: {
-    emptyNewName() {
-      return !this.newName;
-    }
   },
   watch: {
     isRenameModalActive(val) {

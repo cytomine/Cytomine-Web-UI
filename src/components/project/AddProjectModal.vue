@@ -6,12 +6,8 @@
         <p class="modal-card-title">{{$t('create-project')}}</p>
       </header>
       <section class="modal-card-body">
-        <b-field
-          :label="$t('name')"
-          :type="!validName && displayErrors ? 'is-danger' : null"
-          :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''"
-        >
-          <b-input v-model="name" />
+        <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+          <b-input v-model="name" name="name" v-validate="'required'" />
         </b-field>
 
         <b-field :label="$t('ontology')">
@@ -30,24 +26,27 @@
           </b-radio>
         </b-field>
 
-        <b-collapse class="panel" :open="ontology === 'EXISTING'">
-          <b-field
-            :type="!validOntology && displayErrors ? 'is-danger' : null"
-            :message="!validOntology && displayErrors ? $t('ontology-must-be-selected') : ''"
-          >
-            <b-select size="is-small" v-model="selectedOntology" :placeholder="$t('select-ontology')">
+        <template v-if="ontology === 'EXISTING'">
+          <b-field :type="{'is-danger': errors.has('ontology')}" :message="errors.first('ontology')">
+            <b-select
+              size="is-small"
+              v-model="selectedOntology"
+              :placeholder="$t('select-ontology')"
+              name="ontology"
+              v-validate="'required'"
+            >
               <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
                 {{ontology.name}}
               </option>
             </b-select>
           </b-field>
-        </b-collapse>
+        </template>
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="(!validName || !validOntology) && displayErrors">
+        <button class="button is-link" :disabled="errors.any()">
           {{$t('button-save')}}
         </button>
       </footer>
@@ -61,6 +60,7 @@ import {Project, Ontology, OntologyCollection} from 'cytomine-client';
 
 export default {
   name: 'add-project-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     active: Boolean
   },
@@ -69,17 +69,8 @@ export default {
       name: '',
       ontology: 'NO',
       ontologies: [],
-      selectedOntology: null,
-      displayErrors: false
+      selectedOntology: null
     };
-  },
-  computed: {
-    validName() {
-      return this.name.length > 0;
-    },
-    validOntology() {
-      return this.ontology !== 'EXISTING' || this.selectedOntology;
-    }
   },
   watch: {
     active(val) {
@@ -87,14 +78,13 @@ export default {
         this.name = '';
         this.ontology = 'NO';
         this.selectedOntology = null;
-        this.displayErrors = false;
       }
     }
   },
   methods: {
     async createProject() {
-      if(!this.validName || !this.validOntology) {
-        this.displayErrors = true;
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 

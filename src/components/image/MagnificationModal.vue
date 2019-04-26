@@ -11,15 +11,15 @@
             {{ $t('warning-change-applies-in-project-only') }}
           </b-message>
 
-          <b-field :label="$t('magnification')" :type="fieldType" :message="errorMessage">
-            <b-input v-model="newMagnification" />
+          <b-field :label="$t('magnification')" :type="fieldType" :message="errors.first('magnification')">
+            <b-input v-model="newMagnification" name="magnification" v-validate="'required|decimal|positive'" />
           </b-field>
         </section>
         <footer class="modal-card-foot">
           <button class="button" type="button" @click="$emit('update:active', false)">
             {{$t('button-cancel')}}
           </button>
-          <button class="button is-link" :disabled="errorMessage">
+          <button class="button is-link" :disabled="errors.any()">
             {{$t('button-save')}}
           </button>
         </footer>
@@ -32,44 +32,38 @@
 <script>
 export default {
   name: 'magnification-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     active: {type: Boolean},
     image: {type: Object}
   },
   data() {
     return {
-      newMagnification: '',
-      displayErrors: false
+      newMagnification: ''
     };
   },
   computed: {
     blindMode() {
       return this.$store.state.currentProject.project.blindMode;
     },
-    errorMessage() {
-      if(this.displayErrors && this.newMagnification && (isNaN(this.newMagnification) || +this.newMagnification <= 0)) {
-        return this.$t('must-be-positive-number');
-      }
-    },
     fieldType() {
-      return this.errorMessage ? 'is-danger' : null;
+      return {'is-danger': this.errors.has('magnification')};
     }
   },
   watch: {
     active(val) {
       if(val) {
         this.newMagnification = this.image.magnification;
-        this.displayErrors = false;
-      }
-    },
-    newMagnification() {
-      if(this.newMagnification !== this.image.magnification) {
-        this.displayErrors = true;
       }
     }
   },
   methods: {
     async setMagnification() {
+      let result = await this.$validator.validateAll();
+      if(!result) {
+        return;
+      }
+
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();

@@ -12,7 +12,7 @@ module.exports = {
     'quotes': ['error', 'single', {'avoidEscape': true}],
     'brace-style': ['error', 'stroustrup'],
     'array-bracket-spacing': ['error', 'never'],
-    'camelcase': ['error', {'properties': 'always'}],
+    'camelcase': ['error', {'properties': 'always'}], // TODO update to {allow: ['$_veeValidate']} once ESLint updated
     'semi': ['error', 'always'],
     'no-console': ['off']
   },

@@ -23,35 +23,44 @@
               </tr>
             </thead>
             <tbody>
-              <job-parameter-row v-for="param in paramsMandatoryNoDefault" :displayErrors="displayErrors"
-                :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+              <job-parameter-row
+                v-for="param in paramsMandatoryNoDefault"
+                :param="param"
+                :key="param.id"
+                v-model="param.value"
               />
 
               <tr class="row-separator" v-if="optionalParams.length > 0">
                 <td colspan="2">
                   {{$t('optional-parameters')}}
-                  <button class="button is-small" @click="showOptional = !showOptional">
+                  <button class="button is-small" type="button" @click="showOptional = !showOptional">
                     {{$t(showOptional ? 'button-hide' : 'button-show')}}
                   </button>
                 </td>
               </tr>
               <template v-if="showOptional">
-                <job-parameter-row v-for="param in optionalParams" :displayErrors="displayErrors"
-                  :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                <job-parameter-row
+                  v-for="param in optionalParams"
+                  :param="param"
+                  :key="param.id"
+                  v-model="param.value"
                 />
               </template>
 
               <tr class="row-separator" v-if="prefilledParams.length > 0">
                 <td colspan="2">
                   {{$t('prefilled-parameters')}}
-                  <button class="button is-small" @click="showPrefilled = !showPrefilled">
+                  <button class="button is-small" type="button" @click="showPrefilled = !showPrefilled">
                     {{$t(showPrefilled ? 'button-hide' : 'button-show')}}
                   </button>
                 </td>
               </tr>
               <template v-if="showPrefilled">
-                <job-parameter-row v-for="param in prefilledParams" :displayErrors="displayErrors"
-                  :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                <job-parameter-row
+                  v-for="param in prefilledParams"
+                  :param="param"
+                  :key="param.id"
+                  v-model="param.value"
                 />
               </template>
             </tbody>
@@ -62,7 +71,7 @@
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="!validForm && displayErrors">
+        <button class="button is-link" :disabled="errors.any()">
           {{$t('button-launch-new-analysis')}}
         </button>
       </footer>
@@ -79,7 +88,8 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import JobParameterRow from './JobParameterRow';
 
 export default {
-  name: 'launch-job-modal',
+  name: 'add-job-modal',
+  $_veeValidate: {validator: 'new'},
   components: {
     CytomineMultiselect,
     JobParameterRow
@@ -91,7 +101,6 @@ export default {
     return {
       softwares: [],
       selectedSoftware: null,
-      displayErrors: false,
       showPrefilled: false,
       showOptional: false
     };
@@ -109,9 +118,6 @@ export default {
     },
     paramsMandatoryNoDefault() {
       return this.params.filter(param => param.required && !param.defaultParamValue);
-    },
-    validForm() {
-      return this.params.every(param => param.valid);
     },
     jobParameters() {
       return this.params.map(param => {
@@ -132,24 +138,21 @@ export default {
         this.selectedSoftware = null;
         this.showOptional = false;
         this.showPrefilled = false;
-        this.displayErrors = false;
       }
     },
     async selectedSoftware() {
       if(!this.selectedSoftware) {
         return;
       }
-
       for(let param of this.selectedSoftware.parameters) {
         this.$set(param, 'value', param.defaultParamValue);
-        this.$set(param, 'valid', !param.required || param.defaultParamValue);
       }
     }
   },
   methods: {
     async createJob() {
-      if(!this.validForm) {
-        this.displayErrors = true;
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 
@@ -169,10 +172,6 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-analysis-launch')});
       }
-    },
-    changeParam(param, {value, valid}) {
-      param.value = value;
-      param.valid = valid;
     }
   },
   async created() {

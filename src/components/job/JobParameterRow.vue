@@ -2,16 +2,19 @@
 <tr class="job-param-row-wrapper">
   <td>{{param.name}}</td>
   <td>
-    <b-field :type="displayErrors && errorMessage ? 'is-danger': ''" :message="displayErrors ? errorMessage : ''">
+    <b-field :type="{'is-danger': errors.has(validationName)}" :message="errors.first(validationName)">
       <b-input v-if="loading" loading disabled />
+
       <cytomine-multiselect
         v-else-if="options"
         v-model="internalValue"
         :options="options"
         track-by="id"
         :label="param.uriPrintAttribut"
-        :class="{'is-danger': displayErrors && errorMessage}"
+        :class="{'is-danger': errors.has(validationName)}"
         :multiple="param.type === 'ListDomain'"
+        :name="validationName"
+        v-validate="validationRules"
       >
         <template #option="{option}">
           <div class="is-flex" v-if="annotationObjects">
@@ -32,8 +35,10 @@
           </div>
         </template>
       </cytomine-multiselect>
+
       <b-checkbox v-model="internalValue" v-else-if="param.type === 'Boolean'" />
-      <b-input v-else v-model="internalValue" />
+
+      <b-input v-else v-model="internalValue" :name="validationName" v-validate="validationRules" />
     </b-field>
   </td>
 </tr>
@@ -47,10 +52,11 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'job-parameter-row',
+  inject: ['$validator'],
   components: {CytomineMultiselect},
   props: {
     param: Object,
-    displayErrors: Boolean
+    value: null
   },
   data() {
     return {
@@ -73,19 +79,14 @@ export default {
         return result;
       }
     },
-    empty() {
-      return !this.internalValue;
+    validationName() {
+      return String(this.param.id);
     },
-    validNumber() {
-      return !isNaN(this.internalValue);
-    },
-    errorMessage() {
-      if(this.empty && this.param.type !== 'Boolean') {
-        return this.param.required ? this.$t('mandatory-parameter') : null;
-      }
-      if(this.param.type === 'Number' && !this.validNumber) {
-        return this.$t('must-be-number');
-      }
+    validationRules() {
+      return {
+        required: this.param.required,
+        decimal: this.param.type === 'Number'
+      };
     },
     annotationObjects() {
       if(this.options && this.options.length > 0) {
@@ -99,9 +100,9 @@ export default {
     }
   },
   watch: {
-    internalValue() {
-      if(this.internalValue !== this.param.value) {
-        this.$emit('changeValue', {value: this.internalValue, valid: !this.errorMessage});
+    internalValue(value) {
+      if(value !== this.value) {
+        this.$emit('input', value);
       }
     },
     'param.value': function() {

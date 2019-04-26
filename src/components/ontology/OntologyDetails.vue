@@ -68,17 +68,17 @@
         <section class="modal-card-body">
           <b-field
             :label="$t('new-name')"
-            :type="emptyNewName ? 'is-danger' : null"
-            :message="emptyNewName ? $t('field-cannot-be-empty') : ''"
+            :type="{'is-danger': errors.has('name')}"
+            :message="errors.first('name')"
           >
-            <b-input v-model="newName" />
+            <b-input v-model="newName" name="name" v-validate="'required'" />
           </b-field>
         </section>
         <footer class="modal-card-foot">
           <button class="button" type="button" @click="isRenameModalActive = false">
             {{$t('button-cancel')}}
           </button>
-          <button class="button is-link" :disabled="emptyNewName">
+          <button class="button is-link" :disabled="errors.any()">
             {{$t('button-save')}}
           </button>
         </footer>
@@ -97,10 +97,11 @@ import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'ontology-details',
+  components: {OntologyTree},
+  $_veeValidate: {validator: 'new'},
   props: {
     ontology: Object
   },
-  components: {OntologyTree},
   data() {
     return {
       loading: true,
@@ -121,9 +122,6 @@ export default {
     },
     nbProjects() {
       return this.fullOntology.projects.length;
-    },
-    emptyNewName() {
-      return !this.newName;
     }
   },
   watch: {

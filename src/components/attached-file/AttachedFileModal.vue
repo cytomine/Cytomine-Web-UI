@@ -21,18 +21,15 @@
       </b-upload>
     </b-field>
 
-    <b-field :label="$t('name')"
-      :type="selectedFile && !validName ? 'is-danger' : ''"
-      :message="selectedFile && !validName ? $t('field-cannot-be-empty') : ''"
-    >
-      <b-input v-model="name" :disabled="!selectedFile" />
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
     </b-field>
   </section>
   <footer class="modal-card-foot">
     <button class="button" @click="$parent.close()">
       {{$t('button-cancel')}}
     </button>
-    <button class="button is-link" :disabled="!selectedFile || !validName" @click="save()">
+    <button class="button is-link" :disabled="!selectedFile || errors.any()" @click="save()">
       {{$t('button-save')}}
     </button>
   </footer>
@@ -44,6 +41,7 @@ import {AttachedFile} from 'cytomine-client';
 
 export default {
   name: 'attached-file-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     object: Object
   },
@@ -52,11 +50,6 @@ export default {
       selectedFile: null,
       name: ''
     };
-  },
-  computed: {
-    validName() {
-      return this.name.length > 0;
-    }
   },
   watch: {
     selectedFile(file) {
@@ -67,7 +60,8 @@ export default {
   },
   methods: {
     async save() {
-      if(!this.selectedFile || !this.validName) {
+      let result = await this.$validator.validateAll('password');
+      if(!this.selectedFile || !result) {
         return;
       }
 

@@ -172,6 +172,7 @@ import copyToClipboard from 'copy-to-clipboard';
 
 export default {
   name: 'Account',
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       updatedUser: this.$store.state.currentUser.user.clone(),

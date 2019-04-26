@@ -42,18 +42,18 @@
           {{$t('send-to-some-members')}}
         </b-radio>
       </b-field>
-      <b-field v-if="!sendToAllMembers" :type="errorSelectedMembers ? 'is-danger' : null" :message="errorSelectedMembers">
-        <user-taginput v-model="selectedMembers" :users="members" />
+      <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
+        <user-taginput v-model="selectedMembers" :users="members" name="members" v-validate="'required'" />
       </b-field>
-      <b-field :type="errorComment ? 'is-danger' : null" :message="errorComment">
-        <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" />
+      <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
+        <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
       </b-field>
       <p class="buttons is-right are-small">
         <button class="button" @click="addingComment = false" :disabled="loading">
           {{$t('button-cancel')}}
         </button>
         <button class="button is-link" :class="{'is-loading': loading}"
-          :disabled="loading || errorComment || errorSelectedMembers" @click="share()">
+          :disabled="loading || errors.any()" @click="share()">
           {{$t('button-share')}}
         </button>
       </p>
@@ -77,6 +77,7 @@ export default {
   components: {
     UserTaginput
   },
+  $_veeValidate: {validator: 'new'},
   props: {
     annotation: Object,
     comments: Array
@@ -87,7 +88,6 @@ export default {
       sendToAllMembers: true,
       selectedMembers: [],
       text: '',
-      displayErrors: false,
       loading: false
     };
   },
@@ -95,35 +95,27 @@ export default {
     currentUser: get('currentUser/user'),
     allMembers: get('currentProject/members'),
     members() { // all project members except current user
-      return this.members.filter(member => member.id !== this.currentUser.id);
+      return this.allMembers.filter(member => member.id !== this.currentUser.id);
     },
     annotationURL() {
       let uri = `project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
       return `${window.location.origin}/#/${uri}`;
-    },
-    errorComment() {
-      if(this.displayErrors && !this.text) {
-        return this.$t('field-cannot-be-empty');
-      }
-    },
-    errorSelectedMembers() {
-      if(this.displayErrors && !this.sendToAllMembers && !this.selectedMembers.length) {
-        return this.$t('field-cannot-be-empty');
-      }
     }
   },
   watch: {
     addingComment() {
-      this.sendToAllMembers = true;
-      this.selectedMembers = [];
       this.text = '';
-      this.displayErrors = false;
+      this.selectedMembers = [];
+      this.$nextTick(() => {
+        this.sendToAllMembers = true;
+        this.$validator.reset();
+      });
     }
   },
   methods: {
     async share() {
-      this.displayErrors = true;
-      if(this.errorComment || this.errorSelectedMembers) {
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 

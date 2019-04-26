@@ -147,17 +147,17 @@
         <section class="modal-card-body">
           <b-field
             :label="$t('enter-new-name-of-image')"
-            :type="emptyNewName ? 'is-danger' : null"
-            :message="emptyNewName ? $t('field-cannot-be-empty') : ''"
+            :type="{'is-danger': errors.has('name')}"
+            :message="errors.first('name')"
           >
-            <b-input v-model="newName" />
+            <b-input v-model="newName" name="name" v-validate="'required'" />
           </b-field>
         </section>
         <footer class="modal-card-foot">
           <button class="button" type="button" @click="isRenameModalActive = false">
             {{$t('button-cancel')}}
           </button>
-          <button class="button is-link" :disabled="emptyNewName">
+          <button class="button is-link" :disabled="errors.any()">
             {{$t('button-save')}}
           </button>
         </footer>
@@ -204,6 +204,7 @@ export default {
     CalibrationModal,
     ImageMetadataModal
   },
+  $_veeValidate: {validator: 'new'},
   props: {
     image: {type: Object},
     excludedProperties: {type: Array, default: () => []}
@@ -226,9 +227,6 @@ export default {
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
-    },
-    emptyNewName() {
-      return !this.newName;
     },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;

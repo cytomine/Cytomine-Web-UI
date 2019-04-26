@@ -11,10 +11,12 @@ import store from './store/store.js';
 import Buefy from 'buefy';
 Vue.use(Buefy, {defaultIconPack: 'fas'});
 
-import VeeValidate from 'vee-validate';
+import VeeValidate, {Validator} from 'vee-validate';
+Validator.extend('positive', value => Number(value) > 0);
 Vue.use(VeeValidate, {
   i18nRootKey: 'validations',
-  i18n
+  i18n,
+  inject: false
 });
 
 import Notifications from 'vue-notification';

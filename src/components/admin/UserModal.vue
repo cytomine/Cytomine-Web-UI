@@ -10,12 +10,18 @@
         <input id="username" class="hidden" type="text">
         <input id="password" class="hidden" type="password">
 
-        <b-field v-for="field in editableFields" :key="field"
-          :label="$t(field === 'password' && editionMode ? 'password-new' : field)" horizontal
-          :type="getError(field) && displayErrors ? 'is-danger' : null"
-          :message="getError(field) && displayErrors ? getError(field) : ''"
+        <b-field
+          v-for="{field, validationRules} in editableFields"
+          :key="field"
+          :label="$t(field === 'password' && editionMode ? 'password-new' : field)"
+          horizontal
+          :type="{'is-danger': errors.has(field)}"
+          :message="errors.first(field)"
         >
-          <b-input v-model="internalUser[field]"
+          <b-input
+            v-model="internalUser[field]"
+            :name="field"
+            v-validate="validationRules"
             :type="field === 'password' ? 'password': 'text'"
             :password-reveal="field === 'password'"
           />
@@ -33,7 +39,7 @@
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="!validForm && displayErrors">
+        <button class="button is-link" :disabled="errors.any()">
           {{$t('button-save')}}
         </button>
       </footer>
@@ -49,6 +55,7 @@ const defaultRole = 'ROLE_GUEST';
 
 export default {
   name: 'user-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     active: Boolean,
     user: Object
@@ -69,11 +76,13 @@ export default {
       return Boolean(this.user);
     },
     editableFields() {
-      let fields = ['firstname', 'lastname', 'username', 'email', 'password'];
-      return fields;
-    },
-    validForm() {
-      return this.editableFields.every(field => !this.getError(field));
+      return [
+        {field: 'firstname', validationRules: 'required'},
+        {field: 'lastname', validationRules: 'required'},
+        {field: 'username', validationRules: 'required'}, // TODO: check if other rule (alphanumeric?)
+        {field: 'email', validationRules: 'required|email'},
+        {field: 'password', validationRules: this.editionMode ? 'min:4' : 'required|min:4'}
+      ];
     },
     idRole() {
       return this.rolesWithIds.find(role => role.authority === this.selectedRole).id;
@@ -94,30 +103,9 @@ export default {
     }
   },
   methods: {
-    getError(field) {
-      let value = this.internalUser[field];
-      if(field === 'password' && this.editionMode && !value) {
-        return;
-      }
-
-      if(!value) {
-        return this.$t('field-cannot-be-empty');
-      }
-
-      if(field === 'password' && value.length < 4) {
-        return this.$t('field-not-enough-characters', {minLength: 4});
-      }
-
-      if(field === 'email') {
-        var regex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/; // source: https://gist.github.com/gregseth/5582254
-        if(!regex.test(String(value).toLowerCase())) {
-          return this.$t('field-invalid-email-address');
-        }
-      }
-    },
     async save() {
-      if(!this.validForm) {
-        this.displayErrors = true;
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 
@@ -131,8 +119,8 @@ export default {
         }
         if(this.editionMode && this.internalUser.password) {
           await this.internalUser.savePassword(this.internalUser.password);
-          this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
         }
+        this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
         this.$notify({type: 'success', text: this.$t('notif-success-user-' + labelTranslation)});
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateUser' : 'addUser', this.internalUser);

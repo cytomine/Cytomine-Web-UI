@@ -6,19 +6,15 @@
         <p class="modal-card-title">{{$t('create-ontology')}}</p>
       </header>
       <section class="modal-card-body">
-        <b-field
-          :label="$t('name')"
-          :type="!validName && displayErrors ? 'is-danger' : null"
-          :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''"
-        >
-          <b-input v-model="name" />
+        <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+          <b-input v-model="name" name="name" v-validate="'required'" />
         </b-field>
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="!validName && displayErrors">
+        <button class="button is-link" :disabled="errors.any()">
           {{$t('button-save')}}
         </button>
       </footer>
@@ -32,32 +28,26 @@ import {Ontology} from 'cytomine-client';
 
 export default {
   name: 'add-ontology-modal',
+  $_veeValidate: {validator: 'new'},
   props: {
     active: Boolean
   },
   data() {
     return {
-      name: '',
-      displayErrors: false
+      name: ''
     };
-  },
-  computed: {
-    validName() {
-      return this.name.length > 0;
-    }
   },
   watch: {
     active(val) {
       if(val) {
         this.name = '';
-        this.displayErrors = false;
       }
     }
   },
   methods: {
     async createOntology() {
-      if(!this.validName) {
-        this.displayErrors = true;
+      let result = await this.$validator.validateAll();
+      if(!result) {
         return;
       }
 
