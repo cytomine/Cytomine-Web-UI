@@ -84,7 +84,7 @@ export default {
     },
     methods: {
         findRoot() {
-            this.rootId = this.file.parent || this.file.id;
+            this.rootId = this.file.root || this.file.id;
         },
         async makeTree() {
             try {
