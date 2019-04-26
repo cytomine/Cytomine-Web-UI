@@ -28,7 +28,8 @@
     "sl-vue-tree": "1.8.3",
     "v-click-outside-x": "^4.0.1",
     "v-tooltip": "^2.0.0-rc.33",
-    "vue": "^2.6.9",
+    "vee-validate": "^2.2.4",
+    "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
     "vue-color": "^2.7.0",
     "vue-draggable-resizable": "^1.7.5",
@@ -52,7 +53,7 @@
     "node-sass": "^4.11.0",
     "onchange": "^5.2.0",
     "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.6.9"
+    "vue-template-compiler": "^2.6.10"
   },
   "postcss": {
     "plugins": {

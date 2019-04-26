@@ -6,7 +6,7 @@
       {{ $t('profile') }}
     </p>
     <div class="panel-block">
-      <form @submit.prevent="editDetails()">
+      <form @submit.prevent="editDetails()" data-vv-scope="profile">
         <b-field :label="$t('username')" horizontal>
           <b-input :value="currentUser.username" disabled />
         </b-field>
@@ -15,16 +15,31 @@
           <span class="tag" :class="role.class">{{$t(role.label)}}</span>
         </b-field>
 
-        <b-field :label="$t('lastname')" horizontal>
-          <b-input v-model="updatedUser.lastname" />
+        <b-field
+          :label="$t('lastname')"
+          horizontal
+          :type="{'is-danger': errors.has('profile.lastname')}"
+          :message="errors.first('profile.lastname')"
+        >
+          <b-input v-model="updatedUser.lastname" name="lastname" v-validate="'required'" />
         </b-field>
 
-        <b-field :label="$t('firstname')" horizontal>
-          <b-input v-model="updatedUser.firstname" />
+        <b-field
+          :label="$t('firstname')"
+          horizontal
+          :type="{'is-danger': errors.has('profile.firstname')}"
+          :message="errors.first('profile.firstname')"
+        >
+          <b-input v-model="updatedUser.firstname" name="firstname" v-validate="'required'" />
         </b-field>
 
-        <b-field :label="$t('email')" horizontal>
-          <b-input v-model="updatedUser.email" />
+        <b-field
+          :label="$t('email')"
+          horizontal
+          :type="{'is-danger': errors.has('profile.email')}"
+          :message="errors.first('profile.email')"
+        >
+          <b-input v-model="updatedUser.email" name="email" v-validate="'required|email'" />
         </b-field>
 
         <b-field :label="$t('language')" horizontal>
@@ -37,7 +52,7 @@
 
         <b-field grouped position="is-right">
           <div class="control">
-            <button class="button is-link"> {{$t('button-save')}}</button>
+            <button class="button is-link" :disabled="errors.any('profile')"> {{$t('button-save')}}</button>
           </div>
         </b-field>
       </form>
@@ -50,28 +65,56 @@
       {{ $t('password') }}
     </p>
     <div class="panel-block">
-      <form @submit.prevent="savePassword()">
+      <form @submit.prevent="savePassword()" data-vv-scope="password">
         <input id="password" class="hidden" type="password"> <!-- HACK: fake field to prevent autofill -->
 
         <b-message v-if="currentUser.passwordExpired" type="is-danger" has-icon icon-size="is-small">
           {{$t('password-expired-info-message')}}
         </b-message>
 
-        <b-field v-else :label="$t('password-current')" :type="typeCurrentPassword" horizontal>
+        <b-field
+          v-else
+          :label="$t('password-current')"
+          horizontal
+          :type="typeCurrentPassword"
+          :message="messageCurrentPassword"
+        >
           <b-input type="password" v-model="currentPassword" :loading="isCheckingPassword" />
         </b-field>
 
-        <b-field :label="$t('password-new')" horizontal>
-          <b-input type="password" v-model="newPassword" :disabled="!correctPassword && !currentUser.passwordExpired" />
+        <b-field
+          :label="$t('password-new')"
+          horizontal
+          :type="{'is-danger': errors.has('password.newPassword')}"
+          :message="errors.first('password.newPassword')"
+        >
+          <b-input
+            type="password"
+            v-model="newPassword"
+            name="newPassword"
+            v-validate="'required|min:4'"
+            :disabled="newPasswordDisabled"
+          />
         </b-field>
 
-        <b-field :label="$t('password-confirm')" horizontal>
-          <b-input type="password" v-model="confirmPassword" :disabled="!newPassword" />
+        <b-field
+          :label="$t('password-confirm')"
+          horizontal
+          :type="{'is-danger': errors.has('password.confirmPassword')}"
+          :message="errors.first('password.confirmPassword')"
+        >
+          <b-input
+            type="password"
+            v-model="confirmPassword"
+            name="confirmPassword"
+            v-validate="{required: true, is: newPassword}"
+            :disabled="newPasswordDisabled"
+          />
         </b-field>
 
         <b-field grouped position="is-right">
           <div class="control">
-            <button class="button is-link" :disabled="savePasswordDisabled">
+            <button class="button is-link" :disabled="errors.any('password') || newPasswordDisabled">
               {{$t('button-save')}}
             </button>
           </div>
@@ -149,11 +192,17 @@ export default {
       let key = this.currentUser.guestByNow ? 'ROLE_GUEST' : this.currentUser.adminByNow ? 'ROLE_ADMIN' : 'ROLE_USER';
       return rolesMapping[key];
     },
-    savePasswordDisabled() {
-      return !this.newPassword || this.newPassword !== this.confirmPassword;
+    newPasswordDisabled() {
+      return !this.correctPassword && !this.currentUser.passwordExpired;
+    },
+    messageCurrentPassword() {
+      if(!this.currentPassword || this.isCheckingPassword) {
+        return;
+      }
+      return this.correctPassword ? '' : this.$t('invalid-password');
     },
     typeCurrentPassword() {
-      if(!this.currentPassword) {
+      if(!this.currentPassword || this.isCheckingPassword) {
         return;
       }
       return this.correctPassword ? 'is-success' : 'is-danger';
@@ -167,18 +216,24 @@ export default {
   },
   methods: {
     async editDetails() {
+      let result = await this.$validator.validateAll('profile');
+      if(!result) {
+        return;
+      }
+
       try {
         await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
-      catch(err) {
+      catch(error) {
+        console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-details-not-saved')});
       }
     },
 
     async savePassword() {
-      if(this.newPassword !== this.confirmPassword) {
-        this.$notify({type: 'error', text: 'The provided passwords are not identical'});
+      let result = await this.$validator.validateAll('password');
+      if(!result || (!this.correctPassword && !this.currentUser.passwordExpired)) {
         return;
       }
 
@@ -190,8 +245,10 @@ export default {
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmPassword = '';
+        this.$validator.reset({scope: 'password'});
       }
-      catch(err) {
+      catch(error) {
+        console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-password-not-saved')});
       }
     },
@@ -201,6 +258,7 @@ export default {
       if(!this.correctPassword) {
         this.newPassword = '';
         this.confirmPassword = '';
+        this.$validator.reset({scope: 'password'});
       }
       this.isCheckingPassword = false;
     }, 500),
