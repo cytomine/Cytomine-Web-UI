@@ -308,12 +308,7 @@ export default {
     boundsReviewedAnnotations: syncBoundsFilter('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
     nbActiveFilters() {
-      let filters = this.$store.state.listProjects.filters;
-      let count = 0;
-      for(let key in filters) {
-        count += Number(filters[key] !== null);
-      }
-      return count;
+      return this.$store.getters['listProjects/nbActiveFilters'];
     },
 
     selectedOntologiesIds() {

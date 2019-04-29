@@ -60,5 +60,11 @@ export default {
     setOpenedDetails(state, value) {
       state.openedDetails = value;
     }
+  },
+
+  getters: {
+    nbActiveFilters: state => {
+      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+    }
   }
 };

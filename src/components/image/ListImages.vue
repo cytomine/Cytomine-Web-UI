@@ -235,7 +235,6 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 
-import {isBetweenBounds} from '@/utils/bounds';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection} from 'cytomine-client';
@@ -362,32 +361,10 @@ export default {
     boundsReviewedAnnotations: localSyncBoundsFilter('boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
     filteredImages() {
-      let filtered = this.images;
-
-      if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(image => {
-          return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
-            (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
-        });
-      }
-
-      return filtered.filter(image => {
-        return this.selectedFormats.includes(image.extension) &&
-          this.selectedVendors.includes(image.vendorFormatted) &&
-          this.selectedMagnifications.includes(image.magnificationFormatted) &&
-          this.selectedResolutions.includes(image.resolutionFormatted) &&
-          isBetweenBounds(image.width, this.boundsWidth) &&
-          isBetweenBounds(image.height, this.boundsHeight) &&
-          isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
-          isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
-          isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
-      });
+      return this.$store.getters[this.storeModule + '/filteredImages'](this.images);
     },
-
-    filters: get('filters', storeOptions),
     nbActiveFilters() {
-      return Object.values(this.filters).filter(val => val).length; // count the number of not null values
+      return this.$store.getters[this.storeModule + '/nbActiveFilters'];
     },
 
     currentPage: sync('currentPage', storeOptions),
