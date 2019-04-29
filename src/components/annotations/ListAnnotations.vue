@@ -444,6 +444,6 @@ export default {
 }
 
 .download-buttons {
-  justify-content: right;
+  justify-content: flex-end;
 }
 </style>
