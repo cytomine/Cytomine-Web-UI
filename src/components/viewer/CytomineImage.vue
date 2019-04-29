@@ -574,6 +574,7 @@ $colorOpenedPanelLink: #6c95c8;
   position: absolute;
   top: 0.7em;
   left: 3.5rem;
+  right: $widthPanelBar;
   z-index: 10;
 }
 
