@@ -45,6 +45,7 @@ export default {
     projectModule() {
       if(!this.projectModule) {
         console.log('Project closed from external source');
+        this.$store.commit('currentProject/resetState');
         this.$router.push('/projects');
       }
     }
