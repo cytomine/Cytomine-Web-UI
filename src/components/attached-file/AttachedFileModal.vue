@@ -1,50 +1,48 @@
 <template>
-<div class="modal-card">
-  <header class="modal-card-head">
-    <p class="modal-card-title">{{$t('add-attached-file')}}</p>
-  </header>
-  <section class="modal-card-body">
-    <b-field>
-      <b-upload v-model="selectedFile" type="is-link" drag-drop>
-        <section class="section">
-          <div class="content has-text-centered">
-            <template v-if="!selectedFile">
-              <p><i class="fas fa-upload fa-3x"></i></p>
-              <p>{{$t('choose-file-or-drop')}}</p>
-            </template>
-            <template v-else>
-              <p class="filename is-size-4"><i class="fas fa-file"></i> {{selectedFile.name}}</p>
-              <p class="has-text-grey is-size-6">{{$t('click-or-drop-new-file')}}</p>
-            </template>
-          </div>
-        </section>
-      </b-upload>
-    </b-field>
+<cytomine-modal-card :title="$t('add-attached-file')">
+  <b-field>
+    <b-upload v-model="selectedFile" type="is-link" drag-drop>
+      <section class="section">
+        <div class="content has-text-centered">
+          <template v-if="!selectedFile">
+            <p><i class="fas fa-upload fa-3x"></i></p>
+            <p>{{$t('choose-file-or-drop')}}</p>
+          </template>
+          <template v-else>
+            <p class="filename is-size-4"><i class="fas fa-file"></i> {{selectedFile.name}}</p>
+            <p class="has-text-grey is-size-6">{{$t('click-or-drop-new-file')}}</p>
+          </template>
+        </div>
+      </section>
+    </b-upload>
+  </b-field>
 
-    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-      <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
-    </b-field>
-  </section>
-  <footer class="modal-card-foot">
+  <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+    <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
+  </b-field>
+
+  <template #footer>
     <button class="button" @click="$parent.close()">
       {{$t('button-cancel')}}
     </button>
     <button class="button is-link" :disabled="!selectedFile || errors.any()" @click="save()">
       {{$t('button-save')}}
     </button>
-  </footer>
-</div>
+  </template>
+</cytomine-modal-card>
 </template>
 
 <script>
 import {AttachedFile} from 'cytomine-client';
+import CytomineModalCard from '@/components/layout/CytomineModalCard';
 
 export default {
   name: 'attached-file-modal',
-  $_veeValidate: {validator: 'new'},
   props: {
     object: Object
   },
+  components: {CytomineModalCard},
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       selectedFile: null,

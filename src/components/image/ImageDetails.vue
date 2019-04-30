@@ -78,7 +78,7 @@
       <tr v-if="isPropDisplayed('vendor')">
         <td class="prop-label">{{$t('vendor')}}</td>
         <td class="prop-content">
-            <!-- vendor defined in parent component -->
+          <!-- vendor defined in parent component -->
           <img v-if="image.vendor" :src="image.vendor.imgPath" :alt="image.vendor.name"
             :title="image.vendor.name" class="vendor-img">
           <template v-else>{{$t('unknown')}}</template>
@@ -138,32 +138,12 @@
     </tbody>
   </table>
 
-  <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
-    <form @submit.prevent="rename()">
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{$t('rename-image')}}</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field
-            :label="$t('enter-new-name-of-image')"
-            :type="{'is-danger': errors.has('name')}"
-            :message="errors.first('name')"
-          >
-            <b-input v-model="newName" name="name" v-validate="'required'" />
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isRenameModalActive = false">
-            {{$t('button-cancel')}}
-          </button>
-          <button class="button is-link" :disabled="errors.any()">
-            {{$t('button-save')}}
-          </button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+  <rename-modal
+    :title="$t('rename-image')"
+    :currentName="image.instanceFilename"
+    :active.sync="isRenameModalActive"
+    @rename="rename"
+  />
 
   <magnification-modal
     :image="image"
@@ -191,6 +171,7 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
+import RenameModal from '@/components/layout/RenameModal';
 
 import {ImageInstance} from 'cytomine-client';
 
@@ -202,9 +183,9 @@ export default {
     AttachedFiles,
     MagnificationModal,
     CalibrationModal,
-    ImageMetadataModal
+    ImageMetadataModal,
+    RenameModal
   },
-  $_veeValidate: {validator: 'new'},
   props: {
     image: {type: Object},
     excludedProperties: {type: Array, default: () => []}
@@ -212,7 +193,6 @@ export default {
   data() {
     return {
       isRenameModalActive: false,
-      newName: '',
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
@@ -232,22 +212,15 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     }
   },
-  watch: {
-    isRenameModalActive(val) {
-      if(val) {
-        this.newName = this.image.instanceFilename;
-      }
-    }
-  },
   methods: {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop);
     },
 
-    async rename() {
+    async rename(newName) {
       let oldName = this.image.instanceFilename;
       try {
-        this.image.instanceFilename = this.newName;
+        this.image.instanceFilename = newName;
         await this.image.save();
         this.$notify({
           type: 'success',

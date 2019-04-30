@@ -1,40 +1,40 @@
 <template>
-<div class="modal-card term-modal">
-  <form @submit.prevent="save()">
-    <header class="modal-card-head">
-      <p class="modal-card-title">{{$t(term ? 'update-term' : 'create-term')}}</p>
-    </header>
-    <section class="modal-card-body">
-      <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-        <b-input v-model="name" name="name" v-validate="'required'" />
-      </b-field>
+<form @submit.prevent="save()">
+  <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" name="name" v-validate="'required'" />
+    </b-field>
 
-      <sketch-picker v-model="color" :presetColors="presetColors" />
-    </section>
-    <footer class="modal-card-foot">
+    <sketch-picker v-model="color" :presetColors="presetColors" />
+
+    <template #footer>
       <button class="button" type="button" @click="$parent.close()">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :disabled="errors.any()">
         {{$t('button-save')}}
       </button>
-    </footer>
-  </form>
-</div>
+    </template>
+  </cytomine-modal-card>
+</form>
 </template>
 
 <script>
 import {Term} from 'cytomine-client';
 import {Sketch} from 'vue-color';
+import CytomineModalCard from '@/components/layout/CytomineModalCard';
 
 export default {
   name: 'term-modal',
-  components: {'sketch-picker': Sketch},
-  $_veeValidate: {validator: 'new'},
   props: {
     term: Object,
     ontology: Object
   },
+  components: {
+    'sketch-picker': Sketch,
+    CytomineModalCard
+  },
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       name: '',

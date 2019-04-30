@@ -1,51 +1,45 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-  <form @submit.prevent="save()">
-    <div class="modal-card add-image-modal">
-      <header class="modal-card-head">
-        <p class="modal-card-title">{{$t(editionMode ? 'update-user' : 'create-user')}}</p>
-      </header>
-      <section class="modal-card-body">
-        <!-- HACK: fake fields to prevent autofill -->
-        <input id="username" class="hidden" type="text">
-        <input id="password" class="hidden" type="password">
+<form @submit.prevent="save()">
+  <cytomine-modal :active="active" :title="title" @close="$emit('update:active', false)">
+    <!-- HACK: fake fields to prevent autofill -->
+    <input id="username" class="hidden" type="text">
+    <input id="password" class="hidden" type="password">
 
-        <b-field
-          v-for="{field, validationRules} in editableFields"
-          :key="field"
-          :label="$t(field === 'password' && editionMode ? 'password-new' : field)"
-          horizontal
-          :type="{'is-danger': errors.has(field)}"
-          :message="errors.first(field)"
-        >
-          <b-input
-            v-model="internalUser[field]"
-            :name="field"
-            v-validate="validationRules"
-            :type="field === 'password' ? 'password': 'text'"
-            :password-reveal="field === 'password'"
-          />
-        </b-field>
+    <b-field
+      v-for="{field, validationRules} in editableFields"
+      :key="field"
+      :label="$t(field === 'password' && editionMode ? 'password-new' : field)"
+      horizontal
+      :type="{'is-danger': errors.has(field)}"
+      :message="errors.first(field)"
+    >
+      <b-input
+        v-model="internalUser[field]"
+        :name="field"
+        v-validate="validationRules"
+        :type="field === 'password' ? 'password': 'text'"
+        :password-reveal="field === 'password'"
+      />
+    </b-field>
 
-        <b-field :label="$t('role')" horizontal>
-          <b-select v-model="selectedRole">
-            <option v-for="(value, key) in roles" :value="key" :key="key">
-              {{$t(value.label)}}
-            </option>
-          </b-select>
-        </b-field>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" type="button" @click="$emit('update:active', false)">
-          {{$t('button-cancel')}}
-        </button>
-        <button class="button is-link" :disabled="errors.any()">
-          {{$t('button-save')}}
-        </button>
-      </footer>
-    </div>
-  </form>
-</b-modal>
+    <b-field :label="$t('role')" horizontal>
+      <b-select v-model="selectedRole">
+        <option v-for="(value, key) in roles" :value="key" :key="key">
+          {{$t(value.label)}}
+        </option>
+      </b-select>
+    </b-field>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
@@ -53,13 +47,16 @@ import {User, RoleCollection} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
 
+import CytomineModal from '@/components/layout/CytomineModal';
+
 export default {
   name: 'user-modal',
-  $_veeValidate: {validator: 'new'},
   props: {
     active: Boolean,
     user: Object
   },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       internalUser: {},
@@ -74,6 +71,9 @@ export default {
     },
     editionMode() {
       return Boolean(this.user);
+    },
+    title() {
+      return this.$t(this.editionMode ? 'update-user' : 'create-user');
     },
     editableFields() {
       return [
@@ -147,7 +147,7 @@ export default {
   display: none;
 }
 
-.modal-card, .modal-card-body {
+>>> .modal-card, >>> .modal-card-body {
   width: 100vw;
   max-width: 800px;
 }

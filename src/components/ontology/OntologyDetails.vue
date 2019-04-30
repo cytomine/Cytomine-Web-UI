@@ -59,48 +59,31 @@
     </tbody>
   </table>
 
-  <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
-    <form @submit.prevent="rename()">
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{$t('rename-ontology')}}</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field
-            :label="$t('new-name')"
-            :type="{'is-danger': errors.has('name')}"
-            :message="errors.first('name')"
-          >
-            <b-input v-model="newName" name="name" v-validate="'required'" />
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isRenameModalActive = false">
-            {{$t('button-cancel')}}
-          </button>
-          <button class="button is-link" :disabled="errors.any()">
-            {{$t('button-save')}}
-          </button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+  <rename-modal
+    :title="$t('rename-ontology')"
+    :currentName="ontology.name"
+    :active.sync="isRenameModalActive"
+    @rename="rename"
+  />
+
 </div>
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
-
 import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
+import RenameModal from '@/components/layout/RenameModal';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'ontology-details',
-  components: {OntologyTree},
-  $_veeValidate: {validator: 'new'},
   props: {
     ontology: Object
+  },
+  components: {
+    OntologyTree,
+    RenameModal
   },
   data() {
     return {
@@ -111,8 +94,7 @@ export default {
       projects: [],
       creatorFullname: null,
 
-      isRenameModalActive: false,
-      newName: ''
+      isRenameModalActive: false
     };
   },
   computed: {
@@ -127,11 +109,6 @@ export default {
   watch: {
     ontology() {
       this.fetchOntology();
-    },
-    isRenameModalActive(val) {
-      if(val) {
-        this.newName = this.ontology.name;
-      }
     },
   },
   methods: {
@@ -162,16 +139,16 @@ export default {
       this.loading = false;
     },
 
-    async rename() {
+    async rename(newName) {
       let oldName = this.ontology.name;
       try {
-        this.fullOntology.name = this.newName;
+        this.fullOntology.name = newName;
         await this.fullOntology.save();
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-ontology-rename', {name: this.fullOntology.name})
         });
-        this.$emit('rename', this.newName);
+        this.$emit('rename', newName);
       }
       catch(error) {
         console.log(error);

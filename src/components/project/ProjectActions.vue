@@ -1,81 +1,59 @@
 <template>
 <div class="project-actions-wrapper">
-  <b-modal :active="isRenameModalActive" has-modal-card @close="isRenameModalActive = false">
-    <form @submit.prevent="rename()">
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{$t('rename-project')}}</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field :label="$t('new-name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-            <b-input v-model="newName" name="name" v-validate="'required'" />
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="isRenameModalActive = false">
-            {{$t('button-cancel')}}
-          </button>
-          <button class="button is-link" :disabled="errors.any()">
-            {{$t('button-save')}}
-          </button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+  <rename-modal
+    :title="$t('rename-project')"
+    :currentName="project.name"
+    :active.sync="isRenameModalActive"
+    @rename="rename"
+  />
 
-  <b-modal :active="isOntologyModalActive" has-modal-card @close="isOntologyModalActive = false">
-    <form @submit.prevent="saveOntology()">
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{$t('change-ontology')}}</p>
-        </header>
-        <section class="modal-card-body">
-          <b-message v-if="errorOntologies" type="is-danger" has-icon icon-size="is-small">
-            <h2> {{ $t('error') }} </h2>
-            <p> {{ $t('unexpected-error-info-message') }} </p>
-          </b-message>
-          <template v-else>
-            <b-message v-if="project.ontology" type="is-warning" has-icon icon-size="is-small">
-              {{$t('change-ontology-warning-message')}}
-            </b-message>
-            <b-field :label="$t('ontology')">
-              <b-select
-                v-model="selectedOntology"
-                :placeholder="$t('no-ontology')"
-                :disabled="loadingOntologies"
-                :loading="loadingOntologies"
-              >
-                <option :value="null">
-                  {{$t('no-ontology')}}
-                </option>
-                <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
-                  {{ontology.name}}
-                </option>
-              </b-select>
-            </b-field>
-          </template>
-        </section>
-        <footer class="modal-card-foot">
-          <button
-            class="button"
-            type="button"
-            @click="isOntologyModalActive = false"
-            :disabled="savingOntology"
+  <form @submit.prevent="saveOntology()">
+    <cytomine-modal :active="isOntologyModalActive" :title="$t('change-ontology')" @close="isOntologyModalActive = false">
+      <b-message v-if="errorOntologies" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t('error') }} </h2>
+        <p> {{ $t('unexpected-error-info-message') }} </p>
+      </b-message>
+      <template v-else>
+        <b-message v-if="project.ontology" type="is-warning" has-icon icon-size="is-small">
+          {{$t('change-ontology-warning-message')}}
+        </b-message>
+        <b-field :label="$t('ontology')">
+          <b-select
+            v-model="selectedOntology"
+            :placeholder="$t('no-ontology')"
+            :disabled="loadingOntologies"
+            :loading="loadingOntologies"
           >
-            {{$t('button-cancel')}}
-          </button>
-          <button
-            v-if="!errorOntologies"
-            class="button is-link"
-            :class="{'is-loading': savingOntology}"
-            :disabled="loadingOntologies || savingOntology"
-          >
-            {{$t('button-save')}}
-          </button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+            <option :value="null">
+              {{$t('no-ontology')}}
+            </option>
+            <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
+              {{ontology.name}}
+            </option>
+          </b-select>
+        </b-field>
+      </template>
+
+      <template #footer>
+        <button
+          class="button"
+          type="button"
+          @click="isOntologyModalActive = false"
+          :disabled="savingOntology"
+        >
+          {{$t('button-cancel')}}
+        </button>
+        <button
+          v-if="!errorOntologies"
+          class="button is-link"
+          :class="{'is-loading': savingOntology}"
+          :disabled="loadingOntologies || savingOntology"
+        >
+          {{$t('button-save')}}
+        </button>
+      </template>
+    </cytomine-modal>
+  </form>
 
   <div class="buttons">
     <button class="button" :class="size" @click="isRenameModalActive = true">
@@ -93,19 +71,22 @@
 
 <script>
 import {OntologyCollection} from 'cytomine-client';
+import CytomineModal from '@/components/layout/CytomineModal';
+import RenameModal from '@/components/layout/RenameModal';
 
 export default {
   name: 'project-actions',
-  $_veeValidate: {validator: 'new'},
   props: {
     project: {type: Object},
     size: {type: String, default: 'is-small'}
   },
+  components: {
+    CytomineModal,
+    RenameModal
+  },
   data() {
     return {
       isRenameModalActive: false,
-      newName: '',
-
       isOntologyModalActive: false,
       loadingOntologies: true,
       errorOntologies: false,
@@ -116,11 +97,6 @@ export default {
     };
   },
   watch: {
-    isRenameModalActive(val) {
-      if(val) {
-        this.newName = this.project.name;
-      }
-    },
     async isOntologyModalActive(val) {
       if(val) {
         if(this.loadingOntologies) { // first opening of the ontology modal => load ontologies
@@ -142,10 +118,10 @@ export default {
     }
   },
   methods: {
-    async rename() {
+    async rename(newName) {
       let updatedProject = this.project.clone();
       try {
-        updatedProject.name = this.newName;
+        updatedProject.name = newName;
         await updatedProject.save();
         this.$emit('update', updatedProject);
         this.$notify({

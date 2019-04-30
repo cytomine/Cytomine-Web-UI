@@ -1,42 +1,37 @@
 <template>
-<div class="image-magnification-wrapper">
-  <b-modal :active="active" has-modal-card @close="$emit('update:active', false)">
-    <form @submit.prevent="setMagnification()">
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{$t('set-magnification')}}</p>
-        </header>
-        <section class="modal-card-body">
-          <b-message type="is-warning" has-icon icon-size="is-small">
-            {{ $t('warning-change-applies-in-project-only') }}
-          </b-message>
+<form @submit.prevent="setMagnification()">
+  <cytomine-modal :active="active" :title="$t('set-magnification')" @close="$emit('update:active', false)">
+    <b-message type="is-warning" has-icon icon-size="is-small">
+      {{ $t('warning-change-applies-in-project-only') }}
+    </b-message>
 
-          <b-field :label="$t('magnification')" :type="fieldType" :message="errors.first('magnification')">
-            <b-input v-model="newMagnification" name="magnification" v-validate="'required|decimal|positive'" />
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button" type="button" @click="$emit('update:active', false)">
-            {{$t('button-cancel')}}
-          </button>
-          <button class="button is-link" :disabled="errors.any()">
-            {{$t('button-save')}}
-          </button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
-</div>
+    <b-field :label="$t('magnification')" :type="fieldType" :message="errors.first('magnification')">
+      <b-input v-model="newMagnification" name="magnification" v-validate="'required|decimal|positive'" />
+    </b-field>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
+import CytomineModal from '@/components/layout/CytomineModal';
+
 export default {
   name: 'magnification-modal',
-  $_veeValidate: {validator: 'new'},
   props: {
     active: {type: Boolean},
     image: {type: Object}
   },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       newMagnification: ''

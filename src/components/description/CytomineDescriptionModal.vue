@@ -1,46 +1,52 @@
 <template>
-<div class="description-modal modal-card" :class="{expanded: expanded}">
-  <div class="modal-card-head">
-    <p class="modal-card-title">{{ $t('description') }}</p>
+<cytomine-modal-card
+  :title="$t('description')"
+  class="description-modal"
+  :class="{expanded: expanded}"
+  @close="$parent.close()"
+>
+  <template #controls>
     <button class="button is-small" @click="expanded = !expanded">
       <i :class="['fas', expanded ? 'fa-compress' : 'fa-expand']"></i>
     </button>
+  </template>
+
+  <div v-if="!edit" class="ql-snow">
+    <div class="ql-editor preview" v-html="descriptionWithoutKeywords"></div>
   </div>
-  <div class="modal-card-body">
-    <div v-if="!edit" class="ql-snow">
-      <div class="ql-editor preview" v-html="descriptionWithoutKeywords"></div>
+
+  <template v-else>
+    <div class="keyword-info">
+      <i class="fas fa-info-circle"></i>
+      <i18n path="info-keyword-stop-preview-description">
+        <span place="keyword" class="keyword"> {{ stopPreviewKeyword }} </span>
+      </i18n>
     </div>
 
-    <template v-else>
-      <div class="keyword-info">
-        <i class="fas fa-info-circle"></i>
-        <i18n path="info-keyword-stop-preview-description">
-          <span place="keyword" class="keyword"> {{ stopPreviewKeyword }} </span>
-        </i18n>
-      </div>
+    <cytomine-quill-editor v-model="descriptionContent" :placeholder="$t('enter-description')" />
+  </template>
 
-      <cytomine-quill-editor v-model="descriptionContent" :placeholder="$t('enter-description')" />
-    </template>
-  </div>
-  <div class="modal-card-foot">
-    <button class="button" @click="$parent.close()">
-      {{ edit ? $t('button-cancel') : $t('button-close') }}
-    </button>
+  <template v-if="edit" #footer>
+    <button class="button" @click="$parent.close()">{{$t('button-cancel')}}</button>
     <button v-if="edit" class="button is-link" @click="save()"> {{ $t('button-save') }} </button>
-  </div>
-</div>
+  </template>
+</cytomine-modal-card>
 </template>
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
+import CytomineModalCard from '@/components/layout/CytomineModalCard';
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'cytomine-description-modal',
-  components: {CytomineQuillEditor},
   props: {
     description: Object,
     edit: Boolean
+  },
+  components: {
+    CytomineModalCard,
+    CytomineQuillEditor
   },
   data() {
     return {
@@ -77,19 +83,19 @@ export default {
 </script>
 
 <style lang="scss">
-.description-modal.expanded, .description-modal.expanded .modal-card-body {
-  width: 90vw;
-  height: 90vh;
-  max-height: 90vh;
-}
-
-.description-modal:not(.expanded), .description-modal:not(.expanded) .modal-card-body {
-  width: 50vw;
-  height: 60vh;
-  max-height: 60vh;
-}
-
 .description-modal {
+  &.expanded, &.expanded .modal-card-body {
+    width: 90vw;
+    height: 90vh;
+    max-height: 90vh;
+  }
+
+  &:not(.expanded), &:not(.expanded) .modal-card-body {
+    width: 50vw;
+    height: 60vh;
+    max-height: 60vh;
+  }
+
   .ql-editor.preview {
     padding: 0 0 1em 0;
     text-align: justify;

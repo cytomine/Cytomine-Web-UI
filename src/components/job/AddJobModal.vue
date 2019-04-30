@@ -1,102 +1,98 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true" class="add-job-modal">
-  <form @submit.prevent="createJob()">
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">{{$t('launch-new-analysis')}}</p>
-      </header>
-      <section class="modal-card-body">
-        <div class="columns">
-          <div class="column is-narrow">
-            <strong>{{$t('algorithm')}}</strong>
-          </div>
-          <div class="column">
-            <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name" />
-          </div>
-        </div>
-        <template v-if="selectedSoftware">
-          <table class="table is-fullwidth">
-            <thead>
-              <tr>
-                <th>{{$t('name')}}</th>
-                <th>{{$t('value')}}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <job-parameter-row
-                v-for="param in paramsMandatoryNoDefault"
-                :param="param"
-                :key="param.id"
-                v-model="param.value"
-              />
-
-              <tr class="row-separator" v-if="optionalParams.length > 0">
-                <td colspan="2">
-                  {{$t('optional-parameters')}}
-                  <button class="button is-small" type="button" @click="showOptional = !showOptional">
-                    {{$t(showOptional ? 'button-hide' : 'button-show')}}
-                  </button>
-                </td>
-              </tr>
-              <template v-if="showOptional">
-                <job-parameter-row
-                  v-for="param in optionalParams"
-                  :param="param"
-                  :key="param.id"
-                  v-model="param.value"
-                />
-              </template>
-
-              <tr class="row-separator" v-if="prefilledParams.length > 0">
-                <td colspan="2">
-                  {{$t('prefilled-parameters')}}
-                  <button class="button is-small" type="button" @click="showPrefilled = !showPrefilled">
-                    {{$t(showPrefilled ? 'button-hide' : 'button-show')}}
-                  </button>
-                </td>
-              </tr>
-              <template v-if="showPrefilled">
-                <job-parameter-row
-                  v-for="param in prefilledParams"
-                  :param="param"
-                  :key="param.id"
-                  v-model="param.value"
-                />
-              </template>
-            </tbody>
-          </table>
-        </template>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" type="button" @click="$emit('update:active', false)">
-          {{$t('button-cancel')}}
-        </button>
-        <button class="button is-link" :disabled="errors.any()">
-          {{$t('button-launch-new-analysis')}}
-        </button>
-      </footer>
+<form @submit.prevent="createJob()">
+  <cytomine-modal :active="active" :title="$t('launch-new-analysis')" @close="$emit('update:active', false)">
+    <div class="columns">
+      <div class="column is-narrow">
+        <strong>{{$t('algorithm')}}</strong>
+      </div>
+      <div class="column">
+        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name" />
+      </div>
     </div>
-  </form>
-</b-modal>
+    <template v-if="selectedSoftware">
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>{{$t('name')}}</th>
+            <th>{{$t('value')}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <job-parameter-row
+            v-for="param in paramsMandatoryNoDefault"
+            :param="param"
+            :key="param.id"
+            v-model="param.value"
+          />
+
+          <tr class="row-separator" v-if="optionalParams.length > 0">
+            <td colspan="2">
+              {{$t('optional-parameters')}}
+              <button class="button is-small" type="button" @click="showOptional = !showOptional">
+                {{$t(showOptional ? 'button-hide' : 'button-show')}}
+              </button>
+            </td>
+          </tr>
+          <template v-if="showOptional">
+            <job-parameter-row
+              v-for="param in optionalParams"
+              :param="param"
+              :key="param.id"
+              v-model="param.value"
+            />
+          </template>
+
+          <tr class="row-separator" v-if="prefilledParams.length > 0">
+            <td colspan="2">
+              {{$t('prefilled-parameters')}}
+              <button class="button is-small" type="button" @click="showPrefilled = !showPrefilled">
+                {{$t(showPrefilled ? 'button-hide' : 'button-show')}}
+              </button>
+            </td>
+          </tr>
+          <template v-if="showPrefilled">
+            <job-parameter-row
+              v-for="param in prefilledParams"
+              :param="param"
+              :key="param.id"
+              v-model="param.value"
+            />
+          </template>
+        </tbody>
+      </table>
+    </template>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-launch-new-analysis')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
 
 import {SoftwareCollection, Job, JobParameter} from 'cytomine-client';
+import CytomineModal from '@/components/layout/CytomineModal';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import JobParameterRow from './JobParameterRow';
 
 export default {
   name: 'add-job-modal',
-  $_veeValidate: {validator: 'new'},
-  components: {
-    CytomineMultiselect,
-    JobParameterRow
-  },
   props: {
     active: Boolean
   },
+  components: {
+    CytomineModal,
+    CytomineMultiselect,
+    JobParameterRow
+  },
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       softwares: [],
@@ -181,8 +177,13 @@ export default {
 </script>
 
 <style scoped>
-.modal-card {
+>>> .modal-card {
   width: 100%;
+  min-height: 70vh;
+}
+
+>>> .animation-content {
+  min-width: 70vw;
   min-height: 70vh;
 }
 
@@ -206,12 +207,5 @@ td {
   border-top-width: 2px !important;
   border-bottom-width: 1px !important;
   font-weight: 600;
-}
-</style>
-
-<style>
-.add-job-modal .animation-content {
-  min-width: 70vw;
-  min-height: 70vh;
 }
 </style>

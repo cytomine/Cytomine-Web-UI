@@ -1,9 +1,6 @@
 <template>
-<div class="modal-card">
-  <header class="modal-card-head">
-    <p class="modal-card-title">{{$t('about-cytomine')}}</p>
-  </header>
-  <section v-if="!loading" class="modal-card-body">
+<cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
+  <template v-if="!loading">
     <dl>
       <dt>{{$t('version')}}</dt>
       <dd>{{version || '?'}}</dd>
@@ -59,21 +56,18 @@
         </i18n>
       </dd>
     </dl>
-  </section>
-  <footer class="modal-card-foot">
-    <button class="button" type="button" @click="$parent.close()">
-      {{$t('button-close')}}
-    </button>
-  </footer>
-</div>
+  </template>
+</cytomine-modal-card>
 </template>
 
 <script>
 import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
+import CytomineModalCard from '@/components/layout/CytomineModalCard';
 
 export default {
   name: 'about-cytomine-wrapper',
+  components: {CytomineModalCard},
   data() {
     return {
       version: null,

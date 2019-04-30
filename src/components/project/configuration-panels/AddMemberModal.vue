@@ -1,27 +1,21 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-  <div class="modal-card add-member-modal">
-    <header class="modal-card-head">
-      <p class="modal-card-title">{{$t('add-members-to-project')}}</p>
-    </header>
-    <section class="modal-card-body">
-      <b-loading :is-full-page="false" :active="loading" class="small" />
-      <template v-if="!loading">
-        <b-field>
-          <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
-        </b-field>
-      </template>
-    </section>
-    <footer class="modal-card-foot">
+<cytomine-modal :active="active" :title="$t('add-members-to-project')" @close="$emit('update:active', false)">
+    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <template v-if="!loading">
+      <b-field>
+        <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
+      </b-field>
+    </template>
+
+    <template #footer>
       <button class="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" @click="addMembers">
         {{$t('button-add')}}
       </button>
-    </footer>
-  </div>
-</b-modal>
+    </template>
+</cytomine-modal>
 </template>
 
 <script>
@@ -29,13 +23,17 @@ import {get} from '@/utils/store-helpers';
 
 import {UserCollection} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
+import CytomineModal from '@/components/layout/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'add-member-modal',
-  components: {UserTaginput},
   props: {
     active: Boolean
+  },
+  components: {
+    CytomineModal,
+    UserTaginput
   },
   data() {
     return {
@@ -88,8 +86,8 @@ export default {
 };
 </script>
 
-<style>
-.add-member-modal, .add-member-modal .modal-card-body {
+<style scoped>
+>>> .modal-card, >>> .modal-card-body {
   overflow: visible !important;
   width: 60vw !important;
 }

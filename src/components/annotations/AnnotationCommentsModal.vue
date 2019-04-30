@@ -1,68 +1,60 @@
 <template>
-<div class="modal-card">
-  <header class="modal-card-head">
-    <p class="modal-card-title">{{$t('annotation-comments')}}</p>
-  </header>
-  <section class="modal-card-body">
-    <div v-if="!comments || !comments.length">
-      <em class="has-text-grey">
-        {{$t('no-annotation-comments')}}
-      </em>
-      <hr>
-    </div>
-    <template v-else>
-      <div class="comments-wrapper">
-        <div v-for="comment in comments" :key="comment.id">
-          <p class="comment-sender is-size-7">
-            <strong>{{ comment.senderName }}</strong>
-            <span class="has-text-grey">{{Number(comment.created) | moment('ll LT')}}</span>
-          </p>
-          <p class="comment-content">{{comment.comment}}</p>
-          <hr>
-        </div>
+<cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
+  <div v-if="!comments || !comments.length">
+    <em class="has-text-grey">
+      {{$t('no-annotation-comments')}}
+    </em>
+    <hr>
+  </div>
+  <template v-else>
+    <div class="comments-wrapper">
+      <div v-for="comment in comments" :key="comment.id">
+        <p class="comment-sender is-size-7">
+          <strong>{{ comment.senderName }}</strong>
+          <span class="has-text-grey">{{Number(comment.created) | moment('ll LT')}}</span>
+        </p>
+        <p class="comment-content">{{comment.comment}}</p>
+        <hr>
       </div>
-    </template>
-
-    <div v-show="!addingComment" class="has-text-centered">
-      <button class="button is-link" @click="addingComment = true">{{$t('button-add-comment')}}</button>
     </div>
+  </template>
 
-    <div v-show="addingComment">
-      <h2>{{$t('add-new-comment')}}</h2>
-      <b-message type="is-info" has-icon size="is-small">
-        {{$t('comment-will-be-sent-by-email')}}
-      </b-message>
-      <b-field>
-        <b-radio v-model="sendToAllMembers" :native-value="true">
-          {{$t('send-to-all-project-members')}}
-        </b-radio>
-      </b-field>
-      <b-field>
-        <b-radio v-model="sendToAllMembers" :native-value="false">
-          {{$t('send-to-some-members')}}
-        </b-radio>
-      </b-field>
-      <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
-        <user-taginput v-model="selectedMembers" :users="members" name="members" v-validate="'required'" />
-      </b-field>
-      <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
-        <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
-      </b-field>
-      <p class="buttons is-right are-small">
-        <button class="button" @click="addingComment = false" :disabled="loading">
-          {{$t('button-cancel')}}
-        </button>
-        <button class="button is-link" :class="{'is-loading': loading}"
-          :disabled="loading || errors.any()" @click="share()">
-          {{$t('button-share')}}
-        </button>
-      </p>
-    </div>
+  <div v-show="!addingComment" class="has-text-centered">
+    <button class="button is-link" @click="addingComment = true">{{$t('button-add-comment')}}</button>
+  </div>
 
-  </section>
-  <footer class="modal-card-foot">
-  </footer>
-</div>
+  <div v-show="addingComment">
+    <h2>{{$t('add-new-comment')}}</h2>
+    <b-message type="is-info" has-icon size="is-small">
+      {{$t('comment-will-be-sent-by-email')}}
+    </b-message>
+    <b-field>
+      <b-radio v-model="sendToAllMembers" :native-value="true">
+        {{$t('send-to-all-project-members')}}
+      </b-radio>
+    </b-field>
+    <b-field>
+      <b-radio v-model="sendToAllMembers" :native-value="false">
+        {{$t('send-to-some-members')}}
+      </b-radio>
+    </b-field>
+    <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
+      <user-taginput v-model="selectedMembers" :users="members" name="members" v-validate="'required'" />
+    </b-field>
+    <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
+      <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
+    </b-field>
+    <p class="buttons is-right are-small">
+      <button class="button" @click="addingComment = false" :disabled="loading">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :class="{'is-loading': loading}"
+        :disabled="loading || errors.any()" @click="share()">
+        {{$t('button-share')}}
+      </button>
+    </p>
+  </div>
+</cytomine-modal-card>
 </template>
 
 <script>
@@ -70,12 +62,14 @@ import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
+import CytomineModalCard from '@/components/layout/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'annotation-comments-modal',
   components: {
-    UserTaginput
+    UserTaginput,
+    CytomineModalCard
   },
   $_veeValidate: {validator: 'new'},
   props: {
@@ -146,11 +140,11 @@ export default {
 </script>
 
 <style scoped>
-.modal-card {
+>>> .modal-card {
   max-height: 80vh;
 }
 
-.modal-card-body {
+>>> .modal-card-body {
   display: flex;
   flex-direction: column;
 }

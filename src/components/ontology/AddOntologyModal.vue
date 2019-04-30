@@ -1,37 +1,33 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-  <form @submit.prevent="createOntology()">
-    <div class="modal-card add-image-modal">
-      <header class="modal-card-head">
-        <p class="modal-card-title">{{$t('create-ontology')}}</p>
-      </header>
-      <section class="modal-card-body">
-        <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-          <b-input v-model="name" name="name" v-validate="'required'" />
-        </b-field>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" type="button" @click="$emit('update:active', false)">
-          {{$t('button-cancel')}}
-        </button>
-        <button class="button is-link" :disabled="errors.any()">
-          {{$t('button-save')}}
-        </button>
-      </footer>
-    </div>
-  </form>
-</b-modal>
+<form @submit.prevent="createOntology()">
+  <cytomine-modal :active="active" :title="$t('create-ontology')" @close="$emit('update:active', false)">
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" name="name" v-validate="'required'" />
+    </b-field>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
 import {Ontology} from 'cytomine-client';
+import CytomineModal from '@/components/layout/CytomineModal';
 
 export default {
   name: 'add-ontology-modal',
-  $_veeValidate: {validator: 'new'},
   props: {
     active: Boolean
   },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
       name: ''
