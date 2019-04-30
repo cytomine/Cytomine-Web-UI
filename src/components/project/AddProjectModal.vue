@@ -51,7 +51,7 @@
 
 <script>
 import {Project, Ontology, OntologyCollection} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-project-modal',

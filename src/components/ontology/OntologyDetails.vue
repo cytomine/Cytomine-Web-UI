@@ -73,7 +73,7 @@
 import {get} from '@/utils/store-helpers';
 import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
-import RenameModal from '@/components/layout/RenameModal';
+import RenameModal from '@/components/utils/RenameModal';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

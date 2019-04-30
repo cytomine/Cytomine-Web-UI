@@ -39,7 +39,7 @@
 
 <script>
 import {AbstractImage, PropertyCollection} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'image-metadata-modal',

@@ -47,7 +47,7 @@ import {User, RoleCollection} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
 
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'user-modal',

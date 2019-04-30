@@ -78,7 +78,7 @@
 import {get} from '@/utils/store-helpers';
 
 import {SoftwareCollection, Job, JobParameter} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import JobParameterRow from './JobParameterRow';
 

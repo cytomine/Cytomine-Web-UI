@@ -71,8 +71,8 @@
 
 <script>
 import {OntologyCollection} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
-import RenameModal from '@/components/layout/RenameModal';
+import CytomineModal from '@/components/utils/CytomineModal';
+import RenameModal from '@/components/utils/RenameModal';
 
 export default {
   name: 'project-actions',

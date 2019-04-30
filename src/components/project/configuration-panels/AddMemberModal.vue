@@ -23,7 +23,7 @@ import {get} from '@/utils/store-helpers';
 
 import {UserCollection} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

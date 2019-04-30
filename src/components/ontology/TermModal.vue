@@ -22,7 +22,7 @@
 <script>
 import {Term} from 'cytomine-client';
 import {Sketch} from 'vue-color';
-import CytomineModalCard from '@/components/layout/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
   name: 'term-modal',

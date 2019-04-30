@@ -34,7 +34,7 @@
 
 <script>
 import {AttachedFile} from 'cytomine-client';
-import CytomineModalCard from '@/components/layout/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
   name: 'attached-file-modal',

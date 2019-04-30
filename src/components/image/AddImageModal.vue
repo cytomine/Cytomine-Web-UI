@@ -69,7 +69,7 @@
 // TODO: add endpoints in backend to allow backend pagination
 import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-image-modal',

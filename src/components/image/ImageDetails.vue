@@ -171,7 +171,7 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
-import RenameModal from '@/components/layout/RenameModal';
+import RenameModal from '@/components/utils/RenameModal';
 
 import {ImageInstance} from 'cytomine-client';
 

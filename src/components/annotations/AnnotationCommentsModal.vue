@@ -62,7 +62,7 @@ import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
 import UserTaginput from '@/components/user/UserTaginput';
-import CytomineModalCard from '@/components/layout/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

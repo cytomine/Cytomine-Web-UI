@@ -35,7 +35,7 @@
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import CytomineModalCard from '@/components/layout/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import constants from '@/utils/constants.js';
 
 export default {

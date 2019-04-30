@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import CytomineModalCard from '@/components/layout/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
   name: 'hotkeys-modal',

@@ -19,7 +19,7 @@
 
 <script>
 import {Ontology} from 'cytomine-client';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-ontology-modal',

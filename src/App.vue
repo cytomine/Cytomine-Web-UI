@@ -37,7 +37,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import CytomineNavbar from './components/layout/CytomineNavbar.vue';
+import CytomineNavbar from './components/navbar/CytomineNavbar.vue';
 import Login from './components/user/Login.vue';
 
 import {Cytomine} from 'cytomine-client';

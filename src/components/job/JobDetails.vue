@@ -143,7 +143,7 @@ import {get} from '@/utils/store-helpers';
 
 import {Job, JobStatus, JobDataCollection, Task} from 'cytomine-client';
 import filesize from 'filesize';
-import CytomineModal from '@/components/layout/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
