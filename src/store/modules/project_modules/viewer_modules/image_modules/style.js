@@ -1,4 +1,4 @@
-import {createColorStyle, changeOpacity} from '@/utils/style-utils.js';
+import {createColorStyle, createLineStyle, changeOpacity} from '@/utils/style-utils.js';
 
 let initialTermsOpacity = 1;
 let initialLayersOpacity = 0.5;
@@ -41,6 +41,7 @@ export default {
       let term = state.terms[indexTerm];
       term.opacity = opacity;
       changeOpacity(term.olStyle, state.layersOpacity*opacity);
+      changeOpacity(term.olLineStyle, state.layersOpacity*opacity);
     },
 
     setNoTermOpacity(state, opacity) {
@@ -52,6 +53,7 @@ export default {
       state.terms.forEach(term => {
         term.opacity = initialTermsOpacity;
         changeOpacity(term.olStyle, state.layersOpacity*initialTermsOpacity);
+        changeOpacity(term.olLineStyle, state.layersOpacity*initialTermsOpacity);
       });
       state.noTermOpacity = initialTermsOpacity;
       changeOpacity(state.noTermStyle, state.layersOpacity*state.noTermOpacity);
@@ -60,7 +62,10 @@ export default {
     setLayersOpacity(state, opacity) {
       state.layersOpacity = opacity;
       if(state.terms) {
-        state.terms.forEach(term => changeOpacity(term.olStyle, opacity*term.opacity));
+        state.terms.forEach(term => {
+          changeOpacity(term.olStyle, opacity*term.opacity);
+          changeOpacity(term.olLineStyle, opacity*term.opacity);
+        });
       }
       changeOpacity(state.noTermStyle, opacity*state.noTermOpacity);
       changeOpacity(state.multipleTermsStyle, opacity);
@@ -116,6 +121,7 @@ function formatTerm(term, layersOpacity) {
   let result = {id: term.id};
   result.opacity = initialTermsOpacity;
   result.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+  result.olLineStyle = createLineStyle(term.color, initialTermsOpacity*layersOpacity);
   result.visible = true;
   return result;
 }

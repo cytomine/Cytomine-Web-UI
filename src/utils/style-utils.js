@@ -20,9 +20,9 @@ function createStroke(opacity=0.5) {
 
 export function createColorStyle(color, opacity=0.5) {
   let colorArray = hexToRgb(color);
-
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
+
   let fill = new Fill({color: colorWithOpacity});
 
   let circleStyle = new Circle({
@@ -37,6 +37,16 @@ export function createColorStyle(color, opacity=0.5) {
     stroke: createStroke(opacity),
     image: circleStyle
   });
+}
+
+// -----
+
+export function createLineStyle(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  return new Style({ stroke: new Stroke({color: colorWithOpacity, width: 3}) });
 }
 
 // -----
@@ -99,11 +109,18 @@ export let reviewedSelectStyles = [
 // -----
 
 export function changeOpacity(style, opacity) {
-  let color = style.getStroke().getColor();
-  color[3] = opacity;
-  color = style.getFill().getColor();
-  color[3] = opacity;
-  style.getImage().setOpacity(opacity);
+  let stroke = style.getStroke();
+  if(stroke) {
+    stroke.getColor()[3] = opacity;
+  }
+  let fill = style.getFill();
+  if(fill) {
+    fill.getColor()[3] = opacity;
+  }
+  let image = style.getImage();
+  if(image) {
+    image.setOpacity(opacity);
+  }
 }
 
 // -----

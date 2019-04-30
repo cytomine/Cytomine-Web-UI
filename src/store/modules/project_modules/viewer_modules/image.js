@@ -92,7 +92,12 @@ export default {
           if(!wrappedTerm.visible) {
             return; // do not display annot
           }
-          styles.push(wrappedTerm.olStyle);
+          if(feature.getGeometry().getType() === 'LineString') {
+            styles.push(wrappedTerm.olLineStyle);
+          }
+          else {
+            styles.push(wrappedTerm.olStyle);
+          }
         }
         else {
           styles.push(state.style.noTermStyle); // could not find term => display no term style
