@@ -51,19 +51,19 @@
     <tr v-if="isPropDisplayed('description')">
       <td class="prop-label">{{$t('description')}}</td>
       <td class="prop-content">
-        <cytomine-description :object="project" />
+        <cytomine-description :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('properties')">
       <td class="prop-label">{{$t('properties')}}</td>
       <td class="prop-content">
-        <cytomine-properties :object="project" />
+        <cytomine-properties :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('attachedFiles')">
       <td class="prop-label">{{$t('attached-files')}}</td>
       <td class="prop-content">
-        <attached-files :object="project" />
+        <attached-files :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('ontology')">

@@ -37,19 +37,19 @@
       <tr v-if="isPropDisplayed('description')">
         <td class="prop-label">{{$t('description')}}</td>
         <td class="prop-content">
-          <cytomine-description :object="image" />
+          <cytomine-description :object="image" :canEdit="canEdit" />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content">
-          <cytomine-properties :object="image" />
+          <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('attachedFiles')">
         <td class="prop-label">{{$t('attached-files')}}</td>
         <td class="prop-content">
-          <attached-files :object="image" />
+          <attached-files :object="image" :canEdit="canEdit" />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('slidePreview')">
