@@ -49,6 +49,7 @@
     "@vue/cli-plugin-eslint": "^3.6.0",
     "@vue/cli-service": "^3.5.3",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "eslint": "^5.16.0",
     "i18n-csv2json-cli": "^1.0.2",
     "node-sass": "^4.11.0",
     "onchange": "^5.2.0",
