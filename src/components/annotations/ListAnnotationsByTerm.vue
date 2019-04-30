@@ -1,5 +1,6 @@
 <template>
 <div class="box">
+  <b-loading :is-full-page="false" class="small" :active="loading" />
   <h2> {{ title }} ({{nbAnnotations}}) </h2>
   <template v-if="error">
     <b-message type="is-danger" has-icon icon-size="is-small">
@@ -59,7 +60,6 @@ import {AnnotationCollection} from 'cytomine-client';
 
 export default {
   name: 'list-annotations-by-term',
-  components: {AnnotationDetails},
   props: {
     nbPerPage: Number,
     size: Number,
@@ -79,8 +79,10 @@ export default {
 
     revision: Number
   },
+  components: {AnnotationDetails},
   data() {
     return {
+      loading: false,
       error: false,
       annotations: [],
       nbAnnotations: 0,
@@ -142,6 +144,8 @@ export default {
         return;
       }
 
+      this.loading = true;
+
       try {
         let data = await this.collection.fetchPage(this.currentPage - 1);
         this.annotations = data.array;
@@ -163,6 +167,7 @@ export default {
         this.nbAnnotations = 0;
         this.error = true;
       }
+      this.loading = false;
     },
     viewAnnot(annot) {
       this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
