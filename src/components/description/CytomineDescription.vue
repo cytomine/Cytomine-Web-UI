@@ -2,19 +2,24 @@
 <div :class="['description-wrapper', loading ? 'loading' : '']">
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <template v-if="!loading">
-    <template v-if="definedDescription">
+    <template v-if="description">
       <div class="ql-snow">
         <div class="ql-editor" v-html="previewDescription"></div> <!-- WARNING can lead to js injection -->
       </div>
-      <a @click="openModal(false)"> {{ $t('see-full-text') }} </a>
-      <template v-if="canEdit">
-        {{ $t('or') }}
-        <a @click="openModal(true)"> {{ $t('edit') }} </a>
-      </template>
+      <div class="buttons are-small">
+        <button class="button" v-if="croppedDescription" @click="openModal(false)">
+          {{ $t('button-full-text') }}
+        </button>
+        <button class="button" v-if="canEdit" @click="openModal(true)">
+          {{ $t('button-edit') }}
+        </button>
+      </div>
     </template>
     <template v-else>
       <em>{{$t('no-description')}}</em>
-      <a v-if="canEdit" @click="openModal(true)"> {{ $t('add-one') }} </a>
+      <button v-if="canEdit" class="button is-small margin" @click="openModal(true)">
+        {{$t('button-add')}}
+      </button>
     </template>
   </template>
 </div>
@@ -41,14 +46,7 @@ export default {
     };
   },
   computed: {
-    definedDescription() {
-      return !this.description.isNew();
-    },
     previewDescription() {
-      if(!this.description) {
-        return null;
-      }
-
       let posStop = this.description.data.indexOf(constants.STOP_PREVIEW_KEYWORD);
       if(posStop !== -1) {
         return this.description.data.substring(0, posStop);
@@ -59,6 +57,9 @@ export default {
       else {
         return this.description.data;
       }
+    },
+    croppedDescription() {
+      return this.description.data.length !== this.previewDescription.length;
     }
   },
   methods: {
@@ -70,8 +71,14 @@ export default {
       this.$modal.open({
         parent: this,
         component: DescriptionModal,
-        props: {description: this.description, edit},
-        hasModalCard: true
+        props: {
+          description: this.description || new Description({data: '', object: this.object}),
+          edit
+        },
+        hasModalCard: true,
+        events: {
+          change: newDesc => this.description = newDesc
+        }
       });
     }
   },
@@ -81,7 +88,6 @@ export default {
     }
     catch(err) {
       // the error may make sense if the object has no description
-      this.description = new Description({data: '', object: this.object});
     }
     this.loading = false;
   }
@@ -101,5 +107,13 @@ export default {
 
 .description-wrapper.loading {
   min-height: 3em;
+}
+
+.button.margin {
+  margin-left: 0.5em;
+}
+
+.ql-snow {
+  margin-bottom: 0.5em;
 }
 </style>

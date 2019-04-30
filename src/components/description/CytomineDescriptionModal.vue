@@ -64,14 +64,21 @@ export default {
   },
   methods: {
     async save() {
-      let oldData = this.description.data;
+      let updatedDesc = this.description.clone();
       try {
-        this.description.data = this.descriptionContent;
-        await this.description.save();
+        if(this.descriptionContent) {
+          updatedDesc.data = this.descriptionContent;
+          await updatedDesc.save();
+          this.$emit('change', updatedDesc);
+        }
+        else if(this.description.data) { // if description existed, and content was emptied by user, delete description model
+          await updatedDesc.delete();
+          this.$emit('change', null);
+        }
         this.$parent.close();
       }
       catch(error) {
-        this.description.data = oldData;
+        this.descriptionContent = this.description.data;
         this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
       }
     }
