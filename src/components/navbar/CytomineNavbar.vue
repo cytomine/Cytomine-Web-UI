@@ -39,10 +39,13 @@
         :title="currentUserFullInfo"
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
-        :listPathes="['/account']"
+        :listPathes="['/account', '/activity']"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
+        </router-link>
+        <router-link to="/activity" class="navbar-item">
+          <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
         </router-link>
         <template v-if="currentUser.admin">
           <a v-if="!currentUser.adminByNow" class="navbar-item" @click="openAdminSession()">

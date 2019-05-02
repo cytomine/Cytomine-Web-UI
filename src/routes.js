@@ -18,6 +18,7 @@ import CytomineViewer from './components/viewer/CytomineViewer.vue';
 import CytomineProject from './components/project/CytomineProject.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
+import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 
 // Define routes
@@ -99,6 +100,10 @@ const routes = [
         component: PageNotFound
       }
     ]
+  },
+  {
+    path: '/activity',
+    component: UserActivity
   },
   {
     path: '/admin',
