@@ -9,9 +9,7 @@
     <div v-for="(day, idx) in month.days" :key="idx">
       <h4>{{day.refDate | moment('ll')}}</h4>
       <ul>
-        <li v-for="action in day.actions" :key="action.id">
-          <strong>{{Number(action.created) | moment('l LTS')}}:</strong> {{action.message}}
-        </li>
+        <activity-logs-item v-for="action in day.actions" :action="action" :key="action.id" />
       </ul>
     </div>
   </div>
@@ -30,6 +28,8 @@ import {Project} from 'cytomine-client';
 import moment from 'moment';
 import _ from 'lodash';
 
+import ActivityLogsItem from './ActivityLogsItem';
+
 export default {
   name: 'activity-logs',
   props: {
@@ -38,6 +38,7 @@ export default {
     idUser: Number,
     project: Object
   },
+  components: {ActivityLogsItem},
   data() {
     return {
       loading: true,
@@ -56,7 +57,8 @@ export default {
         user: this.idUser,
         startDate: this.startDate,
         endDate: this.endDate,
-        project: this.project ? this.project.id : null
+        project: this.project ? this.project.id : null,
+        fullData: true
       };
     },
     formattedActions() {
@@ -179,14 +181,6 @@ h4 {
   text-transform: uppercase;
   font-weight: bold;
   font-size: 0.9rem;
-}
-
-ul {
-  margin-left: 2.5em;
-}
-
-li {
-  margin-bottom: 0.6em;
 }
 
 .button {
