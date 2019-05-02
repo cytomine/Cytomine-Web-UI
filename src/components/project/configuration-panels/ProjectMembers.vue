@@ -257,12 +257,18 @@ export default {
     },
     async removeSelectedMembers() {
       let updatedProject = this.project.clone();
-      updatedProject.users = this.allMembers.reduce((ids, member) => {
-        if(!member.selected) {
-          ids.push(member.id);
+      let users = [];
+      let admins = [];
+      this.allMembers.forEach(member => {
+        if(!member.selected) { // keep only the members not selected for deletion
+          users.push(member.id);
+          if(member.role !== this.contributorRole) {
+            admins.push(member.id);
+          }
         }
-        return ids;
-      }, []);
+      });
+      updatedProject.users = users;
+      updatedProject.admins = admins;
 
       try {
         await updatedProject.save();
