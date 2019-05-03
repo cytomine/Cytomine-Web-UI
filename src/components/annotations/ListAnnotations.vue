@@ -154,13 +154,6 @@
 
         </div>
       </div>
-
-      <h2 class="has-text-right"> {{ $t('download-results') }} </h2>
-      <div class="buttons download-buttons">
-        <a class="button is-link" :href="downloadURL('pdf')">{{$t('download-PDF')}}</a>
-        <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
-        <a class="button is-link" :href="downloadURL('xls')">{{$t('download-excel')}}</a>
-      </div>
     </div>
 
     <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
@@ -187,6 +180,15 @@
       @addTerm="addTerm"
       @update="revision++"
     />
+
+    <div class="box">
+      <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+      <div class="buttons is-centered">
+        <a class="button is-link" :href="downloadURL('pdf')">{{$t('download-PDF')}}</a>
+        <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
+        <a class="button is-link" :href="downloadURL('xls')">{{$t('download-excel')}}</a>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -443,7 +445,7 @@ export default {
   margin-bottom: 1.25rem;
 }
 
-.download-buttons {
-  justify-content: flex-end;
+.filter.column {
+  padding: 0.4em 0.75em;
 }
 </style>
