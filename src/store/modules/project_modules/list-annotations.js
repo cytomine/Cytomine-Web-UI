@@ -17,6 +17,8 @@ export default {
         images: null,
         termsIds: null
       },
+      fromDate: null,
+      toDate: null,
 
       currentPages: {} // mapping of type {idTerm: currentPage}
     };
@@ -43,10 +45,20 @@ export default {
       state.filters[filterName] = propValue;
     },
 
+    setFromDate(state, date) {
+      state.fromDate = date;
+    },
+
+    setToDate(state, date) {
+      state.toDate = date;
+    },
+
     resetPagesAndFilters(state) {
       for(let key in state.filters) {
         state.filters[key] = null;
       }
+      state.fromDate = null;
+      state.toDate = null;
       state.currentPages = {};
     },
 

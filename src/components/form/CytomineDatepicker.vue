@@ -1,5 +1,6 @@
 <template>
 <b-datepicker
+  :class="styles"
   :value="value"
   @input="$emit('input', $event)"
   :placeholder="placeholder || this.$t('select-date')"
@@ -25,7 +26,8 @@ export default {
     resetButton: {type: Boolean, default: true},
     maxDate: Date,
     minDate: Date,
-    placeholder: String
+    placeholder: String,
+    styles: {type: Array, default: () => []} // accept "multiselect", "bold-placeholder"
   },
   computed: {
     moment() {
@@ -34,3 +36,24 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.datepicker.multiselect .input {
+  min-height: 40px;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 5px;
+  border: 1px solid #e8e8e8;
+  font-size: 1rem;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #adadad;
+    opacity: 1;
+  }
+}
+
+.datepicker.bold-placeholder .input::placeholder {
+  font-weight: 600;
+  color: black !important;
+}
+</style>

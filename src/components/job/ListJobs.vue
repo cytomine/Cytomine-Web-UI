@@ -43,7 +43,12 @@
               {{$t('execution-date')}}
             </div>
             <div class="filter-body">
-              <cytomine-datepicker v-model="selectedDate" :placeholder="$t('all')" :maxDate="new Date()" />
+              <cytomine-datepicker
+                v-model="selectedDate"
+                :styles="['multiselect', 'bold-placeholder']"
+                :placeholder="$t('all')"
+                :maxDate="new Date()"
+              />
             </div>
           </div>
 
@@ -275,21 +280,3 @@ export default {
   margin-bottom: 1.5em;
 }
 </style>
-
-<style lang="scss">
-.list-jobs-wrapper .datepicker .input {
-  min-height: 40px;
-  background-color: rgba(255, 255, 255, 0.75);
-  border-radius: 5px;
-  border: 1px solid #e8e8e8;
-  font-size: 1rem;
-  font-family: inherit;
-
-  &::placeholder {
-    color: black !important;
-    opacity: 1;
-    font-weight: 600;
-  }
-}
-</style>
-

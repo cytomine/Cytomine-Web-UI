@@ -63,7 +63,7 @@
       <h2> {{ $t('filters') }} </h2>
       <div class="filters">
         <div class="columns">
-          <div class="column filter">
+          <div class="column filter is-third">
             <div class="filter-label">
               {{$t('annotation-type')}}
             </div>
@@ -77,7 +77,37 @@
             </div>
           </div>
 
-          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter">
+          <div class="column filter is-third">
+            <div class="filter-label">
+              {{$t('images')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                v-model="selectedImages"
+                :options="images"
+                :label="blindMode ? 'blindedName' : 'instanceFilename'"
+                track-by="id"
+                :multiple="true"
+              />
+            </div>
+          </div>
+
+          <div v-if="ontology" class="column filter">
+              <div class="filter-label">
+                {{$t('terms')}}
+              </div>
+              <div class="filter-body">
+                <ontology-tree-multiselect
+                  :ontology="ontology"
+                  :additionalNodes="additionalNodes"
+                  v-model="selectedTermsIds"
+                />
+              </div>
+          </div>
+        </div>
+
+        <div class="columns">
+           <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter">
             <div class="filter-label">
               {{$t('analyses')}}
             </div>
@@ -121,35 +151,23 @@
               />
             </div>
           </div>
-        </div>
 
-        <div class="columns">
-          <div class="column filter is-half">
+          <div class="column filter">
             <div class="filter-label">
-              {{$t('images')}}
+              {{$t('from')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect
-                v-model="selectedImages"
-                :options="images"
-                :label="blindMode ? 'blindedName' : 'instanceFilename'"
-                track-by="id"
-                :multiple="true"
-              />
+              <cytomine-datepicker v-model="fromDate" :styles="['multiselect']" :maxDate="toDate || new Date()" />
             </div>
           </div>
 
-          <div v-if="ontology" class="column filter">
-              <div class="filter-label">
-                {{$t('terms')}}
-              </div>
-              <div class="filter-body">
-                <ontology-tree-multiselect
-                  :ontology="ontology"
-                  :additionalNodes="additionalNodes"
-                  v-model="selectedTermsIds"
-                />
-              </div>
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('to')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-datepicker v-model="toDate" :styles="['multiselect']" :minDate="fromDate" />
+            </div>
           </div>
 
         </div>
@@ -172,6 +190,8 @@
       :usersIds="selectedUsersIds"
       :reviewed="reviewed"
       :reviewUsersIds="reviewUsersIds"
+      :afterThan="afterThan"
+      :beforeThan="beforeThan"
 
       :revision="revision"
 
@@ -197,6 +217,7 @@
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
 import ListAnnotationsByTerm from './ListAnnotationsByTerm';
@@ -215,6 +236,7 @@ export default {
   name: 'list-annotations',
   components: {
     CytomineMultiselect,
+    CytomineDatepicker,
     OntologyTreeMultiselect,
     ListAnnotationsByTerm
   },
@@ -325,6 +347,15 @@ export default {
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
+    fromDate: sync('fromDate', storeOptions),
+    toDate: sync('toDate', storeOptions),
+
+    afterThan() {
+      return this.fromDate ? this.fromDate.getTime() : null;
+    },
+    beforeThan() {
+      return this.toDate ? this.toDate.setHours(23, 59, 59, 999) : null;
+    },
 
     reviewed() {
       return this.selectedAnnotationType === this.reviewedAnnotationOption;
@@ -353,7 +384,9 @@ export default {
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
-        multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
+        multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id),
+        afterThan: this.afterThan,
+        beforeThan: this.beforeThan
       });
     },
   },

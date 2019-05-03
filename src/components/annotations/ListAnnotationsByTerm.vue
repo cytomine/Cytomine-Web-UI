@@ -72,6 +72,8 @@ export default {
     usersIds: Array,
     reviewed: Boolean,
     reviewUsersIds: Array,
+    afterThan: Number,
+    beforeThan: Number,
 
     allTerms: Array,
     allUsers: Array,
@@ -102,6 +104,8 @@ export default {
         multipleTerm: this.multipleTerms,
         showTerm: true,
         showGIS: true,
+        afterThan: this.afterThan,
+        beforeThan: this.beforeThan,
         max: this.nbPerPage
       });
     },
