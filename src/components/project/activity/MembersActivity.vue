@@ -35,7 +35,7 @@
             </div>
             <div class="filter-body">
               <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" :multiple="true"
-                :searchable="false" disabled />
+                :searchable="false" />
             </div>
           </div>
 
