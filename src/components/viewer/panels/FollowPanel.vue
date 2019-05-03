@@ -180,7 +180,7 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            this.$store.commit(this.viewerModule + 'unlinkImage', this.index);
+            this.$store.commit(this.viewerModule + 'unlinkImage', {indexImage: this.index});
             this.trackedUser = value;
           },
           onCancel: () => this.trackedUserModel = null

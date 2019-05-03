@@ -31,41 +31,36 @@ export default {
 
     // ----- View links
 
-    linkImages(state, indexes) {
-      let links = state.links;
-      let groups = indexes.map(index => links.findIndex(group => group.includes(index))); // find to which link group (if any) each image belongs
-
-      if(groups[0] !== -1) { // if first image belongs to a link group
-        if(groups[1] === -1) {
-          links[groups[0]].push(indexes[1]);
-        }
-        else if(groups[0] !== groups[1]) { // merge the groups
-          links[groups[0]].push(...links[groups[1]]);
-          links.splice(groups[1], 1);
-        }
-      }
-      else if(groups[1] !== -1) { // if second image belongs to a link group
-        links[groups[1]].push(indexes[0]);
-      }
-      else { // create new group linking the images
-        links.push(indexes);
-      }
+    createLinkGroup(state, indexes) {
+      state.links.push(indexes);
     },
 
-    unlinkImage(state, index) {
+    linkImageToGroup(state, {indexGroup, indexImage}) {
+      state.links[indexGroup].push(indexImage);
+    },
+
+
+    mergeLinkGroups(state, indexes) {
+      state.links[indexes[0]].push(...state.links[indexes[1]]);
+      state.links.splice(indexes[1], 1);
+    },
+
+    unlinkImage(state, {indexGroup, indexImage}) {
       let links = state.links;
-      let groupIndex = links.findIndex(group => group.includes(index));
-      if(groupIndex === -1) {
-        return;
+      if(!indexGroup) { // if group not specified, find the group of the provided image
+        indexGroup = links.findIndex(group => group.includes(indexImage));
+        if(indexGroup === -1) {
+          return;
+        }
       }
 
-      let group = links[groupIndex];
-      let indexWithinGroup = group.findIndex(idx => idx === index);
+      let group = links[indexGroup];
+      let indexWithinGroup = group.findIndex(idx => idx === indexImage);
       group.splice(indexWithinGroup, 1);
       if(group.length === 1) { // if group no longer contains several images, delete it
-        links.splice(groupIndex, 1);
+        links.splice(indexGroup, 1);
       }
-    },
+    }
   },
 
   actions: {
@@ -136,7 +131,7 @@ export default {
     },
 
     removeImage({commit, getters, dispatch}, index) {
-      commit('unlinkImage', index);
+      commit('unlinkImage', {indexImage: index});
       this.unregisterModule(getters.pathImageModule(index), imageModule);
       dispatch('changePath');
     },
