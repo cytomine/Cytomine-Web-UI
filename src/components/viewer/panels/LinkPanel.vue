@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       revisionNumber: 0
-    }
+    };
   },
   computed: {
     viewerModule() {
@@ -111,7 +111,7 @@ export default {
     },
     otherSoloImages() {
       return Object.values(this.imagesWithNum).filter(img => {
-        return img.index !== this.index && !this.inGroupsIndexes.includes(img.index)
+        return img.index !== this.index && !this.inGroupsIndexes.includes(img.index);
       });
     },
     trackedUser() {
@@ -127,7 +127,7 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            event.target.checked = false // reset state of checkbox
+            event.target.checked = false; // reset state of checkbox
             this.$store.commit(this.imageModule + 'setTrackedUser', null);
             this.link(indexGroup, indexImage);
           },
@@ -135,7 +135,7 @@ export default {
         });
       }
       else {
-        event.target.checked = false // reset state of checkbox
+        event.target.checked = false; // reset state of checkbox
         this.link(indexGroup, indexImage);
       }
     },
