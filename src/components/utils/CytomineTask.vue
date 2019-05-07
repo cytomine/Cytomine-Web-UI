@@ -54,3 +54,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.progress {
+  margin: 0.5em 0 !important;
+}
+</style>

@@ -51,6 +51,7 @@ export default {
       this.imageWrapper.draw.activeEditTool; // style is different in edit mode (vertices displayed)
       this.imageWrapper.properties.selectedPropertyValues;
       this.imageWrapper.properties.selectedPropertyColor;
+      this.imageWrapper.review.reviewMode;
 
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];

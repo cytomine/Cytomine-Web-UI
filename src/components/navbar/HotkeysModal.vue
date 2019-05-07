@@ -28,7 +28,9 @@
     <div class="column">
       <h2>{{$t('review')}}</h2>
       <ul>
-          <!-- TODO -->
+        <li><span class="key">a</span> {{$t('hotkey-accept-annotation')}}</li>
+        <li><span class="key">r</span> {{$t('hotkey-reject-annotation')}}</li>
+        <li><span class="key">t</span> {{$t('hotkey-toggle-review')}}</li>
       </ul>
     </div>
   </div>

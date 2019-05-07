@@ -25,6 +25,13 @@ export default {
     toggleLayerDrawOn(state, indexLayer) {
       let layer = state.selectedLayers[indexLayer];
       layer.drawOn = !layer.drawOn;
+    },
+
+    filterSelectedLayers(state, idLayers) {
+      if(!state.selectedLayers) {
+        return;
+      }
+      state.selectedLayers = state.selectedLayers.filter(layer => idLayers.includes(layer.id));
     }
   },
 

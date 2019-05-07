@@ -1,21 +1,36 @@
 <template>
-<span v-if="user">
+<span v-if="resolvedUser">
   <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online !== null"></span>
-  {{displayFullName ? fullName : user.username}}</span></template>
+  {{displayFullName ? fullName : resolvedUser.username}}</span></template>
 
 <script>
+import {User} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'username',
   props: {
-    user: {type: Object},
+    user: Object,
+    id: Number, // if user not set, the user corresponding to the provided id will be fetched
     online: {type: Boolean, default: null},
     displayFullName: {type: Boolean, default: true}
   },
+  data() {
+    return {
+      fetchedUser: {}
+    };
+  },
   computed: {
+    resolvedUser() {
+      return this.user || this.fetchedUser;
+    },
     fullName() {
-      return fullName(this.user);
+      return fullName(this.resolvedUser);
+    }
+  },
+  async created() {
+    if(!this.user && this.id) {
+      this.fetchedUser = await User.fetch(this.id);
     }
   }
 };
