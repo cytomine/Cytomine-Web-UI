@@ -40,7 +40,7 @@ export default {
     },
     computed: {
         isConverted() {
-            return this.file.status == UploadedFileStatus.CONVERTED;
+            return this.file.status === UploadedFileStatus.CONVERTED;
         },
         labels() {
             return {

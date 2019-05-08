@@ -39,10 +39,10 @@ import constants from "@/utils/constants.js";
 export default {
     name: "cytomine-description-modal",
     components: {CytomineQuillEditor},
-    props: [
-        "description",
-        "edit"
-    ],
+    props: {
+        description: Object,
+        edit: Boolean
+    },
     data() {
         return {
             descriptionContent: "",

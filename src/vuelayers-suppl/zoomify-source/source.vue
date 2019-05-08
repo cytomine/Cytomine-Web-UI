@@ -3,8 +3,10 @@
  * @module zoomify-source/source
  */
 import ZoomifySource from "ol/source/Zoomify";
+import {createFromTileUrlFunctions} from "ol/tileurlfunction";
 import tileSource from "vuelayers/lib/mixin/tile-source";
 import TileGrid from "ol/tilegrid/TileGrid";
+import {DEFAULT_TILE_SIZE} from "ol/tilegrid/common";
 
 const props = {
     tierSizeCalculation: {
@@ -16,11 +18,66 @@ const props = {
     size: {
         type: Array,
     },
+    url: {
+        type: [String, Function],
+        required: false // override property since it is not required if urls is set
+    },
+    urls: {
+        type: Array
+    },
+    tileSize: {
+        type: Number,
+        default: DEFAULT_TILE_SIZE
+    },
 };
+
+const data = () => {
+    return {
+        tierSizeInTiles: null,
+        tileCountUpToTier: null,
+        resolutions: null
+    };
+};
+
+function created() { // source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/Zoomify.js#L137
+    const size = this.size;
+    const imageWidth = size[0];
+    const imageHeight = size[1];
+    const tierSizeInTiles = [];
+    let tileSizeForTierSizeCalculation = this.tileSize;
+    while (imageWidth > tileSizeForTierSizeCalculation || imageHeight > tileSizeForTierSizeCalculation) {
+        tierSizeInTiles.push([
+            Math.ceil(imageWidth / tileSizeForTierSizeCalculation),
+            Math.ceil(imageHeight / tileSizeForTierSizeCalculation),
+        ]);
+        tileSizeForTierSizeCalculation += tileSizeForTierSizeCalculation;
+    }
+    tierSizeInTiles.push([1, 1]);
+    tierSizeInTiles.reverse();
+
+    const resolutions = [1];
+    const tileCountUpToTier = [0];
+    for (let i = 1, ii = tierSizeInTiles.length; i < ii; i++) {
+        resolutions.push(1 << i);
+        tileCountUpToTier.push(
+            tierSizeInTiles[i - 1][0] * tierSizeInTiles[i - 1][1] +
+            tileCountUpToTier[i - 1]
+        );
+    }
+    resolutions.reverse();
+
+    this.tierSizeInTiles = tierSizeInTiles;
+    this.tileCountUpToTier = tileCountUpToTier;
+    this.resolutions = resolutions;
+}
 
 const methods = {
     createSource() {
-        return new ZoomifySource({
+        if(!this.url && !this.urls) {
+            throw new Error("Either url or urls properties must be set for ZoomifySource");
+        }
+
+        let source = new ZoomifySource({
             attributions: this.attributions,
             cacheSize: this.cacheSize,
             crossOrigin: this.crossOrigin,
@@ -31,42 +88,54 @@ const methods = {
             size: this.size,
             extent: this.extent,
             transition: this.transition,
-            tileSize: this.tileSize[0],
+            tileSize: this.tileSize
         });
+
+        if(this.urls) {
+            // source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/Zoomify.js#L202
+            // temporary hack since Zoomify does not support multiple URLs (https://github.com/openlayers/openlayers/issues/9352)
+            const createFromTemplate = (template) => {
+                return (
+                    (tileCoord) => {
+                        if (!tileCoord) {
+                            return undefined;
+                        }
+                        else {
+                            const tileCoordZ = tileCoord[0];
+                            const tileCoordX = tileCoord[1];
+                            const tileCoordY = -tileCoord[2] - 1;
+                            const tileIndex = tileCoordX + tileCoordY * this.tierSizeInTiles[tileCoordZ][0];
+                            const tileSize = source.tileGrid.getTileSize(tileCoordZ);
+                            const tileWidth = Array.isArray(tileSize) ? tileSize[0] : tileSize;
+                            const tileGroup = ((tileIndex + this.tileCountUpToTier[tileCoordZ]) / tileWidth) | 0;
+                            const localContext = {
+                                "z": tileCoordZ,
+                                "x": tileCoordX,
+                                "y": tileCoordY,
+                                "tileIndex": tileIndex,
+                                "TileGroup": "TileGroup" + tileGroup
+                            };
+                            return template.replace(/\{(\w+?)\}/g, function(m, p) {
+                                return localContext[p];
+                            });
+                        }
+                    }
+                );
+            };
+
+            const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(createFromTemplate));
+            source.setTileUrlFunction(tileUrlFunction);
+        }
+
+        return source;
     },
     createTileGrid() {
-        const imageWidth = this.size[0];
-        const imageHeight = this.size[1];
-        const tierSizeInTiles = [];
-        const tileSize = this.tileSize || 256;
-        let tileSizeForTierSizeCalculation = tileSize;
-        while (imageWidth > tileSizeForTierSizeCalculation || imageHeight > tileSizeForTierSizeCalculation) {
-            tierSizeInTiles.push([
-                Math.ceil(imageWidth / tileSizeForTierSizeCalculation),
-                Math.ceil(imageHeight / tileSizeForTierSizeCalculation),
-            ]);
-            tileSizeForTierSizeCalculation += tileSizeForTierSizeCalculation;
-        }
-        tierSizeInTiles.push([1, 1]);
-        tierSizeInTiles.reverse();
-
-        const resolutions = [1];
-        const tileCountUpToTier = [0];
-        for (let i = 1, ii = tierSizeInTiles.length; i < ii; i++) {
-            resolutions.push(1 << i);
-            tileCountUpToTier.push(
-                tierSizeInTiles[i - 1][0] * tierSizeInTiles[i - 1][1] +
-                tileCountUpToTier[i - 1]
-            );
-        }
-        resolutions.reverse();
-
         const extent = this.extent || [0, -this.size[1], this.size[0], 0];
         return new TileGrid({
-            tileSize: tileSize,
+            tileSize: this.tileSize,
             extent: extent,
             origin: [extent[0], extent[3]],
-            resolutions: resolutions,
+            resolutions: this.resolutions,
         });
     },
 };
@@ -75,6 +144,8 @@ export default {
     name: "vl-source-zoomify",
     mixins: [tileSource],
     props,
+    data,
     methods,
+    created
 };
 </script>

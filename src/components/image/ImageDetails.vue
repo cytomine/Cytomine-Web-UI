@@ -6,7 +6,7 @@
                 <td class="prop-label">{{$t("overview")}}</td>
                 <td class="prop-content" colspan="3">
                     <router-link :to="`/project/${image.project}/image/${image.id}`">
-                        <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
+                        <img :src="image.thumb" class="image-overview">
                     </router-link>
                 </td>
             </tr>
@@ -19,7 +19,7 @@
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-                <td class="prop-label">{{$t("job-annotations")}}</td>
+                <td class="prop-label">{{$t("analysis-annotations")}}</td>
                 <td class="prop-content" colspan="3">
                     <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                         {{ image.numberOfJobAnnotations }}
@@ -29,43 +29,41 @@
             <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
                 <td class="prop-label">{{$t("reviewed-annotations")}}</td>
                 <td class="prop-content" colspan="3">
-                    <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                    <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+                        {{ image.numberOfReviewedAnnotations }}
+                    </router-link>
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('description')">
                 <td class="prop-label">{{$t("description")}}</td>
                 <td class="prop-content" colspan="3">
-                    <cytomine-description :object="image"></cytomine-description>
-                </td>
-            </tr>
-            <tr v-if="isPropDisplayed('tags')">
-                <td class="prop-label">{{$t("tags")}}</td>
-                <td class="prop-content" colspan="3">
-                    <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
-                        <span class="tag is-rounded is-info">Demo</span>
-                        <span class="tag is-rounded is-info">CHU</span>
-                    </div>
+                    <cytomine-description :object="image" />
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('properties')">
                 <td class="prop-label">{{$t("properties")}}</td>
                 <td class="prop-content" colspan="3">
-                    <cytomine-properties :object="image"></cytomine-properties>
+                    <cytomine-properties :object="image" />
                 </td>
             </tr>
             <tr v-if="isPropDisplayed('attachedFiles')">
                 <td class="prop-label">{{$t("attached-files")}}</td>
                 <td class="prop-content" colspan="3">
-                    <attached-files :object="image"></attached-files>
+                    <attached-files :object="image" />
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('thumbnail')">
-                <td class="prop-label">{{$t("thumbnail")}}</td>
+            <tr v-if="isPropDisplayed('slidePreview')">
+                <td class="prop-label">{{$t("slide-preview")}}</td>
                 <td class="prop-content" colspan="3">
-                    <img :src="image.macroURL" :alt="image.instanceFilename" class="image-overview"> <!-- TODO in backend: do not return anything when thumb not available instead of returning overview? -->
+                    <a v-if="image.macroURL" @click="isMetadataModalActive = true">
+                        <img :src="image.macroURL" class="image-overview">
+                    </a>
+                    <em v-else>
+                        {{$t("slide-preview-not-available")}}
+                    </em>
                 </td>
             </tr>
-            <tr v-if="isPropDisplayed('originalFilename')">
+            <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
                 <td class="prop-label">{{$t("originalFilename")}}</td>
                 <td class="prop-content" colspan="3">
                     {{image.originalFilename}}
@@ -164,17 +162,30 @@
                 <td class="prop-label">{{$t("actions")}}</td>
                 <td class="prop-content" colspan="3">
                     <div class="buttons">
-                        <button class="button is-small" @click="isRenameModalActive = true">
-                            {{$t("button-rename")}}
+                        <button class="button is-small" @click="isMetadataModalActive = true">
+                            {{$t("button-metadata")}}
                         </button>
-                        <button class="button is-small" @click="isCalibrationModalActive = true">
-                            {{$t("button-set-calibration")}}
-                        </button>
-                        <button class="button is-small" @click="isMagnificationModalActive = true">
-                            {{$t("button-set-magnification")}}
-                        </button>
-                        <a class="button is-small" :href="image.downloadURL">{{$t("button-download")}}</a>
-                        <button class="button is-danger is-small" @click="confirmDeletion()">{{$t("button-delete")}}</button>
+                        <template v-if="canEdit">
+                            <button
+                                v-if="!blindMode || canManageProject"
+                                class="button is-small"
+                                @click="isRenameModalActive = true"
+                            >
+                                {{$t("button-rename")}}
+                            </button>
+                            <button class="button is-small" @click="isCalibrationModalActive = true">
+                                {{$t("button-set-calibration")}}
+                            </button>
+                            <button class="button is-small" @click="isMagnificationModalActive = true">
+                                {{$t("button-set-magnification")}}
+                            </button>
+                            <a class="button is-small" :href="image.downloadURL">
+                                {{$t("button-download")}}
+                            </a>
+                            <button class="button is-danger is-small" @click="confirmDeletion()">
+                                {{$t("button-delete")}}
+                            </button>
+                        </template>
                     </div>
                 </td>
             </tr>
@@ -191,7 +202,7 @@
                     <b-field :label="$t('enter-new-name-of-image')"
                              :type="emptyNewName ? 'is-danger' : null"
                              :message="emptyNewName ? $t('field-cannot-be-empty') : ''">
-                        <b-input v-model="newName"></b-input>
+                        <b-input v-model="newName" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">
@@ -206,39 +217,22 @@
         </form>
     </b-modal>
 
-    <b-modal :active="isMagnificationModalActive" has-modal-card @close="isMagnificationModalActive = false">
-        <form>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">{{$t("set-magnification")}}</p>
-                </header>
-                <section class="modal-card-body">
-                    <div class="modal-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        {{ $t("warning-change-applies-in-all-projects") }}
-                    </div>
+    <magnification-modal
+        :image="image"
+        :active.sync="isMagnificationModalActive"
+        @setMagnification="(event) => $emit('setMagnification', event)"
+    />
 
-                    <b-field :label="$t('magnification')">
-                        <b-input v-model="newMagnification"></b-input>
-                    </b-field>
-                </section>
-                <footer class="modal-card-foot">
-                    <button class="button" type="button" @click="isMagnificationModalActive = false">
-                        {{$t("button-cancel")}}
-                    </button>
-                    <button class="button is-link" @click="setMagnification()">
-                        {{$t("button-save")}}
-                    </button>
-                </footer>
-            </div>
-        </form>
-    </b-modal>
+    <calibration-modal
+        :image="image"
+        :active.sync="isCalibrationModalActive"
+        @setResolution="(event) => $emit('setResolution', event)"
+    />
 
-    <calibration-modal :image="image"
-                       :active.sync="isCalibrationModalActive"
-                       @setResolution="(event) => $emit('setResolution', event)"
-                       @setScale="$router.push(`/project/${image.project}/image/${image.id}?action=calibration`)">
-    </calibration-modal>
+    <image-metadata-modal
+        :active.sync="isMetadataModalActive"
+        :idAbstractImage="image.baseImage"
+    />
 </div>
 </template>
 
@@ -246,11 +240,13 @@
 import CytomineDescription from "@/components/description/CytomineDescription";
 import CytomineProperties from "@/components/property/CytomineProperties";
 import AttachedFiles from "@/components/attached-file/AttachedFiles";
+import MagnificationModal from "./MagnificationModal";
 import CalibrationModal from "./CalibrationModal";
+import ImageMetadataModal from "./ImageMetadataModal";
 
 import {formatMinutesSeconds} from "@/utils/video-utils.js";
 
-import {AbstractImage, ImageInstance} from "cytomine-client";
+import {ImageInstance} from "cytomine-client";
 
 export default {
     name: "image-details",
@@ -258,7 +254,9 @@ export default {
         CytomineDescription,
         CytomineProperties,
         AttachedFiles,
-        CalibrationModal
+        MagnificationModal,
+        CalibrationModal,
+        ImageMetadataModal
     },
     props: {
         image: {type: Object},
@@ -266,29 +264,34 @@ export default {
     },
     data() {
         return {
-            isCalibrationModalActive: false,
-
             isRenameModalActive: false,
             newName: "",
-
+            isCalibrationModalActive: false,
             isMagnificationModalActive: false,
-            newMagnification: "",
+            isMetadataModalActive: false,
         };
     },
     computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
+        },
+        canEdit() {
+            return this.$store.getters.canEditImage(this.image);
+        },
         emptyNewName() {
-            return this.newName.length == 0;
+            return !this.newName;
+        },
+        imageNameNotif() {
+            return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
         }
     },
     watch: {
         isRenameModalActive(val) {
             if(val) {
                 this.newName = this.image.instanceFilename;
-            }
-        },
-        isMagnificationModalActive(val) {
-            if(val) {
-                this.newMagnification = this.image.magnification;
             }
         }
     },
@@ -317,33 +320,10 @@ export default {
             this.isRenameModalActive = false;
         },
 
-        async setMagnification() {
-            try {
-                let baseImage = await AbstractImage.fetch(this.image.baseImage);
-                baseImage.magnification = this.newMagnification;
-                await baseImage.save();
-
-                this.$emit("setMagnification", baseImage.magnification);
-
-                this.$notify({
-                    type: "success",
-                    text: this.$t("notif-success-magnification-update", {imageName: baseImage.originalFilename})
-                });
-            }
-            catch(error) {
-                console.log(error);
-                this.$notify({
-                    type: "error",
-                    text: this.$t("notif-error-magnification-update", {imageName: this.image.originalFilename})
-                });
-            }
-            this.isMagnificationModalActive = false;
-        },
-
         confirmDeletion() {
             this.$dialog.confirm({
                 title: this.$t("delete-image"),
-                message: this.$t("delete-image-confirmation-message", {imageName: this.image.instanceFilename}),
+                message: this.$t("delete-image-confirmation-message", {imageName: this.imageNameNotif}),
                 type: "is-danger",
                 confirmText: this.$t("button-confirm"),
                 cancelText: this.$t("button-cancel"),
@@ -355,7 +335,7 @@ export default {
                 await ImageInstance.delete(this.image.id);
                 this.$notify({
                     type: "success",
-                    text: this.$t("notif-success-image-deletion", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-success-image-deletion", {imageName: this.imageNameNotif})
                 });
                 this.$emit("delete");
             }
@@ -363,7 +343,7 @@ export default {
                 console.log(err);
                 this.$notify({
                     type: "error",
-                    text: this.$t("notif-error-image-deletion", {imageName: this.image.instanceFilename})
+                    text: this.$t("notif-error-image-deletion", {imageName: this.imageNameNotif})
                 });
             }
         },
@@ -406,22 +386,6 @@ td.prop-content-half {
 .vendor-img {
     max-height: 40px;
     max-width: 150px;
-}
-
-.modal-warning {
-    display: flex;
-    margin-bottom: 15px;
-    align-items: center;
-    padding: 5px;
-    border-left: 3px solid rgb(255, 120, 0);
-    border-radius: 4px;
-    background: rgba(255, 69, 0, 0.05);
-}
-.modal-warning .fas {
-    margin-left: 10px;
-    margin-right: 20px;
-    font-size: 16px;
-    color: rgb(255, 120, 0);
 }
 
 .image-overview {

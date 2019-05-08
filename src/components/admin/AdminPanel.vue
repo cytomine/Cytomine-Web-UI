@@ -4,20 +4,24 @@
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
 <div class="content-wrapper" v-else>
+    <b-field class="radio-buttons-fullwidth">
+        <b-radio-button v-model="activeTab" native-value="dashboard" type="is-link">
+            {{$t("dashboard")}}
+        </b-radio-button>
+
+        <b-radio-button v-model="activeTab" native-value="users" type="is-link">
+            {{$t("users")}}
+        </b-radio-button>
+
+        <b-radio-button v-model="activeTab" native-value="configuration" type="is-link">
+            {{$t("configuration")}}
+        </b-radio-button>
+    </b-field>
+
     <div class="box">
-        <b-tabs v-model="activeTab">
-            <b-tab-item :label="$t('dashboard')">
-                <admin-dashboard></admin-dashboard>
-            </b-tab-item>
-
-            <b-tab-item :label="$t('users')">
-                <admin-users></admin-users>
-            </b-tab-item>
-
-            <b-tab-item :label="$t('configuration')">
-                <admin-configuration></admin-configuration>
-            </b-tab-item>
-        </b-tabs>
+        <keep-alive>
+            <component :is="activeComponent" />
+        </keep-alive>
     </div>
 </div>
 </template>
@@ -27,13 +31,10 @@ import AdminDashboard from "./AdminDashboard";
 import AdminUsers from "./AdminUsers";
 import AdminConfiguration from "./AdminConfiguration";
 
+const defaultTab = "dashboard";
+
 export default {
     name: "admin-panel",
-    components: {
-        AdminDashboard,
-        AdminUsers,
-        AdminConfiguration
-    },
     data() {
         return {
             activeTab: 0,
@@ -47,18 +48,48 @@ export default {
     computed: {
         currentUser() {
             return this.$store.state.currentUser.user;
+        },
+        queriedTab() {
+            return this.$route.query.tab;
+        },
+        activeComponent() {
+            switch(this.activeTab) {
+                case "dashboard":
+                    return AdminDashboard;
+                case "users":
+                    return AdminUsers;
+                case "configuration":
+                    return AdminConfiguration;
+            }
         }
     },
     watch: {
-        activeTab(idx) {
-            this.$router.push(`?tab=${this.tabNames[idx]}`);
+        queriedTab() {
+            this.changeTab();
+        },
+        activeTab() {
+            if(this.activeTab !== defaultTab || this.queriedTab) {
+                this.$router.push(`?tab=${this.activeTab}`);
+            }
         }
     },
-    async created() {
-        let idx = this.tabNames.indexOf(this.$route.query.tab);
-        if(idx != -1) {
-            this.activeTab = idx;
+    methods: {
+        changeTab() {
+            this.activeTab = this.queriedTab || defaultTab;
+            if(!this.activeComponent) {
+                this.activeTab = defaultTab;
+            }
         }
+    },
+    created() {
+        this.changeTab();
     }
 };
 </script>
+
+<style scoped>
+.box {
+    position: relative;
+    min-height: 20em;
+}
+</style>

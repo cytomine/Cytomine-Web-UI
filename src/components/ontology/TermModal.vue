@@ -8,12 +8,13 @@
             <b-field :label="$t('name')"
                         :type="!validName && displayErrors ? 'is-danger' : null"
                         :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                <b-input v-model="name"></b-input>
+                <b-input v-model="name" />
             </b-field>
 
-            <sketch-picker v-model="color"
-                :presetColors="['#F44E3B', '#FB9E00', '#FCDC00', '#68BC00', '#16A5A5', '#009CE0', '#7B10D8', '#F06292', '#000', '#777', '#FFF']">
-            </sketch-picker>
+            <sketch-picker
+                v-model="color"
+                :presetColors="presetColors"
+            />
         </section>
         <footer class="modal-card-foot">
             <button class="button" type="button" @click="$parent.close()">
@@ -36,10 +37,10 @@ const defaultColor = {hex: "#4480c4"};
 export default {
     name: "term-modal",
     components: {"sketch-picker": Sketch},
-    props: [
-        "term",
-        "ontology"
-    ],
+    props: {
+        term: Object,
+        ontology: Object
+    },
     data() {
         return {
             name: "",
@@ -50,6 +51,21 @@ export default {
     computed: {
         validName() {
             return this.name.length > 0;
+        },
+        presetColors() {
+            return [
+                "#F44E3B",
+                "#FB9E00",
+                "#FCDC00",
+                "#68BC00",
+                "#16A5A5",
+                "#009CE0",
+                "#7B10D8",
+                "#F06292",
+                "#000",
+                "#777",
+                "#FFF"
+            ];
         }
     },
     methods: {

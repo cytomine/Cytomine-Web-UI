@@ -4,7 +4,12 @@
         <p class="panel-heading">
             {{ $t("upload") }}
         </p>
-        <div class="panel-block">
+        <div class="panel-block" v-if="newUploadError">
+            <b-message type="is-danger" has-icon icon-size="is-small">
+                {{ $t("error-cannot-upload") }}
+            </b-message>
+        </div>
+        <div class="panel-block" v-else>
             <b-message type="is-info" has-icon icon-size="is-small">
                 <h2>{{$t("important-notes")}}</h2>
                 <ul class="small-text">
@@ -22,9 +27,7 @@
                     <strong>{{$t('storage')}}</strong>
                 </div>
                 <div class="column is-half">
-                    <cytomine-multiselect v-model="selectedStorages" :options="storages" label="name" track-by="id"
-                                          :allow-empty="false" :multiple="true">
-                    </cytomine-multiselect>
+                    <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false" />
                 </div>
             </div>
 
@@ -34,8 +37,7 @@
                 </div>
                 <div class="column is-half">
                     <cytomine-multiselect v-model="selectedProjects" :options="projects" label="name" track-by="id"
-                                          :multiple="true">
-                    </cytomine-multiselect>
+                                          :multiple="true" />
                 </div>
             </div>
 
@@ -49,7 +51,7 @@
                             <tr v-for="(wrapper, idx) in dropFiles" :key="idx">
                                 <td>{{wrapper.file.name}}</td>
                                 <td>{{filesize(wrapper.file.size)}}</td>
-                                <template v-if="wrapper.uploadedFile == null">
+                                <template v-if="wrapper.uploadedFile === null">
                                     <td>
                                         <progress class="progress is-info" :value="wrapper.progress" max="100">
                                             {{wrapper.progress}}%
@@ -72,8 +74,7 @@
                                 </template>
                                 <template v-else>
                                     <td>
-                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile">
-                                        </uploaded-file-status>
+                                        <uploaded-file-status v-if="wrapper.uploadedFile" :file="wrapper.uploadedFile" />
                                         <span v-else class="tag is-danger">
                                             {{$t("upload-error")}}
                                         </span>
@@ -106,7 +107,7 @@
                         <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">
                             {{$t("start-upload")}}
                         </button>
-                        <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload">
+                        <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
                             {{$t("cancel-upload")}}
                         </button>
                     </div>
@@ -120,16 +121,20 @@
         <p class="panel-heading">
             {{ $t("storage") }}
         </p>
-        <div class="panel-block">
-            <b-loading :is-full-page="false" :active="loading"></b-loading>
+        <div class="panel-block" v-if="storageViewError">
+            <b-message type="is-danger" has-icon icon-size="is-small">
+                <h2> {{ $t("error") }} </h2>
+                <p> {{ $t("unexpected-error-info-message") }} </p>
+            </b-message>
+        </div>
+        <div class="panel-block storage" v-else>
+            <b-loading :is-full-page="false" :active="loading" />
             <template v-if="!loading">
-                <b-input v-model="searchString" class="search-uploaded-file"
-                    :placeholder="$t('search-placeholder')" icon="search">
-                </b-input>
+                <b-input v-model="searchString" class="search-uploaded-file" :placeholder="$t('search-placeholder')" icon="search" />
 
                 <b-table :data="filteredUploadedFiles" :paginated="true" :per-page="perPage"
                 pagination-size="is-small" detailed detail-key="id">
-                    <template slot-scope="{row: uFile}">
+                    <template #default="{row: uFile}">
                         <b-table-column :label="$t('preview')" width="80">
                             <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
                             <div v-else class="is-size-7 has-text-grey">{{$t("no-preview-available")}}</div>
@@ -156,7 +161,7 @@
                         </b-table-column>
 
                         <b-table-column field="status" :label="$t('status')" sortable width="80">
-                            <uploaded-file-status :file="uFile"></uploaded-file-status>
+                            <uploaded-file-status :file="uFile" />
                         </b-table-column>
 
                         <!--<b-table-column field="parentFilename" :label="$t('from')" sortable width="150">-->
@@ -164,17 +169,17 @@
                         <!--</b-table-column>-->
                     </template>
 
-                    <template slot="detail" slot-scope="{row: uFile}">
-                        <uploaded-file-details :file="uFile" :revision="revision" @update="updatedTree()"></uploaded-file-details>
+                    <template #detail="{row: uFile}">
+                        <uploaded-file-details :file="uFile" :key="uFile.id" :revision="revision" @update="updatedTree()" />
                     </template>
 
-                    <template slot="empty">
+                    <template #empty>
                         <div class="content has-text-grey has-text-centered">
                             <p>{{$t("no-uploaded-file")}}</p>
                         </div>
                     </template>
 
-                    <template slot="bottom-left">
+                    <template #bottom-left>
                         <b-select v-model="perPage" size="is-small">
                             <option value="10">10 {{$t("per-page")}}</option>
                             <option value="25">25 {{$t("per-page")}}</option>
@@ -190,7 +195,7 @@
 </template>
 
 <script>
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFile, UploadedFileStatus, UploadedFileCollection} from "cytomine-client";
+import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from "cytomine-client";
 import axios from "axios";
 import filesize from "filesize";
 import constants from "@/utils/constants.js";
@@ -209,11 +214,14 @@ export default {
     data() {
         return {
             loading: true,
+            newUploadError: false,
+            storageViewError: false,
+
             timeoutRefreshFullList: null,
             timeoutRefreshSessionUploads: null,
 
             storages: [],
-            selectedStorages: null,
+            selectedStorage: null,
             projects: [],
             selectedProjects: [],
 
@@ -237,7 +245,7 @@ export default {
             return this.dropFiles.some(wrapper => wrapper.uploading);
         },
         filesPendingUpload() {
-            return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadResult == null);
+            return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile === null);
         },
         overallProgress() {
             let nbUploads = 0;
@@ -255,8 +263,8 @@ export default {
         },
         queryString() {
             let str = `cytomine=${constants.CYTOMINE_CORE_HOST}`;
-            if(this.selectedStorages) {
-                str += `&idStorage=${this.selectedStorages.map(storage => storage.id).join(",")}`;
+            if(this.selectedStorage) {
+                str += `&idStorage=${this.selectedStorage.id}`;
             }
             if(this.selectedProjects) {
                 str += `&idProject=${this.selectedProjects.map(project => project.id).join(",")}`;
@@ -267,7 +275,7 @@ export default {
             return this.dropFiles.map(wrapper => wrapper.file);
         },
         filteredUploadedFiles() {
-            if(this.searchString == "") {
+            if(!this.searchString) {
                 return this.uploadedFiles;
             }
 
@@ -277,32 +285,53 @@ export default {
     },
     watch: {
         async queryString() {
-            this.signatureDate = new Date().toString();
-            this.signature = await Cytomine.instance.fetchSignature({
-                uri: this.uri,
-                queryString: this.queryString,
-                method: "POST",
-                date: this.signatureDate
-            });
+            this.signatureDate = new Date().toISOString();
+            try {
+                this.signature = await Cytomine.instance.fetchSignature({
+                    uri: this.uri,
+                    queryString: this.queryString,
+                    method: "POST",
+                    date: this.signatureDate
+                });
+            }
+            catch(error) {
+                this.newUploadError = true;
+            }
         }
     },
     methods: {
         async fetchStorages() {
-            this.storages = (await StorageCollection.fetchAll()).array;
-            this.selectedStorages = [this.storages.find(storage => storage.user === this.currentUser.id)];
+            try {
+                this.storages = (await StorageCollection.fetchAll()).array;
+                this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
+            }
+            catch(error) {
+                console.log(error);
+                this.newUploadError = true;
+            }
         },
         async fetchProjects() {
-            this.projects = (await ProjectCollection.fetchAll()).array;
+            try {
+                this.projects = (await ProjectCollection.fetchAll()).array;
+            }
+            catch(error) {
+                console.log(error); // not mandatory for upload => only log error, no other action
+            }
         },
         async fetchUploadedFiles() {
-            this.uploadedFiles = (await UploadedFileCollection.fetchAll({
-                onlyRootsWithDetails: true
-            })).array;
+            try {
+                this.uploadedFiles = (await UploadedFileCollection.fetchAll({onlyRootsWithDetails: true})).array;
+            }
+            catch(error) {
+                console.log(error);
+                this.storageViewError = true;
+                return;
+            }
 
             this.loading = false;
 
             clearTimeout(this.timeoutRefreshFullList);
-            this.timeoutRefreshFullList = setTimeout(this.fetchUploadedFiles, 10000);
+            this.timeoutRefreshFullList = setTimeout(this.fetchUploadedFiles, constants.STORAGE_REFRESH_INTERVAL);
         },
 
         async refreshStatusSessionUploads() {
@@ -316,23 +345,29 @@ export default {
             let unfinishedConversions = false;
             let statusChange = false;
 
-            await Promise.all(this.dropFiles.map(async wrapper => {
-                if(wrapper.uploadedFile) {
-                    let oldStatus = wrapper.uploadedFile.status;
-                    if(!pendingStatus.includes(oldStatus)) {
-                        return;
-                    }
+            try {
+                await Promise.all(this.dropFiles.map(async wrapper => {
+                    if(wrapper.uploadedFile) {
+                        let oldStatus = wrapper.uploadedFile.status;
+                        if(!pendingStatus.includes(oldStatus)) {
+                            return;
+                        }
 
-                    await wrapper.uploadedFile.fetch();
-                    let status = wrapper.uploadedFile.status;
-                    if(status != oldStatus) {
-                        statusChange = true;
+                        await wrapper.uploadedFile.fetch();
+                        let status = wrapper.uploadedFile.status;
+                        if(status !== oldStatus) {
+                            statusChange = true;
+                        }
+                        if(pendingStatus.includes(status)) {
+                            unfinishedConversions = true;
+                        }
                     }
-                    if(pendingStatus.includes(status)) {
-                        unfinishedConversions = true;
-                    }
-                }
-            }));
+                }));
+            }
+            catch(error) {
+                console.log(error);
+                return;
+            }
 
             if(statusChange) {
                 this.fetchUploadedFiles();
@@ -340,7 +375,7 @@ export default {
 
             if(unfinishedConversions) {
                 clearTimeout(this.timeoutRefreshSessionUploads);
-                this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, 2000);
+                this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, constants.ONGOING_UPLOAD_REFRESH_INTERVAL);
             }
         },
 
@@ -363,7 +398,7 @@ export default {
         },
 
         startUpload(fileWrapper) {
-            if(fileWrapper.uploading || fileWrapper.uploadedFile != null) {
+            if(fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
                 return;
             }
 
@@ -411,7 +446,7 @@ export default {
             let nbFiles = this.dropFiles.length;
             let idx = 0;
             for(let i = 0; i < nbFiles; i++) {
-                if(this.dropFiles[idx].uploadedFile != null) {
+                if(this.dropFiles[idx].uploadedFile !== null) {
                     idx++;
                 }
                 else {
@@ -502,7 +537,7 @@ export default {
     max-width: 80px;
 }
 
-.panel-block {
+.panel-block.storage {
     min-height: 200px;
     position: relative;
 }

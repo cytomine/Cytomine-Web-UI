@@ -9,7 +9,7 @@
                 <section v-if="!loading" class="modal-card-body">
                     <dl>
                         <dt>{{$t("version")}}</dt>
-                        <dd>{{version}}</dd>
+                        <dd>{{version || "?"}}</dd>
 
                         <dt>{{$t("sponsors")}}</dt>
                         <dd>
@@ -80,7 +80,9 @@ import constants from "@/utils/constants.js";
 
 export default {
     name: "about-cytomine-wrapper",
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             version: null,
@@ -94,8 +96,13 @@ export default {
         }
     },
     async created() {
-        let {version} = await Cytomine.instance.ping();
-        this.version = version;
+        try {
+            let {version} = await Cytomine.instance.ping();
+            this.version = version;
+        }
+        catch(error) {
+            console.log(error);
+        }
         this.loading = false;
     }
 };

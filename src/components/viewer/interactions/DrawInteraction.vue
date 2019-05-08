@@ -1,24 +1,19 @@
 <template>
 <div>
     <vl-layer-vector>
-        <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget"></vl-source-vector>
+        <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
     </vl-layer-vector>
 
-    <vl-interaction-draw v-if="nbActiveLayers > 0"
-                        ref="olDrawInteraction" 
-                        :source="drawSourceName"
-                        :type="drawType"
-                        :freehand="drawFreehand" 
-                        :freehand-condition="undefined"
-                        :geometry-function="drawGeometryFunction" 
-                        @drawend="drawEndHandler">
-    </vl-interaction-draw>
-
-    <calibration-modal :image="image"
-                       :pixelLength="pixelLengthCalibrationFeature"
-                       :active.sync="calibrationModal"
-                       @setResolution="endCalibration">
-    </calibration-modal>
+    <vl-interaction-draw
+        v-if="nbActiveLayers > 0 || drawCorrection"
+        ref="olDrawInteraction"
+        :source="drawSourceName"
+        :type="drawType"
+        :freehand="drawFreehand"
+        :freehand-condition="undefined"
+        :geometry-function="drawGeometryFunction"
+        @drawend="drawEndHandler"
+    />
 </div>
 </template>
 
@@ -27,21 +22,16 @@ import Polygon, {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import WKT from "ol/format/WKT";
 
 import {Annotation} from "cytomine-client";
-
-import CalibrationModal from "@/components/image/CalibrationModal";
+import {Action} from "@/utils/annotation-utils.js";
 
 export default {
     name: "draw-interaction",
-    components: {CalibrationModal},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
-            calibrationModal: false,
-            calibrationFeature: null,
-
             format: new WKT()
         };
     },
@@ -51,9 +41,6 @@ export default {
         },
         imageWrapper() {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index];
-        },
-        ongoingCalibration() {
-            return this.imageWrapper.ongoingCalibration;
         },
         rotation() {
             return this.imageWrapper.rotation;
@@ -67,6 +54,15 @@ export default {
         activeTool() {
             return this.imageWrapper.activeTool;
         },
+        activeEditTool() {
+            return this.imageWrapper.activeEditTool;
+        },
+        selectedFeature() {
+            let selectedFeatures = this.imageWrapper.selectedFeatures;
+            if(selectedFeatures && selectedFeatures.length === 1) {
+                return selectedFeatures[0];
+            }
+        },
         drawType() {
             switch(this.activeTool) {
                 case "point":
@@ -79,19 +75,18 @@ export default {
                     return "Circle";
                 case "polygon": 
                 case "freehand-polygon":
-                case "correct-add": 
-                case "correct-remove":
+                case "select": // correct mode
                     return "Polygon";
             }
         },
         drawCorrection() {
-            return this.activeTool == "correct-add" || this.activeTool == "correct-remove";
+            return this.activeTool === "select";
         },
         drawFreehand() {
-            return this.activeTool == "freehand-polygon" || this.activeTool == "freehand-line" || this.drawCorrection;
+            return this.activeTool === "freehand-polygon" || this.activeTool === "freehand-line" || this.drawCorrection;
         },
         drawGeometryFunction() {
-            if(this.activeTool == "rectangle") {
+            if(this.activeTool === "rectangle") {
                 return (coordinates, geometry) => {
                     let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
 
@@ -126,28 +121,12 @@ export default {
         },
         drawSourceName() {
             return `draw-target-${this.idViewer}-${this.index}`;
-        },
-        pixelLengthCalibrationFeature() {
-            if(this.calibrationFeature) {
-                return this.calibrationFeature.getGeometry().getLength();
-            }
-        },
+        }
     },
 
     watch: {
         activeTool() {
             this.$refs.olDrawInteraction.scheduleRecreate();
-        },
-
-        calibrationModal(val) {
-            if(!val) {
-                this.clearDrawnFeatures();
-            }
-        },
-        lengthCalibrationSegment(length) {
-            if(length != "") {
-                this.displayErrors = true;
-            }
         }
     },
 
@@ -163,40 +142,14 @@ export default {
         },
 
         async drawEndHandler({feature}) {
-            if(this.nbActiveLayers > 0) {
-                if(this.ongoingCalibration) {
-                    await this.endDrawCalibration(feature);
-                }
-                else {
-                    if(this.drawCorrection) {
-                        await this.endCorrection(feature);
-                    }
-                    else {
-                        await this.endDraw(feature);
-                    }
-                    this.clearDrawnFeatures();
-                }
+            if(this.drawCorrection) {
+                await this.endCorrection(feature);
             }
-            else {
-                this.clearDrawnFeatures();
-            }
-        },
-
-        endDrawCalibration(drawnFeature) {
-            let geom = drawnFeature.getGeometry();
-            if(geom.getType() != "LineString" || geom.getCoordinates().length != 2) {
-                this.$nextTick(this.clearDrawnFeatures);
-                this.$notify({type: "error", text: this.$t("calibration-annotation-must-be-segment")});
-                return;
+            else if(this.nbActiveLayers > 0) {
+                await this.endDraw(feature);
             }
 
-            this.calibrationFeature = drawnFeature;
-            this.calibrationModal = true;
-        },
-
-        endCalibration(resolution) {
-            this.$store.dispatch("endCalibration", {idViewer: this.idViewer, index: this.index, resolution});
-            this.endDraw(this.calibrationFeature);
+            this.clearDrawnFeatures();
         },
 
         async endDraw(drawnFeature) {
@@ -219,11 +172,16 @@ export default {
                     // ----
 
                     this.$eventBus.$emit("addAnnotation", annot);
-                    if(idx == this.nbActiveLayers - 1) {
+                    if(idx === this.nbActiveLayers - 1) {
                         this.$eventBus.$emit("selectAnnotation", {idViewer: this.idViewer, index: this.index, annot});
                     }
 
-                    this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot: null});
+                    this.$store.commit("addAction", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        annot,
+                        type: Action.CREATE
+                    });
                 }
                 catch(err) {
                     console.log(err);
@@ -233,21 +191,33 @@ export default {
         },
 
         async endCorrection(feature) {
-            let remove = (this.activeTool == "correct-remove");
-            let review = false; // TODO: handle
-            let geom = this.getWktLocation(feature);
-            let idLayers = this.activeLayers.map(layer => layer.id);
-            try {
-                let correctedAnnot = await Annotation.correctAnnotations(this.image.id, geom, review, remove, idLayers);
-                if(correctedAnnot != null) {
-                    // TODO: add action for undo/redo system (currently not possible because core does not return the list of affected annotations)
-                    this.$store.commit("resetActions", {idViewer: this.idViewer, index: this.index});
+            if(!this.selectedFeature) {
+                return;
+            }
 
-                    // refresh the sources because several annotations might have been modified
-                    this.$eventBus.$emit("reloadAnnotations", this.image.id);
+            let remove = (this.activeEditTool === "correct-remove");
+            let review = false; // TODO: handle
+            let location = this.getWktLocation(feature);
+            try {
+                let correctedAnnot = await Annotation.correctAnnotations({
+                    location,
+                    review,
+                    remove,
+                    annotation: this.selectedFeature.id
+                });
+                if(correctedAnnot) {
+                    correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
+                    this.$store.commit("addAction", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        annot: correctedAnnot,
+                        type: Action.UPDATE
+                    });
+                    this.$eventBus.$emit("editAnnotation", correctedAnnot);
                 }
             }
             catch(err) {
+                console.log(err);
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-correction")});
             }
         },
@@ -255,7 +225,7 @@ export default {
         getWktLocation(feature) {
             // transform circle to circular polygon
             let geometry = feature.getGeometry();
-            if (geometry.getType() == "Circle") {
+            if (geometry.getType() === "Circle") {
                 feature.setGeometry(polygonFromCircle(geometry));
             }
             return this.format.writeFeature(feature);

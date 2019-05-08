@@ -8,11 +8,20 @@
     :debug="false"
     ref="slider"
 >
-    <template slot="tooltip" slot-scope="{index, value, merge}">
+    <template #tooltip="{index, value, merge}">
         <span v-if="!merge" class="vue-slider-tooltip" @mousedown.stop @click.stop="startEdition(index)">
-            <template v-if="indexEdited != (index || 0)">{{Math.round(value * 1000)/1000}}</template>
-            <b-input ref="inputSlider" v-else type="text" v-model="editedValue" @hook:mounted="focus()"
-             @blur="stopEdition(index)" @keyup.enter.native="stopEdition(index)"></b-input>
+            <template v-if="indexEdited !== (index || 0)">
+                {{Math.round(value * 1000)/1000}}
+            </template>
+            <b-input
+                v-else
+                type="text"
+                ref="inputSlider"
+                v-model="editedValue"
+                @hook:mounted="focus()"
+                @blur="stopEdition(index)"
+                @keyup.enter.native="stopEdition(index)"
+            />
         </span>
     </template>
 </vue-slider>
@@ -54,14 +63,14 @@ export default {
     },
     methods: {
         startEdition(index=0) {
-            if(this.indexEdited != index) {
+            if(this.indexEdited !== index) {
                 this.editedValue = this.isArray ? this.value[index] : this.value;
                 this.indexEdited = index;
                 this.refresh();
             }
         },
         stopEdition(index=0) {
-            if(this.indexEdited == index) {
+            if(this.indexEdited === index) {
                 let newValue = this.processInternalValue(index);
                 this.$refs.slider.setValue(newValue);
                 this.indexEdited = null;
@@ -72,7 +81,7 @@ export default {
             let newValue = this.isArray ? this.value.slice() : this.value;
 
             // if entered value is incorrect, reset to initial value
-            if(isNaN(this.editedValue) || this.editedValue.length == 0) {
+            if(!this.editedValue || isNaN(this.editedValue)) {
                 return newValue;
             }
 

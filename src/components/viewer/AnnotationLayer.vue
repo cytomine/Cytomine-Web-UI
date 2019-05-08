@@ -6,8 +6,8 @@
     <vl-source-vector ref="olSource"
                       :loader-factory="loaderFactory" 
                       :strategy-factory="strategyFactory"
-                      url="-"> <!-- loader factory not used if URL not specified -->
-        <vl-style-func :factory="styleFunctionFactory"></vl-style-func>
+                      url="-"> <!-- HACK because loader factory not used if URL not specified -->
+        <vl-style-func :factory="styleFunctionFactory" />
     </vl-source-vector>
 
 </vl-layer-vector>
@@ -16,15 +16,15 @@
 <script>
 import WKT from "ol/format/WKT";
 
-import {AnnotationCollection} from "cytomine-client";
+import {AnnotationCollection, AnnotationType} from "cytomine-client";
 
 export default {
     name: "annotation-layer",
-    props: [
-        "idViewer",
-        "index",
-        "layer"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        layer: Object
+    },
     data() {
         return {
             format: new WKT(),
@@ -51,18 +51,18 @@ export default {
         selectedFeatures() {
             return this.imageWrapper.selectedFeatures;
         },
-        activeTool() {
-            return this.imageWrapper.activeTool;
+        ongoingEdit() {
+            return this.imageWrapper.ongoingEdit;
         },
-        activeEditTool() {
-            return this.imageWrapper.activeEditTool;
+        terms() {
+            return this.imageWrapper.terms || [];
         },
         styleFunctionFactory() {
             // Force computed property update when one of those properties change (leading to new style function =>
             // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
             this.imageWrapper.selectedFeatures;
             this.imageWrapper.layersOpacity;
-            this.imageWrapper.terms.forEach(term => {
+            this.terms.forEach(term => {
                 term.visible;
                 term.opacity;
             });
@@ -70,7 +70,6 @@ export default {
             this.imageWrapper.noTermOpacity;
             this.imageWrapper.selectedPropertyKey;
             this.imageWrapper.selectedPropertyColor;
-            this.imageWrapper.highlightedFeaturesIds;
 
             return () => {
                 return this.$store.getters.genStyleFunction(this.idViewer, this.index);
@@ -78,15 +77,19 @@ export default {
         }
     },
     methods: {
+        annotBelongsToLayer(annot) {
+            return this.layer.isReview ? annot.type === AnnotationType.REVIEWED : annot.user === this.layer.id;
+        },
+
         addAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 this.$refs.olSource.addFeature(this.createFeature(annot));
             }
         },
         selectAnnotationHandler({annot, idViewer, index}) {
-            if(idViewer == this.idViewer && index == this.index && annot.user == this.layer.id && this.$refs.olSource) {
+            if(idViewer === this.idViewer && index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-                if(olFeature == null) {
+                if(!olFeature) {
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
                 }
                 else {
@@ -95,30 +98,40 @@ export default {
             }
         },
         reloadAnnotationsHandler(idImage) {
-            if(idImage == null || idImage == this.image.id) {
+            if(!idImage || idImage === this.image.id) {
                 this.loader();
             }
         },
         editAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-                if(olFeature == null) {
+                if(!olFeature) {
                     return;
                 }
                 olFeature.setGeometry(this.format.readGeometry(annot.location));
                 olFeature.set("annot", annot);
+
+                let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === annot.id);
+                if(indexSelectedFeature >= 0) {
+                    this.$store.commit("changeAnnotSelectedFeature", {
+                        idViewer: this.idViewer,
+                        index: this.index,
+                        indexFeature: indexSelectedFeature,
+                        annot
+                    });
+                }
             }
         },
         deleteAnnotationHandler(annot) {
-            if(annot.user == this.layer.id && this.$refs.olSource) {
+            if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
                 let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-                if(olFeature == null) {
+                if(!olFeature) {
                     return;
                 }
                 olFeature.set("deleted", true); // TODO: is it still needed?
                 this.$refs.olSource.removeFeature(olFeature);
 
-                if(this.selectedFeatures.some(ftr => ftr.id == annot.id)) {
+                if(this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
                     this.$store.commit("clearSelectedFeatures", {idViewer: this.idViewer, index: this.index});
                 }
             }
@@ -130,7 +143,7 @@ export default {
 
                 if(this.$refs.olSource && this.resolution && this.clustered != null && ( // some features have already been loaded
                     !this.clustered && resolution > this.maxResolutionNoClusters // recluster
-                    || resolution != this.resolution && this.clustered)) { // change of resolution while clustering
+                    || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
 
                     // clear loaded extents to force reloading features
                     this.$refs.olSource.$source.loadedExtentsRtree_.clear();
@@ -153,8 +166,9 @@ export default {
             });
 
             let annots = await new AnnotationCollection({
-                user: this.layer.id,
+                user: !this.layer.isReview ? this.layer.id : null,
                 image: this.image.id,
+                reviewed: this.layer.isReview,
                 bbox: extent.join(),
                 showWKT: true,
                 showTerm: true,
@@ -166,10 +180,10 @@ export default {
         },
 
         updateFeature(feature, annot) {
-            let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id == feature.getId());
-            let isFeatureSelected = indexSelectedFeature != -1;
+            let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === feature.getId());
+            let isFeatureSelected = indexSelectedFeature !== -1;
 
-            if(annot == null) {
+            if(!annot) {
                 console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
                 this.$refs.olSource.removeFeature(feature);
                 if(isFeatureSelected) {
@@ -179,14 +193,15 @@ export default {
             }
 
             let storedAnnot = feature.get("annot");
-            if(!this.clustered && annot.updated == storedAnnot.updated && this.sameTerms(annot.term, storedAnnot.term)) {
+            if(!this.clustered && annot.updated === storedAnnot.updated && this.sameTerms(annot.term, storedAnnot.term)) {
                 // no modification performed since feature was loaded
                 return;
             }
 
             if(isFeatureSelected) {
-                if(this.activeTool == "select" && this.activeEditTool != null) {
+                if(this.ongoingEdit) {
                     // if feature is selected and under modification, updating it may lead to conflict
+                    console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
                     return;
                 }
                 console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
@@ -206,16 +221,24 @@ export default {
         async loader(extent=this.lastExtent, resolution=this.resolution) {
             this.resolution = resolution;
 
-            if(!this.layer.visible || this.$refs.olSource == null || extent == null) {
+            if(!this.layer.visible || !this.$refs.olSource || !extent) {
                 return;
             }
 
             // TODO: test performances
             // TODO: in core, add method allowing to retrieve only created/updated/deleted annotations since a given
             // timestamp? would probably be more efficient than current approach
-            let arrayAnnots = await this.fetchAnnots(extent);
+            let arrayAnnots;
+            try {
+                arrayAnnots = await this.fetchAnnots(extent);
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-fetch-annotations-viewer")});
+                return;
+            }
 
-            if(arrayAnnots.length == 0) {
+            if(arrayAnnots.length === 0) {
                 return;
             }
 
@@ -231,7 +254,7 @@ export default {
             }, {});
             let seenAnnots = [];
 
-            if(wasClustered != this.clustered) {
+            if(wasClustered !== this.clustered) {
                 this.$store.commit("removeLayerFromSelectedFeatures", {
                     idViewer: this.idViewer,
                     index: this.index,
@@ -275,7 +298,7 @@ export default {
         },
 
         sameTerms(terms1, terms2) {
-            if(terms1.length != terms2.length) {
+            if(terms1.length !== terms2.length) {
                 return false;
             }
             return terms1.every(term => terms2.includes(term));

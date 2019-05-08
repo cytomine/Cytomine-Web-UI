@@ -1,6 +1,6 @@
 <template>
-<div class="algo-details-wrapper">
-    <b-loading :is-full-page="false" :active.sync="loading" class="small"></b-loading>
+<div class="job-details-wrapper">
+    <b-loading :is-full-page="false" :active.sync="loading" class="small" />
 
     <template v-if="!loading">
         <table class="table">
@@ -84,16 +84,23 @@
                         <em v-else class="has-text-grey">{{$t("no-result-file")}}</em>
                     </td>
                 </tr>
-                <tr v-if="!job.dataDeleted">
-                    <td>{{$t("actions")}}</td>
-                    <td>
-                        <button class="button is-small is-danger" @click="deletionModal = true">{{$t("delete-data")}}</button>
-                    </td>
-                </tr>
-                <tr v-else>
+                <tr v-if="job.dataDeleted">
                     <td>{{$t("data")}}</td>
                     <td>
-                        {{$t("deleted-algo-data")}}
+                        {{$t("deleted-analysis-data")}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{$t("actions")}}</td>
+                    <td>
+                        <div class="buttons are-small">
+                            <button v-if="!job.dataDeleted" class="button" @click="deletionModal = true">
+                                {{$t("delete-data")}}
+                            </button>
+                            <button class="button is-danger" @click="confirmJobDeletion()">
+                                {{$t("button-delete")}}
+                            </button>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -103,10 +110,10 @@
             <form>
                 <div class="modal-card">
                     <header class="modal-card-head">
-                        <p class="modal-card-title">{{$t("delete-algo-data")}}</p>
+                        <p class="modal-card-title">{{$t("delete-analysis-data")}}</p>
                     </header>
                     <section class="modal-card-body">
-                        <p>{{$t("confirm-deletion-algo-data")}}</p>
+                        <p>{{$t("confirm-deletion-analysis-data")}}</p>
                         <ul>
                             <li>{{$tc("count-annotations", allData.annotations, {count: allData.annotations})}}</li>
                             <li>{{$tc("count-reviewed-annotations", allData.reviewed, {count: allData.reviewed})}}</li>
@@ -143,12 +150,15 @@
 import {Job, JobStatus, JobDataCollection, Task} from "cytomine-client";
 import filesize from "filesize";
 
-const REFRESH_INTERVAL = 2000;
-const REFRESH_INTERVAL_DELETION_TASK = 1000;
+import constants from "@/utils/constants.js";
+const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
+const REFRESH_INTERVAL_DELETION_TASK = constants.JOB_DELETION_TASK_REFRESH_INTERVAL;
 
 export default {
-    name: "algorithm-details",
-    props: ["job"],
+    name: "job-details",
+    props: {
+        job: Object
+    },
     data() {
         return {
             loading: true,
@@ -169,13 +179,13 @@ export default {
             return this.$store.state.project.project;
         },
         isRunning() {
-            return this.job.status == JobStatus.RUNNING;
+            return this.job.status === JobStatus.RUNNING;
         },
         isSuccessful() {
-            return this.job.status == JobStatus.SUCCESS;
+            return this.job.status === JobStatus.SUCCESS;
         },
         isFinished() {
-            return this.isSuccessful || this.job.status == JobStatus.FAILED;
+            return this.isSuccessful || this.job.status === JobStatus.FAILED;
         },
         hasAnnotationResult() {
             return this.allData.annotations > 0;
@@ -220,21 +230,31 @@ export default {
                 this.refresh(true);
                 this.deletionTask = null;
                 this.deletionModal = false;
-                this.$notify({type: "success", text: this.$t("notif-success-algo-data-deletion")});
+                this.$notify({type: "success", text: this.$t("notif-success-analysis-data-deletion")});
             }
             catch(error) {
                 console.log(error);
                 this.deletionTask = null;
-                this.$notify({type: "error", text: this.$t("notif-error-algo-data-deletion")});
+                this.$notify({type: "error", text: this.$t("notif-error-analysis-data-deletion")});
             }
         },
         async refreshDeletionTask() {
-            if(this.deletionTask == null) {
+            if(!this.deletionTask) {
                 return;
             }
             await this.deletionTask.fetch();
             clearTimeout(this.timeoutRefreshDeletionTask);
             this.timeoutRefreshDeletionTask = setTimeout(this.refreshDeletionTask, REFRESH_INTERVAL_DELETION_TASK);
+        },
+        confirmJobDeletion() {
+            this.$dialog.confirm({
+                title: this.$t("delete-analysis"),
+                message: this.$t("delete-analysis-confirmation-message"),
+                type: "is-danger",
+                confirmText: this.$t("button-confirm"),
+                cancelText: this.$t("button-cancel"),
+                onConfirm: () => this.$emit("delete")
+            });
         }
     },
     async created() {
@@ -249,7 +269,7 @@ export default {
 </script>
 
 <style scoped>
-.algo-details-wrapper {
+.job-details-wrapper {
     position: relative;
     min-height: 50px;
 }

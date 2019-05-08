@@ -3,28 +3,34 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
-<div class="box" v-else>
-    <b-tabs v-model="activeTab">
-        <b-tab-item :label="$t('general')">
-            <general-configuration></general-configuration>
-        </b-tab-item>
+<div class="content-wrapper" v-else>
+    <b-field class="radio-buttons-fullwidth">
+        <b-radio-button v-model="activeTab" native-value="general" type="is-link">
+            {{$t("general")}}
+        </b-radio-button>
 
-        <b-tab-item :label="$t('members')">
-            <project-members></project-members>
-        </b-tab-item>
+        <b-radio-button v-model="activeTab" native-value="members" type="is-link">
+            {{$t("members")}}
+        </b-radio-button>
 
-        <b-tab-item :label="$t('custom-ui')">
-            <custom-ui-project></custom-ui-project>
-        </b-tab-item>
+        <b-radio-button v-model="activeTab" native-value="customUI" type="is-link">
+            {{$t("custom-ui")}}
+        </b-radio-button>
 
-        <b-tab-item :label="$t('softwares')">
-            <project-softwares></project-softwares>
-        </b-tab-item>
+        <b-radio-button v-model="activeTab" native-value="algorithms" type="is-link">
+            {{$t("algorithms")}}
+        </b-radio-button>
 
-        <b-tab-item :label="$t('image-filters')">
-            <project-image-filters></project-image-filters>
-        </b-tab-item>
-    </b-tabs>
+        <b-radio-button v-model="activeTab" native-value="imageFilters" type="is-link">
+            {{$t("image-filters")}}
+        </b-radio-button>
+    </b-field>
+
+    <div class="box tab-content">
+        <keep-alive>
+            <component :is="activeComponent" />
+        </keep-alive>
+    </div>
 </div>
 </template>
 
@@ -35,51 +41,64 @@ import CustomUIProject from "./configuration-panels/CustomUIProject";
 import ProjectSoftwares from "./configuration-panels/ProjectSoftwares";
 import ProjectImageFilters from "./configuration-panels/ProjectImageFilters";
 
+const defaultTab = "general";
+
 export default {
     name: "project-configuration",
-    components: {
-        GeneralConfiguration,
-        ProjectMembers,
-        "custom-ui-project": CustomUIProject,
-        ProjectSoftwares,
-        ProjectImageFilters
-    },
     data() {
         return {
-            activeTab: 0,
-            tabNames: [
-                "general",
-                "members",
-                "customUI",
-                "softwares",
-                "imageFilters"
-            ]
+            activeTab: defaultTab
         };
     },
     computed: {
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        queriedTab() {
+            return this.$route.query.tab;
+        },
+        activeComponent() {
+            switch(this.activeTab) {
+                case "general":
+                    return GeneralConfiguration;
+                case "members":
+                    return ProjectMembers;
+                case "customUI":
+                    return CustomUIProject;
+                case "algorithms":
+                    return ProjectSoftwares;
+                case "imageFilters":
+                    return ProjectImageFilters;
+            }
         }
     },
     watch: {
-        activeTab(idx) {
-            this.$router.push(`?tab=${this.tabNames[idx]}`);
+        queriedTab() {
+            this.changeTab();
+        },
+        activeTab() {
+            if(this.activeTab !== defaultTab || this.queriedTab) {
+                this.$router.push(`?tab=${this.activeTab}`);
+            }
         }
     },
     methods: {
+        changeTab() {
+            this.activeTab = this.$route.query.tab || defaultTab;
+            if(!this.activeComponent) {
+                this.activeTab = defaultTab;
+            }
+        }
     },
     async created() {
-        let idx = this.tabNames.indexOf(this.$route.query.tab);
-        if(idx != -1) {
-            this.activeTab = idx;
-        }
+        this.changeTab();
     }
 };
 </script>
 
 <style scoped>
-.box:not(.error) {
-    margin: 20px 50px 20px 50px;
-    min-height: 80vh;
+.tab-content {
+    position: relative;
+    min-height: 20em;
 }
 </style>

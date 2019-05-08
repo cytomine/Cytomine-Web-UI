@@ -1,6 +1,6 @@
 <template>
 <span v-if="user">
-    <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online != null"></span>
+    <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online !== null"></span>
     {{displayFullName ? fullName : user.username}}</span></template>
 
 <script>

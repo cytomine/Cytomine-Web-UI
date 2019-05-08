@@ -7,18 +7,22 @@
                 <div class="viewer-name">
                     <span>
                         <i class="fas fa-caret-right"></i>
+                        <template v-if="viewer.maps.length === 1">
+                            <image-name :image="viewer.maps[0].imageInstance" :blindMode="project.blind" />
+                        </template>
+                        <template v-else>
+                            {{$t("viewer-group", {nbImages: viewer.maps.length})}}
+                        </template>
                         {{viewer.name}}
                     </span>
                     <ul class="viewer-details" v-if="viewer.maps.length > 1">
                         <li v-for="(map, index) in viewer.maps" :key="index">
-                            {{map.imageInstance.instanceFilename}}
+                            <image-name :image="map.imageInstance" />
                         </li>
                     </ul>
                 </div>
-                <a class="delete is-small" @click.stop.prevent="close(viewer.id)">
-                </a>
+                <a class="delete is-small" @click.stop.prevent="close(viewer.id)"></a>
             </router-link>
-            <template></template>
         </template>
         <hr v-if="index < nbNavigationProjects - 1" class="navbar-divider">
     </div>
@@ -26,8 +30,11 @@
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
+
 export default {
     name: "navigation-tree",
+    components: {ImageName},
     computed: {
         navigationObject() {
             let data = {};
@@ -35,17 +42,16 @@ export default {
             for(let id in viewers) {
                 let viewer = viewers[id];
                 let nbMaps = viewer.maps.length;
-                if(nbMaps == 0) {
+                if(nbMaps === 0) {
                     return;
                 }
 
                 if(!(viewer.idProject in data)) {
-                    data[viewer.idProject] = {name: viewer.nameProject, viewers: []};
+                    data[viewer.idProject] = {name: viewer.nameProject, blind: viewer.blindProject, viewers: []};
                 }
 
                 data[viewer.idProject].viewers.push({
                     id,
-                    name: nbMaps == 1 ? viewer.maps[0].imageInstance.instanceFilename : this.$t("viewer-group", {nbImages: nbMaps}),
                     path: this.$store.getters.pathViewer({idViewer: id}),
                     maps: viewer.maps
                 });

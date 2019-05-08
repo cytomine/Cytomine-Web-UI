@@ -1,6 +1,6 @@
 <template>
 <table class="table">
-    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" />
     <tbody v-if="!loading">
         <tr>
             <td>{{$t("operating-system")}}</td>
@@ -8,14 +8,16 @@
         </tr>
         <tr>
             <td>{{$t("browser")}}</td>
-            <td>{{connection.browser}} <span v-if="connection.browserVersion">{{connection.browserVersion}}</span></td>
+            <td class="is-capitalized">
+                {{connection.browser}} <span v-if="connection.browserVersion">{{connection.browserVersion}}</span>
+            </td>
         </tr>
-        <tr v-if="consultations != null">
+        <tr v-if="consultations">
             <td>{{$t("image-consultations")}}</td>
             <td>
                 <div v-if="consultations.length > 0" class="columns is-multiline">
                     <div class="column" v-for="consultation in consultations" :key="consultation.id">
-                        <image-preview :image="consultation">
+                        <image-preview :image="consultation" :blindMode="blindMode">
                             <div class="details">
                                 <p>
                                     <strong>{{$t("duration")}}:</strong>
@@ -42,12 +44,19 @@ import ImagePreview from "@/components/image/ImagePreview";
 export default {
     name: "project-connection-details",
     components: {ImagePreview},
-    props: ["connection"],
+    props: {
+        connection: Object
+    },
     data() {
         return {
             loading: true,
             consultations: null
         };
+    },
+    computed: {
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
+        }
     },
     async created() {
         try {

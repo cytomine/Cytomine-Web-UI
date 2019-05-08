@@ -1,32 +1,29 @@
 <template>
 <div>
     <h1>{{$t("link-images")}}</h1>
-    <p>
-        <label>
-            <input type="checkbox" v-model="showCrosshair">
-            {{$t("show-crosshair")}}
-        </label>
-    </p>
 
     <p>{{$t("link-view-with")}}</p>
-    <p v-for="(map, idx) in maps" v-if="idx != index" :key="idx">
-        <label>
-            <input type="checkbox"
-               :checked="revisionCheckboxes && linkedIndexes.includes(idx)"
-               @change="event => handleCheckboxChange(idx, event.target.checked)">
-            {{$t("viewer-view")}} {{idx + 1}} ({{map.imageInstance.instanceFilename}})
-        </label>
+    <p v-for="(map, idx) in maps" v-if="idx !== index" :key="idx">
+        <b-checkbox
+            :value="revisionCheckboxes && linkedIndexes.includes(idx)"
+            @input="value => handleCheckboxChange(idx, value)"
+        >
+            {{$t("viewer-view")}} {{idx + 1}} (<image-name :image="map.imageInstance" />)
+        </b-checkbox>
     </p>
 </div>
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
+
 export default {
     name: "link-panel",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    components: {ImageName},
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             revisionCheckboxes: 1
@@ -42,16 +39,6 @@ export default {
         linkedIndexes() {
             return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
         },
-
-        showCrosshair: {
-            get() {
-                return this.maps[this.index].showCrosshair;
-            },
-            set(value) {
-                this.$store.commit("setShowCrosshair", {idViewer: this.idViewer, index: this.index, value});
-            }
-        },
-
         trackedUser() {
             return this.viewerWrapper.maps[this.index].trackedUser;
         },
@@ -59,7 +46,7 @@ export default {
     methods: {
         handleCheckboxChange(indexLinked, checked) {
             if(checked) {
-                if(this.trackedUser != null) {
+                if(this.trackedUser) {
                     this.$dialog.confirm({
                         title: this.$t("possible-conflict"),
                         message: this.$t("confirm-untrack-to-link-view"),
@@ -87,9 +74,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-p:first-of-type {
-    margin-bottom: 1em;
-}
-</style>

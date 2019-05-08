@@ -10,8 +10,8 @@
     </div>
     <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
         <div class="navbar-start">
-            <navbar-dropdown icon="fa-folder" v-if="this.nbViewers > 0" :title="$t('navigation')">
-                <navigation-tree></navigation-tree>
+            <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbViewers > 0" :title="$t('viewers')">
+                <navigation-tree />
             </navbar-dropdown>
             <router-link to="/projects" class="navbar-item">
                 <i class="fas fa-list-alt"></i>
@@ -32,16 +32,11 @@
         </div>
 
         <div class="navbar-end">
-            <cytomine-searcher></cytomine-searcher>
-
-            <navbar-dropdown icon="fa-question-circle" :title="$t('help')">
-                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
-                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
-            </navbar-dropdown>
+            <cytomine-searcher />
 
             <navbar-dropdown :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
                              :title="currentUserFullInfo"
-                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : ''"
+                             :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
                              :listPathes="['/account']">
                 <router-link to="/account" class="navbar-item">
                     {{$t("account")}}
@@ -59,25 +54,19 @@
                 </a>
             </navbar-dropdown>
 
-            <navbar-dropdown :title="currentLanguage" :classes="['is-right']">
-                <a v-for="lang in languages"
-                    class="navbar-item language" :class="{selected: (lang.value == currentLanguage)}"
-                    :key="lang.value"
-                    @click="changeLanguage(lang.value)">
-                {{ lang.name }}
-                </a>
+            <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
+                <a class="navbar-item" @click="hotkeysModal = true">{{$t("hotkeys")}}</a>
+                <a class="navbar-item" @click="aboutModal = true">{{$t("about-cytomine")}}</a>
             </navbar-dropdown>
         </div>
     </div>
 
-    <hotkeys-modal :active.sync="hotkeysModal"></hotkeys-modal>
-    <about-cytomine-modal :active.sync="aboutModal"></about-cytomine-modal>
+    <hotkeys-modal :active.sync="hotkeysModal" />
+    <about-cytomine-modal :active.sync="aboutModal" />
 </nav>
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 import NavbarDropdown from "./NavbarDropdown";
 import NavigationTree from "./NavigationTree";
 import HotkeysModal from "./HotkeysModal";
@@ -98,37 +87,26 @@ export default {
     data() {
         return {
             openedTopMenu: false,
-            openedLanguagePanel: false,
-            visibleSideBar: true,
-            languages: [
-                {value: "en", name:"English"},
-                {value: "fr", name:"Français"}
-            ],
             hotkeysModal: false,
             aboutModal: false
         };
     },
     computed: {
-        currentLanguage() {
-            return this.$i18n.locale;
+        currentUser() {
+            return this.$store.state.currentUser.user;
         },
         currentUserFullInfo() {
             return fullName(this.currentUser);
         },
         nbViewers() {
             return Object.keys(this.$store.state.images.viewers).length;
-        },
-        ...mapState({currentUser: state => state.currentUser.user})
+        }
     },
     methods: {
-        changeLanguage(newLocale) {
-            this.$i18n.locale = newLocale;
-            this.$moment.locale(newLocale);
-        },
         async openAdminSession() {
             try {
                 await this.$store.dispatch("openAdminSession");
-                this.$router.go();
+                this.$router.push("/admin");
             }
             catch(error) {
                 console.log(error);
@@ -137,7 +115,7 @@ export default {
         async closeAdminSession() {
             try {
                 await this.$store.dispatch("closeAdminSession");
-                this.$router.go();
+                this.$router.push("/");
             }
             catch(error) {
                 console.log(error);
@@ -147,7 +125,8 @@ export default {
             try {
                 await this.$store.dispatch("logout");
             }
-            catch(err) {
+            catch(error) {
+                console.log(error);
                 this.$notify({type: "error", text: this.$t("notif-error-logout")});
             }
         }
@@ -155,50 +134,31 @@ export default {
 };
 </script>
 
-<style>
-
-/*nav.navbar {
-height: 50px;
-color: white;
-flex-shrink: 0;
-border-bottom: 1px solid #111;
-background: #444;
-padding-left: 20px;
-display: flex;
-align-items: center;
-}
-
-.cytomine {
-font-family: "cytomine";
-font-size: 2em;
-font-weight: lighter;
-}*/
-
+<style lang="scss">
 #logo {
     height: 35px;
+    font-family: "cytomine";
+    font-size: 2em;
+    font-weight: lighter;
+    line-height: 1em;
 }
 
 .navbar {
     font-weight: 600;
     z-index: 500 !important;
-}
-
-.navbar-item.logo {
-    font-family: "cytomine";
-    font-size: 2em;
-    font-weight: lighter;
-}
-
-.navbar .fas {
-    padding-right: 7px;
+    
+    .fas, .far {
+        padding-right: 7px;
+    }
 }
 
 .navbar-item.language {
     font-size: 13px;
     font-weight: normal;
+
+    &.selected {
+        font-weight: 600;
+    }
 }
 
-.navbar-item.language.selected {
-    font-weight: 600;
-}
 </style>

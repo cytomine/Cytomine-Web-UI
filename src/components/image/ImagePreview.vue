@@ -1,6 +1,6 @@
 <template>
 <div class="card" :class="{'full-height-card': fullHeightCard}">
-    <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${(image.id || idImage)}`">
+    <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${idImage}`">
         <figure class="image is-5by3" :style="figureStyle">
         </figure>
     </router-link>
@@ -8,7 +8,8 @@
         <div class="content">
             <p>
                 <router-link :to="`/project/${image.project}/image/${idImage}`">
-                    {{ image.instanceFilename || image.imageName }}
+                    <span v-if="blindMode" class="blind-indication">[{{this.$t("blinded-name-indication")}}]</span>
+                    {{ image.blindedName || image.instanceFilename || image.imageName }}
                     <span v-if="showProject" class="in-project">({{$t("in-project", {projectName: image.projectName})}})</span>
                 </router-link>
             </p>
@@ -24,7 +25,8 @@ export default {
     props: {
         image: {type: Object},
         fullHeightCard: {type: Boolean, default: true},
-        showProject: {type: Boolean, default: false} 
+        showProject: {type: Boolean, default: false},
+        blindMode: {type: Boolean, default: false},
     },
     computed: {
         idImage() {
@@ -52,10 +54,15 @@ export default {
 
 .card-content {
     padding: 20px;
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .card-content a {
     font-weight: 600;
+}
+
+.blind-indication {
+    font-size: 0.9em;
+    text-transform: uppercase;
 }
 </style>

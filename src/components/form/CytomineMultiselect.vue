@@ -16,9 +16,10 @@
     :showPointer="false"
     :placeholder="$t('select-options')"
     :allow-empty="allowEmpty"
+    :disabled="disabled"
 >
 
-    <template slot="beforeList" v-if="multiple && options.length > 0 && selectAllAvailable">
+    <template #beforeList v-if="multiple && options.length > 0 && selectAllAvailable">
         <li class="multiselect__element multiselect__select-all" @click="selectAll()">
             <span :class="['multiselect__option', allSelected ? 'multiselect__option--selected' : '']">
                 {{$t("select-all")}}
@@ -26,7 +27,7 @@
         </li>
     </template>
 
-    <template slot="selection" slot-scope="{isOpen}" v-if="multiple && options.length > 0">
+    <template #selection="{isOpen}" v-if="multiple && options.length > 0">
         <div class="multiselect__tags-wrap" v-if="!isOpen">
             <strong v-if="allSelected"> {{$t("all")}} </strong>
             <template v-else>
@@ -38,6 +39,11 @@
                 </strong>
             </template>
         </div>
+        <div v-else></div>
+    </template>
+
+    <template #option="{option}">
+      <slot name="option" :option="option"></slot>
     </template>
 
 </multiselect>
@@ -59,7 +65,8 @@ export default {
         multiple: {type: Boolean, default: false},
         selectAllAvailable: {type: Boolean, default: true},
         searchable: {type: Boolean, default: true},
-        allowEmpty: {type: Boolean, default: true}
+        allowEmpty: {type: Boolean, default: true},
+        disabled: {type: Boolean, default: false}
     },
     data() {
         return {
@@ -90,8 +97,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import "~vue-multiselect/dist/vue-multiselect.min.css";
+@import "~bulma/sass/utilities/initial-variables.sass";
 
 .multiselect--active, .multiselect__content-wrapper {
     z-index: 50 !important;
@@ -146,5 +154,13 @@ export default {
 
 .multiselect__input {
     font-size: 14px !important;
+}
+
+.is-danger .multiselect__tags {
+    border-color: $red;
+}
+
+.is-danger .multiselect__select::before {
+    border-color: $red transparent transparent;
 }
 </style>

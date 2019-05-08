@@ -6,22 +6,17 @@
                 <p class="modal-card-title">{{$t("add-members-to-project")}}</p>
             </header>
             <section class="modal-card-body">
-                <b-loading :is-full-page="false" :active="loading" class="small"></b-loading>
+                <b-loading :is-full-page="false" :active="loading" class="small" />
                 <template v-if="!loading">
                     <b-field>
-                        <b-taginput v-model="selectedUsers"
-                                    :data="filteredUsers"
-                                    autocomplete
-                                    :open-on-focus="true"
-                                    field="fullName"
-                                    :placeholder="$t('search-user')"
-                                    @typing="filterUsers"
-                                    :allow-duplicates="false">
-                        </b-taginput>
+                        <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
                     </b-field>
                 </template>
             </section>
             <footer class="modal-card-foot">
+                <button class="button" @click="$emit('update:active', false)">
+                    {{$t("button-cancel")}}
+                </button>
                 <button class="button is-link" @click="addMembers">
                     {{$t("button-add")}}
                 </button>
@@ -33,16 +28,19 @@
 
 <script>
 import {UserCollection} from "cytomine-client";
+import UserTaginput from "@/components/user/UserTaginput";
 import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "add-member-modal",
-    props: ["active"],
+    components: {UserTaginput},
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             loading: true,
             users: [],
-            searchString: "",
             filteredUsers: [],
             selectedUsers: []
         };
@@ -52,29 +50,20 @@ export default {
             return this.$store.state.project.project;
         },
         projectMembersIds() {
-            let projectMembers = this.$store.state.project.contributors.concat(this.$store.state.project.managers);
+            let projectMembers = this.$store.state.project.members;
             let excluded = projectMembers.concat(this.selectedUsers);
             return excluded.map(u => u.id);
         },
+        notMemberUsers() {
+            return this.users.filter(user => !this.projectMembersIds.includes(user.id));
+        }
     },
     watch: {
-        projectMembersIds() {
-            this.filterUsers();
-        },
         active() {
-            this.searchString = "";
             this.selectedUsers = [];
         }
     },
     methods: {
-        filterUsers(searchString=this.searchString) {
-            let str = searchString.toLowerCase();
-            this.searchString = str;
-            this.filteredUsers = this.users.filter(user => {
-                return user.fullName.toLowerCase().indexOf(this.searchString) >= 0 &&
-                    !this.projectMembersIds.includes(user.id);
-            });
-        },
         async addMembers() {
             let updatedProject = this.project.clone();
             updatedProject.users = this.projectMembersIds;
@@ -95,9 +84,7 @@ export default {
     async created() {
         let users = (await UserCollection.fetchAll()).array;
         users.forEach(u => u.fullName = fullName(u));
-
         this.users = users;
-        this.filterUsers();
         this.loading = false;
     }
 };

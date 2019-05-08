@@ -1,8 +1,8 @@
 <template>
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
-    <b-field class="no-margin">
+    <b-field class="no-margin" :type="error ? 'is-danger' : null">
         <b-input class="global-search" v-model="searchString" :placeholder="$t('search-placeholder')" type="search"
-        icon="search" @click.native="activate()" :loading="isLoading"></b-input>
+            icon="search" @click.native="activate()" :loading="loading" :disabled="error" />
         <p class="control">
             <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
         </p>
@@ -11,18 +11,27 @@
     <div class="navbar-dropdown search-results" v-show="true">
         <h2>Projects ({{filteredProjects.length}})</h2>
         <template v-if="filteredProjects.length > 0">
-            <router-link v-for="project in subsetProjects" :key="project.id" :to="`/project/${project.id}`"
-            class="navbar-item" v-html="highlightedName(project.name)" @click.native="deactivate"></router-link>
+            <router-link
+                v-for="project in subsetProjects"
+                :key="project.id"
+                :to="`/project/${project.id}`"
+                class="navbar-item"
+                v-html="highlightedName(project.name)"
+                @click.native="deactivate"
+            />
             <a v-if="moreProjects" class="navbar-item">...</a>
         </template>
         <span v-else class="navbar-item no-result">{{$t("no-project")}}</span>
 
         <h2>Images ({{filteredImages.length}})</h2>
         <template v-if="filteredImages.length > 0">
-            <router-link v-for="img in subsetImages" :key="img.id" :to="`/project/${img.project}/image/${img.id}`"
-            class="navbar-item" @click.native="deactivate"
-            v-html="`${highlightedName(img.originalFilename)} <span class='in-project'>(${$t('in-project', {projectName: img.projectName})})</span>`">
-            </router-link>
+            <router-link
+                v-for="img in subsetImages"
+                :key="img.id"
+                :to="`/project/${img.project}/image/${img.id}`"
+                class="navbar-item" @click.native="deactivate"
+                v-html="htmlImageName(img)"
+            />
             <a v-if="moreImages" class="navbar-item">...</a>
         </template>
         <span v-else class="navbar-item no-result">{{$t("no-image")}}</span>
@@ -45,7 +54,8 @@ export default {
     data() {
         return {
             isActive: false,
-            isLoading: false,
+            loading: false,
+            error: false,
             searchString: "",
             projects: [],
             images: [],
@@ -54,7 +64,7 @@ export default {
     },
     computed: {
         displayResults() {
-            return this.isActive && this.searchString.length > 0;
+            return this.isActive && !this.error && this.searchString.length > 0;
         },
         lowCaseSearchString() {
             return this.searchString.toLowerCase();
@@ -87,17 +97,30 @@ export default {
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
+        async fetchImages() {
+            this.images = await ImageInstanceCollection.fetchAllLight();
+        },
+        async fetchProjects() {
+            this.projects = (await new ProjectCollection({
+                light: true,
+                filterKey: "user",
+                filterValue: this.currentUser.id
+            }).fetchAll()).array;
+        },
         async activate() {
             if(!this.isActive) {
-                this.isLoading = true;
-                let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-                this.projects = (await new ProjectCollection({
-                    light: true,
-                    filterKey: "user",
-                    filterValue: this.currentUser.id
-                }).fetchAll()).array;
-                this.images = await imagesPromise;
-                this.isLoading = false;
+                try {
+                    this.loading = true;
+                    await Promise.all([
+                        this.fetchImages(),
+                        this.fetchProjects()
+                    ]);
+                }
+                catch(error) {
+                    console.log(error);
+                    this.error = true;
+                }
+                this.loading = false;
                 this.isActive = true;
             }
         },
@@ -108,6 +131,10 @@ export default {
             let regex = new RegExp(`(${this.lowCaseSearchString})`, "gi");
             return value.replace(regex, "<strong>$1</strong>");
         },
+        htmlImageName(img) {
+            let inProject = `<span class="in-project">(${this.$t("in-project", {projectName: img.projectName})})</span>`;
+            return `${this.highlightedName(img.originalFilename)} ${inProject}`;
+        }
     }
 };
 </script>

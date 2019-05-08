@@ -1,27 +1,31 @@
 <template>
-<div class="advanced-search-results">
+<div class="box error" v-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
+<div v-else class="advanced-search-results">
     <div class="panel">
         <p class="panel-heading">
             {{$t("advanced-search")}}
         </p>
         <div class="panel-block">
-            <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search"></b-input>
+            <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
         </div>
         <p class="panel-tabs">
-            <a :class="{'is-active': activeTab == 'projects'}" @click="activeTab = 'projects'">
+            <a :class="{'is-active': activeTab === 'projects'}" @click="activeTab = 'projects'">
                 {{$t("projects")}} ({{filteredProjects.length}})
             </a>
-            <a :class="{'is-active': activeTab == 'images'}" @click="activeTab = 'images'">
+            <a :class="{'is-active': activeTab === 'images'}" @click="activeTab = 'images'">
                 {{$t("images")}} ({{filteredImages.length}})
             </a>
         </p>
         <div class="panel-block">
-            <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
+            <b-loading :is-full-page="false" :active="loading" />
 
-            <b-table v-show="activeTab == 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
+            <b-table v-show="activeTab === 'projects'" :data="filteredProjects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'projects'">
 
-                <template slot-scope="props">
+                <template #default="props">
                     <b-table-column :label="$t('name')" width="100">
                         <router-link :to="`/project/${props.row.id}`">
                             {{ props.row.name }}
@@ -35,17 +39,17 @@
                     </b-table-column>
                 </template>
 
-                <template slot="empty">
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-project")}}</p>
                     </div>
                 </template>
             </b-table>
 
-            <b-table v-show="activeTab == 'images'" :data="filteredImages" :paginated="true" :per-page="perPage"
+            <b-table v-show="activeTab === 'images'" :data="filteredImages" :paginated="true" :per-page="perPage"
             pagination-size="is-small" :key="'images'">
 
-                <template slot-scope="props">
+                <template #default="props">
                     <b-table-column :label="$t('name')" width="100">
                         <router-link :to="`/project/${props.row.project}/image/${props.row.id}`">
                             {{ props.row.originalFilename }}
@@ -65,7 +69,7 @@
                     </b-table-column>
                 </template>
 
-                <template slot="empty">
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-image")}}</p>
                     </div>
@@ -84,7 +88,9 @@ export default {
     name: "advanced-search",
     data() {
         return {
-            isLoading: false,
+            loading: true,
+            error: false,
+
             searchString: "",
             projects: [],
             images: [],
@@ -113,22 +119,37 @@ export default {
     },
     watch: {
         pathSearchString(val) {
-            if(val != null) {
+            if(val) {
                 this.searchString = val;
             }
         }
     },
+    methods: {
+        async fetchImages() {
+            this.images = await ImageInstanceCollection.fetchAllLight();
+        },
+        async fetchProjects() {
+            this.projects = (await new ProjectCollection({
+                light: true,
+                filterKey: "user",
+                filterValue: this.currentUser.id
+            }).fetchAll()).array;
+        }
+    },
     async created() {
-        this.isLoading = true;
         this.searchString = this.pathSearchString || "";
-        let imagesPromise = ImageInstanceCollection.fetchAllLight(); // promise to parallelize
-        this.projects = (await new ProjectCollection({
-            light: true,
-            filterKey: "user",
-            filterValue: this.currentUser.id
-        }).fetchAll()).array;
-        this.images = await imagesPromise;
-        this.isLoading = false;
+        try {
+            await Promise.all([
+                this.fetchImages(),
+                this.fetchProjects()
+            ]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+
+        this.loading = false;
     }
 };
 </script>

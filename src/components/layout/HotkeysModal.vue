@@ -54,7 +54,9 @@
 <script>
 export default {
     name: "hotkeys-modal",
-    props: ["active"]
+    props: {
+        active: Boolean
+    }
 };
 </script>
 

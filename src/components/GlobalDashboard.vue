@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-    <b-loading :is-full-page="false" :active.sync="loading"></b-loading>
+    <b-loading :is-full-page="false" :active.sync="loading" />
 
     <template v-if="!loading">
         <div v-if="welcomeMessage" class="box" v-html="welcomeMessage"></div>
@@ -9,9 +9,12 @@
             <div class="column is-two-thirds">
                 <div class="box">
                     <h2> {{ $t("recently-opened") }} </h2>
-                    <b-table :data="recentProjects">
+                    <b-message v-if="!recentProjects" type="is-danger" has-icon icon-size="is-small">
+                        {{$t("failed-fetch-recent-projects")}}
+                    </b-message>
+                    <b-table v-else :data="recentProjects">
 
-                        <template slot-scope="{row: project}">
+                        <template #default="{row: project}">
                             <b-table-column :label="$t('project')" width="100" centered>
                                 <router-link class="project-name" :to="`/project/${project.id}`">
                                     {{ project.name }}
@@ -19,11 +22,11 @@
                             </b-table-column>
 
                             <b-table-column :label="$t('images')" width="400">
-                                <list-images-preview :idProject="project.id"></list-images-preview>
+                                <list-images-preview :project="project" />
                             </b-table-column>
                         </template>
 
-                        <template slot="empty">
+                        <template #empty>
                             <div class="content has-text-grey has-text-centered">
                                 <p>{{$t("no-recent-project")}}</p>
                             </div>
@@ -42,24 +45,52 @@
                     <table class="table is-fullwidth">
                         <tbody>
                             <tr>
-                                <td>{{projects.length}}</td>
+                                <td>{{projects ? projects.length : "?"}}</td>
                                 <td>{{$t("projects")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-projects-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
-                                <td>{{images.length}}</td>
+                                <td>{{nbImages != null ? nbImages : "?"}}</td>
                                 <td>{{$t("images")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-images-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
-                                <td>{{nbUserAnnots}}</td>
+                                <td>{{nbUserAnnots != null ? nbUserAnnots : "?"}}</td>
                                 <td>{{$t("user-annotations")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-annotations-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                             <tr>
-                                <td>{{nbJobAnnots}}</td>
-                                <td>{{$t("job-annotations")}}</td>
-                            </tr>
-                            <tr>
-                                <td>{{nbReviewed}}</td>
+                                <td>{{nbReviewed != null ? nbReviewed : "?"}}</td>
                                 <td>{{$t("reviewed-annotations")}}</td>
+                                <td>
+                                    <v-popover>
+                                        <i class="fas fa-info-circle"></i>
+                                        <template #popover>
+                                            <p>{{$t("number-reviewed-annotations-info-message")}}</p>
+                                        </template>
+                                    </v-popover>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -67,9 +98,13 @@
 
                 <div class="box last-image">
                     <h2> {{ $t("last-opened-image") }} </h2>
-                    <image-preview v-if="lastOpenedImage" :image="lastOpenedImage" 
-                        :fullHeightCard="false" :showProject="true">
-                    </image-preview>
+                    <image-preview
+                        v-if="lastOpenedImage"
+                        :image="lastOpenedImage"
+                        :fullHeightCard="false"
+                        :showProject="true"
+                        :blindMode="lastOpenedImage.blindMode"
+                    />
                     <div class="has-text-grey has-text-centered" v-else>
                         {{$t("no-recent-image")}}
                     </div>
@@ -104,43 +139,53 @@ export default {
     },
     data() {
         return {
-            projects: [],
-            recentProjectsId: [],
-            images: [],
+            projects: null,
+            recentProjectsId: null,
             recentImages: [],
-            nbProjects: 0,
-            nbUserAnnots: 0,
-            nbJobAnnots: 0,
-            nbReviewed: 0,
+            nbUserAnnots: null,
+            nbReviewed: null,
             welcomeMessage: null,
             loading: true
         };
     },
     computed: {
+        nbImages() {
+            if(!this.projects) {
+                return;
+            }
+
+            return this.projects.array.reduce((count, project) => {
+                return count + project.numberOfImages;
+            }, 0);
+        },
         recentProjects() {
+            if(!this.recentProjectsId || !this.projects) {
+                return;
+            }
+
             let array = [];
             this.recentProjectsId.forEach(id => {
-                let project = this.projects.array.find(project => project.id == id);
-                if(project != null) {
+                let project = this.projects.array.find(project => project.id === id);
+                if(project) {
                     array.push(project);
                 }
             });
             return array;
         },
         lastOpenedImage() {
-            if(this.recentImages && this.recentImages.length > 0) {
+            if(this.recentImages && this.recentImages.length > 0 && this.projects) {
                 let lastOpened = this.recentImages[0];
-                let project = this.projects.array.find(project => project.id == lastOpened.project);
-                lastOpened.projectName = project.name;
+                let project = this.projects.array.find(project => project.id === lastOpened.project);
+                if(project) {
+                    lastOpened.projectName = project.name;
+                    lastOpened.blindMode = project.blindMode;
+                }
                 return lastOpened;
             }
         },
         ...mapState({currentUser: state => state.currentUser.user})
     },
     methods: {
-        async fetchImages() {
-            this.images = await ImageInstanceCollection.fetchAllLight();
-        },
         async fetchProjects() {
             this.projects = await ProjectCollection.fetchAll();
         },
@@ -168,14 +213,13 @@ export default {
     },
     async created() {
         await Promise.all([
-            this.fetchImages(),
             this.fetchProjects(),
             this.fetchNbAnnots(),
             this.fetchNbReviewedAnnots(),
             this.fetchRecentProjectsId(),
             this.fetchRecentImages(),
             this.fetchWelcomeMessage()
-        ]);
+        ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process
         this.loading = false;
     }
 };

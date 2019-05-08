@@ -3,7 +3,7 @@
     <h1>{{$t("broadcast")}}</h1>
 
     <div>
-        <b-checkbox v-model="broadcast" :native-value="null" type="is-info">
+        <b-checkbox v-model="broadcastModel" type="is-info" :disabled="disabledBroadcast">
             {{$t("broadcast-my-position")}}
         </b-checkbox>
     </div>
@@ -11,7 +11,7 @@
     <h2 :class="{disabled: broadcast}">{{$t("follow-user")}}</h2>
 
     <div class="follow-panel-content" :class="{disabled: broadcast}">
-        <div>
+        <div class="field">
             <b-radio v-model="trackedUserModel" :native-value="null" type="is-info" :disabled="broadcast">
                 {{$t("no-tracking")}}
             </b-radio>
@@ -19,18 +19,18 @@
 
         <template v-if="onlineManagers.length > 0">
             <h3>{{$t("online-managers")}}</h3>
-            <div v-for="user in onlineManagers" :key="user.id">
+            <div class="field" v-for="user in onlineManagers" :key="user.id">
                 <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
-                    <username :user="user"></username>
+                    <username :user="user" />
                 </b-radio>
             </div>
         </template>
 
         <template v-if="onlineContributors.length > 0">
             <h3>{{$t("online-contributors")}}</h3>
-            <div v-for="user in onlineContributors" :key="user.id">
+            <div class="field" v-for="user in onlineContributors" :key="user.id">
                 <b-radio v-model="trackedUserModel" :native-value="user.id" type="is-info" :disabled="broadcast">
-                    <username :user="user"></username>
+                    <username :user="user" />
                 </b-radio>
             </div>
         </template>
@@ -40,37 +40,47 @@
 
 <script>
 import Username from "@/components/user/Username";
-import {fullName} from "@/utils/user-utils.js";
 
 import {UserPosition} from "cytomine-client";
+
+import constants from "@/utils/constants.js";
 
 export default {
     name: "follow-panel",
     components: {Username},
-    props: [
-        "idViewer",
-        "index",
-        "view"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        view: Object
+    },
     data() {
         return {
             onlineUsers: [],
 
+            broadcastModel: false,
             trackedUserModel: null,
 
             timeoutOnlineUsers: null,
-            timeoutTracking: null
+            timeoutTracking: null,
+
+            disabledBroadcast: false
         };
     },
     computed: {
+        projectMembers() {
+            return this.$store.state.project.members;
+        },
         projectManagers() {
             return this.$store.state.project.managers;
         },
         projectContributors() {
-            return this.$store.state.project.contributors;
+            return this.$store.getters.contributors;
         },
         currentUser() {
             return this.$store.state.currentUser.user;
+        },
+        blindMode() {
+            return this.$store.state.project.project.blindMode;
         },
         viewerWrapper() {
             return this.$store.state.images.viewers[this.idViewer];
@@ -82,7 +92,7 @@ export default {
             return this.viewerWrapper.links.find(group => group.includes(this.index)) || [];
         },
         linkedIndexTracking() { // true if current view is linked with another view with tracking enabled
-            return this.linkedIndexes.any(idx => idx != this.index && this.maps[idx].trackedUser != null);
+            return this.linkedIndexes.some(idx => idx !== this.index && this.maps[idx].trackedUser);
         },
         imageWrapper() {
             return this.viewerWrapper.maps[this.index];
@@ -98,9 +108,13 @@ export default {
                 return this.imageWrapper.broadcast;
             },
             set(value) {
-                // QUESTION: forbid user to broadcast several times the same image
                 this.$store.commit("setBroadcast", {idViewer: this.idViewer, index: this.index, value});
             }
+        },
+        alreadyBroadcastingImage() {
+            return this.maps.some((map, index) => {
+                return index !== this.index && map.imageInstance.id === this.image.id && map.broadcast;
+            });
         },
         trackedUser: {
             get() {
@@ -117,16 +131,15 @@ export default {
             return this.projectContributors.filter(({id}) => this.onlineUsers.includes(id));
         },
         trackedUserFullName() {
-            let allUsers = this.projectManagers.concat(this.projectContributors);
-            let trackedUser = allUsers.find(user => user.id == this.trackedUser);
-            if(trackedUser != null) {
-                return fullName(trackedUser);
+            let trackedUser = this.projectMembers.find(user => user.id === this.trackedUser);
+            if(trackedUser) {
+                return trackedUser.fullName;
             }
         }
     },
     watch: {
         activePanel(panel) {
-            if(panel == "follow") {
+            if(panel === "follow") {
                 this.fetchOnline();
             }
         },
@@ -137,9 +150,26 @@ export default {
             }
         },
 
+        alreadyBroadcastingImage(value) {
+            if(!value) {
+                this.disabledBroadcast = false;
+            }
+        },
+
+        broadcastModel(value) {
+            if(value && this.alreadyBroadcastingImage) {
+                this.$notify({type: "error", text: this.$t("notif-error-already-broadcasting-this-image")});
+                this.disabledBroadcast = true;
+                this.$nextTick(() => this.broadcastModel = false);
+                return;
+            }
+
+            this.broadcast = value;
+        },
+
         trackedUserModel(value) {
             // if map is linked to another map on which tracking is already enabled, possible conflict
-            if(value && this.linkedIndexes.some(idx => idx != this.index && this.maps[idx].trackedUser != null)) {
+            if(value && this.linkedIndexTracking) {
                 this.$dialog.confirm({
                     title: this.$t("possible-conflict"),
                     message: this.$t("confirm-unlink-view-to-track"),
@@ -160,19 +190,19 @@ export default {
         trackedUser(id) {
             this.trackedUserModel = id;
 
-            if(id != null) {
+            if(id) {
                 this.track();
                 this.fetchOnline();
             }
         },
 
         onlineUsers(onlines) {
-            if(this.trackedUser != null && !onlines.includes(this.trackedUser)) {
+            if(this.trackedUser && !onlines.includes(this.trackedUser)) {
                 this.$notify({
                     type: "info",
-                    text: this.$t("end-tracking-user-disconnected", {
+                    text: this.$t("end-tracking-user-no-longer-broadcasting", {
                         username: this.trackedUserFullName,
-                        imageName: this.image.instanceFilename
+                        imageName: this.blindMode ? this.image.blindedName : this.image.instanceFilename
                     })
                 });
                 this.trackedUser = null;
@@ -182,32 +212,42 @@ export default {
     },
     methods: {
         async track() {
-            if(this.trackedUser == null) {
+            if(!this.trackedUser) {
                 return;
             }
-            // TODO in backend: fetchLastPosition() allowed only if targetted user is broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
-            let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
-            this.view.animate({
-                center: [pos.x, pos.y],
-                zoom: pos.zoom,
-                rotation: pos.rotation,
-                duration: 500
-            });
+
+            try {
+                let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
+                if(!pos.id || !pos.broadcast) {
+                    return;
+                }
+
+                this.view.animate({
+                    center: [pos.x, pos.y],
+                    zoom: pos.zoom,
+                    rotation: pos.rotation,
+                    duration: 500
+                });
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("notif-error-tracked-user-position")});
+            }
 
             clearTimeout(this.timeoutTracking);
-            this.timeoutTracking = setTimeout(this.track, 500);
+            this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
         },
 
-        async fetchOnline() { // TODO in backend: method for fetching only the users broadcasting (https://github.com/cytomine/Cytomine-core/issues/1150)
-            if(this.trackedUser == null && this.activePanel != "follow") {
+        async fetchOnline() {
+            if(!this.trackedUser && this.activePanel !== "follow") { // if panel not opened and no tracking ongoing, no need to refresh the data
                 return;
             }
 
-            let onlines = await this.image.fetchConnectedUsers();
-            this.onlineUsers = onlines.filter(id => id != this.currentUser.id);
+            let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting users
+            this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
 
             clearTimeout(this.timeoutOnlineUsers);
-            this.timeoutOnlineUsers = setTimeout(this.fetchOnline, 10000);
+            this.timeoutOnlineUsers = setTimeout(this.fetchOnline, constants.BROADCASTING_USERS_REFRESH_INTERVAL);
         },
     },
     created() {

@@ -3,19 +3,23 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
-<div v-else class="list-images-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
+<div v-else class="content-wrapper">
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("images")}}
-            <button v-if="!currentUser.guestByNow" class="button is-link" @click="addImageModal = true">
+            <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
                 {{$t('button-add-image')}}
             </button>
         </p>
         <div class="panel-block">
             <div class="search-block">
                 <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                    type="search" icon="search" />
                 <button class="button" @click="toggleFilterDisplay()">
                     <span class="icon">
                         <i class="fas fa-filter"></i>
@@ -27,38 +31,23 @@
             <b-collapse :open="filtersOpened">
                 <div class="filters">
                     <div class="columns">
-                        <div class="column filter">
-                            <div class="filter-label">
-                                {{$t("tags")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
-                        </div>
-
-                        <div class="column filter">
+                        <div class="column filter is-one-quarter">
                             <div class="filter-label">
                                 {{$t("format")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true">
-                                </cytomine-multiselect>
+                                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true" />
                             </div>
                         </div>
 
-                        <div class="column filter">
+                        <div class="column filter is-one-quarter">
                             <div class="filter-label">
                                 {{$t("vendor")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true">
-                                </cytomine-multiselect>
+                                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true" />
                             </div>
                         </div>
-
-                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -68,8 +57,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect :multiple="true" :searchable="false"
-                                    v-model="selectedMagnifications" :options="availableMagnifications">
-                                </cytomine-multiselect>
+                                    v-model="selectedMagnifications" :options="availableMagnifications" />
                             </div>
                         </div>
 
@@ -79,8 +67,7 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect :multiple="true" :searchable="false"
-                                    v-model="selectedResolutions" :options="availableResolutions">
-                                </cytomine-multiselect>
+                                    v-model="selectedResolutions" :options="availableResolutions" />
                             </div>
                         </div>
 
@@ -89,8 +76,7 @@
                                 {{$t("width")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsWidth" :max="maxWidth"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsWidth" :max="maxWidth" :show="initSliders" />
                             </div>
                         </div>
 
@@ -99,8 +85,7 @@
                                 {{$t("height")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsHeight" :max="maxHeight"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsHeight" :max="maxHeight" :show="initSliders" />
                             </div>
                         </div>
                     </div>
@@ -111,18 +96,16 @@
                                 {{$t("user-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
                         <div class="column filter">
                             <div class="filter-label">
-                                {{$t("job-annotations")}}
+                                {{$t("analysis-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -131,8 +114,7 @@
                                 {{$t("reviewed-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -144,17 +126,25 @@
             <b-table :data="filteredImages" class="table-images" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
 
-                <template slot-scope="{row: image}">
+                <template #default="{row: image}">
                     <b-table-column :label="$t('overview')" width="100">
                         <router-link :to="`/project/${image.project}/image/${image.id}`">
-                            <img :src="image.thumb" :alt="image.instanceFilename" class="image-overview">
+                            <img :src="image.thumb" class="image-overview">
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="instanceFilename" :label="$t('name')" sortable width="400">
+                    <b-table-column
+                        :field="blindMode ? 'blindedName' : 'instanceFilename'"
+                        :label="$t('name')"
+                        sortable
+                        width="400"
+                    >
                         <router-link :to="`/project/${image.project}/image/${image.id}`">
-                            {{ image.instanceFilename }}
+                            <image-name :image="image" />
                         </router-link>
+                        <p v-if="canManageProject && blindMode" class="true-name">
+                            {{image.instanceFilename}} <!-- if user is a manager, also display the true name of the image -->
+                        </p>
                     </b-table-column>
 
                     <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
@@ -167,14 +157,16 @@
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="100">
+                    <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
                         <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                             {{ image.numberOfJobAnnotations }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-                        <a>{{ image.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+                            {{ image.numberOfReviewedAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column label=" " centered width="150">
@@ -184,21 +176,23 @@
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="{row: image}">
-                    <image-details :image="image" :excludedProperties="excludedProperties"
-                                   @delete="deleteImage(image.id)"
-                                   @setResolution="(event) => setResolution(image, event)"
-                                   @setMagnification="(event) => setMagnification(image, event)">
-                    </image-details>
+                <template #detail="{row: image}">
+                    <image-details
+                        :image="image"
+                        :excludedProperties="excludedProperties"
+                        @delete="deleteImage(image.id)"
+                        @setResolution="(event) => setResolution(image, event)"
+                        @setMagnification="(event) => setMagnification(image, event)"
+                    />
                 </template>
 
-                <template slot="empty">
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-image")}}</p>
                     </div>
                 </template>
 
-                <template slot="bottom-left">
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>
@@ -208,15 +202,16 @@
                 </template>
             </b-table>
         </div>
-    </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="addImage"></add-image-modal>
+        <add-image-modal :active.sync="addImageModal" :idsImages="idsAbstractImages" @addImage="addImage" />
+    </div>
 </div>
 </template>
 
 <script>
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
 import CytomineSlider from "@/components/form/CytomineSlider";
+import ImageName from "./ImageName";
 import ImageDetails from "./ImageDetails";
 import AddImageModal from "./AddImageModal";
 
@@ -228,6 +223,7 @@ import {ImageInstanceCollection} from "cytomine-client";
 export default {
     name: "list-images",
     components: {
+        ImageName,
         ImageDetails,
         CytomineMultiselect,
         CytomineSlider,
@@ -235,15 +231,17 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             images: [],
             searchString: "",
             perPage: 10,
-            loading: true,
+
             // filters
             filtersOpened: false,
             initSliders: false,
 
-            selectedTags: [],
             selectedFormats: [],
             selectedVendors: [],
             selectedMagnifications: [],
@@ -258,8 +256,6 @@ export default {
 
             addImageModal: false,
 
-            // TODO: should be defined in project config and retrieved from backend (corresponds to properties displayed
-            // in table columns) - https://github.com/cytomine/Cytomine-core/issues/1154
             excludedProperties: [
                 "overview",
                 "instanceFilename",
@@ -277,41 +273,43 @@ export default {
         project() {
             return this.$store.state.project.project;
         },
+        blindMode() {
+            return this.project.blindMode;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
+        },
+        canAddImage() {
+            return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+        },
         configUI() {
             return this.$store.state.project.configUI;
+        },
+        idsAbstractImages() {
+            return this.images.map(i => i.baseImage);
         },
         filteredImages() {
             let filtered = this.images;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(image => {
-                    return image.instanceFilename.toLowerCase().indexOf(str) >= 0;
+                    return image.instanceFilename.toLowerCase().indexOf(str) >= 0 ||
+                        (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0);
                 });
             }
 
-            // TODO: tags
-
-            filtered = filtered.filter(image => this.selectedFormats.includes(image.extension));
-            filtered = filtered.filter(image => this.selectedVendors.includes(image.vendorFormatted));
-
-            filtered = filtered.filter(image => this.selectedMagnifications.includes(image.magnificationFormatted));
-            filtered = filtered.filter(image => this.selectedResolutions.includes(image.resolutionFormatted));
-
-            filtered = filtered.filter(image => isBetweenBounds(image.width, this.boundsWidth));
-            filtered = filtered.filter(image => isBetweenBounds(image.height, this.boundsHeight));
-
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations));
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations));
-            filtered = filtered.filter(image =>
-                isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations));
-
-            return filtered;
-        },
-        availableTags() {
-            return [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}]; // TODO
+            return filtered.filter(image => {
+                return this.selectedFormats.includes(image.extension) &&
+                    this.selectedVendors.includes(image.vendorFormatted) &&
+                    this.selectedMagnifications.includes(image.magnificationFormatted) &&
+                    this.selectedResolutions.includes(image.resolutionFormatted) &&
+                    isBetweenBounds(image.width, this.boundsWidth) &&
+                    isBetweenBounds(image.height, this.boundsHeight) &&
+                    isBetweenBounds(image.numberOfAnnotations, this.boundsUserAnnotations) &&
+                    isBetweenBounds(image.numberOfJobAnnotations, this.boundsJobAnnotations) &&
+                    isBetweenBounds(image.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+            });
         },
         availableFormats() {
             let formats = [];
@@ -375,7 +373,10 @@ export default {
         },
 
         async deleteImage(idDeleted) {
-            this.images = this.images.filter(image => image.id != idDeleted);
+            this.images = this.images.filter(image => image.id !== idDeleted);
+            if(!this.filtersOpened) { // deleting an image may change the sliders bounds => need to reinitialize them
+                this.initSliders = false;
+            }
         },
 
         addImage(image) {
@@ -386,8 +387,8 @@ export default {
             let addVendor = !this.availableVendors.includes(image.vendorFormatted);
             let addMagnification = !this.availableMagnifications.includes(image.magnificationFormatted);
             let addResolution = !this.availableResolutions.includes(image.resolutionFormatted);
-            let updateMaxWidth = this.boundsWidth[1] == this.maxWidth && image.width > this.maxWidth;
-            let updateMaxHeight = this.boundsHeight[1] == this.maxHeight && image.height > this.maxHeight;
+            let updateMaxWidth = this.boundsWidth[1] === this.maxWidth && image.width > this.maxWidth;
+            let updateMaxHeight = this.boundsHeight[1] === this.maxHeight && image.height > this.maxHeight;
             // ---
 
             this.images.unshift(image);
@@ -405,10 +406,13 @@ export default {
                 this.selectedResolutions.push(image.resolutionFormatted);
             }
             if(updateMaxWidth) {
-                this.boundsWidth[1] = image.width;
+                this.boundsWidth = [this.boundsWidth[0], image.width];
             }
             if(updateMaxHeight) {
-                this.boundsHeight[1] = image.height;
+                this.boundsHeight = [this.boundsHeight[0], image.height];
+            }
+            if(!this.filtersOpened && (updateMaxWidth || updateMaxHeight)) { // need to reinitialize the sliders if they are not currently displayed
+                this.initSliders = false;
             }
         },
 
@@ -446,7 +450,7 @@ export default {
         },
 
         formatResolution(resolution) {
-            return (resolution != null) ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
+            return resolution ? `${resolution.toFixed(3)} ${this.$t("um-per-pixel")}` : this.$t("unknown");
         },
 
         formatVendor(vendor) {
@@ -458,30 +462,32 @@ export default {
         }
     },
     async created() {
-        this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-        this.loading = false;
+        try {
+            this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
+            this.images.forEach(image => this.formatImage(image));
 
-        this.images.forEach(image => this.formatImage(image));
+            this.selectedVendors = this.availableVendors;
+            this.selectedFormats = this.availableFormats;
+            this.selectedMagnifications = this.availableMagnifications;
+            this.selectedResolutions = this.availableResolutions;
 
-        this.selectedVendors = this.availableVendors;
-        this.selectedFormats = this.availableFormats;
-        this.selectedMagnifications = this.availableMagnifications;
-        this.selectedResolutions = this.availableResolutions;
+            this.boundsWidth = [0, this.maxWidth];
+            this.boundsHeight = [0, this.maxHeight];
+            this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
+            this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
+            this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
 
-        this.boundsWidth = [0, this.maxWidth];
-        this.boundsHeight = [0, this.maxHeight];
-        this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-        this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-        this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+            this.loading = false;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
     }
 };
 </script>
 
 <style scoped>
-.list-images-wrapper {
-    padding: 30px 50px 30px 50px;
-}
-
 .panel-heading {
     display: flex;
     justify-content: space-between;
@@ -496,15 +502,19 @@ export default {
 .search-block {
     display: flex;
 }
-</style>
 
-<style>
-.search-images {
+.true-name {
+    margin-top: 0.2em;
+    font-size: 0.9em;
+    color: #888;
+}
+
+>>> .search-images {
     max-width: 300px;
     margin-right: 10px;
 }
 
-.list-images-wrapper td, .list-images-wrapper th {
+>>> td, >>> th {
     vertical-align: middle !important;
 }
 </style>

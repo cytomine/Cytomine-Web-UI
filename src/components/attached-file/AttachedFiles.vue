@@ -1,7 +1,8 @@
 <template>
 <div class="attached-files-wrapper">
     <template v-if="!loading">
-        <template v-if="attachedFiles.length > 0">
+        <em v-if="error">{{$t("error-attached-files")}}</em>
+        <template v-else-if="attachedFiles.length > 0">
             <span class="file-item" v-for="(file, index) in attachedFiles" :key="file.id">
                 <a :href="host + file.url">{{file.filename}}</a>
                 <button v-if="canEdit" class="delete is-small" @click="confirmDeletion(file, index)"></button>
@@ -27,6 +28,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
             attachedFiles: []
         };
     },
@@ -81,7 +83,13 @@ export default {
         }
     },
     async created() {
-        this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+        try {
+            this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 

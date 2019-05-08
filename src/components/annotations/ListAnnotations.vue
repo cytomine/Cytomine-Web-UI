@@ -3,8 +3,12 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("error-load-annotations-filters") }}</p>
+</div>
 <div v-else class="list-annotations-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading">
         <div class="box">
             <h2> {{ $t("display") }} </h2>
@@ -15,10 +19,14 @@
                             {{$t("preview-size")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedSize" :options="allowedSizes"
-                                label="label" track-by="size"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedSize"
+                                :options="allowedSizes"
+                                label="label"
+                                track-by="size"
+                                :allow-empty="false"
+                                :searchable="false"
+                            />
                         </div>
                     </div>
                     <div class="column filter">
@@ -26,9 +34,12 @@
                             {{$t("number-per-page")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="nbPerPage" :options="[10, 25, 50, 100]"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="nbPerPage"
+                                :options="[10, 25, 50, 100]"
+                                :allow-empty="false"
+                                :searchable="false"
+                            />
                         </div>
                     </div>
                     <div class="column filter">
@@ -36,10 +47,14 @@
                             {{$t("outline-color")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedColor" :options="colors"
-                                label="label" track-by="name"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedColor"
+                                :options="colors"
+                                label="label"
+                                track-by="name"
+                                :allow-empty="false"
+                                :searchable="false"
+                            />
                         </div>
                     </div>
                 </div>
@@ -53,56 +68,87 @@
                             {{$t("annotation-type")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedAnnotationType" :options="annotationTypes"
-                                :allow-empty="false" :searchable="false">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedAnnotationType"
+                                :options="annotationTypes"
+                                :allow-empty="false"
+                                :searchable="false"
+                            />
                         </div>
                     </div>
 
-                    <div v-if="selectedAnnotationType == userAnnotationOption" class="column filter">
+                    <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter">
+                        <div class="filter-label">
+                            {{$t("analyses")}}
+                        </div>
+                        <div class="filter-body">
+                            <cytomine-multiselect
+                                v-model="selectedUserJobs"
+                                :options="userJobs"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                            />
+                        </div>
+                    </div>
+
+                    <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter">
                         <div class="filter-label">
                             {{$t("members")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedMembers" :options="members"
-                                label="fullName" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedMembers"
+                                :options="filteredMembers"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                            />
                         </div>
                     </div>
 
                     <div v-else class="column filter">
                         <div class="filter-label">
-                            {{$t("algorithms")}}
+                            {{$t("reviewers")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedUserJobs" :options="userJobs"
-                                label="fullName" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedReviewers"
+                                :options="members"
+                                label="fullName"
+                                track-by="id"
+                                :multiple="true"
+                            />
                         </div>
                     </div>
                 </div>
 
                 <div class="columns">
-                    <div class="column filter">
+                    <div class="column filter is-half">
                         <div class="filter-label">
                             {{$t("images")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedImages" :options="images"
-                                label="instanceFilename" track-by="id" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect
+                                v-model="selectedImages"
+                                :options="images"
+                                :label="blindMode ? 'blindedName' : 'instanceFilename'"
+                                track-by="id"
+                                :multiple="true"
+                            />
                         </div>
                     </div>
 
-                    <div class="column filter">
+                    <div v-if="ontology" class="column filter">
                         <div class="filter-label">
                             {{$t("terms")}}
                         </div>
                         <div class="filter-body">
-                            <ontology-tree-multiselect :ontology="ontology"
+                            <ontology-tree-multiselect
+                                :ontology="ontology"
                                 :additionalNodes="additionalNodes"
-                                v-model="selectedTermsIds">
-                            </ontology-tree-multiselect>
+                                v-model="selectedTermsIds"
+                            />
                         </div>
                     </div>
 
@@ -111,7 +157,7 @@
 
             <h2 class="has-text-right"> {{ $t("download-results") }} </h2>
             <div class="buttons download-buttons">
-                <!-- TODO in core: change URLs returned in column "View annotation on image" -->
+                <!-- TODOv2: change URLs returned in column "View annotation on image" -->
                 <a class="button is-link" :href="downloadURL('pdf')">{{$t("download-PDF")}}</a>
                 <a class="button is-link" :href="downloadURL('csv')">{{$t("download-CSV")}}</a>
                 <a class="button is-link" :href="downloadURL('xls')">{{$t("download-excel")}}</a>
@@ -128,18 +174,20 @@
             :allImages="images"
 
             :term="term"
-            :multipleTerms="term == multipleTermsOption"
-            :noTerm="term == noTermOption"
+            :multipleTerms="term === multipleTermsOption"
+            :noTerm="term === noTermOption"
             :imagesIds="selectedImagesIds"
             :usersIds="selectedUsersIds"
+            :reviewed="reviewed"
+            :reviewUsersIds="reviewUsersIds"
 
-            :forceUpdate="forceUpdate"
+            :revision="revision"
 
             v-show="selectedTermsIds.includes(term.id)"
 
             @addTerm="addTerm"
-            @update="forceUpdate = []"> <!-- assigning a new array will be considered as a change in children components -->
-        </list-annotations-by-term>
+            @update="revision++"
+        />
     </div>
 </div>
 </template>
@@ -150,7 +198,7 @@ import OntologyTreeMultiselect from "@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsByTerm from "./ListAnnotationsByTerm";
 
-import {ImageInstanceCollection, TermCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection} from "cytomine-client";
 
 import {fullName} from "@/utils/user-utils.js";
 import {defaultColors} from "@/utils/style-utils.js";
@@ -164,8 +212,9 @@ export default {
     },
     data() {
         return {
-            loading: true, 
-            forceUpdate: [],
+            loading: true,
+            error: false,
+            revision: 0,
             users: [],
 
             allowedSizes: [],
@@ -173,20 +222,20 @@ export default {
             nbPerPage: 25,
 
             userAnnotationOption: this.$t("user-annotations"),
-            jobAnnotationOption: this.$t("job-annotations"),
+            jobAnnotationOption: this.$t("analysis-annotations"),
+            reviewedAnnotationOption: this.$t("reviewed-annotations"),
             annotationTypes: [],
             selectedAnnotationType : "",
 
             images: [],
             selectedImages: [],
 
-            terms: [],
             noTermOption: {id: 0, name: this.$t("no-term")},
             multipleTermsOption: {id: -1, name: this.$t("multiple-terms")},
             selectedTermsIds: [],
 
-            members: [],
             selectedMembers: [],
+            selectedReviewers: [],
             
             userJobs: [],
             selectedUserJobs: [],
@@ -195,8 +244,17 @@ export default {
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
         project() {
             return this.$store.state.project.project;
+        },
+        blindMode() {
+            return this.project.blindMode;
+        },
+        canManageProject() {
+            return this.$store.getters.canManageProject;
         },
         ontology() {
             return this.$store.state.project.ontology;
@@ -207,13 +265,39 @@ export default {
         selectedImagesIds() {
             return this.selectedImages.map(img => img.id);
         },
+        reviewed() {
+            return this.selectedAnnotationType === this.reviewedAnnotationOption;
+        },
         selectedUsersIds() {
-            let users = (this.selectedAnnotationType == this.jobAnnotationOption) ? this.selectedUserJobs 
+            if(this.reviewed) {
+                return null;
+            }
+            let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.selectedUserJobs 
                 : this.selectedMembers;
             return users.map(user => user.id);
         },
+        reviewUsersIds() {
+            return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
+        },
         allUsers() {
             return this.users.concat(this.userJobs);
+        },
+        members() {
+            return this.$store.state.project.members;
+        },
+        filteredMembers() { // filter the members so as to return only those whose annotations can be seen by current user
+            if(this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
+                return this.members;
+            }
+
+            let idManagers = this.$store.state.project.managers.map(m => m.id);
+            return this.members.filter(member => {
+                if(this.currentUser.id === member.id) {
+                    return true;
+                }
+                let isManager = idManagers.includes(member.id);
+                return isManager ? !this.project.hideAdminsLayers : !this.project.hideUsersLayers;
+            });
         },
         collection() {
             return new AnnotationCollection({
@@ -221,9 +305,14 @@ export default {
                 terms: this.selectedTermsIds,
                 images: this.selectedImagesIds,
                 users: this.selectedUsersIds,
+                reviewed: this.reviewed,
+                reviewUsers: this.reviewUsersIds,
                 noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
                 multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id)
             });
+        },
+        terms() {
+            return this.$store.getters.terms || [];
         },
         additionalNodes() {
             let additionalNodes = [this.noTermOption];
@@ -242,10 +331,6 @@ export default {
         }
     },
     methods: {
-        async fetchTerms() {
-            this.terms = (await TermCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.selectedTermsIds = this.termsOptions.map(term => term.id);
-        },
         async fetchImages() {
             this.images = (await ImageInstanceCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
             this.selectedImages = this.images;
@@ -256,16 +341,9 @@ export default {
                 user.fullName = fullName(user);
             });
         },
-        async fetchMembers() {
-            this.members = (await this.project.fetchUsers()).array;
-            this.members.forEach(member => {
-                member.fullName = fullName(member);
-            });
-            this.selectedMembers = this.members;
-        },
         async fetchUserJobs() {
             this.userJobs = (await UserJobCollection.fetchAll({filterKey: "project", filterValue: this.project.id})).array;
-            this.userJobs = this.userJobs.filter(uj => uj.id != null); // HACK because some returned jobs are empty objects
+            this.userJobs = this.userJobs.filter(uj => uj.id); // HACK because some returned jobs are empty objects
             this.userJobs.forEach(userJob => {
                 userJob.fullName = fullName(userJob);
             });
@@ -281,9 +359,9 @@ export default {
         }
     },
     async created() {
-        this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption];
-        this.selectedAnnotationType = (this.$route.query.type == "algo") ? this.jobAnnotationOption
-            : this.userAnnotationOption;
+        this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
+        this.selectedAnnotationType = (this.$route.query.type === "algo") ? this.jobAnnotationOption
+            : (this.$route.query.type === "reviewed") ? this.reviewedAnnotationOption : this.userAnnotationOption;
 
         this.allowedSizes = [
             {label: this.$t("small"), size: 85},
@@ -295,29 +373,32 @@ export default {
 
         this.selectedColor = this.colors[0];
 
+        this.selectedTermsIds = this.termsOptions.map(term => term.id);
+        this.selectedMembers = this.filteredMembers;
+        this.selectedReviewers = this.members;
+
         try {
             await Promise.all([
-                this.fetchTerms(),
                 this.fetchImages(), 
                 this.fetchUsers(),
-                this.fetchMembers(),
                 this.fetchUserJobs()
             ]);
-        }     
+        }
         catch(error) {
-            this.$notify({type: "error", text: this.$t("notif-error-load-annotations-filters")});
+            this.error = true;
+            return;
         }
 
-        if(this.$route.query.image != null) {
-            let queriedImage = this.images.find(image => image.id == this.$route.query.image);
-            if(queriedImage != null) {
+        if(this.$route.query.image) {
+            let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
+            if(queriedImage) {
                 this.selectedImages = [queriedImage];
             }
         }
 
-        if(this.$route.query.userJob != null) {
-            let queriedUserJob = this.userJobs.find(uj => uj.id == this.$route.query.userJob);
-            if(queriedUserJob != null) {
+        if(this.$route.query.userJob) {
+            let queriedUserJob = this.userJobs.find(uj => uj.id === Number(this.$route.query.userJob));
+            if(queriedUserJob) {
                 this.selectedAnnotationType = this.jobAnnotationOption;
                 this.selectedUserJobs = [queriedUserJob];
             }

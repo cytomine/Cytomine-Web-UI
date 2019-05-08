@@ -1,31 +1,34 @@
 <template>
 <div class="box box-annotations">
     <h2> {{ title }} ({{nbAnnotations}}) </h2>
-    <template v-if="annotations.length == 0">
+    <template v-if="!annotations.length">
         <em class="no-result">{{ $t("no-annotation") }}</em>
     </template>
     <template v-else>
         <v-popover v-for="annot in annotations" :key="title + annot.id" placement="right" trigger="manual" 
-        :open="openedAnnot == annot.id" :auto-hide="false"> 
+        :open="openedAnnot === annot.id" :auto-hide="false">
             <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="openedAnnot = annot.id">
+            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="toggle(annot.id)">
                 <button class="button is-small">
-                    <i :class="['fas', openedAnnot == annot.id ? 'fa-minus' : 'fa-plus']"></i>
+                    <i :class="['fas', openedAnnot === annot.id ? 'fa-minus' : 'fa-plus']"></i>
                 </button>
             </div>
 
-            <annotation-details slot="popover" v-click-outside="(event) => close(event, annot.id)"
-                :annotation="annot"
-                :terms="allTerms"
-                :users="allUsers"
-                :images="allImages"
-                @addTerm="term => $emit('addTerm', term)"
-                @updateTerms="$emit('update', annot.id)"
-                @deletion="$emit('update', annot.id)"
-                v-if="openedAnnot == annot.id"> <!-- Display component only if it is the currently displayed annotation
-                (prevents fetching unnecessary information) -->
-            </annotation-details>
+            <template #popover>
+                <annotation-details
+                    v-click-outside.capture="(event) => close(event, annot.id)"
+                    :annotation="annot"
+                    :terms="allTerms"
+                    :users="allUsers"
+                    :images="allImages"
+                    @addTerm="term => $emit('addTerm', term)"
+                    @updateTerms="$emit('update', annot.id)"
+                    @deletion="$emit('update', annot.id)"
+                    v-if="openedAnnot === annot.id"
+                /> <!-- Display component only if it is the currently displayed annotation
+                        (prevents fetching unnecessary information) -->
+            </template>
         </v-popover>
         
         <b-pagination
@@ -33,8 +36,8 @@
             :current="currentPage"
             size="is-small"
             :per-page="nbPerPage"
-            @change="fetchPage">
-        </b-pagination>
+            @change="fetchPage"
+        />
     </template>
 </div> 
 </template>
@@ -47,23 +50,25 @@ import {AnnotationCollection} from "cytomine-client";
 export default {
     name: "list-annotations-by-term",
     components: {AnnotationDetails},
-    props: [
-        "nbPerPage",
-        "size",
-        "color",
+    props: {
+        nbPerPage: Number,
+        size: Number,
+        color: String,
 
-        "term", 
-        "multipleTerms", 
-        "noTerm", 
-        "imagesIds", 
-        "usersIds",
+        term: Object,
+        multipleTerms: Boolean,
+        noTerm: Boolean,
+        imagesIds: Array,
+        usersIds: Array,
+        reviewed: Boolean,
+        reviewUsersIds: Array,
 
-        "allTerms", 
-        "allUsers", 
-        "allImages",
+        allTerms: Array,
+        allUsers: Array,
+        allImages: Array,
         
-        "forceUpdate"
-    ],
+        revision: Number
+    },
     data() {
         return {
             annotations: [],
@@ -74,12 +79,14 @@ export default {
     },
     computed: {
         collection() {
-            this.forceUpdate; // to ensure that collection is reloaded if forceUpdate prop changes
+            this.revision; // to ensure that collection is reloaded if revision changes
             return new AnnotationCollection({
                 images: this.imagesIds,
                 term: this.multipleTerms || this.noTerm ? null : this.term.id,
                 noTerm: this.noTerm,
                 users: this.usersIds,
+                reviewed: this.reviewed,
+                reviewUsers: this.reviewUsersIds,
                 multipleTerm: this.multipleTerms, 
                 showTerm: true,
                 showGIS: true,
@@ -104,7 +111,8 @@ export default {
     methods: {
         async fetchPage(numPage) {
             this.currentPage = numPage;
-            if(this.imagesIds.length == 0 || this.usersIds.length == 0) {
+            if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
+                    || (this.reviewed && !this.reviewUsersIds.length)) {
                 this.annotations = [];
                 return;
             }
@@ -132,14 +140,18 @@ export default {
                 });
             }
         },
+        toggle(id) {
+            this.openedAnnot = this.openedAnnot === id ? 0 : id;
+        },
         close(event, id) {
             // do not close the popover if click was performed in modal or in notification
             let el = event.target;
             let isModal = false;
-            while(!(isModal = el.classList.contains("modal") || el.classList.contains("notifications"))
-                && (el = el.parentElement));
+            while(el && !(isModal = el.classList.contains("modal") || el.classList.contains("notifications"))) {
+                el = el.parentElement;
+            }
 
-            if(!isModal && this.openedAnnot == id) {
+            if(!isModal && this.openedAnnot === id) {
                 this.openedAnnot = 0;
             }
         },

@@ -1,7 +1,11 @@
 <template>
 <div class="list-projects-wrapper content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <div v-if="!loading" class="panel">
+    <b-loading :is-full-page="false" :active="loading" />
+    <div class="box error" v-if="error">
+        <h2> {{ $t("error") }} </h2>
+        <p>{{ $t("unexpected-error-info-message") }}</p>
+    </div>
+    <div v-else-if="!loading" class="panel">
         <p class="panel-heading">
             {{$t("projects")}}
             <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
@@ -11,7 +15,7 @@
         <div class="panel-block">
             <div class="search-block">
                 <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')"
-                    type="search" icon="search"></b-input>
+                    type="search" icon="search" />
                 <button class="button" @click="toggleFilterDisplay()">
                     <span class="icon">
                         <i class="fas fa-filter"></i>
@@ -25,23 +29,11 @@
                     <div class="columns">
                         <div class="column filter">
                             <div class="filter-label">
-                                {{$t("tags")}}
-                            </div>
-                            <div class="filter-body">
-                                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
-                            </div>
-                        </div>
-
-                        <div class="column filter">
-                            <div class="filter-label">
                                 {{$t("ontology")}}
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedOntologies" :options="ontologies"
-                                    label="name" track-by="id" :multiple="true">
-                                </cytomine-multiselect>
+                                    label="name" track-by="id" :multiple="true" />
                             </div>
                         </div>
 
@@ -51,10 +43,11 @@
                             </div>
                             <div class="filter-body">
                                 <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                                    :searchable="false">
-                                </cytomine-multiselect>
+                                    :searchable="false" />
                             </div>
                         </div>
+
+                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -63,8 +56,7 @@
                                 {{$t("members")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsMembers" :max="maxNbMembers"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" :show="initSliders" />
                             </div>
                         </div>
 
@@ -73,14 +65,11 @@
                                 {{$t("images")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsImages" :max="maxNbImages"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsImages" :max="maxNbImages" :show="initSliders" />
                             </div>
                         </div>
 
-                        <div class="column">
-
-                        </div>
+                        <div class="column"></div>
                     </div>
 
                     <div class="columns">
@@ -89,18 +78,16 @@
                                 {{$t("user-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
                         <div class="column filter">
                             <div class="filter-label">
-                                {{$t("job-annotations")}}
+                                {{$t("analysis-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
                             </div>
                         </div>
 
@@ -109,8 +96,7 @@
                                 {{$t("reviewed-annotations")}}
                             </div>
                             <div class="filter-body">
-                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations"
-                                :show="initSliders"></cytomine-slider>
+                                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
                             </div>
                         </div>
                     </div>
@@ -120,11 +106,11 @@
 
             <b-table :data="filteredProjects" class="table-projects" :paginated="true" :per-page="perPage"
             pagination-size="is-small" detailed detail-key="id">
-                <template slot-scope="{row: project}">
-                    <b-table-column :visible="atLeastOneManaged" field="roleIndex" label="" centered width="1" sortable>
-                        <i v-if="project.isManaged" class="fas fa-cog"
-                           :title="$t(project.isRepresented ? 'representative-icon-label' : 'manager-icon-label')">
-                            <i v-if="project.isRepresented" class="superscript fas fa-plus"></i>
+                <template #default="{row: project}">
+                    <b-table-column :visible="showRole" field="roleIndex" label="" centered width="1" sortable>
+                        <i v-if="project.currentUserRoles.admin" class="fas fa-cog"
+                           :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')">
+                            <i v-if="project.currentUserRoles.representative" class="superscript fas fa-plus"></i>
                         </i>
                     </b-table-column>
 
@@ -148,14 +134,16 @@
                         </router-link>
                     </b-table-column>
 
-                    <b-table-column field="numberOfJobAnnotations" :label="$t('job-annotations')" centered sortable width="150">
+                    <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
                         <router-link :to="`/project/${project.id}/annotations?type=algo`">
                             {{ project.numberOfJobAnnotations }}
                         </router-link>
                     </b-table-column>
 
                     <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-                        <a>{{ project.numberOfReviewedAnnotations }}</a> <!-- TODO router link -->
+                        <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                            {{ project.numberOfReviewedAnnotations }}
+                        </router-link>
                     </b-table-column>
 
                     <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
@@ -169,20 +157,22 @@
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="{row: project}">
-                    <project-details :project="project"
+                <template #detail="{row: project}">
+                    <project-details
+                        :project="project"
                         :excluded-properties="excludedProperties"
-                        @delete="deleteProject(project)">
-                    </project-details>
+                        @update="updateProject"
+                        @delete="deleteProject(project)"
+                    />
                 </template>
 
-                <template slot="empty">
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
                         <p>{{$t("no-project")}}</p>
                     </div>
                 </template>
 
-                <template slot="bottom-left">
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>
@@ -192,7 +182,7 @@
                 </template>
             </b-table>
 
-            <div class="legend" v-if="atLeastOneManaged">
+            <div class="legend" v-if="showRole">
                 <h2>{{$t("legend")}}</h2>
                 <p><i class="fas fa-cog"></i> : {{$t('manager-icon-label')}}</p>
                 <p><i class="fas fa-cog">
@@ -228,16 +218,17 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             projects: [],
             searchString: "",
             perPage: 10,
-            loading: true,
+
             // filters
             filtersOpened: false,
             initSliders: false,
             selectedOntologies: [],
-            availableTags: [{id: 1, name:"Tag1"}, {id:2, name:"CHU"}, {id:3, name:"Demo"}], // TODO
-            selectedTags: [],
             availableRoles: [],
             contributorLabel: null,
             managerLabel: null,
@@ -251,8 +242,6 @@ export default {
             creationModal: false,
             nameNewProject: "",
 
-            // TODO: should be defined in app config and retrieved from backend (corresponds to properties displayed in
-            // columns in the list of project) - https://github.com/cytomine/Cytomine-core/issues/1155
             excludedProperties: [
                 "name",
                 "membersCount",
@@ -268,7 +257,7 @@ export default {
         filteredProjects() {
             let filtered = this.projects;
 
-            if(this.searchString != "") {
+            if(this.searchString) {
                 let str = this.searchString.toLowerCase();
                 filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
             }
@@ -276,9 +265,9 @@ export default {
             let includeContributor = this.selectedRoles.includes(this.contributorLabel);
             let includeManager = this.selectedRoles.includes(this.managerLabel);
 
-            // TODO tags
             filtered = filtered.filter(project => {
-                let roleIncluded = (includeContributor && !project.isManaged) || (includeManager && project.isManaged);
+                let managedProject = project.currentUserRoles.admin;
+                let roleIncluded = (includeContributor && !managedProject) || (includeManager && managedProject);
                 return this.selectedOntologiesIds.includes(project.ontology) &&
                     roleIncluded &&
                     isBetweenBounds(project.numberOfImages, this.boundsImages) &&
@@ -305,8 +294,8 @@ export default {
         maxNbReviewedAnnotations() {
             return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
         },
-        atLeastOneManaged() {
-            return this.projects.some(project => project.isManaged);
+        showRole() { // show role iff the current user is manager or representative of at least one project
+            return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
         },
         ontologies() {
             let seenIds = [];
@@ -329,10 +318,16 @@ export default {
             this.filtersOpened = !this.filtersOpened;
             this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
         },
+        updateProject(updatedProject) {
+            let project = this.projects.find(project => project.id === updatedProject.id);
+            if(project) {
+                project.populate({...updatedProject});
+            }
+        },
         async deleteProject(projectToDelete) {
             try {
                 await projectToDelete.delete();
-                this.projects = this.projects.filter(project => project.id != projectToDelete.id);
+                this.projects = this.projects.filter(project => project.id !== projectToDelete.id);
                 this.$notify({
                     type: "success",
                     text: this.$t("notif-success-project-deletion", {projectName: projectToDelete.name})
@@ -347,48 +342,36 @@ export default {
         }
     },
     async created() {
-        let managedProjectsPromise = new ProjectCollection({
-            light: true,
-            admin: true,
-            filterKey: "user",
-            filterValue: this.currentUser.id
-        }).fetchAll();
+        try {
+            let projects = await ProjectCollection.fetchAll({
+                withMembersCount: true,
+                withLastActivity: true,
+                withCurrentUserRoles: true
+            });
 
-        // let representativeProjectsPromise = new ProjectCollection({
-        //     light: true,
-        //     representative: true,
-        //     filterKey: "user",
-        //     filterValue: this.currentUser.id
-        // }).fetchAll(); // TODO in core
-        let representativeProjectsPromise = {array: []};
+            this.contributorLabel = this.$t("contributor");
+            this.managerLabel = this.$t("manager");
+            this.availableRoles = [this.contributorLabel, this.managerLabel];
+            this.selectedRoles = this.availableRoles;
 
-        let projects = await ProjectCollection.fetchAll({
-            withMembersCount: true,
-            withLastActivity: true
-        });
+            this.projects = projects.array.map(project => {
+                let roles = project.currentUserRoles;
+                project.roleIndex = Number(roles.admin) + Number(roles.representative); // to allow sorting
+                return project;
+            });
 
-        let idManagedProjects = (await managedProjectsPromise).array.map(project => project.id);
-        let idProjectsRepresentatives = (await representativeProjectsPromise).array.map(project => project.id);
+            this.selectedOntologies = this.ontologies;
 
-        this.contributorLabel = this.$t("contributor");
-        this.managerLabel = this.$t("manager");
-        this.availableRoles = [this.contributorLabel, this.managerLabel];
-        this.selectedRoles = this.availableRoles;
-
-        this.projects = projects.array.map(project => {
-            project.isManaged = idManagedProjects.includes(project.id);
-            project.isRepresented = idProjectsRepresentatives.includes(project.id);
-            project.roleIndex = Number(project.isManaged) + Number(project.isRepresented); // to allow sorting
-            return project;
-        });
-
-        this.selectedOntologies = this.ontologies;
-
-        this.boundsMembers = [0, this.maxNbMembers];
-        this.boundsImages = [0, this.maxNbImages];
-        this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
-        this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
-        this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+            this.boundsMembers = [0, this.maxNbMembers];
+            this.boundsImages = [0, this.maxNbImages];
+            this.boundsUserAnnotations = [0, this.maxNbUserAnnotations];
+            this.boundsJobAnnotations = [0, this.maxNbJobAnnotations];
+            this.boundsReviewedAnnotations = [0, this.maxNbReviewedAnnotations];
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
 
         this.loading = false;
     }

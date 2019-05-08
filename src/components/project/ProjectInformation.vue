@@ -1,16 +1,21 @@
 <template>
-<!-- <div class="box error" v-if="!configUI['project-info-tab']">
+<div class="box error" v-if="!configUI['project-information-tab']">
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
-</div> TODO once core handles info-tab field -->
-<div class="box">
-    <project-details :project="project" :excluded-properties="['imagesPreview']">
-    </project-details>
+</div>
+<div v-else class="box">
+    <project-details
+        :project="project"
+        :excluded-properties="['imagesPreview']"
+        @update="updateProject"
+        @delete="deleteProject()"
+    />
 </div>
 </template>
 
 <script>
 import ProjectDetails from "./ProjectDetails";
+import {Project} from "cytomine-client";
 
 export default {
     name: "project-information",
@@ -21,6 +26,28 @@ export default {
         },
         configUI() {
             return this.$store.state.project.configUI;
+        }
+    },
+    methods: {
+        updateProject(updatedProject) {
+            this.$store.dispatch("updateProject", updatedProject);
+        },
+        async deleteProject() {
+            try {
+                await Project.delete(this.project.id);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-project-deletion", {projectName: this.project.name})
+                });
+                this.$router.push("/projects");
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-project-deletion", {projectName: this.project.name})
+                });
+            }
         }
     }
 };

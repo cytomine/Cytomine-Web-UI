@@ -1,14 +1,15 @@
 <template>
 <div class="annotation-details-playground" ref="playground">
-    <vue-draggable-resizable v-if="selectedFeature && selectedFeature.properties && reload"
-                            v-show="displayAnnotDetails"
-                            class="draggable"
-                            :parent="true" 
-                            :resizable="false" 
-                            drag-handle=".drag"
-                            @dragstop="dragStop"
-                            :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y">
-
+    <vue-draggable-resizable
+        v-if="selectedFeature && selectedFeature.properties && reload"
+        v-show="displayAnnotDetails"
+        class="draggable"
+        :parent="true"
+        :resizable="false"
+        drag-handle=".drag"
+        @dragstop="dragStop"
+        :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    >
         <div class="actions">
             <h1>{{$t("current-selection")}}</h1>
             <button class="drag button is-small close">
@@ -20,17 +21,19 @@
         </div>
 
         <div class="annotation-details-container">
-            <annotation-details :annotation="selectedFeature.properties.annot"
-                                :terms="imageWrapper.terms"
-                                :users="allUsers"
-                                :showImageInfo="false"
-                                :key="selectedFeature.id"
-                                @addTerm="addTerm"
-                                @updateTerms="updateTerms()"
-                                @updateProperties="updateProperties()"
-                                @centerView="centerViewOnAnnot()"
-                                @deletion="handleDeletion()">
-            </annotation-details>
+            <annotation-details
+                :annotation="selectedFeature.properties.annot"
+                :terms="imageWrapper.terms"
+                :users="allUsers"
+                :showImageInfo="false"
+                :key="selectedFeature.id"
+                :showComments="showComments"
+                @addTerm="addTerm"
+                @updateTerms="updateTerms()"
+                @updateProperties="updateProperties()"
+                @centerView="centerViewOnAnnot()"
+                @deletion="handleDeletion()"
+            />
         </div>
     </vue-draggable-resizable>
 </div>
@@ -40,19 +43,20 @@
 import VueDraggableResizable from "vue-draggable-resizable";
 
 import AnnotationDetails from "@/components/annotations/AnnotationDetails";
-import {AnnotationTermCollection, UserCollection, UserJobCollection} from "cytomine-client";
+import {UserCollection, UserJobCollection} from "cytomine-client";
 import {fullName} from "@/utils/user-utils.js";
+import {Action, updateTermProperties} from "@/utils/annotation-utils.js";
 
 import WKT from "ol/format/WKT";
 
 export default {
     name: "annotations-details-container",
     components: {VueDraggableResizable, AnnotationDetails},
-    props: [
-        "idViewer",
-        "index",
-        "view"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        view: Object
+    },
     data() {
         return {
             width: 350,
@@ -60,7 +64,8 @@ export default {
             users: [],
             userJobs: [],
             reload: true,
-            format: new WKT()
+            format: new WKT(),
+            showComments: false
         };
     },
     computed: {
@@ -90,7 +95,7 @@ export default {
             return this.imageWrapper.selectedFeatures;
         },
         selectedFeature() {
-            if(this.selectedFeatures && this.selectedFeatures.length == 1) {
+            if(this.selectedFeatures && this.selectedFeatures.length === 1) {
                 return this.selectedFeatures[0];
             }
         },
@@ -108,8 +113,13 @@ export default {
     },
     watch: {
         selectedFeature() {
-            if(this.selectedFeature != null) {
+            if(this.selectedFeature) {
                 this.displayAnnotDetails = true;
+                let targetAnnot = this.imageWrapper.showComments;
+                this.showComments = (targetAnnot === this.annot.id);
+                if(targetAnnot !== null) {
+                    this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot: null});
+                }
             }
         }
     },
@@ -134,12 +144,8 @@ export default {
         },
 
         async updateTerms() {
-            // TODO in backend: include userByTerm in annotation fetch() response
             let updatedAnnot = await this.annot.clone().fetch();
-            let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: "annotation", filterValue: this.annot.id});
-            updatedAnnot.userByTerm = annotTerms.array.map(({term, user}) => {
-                return {term, user: [user]};
-            });
+            await updateTermProperties(updatedAnnot);
 
             this.$eventBus.$emit("editAnnotation", updatedAnnot);
             this.$store.commit("changeAnnotSelectedFeature", {
@@ -158,8 +164,8 @@ export default {
             this.$store.commit("addAction", {
                 idViewer: this.idViewer,
                 index: this.index,
-                annot: null,
-                oldAnnot: this.annot
+                annot: this.annot,
+                type: Action.DELETE
             });
             this.$eventBus.$emit("deleteAnnotation", this.annot);
         },

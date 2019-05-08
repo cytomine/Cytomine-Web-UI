@@ -7,7 +7,7 @@
         <tbody>
             <tr>
                 <td><strong>{{$t("filename")}}</strong></td>
-                <td>{{image.instanceFilename}}</td>
+                <td><image-name :image="image" /></td>
             </tr>
             <tr>
                 <td><strong>{{$t("width")}}</strong></td>
@@ -28,7 +28,7 @@
             <tr>
                 <td colspan="2">
                     <div class="buttons">
-                        <button class="button is-small" @click="calibrationModal = true">
+                        <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
                             {{$t("button-set-calibration")}}
                         </button>
                         <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
@@ -54,24 +54,28 @@
         </tbody>
     </table>
 
-    <calibration-modal :image="image"
-                       :active.sync="calibrationModal"
-                       @setResolution="setResolution"
-                       @setScale="startCalibration()">
-    </calibration-modal>
+    <calibration-modal
+        :image="image"
+        :active.sync="calibrationModal"
+        @setResolution="setResolution"
+    />
 </div>
 </template>
 
 <script>
+import ImageName from "@/components/image/ImageName";
 import CalibrationModal from "@/components/image/CalibrationModal";
 
 export default {
     name: "information-panel",
-    components: {CalibrationModal},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    components: {
+        ImageName,
+        CalibrationModal
+    },
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             calibrationModal: false,
@@ -84,7 +88,7 @@ export default {
             return this.$store.state.images.viewers[this.idViewer].maps[this.index].imageInstance;
         },
         resolution() {
-            if(this.image.resolution != null) {
+            if(this.image.resolution) {
                 return this.image.resolution.toFixed(3);
             }
             else {
@@ -93,25 +97,26 @@ export default {
         },
         magnification() {
             return this.image.magnification || this.$t("unknown");
-        }
+        },
+        canEdit() {
+            return this.$store.getters.canEditImage(this.image);
+        },
     },
     methods: {
         setResolution(resolution) {
             this.$store.commit("setResolution", {idViewer: this.idViewer, idImage: this.image.id, resolution});
-        },
-        startCalibration() {
-            this.calibrationModal = false;
-            this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
+            // refresh the sources to update perimeter/area
+            this.$eventBus.$emit("reloadAnnotations", this.image.id);
         },
         async previousImage() {
             try {
                 let prev = await this.image.fetchPrevious();
-                if(prev.id == null) {
+                if(!prev.id) {
                     this.$notify({type: "error", text: this.$t("notif-error-first-image")});
                     this.isFirstImage = true;
                 }
                 else {
-                    this.$store.dispatch("setImageInstance", {
+                    await this.$store.dispatch("setImageInstance", {
                         idViewer: this.idViewer,
                         index: this.index,
                         image: prev
@@ -126,12 +131,12 @@ export default {
         async nextImage() {
             try {
                 let next = await this.image.fetchNext();
-                if(next.id == null) {
+                if(!next.id) {
                     this.$notify({type: "error", text: this.$t("notif-error-last-image")});
                     this.isLastImage = true;
                 }
                 else {
-                    this.$store.dispatch("setImageInstance", {
+                    await this.$store.dispatch("setImageInstance", {
                         idViewer: this.idViewer,
                         index: this.index,
                         image: next

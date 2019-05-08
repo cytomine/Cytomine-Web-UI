@@ -1,9 +1,10 @@
 <template>
 <div class="properties-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">    
         <b-field grouped group-multiline>
-            <div class="control" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
+            <em v-if="error">{{$t("error-fetch-properties")}}</em>
+            <div class="control" v-else v-for="(prop, idx) in notEditedProperties" :key="prop.id">
                 <b-taglist attached>
                     <b-tag type="is-dark">{{prop.key}}</b-tag>
                     <b-tag>
@@ -22,12 +23,12 @@
             <button v-if="canEdit" class="button is-small add-prop" @click="addNewProp()" key="showForm">
                 {{$t("button-add")}}
             </button>
-            <em v-else-if="properties.length == 0">{{$t("no-properties")}}</em>
+            <em v-else-if="properties.length === 0">{{$t("no-properties")}}</em>
         </b-field>
 
         <form class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">
-            <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')"></b-input>
-            <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')"></b-input>
+            <b-input size="is-small" v-model="prop.key" :placeholder="$t('key')" />
+            <b-input size="is-small" v-model="prop.value" :placeholder="$t('value')" />
             <button class="button is-small" type="submit" @click="saveProp(idx)">
                 {{prop.id ? $t("button-save") : $t("button-add")}}
             </button>
@@ -51,6 +52,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             properties: [],
             editedProperties: [],
@@ -112,17 +114,19 @@ export default {
         },
     },
     async created() {
-        this.properties = (await PropertyCollection.fetchAll({object: this.object})).array;
+        try {
+            this.properties = (await PropertyCollection.fetchAll({object: this.object})).array;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
         this.loading = false;
     }
 };
 </script>
 
-<style>
-.add-prop {
-    height: 24px;
-}
-
+<style scoped>
 .new-prop-form {
     margin-bottom: 5px;
     margin-top: 5px;
@@ -163,6 +167,10 @@ export default {
 
 .tag button.edit:hover {
     background-color: rgba(10, 10, 10, 0.3);
+}
+
+em {
+    margin-right: 0.5em;
 }
 </style>
 

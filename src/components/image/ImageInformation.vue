@@ -1,22 +1,30 @@
 <template>
-<div class="box">
-    <template v-if="image">
+<div class="box error" v-if="permissionError || notFoundError">
+    <h2> {{ $t(permissionError ? "access-denied" : "not-found") }} </h2>
+    <p> {{ $t(permissionError ?  "insufficient-permission" : "not-found-error") }} </p>
+</div>
+<div class="content-wrapper" v-else>
+    <b-loading :is-full-page="false" :active.sync="loading" />
+    <div class="box" v-if="!loading">
         <i18n path="detailed-image-information" tag="h1">
             <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
-                {{ image.instanceFilename }}
+                <image-name :image="image" />
             </router-link>
         </i18n>
 
-        <image-details v-if="image" :image="image" 
+        <image-details
+            v-if="image"
+            :image="image"
             @setResolution="resolution => image.resolution = resolution"
             @setMagnification="magnification => image.magnification = magnification"
-            @delete="deleteImage()">
-        </image-details>
-    </template>
+            @delete="deleteImage()"
+        />
+    </div>
 </div>
 </template>
 
 <script>
+import ImageName from "./ImageName";
 import ImageDetails from "./ImageDetails";
 
 import {ImageInstance} from "cytomine-client";
@@ -24,27 +32,55 @@ import vendorFromMime from "@/utils/vendor";
 
 export default {
     name: "image-information",
-    components: {ImageDetails},
+    components: {
+        ImageName,
+        ImageDetails
+    },
     data() {
         return {
-            image: null
+            loading: true,
+            image: null,
+            permissionError: false,
+            notFoundError: false
         };
     },
+    computed: {
+        idImage() {
+            return this.$route.params.idImage;
+        }
+    },
+    watch: {
+        idImage() {
+            this.loadImage();
+        }
+    },
     methods: {
+        async loadImage() {
+            this.loading = true;
+            this.permissionError = false;
+            this.notFoundError = false;
+            try {
+                let image = await ImageInstance.fetch(this.idImage);
+                image.vendor = vendorFromMime(image.mime);
+                this.image = image;
+            }
+            catch(error) {
+                console.log(error);
+                if(error.response.status === 403) {
+                    this.permissionError = true;
+                }
+                else {
+                    this.notFoundError = true;
+                }
+            }
+            this.loading = false;
+        },
         deleteImage() {
             this.$router.push(`/project/${this.image.project}`);
         },
     },
-    async created() {
-        let image = await ImageInstance.fetch(this.$route.params.idImage);
-        image.vendor = vendorFromMime(image.mime);
-        this.image = image;
+    created() {
+        this.loadImage();
     }
 };
 </script>
-
-<style scoped>
-.box {
-    margin: 20px 50px 20px 50px;
-}
-</style>

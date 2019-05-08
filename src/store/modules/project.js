@@ -1,4 +1,6 @@
-import {Cytomine, Project, ProjectConnection, Ontology} from "cytomine-client";
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from "cytomine-client";
+import {fullName} from "@/utils/user-utils.js";
+import {getAllTerms} from "@/utils/ontology-utils";
 
 export default {
     state: {
@@ -6,15 +8,16 @@ export default {
         configUI: {},
         ontology: null,
         managers: [],
-        contributors: []
+        members: []
     },
 
     mutations: {
         logout(state) {
             state.project = null;
             state.configUI = {};
+            state.ontology = null;
             state.managers = [];
-            state.contributors = [];
+            state.members = [];
         },
 
         setProject(state, project) {
@@ -33,14 +36,14 @@ export default {
             state.managers = managers;
         },
 
-        setContributors(state, contributors) {
-            state.contributors = contributors;
+        setMembers(state, members) {
+            state.members = members;
         },
     },
 
     actions: {
         async loadProject({state, dispatch, commit}, idProject) {
-            let projectChange = state.project == null || state.project.id != idProject;
+            let projectChange = !state.project || state.project.id !== idProject;
             let project = await Project.fetch(idProject);
             commit("setProject", project);
 
@@ -56,6 +59,14 @@ export default {
             await Promise.all(promises);
         },
 
+        async updateProject({state, dispatch, commit}, updatedProject) {
+            let reloadOntology = state.project.ontology !== updatedProject.ontology;
+            commit("setProject", updatedProject);
+            if(reloadOntology) {
+                await dispatch("fetchOntology");
+            }
+        },
+
         async fetchUIConfig({state, commit}) {
             let config = await Cytomine.instance.fetchUIConfigCurrentUser(state.project.id);
             commit("setConfigUI", config);
@@ -68,28 +79,52 @@ export default {
             let managers = (await managersPromise).array;
             let members = (await membersPromise).array;
 
-            let idsManagers = managers.map(user => user.id);
-            let contributors = members.filter(user => !idsManagers.includes(user.id));
+            members.forEach(member => member.fullName = fullName(member));
 
             commit("setManagers", managers);
-            commit("setContributors", contributors);
+            commit("setMembers", members);
         },
 
         async fetchOntology({state, commit}) {
-            let ontology = await Ontology.fetch(state.project.ontology);
+            let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
             commit("setOntology", ontology);
         }
     },
 
     getters: {
-        canEditLayer: (state, _, rootState) => idLayer => {
+        canEditLayer: (state, getters, rootState) => idLayer => {
             let currentUser = rootState.currentUser.user;
-            if(currentUser.adminByNow || state.managers.some(user => user.id == currentUser.id)) { // user admin or manager
-                return true;
-            }
-
             let project = state.project;
-            return !project.isReadOnly && (idLayer == currentUser.id || !project.isRestricted);
+            return getters.canManageProject || (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+        },
+
+        canEditAnnot: (_, getters, rootState) => annot => {
+            let currentUser = rootState.currentUser.user;
+            let idLayer = annot.user;
+            if(annot.type === AnnotationType.REVIEWED) {
+                return currentUser.adminByNow || annot.reviewUser === currentUser.id;
+            }
+            return getters.canEditLayer(idLayer);
+        },
+
+        canEditImage: (state, getters, rootState) => image => {
+            let currentUser = rootState.currentUser.user;
+            let project = state.project;
+            return getters.canManageProject || (!project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+        },
+
+        canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
+            let currentUser = rootState.currentUser.user || {};
+            return currentUser.adminByNow || state.managers.some(user => user.id === currentUser.id);
+        },
+
+        contributors: (state) => {
+            let idsManagers = state.managers.map(user => user.id);
+            return state.members.filter(user => !idsManagers.includes(user.id));
+        },
+
+        terms: (state) => {
+            return state.ontology ? getAllTerms(state.ontology) : null;
         }
     }
 };

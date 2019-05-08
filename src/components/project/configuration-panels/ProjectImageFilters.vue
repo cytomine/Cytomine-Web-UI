@@ -1,9 +1,12 @@
 <template>
 <div class="project-image-filters-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
-    <template v-if="!loading">
-        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search">
-        </b-input>
+    <b-loading :is-full-page="false" :active="loading" />
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t("error") }} </h2>
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else-if="!loading">
+        <b-input class="search-field" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
 
         <b-table :data="filteredImageFilters"
                 default-sort="selected"
@@ -12,7 +15,7 @@
                 :per-page="perPage"
                 pagination-size="is-small">
 
-            <template slot-scope="{row: filter}">
+            <template #default="{row: filter}">
                 <b-table-column field="name" :label="$t('name')" sortable>
                     {{filter.name}}
                 </b-table-column>
@@ -25,13 +28,13 @@
                 </b-table-column>
             </template>
 
-            <template slot="empty">
+            <template #empty>
                 <div class="content has-text-grey has-text-centered">
                     <p>{{$t("no-image-filter")}}</p>
                 </div>
             </template>
 
-            <template slot="bottom-left">
+            <template #bottom-left>
                 <b-select v-model="perPage" size="is-small">
                     <option value="10">10 {{$t("per-page")}}</option>
                     <option value="25">25 {{$t("per-page")}}</option>
@@ -52,6 +55,7 @@ export default {
     data() {
         return {
             loading: true,
+            error: false,
 
             searchString: "",
             perPage: 10,
@@ -95,21 +99,28 @@ export default {
         }
     },
     async created() {
-        let promiseFilters = ImageFilterCollection.fetchAll();
-        let promiseFiltersProjects = ImageFilterProjectCollection.fetchAll({
-            filterKey: "project",
-            filterValue: this.project.id
-        });
+        try {
+            let promiseFilters = ImageFilterCollection.fetchAll();
+            let promiseFiltersProjects = ImageFilterProjectCollection.fetchAll({
+                filterKey: "project",
+                filterValue: this.project.id
+            });
 
-        let filters = (await promiseFilters).array;
-        let filtersProject = (await promiseFiltersProjects).array;
+            let filters = (await promiseFilters).array;
+            let filtersProject = (await promiseFiltersProjects).array;
 
-        filters.forEach(filter => {
-            filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter == filter.id);
-            filter.selected = filter.imageFilterProject != null;
-        });
+            filters.forEach(filter => {
+                filter.imageFilterProject = filtersProject.find(fp => fp.imageFilter === filter.id);
+                filter.selected = (filter.imageFilterProject !== undefined);
+            });
 
-        this.imageFilters = filters;
+            this.imageFilters = filters;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+
         this.loading = false;
     }
 };

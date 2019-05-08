@@ -1,25 +1,26 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
     <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
-        <template slot="toggle" slot-scope="{node}">
+        <template #toggle="{node}">
             <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
                 <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
             </template>
             <div class="sl-vue-tree-gap"></div>
         </template>
 
-        <template slot="title" slot-scope="{node}">
+        <template #title="{node}">
             <div v-if="!node.data.hidden" class="tree-selector">
                 <i class="tree-checkbox"
                    v-if="allowSelection"
-                   :class="node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square']">
+                   :class="classNames(node)">
                 </i>
-                <cytomine-term :term="node.data"></cytomine-term>
+                <cytomine-term :term="node.data" />
             </div>
+            <div v-else></div>
         </template>
 
-        <template slot="sidebar" slot-scope="{node}" v-if="!node.data.hidden">
-            <slot name="custom-sidebar" :term="node.data">
+        <template #sidebar="{node}">
+            <slot v-if="!node.data.hidden" name="custom-sidebar" :term="node.data">
                 <div v-if="allowEdition" class="buttons">
                     <button class="button is-small" @click="startTermUpdate(node)">
                         <span class="icon is-small">
@@ -62,12 +63,14 @@ export default {
     props: {
         ontology: {type: Object},
         additionalNodes: {type: Array, default: () => []},
+        startWithAdditionalNodes: {type: Boolean, default: false},
         searchString: {type: String, default: ""},
         selectedNodes: {type: Array, default: () => []},
         allowSelection: {type: Boolean, default: true},
+        multipleSelection: {type: Boolean, default: true},
         allowDrag: {type: Boolean, default: false},
         allowEdition: {type: Boolean, default: false},
-        allowNew: {type: Boolean, default: false},
+        allowNew: {type: Boolean, default: false}
     },
     components: {
         SlVueTree,
@@ -105,14 +108,14 @@ export default {
     },
     methods: {
         makeTree() {
-            if(this.ontology == null) {
+            if(!this.ontology) {
                 this.treeNodes = [];
                 return;
             }
 
             let nodes = this.createSubTree(this.ontology.children.array.slice());
-            nodes.push(...this.createSubTree(this.additionalNodes.slice()));
-            this.treeNodes = nodes;
+            let additionalNodes = this.createSubTree(this.additionalNodes.slice());
+            this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
             this.filter();
         },
@@ -153,6 +156,15 @@ export default {
             });
         },
 
+        classNames(node) {
+            if(this.multipleSelection) {
+                return node.isSelected ? ["fas", "fa-check-square"] : ["far", "fa-square"];
+            }
+            else {
+                return node.isSelected ? ["fas", "fa-dot-circle"] : ["far", "fa-circle"];
+            }
+        },
+
         select(nodes, event) {
             if(!this.allowSelection) {
                 return;
@@ -160,13 +172,19 @@ export default {
 
             if(this.clickOnTreeSelector(event.target)) {
                 nodes.forEach(node => {
-                    let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
-                    if(indexSelected >= 0) {
-                        this.internalSelectedNodes.splice(indexSelected, 1);
-                        this.$emit("unselect", node.data.id);
+                    if(this.multipleSelection) {
+                        let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
+                        if(indexSelected >= 0) {
+                            this.internalSelectedNodes.splice(indexSelected, 1);
+                            this.$emit("unselect", node.data.id);
+                        }
+                        else {
+                            this.internalSelectedNodes.push(node.data.id);
+                            this.$emit("select", node.data.id);
+                        }
                     }
                     else {
-                        this.internalSelectedNodes.push(node.data.id);
+                        this.internalSelectedNodes = [node.data.id];
                         this.$emit("select", node.data.id);
                     }
                 });
@@ -181,7 +199,7 @@ export default {
             }
 
             this.applyToAllNodes(node => {
-                node.isSelected = this.internalSelectedNodes.some(id => id == node.data.id);
+                node.isSelected = this.internalSelectedNodes.some(id => id === node.data.id);
             });
         },
         clickOnTreeSelector(elem) {
@@ -234,12 +252,12 @@ export default {
 
         drop(nodes, position) {
             nodes.forEach(async node => {
-                let idParent = (position.placement == "inside") ? position.node.data.id : position.node.data.parent;
+                let idParent = (position.placement === "inside") ? position.node.data.id : position.node.data.parent;
                 if(node.data.parent !== idParent) {
                     try {
                         await new Term(node.data).changeParent(idParent);
                         this.applyToAllNodes(tmp => {
-                            if(tmp.data.id == node.data.id) {
+                            if(tmp.data.id === node.data.id) {
                                 tmp.data.parent = idParent;
                             }
                         });
@@ -323,7 +341,10 @@ export default {
 .ontology-tree.selector .tree-selector {
     cursor: pointer;
     flex-grow: 1;
-    word-break: break-all !important;
+}
+
+.ontology-tree .tree-selector {
+    min-width: 0px; /* to allow correct handling of overflow-wrap */
 }
 
 .ontology-tree .tree-selector:hover .tree-checkbox {

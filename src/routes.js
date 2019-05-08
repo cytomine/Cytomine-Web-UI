@@ -8,14 +8,15 @@ import ListOntologies from "./components/ontology/ListOntologies.vue";
 import ListImages from "./components/image/ListImages.vue";
 import ImageInformation from "./components/image/ImageInformation.vue";
 import ListAnnotations from "./components/annotations/ListAnnotations.vue";
-import ListAlgorithms from "./components/algorithms/ListAlgorithms.vue";
+import ProjectActivity from "./components/project/ProjectActivity.vue";
+import ListJobs from "./components/job/ListJobs.vue";
 import ProjectInformation from "./components/project/ProjectInformation.vue";
 import ProjectConfiguration from "./components/project/ProjectConfiguration.vue";
 import Account from "./components/user/Account.vue";
 import AdvancedSearch from "./components/search/AdvancedSearch.vue";
 import CytomineViewer from "./components/viewer/CytomineViewer.vue";
 import CytomineProject from "./components/project/CytomineProject.vue";
-import UserActivity from "./components/user/UserActivity.vue";
+import MemberActivityDetails from "./components/project/activity/MemberActivityDetails.vue";
 import AdminPanel from "./components/admin/AdminPanel.vue";
 import PageNotFound from "./components/PageNotFound.vue";
 
@@ -89,8 +90,16 @@ const routes = [
                 component: ListAnnotations
             },
             {
-                path: "algorithms",
-                component: ListAlgorithms
+                path: "analysis",
+                component: ListJobs
+            },
+            {
+                path: "activity",
+                component: ProjectActivity
+            },
+            {
+                path: "activity/user/:idUser",
+                component: MemberActivityDetails
             },
             {
                 path: "information",
@@ -99,10 +108,6 @@ const routes = [
             {
                 path: "configuration",
                 component: ProjectConfiguration
-            },
-            {
-                path: "activity/user/:idUser",
-                component: UserActivity
             },
             {
                 path: "*",
@@ -122,8 +127,8 @@ const routes = [
     {path: "/upload", redirect: "/storage"},
 
     {path: "/activity", redirect: "/"},
-    {path: "/activity-:idProject-", redirect: "/"}, // TODO
-    {path: "/activity-:idProject-:idUser", redirect: "/"}, // TODO
+    {path: "/activity-:idProject-", redirect: "/project/:idProject/activity"},
+    {path: "/activity-:idProject-:idUser", redirect: "/project/:idProject/activity/user/:idUser"},
 
     {path: "/search-", redirect: "/advanced-search"},
 
@@ -139,9 +144,9 @@ const routes = [
     {path: "/tabs-annotationproperties-:idProject-:idAnnot", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
     {path: "/tabs-imageproperties-:idProject-:idImage", redirect: "/project/:idProject"},
-    {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/algorithms"},
+    {path: "/tabs-algos-:idProject", redirect: "/project/:idProject/analysis"},
     {path: "/tabs-config-:idProject", redirect: "/project/:idProject/configuration"},
-    {path: "/tabs-usersconfig-:idProject", redirect: {path: "/project/:idProject/configuration", query: {tab: "members"}}},
+    {path: "/tabs-usersconfig-:idProject", redirect: "/project/:idProject/configuration?tab=members"},
     {path: "/tabs-#tabs-useractivity-:idProject-:idUser", redirect: "/project/:idProject/activity/user/:idUser"},
     {path: "/tabs-image-:idProject-:idImage-0", redirect: "/project/:idProject/image/:idImage"},
     {path: "/tabs-image-:idProject-:idImage-:idAnnotation", redirect: "/project/:idProject/image/:idImage/annotation/:idAnnotation"},

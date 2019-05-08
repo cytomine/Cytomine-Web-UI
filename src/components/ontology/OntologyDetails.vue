@@ -1,12 +1,15 @@
 <template>
-<div v-if="!loading" class="ontology-details-wrapper">
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+    {{$t("unexpected-error-info-message")}}
+</b-message>
+<div v-else-if="!loading" class="ontology-details-wrapper">
     <table class="table is-fullwidth">
         <tbody>
             <tr>
                 <td colspan="2">
                     <strong>{{$t("terms")}}</strong>
                     <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="true" :allowEdition="true">
-                        <template slot="no-result">
+                        <template #no-result>
                             <em class="has-text-grey">{{$t('no-term')}}</em>
                         </template>
                     </ontology-tree>
@@ -19,7 +22,7 @@
                         <router-link :to="`/project/${project.id}`">{{project.name}}</router-link>
                         <span v-if="index < nbProjects - 1">, </span>
                     </span>
-                    <em class="has-text-grey" v-if="nbProjects == 0">
+                    <em class="has-text-grey" v-if="nbProjects === 0">
                         {{$t("not-used-in-any-project")}}
                     </em>
                 </td>
@@ -27,7 +30,7 @@
             <tr>
                 <td><strong>{{$t("creator")}}</strong></td>
                 <td>
-                    {{creatorFullname}}
+                    {{creatorFullname || $t("unknown")}}
                 </td>
             </tr>
             <tr>
@@ -38,7 +41,7 @@
                             {{$t("button-rename")}}
                         </button>
                         <button class="button is-danger" @click="confirmDeletion()" :disabled="nbProjects > 0" 
-                             :title="nbProjects > 0 ? $t('cannot-delete-ontology-with-projects') : ''">
+                             :title="nbProjects ? $t('cannot-delete-ontology-with-projects') : ''">
                             {{$t("button-delete")}}
                         </button>
                     </div>
@@ -57,7 +60,7 @@
                     <b-field :label="$t('new-name')"
                              :type="emptyNewName ? 'is-danger' : null"
                              :message="emptyNewName ? $t('field-cannot-be-empty') : ''">
-                        <b-input v-model="newName"></b-input>
+                        <b-input v-model="newName" />
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">
@@ -81,11 +84,15 @@ import {fullName} from "@/utils/user-utils.js";
 
 export default {
     name: "ontology-details",
-    props: ["ontology"],
+    props: {
+        ontology: Object
+    },
     components: {OntologyTree},
     data() {
         return {
             loading: true,
+            error: false,
+
             fullOntology: {},
             creatorFullname: null,
 
@@ -98,7 +105,7 @@ export default {
             return this.fullOntology.projects.length;
         },
         emptyNewName() {
-            return this.newName.length == 0;
+            return !this.newName;
         }
     },
     watch: {
@@ -113,9 +120,26 @@ export default {
     },
     methods: {
         async fetchOntology() {
-            this.fullOntology = await Ontology.fetch(this.ontology.id);
-            let creator = await User.fetch(this.fullOntology.user);
-            this.creatorFullname = fullName(creator);
+            this.loading = true;
+            this.error = false;
+
+            try {
+                this.fullOntology = await Ontology.fetch(this.ontology.id);
+            }
+            catch(error) {
+                console.log(error);
+                this.error = true;
+            }
+
+            try {
+                let creator = await User.fetch(this.fullOntology.user);
+                this.creatorFullname = fullName(creator);
+            }
+            catch(error) {
+                console.log(error);
+            }
+
+            this.loading = false;
         },
 
         async rename() {
@@ -150,9 +174,8 @@ export default {
             });
         }
     },
-    async created() {
-        await this.fetchOntology();
-        this.loading = false;
+    created() {
+        this.fetchOntology();
     }
 };
 </script>

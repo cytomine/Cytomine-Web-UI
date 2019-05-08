@@ -1,18 +1,17 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true" class="launch-algo-modal">
+<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true" class="add-job-modal">
     <form>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">{{$t("launch-new-algorithm")}}</p>
+                <p class="modal-card-title">{{$t("launch-new-analysis")}}</p>
             </header>
             <section class="modal-card-body">
                 <div class="columns">
                     <div class="column is-narrow">
-                        <strong>{{$t("software")}}</strong>
+                        <strong>{{$t("algorithm")}}</strong>
                     </div>
                     <div class="column">
-                        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name">
-                        </cytomine-multiselect>
+                        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name" />
                     </div>
                 </div>
                 <template v-if="selectedSoftware">
@@ -24,9 +23,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <algo-parameter-row v-for="param in paramsMandatoryNoDefault" :displayErrors="displayErrors"
-                                :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                            </algo-parameter-row>
+                            <job-parameter-row v-for="param in paramsMandatoryNoDefault" :displayErrors="displayErrors"
+                                :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                            />
 
                             <tr class="row-separator" v-if="optionalParams.length > 0">
                                 <td colspan="2">
@@ -37,9 +36,9 @@
                                 </td>
                             </tr>
                             <template v-if="showOptional">
-                                <algo-parameter-row v-for="param in optionalParams" :displayErrors="displayErrors"
-                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                                </algo-parameter-row>
+                                <job-parameter-row v-for="param in optionalParams" :displayErrors="displayErrors"
+                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                                />
                             </template>
 
                             <tr class="row-separator" v-if="prefilledParams.length > 0">
@@ -51,9 +50,9 @@
                                 </td>
                             </tr>
                             <template v-if="showPrefilled">
-                                <algo-parameter-row v-for="param in prefilledParams" :displayErrors="displayErrors"
-                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)">
-                                </algo-parameter-row>
+                                <job-parameter-row v-for="param in prefilledParams" :displayErrors="displayErrors"
+                                    :param="param" :key="param.id" @changeValue="event => changeParam(param, event)"
+                                />
                             </template>
                         </tbody>
                     </table>
@@ -64,7 +63,7 @@
                     {{$t("button-cancel")}}
                 </button>
                 <button class="button is-link" :disabled="!validForm && displayErrors" @click="createJob()">
-                    {{$t("button-launch-new-algorithm")}}
+                    {{$t("button-launch-new-analysis")}}
                 </button>
             </footer>
         </div>
@@ -75,15 +74,17 @@
 <script>
 import {SoftwareCollection, Job, JobParameter} from "cytomine-client";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
-import AlgoParameterRow from "./AlgoParameterRow";
+import JobParameterRow from "./JobParameterRow";
 
 export default {
-    name: "launch-algorithm-modal",
+    name: "launch-job-modal",
     components: {
         CytomineMultiselect,
-        AlgoParameterRow
+        JobParameterRow
     },
-    props: ["active"],
+    props: {
+        active: Boolean
+    },
     data() {
         return {
             softwares: [],
@@ -101,13 +102,13 @@ export default {
             return this.selectedSoftware ? this.selectedSoftware.parameters.array : [];
         },
         optionalParams() {
-            return this.params.filter(param => !param.required);
+            return this.params.filter(param => !param.required && !param.defaultParamValue);
         },
         prefilledParams() {
-            return this.params.filter(param => param.defaultParamValue != null);
+            return this.params.filter(param => param.defaultParamValue);
         },
         paramsMandatoryNoDefault() {
-            return this.params.filter(param => param.required && param.defaultParamValue == null);
+            return this.params.filter(param => param.required && !param.defaultParamValue);
         },
         validForm() {
             return this.params.every(param => param.valid);
@@ -135,13 +136,13 @@ export default {
             }
         },
         async selectedSoftware() {
-            if(this.selectedSoftware == null) {
+            if(!this.selectedSoftware) {
                 return;
             }
 
             for(let param of this.selectedSoftware.parameters) {
                 this.$set(param, "value", param.defaultParamValue);
-                this.$set(param, "valid", !param.required || !param.hasDefault);
+                this.$set(param, "valid", !param.required || param.defaultParamValue);
             }
         }
     },
@@ -162,11 +163,11 @@ export default {
                 this.$emit("add", job);
                 this.$emit("update:active", false);
                 await job.execute();
-                this.$notify({type: "success", text: this.$t("notif-success-algo-launch")});
+                this.$notify({type: "success", text: this.$t("notif-success-analysis-launch")});
             }
             catch(error) {
                 console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-algo-launch")});
+                this.$notify({type: "error", text: this.$t("notif-error-analysis-launch")});
             }
         },
         changeParam(param, {value, valid}) {
@@ -181,7 +182,7 @@ export default {
 </script>
 
 <style scoped>
-.launch-algo-modal .modal-card {
+.modal-card {
     width: 100%;
     min-height: 70vh;
 }
@@ -210,7 +211,7 @@ td {
 </style>
 
 <style>
-.launch-algo-modal .animation-content {
+.add-job-modal .animation-content {
     min-width: 70vw;
     min-height: 70vh;
 }

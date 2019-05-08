@@ -1,67 +1,65 @@
-<!-- TODO job templates -->
 <template>
     <div class="map-container" v-if="!loading" @click="isActiveMap = true">
 
-        <vl-map :data-projection="projectionName"
-                :load-tiles-while-animating="true"
-                :load-tiles-while-interacting="true"
-                :keyboard-event-target="document"
-                @pointermove="projectedMousePosition = $event.coordinate"
-                @mounted="updateKeyboardInteractions"
-                ref="map">
+        <vl-map
+            :data-projection="projectionName"
+            :load-tiles-while-animating="true"
+            :load-tiles-while-interacting="true"
+            :keyboard-event-target="document"
+            @pointermove="projectedMousePosition = $event.coordinate"
+            @mounted="updateKeyboardInteractions"
+            ref="map"
+        >
 
-            <vl-view :center.sync="center"
-                     :zoom.sync="zoom"
-                     :rotation.sync="rotation"
-                     :max-zoom="maxZoom"
-                     :min-zoom="minZoom"
-                     :extent="extent"
-                     :projection="projectionName"
-                     @mounted="viewMounted()"
-                     ref="view">
-            </vl-view>
+            <vl-view
+                :center.sync="center"
+                :zoom.sync="zoom"
+                :rotation.sync="rotation"
+                :max-zoom="maxZoom"
+                :max-resolution="Math.pow(2, image.depth)"
+                :extent="extent"
+                :projection="projectionName"
+                @mounted="viewMounted()"
+                ref="view"
+            />
 
             <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-                <vl-source-zoomify :projection="projectionName"
-                                   :url="baseLayerURL"
-                                   :size="imageSize"
-                                   :extent="extent"
-                                   :key="baseLayerURL"
-                                   crossOrigin="Anonymous"
-                                   ref="baseSource"
-                                   @mounted="setBaseSource()">
-                </vl-source-zoomify>
+                <vl-source-zoomify
+                    :projection="projectionName"
+                    :urls="baseLayerURLs"
+                    :size="imageSize"
+                    :extent="extent"
+                    crossOrigin="Anonymous"
+                    ref="baseSource"
+                    @mounted="setBaseSource()"
+                />
             </vl-layer-tile>
 
             <vl-layer-image>
-                <vl-source-raster v-if="baseSource != null && colorManipulationOn"
-                                  :sources="[baseSource]"
-                                  :operation="operation"
-                                  :lib="lib">
-                </vl-source-raster>
+                <vl-source-raster
+                    v-if="baseSource && colorManipulationOn"
+                    :sources="[baseSource]"
+                    :operation="operation"
+                    :lib="lib"
+                />
             </vl-layer-image>
 
-            <annotation-layer v-for="layer in selectedLayers" :key="'layer-'+layer.id"
-                              :idViewer="idViewer"
-                              :index="index"
-                              :layer="layer">
-            </annotation-layer>
+            <annotation-layer
+                v-for="layer in selectedLayers"
+                :key="'layer-'+layer.id"
+                :idViewer="idViewer"
+                :index="index"
+                :layer="layer"
+            />
 
-            <select-interaction v-if="activeTool == 'select'" :idViewer="idViewer" :index="index">
-            </select-interaction>
-
-            <draw-interaction v-if="activeTool != 'select'"
-                :idViewer="idViewer" :index="index">
-            </draw-interaction>
-
-            <modify-interaction v-if="activeTool == 'select' && activeEditTool != null"
-                :idViewer="idViewer" :index="index">
-            </modify-interaction>
+            <select-interaction v-if="activeSelectInteraction" :idViewer="idViewer" :index="index" />
+            <draw-interaction v-if="activeDrawInteraction" :idViewer="idViewer" :index="index" />
+            <modify-interaction v-if="activeModifyInteraction" :idViewer="idViewer" :index="index" />
 
         </vl-map>
 
         <div v-if="configUI['project-tools-main']" class="draw-tools">
-            <draw-tools :idViewer="idViewer" :index="index"></draw-tools>
+            <draw-tools :idViewer="idViewer" :index="index" />
         </div>
 
         <div class="panels">
@@ -72,85 +70,77 @@
                     </a>
                 </li>
 
-                <template v-if="configUI['project-explore-hide-tools']">
+                <template v-if="isPanelDisplayed('hide-tools')">
                     <li v-if="isPanelDisplayed('info')">
-                        <a @click="togglePanel('info')" :class="{active: activePanel == 'info'}">
+                        <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
                             <i class="fas fa-info"></i>
                         </a>
-                        <information-panel class="panel-options" v-show="activePanel == 'info'"
-                            :idViewer="idViewer" :index="index">
-                        </information-panel>
+                        <information-panel class="panel-options" v-show="activePanel === 'info'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('digital-zoom')">
-                        <a @click="togglePanel('digital-zoom')" :class="{active: activePanel == 'digital-zoom'}">
+                        <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
                             <i class="fas fa-search"></i>
                         </a>
-                        <digital-zoom class="panel-options" v-show="activePanel == 'digital-zoom'"
-                            :idViewer="idViewer" :index="index">
-                        </digital-zoom>
+                        <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('link') && viewerWrapper.maps.length > 1">
-                        <a @click="togglePanel('link')" :class="{active: activePanel == 'link'}">
+                        <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
                             <i class="fas fa-link"></i>
                         </a>
-                        <link-panel class="panel-options" v-show="activePanel == 'link'"
-                            :idViewer="idViewer" :index="index">
-                        </link-panel>
+                        <link-panel class="panel-options" v-show="activePanel === 'link'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
-                    <li v-if="isPanelDisplayed('colors')">
-                        <a @click="togglePanel('colors')" :class="{active: activePanel == 'colors'}">
+                    <li v-if="isPanelDisplayed('color-manipulation')">
+                        <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
                             <i class="fas fa-adjust"></i>
                         </a>
-                        <color-manipulation class="panel-options" v-show="activePanel == 'colors'"
-                            :idViewer="idViewer" :index="index">
-                        </color-manipulation>
+                        <color-manipulation class="panel-options" v-show="activePanel === 'colors'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('image-layers')">
-                        <a @click="togglePanel('layers')" :class="{active: activePanel == 'layers'}">
+                        <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
                             <i class="fas fa-copy"></i>
                         </a>
-                        <annotations-panel class="panel-options" v-show="activePanel == 'layers'"
-                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload">
-                        </annotations-panel>
+                        <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
+                            :idViewer="idViewer" :index="index" :layers-to-preload="layersToPreload"
+                        />
                     </li>
 
-                    <li v-if="isPanelDisplayed('ontology') && terms.length > 0">
-                        <a @click="togglePanel('ontology')" :class="{active: activePanel == 'ontology'}">
+                    <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
+                        <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
                             <i class="fas fa-hashtag"></i>
                         </a>
-                        <ontology-panel class="panel-options" v-show="activePanel == 'ontology'"
-                            :idViewer="idViewer" :index="index">
-                        </ontology-panel>
+                        <ontology-panel class="panel-options" v-show="activePanel === 'ontology'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li  v-if="isPanelDisplayed('property')">
-                        <a @click="togglePanel('properties')" :class="{active: activePanel == 'properties'}">
+                        <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
                             <i class="fas fa-tag"></i>
                         </a>
-                        <properties-panel class="panel-options" v-show="activePanel == 'properties'"
-                            :idViewer="idViewer" :index="index">
-                        </properties-panel>
+                        <properties-panel class="panel-options" v-show="activePanel === 'properties'"
+                            :idViewer="idViewer" :index="index"
+                        />
                     </li>
 
                     <li v-if="isPanelDisplayed('follow')">
-                        <a @click="togglePanel('follow')" :class="{active: activePanel == 'follow'}">
+                        <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
                             <i class="fas fa-street-view"></i>
                         </a>
-                        <follow-panel class="panel-options" v-show="activePanel == 'follow'"
-                            :idViewer="idViewer" :index="index" :view="$refs.view">
-                        </follow-panel>
-                    </li>
-
-                    <li v-if="isPanelDisplayed('guided-tour')">
-                        <a @click="togglePanel('guided-tour')" :class="{active: activePanel == 'guided-tour'}">
-                            <i class="fas fa-map-signs"></i>
-                        </a>
-                        <guided-tour class="panel-options" v-show="activePanel == 'guided-tour'" :view="$refs.view">
-                        </guided-tour>
+                        <follow-panel class="panel-options" v-show="activePanel === 'follow'"
+                            :idViewer="idViewer" :index="index" :view="$refs.view"
+                        />
                     </li>
                 </template>
             </ul>
@@ -160,41 +150,30 @@
             <i class="fas fa-circle"></i> {{$t("live")}}
         </div>
 
-        <b-message class="info-calibration" v-if="imageWrapper.ongoingCalibration" type="is-info" has-icon icon-size="is-small">
-            <p>{{$t("calibration-mode-explanation")}}</p>
-            <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
-        </b-message>
+        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index" />
 
-        <rotation-selector class="rotation-selector-wrapper" :idViewer="idViewer" :index="index">
-        </rotation-selector>
+        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-        <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition">
-        </scale-line>
+        <annotation-details-container v-if="isPanelDisplayed('annotation-main')"
+            :idViewer="idViewer" :index="index" :view="$refs.view"
+        />
 
-        <div v-if="imageWrapper.showCrosshair && viewerWrapper.maps.length > 1" class="view-positioning-helper">
-            <div class="horizontal-line"></div>
-            <div class="vertical-line"></div>
-            <div class="center"></div>
+        <div class="custom-overview" ref="overview">
+            <p class="image-name" :class="{hidden: overviewCollapsed}">
+                <image-name :image="image" />
+            </p>
         </div>
-
-        <annotation-details-container v-if="configUI['project-explore-annotation-main']" 
-            :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotation-details-container>
-
-        <annotations-table v-if="isPanelDisplayed('annotation-panel')"
-            class="annotations-table-wrapper" :idViewer="idViewer" :index="index" :view="$refs.view">
-        </annotations-table>
     </div>
 </template>
 
 <script>
 import _ from "lodash";
 
+import ImageName from "@/components/image/ImageName";
 import AnnotationLayer from "./AnnotationLayer";
 import RotationSelector from "./RotationSelector";
 import ScaleLine from "./ScaleLine";
 import DrawTools from "./DrawTools";
-import AnnotationsTable from "./AnnotationsTable";
 
 import InformationPanel from "./panels/InformationPanel";
 import DigitalZoom from "./panels/DigitalZoom";
@@ -204,7 +183,6 @@ import AnnotationsPanel from "./panels/AnnotationsPanel";
 import OntologyPanel from "./panels/OntologyPanel";
 import PropertiesPanel from "./panels/PropertiesPanel";
 import FollowPanel from "./panels/FollowPanel";
-import GuidedTour from "./panels/GuidedTour";
 
 import AnnotationDetailsContainer from "./AnnotationDetailsContainer";
 
@@ -220,23 +198,26 @@ import {KeyboardPan, KeyboardZoom} from "ol/interaction";
 import {noModifierKeys, targetNotEditable} from "ol/events/condition";
 import WKT from "ol/format/WKT";
 
-import {ImageConsultation, Annotation, UserPosition} from "cytomine-client";
+import {ImageConsultation, Annotation, AnnotationType, UserPosition} from "cytomine-client";
 
 import {constLib, operation} from "@/utils/color-manipulation.js";
 
+import constants from "@/utils/constants.js";
+
 export default {
     name: "cytomine-image",
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     components: {
+        ImageName,
+
         AnnotationLayer,
 
         RotationSelector,
         ScaleLine,
         DrawTools,
-        AnnotationsTable,
 
         AnnotationDetailsContainer,
 
@@ -248,7 +229,6 @@ export default {
         OntologyPanel,
         PropertiesPanel,
         FollowPanel,
-        GuidedTour,
 
         SelectInteraction,
         DrawInteraction,
@@ -265,7 +245,9 @@ export default {
 
             timeoutSavePosition: null,
 
-            loading: true
+            loading: true,
+
+            overview: null
         };
     },
     computed: {
@@ -295,7 +277,7 @@ export default {
         },
         isActiveMap: {
             get() {
-                return this.viewerWrapper.activeMap == this.index;
+                return this.viewerWrapper.activeMap === this.index;
             },
             set(value) {
                 if(value) {
@@ -356,14 +338,14 @@ export default {
         imageSize() {
             return [this.image.width, this.image.height];
         },
-        baseLayerURL() { // TODO: randomize + filter (see ULiege repo)
-            return `${this.image.imageServerURL}&tileGroup={TileGroup}&x={x}&y={y}&z={z}
-                &channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
+        baseLayerURLs() { // TODO: image filters (see ULiege repo)
+            let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
+            return this.image.imageServerURLs.map(url => url + params);
         },
 
         colorManipulationOn() {
-            return this.imageWrapper.brightness != 0 || this.imageWrapper.contrast != 0
-                || this.imageWrapper.hue != 0 || this.imageWrapper.saturation != 0;
+            return this.imageWrapper.brightness !== 0 || this.imageWrapper.contrast !== 0
+                || this.imageWrapper.hue !== 0 || this.imageWrapper.saturation !== 0;
         },
         operation() {
             return operation;
@@ -379,9 +361,26 @@ export default {
         },
 
         layersToPreload() {
-            if(this.routedAnnotation != null) {
-                return [this.routedAnnotation.user];
+            if(this.routedAnnotation) {
+                return this.routedAnnotation.type === AnnotationType.REVIEWED ? [-1] : [this.routedAnnotation.user];
             }
+        },
+
+        overviewCollapsed() {
+            return this.overview ? this.overview.getCollapsed() : null;
+        },
+
+        correction() {
+            return ["correct-add", "correct-remove"].includes(this.activeEditTool);
+        },
+        activeSelectInteraction() {
+            return this.activeTool === "select";
+        },
+        activeDrawInteraction() {
+            return !this.activeSelectInteraction || this.correction;
+        },
+        activeModifyInteraction() {
+            return this.activeSelectInteraction && this.activeEditTool && !this.correction;
         }
     },
     watch: {
@@ -413,13 +412,13 @@ export default {
         async viewMounted() {
             await this.$refs.view.$createPromise; // wait for ol.View to be created
 
-            if(this.routedAnnotation != null) { // center view on annotation
+            if(this.routedAnnotation) { // center view on annotation
                 let annot = this.routedAnnotation;
                 let geometry = new WKT().readGeometry(annot.location);
                 this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
 
                 // HACK: center set by view.fit() is incorrect => reset it manually
-                this.center = (geometry.getType() == "Point") ? geometry.getFirstCoordinate()
+                this.center = (geometry.getType() === "Point") ? geometry.getFirstCoordinate()
                     : [annot.centroid.x, annot.centroid.y];
                 // ---
             }
@@ -433,18 +432,21 @@ export default {
         },
 
         async addOverviewMap() {
-            if(!this.configUI["project-explore-overview"]) {
+            if(!this.isPanelDisplayed("overview")) {
                 return;
             }
 
             await this.$refs.map.$createPromise; // wait for ol.Map to be created
             await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
-            this.$refs.map.$map.addControl(new OverviewMap({
+            this.overview = new OverviewMap({
                 collapsed: false,
                 view: new View({projection: this.projectionName}),
-                layers: [this.$refs.baseLayer.$layer]
-            }));
+                layers: [this.$refs.baseLayer.$layer],
+                tipLabel: this.$t("overview"),
+                target: this.$refs.overview
+            });
+            this.$refs.map.$map.addControl(this.overview);
         },
 
         togglePanel(panel) {
@@ -454,38 +456,40 @@ export default {
         savePosition: _.debounce(async function() {
             if(this.$refs.view) {
                 let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
-                await UserPosition.create({
-                    image: this.image.id,
-                    zoom: this.zoom,
-                    rotation: this.rotation,
-                    bottomLeftX: Math.round(extent[0]),
-                    bottomLeftY: Math.round(extent[1]),
-                    bottomRightX: Math.round(extent[2]),
-                    bottomRightY: Math.round(extent[1]),
-                    topLeftX: Math.round(extent[0]),
-                    topLeftY: Math.round(extent[3]),
-                    topRightX: Math.round(extent[2]),
-                    topRightY: Math.round(extent[3]),
-                    // broadcasting: this.imageWrapper.broadcasting // TODO handle in backend
-                });
+
+                try {
+                    await UserPosition.create({
+                        image: this.image.id,
+                        zoom: this.zoom,
+                        rotation: this.rotation,
+                        bottomLeftX: Math.round(extent[0]),
+                        bottomLeftY: Math.round(extent[1]),
+                        bottomRightX: Math.round(extent[2]),
+                        bottomRightY: Math.round(extent[1]),
+                        topLeftX: Math.round(extent[0]),
+                        topLeftY: Math.round(extent[3]),
+                        topRightX: Math.round(extent[2]),
+                        topRightY: Math.round(extent[3]),
+                        broadcast: this.imageWrapper.broadcast
+                    });
+                }
+                catch(error) {
+                    console.log(error);
+                    this.$notify({type: "error", text: this.$t("notif-error-save-user-position")});
+                }
 
                 clearTimeout(this.timeoutSavePosition);
-                this.timeoutSavePosition = setTimeout(this.savePosition, 5000);
+                this.timeoutSavePosition = setTimeout(this.savePosition, constants.SAVE_POSITION_IN_IMAGE_INTERVAL);
             }
         }, 500),
 
         isPanelDisplayed(panel) {
-            let displayed = this.configUI[`project-explore-${panel}`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all panels are managed in backend
-        },
-        
-        cancelCalibration() {
-            this.$store.dispatch("cancelCalibration", {idViewer: this.idViewer, index: this.index});
+            return this.configUI[`project-explore-${panel}`];
         }
     },
     async created() {
-        if(getProj(this.projectionName) == null) { // if image opened for the first time
-            let projection = createProj({code: this.projectionName, extent: this.extent});
+        if(!getProj(this.projectionName)) { // if image opened for the first time
+            let projection = createProj({code: this.projectionName, units: "pixels", extent: this.extent});
             addProj(projection);
         }
 
@@ -502,20 +506,19 @@ export default {
 
         // Actions related to query parameters should be executed only once, for first image of viewer
         let firstIndexTargettedImage = this.viewerWrapper.maps.findIndex(map => {
-            return map.imageInstance.id == this.$route.params.idImages;
+            return map.imageInstance.id === Number(this.$route.params.idImages);
         });
-        if(this.index == firstIndexTargettedImage) {
+        if(this.index === firstIndexTargettedImage) {
             let idRoutedAnnot = this.$route.params.idAnnotation;
-            if(idRoutedAnnot != null) {
+            if(idRoutedAnnot) {
                 let annot = await Annotation.fetch(idRoutedAnnot);
-                if(annot.image == this.image.id) {
+                if(annot.image === this.image.id) {
                     this.routedAnnotation = annot;
+                    if(this.$route.query.action === "comments") {
+                        this.$store.commit("setShowComments", {idViewer: this.idViewer, index: this.index, annot});
+                    }
                     this.$store.commit("setAnnotToSelect", {idViewer: this.idViewer, index: this.index, annot});
                 }
-            }
-
-            if(this.$route.query.action == "calibration") {
-                this.$store.dispatch("startCalibration", {idViewer: this.idViewer, index: this.index});
             }
         }
 
@@ -576,30 +579,10 @@ $sizePositioningLineSize: 2px;
     padding: 5px;
     border-radius: 5px;
     border: 2px solid white;
-}
 
-.info-calibration {
-    position: absolute;
-    left: 50px;
-    top: 50px;
-    max-width: 400px;
-
-    p:first-child {
-        margin-bottom: 10px;
+    i.fas {
+        margin-right: 5px;
     }
-}
-
-.broadcast i.fas {
-    margin-right: 5px;
-}
-
-.annotations-table-wrapper {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: $widthPanelBar;
-    z-index: 5;
-    pointer-events: none;
 }
 
 .panels {
@@ -626,23 +609,20 @@ $sizePositioningLineSize: 2px;
                 text-decoration: none;
                 text-align:center;
 
-                :hover {
+                &:hover {
                     color: $colorHoverPanelLink;
                 }
-            }
 
-            > a.active {
-                background: $backgroundPanel;
-                color: $colorOpenedPanelLink;
-                :hover {
-                    color: unset;
+                &.active {
+                    background: $backgroundPanel;
+                    color: $colorOpenedPanelLink;
                 }
-            }
 
-            > a.close {
-                color: #ffc4c4;
-                :hover {
-                    color: #ff7070;
+                &.close {
+                    color: #ffc4c4;
+                    :hover {
+                        color: #ff7070;
+                    }
                 }
             }
         }
@@ -702,11 +682,11 @@ $sizePositioningLineSize: 2px;
     color: black !important;
     border-radius: 2px !important;
     box-shadow: 0px 0px 1px #777;
-}
 
-.ol-control button:hover {
-    box-shadow: 0px 0px 1px black;
-    cursor: pointer;
+    &:hover {
+        box-shadow: 0px 0px 1px black;
+        cursor: pointer;
+    }
 }
 
 .ol-zoom-in {
@@ -720,46 +700,33 @@ $sizePositioningLineSize: 2px;
     top: 70px;
 }
 
-/* ----- View positioning helper ----- */
-
-.view-positioning-helper {
+.custom-overview {
     position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: $widthPanelBar;
-    pointer-events: none;
-    z-index: 1;
+    bottom: 0.5em;
+    left: 0.5em;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px 4px 0px 0px;
 
-    .horizontal-line {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        box-sizing: border-box;
-        height: calc(50% + #{$sizePositioningLineSize} / 2);
-        width: 100%;
-        border-bottom: $sizePositioningLineSize dashed $colorPositioningHelper;
+    .ol-overviewmap {
+        position: static;
+        background: none;
     }
 
-    .vertical-line {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        box-sizing: border-box;
-        height: 100%;
-        width: calc(50% + #{$sizePositioningLineSize} / 2);
-        border-right: $sizePositioningLineSize dashed $colorPositioningHelper;
+    .ol-overviewmap:not(.ol-collapsed) button {
+        bottom: 2px !important;
     }
 
-    .center {
-        position: absolute;
-        top: calc(50% - #{$sizePositioningHelperCenter} / 2);
-        left: calc(50% - #{$sizePositioningHelperCenter} / 2);
-        box-sizing: border-box;
-        width: $sizePositioningHelperCenter;
-        height: $sizePositioningHelperCenter;
-        border-radius: calc(#{$sizePositioningHelperCenter} / 2);
-        border: $sizePositioningLineSize dashed $colorPositioningHelper;
+    .image-name {
+        font-size: 0.8em;
+        padding: 2px 5px;
+        width: 158px;
+        word-wrap: break-word;
+
+        &.hidden {
+            display: none;
+        }
     }
 }
 

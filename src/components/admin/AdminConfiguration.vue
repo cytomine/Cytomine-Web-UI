@@ -1,7 +1,7 @@
 <template>
 <div class="admin-config-wrapper">
     <h2>{{$t("welcome-message")}}</h2>
-    <cytomine-quill-editor v-model="welcomeConfig.value"></cytomine-quill-editor>
+    <cytomine-quill-editor v-model="welcomeConfig.value" />
     <p class="has-text-right">
         <button class="button is-link" @click="save">{{$t("button-save")}}</button>
     </p>
@@ -24,7 +24,7 @@ export default {
     methods: {
         async save() {
             try {
-                if(this.welcomeConfig.value.length === 0) {
+                if(!this.welcomeConfig.value) {
                     await this.welcomeConfig.delete();
                 }
                 else {

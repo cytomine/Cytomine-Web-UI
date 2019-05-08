@@ -8,7 +8,7 @@
             <b-upload v-model="selectedFile" type="is-link" drag-drop>
                 <section class="section">
                     <div class="content has-text-centered">
-                        <template v-if="selectedFile == null">
+                        <template v-if="!selectedFile">
                             <p><i class="fas fa-upload fa-3x"></i></p>
                             <p>{{$t("choose-file-or-drop")}}</p>
                         </template>
@@ -24,7 +24,7 @@
         <b-field :label="$t('name')" 
                     :type="selectedFile && !validName ? 'is-danger' : ''" 
                     :message="selectedFile && !validName ? $t('field-cannot-be-empty') : ''">
-            <b-input v-model="name" :disabled="selectedFile == null"></b-input>
+            <b-input v-model="name" :disabled="!selectedFile" />
         </b-field>
     </section>
     <footer class="modal-card-foot">
@@ -43,7 +43,9 @@ import {AttachedFile} from "cytomine-client";
 
 export default {
     name: "attached-file-modal",
-    props: ["object"],
+    props: {
+        object: Object
+    },
     data() {
         return {
             selectedFile: null,
@@ -57,7 +59,7 @@ export default {
     },
     watch: {
         selectedFile(file) {
-            if(file != null) {
+            if(file) {
                 this.name = file.name;
             }
         }

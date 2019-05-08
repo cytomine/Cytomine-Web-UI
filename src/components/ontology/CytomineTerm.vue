@@ -8,7 +8,9 @@
 <script>
 export default {
     name: "cytomine-term",
-    props: ["term"]
+    props: {
+        term: Object
+    }
 };
 </script>
 

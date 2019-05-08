@@ -3,13 +3,17 @@
     <h2> {{ $t("access-denied") }} </h2>
     <p>{{ $t("insufficient-permission") }}</p>
 </div>
-<div v-else class="list-algorithms-wrapper content-wrapper">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+<div class="box error" v-else-if="error">
+    <h2> {{ $t("error") }} </h2>
+    <p>{{ $t("unexpected-error-info-message") }}</p>
+</div>
+<div v-else class="list-jobs-wrapper content-wrapper">
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="panel">
         <p class="panel-heading">
-            {{$t("algorithms")}}
+            {{$t("analysis")}}
             <button class="button is-link" @click="launchModal = true">
-                {{$t('button-launch-new-algorithm')}}
+                {{$t('button-launch-new-analysis')}}
             </button>
         </p>
         <div class="panel-block">
@@ -18,11 +22,10 @@
                 <div class="columns">
                     <div class="column filter">
                         <div class="filter-label">
-                            {{$t("software")}}
+                            {{$t("algorithm")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true" />
                         </div>
                     </div>
 
@@ -31,8 +34,7 @@
                             {{$t("launcher")}}
                         </div>
                         <div class="filter-body">
-                            <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true">
-                            </cytomine-multiselect>
+                            <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true" />
                         </div>
                     </div>
 
@@ -41,15 +43,7 @@
                             {{$t("execution-date")}}
                         </div>
                         <div class="filter-body">
-                            <b-datepicker v-model="selectedDate" :placeholder="$t('all')" :max-date="new Date()"
-                                        :month-names="moment.months()" :day-names="moment.weekdaysMin()"
-                                        :date-formatter="date => moment(date).format('ll')" size="is-small">
-                                <div class="has-text-centered">
-                                    <button class="button is-small is-link" :disabled="selectedDate == null" @click="selectedDate = null">
-                                        {{$t("button-reset")}}
-                                    </button>
-                                </div>
-                            </b-datepicker>
+                            <cytomine-datepicker v-model="selectedDate" :placeholder="$t('all')" :maxDate="new Date()" />
                         </div>
                     </div>
 
@@ -59,21 +53,18 @@
                         </div>
                         <div class="filter-body">
                             <cytomine-multiselect v-model="selectedStatus" :options="availableStatus"
-                                label="label" track-by="status" :multiple="true">
-                            </cytomine-multiselect>
+                                label="label" track-by="status" :multiple="true" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <b-table :data="filteredJobs" class="table-algorithms" ref="table"
-            :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id"
-            default-sort="created" default-sort-direction="desc">
+            <b-table :data="filteredJobs" ref="table" default-sort="created" default-sort-direction="desc"
+            :paginated="true" :per-page="perPage" pagination-size="is-small" detailed detail-key="id">
 
-                <template slot-scope="{row: job}">
-                    <b-table-column field="software" :label="$t('software')" sortable width="1000">
+                <template #default="{row: job}">
+                    <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
                         {{job.softwareName}}
-                        <!-- {{$t("software-execution", {softwareName: job.softwareName, executionNumber: job.number})}} -->
                     </b-table-column>
 
                     <b-table-column :label="$t('run-number')" width="500" centered>
@@ -89,21 +80,26 @@
                     </b-table-column>
 
                     <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
-                        <algorithm-status :status="job.status"></algorithm-status>
+                        <job-status :status="job.status" />
                     </b-table-column>
                 </template>
 
-                <template slot="detail" slot-scope="{row: job}">
-                    <algorithm-details :key="job.id" :job="job" @update="props => job.populate(props)"></algorithm-details>
+                <template #detail="{row: job}">
+                    <job-details
+                        :key="job.id"
+                        :job="job"
+                        @update="props => job.populate(props)"
+                        @delete="deleteJob(job)"
+                    />
                 </template>
 
-                <template slot="empty">
+                <template #empty>
                     <div class="content has-text-grey has-text-centered">
-                        <p>{{$t("no-algorithm-run")}}</p>
+                        <p>{{$t("no-analysis-run")}}</p>
                     </div>
                 </template>
 
-                <template slot="bottom-left">
+                <template #bottom-left>
                     <b-select v-model="perPage" size="is-small">
                         <option value="10">10 {{$t("per-page")}}</option>
                         <option value="25">25 {{$t("per-page")}}</option>
@@ -115,30 +111,34 @@
         </div>
     </div>
 
-    <launch-algorithm-modal :active.sync="launchModal" @add="addJob"></launch-algorithm-modal>
+    <add-job-modal :active.sync="launchModal" @add="addJob" />
 </div>
 </template>
 
 <script>
 import {JobCollection} from "cytomine-client";
-import AlgorithmStatus from "./AlgorithmStatus";
-import AlgorithmDetails from "./AlgorithmDetails";
-import LaunchAlgorithmModal from "./LaunchAlgorithmModal";
+import JobStatus from "./JobStatus";
+import JobDetails from "./JobDetails";
+import AddJobModal from "./AddJobModal";
 import CytomineMultiselect from "@/components/form/CytomineMultiselect";
+import CytomineDatepicker from "@/components/form/CytomineDatepicker";
 import jobStatusLabelMapping from "@/utils/job-utils";
 import moment from "moment";
 
 export default {
-    name: "list-algorithms",
+    name: "list-jobs",
     components: {
-        AlgorithmStatus,
-        AlgorithmDetails,
-        LaunchAlgorithmModal,
-        CytomineMultiselect
+        JobStatus,
+        JobDetails,
+        AddJobModal,
+        CytomineMultiselect,
+        CytomineDatepicker
     },
     data() {
         return {
             loading: true,
+            error: false,
+
             jobs: [],
             searchString: "",
             perPage: 10,
@@ -159,10 +159,6 @@ export default {
         },
         configUI() {
             return this.$store.state.project.configUI;
-        },
-
-        moment() {
-            return moment;
         },
 
         availableSoftwares() {
@@ -201,14 +197,36 @@ export default {
 
             this.jobs.unshift(job);
             this.$refs.table.toggleDetails(job);
+        },
+        async deleteJob(jobToDelete) {
+            try {
+                await jobToDelete.delete();
+                this.jobs = this.jobs.filter(job => job.id !== jobToDelete.id);
+                this.$notify({
+                    type: "success",
+                    text: this.$t("notif-success-analysis-deletion")
+                });
+            }
+            catch(error) {
+                this.$notify({
+                    type: "error",
+                    text: this.$t("notif-error-analysis-deletion")
+                });
+            }
         }
     },
     async created() {
-        this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-        this.selectedSoftwares = this.availableSoftwares.slice();
-        this.selectedLaunchers = this.availableLaunchers.slice();
-        this.selectedStatus = this.availableStatus.slice();
-        this.loading = false;
+        try {
+            this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
+            this.selectedSoftwares = this.availableSoftwares.slice();
+            this.selectedLaunchers = this.availableLaunchers.slice();
+            this.selectedStatus = this.availableStatus.slice();
+            this.loading = false;
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
     }    
 };
 </script>
@@ -225,20 +243,20 @@ export default {
 }
 </style>
 
-<style>
-.list-algorithms-wrapper .datepicker .input {
+<style lang="scss">
+.list-jobs-wrapper .datepicker .input {
     min-height: 40px;
     background-color: rgba(255, 255, 255, 0.75);
     border-radius: 5px;
     border: 1px solid #e8e8e8;
     font-size: 14px;
     font-family: inherit;
-}
 
-.list-algorithms-wrapper .datepicker .input::placeholder {
-    color: black !important;
-    opacity: 1;
-    font-weight: 600;
+    &::placeholder {
+        color: black !important;
+        opacity: 1;
+        font-weight: 600;
+    }
 }
 </style>
 

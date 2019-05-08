@@ -1,7 +1,11 @@
 <template>
-<table class="table">
-    <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
-    <tbody>
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+    <h2> {{ $t("error") }} </h2>
+    <p> {{ $t("unexpected-error-info-message") }} </p>
+</b-message>
+<table v-else class="table">
+    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <tbody v-if="!loading">
         <tr v-if="isPropDisplayed('name')">
             <td class="prop-label">{{$t("name")}}</td>
             <td class="prop-content">
@@ -29,7 +33,7 @@
             </td>
         </tr>
         <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-            <td class="prop-label">{{$t("job-annotations")}}</td>
+            <td class="prop-label">{{$t("analysis-annotations")}}</td>
             <td class="prop-content">
                 <router-link :to="`/project/${project.id}/annotations?type=algo`">
                     {{ project.numberOfJobAnnotations }}
@@ -39,34 +43,30 @@
         <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
             <td class="prop-label">{{$t("reviewed-annotations")}}</td>
             <td class="prop-content">
-                <a>{{project.numberOfReviewedAnnotations}}</a> <!-- TODO: router link -->
+                <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                    {{project.numberOfReviewedAnnotations}}
+                </router-link>
             </td>
         </tr>
         <tr v-if="isPropDisplayed('description')">
             <td class="prop-label">{{$t("description")}}</td>
             <td class="prop-content">
-                <cytomine-description :object="project"></cytomine-description>
-            </td>
-        </tr>
-        <tr v-if="isPropDisplayed('tags')">
-            <td class="prop-label">{{$t("tags")}}</td>
-            <td class="prop-content">
-                <div class="tags"> <!-- TODO: handle in backend, and retrieve dynamically -->
-                    <span class="tag is-rounded is-info">Demo</span>
-                    <span class="tag is-rounded is-info">CHU</span>
-                </div>
+                <cytomine-description :object="project" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('attachedFiles')">
             <td class="prop-label">{{$t("attached-files")}}</td>
             <td class="prop-content">
-                <attached-files :object="project"></attached-files>
+                <attached-files :object="project" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('ontology')">
             <td class="prop-label">{{$t("ontology")}}</td>
             <td class="prop-content">
-                <router-link :to="`/ontology/${project.ontology}`">{{project.ontologyName}}</router-link>
+                <router-link v-if="project.ontology" :to="`/ontology/${project.ontology}`">
+                    {{project.ontologyName}}
+                </router-link>
+                <em v-else>{{$t("no-ontology")}}</em>
             </td>
         </tr>
         <tr v-if="isPropDisplayed('created')">
@@ -78,37 +78,37 @@
         <tr v-if="isPropDisplayed('creator')">
             <td class="prop-label">{{$t("creator")}}</td>
             <td class="prop-content">
-                <list-usernames :users="[creator]" :onlines="onlines"></list-usernames>
+                <list-usernames :users="[creator]" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('representatives')">
             <td class="prop-label">{{$t("representatives")}} ({{representatives.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="representatives" :onlines="onlines"></list-usernames>
+                <list-usernames :users="representatives" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('managers')">
             <td class="prop-label">{{$t("managers")}} ({{managers.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="managers" :onlines="onlines"></list-usernames>
+                <list-usernames :users="managers" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="isPropDisplayed('contributors')">
             <td class="prop-label">{{$t("contributors")}} ({{contributors.length}})</td>
             <td class="prop-content">
-                <list-usernames :users="contributors" :onlines="onlines"></list-usernames>
+                <list-usernames :users="contributors" :onlines="onlines" />
             </td>
         </tr>
         <tr v-if="!excludedProperties.includes('imagesPreview')">
             <td class="prop-label">{{$t("images")}}</td>
             <td class="prop-content">
-                <list-images-preview :idProject="project.id"></list-images-preview>
+                <list-images-preview :project="project" />
             </td>
         </tr>
-        <tr>
+        <tr v-if="canManageProject">
             <td class="prop-label">{{$t("actions")}}</td>
             <td class="prop-content">
-                <project-actions :project="project" @delete="$emit('delete')"></project-actions>
+                <project-actions :project="project" @update="$emit('update', $event)" @delete="$emit('delete')" />
             </td>
         </tr>
     </tbody>
@@ -137,16 +137,23 @@ export default {
     },
     data() {
         return {
+            loading: true,
+            error: false,
+
             creator: null,
             managers: [],
             members: [],
             onlines: [],
-            representatives: [],
-
-            isLoading: true
+            representatives: []
         };
     },
     computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        canManageProject() {
+            return this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id);
+        },
         managersIds() {
             return this.managers.map(manager => manager.id);
         },
@@ -187,15 +194,20 @@ export default {
         }
     },
     async created() {
-        await Promise.all([
-            this.fetchCreator(),
-            this.fetchManagers(),
-            this.fetchRepresentatives(),
-            this.fetchMembers(),
-            this.fetchOnlines()
-        ]);
-
-        this.isLoading = false;
+        try {
+            await Promise.all([
+                this.fetchCreator(),
+                this.fetchManagers(),
+                this.fetchRepresentatives(),
+                this.fetchMembers(),
+                this.fetchOnlines()
+            ]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+        }
+        this.loading = false;
     }
 };
 </script>
@@ -204,6 +216,7 @@ export default {
 .table {
     background: none;
     position: relative;
+    height: 3em;
 }
 
 td.prop-label {
@@ -213,10 +226,5 @@ td.prop-label {
 
 td.prop-content {
     width: 100%;
-}
-
-.tag {
-    font-size: 10px !important;
-    font-weight: 600;
 }
 </style>

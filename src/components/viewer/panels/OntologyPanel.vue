@@ -3,7 +3,7 @@
     <h1>{{ $t("terms") }}</h1>
     <div class="ontology-tree-wrapper">
         <div class="header-tree">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded></b-input>
+            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded />
 
             <div class="sidebar-tree">
                 <div class="visibility">
@@ -16,30 +16,33 @@
                        :allowSelection="false"
                        :searchString="searchString"
                        :additionalNodes="additionalNodes">
+            <template #custom-sidebar="{term}">
+                <div class="sidebar-tree">
+                    <div class="visibility">
+                        <b-checkbox
+                            v-if="term.id"
+                            size="is-small"
+                            :value="terms[termsMapping[term.id]].visible"
+                            @input="toggleTermVisibility(termsMapping[term.id])"
+                        />
 
-            <div class="sidebar-tree" slot="custom-sidebar" slot-scope="{term}">
-                <div class="visibility">
-                    <input v-if="term.id"
-                           type="checkbox"
-                           :checked="terms[termsMapping[term.id]].visible"
-                           @change="toggleTermVisibility(termsMapping[term.id])">
+                        <b-checkbox v-else size="is-small" v-model="displayNoTerm" />
+                    </div>
 
-                    <input v-else type="checkbox" v-model="displayNoTerm">
+                    <div class="opacity">
+                        <input v-if="term.id"
+                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+                            :disabled="!terms[termsMapping[term.id]].visible"
+                            :value="terms[termsMapping[term.id]].opacity"
+                            @change="event => changeOpacity(termsMapping[term.id], event)"
+                            @input="event => changeOpacity(termsMapping[term.id], event)">
+
+                        <input v-else
+                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+                            v-model="noTermOpacity">
+                    </div>
                 </div>
-
-                <div class="opacity">
-                    <input v-if="term.id"
-                        class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                        :disabled="!terms[termsMapping[term.id]].visible"
-                        :value="terms[termsMapping[term.id]].opacity"
-                        @change="event => changeOpacity(termsMapping[term.id], event)"
-                        @input="event => changeOpacity(termsMapping[term.id], event)">
-
-                    <input v-else
-                        class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                        v-model="noTermOpacity">
-                </div>
-            </div>
+            </template>
         </ontology-tree>
     </div>
     <div class="has-text-right">
@@ -54,10 +57,10 @@ import OntologyTree from "@/components/ontology/OntologyTree";
 export default {
     name: "ontology-panel",
     components: {OntologyTree},
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             searchString: ""
@@ -172,14 +175,12 @@ input[type="range"].slider {
     width: 80px;
     display: block;
 }
-</style>
 
-<style>
-.ontology-panel .checkbox .control-label {
+>>> .checkbox .control-label {
     padding: 0px !important;
 }
 
-.ontology-panel .ontology-tree .sl-vue-tree-node-item, .ontology-panel .ontology-tree .no-result {
+>>> .ontology-tree .sl-vue-tree-node-item, >>> .ontology-tree .no-result {
     line-height: 2;
     font-size: 0.9em;
 }

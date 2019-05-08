@@ -4,19 +4,21 @@
     <p>{{ $t("error-loading-image") }}</p>
 </div>
 <div v-else class="cytomine-viewer">
-    <b-loading :is-full-page="false" :active="loading"></b-loading>
+    <b-loading :is-full-page="false" :active="loading" />
     <div v-if="!loading" class="maps-wrapper">
         <div class="map-cell" v-for="idx in nbHorizontalCells*nbVerticalCells" :key="idx"
-                :style="`height:${elementHeight}%; width:${elementWidth}%;`">
-            <cytomine-image v-if="idx <= nbMaps"
+            :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+        >
+            <cytomine-image
+                v-if="idx <= nbMaps"
                 :idViewer="idViewer"
                 :index="idx-1"
                 :key="`${idViewer}-${idx}-${viewer.maps[idx-1].imageInstance.id}`"
-                @close="closeMap(idx-1)">
-            </cytomine-image>
+                @close="closeMap(idx-1)"
+            />
         </div>
 
-        <image-selector :idViewer="idViewer"></image-selector>
+        <image-selector :idViewer="idViewer" />
     </div>
 </div>
 </template>
@@ -78,9 +80,15 @@ export default {
             this.findIdViewer();
         },
         idViewer(_, old) {
-            if(old != null) {
+            if(old) {
                 this.loading = true;
                 this.loadViewer();
+            }
+        },
+        viewer() {
+            if(!this.viewer) {
+                console.log("Viewer closed from external source");
+                this.$router.push(`/project/${this.$route.params.idProject}`);
             }
         },
         nbMaps() {
@@ -89,13 +97,14 @@ export default {
     },
     methods: {
         findIdViewer() {
-            if(this.paramIdViewer != null) {
+            if(this.paramIdViewer) {
                 this.idViewer = this.paramIdViewer;
                 return;
             }
 
             for(let id in this.viewers) {
-                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") == this.$route.params.idImages) {
+                // if viewer containing the targetted images, and only them, store its id
+                if(this.viewers[id].maps.map(map => map.imageInstance.id).join("-") === this.$route.params.idImages) {
                     this.idViewer = id;
                     return;
                 }
@@ -105,7 +114,7 @@ export default {
         },
 
         closeMap(index) {
-            if(this.nbMaps == 1) {
+            if(this.nbMaps === 1) {
                 this.$store.commit("removeViewer", this.idViewer);
                 this.$router.push(`/project/${this.$route.params.idProject}`);
             }
@@ -116,7 +125,7 @@ export default {
 
         async loadViewer() {
             try {
-                if(this.viewer == null) {
+                if(!this.viewer) {
                     await this.$store.dispatch("addViewer", {
                         idViewer: this.idViewer,
                         idImages: this.idImages

@@ -1,7 +1,7 @@
 <template>
 <div id="app" class="wrapper">
     <notifications position="top center" width="30%" :max="5">
-        <template slot="body" slot-scope="props">
+        <template #body="props">
             <div class="notification vue-notification" :class="props.item.type">
                 <button class="delete" @click="props.close"></button>
                 <strong class="notification-title">
@@ -20,13 +20,13 @@
             {{$t("core-cannot-be-reached")}}
         </div>
 
-        <login v-else-if="!authenticated"></login>
+        <login v-else-if="!currentUser" />
 
         <template v-else>
-            <cytomine-navbar></cytomine-navbar>
+            <cytomine-navbar />
             <div class="bottom">
                 <keep-alive include="cytomine-storage">
-                    <router-view v-if="currentUser"></router-view>
+                    <router-view v-if="currentUser" />
                 </keep-alive>
             </div>
         </template>
@@ -35,14 +35,14 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
-
 import CytomineNavbar from "./components/layout/CytomineNavbar.vue";
 import Login from "./components/user/Login.vue";
 
 import {Cytomine} from "cytomine-client";
 
-const PING_INTERVAL = 20000;
+import constants from "@/utils/constants.js";
+import ifvisible from "ifvisible";
+ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
     name: "app",
@@ -54,15 +54,44 @@ export default {
             timeout: null
         };
     },
-    computed: mapState({
-        currentUser: state => state.currentUser.user,
-        authenticated: state => state.currentUser.authenticated,
-        project: state => state.project.project
-    }),
+    computed: {
+        currentUser() {
+            return this.$store.state.currentUser.user;
+        },
+        language() {
+            return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
+        },
+        project() {
+            return this.$store.state.project.project;
+        }
+    },
+    watch: {
+        language() {
+            let locale = this.language.toLowerCase();
+            this.$i18n.locale = locale;
+            this.$moment.locale(locale);
+        }
+    },
     methods: {
-        async ping() {
+        async loginWithToken() {
             try {
-                await Cytomine.instance.ping(this.project ? this.project.id : null);
+                await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+                await this.$store.dispatch("fetchUser");
+            }
+            catch(error) {
+                console.log(error);
+                this.$notify({type: "error", text: this.$t("invalid-token")});
+            }
+        },
+        async ping() {
+            if(!ifvisible.now()){
+                return; // window not visible or inactive user => stop pinging
+            }
+            try {
+                let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+                if(this.currentUser && !authenticated) {
+                    await this.$store.dispatch("logout");
+                }
             }
             catch(error) {
                 console.log(error);
@@ -70,19 +99,25 @@ export default {
             }
 
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(this.ping, PING_INTERVAL);
+            this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
         }
     },
     async created() {
-        try {
-            await this.$store.dispatch("fetchUser");
+        if(this.$route.query.token && this.$route.query.username) {
+            await this.loginWithToken();
         }
-        catch(error) {
-            console.log(error);
-            this.communicationError = true;
+        else {
+            try {
+                await this.$store.dispatch("fetchUser");
+            }
+            catch(error) {
+                console.log(error);
+                this.communicationError = true;
+            }
         }
         this.loading = false;
-        this.timeout = setTimeout(this.ping, PING_INTERVAL);
+        this.ping();
+        ifvisible.on("wakeup", this.ping);
     }
 };
 </script>

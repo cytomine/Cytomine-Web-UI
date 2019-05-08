@@ -2,48 +2,53 @@
 <template>
 <div class="layers">
     <h1>{{ $t("annotation-layers") }}</h1>
-    <b-field>
-        <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
-            <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
-                {{ layerName(layer) }}
-            </option>
-        </b-select>
-        <button class="button is-small" @click="addLayer()" :disabled="selectedLayer == null">{{ $t("button-add") }}</button>
-    </b-field>
-    <table class="table layers-table">
-        <thead>
-            <tr>
-                <th class="checkbox-column"><span class="far fa-eye"></span></th>
-                <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
-                <th class="name-column"></th>
-                <th class="checkbox-column"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.visible" @change="toggleLayerVisibility(index)">
-                </td>
-                <td class="checkbox-column">
-                    <input type="checkbox" :checked="layer.drawOn" :disabled="!canDraw(layer)" @change="toggleLayerDrawOn(index)">
-                </td>
-
-                <td class="name-column">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+        <p> {{ $t("unexpected-error-info-message") }} </p>
+    </b-message>
+    <template v-else>
+        <b-field>
+            <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
+                <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
                     {{ layerName(layer) }}
-                </td>
-                <td class="checkbox-column">
-                    <button class="button is-small" @click="removeLayer(index)">
-                        <span class="fas fa-times"></span>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </option>
+            </b-select>
+            <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t("button-add") }}</button>
+        </b-field>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="checkbox-column"><span class="far fa-eye"></span></th>
+                    <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
+                    <th class="name-column"></th>
+                    <th class="checkbox-column"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
+                    <td class="checkbox-column">
+                        <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(index)" />
+                    </td>
+                    <td class="checkbox-column">
+                        <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(index)" />
+                    </td>
 
-    <div class="opacity">
-        <label>{{ $t("layers-opacity") }}</label>
-        <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
-    </div>
+                    <td class="name-column">
+                        {{ layerName(layer) }}
+                    </td>
+                    <td class="checkbox-column">
+                        <button class="button is-small" @click="removeLayer(index)">
+                            <span class="fas fa-times"></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="opacity">
+            <label>{{ $t("layers-opacity") }}</label>
+            <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
+        </div>
+    </template>
 </div>
 </template>
 
@@ -53,13 +58,15 @@ import {ProjectDefaultLayerCollection} from "cytomine-client";
 
 export default {
     name: "annotations-panel",
-    props: [
-        "idViewer",
-        "index",
-        "layersToPreload"
-    ],
+    props: {
+        idViewer: String,
+        index: Number,
+        layersToPreload: Array
+    },
     data() {
         return {
+            error: false,
+
             layers: [], // Array<User> (representing user layers)
             indexLayers: [],
             selectedLayer: null
@@ -117,30 +124,34 @@ export default {
     },
     methods: {
         annotationEventHandler(annot) {
-            if(annot.image == this.image.id) {
+            if(annot.image === this.image.id) {
                 this.fetchIndexLayers();
             }
         },
         reloadAnnotationsHandler(idImage) {
-            if(idImage == null || idImage == this.image.id) {
+            if(!idImage || idImage === this.image.id) {
                 this.fetchIndexLayers();
             }
         },
 
         layerName(layer) {
+            if(layer.isReview) {
+                return this.$t("review-layer");
+            }
+
             let name = fullName(layer);
 
-            let indexLayer = this.indexLayers.find(index => index.user == layer.id) || {};
+            let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
             return `${name} (${indexLayer.countAnnotation || 0})`;
         },
 
         canDraw(layer) {
-            return this.$store.getters.canEditLayer(layer.id);
+            return !layer.isReview && this.$store.getters.canEditLayer(layer.id);
         },
 
         addLayerById(id, visible) {
-            let layer = this.layers.find(layer => layer.id == id);
-            if(layer != null) {
+            let layer = this.layers.find(layer => layer.id === id);
+            if(layer) {
                 this.addLayer(layer, visible);
             }
         },
@@ -151,7 +162,7 @@ export default {
             }
 
             layer.visible = visible;
-            layer.drawOn = (layer.id == this.currentUser.id && this.canDraw(layer));
+            layer.drawOn = (layer.id === this.currentUser.id && this.canDraw(layer));
             this.$store.dispatch("addLayer", {idViewer: this.idViewer, index: this.index, layer});
 
             this.selectedLayer = null;
@@ -184,35 +195,62 @@ export default {
 
         async fetchLayers() {
             this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
+            if(this.image.inReview || this.image.reviewed) {
+                this.layers.push({
+                    id: -1,
+                    isReview: true
+                });
+            }
         },
 
         async fetchIndexLayers(force=false) {
-            if(!force && this.activePanel != "layers") {
+            if(!force && this.activePanel !== "layers") {
                 return;
             }
             this.indexLayers = await this.image.fetchAnnotationsIndex();
         }
     },
     async created() {
-        await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
-        if(this.imageWrapper.selectedLayers == null) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-            this.addLayerById(this.currentUser.id);
+        try {
+            await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
+        }
+        catch(error) {
+            console.log(error);
+            this.error = true;
+            this.$notify({type: "error", text: this.$t("notif-error-loading-annotation-layers")});
+            return;
+        }
+
+        let layersToAdd = [];
+        if(this.layersToPreload) {
+            this.layersToPreload.forEach(id => layersToAdd.push({id, visible: true}));
+        }
+
+        if(!this.imageWrapper.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+            if(!this.layersToPreload || !this.layersToPreload.includes(this.currentUser.id)) {
+                layersToAdd.push({id: this.currentUser.id, visible: true});
+            }
 
             try {
                 let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
                     filterKey: "project",
                     filterValue: this.project.id
                 });
-                defaultLayers.array.forEach(({user, hideByDefault}) => this.addLayerById(user, !hideByDefault));
+
+                let addedIds = layersToAdd.map(layer => layer.id);
+
+                defaultLayers.array.forEach(({user, hideByDefault}) => {
+                    if(!addedIds.includes(user)) {
+                        layersToAdd.push({id: user, visible: !hideByDefault});
+                    }
+                });
             }
             catch(error) {
                 console.log(error);
             }
         }
 
-        if(this.layersToPreload != null) {
-            this.layersToPreload.forEach(id => this.addLayerById(id));
-        }
+        layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
     },
     mounted() {
         this.$eventBus.$on(["addAnnotation", "deleteAnnotation"], this.annotationEventHandler);
@@ -225,52 +263,51 @@ export default {
 };
 </script>
 
-<style>
-
-.layers select {
+<style scoped>
+>>> select {
     width: 220px;
 }
 
-.layers-table {
+.table {
     margin-bottom: 10px !important;
     font-size: 0.9em;
 }
 
-.layers-table tbody {
+.table tbody {
     display:block;
     overflow:auto;
     max-height: 100px;
 }
 
-.layers-table thead tr {
+.table thead tr {
    display: block;
 }
 
-.layers .table td, .layers .table th {
+td, th {
     padding: 3px !important;
     vertical-align: middle !important;
 }
 
-.layers td .button {
+td .button {
     width: 17px;
     height: 17px;
     padding: 0px;
 }
 
-th.checkbox-column, td.checkbox-column {
+.checkbox-column {
     width: 25px;
     text-align: center !important;
 }
 
-th.name-column, td.name-column {
+.name-column {
     width: 200px;
 }
 
-.layers .checkbox .control-label {
+>>> .checkbox .control-label {
     padding: 0px !important;
 }
 
-.layers input[type="range"].slider {
+>>> input[type="range"].slider {
     margin: 0px;
 }
 

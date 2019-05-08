@@ -2,14 +2,18 @@
 <div class="draw-tools-wrapper">
     <div class="buttons has-addons" v-if="isToolDisplayed('select')">
         <button v-tooltip="$t('select')"
-                class="button is-small" :class="{'is-selected': activeTool == 'select'}" :disabled="ongoingCalibration"
+                class="button is-small" :class="{'is-selected': activeTool === 'select'}"
                 @click="activateTool('select')" v-shortkey.once="['s']" @shortkey="activateTool('select')">
             <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
         </button>
     </div>
 
-    <div class="buttons has-addons term-selection" :class="{'has-preview': termsToAssociate.length > 0}"
-         v-click-outside="() => showTermSelector = false">
+    <div
+        v-if="terms && terms.length > 0"
+        class="buttons has-addons term-selection"
+        :class="{'has-preview': termsToAssociate.length > 0}"
+        v-click-outside="() => showTermSelector = false"
+    >
         <button v-tooltip="$t('terms-new-annotation')" 
                 class="button is-small" :disabled="disabledDraw" 
                 @click="showTermSelector = !showTermSelector">
@@ -21,87 +25,74 @@
         </div>
 
         <div class="ontology-tree-container" v-show="showTermSelector">
-            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small"></b-input>
-            <ontology-tree class="ontology-tree"
+            <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
+            <ontology-tree
+                class="ontology-tree"
                 v-model="termsToAssociate"
                 :ontology="ontology"
-                :searchString="searchStringTerm">
-            </ontology-tree>
+                :searchString="searchStringTerm"
+            />
         </div>
     </div>
 
     <div class="buttons has-addons">
         <button v-if="isToolDisplayed('point')" :disabled="disabledDraw" v-tooltip="$t('point')"
-                class="button is-small" :class="{'is-selected': activeTool == 'point'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'point'}"
                 @click="activateTool('point')" v-shortkey.once="['o']" @shortkey="activateTool('point')">
             <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('line')" :disabled="disabledDraw" v-tooltip="$t('line')"
-                class="button is-small" :class="{'is-selected': activeTool == 'line'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'line'}"
                 @click="activateTool('line')">
             <span class="icon is-small"><i class="fas fa-minus"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('freehand-line')" :disabled="disabledDraw" v-tooltip="$t('freehand-line')"
-                class="button is-small" :class="{'is-selected': activeTool == 'freehand-line'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'freehand-line'}"
                 @click="activateTool('freehand-line')">
             <span class="icon is-small">
-                <icon-line-free-hand></icon-line-free-hand>
+                <icon-line-free-hand />
             </span>
         </button>
 
         <!-- QUESTION: redefine expected behaviour
         <button class="button is-small" :disabled="disabledDraw" title="Arrow"
-                @click="activateTool('arrow')" :class="{'is-selected': activeTool == 'arrow'}">
+                @click="activateTool('arrow')" :class="{'is-selected': activeTool === 'arrow'}">
             <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
         </button> -->
 
         <button v-if="isToolDisplayed('rectangle')" :disabled="disabledDraw" v-tooltip="$t('rectangle')"
-                class="button is-small" :class="{'is-selected': activeTool == 'rectangle'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'rectangle'}"
                 @click="activateTool('rectangle')">
             <span class="icon is-small"><i class="far fa-square"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('circle')" :disabled="disabledDraw" v-tooltip="$t('circle')"
-                class="button is-small" :class="{'is-selected': activeTool == 'circle'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'circle'}"
                 @click="activateTool('circle')">
             <span class="icon is-small"><i class="far fa-circle"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('polygon')" :disabled="disabledDraw" v-tooltip="$t('polygon')"
-                class="button is-small" :class="{'is-selected': activeTool == 'polygon'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'polygon'}"
                 @click="activateTool('polygon')">
             <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('freehand-polygon')" :disabled="disabledDraw" v-tooltip="$t('freehand-polygon')"
-                class="button is-small" :class="{'is-selected': activeTool == 'freehand-polygon'}"
+                class="button is-small" :class="{'is-selected': activeTool === 'freehand-polygon'}"
                 @click="activateTool('freehand-polygon')" v-shortkey.once="['f']" @shortkey="activateTool('freehand-polygon')">
             <span class="icon is-small">
-                <icon-polygon-free-hand></icon-polygon-free-hand>
+                <icon-polygon-free-hand />
             </span>
         </button>
     </div>
 
-    <div class="buttons has-addons">
-        <!-- TODO: would be better if correct add and correct remove were targeted on a previously selected annot
-        backend modif required (https://github.com/cytomine/Cytomine-core/issues/1141) -->
-        <button v-if="isToolDisplayed('union')" :disabled="disabledDraw" v-tooltip="$t('freehand-correct-add')"
-                class="button is-small" :class="{'is-selected': activeTool == 'correct-add'}"
-                @click="activateTool('correct-add')">
-            <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
-        </button>
-
-        <button v-if="isToolDisplayed('diff')" :disabled="disabledDraw" v-tooltip="$t('freehand-correct-remove')"
-                class="button is-small" :class="{'is-selected': activeTool == 'correct-remove'}"
-                @click="activateTool('correct-remove')">
-            <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
-        </button>
-    </div>
-
     <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons">
-        <button class="button is-small" :disabled="selectedFeature == null" v-tooltip="$t('display-annot-details')" @click="displayAnnotDetails = !displayAnnotDetails" :class="{'is-selected': displayAnnotDetails && selectedFeature != null}">
+        <button class="button is-small" :disabled="!selectedFeature" v-tooltip="$t('display-annot-details')"
+                :class="{'is-selected': displayAnnotDetails && selectedFeature}"
+                @click="displayAnnotDetails = !displayAnnotDetails">
             <span class="icon is-small"><i class="fas fa-info"></i></span>
         </button>
     </div>
@@ -114,19 +105,33 @@
         </button>
 
         <button v-if="isToolDisplayed('edit')" :disabled="isToolDisabled('edit')" v-tooltip="$t('modify')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'modify'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'modify'}"
                 @click="activateEditTool('modify')">
             <span class="icon is-small"><i class="fas fa-edit"></i></span>
         </button>
 
+        <button v-if="isToolDisplayed('union')" :disabled="isToolDisabled('correct-add')"
+                v-tooltip="$t('freehand-correct-add')"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'correct-add'}"
+                @click="activateEditTool('correct-add')">
+            <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
+        </button>
+
+        <button v-if="isToolDisplayed('diff')" :disabled="isToolDisabled('correct-remove')"
+                v-tooltip="$t('freehand-correct-remove')"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'correct-remove'}"
+                @click="activateEditTool('correct-remove')">
+            <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
+        </button>
+
         <button v-if="isToolDisplayed('move')" :disabled="isToolDisabled('move')" v-tooltip="$t('move')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'translate'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'translate'}"
                 @click="activateEditTool('translate')">
             <span class="icon is-small"><i class="fas fa-arrows-alt"></i></span>
         </button>
 
         <button v-if="isToolDisplayed('rotate')" :disabled="isToolDisabled('rotate')" v-tooltip="$t('rotate')"
-                class="button is-small" :class="{'is-selected': activeEditTool == 'rotate'}"
+                class="button is-small" :class="{'is-selected': activeEditTool === 'rotate'}"
                 @click="activateEditTool('rotate')">
             <span class="icon is-small"><i class="fas fa-sync-alt"></i></span>
         </button>
@@ -139,13 +144,13 @@
     </div>
 
     <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons">
-        <button :disabled="actions.length == 0 || ongoingCalibration" v-tooltip="$t('undo')"
+        <button :disabled="actions.length === 0" v-tooltip="$t('undo')"
             class="button is-small"
             @click="undo()" v-shortkey.once="['ctrl', 'z']" @shortkey="undo()">
             <span class="icon is-small"><i class="fas fa-undo"></i></span>
         </button>
 
-        <button :disabled="undoneActions.length == 0 || ongoingCalibration" v-tooltip="$t('redo')"
+        <button :disabled="undoneActions.length === 0" v-tooltip="$t('redo')"
                 class="button is-small"
                 @click="redo()" v-shortkey.once="['ctrl', 'y']" @shortkey="redo()">
             <span class="icon is-small"><i class="fas fa-redo"></i></span>
@@ -161,7 +166,8 @@ import IconLineFreeHand from "@/components/icons/IconLineFreeHand";
 
 import WKT from "ol/format/WKT";
 
-import {Annotation} from "cytomine-client";
+import {Cytomine, Annotation} from "cytomine-client";
+import {Action, updateTermProperties} from "@/utils/annotation-utils.js";
 
 export default {
     name: "draw-tools",
@@ -170,10 +176,10 @@ export default {
         IconPolygonFreeHand,
         IconLineFreeHand
     },
-    props: [
-        "idViewer",
-        "index"
-    ],
+    props: {
+        idViewer: String,
+        index: Number
+    },
     data() {
         return {
             showTermSelector: false,
@@ -194,9 +200,6 @@ export default {
         image() {
             return this.imageWrapper.imageInstance;
         },
-        ongoingCalibration() {
-            return this.imageWrapper.ongoingCalibration;
-        },
         terms() {
             return this.imageWrapper.terms;
         },
@@ -209,8 +212,8 @@ export default {
             }
         },
         backgroundTermsNewAnnot() {
-            if(this.termsToAssociate.length == 1) {
-                return this.terms.find(term => this.termsToAssociate[0] == term.id).color;
+            if(this.termsToAssociate.length === 1) {
+                return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
             }
             else {
                 return "#e2e2e2";
@@ -244,7 +247,7 @@ export default {
             return this.imageWrapper.selectedFeatures;
         },
         selectedFeature() {
-            if(this.selectedFeatures.length == 1) {
+            if(this.selectedFeatures.length === 1) {
                 return this.selectedFeatures[0];
             }
         },
@@ -252,10 +255,10 @@ export default {
             return this.imageWrapper.selectedLayers || [];
         },
         noActiveLayer() {
-            return (this.layers.find(layer => layer.drawOn) == null);
+            return !this.layers.find(layer => layer.drawOn);
         },
         disabledDraw() {
-            return this.noActiveLayer || this.ongoingCalibration;
+            return this.noActiveLayer;
         },
         actions() {
             return this.imageWrapper.actions;
@@ -269,29 +272,34 @@ export default {
             if(value) {
                 this.activeTool = "select";
             }
+        },
+        selectedFeature(feature) {
+            // disable correct tools if no feature is selected
+            if(!feature && ["correct-add", "correct-remove"].includes(this.activeEditTool)) {
+                this.activeEditTool = null;
+            }
         }
     },
     methods: {
         isToolDisplayed(tool) {
-            let displayed = this.configUI[`project-tools-${tool}`];
-            return (displayed || displayed == null); // TODO: replace with return displayed once all tools are managed in backend
+            return this.configUI[`project-tools-${tool}`];
         },
 
         isToolDisabled(tool) {
-            if(this.selectedFeature == null) {
+            if(!this.selectedFeature) {
                 return true; // no feature selected -> all edit tools disabled
             }
 
-            if(!this.$store.getters.canEditLayer(this.selectedFeature.properties.annot.user)) {
+            if(!this.$store.getters.canEditAnnot(this.selectedFeature.properties.annot)) {
                 return true;
             }
 
             let geomType = this.selectedFeature.geometry.type;
-            if(geomType == "Point") {
-                return (tool != "move" && tool != "delete"); // disable all tools except move and delete for points
+            if(geomType === "Point") {
+                return (tool !== "move" && tool !== "delete"); // disable all tools except move and delete for points
             }
-            else if(geomType == "Line") {
-                return (tool == "fill"); // disable fill tool for lines
+            else if(geomType === "LineString") {
+                return ["fill", "correct-add", "correct-remove"].includes(tool); // disable fill and correct tools for lines
             }
             else {
                 return false;
@@ -304,7 +312,7 @@ export default {
 
         activateEditTool(tool) {
             this.activeTool = "select";
-            this.activeEditTool = (this.activeEditTool == tool) ? null : tool; // toggle behaviour
+            this.activeEditTool = (this.activeEditTool === tool) ? null : tool; // toggle behaviour
         },
 
         toggleTerm(indexTerm) {
@@ -317,18 +325,22 @@ export default {
 
         async fill() {
             let feature = this.selectedFeature;
-            if(feature == null) {
+            if(!feature) {
                 return;
             }
 
             this.activateEditTool(null);
             let annot = feature.properties.annot.clone();
-            let oldAnnot = annot.clone();
 
             try {
                 await annot.fill();
                 this.$eventBus.$emit("editAnnotation", annot);
-                this.$store.commit("addAction", {idViewer: this.idViewer, index: this.index, annot, oldAnnot});
+                this.$store.commit("addAction", {
+                    idViewer: this.idViewer,
+                    index: this.index,
+                    annot,
+                    type: Action.UPDATE
+                });
             }
             catch(err) {
                 this.$notify({type: "error", text: this.$t("notif-error-annotation-fill")});
@@ -337,7 +349,7 @@ export default {
 
         async deleteAnnot() {
             let feature = this.selectedFeature;
-            if(feature == null) {
+            if(!feature) {
                 return;
             }
 
@@ -350,8 +362,8 @@ export default {
                 this.$store.commit("addAction", {
                     idViewer: this.idViewer,
                     index: this.index,
-                    annot: null,
-                    oldAnnot: annot
+                    annot: annot,
+                    type: Action.DELETE
                 });
             }
             catch(err) {
@@ -359,7 +371,7 @@ export default {
             }
         },
         confirmDeletion() {
-            if(this.selectedFeature == null) {
+            if(!this.selectedFeature) {
                 return;
             }
 
@@ -377,7 +389,7 @@ export default {
         async undo() {
             let action = this.actions[this.actions.length - 1];
             try {
-                let opposedAction = await this.reverseAction(action);
+                let opposedAction = await this.reverseAction(action, true);
                 this.$store.commit("undoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
@@ -388,7 +400,7 @@ export default {
         async redo() {
             let action = this.undoneActions[this.undoneActions.length - 1];
             try {
-                let opposedAction = await this.reverseAction(action);
+                let opposedAction = await this.reverseAction(action, false);
                 this.$store.commit("redoAction", {idViewer: this.idViewer, index: this.index, opposedAction});
             }
             catch(err) {
@@ -396,29 +408,43 @@ export default {
                 this.$notify({type: "error", text: this.$t("notif-error-redo")});
             }
         },
-        async reverseAction({annot, oldAnnot}) {
-            // TODO: take into account prop/term/description/attached files when recreating annotation 
-            // (or use backend system for undo/redo ; https://github.com/cytomine/Cytomine-core/issues/1145)
-            let newAnnot = null;
+        async reverseAction({annot, type, command}, undo) {
+            let newType = type;
 
-            if(oldAnnot == null) { // annotation was created
+            if(type === Action.CREATE) {
                 await Annotation.delete(annot.id);
                 this.$eventBus.$emit("deleteAnnotation", annot);
+                newType = Action.DELETE;
+                command = Cytomine.instance.lastCommand;
             }
-            else if(annot == null) { // annotation was deleted
-                newAnnot = oldAnnot.clone();
-                newAnnot.id = null; // set ID to null in order to force creation of a new annotation
-                await newAnnot.save();
+            else if(type === Action.DELETE) {
+                let collection = await Cytomine.instance.undo(command); // always undo if annotation was deleted
+                let newAnnot = await this.getUpdatedAnnotation(collection);
                 this.$eventBus.$emit("addAnnotation", newAnnot);
+                newType = Action.CREATE;
             }
             else { // annotation was updated
-                newAnnot = annot.clone();
-                newAnnot.location = oldAnnot.location; // TODO: fix
-                await newAnnot.save();
+                let collection;
+                if(undo) {
+                    collection = await Cytomine.instance.undo(command);
+                }
+                else {
+                    collection = await Cytomine.instance.redo(command);
+                }
+                let newAnnot = await this.getUpdatedAnnotation(collection);
                 this.$eventBus.$emit("editAnnotation", newAnnot);
             }
 
-            return {annot: newAnnot, oldAnnot: annot};
+            return {annot, command, type: newType};
+        },
+        async getUpdatedAnnotation(collection) {
+            for(let model of collection) {
+                if(model.annotation) {
+                    let annot = new Annotation(model.annotation);
+                    await updateTermProperties(annot);
+                    return annot;
+                }
+            }
         }
     }
 };
