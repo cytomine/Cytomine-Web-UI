@@ -35,10 +35,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import CytomineSlider from '@/components/form/CytomineSlider';
-
-const debounceDelay = 500;
 
 export default {
   name: 'color-manipulation',
