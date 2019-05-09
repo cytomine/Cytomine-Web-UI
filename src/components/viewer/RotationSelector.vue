@@ -22,7 +22,7 @@
       </div>
       <button class="delete is-small" @click="expanded=false"></button>
     </div>
-    <cytomine-slider v-model="degreesRotation" :max="360" :show="expanded" :revision="revisionSlider" />
+    <cytomine-slider v-model="degreesRotation" :max="360" :integerOnly="false" />
   </div>
 </div>
 </template>
@@ -38,8 +38,7 @@ export default {
   },
   data() {
     return {
-      expanded: false,
-      revisionSlider: 0
+      expanded: false
     };
   },
   computed: {
@@ -54,7 +53,7 @@ export default {
     },
     degreesRotation: {
       get() {
-        return Math.round(this.rotation * 180 / Math.PI);
+        return Math.round(this.rotation * 180 / Math.PI * 1000) / 1000;
       },
       set(value) {
         this.$store.dispatch(this.viewerModule + 'setRotation', {
@@ -67,16 +66,7 @@ export default {
   methods: {
     increment(inc) {
       this.degreesRotation = (this.degreesRotation + inc + 360) % 360;
-    },
-    updateMapSize() {
-      this.revisionSlider++;
     }
-  },
-  mounted() {
-    this.$eventBus.$on('updateMapSize', this.updateMapSize);
-  },
-  beforeDestroy() {
-    this.$eventBus.$off('updateMapSize', this.updateMapSize);
   }
 };
 </script>

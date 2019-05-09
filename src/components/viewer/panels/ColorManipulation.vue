@@ -6,25 +6,25 @@
     <tr>
       <td>{{ $t('brightness') }}</td>
       <td>
-        <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders" />
+        <cytomine-slider v-model="brightness" :min="-255" :max="255" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('contrast') }}</td>
       <td>
-        <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders" />
+        <cytomine-slider v-model="contrast" :min="-255" :max="255" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('saturation') }}</td>
       <td>
-        <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders" />
+        <cytomine-slider v-model="saturation" :min="-100" :max="100" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('hue') }}</td>
       <td>
-        <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders" />
+        <cytomine-slider v-model="hue" :min="-180" :max="180" />
       </td>
     </tr>
   </table>
@@ -46,11 +46,6 @@ export default {
   props: {
     index: String
   },
-  data() {
-    return {
-      revisionSliders: 0
-    };
-  },
   computed: {
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -67,7 +62,7 @@ export default {
         return this.imageWrapper.colors.brightness;
       },
       set(value) {
-        this.setBrightness(value);
+        this.$store.commit(this.imageModule + 'setBrightness', value);
       }
     },
     contrast: {
@@ -75,7 +70,7 @@ export default {
         return this.imageWrapper.colors.contrast;
       },
       set(value) {
-        this.setContrast(value);
+        this.$store.commit(this.imageModule + 'setContrast', value);
       }
     },
     hue: {
@@ -83,7 +78,7 @@ export default {
         return this.imageWrapper.colors.hue;
       },
       set(value) {
-        this.setHue(value);
+        this.$store.commit(this.imageModule + 'setHue', value);
       }
     },
     saturation: {
@@ -91,47 +86,14 @@ export default {
         return this.imageWrapper.colors.saturation;
       },
       set(value) {
-        this.setSaturation(value);
-      }
-    }
-  },
-  watch: {
-    activePanel(panel) {
-      if(panel === 'colors') {
-        this.revisionSliders++;
+        this.$store.commit(this.imageModule + 'setSaturation', value);
       }
     }
   },
   methods: {
     reset() {
       this.$store.commit(this.imageModule + 'resetColorManipulation');
-    },
-
-    setBrightness: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setBrightness', value);
-    }, debounceDelay),
-
-    setContrast: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setContrast', value);
-    }, debounceDelay),
-
-    setHue: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setHue', value);
-    }, debounceDelay),
-
-    setSaturation: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setSaturation', value);
-    }, debounceDelay),
-
-    updateMapSize() {
-      this.revisionSliders++;
     }
-  },
-  mounted() {
-    this.$eventBus.$on('updateMapSize', this.updateMapSize);
-  },
-  beforeDestroy() {
-    this.$eventBus.$off('updateMapSize', this.updateMapSize);
   }
 };
 </script>
