@@ -66,7 +66,6 @@
 
       <b-table
         :data="filteredJobs"
-        ref="table"
         :paginated="true"
         :current-page.sync="currentPage"
         :per-page="perPage"
@@ -222,16 +221,8 @@ export default {
     },
     addJob(job) {
       job.username = this.currentUser.username; // HACK because not correctly returned by core
-      if(!this.availableSoftwares.includes(job.softwareName)) {
-        this.selectedSoftwares.push(job.softwareName);
-      }
-
-      if(!this.availableLaunchers.includes(job.username)) {
-        this.selectedLaunchers.push(job.username);
-      }
-
       this.jobs.unshift(job);
-      this.$refs.table.toggleDetails(job);
+      this.openedDetails = [job.id, ...this.openedDetails];
     },
     async deleteJob(jobToDelete) {
       try {
