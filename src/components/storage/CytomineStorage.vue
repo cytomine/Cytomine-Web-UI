@@ -271,7 +271,7 @@ export default {
         str += `&idStorage=${this.selectedStorage.id}`;
       }
       if(this.selectedProjects) {
-        str += `&idProject=${this.selectedProjects.map(project => project.id).join(",")}`;
+        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
       }
       return str;
     },
@@ -341,9 +341,10 @@ export default {
     async refreshStatusSessionUploads() {
       let pendingStatus = [
         UploadedFileStatus.UPLOADED,
-        UploadedFileStatus.TO_DEPLOY,
-        UploadedFileStatus.UNCOMPRESSED,
-        UploadedFileStatus.TO_CONVERT
+        UploadedFileStatus.DETECTING_FORMAT,
+        UploadedFileStatus.EXTRACTING_DATA,
+        UploadedFileStatus.CONVERTING,
+        UploadedFileStatus.DEPLOYING,
       ];
 
       let unfinishedConversions = false;

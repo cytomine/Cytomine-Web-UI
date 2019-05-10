@@ -43,12 +43,23 @@ export default {
       };
     },
     result() {
-      if (this.file.status % 2 === 0 && this.file.status >= 100)
-        return 'success';
-      else if (this.file.status % 2 === 0)
-        return 'info';
-      else
-        return 'danger';
+      switch(this.file.status) {
+        case UploadedFileStatus.UPLOADED:
+        case UploadedFileStatus.DETECTING_FORMAT:
+        case UploadedFileStatus.EXTRACTING_DATA:
+        case UploadedFileStatus.CONVERTING:
+        case UploadedFileStatus.DEPLOYING:
+        case UploadedFileStatus.EXTRACTED:
+          return 'info';
+        case UploadedFileStatus.CONVERTED:
+        case UploadedFileStatus.DEPLOYED:
+          return 'success';
+        case UploadedFileStatus.ERROR_FORMAT:
+        case UploadedFileStatus.ERROR_CONVERSION:
+        case UploadedFileStatus.ERROR_DEPLOYMENT:
+        case UploadedFileStatus.ERROR_EXTRACTION:
+          return 'danger';
+      }
     },
     tagClass() {
       return 'is-' + this.result;
