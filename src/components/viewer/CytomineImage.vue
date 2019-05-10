@@ -717,7 +717,7 @@ $colorOpenedPanelLink: #6c95c8;
   background: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px;
 
   .ol-overviewmap {
     position: static;
