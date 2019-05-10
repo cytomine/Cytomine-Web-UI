@@ -229,10 +229,6 @@ h2 .button {
   text-transform: none;
 }
 
->>> .sl-vue-tree {
-  max-width: 80em;
-}
-
 >>> .sl-vue-tree-sidebar {
   display: flex;
   align-items: top;
