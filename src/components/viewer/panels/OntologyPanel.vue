@@ -1,187 +1,187 @@
 <template>
-<div class="ontology-panel">
-    <h1>{{ $t("terms") }}</h1>
-    <div class="ontology-tree-wrapper">
-        <div class="header-tree">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded />
+<div>
+  <h1>{{ $t('terms') }}</h1>
+  <div class="ontology-tree-wrapper">
+    <div class="header-tree">
+      <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded />
 
-            <div class="sidebar-tree">
-                <div class="visibility">
-                    <i class="far fa-eye"></i>
-                </div>
-                <div class="opacity">{{$t("opacity")}}</div>
-            </div>
+      <div class="sidebar-tree">
+        <div class="visibility">
+          <i class="far fa-eye"></i>
         </div>
-        <ontology-tree :ontology="ontology"
-                       :allowSelection="false"
-                       :searchString="searchString"
-                       :additionalNodes="additionalNodes">
-            <template #custom-sidebar="{term}">
-                <div class="sidebar-tree">
-                    <div class="visibility">
-                        <b-checkbox
-                            v-if="term.id"
-                            size="is-small"
-                            :value="terms[termsMapping[term.id]].visible"
-                            @input="toggleTermVisibility(termsMapping[term.id])"
-                        />
-
-                        <b-checkbox v-else size="is-small" v-model="displayNoTerm" />
-                    </div>
-
-                    <div class="opacity">
-                        <input v-if="term.id"
-                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                            :disabled="!terms[termsMapping[term.id]].visible"
-                            :value="terms[termsMapping[term.id]].opacity"
-                            @change="event => changeOpacity(termsMapping[term.id], event)"
-                            @input="event => changeOpacity(termsMapping[term.id], event)">
-
-                        <input v-else
-                            class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
-                            v-model="noTermOpacity">
-                    </div>
-                </div>
-            </template>
-        </ontology-tree>
+        <div class="opacity">{{$t('opacity')}}</div>
+      </div>
     </div>
-    <div class="has-text-right">
-        <button class="button is-small" @click="resetOpacities()">{{$t("button-reset-opacities")}}</button>
-    </div>
+    <ontology-tree
+      :ontology="ontology"
+      :allowSelection="false"
+      :searchString="searchString"
+      :additionalNodes="additionalNodes"
+    >
+      <template #custom-sidebar="{term}">
+        <div class="sidebar-tree">
+          <div class="visibility">
+            <b-checkbox
+              v-if="term.id"
+              size="is-small"
+              :value="terms[termsMapping[term.id]].visible"
+              @input="toggleTermVisibility(termsMapping[term.id])"
+            />
+
+            <b-checkbox v-else size="is-small" v-model="displayNoTerm" />
+          </div>
+
+          <div class="opacity">
+            <input
+              v-if="term.id"
+              class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+              :disabled="!terms[termsMapping[term.id]].visible"
+              :value="terms[termsMapping[term.id]].opacity"
+              @change="event => changeOpacity(termsMapping[term.id], event)"
+              @input="event => changeOpacity(termsMapping[term.id], event)"
+            >
+
+            <input
+              v-else
+              class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
+              v-model="noTermOpacity"
+            >
+          </div>
+        </div>
+      </template>
+    </ontology-tree>
+  </div>
+  <div class="has-text-right">
+    <button class="button is-small" @click="resetOpacities()">{{$t('button-reset-opacities')}}</button>
+  </div>
 </div>
 </template>
 
 <script>
-import OntologyTree from "@/components/ontology/OntologyTree";
+import {get} from '@/utils/store-helpers';
+import OntologyTree from '@/components/ontology/OntologyTree';
 
 export default {
-    name: "ontology-panel",
-    components: {OntologyTree},
-    props: {
-        idViewer: String,
-        index: Number
+  name: 'ontology-panel',
+  components: {OntologyTree},
+  props: {
+    index: String
+  },
+  data() {
+    return {
+      searchString: ''
+    };
+  },
+  computed: {
+    ontology: get('currentProject/ontology'),
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
-    data() {
-        return {
-            searchString: ""
-        };
+    imageWrapper() {
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
-    computed: {
-        ontology() {
-            return this.$store.state.project.ontology;
-        },
-        imageWrapper() {
-            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
-        },
-        terms() {
-            return this.imageWrapper.terms;
-        },
-        termsMapping() {
-            let mapping = {};
-            this.terms.forEach((term, idx) => mapping[term.id] = idx);
-            return mapping;
-        },
-        additionalNodes() {
-            return [{id: 0, name: this.$t("no-term")}];
-        },
-        displayNoTerm: {
-            get() {
-                return this.imageWrapper.displayNoTerm;
-            },
-            set(value) {
-                this.$store.commit("setDisplayNoTerm", {idViewer: this.idViewer, index: this.index, value});
-            }
-        },
-        noTermOpacity: {
-            get() {
-                return this.imageWrapper.noTermOpacity;
-            },
-            set(value) {
-                this.$store.commit("setNoTermOpacity", {
-                    idViewer: this.idViewer,
-                    index: this.index,
-                    opacity: Number(value)
-                });
-            }
-        },
+    terms() {
+      return this.imageWrapper.style.terms;
     },
-    methods: {
-        toggleTermVisibility(index) {
-            this.$store.commit("toggleTermVisibility", {idViewer: this.idViewer, index: this.index, indexTerm: index});
-        },
-        changeOpacity(index, event) {
-            let opacity = event.target.value;
-            this.$store.commit("setTermOpacity", {idViewer: this.idViewer, index: this.index, indexTerm: index, opacity});
-        },
-        resetOpacities() {
-            this.$store.commit("resetTermOpacities", {idViewer: this.idViewer, index: this.index});
-        }
+    termsMapping() {
+      let mapping = {};
+      this.terms.forEach((term, idx) => mapping[term.id] = idx);
+      return mapping;
+    },
+    additionalNodes() {
+      return [{id: 0, name: this.$t('no-term')}];
+    },
+    displayNoTerm: {
+      get() {
+        return this.imageWrapper.style.displayNoTerm;
+      },
+      set(value) {
+        this.$store.dispatch(this.imageModule + 'setDisplayNoTerm', value);
+      }
+    },
+    noTermOpacity: {
+      get() {
+        return this.imageWrapper.style.noTermOpacity;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setNoTermOpacity', Number(value));
+      }
+    },
+  },
+  methods: {
+    toggleTermVisibility(index) {
+      this.$store.dispatch(this.imageModule + 'toggleTermVisibility', index);
+    },
+    changeOpacity(index, event) {
+      let opacity = Number(event.target.value);
+      this.$store.commit(this.imageModule + 'setTermOpacity', {indexTerm: index, opacity});
+    },
+    resetOpacities() {
+      this.$store.commit(this.imageModule + 'resetTermOpacities');
     }
+  }
 };
 </script>
 
 <style scoped>
-.ontology-panel h1 {
-    padding-bottom: 10px !important;
-}
-
 .ontology-tree-wrapper {
-    max-height: 185px;
-    overflow: auto;
-    margin-bottom: 5px !important;
+  max-height: 17em;
+  overflow: auto;
+  margin-bottom: 0.4em !important;
 }
 
 
 input[type="range"].slider {
-    margin: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 .header-tree {
-    display: flex;
-    justify-content: right;
-    position: sticky;
-    top: 0px;
-    z-index: 5;
-    padding-bottom: 3px;
-    background: #f2f2f2;
-    border: 2px solid #DBDBDB;
-    border-width: 0px 0px 2px !important;
+  display: flex;
+  justify-content: right;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-bottom: 0.3em;
+  background: #f2f2f2;
+  border: 2px solid #DBDBDB;
+  border-width: 0 0 2px !important;
 }
 
 .header-tree .opacity {
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 11px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.8em;
 }
 
 .sidebar-tree {
-    padding-right: 5px;
-    display: flex;
-    align-items: center;
+  padding-right: 0.4em;
+  display: flex;
+  align-items: center;
 }
 
 .visibility {
-    width: 30px;
-    height: 25px;
-    display: flex;
-    justify-content: center;
+  width: 2.8em;
+  height: 2.1em;
+  display: flex;
+  justify-content: center;
 }
 
 .header-tree .visibility {
-    height: unset;
+  height: auto;
 }
 
 .opacity {
-    width: 80px;
-    display: block;
+  width: 6em;
+  display: block;
 }
 
 >>> .checkbox .control-label {
-    padding: 0px !important;
+  padding: 0 !important;
 }
 
 >>> .ontology-tree .sl-vue-tree-node-item, >>> .ontology-tree .no-result {
-    line-height: 2;
-    font-size: 0.9em;
+  line-height: 2;
+  font-size: 0.9em;
 }
 </style>

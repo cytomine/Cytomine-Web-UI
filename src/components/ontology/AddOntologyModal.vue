@@ -1,75 +1,63 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-    <form>
-        <div class="modal-card add-image-modal">
-            <header class="modal-card-head">
-                <p class="modal-card-title">{{$t("create-ontology")}}</p>
-            </header>
-            <section class="modal-card-body">
-                <b-field :label="$t('name')"
-                         :type="!validName && displayErrors ? 'is-danger' : null"
-                         :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                    <b-input v-model="name" />
-                </b-field>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button" type="button" @click="$emit('update:active', false)">
-                    {{$t("button-cancel")}}
-                </button>
-                <button class="button is-link" :disabled="!validName && displayErrors" @click="createOntology()">
-                    {{$t("button-save")}}
-                </button>
-            </footer>
-        </div>
-    </form>
-</b-modal>
+<form @submit.prevent="createOntology()">
+  <cytomine-modal :active="active" :title="$t('create-ontology')" @close="$emit('update:active', false)">
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" name="name" v-validate="'required'" />
+    </b-field>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
-import {Ontology} from "cytomine-client";
+import {Ontology} from 'cytomine-client';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
-    name: "add-ontology-modal",
-    props: {
-        active: Boolean
-    },
-    data() {
-        return {
-            name: "",
-            displayErrors: false
-        };
-    },
-    computed: {
-        validName() {
-            return this.name.length > 0;
-        }
-    },
-    watch: {
-        active(val) {
-            if(val) {
-                this.name = "";
-                this.displayErrors = false;
-            }
-        }
-    },
-    methods: {
-        async createOntology() {
-            if(!this.validName) {
-                this.displayErrors = true;
-                return;
-            }
-
-            try {
-                let ontology = await new Ontology({name: this.name}).save();
-                this.$notify({type: "success", text: this.$t("notif-success-ontology-creation")});
-                this.$emit("newOntology", ontology);
-                this.$emit("update:active", false);
-            }
-            catch(error) {
-                console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-ontology-creation")});
-            }
-        }
+  name: 'add-ontology-modal',
+  props: {
+    active: Boolean
+  },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
+  data() {
+    return {
+      name: ''
+    };
+  },
+  watch: {
+    active(val) {
+      if(val) {
+        this.name = '';
+      }
     }
+  },
+  methods: {
+    async createOntology() {
+      let result = await this.$validator.validateAll();
+      if(!result) {
+        return;
+      }
+
+      try {
+        let ontology = await new Ontology({name: this.name}).save();
+        this.$notify({type: 'success', text: this.$t('notif-success-ontology-creation')});
+        this.$emit('newOntology', ontology);
+        this.$emit('update:active', false);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-ontology-creation')});
+      }
+    }
+  }
 };
 </script>

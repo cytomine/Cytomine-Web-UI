@@ -1,212 +1,248 @@
 <template>
-<div class="box box-annotations">
-    <h2> {{ title }} ({{nbAnnotations}}) </h2>
-    <template v-if="!annotations.length">
-        <em class="no-result">{{ $t("no-annotation") }}</em>
-    </template>
-    <template v-else>
-        <v-popover v-for="annot in annotations" :key="title + annot.id" placement="right" trigger="manual" 
-        :open="openedAnnot === annot.id" :auto-hide="false">
-            <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
+<div class="box">
+  <b-loading :is-full-page="false" class="small" :active="loading" />
+  <h2> {{ title }} ({{nbAnnotations}}) </h2>
+  <template v-if="error">
+    <b-message type="is-danger" has-icon icon-size="is-small">
+      {{$t('failed-fetch-annots')}}
+    </b-message>
+  </template>
+  <template v-else-if="!annotations.length">
+    <em class="no-result">{{ $t('no-annotation') }}</em>
+  </template>
+  <template v-else>
+    <v-popover
+      v-for="annot in annotations" :key="title + annot.id"
+      placement="right"
+      trigger="manual"
+      :open="openedAnnot === annot.id"
+      :auto-hide="false"
+    > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-            <div class="annot-preview" :style="styleAnnotDetails(annot)" @click="toggle(annot.id)">
-                <button class="button is-small">
-                    <i :class="['fas', openedAnnot === annot.id ? 'fa-minus' : 'fa-plus']"></i>
-                </button>
-            </div>
+      <div class="annot-preview" :style="styleAnnotDetails(annot)" @click.self="viewAnnot(annot)">
+        <button class="button is-small" @click="toggle(annot.id)">
+          <i :class="['fas', openedAnnot === annot.id ? 'fa-minus' : 'fa-plus']"></i>
+        </button>
+      </div>
 
-            <template #popover>
-                <annotation-details
-                    v-click-outside.capture="(event) => close(event, annot.id)"
-                    :annotation="annot"
-                    :terms="allTerms"
-                    :users="allUsers"
-                    :images="allImages"
-                    @addTerm="term => $emit('addTerm', term)"
-                    @updateTerms="$emit('update', annot.id)"
-                    @deletion="$emit('update', annot.id)"
-                    v-if="openedAnnot === annot.id"
-                /> <!-- Display component only if it is the currently displayed annotation
-                        (prevents fetching unnecessary information) -->
-            </template>
-        </v-popover>
-        
-        <b-pagination
-            :total="nbAnnotations"
-            :current="currentPage"
-            size="is-small"
-            :per-page="nbPerPage"
-            @change="fetchPage"
-        />
-    </template>
-</div> 
+      <template #popover>
+        <annotation-details
+          v-click-outside.capture="(event) => close(event, annot.id)"
+          :annotation="annot"
+          :terms="allTerms"
+          :users="allUsers"
+          :images="allImages"
+          @addTerm="term => $emit('addTerm', term)"
+          @updateTerms="$emit('update', annot.id)"
+          @deletion="$emit('update', annot.id)"
+          v-if="openedAnnot === annot.id"
+        /> <!-- Display component only if it is the currently displayed annotation
+                (prevents fetching unnecessary information) -->
+      </template>
+    </v-popover>
+
+    <b-pagination
+      :total="nbAnnotations"
+      :current.sync="currentPage"
+      size="is-small"
+      :per-page="nbPerPage"
+    />
+  </template>
+</div>
 </template>
 
 <script>
-import AnnotationDetails from "./AnnotationDetails";
+import {get} from '@/utils/store-helpers';
 
-import {AnnotationCollection} from "cytomine-client";
+import AnnotationDetails from './AnnotationDetails';
+
+import {AnnotationCollection} from 'cytomine-client';
 
 export default {
-    name: "list-annotations-by-term",
-    components: {AnnotationDetails},
-    props: {
-        nbPerPage: Number,
-        size: Number,
-        color: String,
+  name: 'list-annotations-by-term',
+  props: {
+    nbPerPage: Number,
+    size: Number,
+    color: String,
 
-        term: Object,
-        multipleTerms: Boolean,
-        noTerm: Boolean,
-        imagesIds: Array,
-        usersIds: Array,
-        reviewed: Boolean,
-        reviewUsersIds: Array,
+    term: Object,
+    multipleTerms: Boolean,
+    noTerm: Boolean,
+    imagesIds: Array,
+    usersIds: Array,
+    reviewed: Boolean,
+    reviewUsersIds: Array,
+    afterThan: Number,
+    beforeThan: Number,
 
-        allTerms: Array,
-        allUsers: Array,
-        allImages: Array,
-        
-        revision: Number
-    },
-    data() {
-        return {
-            annotations: [],
-            nbAnnotations: 0,
-            currentPage: 1,
-            openedAnnot: 0
-        };
-    },
-    computed: {
-        collection() {
-            this.revision; // to ensure that collection is reloaded if revision changes
-            return new AnnotationCollection({
-                images: this.imagesIds,
-                term: this.multipleTerms || this.noTerm ? null : this.term.id,
-                noTerm: this.noTerm,
-                users: this.usersIds,
-                reviewed: this.reviewed,
-                reviewUsers: this.reviewUsersIds,
-                multipleTerm: this.multipleTerms, 
-                showTerm: true,
-                showGIS: true,
-                max: this.nbPerPage
-            });
-        },
-        title() {
-            if(this.multipleTerms) {
-                return this.$t("multiple-terms");
-            }
-            if(this.noTerm) {
-                return this.$t("no-term");
-            }
-            return this.term.name;
-        }
-    },
-    watch: {
-        collection() {
-            this.fetchPage(1);
-        }
-    },
-    methods: {
-        async fetchPage(numPage) {
-            this.currentPage = numPage;
-            if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-                    || (this.reviewed && !this.reviewUsersIds.length)) {
-                this.annotations = [];
-                return;
-            }
+    allTerms: Array,
+    allUsers: Array,
+    allImages: Array,
 
-            try {
-                let data = await this.collection.fetchPage(numPage - 1);
-                this.annotations = data.array;
-                this.nbAnnotations = data.totalNbItems;
-
-                // if openedAnnot no longer in collection (can happen if term was removed from annotation), 
-                // reset openedAnnot value (otherwise, if annot added again to collection, popover reopens)
-                if(!this.annotations.map(annot => annot.id).includes(this.openedAnnot)) {
-                    this.openedAnnot = 0;
-                }
-            }
-            catch(error) {
-                this.annotations = [];
-                this.nbAnnotations = 0;
-                this.$notify({
-                    type: "error", 
-                    text: this.$t(
-                        "notif-error-fetch-annots", 
-                        {details: this.title}
-                    )
-                });
-            }
-        },
-        toggle(id) {
-            this.openedAnnot = this.openedAnnot === id ? 0 : id;
-        },
-        close(event, id) {
-            // do not close the popover if click was performed in modal or in notification
-            let el = event.target;
-            let isModal = false;
-            while(el && !(isModal = el.classList.contains("modal") || el.classList.contains("notifications"))) {
-                el = el.parentElement;
-            }
-
-            if(!isModal && this.openedAnnot === id) {
-                this.openedAnnot = 0;
-            }
-        },
-        cropURL(annot) {
-            let outlineParams = this.color ? "&draw=true&color=0x" + this.color : "";
-            return `${annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
-        },
-        styleAnnotDetails(annot) {
-            return {
-                backgroundImage: `url(${this.cropURL(annot)})`,
-                width: this.size + "px",
-                height: this.size + "px"
-            };
-        }
+    revision: Number
+  },
+  components: {AnnotationDetails},
+  data() {
+    return {
+      loading: false,
+      error: false,
+      annotations: [],
+      nbAnnotations: 0,
+      openedAnnot: 0
+    };
+  },
+  computed: {
+    collection() {
+      this.revision; // to ensure that collection is reloaded if revision changes
+      return new AnnotationCollection({
+        images: this.imagesIds,
+        term: this.multipleTerms || this.noTerm ? null : this.term.id,
+        noTerm: this.noTerm,
+        users: this.usersIds,
+        reviewed: this.reviewed,
+        reviewUsers: this.reviewUsersIds,
+        multipleTerm: this.multipleTerms,
+        showTerm: true,
+        showGIS: true,
+        afterThan: this.afterThan,
+        beforeThan: this.beforeThan,
+        max: this.nbPerPage
+      });
     },
-    created() {
-        this.fetchPage(1);
+    title() {
+      if(this.multipleTerms) {
+        return this.$t('multiple-terms');
+      }
+      if(this.noTerm) {
+        return this.$t('no-term');
+      }
+      return this.term.name;
+    },
+    currentProject: get('currentProject/project'),
+    projectModule() {
+      return this.$store.getters['currentProject/currentProjectModule'];
+    },
+    currentPage: {
+      get() {
+        return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.term.id] || 1;
+      },
+      set(page) {
+        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {term: this.term.id, page});
+      }
     }
+  },
+  watch: {
+    currentPage() {
+      this.fetchPage();
+    },
+    collection() {
+      this.fetchPage();
+    }
+  },
+  methods: {
+    async fetchPage() {
+      if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
+                    || (this.reviewed && !this.reviewUsersIds.length)) {
+        this.annotations = [];
+        this.nbAnnotations = 0;
+        return;
+      }
+
+      this.loading = true;
+
+      try {
+        let data = await this.collection.fetchPage(this.currentPage - 1);
+        this.annotations = data.array;
+        this.nbAnnotations = data.totalNbItems;
+
+        // if openedAnnot no longer in collection (can happen if term was removed from annotation),
+        // reset openedAnnot value (otherwise, if annot added again to collection, popover reopens)
+        if(!this.annotations.map(annot => annot.id).includes(this.openedAnnot)) {
+          this.openedAnnot = 0;
+        }
+      }
+      catch(error) {
+        if(this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page
+          this.currentPage = 1;
+          return;
+        }
+
+        console.log(error);
+        this.nbAnnotations = 0;
+        this.error = true;
+      }
+      this.loading = false;
+    },
+    viewAnnot(annot) {
+      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+    },
+    toggle(id) {
+      this.openedAnnot = this.openedAnnot === id ? 0 : id;
+    },
+    close(event, id) {
+      // do not close the popover if click was performed in modal or in notification
+      let el = event.target;
+      let isModal = false;
+      while(el && !(isModal = (el.classList.contains('modal') || el.classList.contains('notifications')
+        || el.classList.contains('annot-preview')))
+      ) {
+        el = el.parentElement;
+      }
+
+      if(!isModal && this.openedAnnot === id) {
+        this.openedAnnot = 0;
+      }
+    },
+    cropURL(annot) {
+      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
+      return `${annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
+    },
+    styleAnnotDetails(annot) {
+      return {
+        backgroundImage: `url(${this.cropURL(annot)})`,
+        width: this.size + 'px',
+        height: this.size + 'px'
+      };
+    }
+  },
+  created() {
+    this.fetchPage();
+  }
 };
 </script>
 
 <style scoped>
 .box {
-    position: relative;
+  position: relative;
 }
 
 .annot-preview {
-    display: inline-block;
-    background-position: center center;
-    background-repeat: no-repeat;
-    margin: 10px;
-    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
-    border: 3px solid white;
-    cursor: pointer;
-    text-align: right;
+  display: inline-block;
+  background-position: center center;
+  background-repeat: no-repeat;
+  margin: 10px;
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+  border: 3px solid white;
+  cursor: pointer;
+  text-align: right;
 }
 
 .annot-preview .button {
-    font-size: 10px;
-    width: 20px;
-    height: 20px;
-    box-sizing: border-box;
-    position: relative;
-    left: 3px;
-    bottom: 3px;
-    border: none;
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  position: relative;
+  left: 3px;
+  bottom: 3px;
+  border: none;
 }
 
 .no-result {
-    color: grey;
+  color: grey;
 }
-</style>
 
-<style>
-.box-annotations ul {
-    justify-content: flex-end;
+>>> ul.pagination-list {
+  justify-content: flex-end;
 }
 </style>

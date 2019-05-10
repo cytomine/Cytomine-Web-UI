@@ -1,172 +1,122 @@
 
 <template>
 <div class="color-manipulation">
-    <h1>{{$t("colors")}}</h1>
-    <table>
-        <tr>
-            <td class="name">{{ $t("brightness") }}</td>
-            <td>
-                <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders" />
-            </td>
-        </tr>
-        <tr>
-            <td class="name">{{ $t("contrast") }}</td>
-            <td>
-                <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders" />
-            </td>
-        </tr>
-        <tr>
-            <td class="name">{{ $t("saturation") }}</td>
-            <td>
-                <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders" />
-            </td>
-        </tr>
-        <tr>
-            <td class="name">{{ $t("hue") }}</td>
-            <td>
-                <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders" />
-            </td>
-        </tr>
-    </table>
-    <div class="actions">
-        <button class="button is-small" @click="reset()">{{$t("button-reset")}}</button>
-    </div>
+  <h1>{{$t('colors')}}</h1>
+  <table>
+    <tr>
+      <td>{{ $t('brightness') }}</td>
+      <td>
+        <cytomine-slider v-model="brightness" :min="-255" :max="255" />
+      </td>
+    </tr>
+    <tr>
+      <td>{{ $t('contrast') }}</td>
+      <td>
+        <cytomine-slider v-model="contrast" :min="-255" :max="255" />
+      </td>
+    </tr>
+    <tr>
+      <td>{{ $t('saturation') }}</td>
+      <td>
+        <cytomine-slider v-model="saturation" :min="-100" :max="100" />
+      </td>
+    </tr>
+    <tr>
+      <td>{{ $t('hue') }}</td>
+      <td>
+        <cytomine-slider v-model="hue" :min="-180" :max="180" />
+      </td>
+    </tr>
+  </table>
+  <div class="actions">
+    <button class="button is-small" @click="reset()">{{$t('button-reset')}}</button>
+  </div>
 </div>
 </template>
 
 <script>
-import _ from "lodash";
-import CytomineSlider from "@/components/form/CytomineSlider";
-
-const debounceDelay = 500;
+import CytomineSlider from '@/components/form/CytomineSlider';
 
 export default {
-    name: "color-manipulation",
-    components: {CytomineSlider},
-    props: {
-        idViewer: String,
-        index: Number
+  name: 'color-manipulation',
+  components: {CytomineSlider},
+  props: {
+    index: String
+  },
+  computed: {
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
     },
-    data() {
-        return {
-            revisionSliders: 0
-        };
+    imageWrapper() {
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
-    computed: {
-        imageWrapper() {
-            return this.$store.state.images.viewers[this.idViewer].maps[this.index];
-        },
-        activePanel() {
-            return this.imageWrapper.activePanel;
-        },
-
-        brightness: {
-            get() {
-                return this.imageWrapper.brightness;
-            },
-            set(value) {
-                this.setBrightness(value);
-            }
-        },
-        contrast: {
-            get() {
-                return this.imageWrapper.contrast;
-            },
-            set(value) {
-                this.setContrast(value);
-            }
-        },
-        hue: {
-            get() {
-                return this.imageWrapper.hue;
-            },
-            set(value) {
-                this.setHue(value);
-            }
-        },
-        saturation: {
-            get() {
-                return this.imageWrapper.saturation;
-            },
-            set(value) {
-                this.setSaturation(value);
-            }
-        }
+    activePanel() {
+      return this.imageWrapper.activePanel;
     },
-    watch: {
-        activePanel(panel) {
-            if(panel === "colors") {
-                this.revisionSliders++;
-            }
-        }
+
+    brightness: {
+      get() {
+        return this.imageWrapper.colors.brightness;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setBrightness', value);
+      }
     },
-    methods: {
-        reset() {
-            this.$store.commit("resetColorManipulation", {idViewer: this.idViewer, index: this.index});
-        },
-
-        setBrightness: _.debounce(function(value) {
-            this.$store.commit("setBrightness", {idViewer: this.idViewer, index: this.index, value});
-        }, debounceDelay),
-
-        setContrast: _.debounce(function(value) {
-            this.$store.commit("setContrast", {idViewer: this.idViewer, index: this.index, value});
-        }, debounceDelay),
-
-        setHue: _.debounce(function(value) {
-            this.$store.commit("setHue", {idViewer: this.idViewer, index: this.index, value});
-        }, debounceDelay),
-
-        setSaturation: _.debounce(function(value) {
-            this.$store.commit("setSaturation", {idViewer: this.idViewer, index: this.index, value});
-        }, debounceDelay),
-
-        updateMapSize() {
-            this.revisionSliders++;
-        }
+    contrast: {
+      get() {
+        return this.imageWrapper.colors.contrast;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setContrast', value);
+      }
     },
-    mounted() {
-        this.$eventBus.$on("updateMapSize", this.updateMapSize);
+    hue: {
+      get() {
+        return this.imageWrapper.colors.hue;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setHue', value);
+      }
     },
-    beforeDestroy() {
-        this.$eventBus.$off("updateMapSize", this.updateMapSize);
+    saturation: {
+      get() {
+        return this.imageWrapper.colors.saturation;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setSaturation', value);
+      }
     }
+  },
+  methods: {
+    reset() {
+      this.$store.commit(this.imageModule + 'resetColorManipulation');
+    }
+  }
 };
 </script>
 
 <style scoped>
 td, tr {
-    vertical-align: middle !important;
+  vertical-align: middle !important;
 }
 
-td.name {
-    font-weight: 600;
-    text-align: right;
-    padding: 4px;
+td:first-child {
+  font-weight: 600;
+  text-align: right;
+  padding: 0.35em 0.5em;
 }
 
-td:not(.name) {
-    width: 100%;
-}
-
-.metrics {
-    width: 48px;
-}
-
-input[type="range"].slider {
-    margin-top: 3px;
-    margin-bottom: 3px;
+td:last-child {
+  width: 100%;
 }
 
 .actions {
-    margin-top: 10px;
-    text-align: right;
+  margin-top: 1em;
+  text-align: right;
 }
-</style>
 
-<style>
-.color-manipulation .vue-slider {
-    margin-left: 5px;
-    margin-right: 50px;
+>>> .vue-slider {
+  margin-left: 0.4em;
+  margin-right: 4em;
 }
 </style>

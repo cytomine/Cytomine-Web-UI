@@ -1,122 +1,112 @@
 <template>
-<b-modal :active="active" @close="$emit('update:active', false)" :has-modal-card="true">
-    <form>
-        <div class="modal-card add-image-modal">
-            <header class="modal-card-head">
-                <p class="modal-card-title">{{$t("create-project")}}</p>
-            </header>
-            <section class="modal-card-body">
-                <b-field :label="$t('name')"
-                         :type="!validName && displayErrors ? 'is-danger' : null"
-                         :message="!validName && displayErrors ? $t('field-cannot-be-empty') : ''">
-                    <b-input v-model="name" />
-                </b-field>
+<form @submit.prevent="createProject()">
+  <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" name="name" v-validate="'required'" />
+    </b-field>
 
-                <b-field :label="$t('ontology')">
-                    <b-radio v-model="ontology" native-value="NO">
-                        {{$t("no-ontology")}}
-                    </b-radio>
-                </b-field>
-                <b-field>
-                    <b-radio v-model="ontology" native-value="NEW">
-                        {{$t("create-ontology-for-project")}}
-                    </b-radio>
-                </b-field>
-                <b-field>
-                    <b-radio v-model="ontology" native-value="EXISTING">
-                        {{$t("use-existing-ontology")}}
-                    </b-radio>
-                </b-field>
+    <b-field :label="$t('ontology')">
+      <b-radio v-model="ontology" native-value="NO">
+        {{$t('no-ontology')}}
+      </b-radio>
+    </b-field>
+    <b-field>
+      <b-radio v-model="ontology" native-value="NEW">
+        {{$t('create-ontology-for-project')}}
+      </b-radio>
+    </b-field>
+    <b-field>
+      <b-radio v-model="ontology" native-value="EXISTING">
+        {{$t('use-existing-ontology')}}
+      </b-radio>
+    </b-field>
 
-                <b-collapse class="panel" :open="ontology === 'EXISTING'">
-                    <b-field :type="!validOntology && displayErrors ? 'is-danger' : null"
-                            :message="!validOntology && displayErrors ? $t('ontology-must-be-selected') : ''">
-                        <b-select size="is-small" v-model="selectedOntology" :placeholder="$t('select-ontology')">
-                            <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
-                                {{ontology.name}}
-                            </option>
-                        </b-select>
-                    </b-field>
-                </b-collapse>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button" type="button" @click="$emit('update:active', false)">
-                    {{$t("button-cancel")}}
-                </button>
-                <button class="button is-link" :disabled="(!validName || !validOntology) && displayErrors" @click="createProject()">
-                    {{$t("button-save")}}
-                </button>
-            </footer>
-        </div>
-    </form>
-</b-modal>
+    <template v-if="ontology === 'EXISTING'">
+      <b-field :type="{'is-danger': errors.has('ontology')}" :message="errors.first('ontology')">
+        <b-select
+          size="is-small"
+          v-model="selectedOntology"
+          :placeholder="$t('select-ontology')"
+          name="ontology"
+          v-validate="'required'"
+        >
+          <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
+            {{ontology.name}}
+          </option>
+        </b-select>
+      </b-field>
+    </template>
+
+    <template #footer>
+      <button class="button" type="button" @click="$emit('update:active', false)">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
-import {Project, Ontology, OntologyCollection} from "cytomine-client";
+import {Project, Ontology, OntologyCollection} from 'cytomine-client';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
-    name: "add-project-modal",
-    props: {
-        active: Boolean
-    },
-    data() {
-        return {
-            name: "",
-            ontology: "NO",
-            ontologies: [],
-            selectedOntology: null,
-            displayErrors: false
-        };
-    },
-    computed: {
-        validName() {
-            return this.name.length > 0;
-        },
-        validOntology() {
-            return this.ontology !== "EXISTING" || this.selectedOntology;
-        }
-    },
-    watch: {
-        active(val) {
-            if(val) {
-                this.name = "";
-                this.ontology = "NO";
-                this.selectedOntology = null;
-                this.displayErrors = false;
-            }
-        }
-    },
-    methods: {
-        async createProject() {
-            if(!this.validName || !this.validOntology) {
-                this.displayErrors = true;
-                return;
-            }
-
-            try {
-                let idOntology;
-                if(this.ontology === "NEW") {
-                    let ontology = await new Ontology({name: this.name}).save();
-                    idOntology = ontology.id;
-                }
-                else if(this.ontology === "EXISTING") {
-                    idOntology = this.selectedOntology.id;
-                }
-
-                let project = await new Project({name: this.name, ontology: idOntology}).save();
-                this.$notify({type: "success", text: this.$t("notif-success-project-creation")});
-                this.$router.push(`/project/${project.id}/configuration`);
-            }
-            catch(error) {
-                console.log(error);
-                this.$notify({type: "error", text: this.$t("notif-error-project-creation")});
-            }
-        }
-    },
-    async created() {
-        this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
-        this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
+  name: 'add-project-modal',
+  props: {
+    active: Boolean
+  },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
+  data() {
+    return {
+      name: '',
+      ontology: 'NO',
+      ontologies: [],
+      selectedOntology: null
+    };
+  },
+  watch: {
+    active(val) {
+      if(val) {
+        this.name = '';
+        this.ontology = 'NO';
+        this.selectedOntology = null;
+      }
     }
+  },
+  methods: {
+    async createProject() {
+      let result = await this.$validator.validateAll();
+      if(!result) {
+        return;
+      }
+
+      try {
+        let idOntology;
+        if(this.ontology === 'NEW') {
+          let ontology = await new Ontology({name: this.name}).save();
+          idOntology = ontology.id;
+        }
+        else if(this.ontology === 'EXISTING') {
+          idOntology = this.selectedOntology;
+        }
+
+        let project = await new Project({name: this.name, ontology: idOntology}).save();
+        this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
+        this.$router.push(`/project/${project.id}/configuration`);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
+      }
+    }
+  },
+  async created() {
+    this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+    this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
+  }
 };
 </script>
