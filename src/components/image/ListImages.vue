@@ -398,7 +398,8 @@ export default {
     },
 
     setResolution(image, resolution) {
-      image.resolution = resolution;
+      image.physicalSizeX = resolution;
+      image.physicalSizeY = resolution;
       this.formatImage(image);
     },
 
@@ -409,7 +410,7 @@ export default {
 
     formatImage(image) {
       // use $set to make the new props reactive
-      this.$set(image, 'resolutionFormatted', this.formatResolution(image.resolution));
+      this.$set(image, 'resolutionFormatted', this.formatResolution(image.physicalSizeX));
       this.$set(image, 'vendor', vendorFromMime(image.contentType));
       this.$set(image, 'vendorFormatted', this.formatVendor(image.vendor));
       this.$set(image, 'magnificationFormatted', this.formatMagnification(image.magnification));

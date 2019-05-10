@@ -37,7 +37,8 @@ export default {
     },
 
     setResolution(state, resolution) {
-      state.imageInstance.resolution = resolution;
+      state.imageInstance.physicalSizeX = resolution;
+      state.imageInstance.physicalSizeY = resolution;
     },
 
     togglePanel(state, panel) {

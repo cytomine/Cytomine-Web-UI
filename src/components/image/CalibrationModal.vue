@@ -56,7 +56,7 @@ export default {
   watch: {
     active(val) {
       if(val) {
-        this.calibrationField = this.image.resolution;
+        this.calibrationField = this.image.physicalSizeX;
       }
     }
   },
@@ -70,10 +70,11 @@ export default {
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();
-        updateImage.resolution = Number(this.calibrationField)*this.calibrationFactor;
+        updateImage.physicalSizeX = Number(this.calibrationField)*this.calibrationFactor;
+        updateImage.physicalSizeY = Number(this.calibrationField)*this.calibrationFactor;
         await updateImage.save();
 
-        this.$emit('setResolution', updateImage.resolution);
+        this.$emit('setResolution', updateImage.physicalSizeX);
 
         this.$notify({
           type: 'success',

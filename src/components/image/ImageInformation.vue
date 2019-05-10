@@ -15,7 +15,7 @@
     <image-details
       v-if="image"
       :image="image"
-      @setResolution="resolution => image.resolution = resolution"
+      @setResolution="resolution => setResolution(resolution)"
       @setMagnification="magnification => image.magnification = magnification"
       @delete="deleteImage()"
     />
@@ -78,6 +78,10 @@ export default {
     deleteImage() {
       this.$router.push(`/project/${this.image.project}`);
     },
+    setResolution(resolution) {
+      this.image.physicalSizeX = resolution;
+      this.image.physicalSizeY = resolution;
+    }
   },
   created() {
     this.loadImage();

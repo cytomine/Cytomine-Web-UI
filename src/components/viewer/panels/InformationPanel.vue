@@ -94,8 +94,8 @@ export default {
       return this.viewerWrapper.images[this.index].imageInstance;
     },
     resolution() {
-      if(this.image.resolution) {
-        return this.image.resolution.toFixed(3);
+      if(this.image.physicalSizeX) {
+        return this.image.physicalSizeX.toFixed(3);
       }
       else {
         return this.$t('unknown');

@@ -39,8 +39,8 @@ export default {
       return Math.round(magnification * 100) / 100;
     },
     resolution() {
-      if(this.image.resolution) {
-        return Math.pow(2, this.image.depth - this.zoom) * this.image.resolution;
+      if(this.image.physicalSizeX) {
+        return Math.pow(2, this.image.depth - this.zoom) * this.image.physicalSizeX;
       }
     },
     scaleLength() {
