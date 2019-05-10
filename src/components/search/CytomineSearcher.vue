@@ -196,14 +196,16 @@ export default {
   font-size: 0.9em;
   text-transform: uppercase;
 }
-</style>
 
-<style>
 .global-search {
   max-width: 15em;
 }
 
 .no-margin {
   margin: 0 !important;
+}
+
+>>> .global-search .fas {
+  padding-right: 0px !important;
 }
 </style>
