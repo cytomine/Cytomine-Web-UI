@@ -298,8 +298,8 @@ export default {
     availableFormats() {
       let formats = [];
       this.images.forEach(image => {
-        if(!formats.includes(image.extension)) {
-          formats.push(image.extension);
+        if(!formats.includes(image.contentType)) {
+          formats.push(image.contentType);
         }
       });
       return formats;

@@ -66,7 +66,7 @@ export default {
       return images.filter(image => {
         return (!str || (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
           (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0)) &&
-          getters.checkMultiselectFilter('formats', image.extension) &&
+          getters.checkMultiselectFilter('formats', image.contentType) &&
           getters.checkMultiselectFilter('vendors', image.vendorFormatted) &&
           getters.checkMultiselectFilter('magnifications', image.magnificationFormatted) &&
           getters.checkMultiselectFilter('resolutions', image.resolutionFormatted) &&
