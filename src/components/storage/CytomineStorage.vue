@@ -426,7 +426,7 @@ export default {
           cancelToken: fileWrapper.cancelToken.token
         }
       ).then(response => {
-        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadFile.attr);
+        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
         this.refreshStatusSessionUploads();
         this.fetchUploadedFiles();
       }).catch(error => {
