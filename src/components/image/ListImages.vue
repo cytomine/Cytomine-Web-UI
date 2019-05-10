@@ -266,7 +266,8 @@ export default {
         'magnification',
         'numberOfAnnotations',
         'numberOfJobAnnotations',
-        'numberOfReviewedAnnotations'
+        'numberOfReviewedAnnotations',
+        'size'
       ]
     };
   },
@@ -409,7 +410,7 @@ export default {
     formatImage(image) {
       // use $set to make the new props reactive
       this.$set(image, 'resolutionFormatted', this.formatResolution(image.resolution));
-      this.$set(image, 'vendor', vendorFromMime(image.mime));
+      this.$set(image, 'vendor', vendorFromMime(image.contentType));
       this.$set(image, 'vendorFormatted', this.formatVendor(image.vendor));
       this.$set(image, 'magnificationFormatted', this.formatMagnification(image.magnification));
       return image;
