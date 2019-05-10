@@ -160,6 +160,10 @@ html {
   }
 }
 
+.message.is-success .icon {
+  color: $success;
+}
+
 .message {
   font-size: 1em;
 }
