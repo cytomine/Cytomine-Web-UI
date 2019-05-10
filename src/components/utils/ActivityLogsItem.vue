@@ -58,7 +58,7 @@ export default {
     },
     annotationHandler(annot) {
       this.previewUrl = `${annot.url}?maxSize=125&complete=true&thickness=2&increaseArea=1.25&draw=true`;
-      this.route = `/project/${annot.project}/image/${annot.image}/annot/${annot.id}`;
+      this.route = `/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`;
     },
     imageHandler(img) {
       if(img.deleted) {
