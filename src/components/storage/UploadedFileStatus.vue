@@ -32,28 +32,23 @@ export default {
         [UploadedFileStatus.CONVERTED]: 'converted',
         [UploadedFileStatus.DEPLOYED]: 'deployed',
         [UploadedFileStatus.ERROR_FORMAT]: 'error-format',
-        [UploadedFileStatus.ERROR_CONVERT]: 'error-convert',
-        [UploadedFileStatus.UNCOMPRESSED]: 'uncompressed',
-        [UploadedFileStatus.TO_DEPLOY]: 'to-deploy',
-        [UploadedFileStatus.TO_CONVERT]: 'to-convert',
+        [UploadedFileStatus.ERROR_CONVERSION]: 'error-convert',
+        [UploadedFileStatus.EXTRACTED]: 'uncompressed',
         [UploadedFileStatus.ERROR_DEPLOYMENT]: 'error-deployment',
+        [UploadedFileStatus.DETECTING_FORMAT]: 'detecting-format',
+        [UploadedFileStatus.EXTRACTING_DATA]: 'extracting-data',
+        [UploadedFileStatus.ERROR_EXTRACTION]: 'error-extraction',
+        [UploadedFileStatus.CONVERTING]: 'converting',
+        [UploadedFileStatus.DEPLOYING]: 'deploying',
       };
     },
     result() {
-      switch(this.file.status) {
-        case UploadedFileStatus.UPLOADED:
-        case UploadedFileStatus.TO_DEPLOY:
-        case UploadedFileStatus.TO_CONVERT:
-        case UploadedFileStatus.UNCOMPRESSED:
-          return 'info';
-        case UploadedFileStatus.CONVERTED:
-        case UploadedFileStatus.DEPLOYED:
-          return 'success';
-        case UploadedFileStatus.ERROR_FORMAT:
-        case UploadedFileStatus.ERROR_CONVERT:
-        case UploadedFileStatus.ERROR_DEPLOYMENT:
-          return 'danger';
-      }
+      if (this.file.status % 2 === 0 && this.file.status >= 100)
+        return 'success';
+      else if (this.file.status % 2 === 0)
+        return 'info';
+      else
+        return 'danger';
     },
     tagClass() {
       return 'is-' + this.result;

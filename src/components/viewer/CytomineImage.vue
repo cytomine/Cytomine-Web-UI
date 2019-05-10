@@ -16,7 +16,7 @@
         :zoom.sync="zoom"
         :rotation.sync="rotation"
         :max-zoom="maxZoom"
-        :max-resolution="Math.pow(2, image.depth)"
+        :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"
         :projection="projectionName"
         @mounted="viewMounted()"
@@ -425,7 +425,7 @@ export default {
       if(this.routedAnnotation) { // center view on annotation
         let annot = this.routedAnnotation;
         let geometry = new WKT().readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()

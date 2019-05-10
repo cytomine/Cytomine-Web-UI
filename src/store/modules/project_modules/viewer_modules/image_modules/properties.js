@@ -113,7 +113,7 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
     key
   );
 
-    // if several properties with target key for an annotation, concatenate their values
+  // if several properties with target key for an annotation, concatenate their values
   let properties = {};
   propertiesValues.forEach(propVal => {
     if(!properties[propVal.idAnnotation]) {
