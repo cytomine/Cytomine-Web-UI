@@ -10,17 +10,17 @@
       </b-message>
     </div>
     <div class="panel-block" v-else>
-      <b-message type="is-info" has-icon icon-size="is-small">
-        <h2>{{$t('important-notes')}}</h2>
-        <ul class="small-text">
-          <li>{{$t('max-size-upload-info')}}</li>
-          <li>{{$t('allowed-formats-upload-info')}}</li>
-          <li>{{$t('vms-mrxs-upload-info')}}</li>
-          <li>{{$t('zip-upload-info')}}</li>
-          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
-          <li>{{$t('link-to-project-upload-info')}}</li>
-        </ul>
-      </b-message>
+<!--      <b-message type="is-info" has-icon icon-size="is-small">-->
+<!--        <h2>{{$t('important-notes')}}</h2>-->
+<!--        <ul class="small-text">-->
+<!--          <li>{{$t('max-size-upload-info')}}</li>-->
+<!--          <li>{{$t('allowed-formats-upload-info')}}</li>-->
+<!--          <li>{{$t('vms-mrxs-upload-info')}}</li>-->
+<!--          <li>{{$t('zip-upload-info')}}</li>-->
+<!--          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>-->
+<!--          <li>{{$t('link-to-project-upload-info')}}</li>-->
+<!--        </ul>-->
+<!--      </b-message>-->
 
       <div class="columns">
         <div class="column is-one-quarter has-text-right">
