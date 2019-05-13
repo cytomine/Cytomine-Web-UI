@@ -392,7 +392,11 @@ export default {
   },
   methods: {
     async fetchImages() {
-      this.images = (await ImageInstanceCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      this.images = (await ImageInstanceCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id,
+        light: true
+      })).array;
     },
     async fetchUsers() {
       this.users = (await UserCollection.fetchAll()).array;
