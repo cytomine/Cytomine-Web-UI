@@ -1,8 +1,12 @@
 import {HorizontalBar} from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+import {asArray as hexToRgb} from 'ol/color';
+
+const defaultColor = '#eee';
+
 export default {
-  name: 'annotation-contributor-chart',
+  name: 'annotated-images-by-term-chart',
   extends: HorizontalBar,
   props: {
     project: Object,
@@ -23,23 +27,31 @@ export default {
     }
   },
   watch: {
-    queryParams() {
+    async queryParams() {
       this.doRenderChart();
     }
   },
   methods: {
     async doRenderChart() {
-      let contribs = await this.project.fetchStatsAnnotationCreators(this.queryParams);
-      let data = contribs.map(c => c.value);
+      let terms = await this.project.fetchStatsAnnotatedImagesByTerm(this.queryParams);
+      let data = terms.map(term => term.value);
+      let borderColors = terms.map(term => {
+        let [r, g, b] = hexToRgb(term.color || defaultColor);
+        const factor = 0.8;
+        return `rgba(${r*factor}, ${g*factor}, ${b*factor}, 1)`;
+      });
+
       this.$emit('nbElems', data.length);
 
       this.renderChart({
-        labels: contribs.map(c => c.key),
+        labels: terms.map(term => term.key || this.$t('no-term')),
         datasets: [
           {
             data,
-            backgroundColor: '#4480c4',
-            borderWidth: 0
+            backgroundColor: terms.map(term => term.color || defaultColor),
+            borderColor: borderColors,
+            borderWidth: 1,
+            hoverBorderColor: borderColors,
           }
         ]
       }, {

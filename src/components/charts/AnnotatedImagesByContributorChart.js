@@ -2,7 +2,7 @@ import {HorizontalBar} from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 export default {
-  name: 'annotation-contributor-chart',
+  name: 'annotated-images-by-contributor-chart',
   extends: HorizontalBar,
   props: {
     project: Object,
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     async doRenderChart() {
-      let contribs = await this.project.fetchStatsAnnotationCreators(this.queryParams);
+      let contribs = await this.project.fetchStatsAnnotatedImagesByCreator(this.queryParams);
       let data = contribs.map(c => c.value);
       this.$emit('nbElems', data.length);
 
