@@ -329,9 +329,11 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-    baseLayerURLs() { // TODO: image filters (see ULiege repo)
+
+    baseLayerURLs() {
+      let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
-      return this.image.imageServerURLs.map(url => url + params);
+      return this.image.imageServerURLs.map(url => filterPrefix + url + params);
     },
 
     colorManipulationOn() {

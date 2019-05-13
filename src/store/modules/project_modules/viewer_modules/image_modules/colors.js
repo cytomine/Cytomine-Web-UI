@@ -4,7 +4,9 @@ export default {
       brightness: 0,
       contrast: 0,
       hue: 0,
-      saturation: 0
+      saturation: 0,
+
+      filter: null
     };
   },
 
@@ -31,5 +33,9 @@ export default {
       state.hue = 0;
       state.saturation = 0;
     },
+
+    setFilter(state, filter) {
+      state.filter = filter;
+    }
   }
 };
