@@ -220,7 +220,6 @@ export default {
       this.sort = {field, order};
     },
     addJob(job) {
-      job.username = this.currentUser.username; // HACK because not correctly returned by core
       this.jobs.unshift(job);
       this.openedDetails = [job.id, ...this.openedDetails];
     },
