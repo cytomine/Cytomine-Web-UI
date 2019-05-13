@@ -360,7 +360,7 @@ export default {
     },
 
     overviewCollapsed() {
-      return this.overview ? this.overview.getCollapsed() : null;
+      return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
     },
 
     correction() {
@@ -380,6 +380,9 @@ export default {
     viewState() {
       this.savePosition();
     },
+    overviewCollapsed(value) {
+      this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
+    }
   },
   methods: {
     setInitialZoom() {
@@ -452,11 +455,11 @@ export default {
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
       this.overview = new OverviewMap({
-        collapsed: false,
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
-        target: this.$refs.overview
+        target: this.$refs.overview,
+        collapsed: this.imageWrapper.view.overviewCollapsed
       });
       this.$refs.map.$map.addControl(this.overview);
     },
