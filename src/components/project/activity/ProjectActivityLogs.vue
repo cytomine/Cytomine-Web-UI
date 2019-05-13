@@ -44,7 +44,6 @@ export default {
   async created() {
     try {
       let userJobs = (await UserJobCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      userJobs = userJobs.filter(uj => uj.id); // HACK because some returned jobs are empty objects
       userJobs.forEach(uJob => uJob.fullName = fullName(uJob));
       this.userJobs = userJobs;
     }

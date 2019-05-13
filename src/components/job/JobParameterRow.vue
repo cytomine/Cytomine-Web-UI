@@ -136,7 +136,7 @@ export default {
     if(this.processedUri) {
       try {
         let {data} = await Cytomine.instance.api.get(this.processedUri);
-        let options = data.collection.filter(option => option); // HACK because some returned values may be null (TODO fix in core - occurs for cytomine-user-job)
+        let options = data.collection;
         if(this.param.uriSortAttribut) {
           options.sort((a, b) => a[this.param.uriSortAttribut] < b[this.param.uriSortAttribut] ? -1 : 1);
         }
