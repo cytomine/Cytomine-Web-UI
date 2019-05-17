@@ -73,11 +73,15 @@ let width = 2;
 let blue = [0, 153, 255, 1];
 let green = [51, 160, 79, 1];
 let lightGreen = [17, 214, 76, 1];
+let red = [200, 40, 40, 1];
+let lightRed = [255, 56, 56, 1];
 let white = [255, 255, 255, 1];
 
 let blueStroke = new Stroke({color: blue, width: width});
 let greenStroke = new Stroke({color: green, width: width + 1});
 let lightGreenStroke = new Stroke({color: lightGreen, width: width});
+let redStroke = new Stroke({color: red, width: width + 1});
+let lightRedStroke = new Stroke({color: lightRed, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
 export let selectStyles = [
@@ -104,6 +108,17 @@ export let reviewedSelectStyles = [
   new Style({ stroke: whiteStroke }),
   new Style({ stroke: lightGreenStroke }),
   new Style({ image: new Circle({radius: 6, stroke: lightGreenStroke}) })
+];
+
+export let rejectedStyles = [
+  new Style({ stroke: redStroke }),
+  new Style({ image: new Circle({radius: 6, stroke: redStroke}) })
+];
+
+export let rejectedSelectStyles = [
+  new Style({ stroke: whiteStroke }),
+  new Style({ stroke: lightRedStroke }),
+  new Style({ image: new Circle({radius: 6, stroke: lightRedStroke}) })
 ];
 
 // -----

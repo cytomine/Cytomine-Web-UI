@@ -99,7 +99,7 @@ export default {
     },
     shortkeysMapping() {
       // for shortkeys composed of a single key, return the key as srcKey
-      let mapping = ['s', 'o', 'f', 'd', 'p', 'n'].reduce((object, key) => {
+      let mapping = ['s', 'o', 'f', 'd', 'p', 'n', 'a', 'r', 't'].reduce((object, key) => {
         object[key] = [key];
         return object;
       }, {});

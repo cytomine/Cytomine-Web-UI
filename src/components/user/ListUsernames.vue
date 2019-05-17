@@ -1,15 +1,15 @@
 <template>
-<p v-if="filteredUsers.length">
+<span v-if="filteredUsers.length">
   <span v-for="(user, index) in usersToDisplay" :key="user.id">
     <username :user="user" :online="isOnline(user.id)" /><template v-if="index < usersToDisplay.length - 1">, </template>
   </span>
   <button class="button is-small" @click="expanded=!expanded" v-if="tooManyUsers">
     {{ expanded ? $t('button-less') : $t('button-more')}}
   </button>
-</p>
-<p v-else>
+</span>
+<span v-else>
   -
-</p>
+</span>
 </template>
 
 <script>

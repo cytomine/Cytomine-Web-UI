@@ -11,6 +11,7 @@ import style from './image_modules/style';
 import tracking from './image_modules/tracking';
 import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
+import review from './image_modules/review';
 
 import {
   isCluster,
@@ -18,7 +19,9 @@ import {
   selectStyles,
   verticesStyle,
   reviewedStyles,
-  reviewedSelectStyles
+  reviewedSelectStyles,
+  rejectedStyles,
+  rejectedSelectStyles
 } from '@/utils/style-utils.js';
 
 export default {
@@ -118,10 +121,11 @@ export default {
       }
 
       let isReviewed = annot.type === AnnotationType.REVIEWED;
+      let isRejected = state.review.reviewMode && !isReviewed;
 
       // Styles for selected elements
       if(state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
-        styles.push(...isReviewed ? reviewedSelectStyles : selectStyles);
+        styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : selectStyles));
 
         // if in modify mode, display vertices
         if(state.draw.activeEditTool === 'modify') {
@@ -130,6 +134,9 @@ export default {
       }
       else if(isReviewed) {
         styles.push(...reviewedStyles);
+      }
+      else if(isRejected) {
+        styles.push(...rejectedStyles);
       }
 
       // Properties
@@ -170,7 +177,8 @@ export default {
     style,
     tracking,
     undoRedo,
-    view
+    view,
+    review
   }
 };
 

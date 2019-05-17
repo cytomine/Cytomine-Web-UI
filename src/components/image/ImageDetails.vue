@@ -10,6 +10,12 @@
           </router-link>
         </td>
       </tr>
+      <tr v-if="isPropDisplayed('status')">
+        <td class="prop-label">{{$t('status')}}</td>
+        <td class="prop-content">
+          <image-status :image="image" />
+        </td>
+      </tr>
       <tr v-if="isPropDisplayed('numberOfAnnotations')">
         <td class="prop-label">{{$t('user-annotations')}}</td>
         <td class="prop-content">
@@ -171,6 +177,7 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
+import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
 
 import {ImageInstance} from 'cytomine-client';
@@ -184,6 +191,7 @@ export default {
     MagnificationModal,
     CalibrationModal,
     ImageMetadataModal,
+    ImageStatus,
     RenameModal
   },
   props: {

@@ -74,7 +74,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit, rootGetters}) {
+    initialize({commit, rootGetters}) {
       let terms = formatTerms(rootGetters['currentProject/terms'], initialLayersOpacity);
       commit('setTerms', terms);
     },

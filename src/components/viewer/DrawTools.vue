@@ -1,9 +1,9 @@
 <template>
 <div class="draw-tools-wrapper">
-  <div class="buttons has-addons" v-if="isToolDisplayed('select')">
+  <div class="buttons has-addons are-small" v-if="isToolDisplayed('select')">
     <button
       v-tooltip="$t('select')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeTool === 'select'}"
       @click="activateTool('select')"
     >
@@ -11,142 +11,167 @@
     </button>
   </div>
 
-  <div
-    v-if="terms && terms.length > 0"
-    class="buttons has-addons term-selection"
-    :class="{'has-preview': termsToAssociate.length > 0}"
-    v-click-outside="() => showTermSelector = false"
-  >
-    <button
-      v-tooltip="$t('terms-new-annotation')"
-      class="button is-small"
-      :disabled="disabledDraw"
-      @click="showTermSelector = !showTermSelector"
+  <template v-if="!reviewMode"> <!-- drawing new annotations forbidden while reviewing -->
+    <div
+      v-if="terms && terms.length > 0"
+      class="buttons has-addons are-small term-selection"
+      :class="{'has-preview': termsToAssociate.length > 0}"
+      v-click-outside="() => showTermSelector = false"
     >
-      <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
-    </button>
+      <button
+        v-tooltip="$t('terms-new-annotation')"
+        class="button"
+        :disabled="disabledDraw"
+        @click="showTermSelector = !showTermSelector"
+      >
+        <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
+      </button>
 
-    <div class="color-preview" :style="{background: backgroundTermsNewAnnot}">
-      <span v-if="termsToAssociate.length > 1">{{termsToAssociate.length}}</span>
+      <div class="color-preview" :style="{background: backgroundTermsNewAnnot}">
+        <span v-if="termsToAssociate.length > 1">{{termsToAssociate.length}}</span>
+      </div>
+
+      <div class="ontology-tree-container" v-show="showTermSelector">
+        <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
+        <ontology-tree
+          class="ontology-tree"
+          v-model="termsToAssociate"
+          :ontology="ontology"
+          :searchString="searchStringTerm"
+        />
+      </div>
     </div>
 
-    <div class="ontology-tree-container" v-show="showTermSelector">
-      <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
-      <ontology-tree
-        class="ontology-tree"
-        v-model="termsToAssociate"
-        :ontology="ontology"
-        :searchString="searchStringTerm"
-      />
+    <div class="buttons has-addons are-small">
+      <button
+        v-if="isToolDisplayed('point')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('point')"
+        class="button"
+        :class="{'is-selected': activeTool === 'point'}"
+        @click="activateTool('point')"
+      >
+        <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
+      </button>
+
+      <button
+        v-if="isToolDisplayed('line')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('line')"
+        class="button"
+        :class="{'is-selected': activeTool === 'line'}"
+        @click="activateTool('line')"
+      >
+        <span class="icon is-small"><i class="fas fa-minus"></i></span>
+      </button>
+
+      <button
+        v-if="isToolDisplayed('freehand-line')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('freehand-line')"
+        class="button"
+        :class="{'is-selected': activeTool === 'freehand-line'}"
+        @click="activateTool('freehand-line')"
+      >
+        <span class="icon is-small">
+          <icon-line-free-hand />
+        </span>
+      </button>
+
+      <!-- QUESTION: redefine expected behaviour
+      <button class="button" :disabled="disabledDraw" title="Arrow"
+              @click="activateTool('arrow')" :class="{'is-selected': activeTool === 'arrow'}">
+          <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
+      </button> -->
+
+      <button
+        v-if="isToolDisplayed('rectangle')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('rectangle')"
+        class="button"
+        :class="{'is-selected': activeTool === 'rectangle'}"
+        @click="activateTool('rectangle')"
+      >
+        <span class="icon is-small"><i class="far fa-square"></i></span>
+      </button>
+
+      <button
+        v-if="isToolDisplayed('circle')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('circle')"
+        class="button"
+        :class="{'is-selected': activeTool === 'circle'}"
+        @click="activateTool('circle')"
+      >
+        <span class="icon is-small"><i class="far fa-circle"></i></span>
+      </button>
+
+      <button
+        v-if="isToolDisplayed('polygon')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('polygon')"
+        class="button"
+        :class="{'is-selected': activeTool === 'polygon'}"
+        @click="activateTool('polygon')"
+      >
+        <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
+      </button>
+
+      <button
+        v-if="isToolDisplayed('freehand-polygon')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('freehand-polygon')"
+        class="button"
+        :class="{'is-selected': activeTool === 'freehand-polygon'}"
+        @click="activateTool('freehand-polygon')"
+      >
+        <span class="icon is-small">
+          <icon-polygon-free-hand />
+        </span>
+      </button>
     </div>
-  </div>
+  </template>
 
-  <div class="buttons has-addons">
-    <button
-      v-if="isToolDisplayed('point')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('point')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'point'}"
-      @click="activateTool('point')"
-    >
-      <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
+  <template v-else>
+    <div class="buttons has-addons are-small">
+      <button
+        :disabled="isToolDisabled('accept')"
+        v-tooltip="$t('validate-annotation')"
+        class="button"
+        :class="{'is-success': !isToolDisabled('accept')}"
+        @click="accept()"
+      >
+      <span class="icon is-small"><i class="fas fa-check"></i></span>
     </button>
-
     <button
-      v-if="isToolDisplayed('line')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('line')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'line'}"
-      @click="activateTool('line')"
-    >
+        :disabled="isToolDisabled('reject')"
+        v-tooltip="$t('reject-annotation')"
+        class="button"
+        :class="{'is-danger': !isToolDisabled('reject')}"
+        @click="reject()"
+      >
       <span class="icon is-small"><i class="fas fa-minus"></i></span>
     </button>
+    </div>
+  </template>
 
-    <button
-      v-if="isToolDisplayed('freehand-line')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('freehand-line')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'freehand-line'}"
-      @click="activateTool('freehand-line')"
-    >
-      <span class="icon is-small">
-        <icon-line-free-hand />
-      </span>
-    </button>
-
-    <!-- QUESTION: redefine expected behaviour
-    <button class="button is-small" :disabled="disabledDraw" title="Arrow"
-            @click="activateTool('arrow')" :class="{'is-selected': activeTool === 'arrow'}">
-        <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
-    </button> -->
-
-    <button
-      v-if="isToolDisplayed('rectangle')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('rectangle')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'rectangle'}"
-      @click="activateTool('rectangle')"
-    >
-      <span class="icon is-small"><i class="far fa-square"></i></span>
-    </button>
-
-    <button
-      v-if="isToolDisplayed('circle')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('circle')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'circle'}"
-      @click="activateTool('circle')"
-    >
-      <span class="icon is-small"><i class="far fa-circle"></i></span>
-    </button>
-
-    <button
-      v-if="isToolDisplayed('polygon')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('polygon')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'polygon'}"
-      @click="activateTool('polygon')"
-    >
-      <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
-    </button>
-
-    <button
-      v-if="isToolDisplayed('freehand-polygon')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('freehand-polygon')"
-      class="button is-small"
-      :class="{'is-selected': activeTool === 'freehand-polygon'}"
-      @click="activateTool('freehand-polygon')"
-    >
-      <span class="icon is-small">
-        <icon-polygon-free-hand />
-      </span>
-    </button>
-  </div>
-
-  <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons">
+  <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons are-small">
     <button
       :disabled="!selectedFeature"
       v-tooltip="$t('display-annot-details')"
-      class="button is-small" :class="{'is-selected': displayAnnotDetails && selectedFeature}"
+      class="button" :class="{'is-selected': displayAnnotDetails && selectedFeature}"
       @click="displayAnnotDetails = !displayAnnotDetails"
     >
       <span class="icon is-small"><i class="fas fa-info"></i></span>
     </button>
   </div>
 
-  <div class="buttons has-addons">
+  <div class="buttons has-addons are-small">
     <button
       v-if="isToolDisplayed('fill')"
       :disabled="isToolDisabled('fill')"
       v-tooltip="$t('fill')"
-      class="button is-small"
+      class="button"
       @click="fill()"
     >
       <span class="icon is-small"><i class="fas fa-fill"></i></span>
@@ -156,7 +181,7 @@
       v-if="isToolDisplayed('edit')"
       :disabled="isToolDisabled('edit')"
       v-tooltip="$t('modify')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeEditTool === 'modify'}"
       @click="activateEditTool('modify')"
     >
@@ -167,7 +192,7 @@
       v-if="isToolDisplayed('union')"
       :disabled="isToolDisabled('correct-add')"
       v-tooltip="$t('freehand-correct-add')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeEditTool === 'correct-add'}"
       @click="activateEditTool('correct-add')"
     >
@@ -178,7 +203,7 @@
       v-if="isToolDisplayed('diff')"
       :disabled="isToolDisabled('correct-remove')"
       v-tooltip="$t('freehand-correct-remove')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeEditTool === 'correct-remove'}"
       @click="activateEditTool('correct-remove')"
     >
@@ -189,7 +214,7 @@
       v-if="isToolDisplayed('move')"
       :disabled="isToolDisabled('move')"
       v-tooltip="$t('move')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeEditTool === 'translate'}"
       @click="activateEditTool('translate')"
     >
@@ -200,7 +225,7 @@
       v-if="isToolDisplayed('rotate')"
       :disabled="isToolDisabled('rotate')"
       v-tooltip="$t('rotate')"
-      class="button is-small"
+      class="button"
       :class="{'is-selected': activeEditTool === 'rotate'}"
       @click="activateEditTool('rotate')"
     >
@@ -211,18 +236,18 @@
       v-if="isToolDisplayed('delete')"
       :disabled="isToolDisabled('delete')"
       v-tooltip="$t('delete')"
-      class="button is-small"
+      class="button"
       @click="confirmDeletion()"
     >
       <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
     </button>
   </div>
 
-  <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons">
+  <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
     <button
       :disabled="actions.length === 0"
       v-tooltip="$t('undo')"
-      class="button is-small"
+      class="button"
       @click="undo()"
     >
       <span class="icon is-small"><i class="fas fa-undo"></i></span>
@@ -231,7 +256,7 @@
     <button
       :disabled="undoneActions.length === 0"
       v-tooltip="$t('redo')"
-      class="button is-small"
+      class="button"
       @click="redo()"
     >
       <span class="icon is-small"><i class="fas fa-redo"></i></span>
@@ -249,7 +274,7 @@ import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
 import WKT from 'ol/format/WKT';
 
-import {Cytomine, Annotation} from 'cytomine-client';
+import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
 import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
 
 export default {
@@ -348,6 +373,9 @@ export default {
     },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
+    },
+    reviewMode() {
+      return this.imageWrapper.review.reviewMode;
     }
   },
   watch: {
@@ -360,6 +388,11 @@ export default {
       // disable correct tools if no feature is selected
       if(!feature && ['correct-add', 'correct-remove'].includes(this.activeEditTool)) {
         this.activeEditTool = null;
+      }
+    },
+    reviewMode(value) {
+      if(value) {
+        this.activeTool = 'select';
       }
     }
   },
@@ -374,7 +407,15 @@ export default {
       }
 
       let ftr = this.selectedFeature;
-      if(!this.$store.getters['currentProject/canEditAnnot'](ftr.properties.annot)) {
+      let annot = ftr.properties.annot;
+      if(tool === 'accept') {
+        return annot.type === AnnotationType.REVIEWED;
+      }
+      if(tool === 'reject') {
+        return annot.type !== AnnotationType.REVIEWED;
+      }
+
+      if(!this.$store.getters['currentProject/canEditAnnot'](annot)) {
         return true;
       }
 
@@ -513,11 +554,62 @@ export default {
     },
     async getUpdatedAnnotation(collection) {
       for(let model of collection) {
-        if(model.annotation) {
-          let annot = new Annotation(model.annotation);
+        let jsonAnnot = model.annotation || model.reviewedannotation;
+        if(jsonAnnot) {
+          let annot = new Annotation(jsonAnnot);
           await updateTermProperties(annot);
           return annot;
         }
+      }
+    },
+
+    async accept() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.activateEditTool(null);
+      let annot = feature.properties.annot;
+      if(annot.type === AnnotationType.REVIEWED) {
+        return;
+      }
+
+      try {
+        let reviewedAnnot = await annot.review();
+        reviewedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
+        this.$eventBus.$emit('reviewAnnotation', annot);
+        this.$eventBus.$emit('addAnnotation', reviewedAnnot);
+        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-validation')});
+      }
+    },
+    async reject() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.activateEditTool(null);
+      let reviewedAnnot = feature.properties.annot;
+      if(reviewedAnnot.type !== AnnotationType.REVIEWED) {
+        return;
+      }
+
+      try {
+        let annot = await Annotation.fetch(reviewedAnnot.parentIdent);
+        annot.userByTerm = reviewedAnnot.userByTerm; // copy terms from reviewed annot
+        await annot.cancelReview();
+        this.$eventBus.$emit('deleteAnnotation', reviewedAnnot);
+        this.$eventBus.$emit('addAnnotation', annot);
+        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-rejection')});
       }
     },
 
@@ -544,6 +636,12 @@ export default {
           return;
         case 'ctrlY':
           this.redo();
+          return;
+        case 'a':
+          this.accept();
+          return;
+        case 'r':
+          this.reject();
           return;
       }
     }

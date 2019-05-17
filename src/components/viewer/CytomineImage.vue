@@ -102,7 +102,7 @@
             <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
               <i class="fas fa-copy"></i>
             </a>
-            <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
+            <layers-panel class="panel-options" v-show="activePanel === 'layers'"
               :index="index" :layers-to-preload="layersToPreload"
             />
           </li>
@@ -126,6 +126,13 @@
               <i class="fas fa-street-view"></i>
             </a>
             <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
+          </li>
+
+          <li v-if="isPanelDisplayed('review')">
+            <a @click="togglePanel('review')" :class="{active: activePanel === 'review'}">
+              <i class="fas fa-check-circle"></i>
+            </a>
+            <review-panel class="panel-options" v-show="activePanel === 'review'" :index="index" />
           </li>
         </template>
       </ul>
@@ -164,10 +171,11 @@ import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
 import ColorManipulation from './panels/ColorManipulation';
 import LinkPanel from './panels/LinkPanel';
-import AnnotationsPanel from './panels/AnnotationsPanel';
+import LayersPanel from './panels/LayersPanel';
 import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
+import ReviewPanel from './panels/ReviewPanel';
 
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 
@@ -209,10 +217,11 @@ export default {
     DigitalZoom,
     ColorManipulation,
     LinkPanel,
-    AnnotationsPanel,
+    LayersPanel,
     OntologyPanel,
     PropertiesPanel,
     FollowPanel,
+    ReviewPanel,
 
     SelectInteraction,
     DrawInteraction,
@@ -616,7 +625,7 @@ $colorOpenedPanelLink: #6c95c8;
         position: relative;
         display: block;
         width: $widthPanelBar;
-        padding: 0.5rem 0.8rem;
+        padding: 0.35rem 0.8rem;
         font-size: 1.25rem;
         color: $colorPanelLink;
         border-bottom: 1px solid $colorBorderPanelLink;
