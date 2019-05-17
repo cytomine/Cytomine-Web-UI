@@ -167,8 +167,8 @@
     </div>
   </div>
 
-  <div class="tile annotation-repartition">
-    <div v-if="ontology" class="tile is-6 is-parent is-vertical">
+  <div class="tile" v-if="ontology">
+    <div class="tile is-6 is-parent is-vertical">
       <div class="tile is-child box chart-box no-grow">
         <div class="columns">
           <h2 class="column">{{$t("manual-annotations-vs-term")}}</h2>
@@ -195,6 +195,32 @@
     <div class="tile is-6 is-parent is-vertical">
       <div class="tile is-child box chart-box no-grow">
         <div class="columns">
+          <h2 class="column">{{$t("annotated-images-vs-term")}}</h2>
+          <div class="column is-narrow is-info-circle">
+            <v-popover>
+              <i class="fas fa-info-circle"></i>
+              <template #popover>
+                <p>{{$t("annotated-images-vs-terms-chart-info-message")}}</p>
+              </template>
+            </v-popover>
+          </div>
+        </div>
+        <div class="chart-container" :style="styleAnnotationTermChart">
+          <annotated-images-by-term-chart
+            css-classes="chart"
+            :project="project"
+            :startDate="startDate"
+            :endDate="endDate"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="tile is-6 is-parent is-vertical">
+      <div class="tile is-child box chart-box no-grow">
+        <div class="columns">
           <h2 class="column">{{$t("manual-annotations-vs-contributor")}}</h2>
           <div class="column is-narrow is-info-circle">
             <v-popover>
@@ -216,6 +242,29 @@
         </div>
       </div>
     </div>
+    <div class="tile is-6 is-parent is-vertical">
+      <div class="tile is-child box chart-box no-grow">
+        <div class="columns">
+          <h2 class="column">{{$t("annotated-images-vs-contributor")}}</h2>
+          <div class="column is-narrow is-info-circle">
+            <v-popover>
+              <i class="fas fa-info-circle"></i>
+              <template #popover>
+                <p>{{$t("annotated-images-vs-contributors-chart-info-message")}}</p>
+              </template>
+            </v-popover>
+          </div>
+        </div>
+        <div class="chart-container" :style="styleAnnotationContributorChart">
+          <annotated-images-by-contributor-chart
+            css-classes="chart"
+            :project="project"
+            :startDate="startDate"
+            :endDate="endDate"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -225,7 +274,9 @@ import {get} from '@/utils/store-helpers';
 
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
 import AnnotationTermChart from '@/components/charts/AnnotationTermChart.js';
+import AnnotatedImagesByTermChart from '@/components/charts/AnnotatedImagesByTermChart.js';
 import AnnotationContributorChart from '@/components/charts/AnnotationContributorChart.js';
+import AnnotatedImagesByContributorChart from '@/components/charts/AnnotatedImagesByContributorChart.js';
 import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
@@ -240,7 +291,9 @@ export default {
   components: {
     NumberAnnotationsChart,
     AnnotationTermChart,
+    AnnotatedImagesByTermChart,
     AnnotationContributorChart,
+    AnnotatedImagesByContributorChart,
     ActivityOverviewChart,
     OntologyTreeMultiselect
   },
