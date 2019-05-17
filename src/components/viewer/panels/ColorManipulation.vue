@@ -3,28 +3,39 @@
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>
   <table>
+    <tr v-if="filters && filters.length > 0" class="has-border-bottom">
+      <td>{{ $t('filter') }}</td>
+      <td>
+        <b-select v-model="selectedFilter" size="is-small">
+          <option :value="null">{{$t('original-no-filter')}}</option>
+          <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
+            {{filter.name}}
+          </option>
+        </b-select>
+      </td>
+    </tr>
     <tr>
       <td>{{ $t('brightness') }}</td>
       <td>
-        <cytomine-slider v-model="brightness" :min="-255" :max="255" :revision="revisionSliders" />
+        <cytomine-slider v-model="brightness" :min="-255" :max="255" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('contrast') }}</td>
       <td>
-        <cytomine-slider v-model="contrast" :min="-255" :max="255" :revision="revisionSliders" />
+        <cytomine-slider v-model="contrast" :min="-255" :max="255" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('saturation') }}</td>
       <td>
-        <cytomine-slider v-model="saturation" :min="-100" :max="100" :revision="revisionSliders" />
+        <cytomine-slider v-model="saturation" :min="-100" :max="100" />
       </td>
     </tr>
     <tr>
       <td>{{ $t('hue') }}</td>
       <td>
-        <cytomine-slider v-model="hue" :min="-180" :max="180" :revision="revisionSliders" />
+        <cytomine-slider v-model="hue" :min="-180" :max="180" />
       </td>
     </tr>
   </table>
@@ -35,10 +46,9 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
-
-const debounceDelay = 500;
+import {ImageFilterProjectCollection} from 'cytomine-client';
 
 export default {
   name: 'color-manipulation',
@@ -48,18 +58,25 @@ export default {
   },
   data() {
     return {
-      revisionSliders: 0
+      filters: null
     };
   },
   computed: {
+    project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
-    activePanel() {
-      return this.imageWrapper.activePanel;
+
+    selectedFilter: {
+      get() {
+        return this.imageWrapper.colors.filter;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setFilter', value);
+      }
     },
 
     brightness: {
@@ -67,7 +84,7 @@ export default {
         return this.imageWrapper.colors.brightness;
       },
       set(value) {
-        this.setBrightness(value);
+        this.$store.commit(this.imageModule + 'setBrightness', value);
       }
     },
     contrast: {
@@ -75,7 +92,7 @@ export default {
         return this.imageWrapper.colors.contrast;
       },
       set(value) {
-        this.setContrast(value);
+        this.$store.commit(this.imageModule + 'setContrast', value);
       }
     },
     hue: {
@@ -83,7 +100,7 @@ export default {
         return this.imageWrapper.colors.hue;
       },
       set(value) {
-        this.setHue(value);
+        this.$store.commit(this.imageModule + 'setHue', value);
       }
     },
     saturation: {
@@ -91,47 +108,28 @@ export default {
         return this.imageWrapper.colors.saturation;
       },
       set(value) {
-        this.setSaturation(value);
-      }
-    }
-  },
-  watch: {
-    activePanel(panel) {
-      if(panel === 'colors') {
-        this.revisionSliders++;
+        this.$store.commit(this.imageModule + 'setSaturation', value);
       }
     }
   },
   methods: {
     reset() {
       this.$store.commit(this.imageModule + 'resetColorManipulation');
-    },
-
-    setBrightness: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setBrightness', value);
-    }, debounceDelay),
-
-    setContrast: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setContrast', value);
-    }, debounceDelay),
-
-    setHue: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setHue', value);
-    }, debounceDelay),
-
-    setSaturation: _.debounce(function(value) {
-      this.$store.commit(this.imageModule + 'setSaturation', value);
-    }, debounceDelay),
-
-    updateMapSize() {
-      this.revisionSliders++;
     }
   },
-  mounted() {
-    this.$eventBus.$on('updateMapSize', this.updateMapSize);
-  },
-  beforeDestroy() {
-    this.$eventBus.$off('updateMapSize', this.updateMapSize);
+  async created() {
+    try {
+      let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      filters.forEach(filter => filter.prefix = filter.processingServer + filter.baseUrl);
+      let prefixes = filters.map(filter => filter.prefix);
+      if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
+        this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
+      }
+      this.filters = filters;
+    }
+    catch(error) {
+      console.log(error);
+    }
   }
 };
 </script>
@@ -159,5 +157,14 @@ td:last-child {
 >>> .vue-slider {
   margin-left: 0.4em;
   margin-right: 4em;
+}
+
+.has-border-bottom td {
+  padding-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.has-border-bottom + tr td {
+  padding-top: 1em;
 }
 </style>

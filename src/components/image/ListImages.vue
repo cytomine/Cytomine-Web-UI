@@ -85,7 +85,7 @@
                 {{$t('width')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsWidth" :max="maxWidth" :show="initSliders" />
+                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
               </div>
             </div>
 
@@ -94,7 +94,7 @@
                 {{$t('height')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsHeight" :max="maxHeight" :show="initSliders" />
+                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@
                 {{$t('user-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
               </div>
             </div>
 
@@ -114,7 +114,7 @@
                 {{$t('analysis-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
               </div>
             </div>
 
@@ -123,7 +123,7 @@
                 {{$t('reviewed-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
               </div>
             </div>
 
@@ -259,7 +259,6 @@ export default {
       loading: true,
       error: false,
       images: [],
-      initSliders: false,
       addImageModal: false,
       excludedProperties: [
         'overview',
@@ -380,29 +379,13 @@ export default {
       }
     }
   },
-  watch: {
-    maxWidth() {
-      if(!this.filtersOpened) { // change the sliders bounds => need to reinitialize them
-        this.initSliders = false;
-      }
-    },
-    maxHeight() {
-      if(!this.filtersOpened) { // change the sliders bounds => need to reinitialize them
-        this.initSliders = false;
-      }
-    }
-  },
   methods: {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
-      this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
     },
 
     async deleteImage(idDeleted) {
       this.images = this.images.filter(image => image.id !== idDeleted);
-      if(!this.filtersOpened) { // deleting an image may change the sliders bounds => need to reinitialize them
-        this.initSliders = false;
-      }
     },
 
     updateSort(field, order) {
@@ -448,10 +431,6 @@ export default {
     try {
       this.images = (await ImageInstanceCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
       this.images.forEach(image => this.formatImage(image));
-
-      if(this.filtersOpened) {
-        this.initSliders = true;
-      }
 
       // if an image was deleted, the currentPage value might not be valid => reinitialize it
       if((this.currentPage - 1)*this.perPage >= this.filteredImages.length) {

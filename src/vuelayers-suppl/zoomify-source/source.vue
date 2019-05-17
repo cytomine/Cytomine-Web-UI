@@ -92,38 +92,7 @@ const methods = {
     });
 
     if(this.urls) {
-      // source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/Zoomify.js#L202
-      // temporary hack since Zoomify does not support multiple URLs (https://github.com/openlayers/openlayers/issues/9352)
-      const createFromTemplate = (template) => {
-        return (
-          (tileCoord) => {
-            if (!tileCoord) {
-              return undefined;
-            }
-            else {
-              const tileCoordZ = tileCoord[0];
-              const tileCoordX = tileCoord[1];
-              const tileCoordY = -tileCoord[2] - 1;
-              const tileIndex = tileCoordX + tileCoordY * this.tierSizeInTiles[tileCoordZ][0];
-              const tileSize = source.tileGrid.getTileSize(tileCoordZ);
-              const tileWidth = Array.isArray(tileSize) ? tileSize[0] : tileSize;
-              const tileGroup = ((tileIndex + this.tileCountUpToTier[tileCoordZ]) / tileWidth) | 0;
-              const localContext = {
-                'z': tileCoordZ,
-                'x': tileCoordX,
-                'y': tileCoordY,
-                'tileIndex': tileIndex,
-                'TileGroup': 'TileGroup' + tileGroup
-              };
-              return template.replace(/\{(\w+?)\}/g, function(m, p) {
-                return localContext[p];
-              });
-            }
-          }
-        );
-      };
-
-      const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(createFromTemplate));
+      const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(source)));
       source.setTileUrlFunction(tileUrlFunction);
     }
 
@@ -138,6 +107,46 @@ const methods = {
       resolutions: this.resolutions,
     });
   },
+  // source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/Zoomify.js#L202
+  // temporary hack since Zoomify does not support multiple URLs (https://github.com/openlayers/openlayers/issues/9352)
+  createFromTemplate(source) {
+    return template => {
+      return (
+        (tileCoord) => {
+          if (!tileCoord) {
+            return undefined;
+          }
+          else {
+            const tileCoordZ = tileCoord[0];
+            const tileCoordX = tileCoord[1];
+            const tileCoordY = -tileCoord[2] - 1;
+            const tileIndex = tileCoordX + tileCoordY * this.tierSizeInTiles[tileCoordZ][0];
+            const tileSize = source.tileGrid.getTileSize(tileCoordZ);
+            const tileWidth = Array.isArray(tileSize) ? tileSize[0] : tileSize;
+            const tileGroup = ((tileIndex + this.tileCountUpToTier[tileCoordZ]) / tileWidth) | 0;
+            const localContext = {
+              'z': tileCoordZ,
+              'x': tileCoordX,
+              'y': tileCoordY,
+              'tileIndex': tileIndex,
+              'TileGroup': 'TileGroup' + tileGroup
+            };
+            return template.replace(/\{(\w+?)\}/g, function(m, p) {
+              return localContext[p];
+            });
+          }
+        }
+      );
+    };
+  }
+};
+
+const watch = {
+  urls() {
+    const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
+    this.$source.setTileUrlFunction(tileUrlFunction);
+    this.$source.refresh();
+  },
 };
 
 export default {
@@ -146,6 +155,7 @@ export default {
   props,
   data,
   methods,
+  watch,
   created
 };
 </script>

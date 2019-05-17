@@ -338,9 +338,11 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-    baseLayerURLs() { // TODO: image filters (see ULiege repo)
+
+    baseLayerURLs() {
+      let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
-      return this.image.imageServerURLs.map(url => url + params);
+      return this.image.imageServerURLs.map(url => filterPrefix + url + params);
     },
 
     colorManipulationOn() {
@@ -367,7 +369,7 @@ export default {
     },
 
     overviewCollapsed() {
-      return this.overview ? this.overview.getCollapsed() : null;
+      return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
     },
 
     correction() {
@@ -387,6 +389,9 @@ export default {
     viewState() {
       this.savePosition();
     },
+    overviewCollapsed(value) {
+      this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
+    }
   },
   methods: {
     setInitialZoom() {
@@ -459,11 +464,11 @@ export default {
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
       this.overview = new OverviewMap({
-        collapsed: false,
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
-        target: this.$refs.overview
+        target: this.$refs.overview,
+        collapsed: this.imageWrapper.view.overviewCollapsed
       });
       this.$refs.map.$map.addControl(this.overview);
     },
@@ -726,7 +731,7 @@ $colorOpenedPanelLink: #6c95c8;
   background: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px;
 
   .ol-overviewmap {
     position: static;

@@ -65,7 +65,7 @@
                   {{$t('members')}}
                 </div>
                 <div class="filter-body">
-                  <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" :show="initSliders" />
+                  <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" />
                 </div>
               </div>
 
@@ -74,7 +74,7 @@
                   {{$t('images')}}
                 </div>
                 <div class="filter-body">
-                  <cytomine-slider v-model="boundsImages" :max="maxNbImages" :show="initSliders" />
+                  <cytomine-slider v-model="boundsImages" :max="maxNbImages" />
                 </div>
               </div>
 
@@ -87,7 +87,7 @@
                 {{$t('user-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
               </div>
             </div>
 
@@ -96,7 +96,7 @@
                 {{$t('analysis-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
               </div>
             </div>
 
@@ -105,7 +105,7 @@
                 {{$t('reviewed-annotations')}}
               </div>
               <div class="filter-body">
-                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" :show="initSliders" />
+                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
               </div>
             </div>
           </div>
@@ -246,7 +246,6 @@ export default {
 
       projects: [],
 
-      initSliders: false,
       contributorLabel: this.$t('contributor'),
       managerLabel: this.$t('manager'),
 
@@ -360,7 +359,6 @@ export default {
   methods: {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
-      this.initSliders = true; // for correct rendering of the sliders, need to show them only when container is displayed
     },
     updateSort(field, order) {
       this.sort = {field, order};
@@ -401,10 +399,6 @@ export default {
         project.roleIndex = Number(roles.admin) + Number(roles.representative); // to allow sorting
         return project;
       });
-
-      if(this.filtersOpened) {
-        this.initSliders = true;
-      }
 
       // if a project was deleted, the currentPage value might not be valid => reinitialize it
       if((this.currentPage - 1)*this.perPage >= this.filteredProjects.length) {
