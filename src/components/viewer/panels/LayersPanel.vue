@@ -23,19 +23,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
+        <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
           <td class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(index)" />
+            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(idx)" />
           </td>
           <td v-if="!reviewMode" class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(index)" />
+            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(idx)" />
           </td>
 
           <td class="name-column">
             {{ layerName(layer) }}
           </td>
           <td class="checkbox-column">
-            <button v-if="!reviewMode || !layer.isReview" class="button is-small" @click="removeLayer(index)">
+            <button v-if="!reviewMode || !layer.isReview" class="button is-small" @click="removeLayer(idx)">
               <span class="fas fa-times"></span>
             </button>
           </td>
@@ -195,8 +195,8 @@ export default {
       this.selectedLayer = null;
     },
 
-    removeLayer(index, cacheSelectedFeatures=false) {
-      this.$store.dispatch(this.imageModule + 'removeLayer', {indexLayer: index, cacheSelectedFeatures});
+    removeLayer(index) {
+      this.$store.dispatch(this.imageModule + 'removeLayer', index);
     },
 
     toggleLayerVisibility(index) {

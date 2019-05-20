@@ -520,7 +520,7 @@ export default {
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {idLayer: layer.id, cache: true});
+      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
     });
 
     let idRoutedAnnot = this.$route.params.idAnnotation;

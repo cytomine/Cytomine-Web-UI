@@ -19,8 +19,8 @@
 
 <script>
 import WKT from 'ol/format/WKT';
-
-import {AnnotationCollection, AnnotationType} from 'cytomine-client';
+import {AnnotationCollection} from 'cytomine-client';
+import {annotBelongsToLayer} from '@/utils/annotation-utils';
 
 export default {
   name: 'annotation-layer',
@@ -94,17 +94,13 @@ export default {
   methods: {
     clearFeatures() {
       if(this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {idLayer: this.layer.id, cache: true});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache: true});
         this.$refs.olSource.clearFeatures();
       }
     },
 
     annotBelongsToLayer(annot) {
-      if(annot.image !== this.image.id) {
-        return false;
-      }
-      let isReviewed = annot.type === AnnotationType.REVIEWED;
-      return this.layer.isReview ? isReviewed : (!isReviewed && annot.user === this.layer.id);
+      return annotBelongsToLayer(annot, this.layer, this.image);
     },
 
     addAnnotationHandler(annot) {
@@ -289,7 +285,7 @@ export default {
       }, {});
       let seenAnnots = [];
 
-      if(wasClustered !== this.clustered) {
+      if(wasClustered !== null && wasClustered !== this.clustered) {
         this.clearFeatures(); // clearing features will retrigger the loader
       }
       else {
