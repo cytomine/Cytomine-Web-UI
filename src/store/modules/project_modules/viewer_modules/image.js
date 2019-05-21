@@ -158,7 +158,7 @@ export default {
         return 0;
       }
       let increment = state.view.digitalZoom ? constants.DIGITAL_ZOOM_INCREMENT : 0;
-      return state.imageInstance.depth + increment;
+      return state.imageInstance.zoom + increment;
     }
   },
 

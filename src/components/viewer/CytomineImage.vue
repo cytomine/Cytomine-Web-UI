@@ -388,7 +388,7 @@ export default {
       let container = this.$refs.container;
       let mapWidth = this.image.width;
       let mapHeight = this.image.height;
-      let idealZoom = this.image.depth;
+      let idealZoom = this.image.zoom;
       while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
         mapWidth /= 2;
         mapHeight /= 2;

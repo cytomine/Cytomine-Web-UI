@@ -35,12 +35,12 @@ export default {
   },
   computed: {
     magnification() {
-      let magnification = Math.pow(2, this.zoom - this.image.depth) * this.image.magnification;
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
       return Math.round(magnification * 100) / 100;
     },
     resolution() {
       if(this.image.physicalSizeX) {
-        return Math.pow(2, this.image.depth - this.zoom) * this.image.physicalSizeX;
+        return Math.pow(2, this.image.zoom - this.zoom) * this.image.physicalSizeX;
       }
     },
     scaleLength() {
@@ -55,7 +55,7 @@ export default {
       }
     },
     interpolation() {
-      return this.zoom > this.image.depth;
+      return this.zoom > this.image.zoom;
     }
   }
 };

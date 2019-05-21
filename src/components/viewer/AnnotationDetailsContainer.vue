@@ -136,7 +136,7 @@ export default {
 
     centerViewOnAnnot() {
       let geometry = this.format.readGeometry(this.annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
     },
 
     addTerm(term) {

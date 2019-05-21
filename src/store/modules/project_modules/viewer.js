@@ -96,12 +96,12 @@ export default {
     setCenter({state, getters, commit}, {index, center}) {
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);
-      let refZoom = refImage.imageInstance.depth - refImage.view.zoom;
+      let refZoom = refImage.imageInstance.zoom - refImage.view.zoom;
 
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
         let image = state.images[idx];
-        let diffZoom = image.imageInstance.depth - image.view.zoom - refZoom;
+        let diffZoom = image.imageInstance.zoom - image.view.zoom - refZoom;
         let zoomFactor = Math.pow(2, diffZoom);
         commit(`images/${idx}/setCenter`, image.view.center.map((val, i) => val + increments[i]*zoomFactor));
       });
