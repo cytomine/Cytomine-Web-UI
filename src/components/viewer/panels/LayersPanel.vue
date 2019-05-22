@@ -61,7 +61,10 @@ export default {
   name: 'layers-panel',
   props: {
     index: String,
-    layersToPreload: Array
+    layersToPreload: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     return {
@@ -255,13 +258,10 @@ export default {
       return;
     }
 
-    let layersToAdd = [];
-    if(this.layersToPreload) {
-      this.layersToPreload.forEach(id => layersToAdd.push({id, visible: true}));
-    }
+    let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
 
     if(!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-      if(!this.layersToPreload || !this.layersToPreload.includes(this.currentUser.id)) {
+      if(!this.layersToPreload.includes(this.currentUser.id)) {
         layersToAdd.push({id: this.currentUser.id, visible: true});
       }
 
@@ -283,7 +283,6 @@ export default {
         console.log(error);
       }
     }
-
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {

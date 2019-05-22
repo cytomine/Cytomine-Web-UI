@@ -10,7 +10,7 @@
       </b-message>
       <button class="button is-small is-fullwidth" @click="unvalidate()">
         <span class="icon"><i class="fas fa-thumbs-down"></i></span>
-        <span>{{$t('button-unvalidate-review')}}</span>
+        <span>{{$t('button-unvalidate-and-continue-review')}}</span>
       </button>
     </template>
 

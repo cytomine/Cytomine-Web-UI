@@ -113,28 +113,47 @@
       <tr>
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content">
-          <div class="buttons">
-            <button class="button is-small" @click="isMetadataModalActive = true">
+          <div class="buttons are-small">
+            <button class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">
-              <button
-                v-if="!blindMode || canManageProject"
-                class="button is-small"
-                @click="isRenameModalActive = true"
+
+              <router-link
+                v-if="!image.reviewed && !image.inReview"
+                :to="`/project/${image.project}/image/${image.id}?action=review`"
+                class="button"
               >
+                {{$t('button-start-review')}}
+              </router-link>
+
+              <template v-else-if="image.reviewUser === currentUser.id">
+                <button v-if="image.reviewed" class="button" @click="cancelReview()">
+                  {{$t('button-unvalidate-review')}}
+                </button>
+                <template v-else>
+                  <router-link :to="`/project/${image.project}/image/${image.id}?action=review`" class="button">
+                    {{$t('button-continue-review')}}
+                  </router-link>
+                  <button class="button" @click="cancelReview()">
+                    {{$t('button-cancel-review')}}
+                  </button>
+                </template>
+              </template>
+
+              <button v-if="!blindMode || canManageProject" class="button" @click="isRenameModalActive = true">
                 {{$t('button-rename')}}
               </button>
-              <button class="button is-small" @click="isCalibrationModalActive = true">
+              <button class="button" @click="isCalibrationModalActive = true">
                 {{$t('button-set-calibration')}}
               </button>
-              <button class="button is-small" @click="isMagnificationModalActive = true">
+              <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <a class="button is-small" :href="image.downloadURL">
+              <a class="button" :href="image.downloadURL">
                 {{$t('button-download')}}
               </a>
-              <button class="button is-danger is-small" @click="confirmDeletion()">
+              <button class="button is-danger" @click="confirmDeletion()">
                 {{$t('button-delete')}}
               </button>
             </template>
@@ -171,6 +190,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
@@ -207,6 +228,7 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     blindMode() {
       return this.$store.state.currentProject.project.blindMode;
     },
@@ -223,6 +245,17 @@ export default {
   methods: {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop);
+    },
+
+    async cancelReview() {
+      let errorLabel = this.image.reviewed ? 'notif-error-unvalidate-review' : 'notif-error-cancel-review';
+      try {
+        await this.image.stopReview(true);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t(errorLabel)});
+      }
     },
 
     async rename(newName) {

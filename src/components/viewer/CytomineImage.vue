@@ -128,7 +128,7 @@
             <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
           </li>
 
-          <li v-if="isPanelDisplayed('review')">
+          <li v-if="isPanelDisplayed('review') && canEdit">
             <a @click="togglePanel('review')" :class="{active: activePanel === 'review'}">
               <i class="fas fa-check-circle"></i>
             </a>
@@ -247,6 +247,9 @@ export default {
     document() {
       return document;
     },
+    routedAction() {
+      return this.$route.query.action;
+    },
     configUI: get('currentProject/configUI'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
@@ -265,6 +268,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    canEdit() {
+      return this.$store.getters['currentProject/canEditImage'](this.image);
     },
     projectionName() {
       return `CYTO-${this.image.id}`;
@@ -363,9 +369,14 @@ export default {
     },
 
     layersToPreload() {
+      let layers = [];
       if(this.routedAnnotation) {
-        return this.routedAnnotation.type === AnnotationType.REVIEWED ? [-1] : [this.routedAnnotation.user];
+        layers.push(AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
       }
+      if(this.routedAction === 'review' && !layers.includes(-1)) {
+        layers.push(-1);
+      }
+      return layers;
     },
 
     overviewCollapsed() {
@@ -517,6 +528,21 @@ export default {
       addProj(projection);
     }
 
+    if(this.routedAction === 'review') {
+      this.togglePanel('review');
+      if(!this.image.inReview) {
+        try {
+          let clone = await this.image.clone().review();
+          this.$store.commit(this.imageModule + 'setImageInstance', clone);
+        }
+        catch(error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
+        }
+      }
+      this.$store.commit(this.imageModule + 'setReviewMode', true);
+    }
+
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
@@ -529,7 +555,7 @@ export default {
         let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
           this.routedAnnotation = annot;
-          if(this.$route.query.action === 'comments') {
+          if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
