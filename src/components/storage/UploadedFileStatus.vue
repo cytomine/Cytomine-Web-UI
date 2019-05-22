@@ -1,11 +1,11 @@
 <template>
 <div v-if="!iconOnly">
-  <span v-if="!isConverted || !file.nbChildren" class="tag" :class="tagClass">
+  <span v-if="!isSuccessful" class="tag" :class="tagClass">
     {{$t(labels[file.status])}}
   </span>
   <div v-else class="tags has-addons">
-    <span class="tag is-success">{{$t('converted')}}</span>
-    <span class="tag is-light">{{$tc("count-files", file.nbChildren, {count: file.nbChildren})}}</span>
+    <span class="tag" :class="tagClass">{{$t(labels[file.status])}}</span>
+    <span class="tag is-light">{{$tc("count-files", file.nbChildren + 1, {count: file.nbChildren + 1})}}</span>
   </div>
 </div>
 <span v-else :class="['icon', textClass]">
@@ -23,8 +23,8 @@ export default {
     iconOnly: {type: Boolean, default: false}
   },
   computed: {
-    isConverted() {
-      return this.file.status === UploadedFileStatus.CONVERTED;
+    isSuccessful() {
+      return this.file.status === UploadedFileStatus.CONVERTED || this.file.status === UploadedFileStatus.DEPLOYED;
     },
     labels() {
       return {
