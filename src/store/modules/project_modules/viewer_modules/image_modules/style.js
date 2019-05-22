@@ -98,6 +98,15 @@ export default {
       let terms = formatTerms(rootGetters['currentProject/terms'], state.layersOpacity, state.terms);
       commit('setTerms', terms);
     }
+  },
+
+  getters: {
+    termsMapping: state => {
+      return state.terms.reduce((mapping, term) => {
+        mapping[term.id] = term;
+        return mapping;
+      }, {});
+    }
   }
 };
 

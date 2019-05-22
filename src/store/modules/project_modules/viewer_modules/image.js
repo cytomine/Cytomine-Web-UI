@@ -69,7 +69,7 @@ export default {
   },
 
   getters: {
-    genStyleFunction: state => (feature) => {
+    genStyleFunction: (state, getters) => (feature) => {
       let annot = feature.get('annot');
       if(!annot) {
         return;
@@ -90,7 +90,7 @@ export default {
       let terms = state.style.terms;
 
       if(terms && nbTerms === 1) {
-        let wrappedTerm = terms.find(term => term.id === annot.term[0]);
+        let wrappedTerm = getters.termsMapping[annot.term[0]];
         if(wrappedTerm) {
           if(!wrappedTerm.visible) {
             return; // do not display annot
