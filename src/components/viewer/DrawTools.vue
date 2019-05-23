@@ -5,6 +5,7 @@
       v-tooltip="$t('select')"
       class="button"
       :class="{'is-selected': activeTool === 'select'}"
+      :disabled="ongoingCalibration"
       @click="activateTool('select')"
     >
       <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
@@ -245,7 +246,7 @@
 
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
     <button
-      :disabled="actions.length === 0"
+      :disabled="actions.length === 0 || ongoingCalibration"
       v-tooltip="$t('undo')"
       class="button"
       @click="undo()"
@@ -254,7 +255,7 @@
     </button>
 
     <button
-      :disabled="undoneActions.length === 0"
+      :disabled="undoneActions.length === 0 || ongoingCalibration"
       v-tooltip="$t('redo')"
       class="button"
       @click="redo()"
@@ -310,6 +311,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    ongoingCalibration() {
+      return this.imageWrapper.ongoingCalibration;
+    },
     terms() {
       return this.$store.getters['currentProject/terms'];
     },
@@ -363,7 +367,7 @@ export default {
       return !this.layers.find(layer => layer.drawOn);
     },
     disabledDraw() {
-      return this.noActiveLayer;
+      return this.noActiveLayer || this.ongoingCalibration;
     },
     actions() {
       return this.imageWrapper.undoRedo.actions;

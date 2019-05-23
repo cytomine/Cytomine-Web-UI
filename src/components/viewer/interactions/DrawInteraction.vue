@@ -14,6 +14,13 @@
     :geometry-function="drawGeometryFunction"
     @drawend="drawEndHandler"
   />
+
+  <calibration-modal
+    :image="image"
+    :pixelLength="pixelLengthCalibrationFeature"
+    :active.sync="calibrationModal"
+    @setResolution="endCalibration"
+  />
 </div>
 </template>
 
@@ -26,23 +33,36 @@ import WKT from 'ol/format/WKT';
 import {Annotation, AnnotationType} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
 
+import CalibrationModal from '@/components/image/CalibrationModal';
+
 export default {
   name: 'draw-interaction',
   props: {
     index: String
   },
+  components: {
+    CalibrationModal
+  },
   data() {
     return {
+      calibrationModal: false,
+      calibrationFeature: null,
       format: new WKT()
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    viewerModule() {
+      return this.$store.getters['currentProject/currentViewerModule'];
+    },
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
+    },
+    ongoingCalibration() {
+      return this.imageWrapper.ongoingCalibration;
     },
     rotation() {
       return this.imageWrapper.view.rotation;
@@ -120,12 +140,22 @@ export default {
     },
     drawSourceName() {
       return `draw-target-${this.index}`;
-    }
+    },
+    pixelLengthCalibrationFeature() {
+      if(this.calibrationFeature) {
+        return this.calibrationFeature.getGeometry().getLength();
+      }
+    },
   },
 
   watch: {
     activeTool() {
       this.$refs.olDrawInteraction.scheduleRecreate();
+    },
+    calibrationModal(val) {
+      if(!val) {
+        this.clearDrawnFeatures();
+      }
     }
   },
 
@@ -141,13 +171,38 @@ export default {
     },
 
     async drawEndHandler({feature}) {
-      if(this.drawCorrection) {
-        await this.endCorrection(feature);
+      if(this.ongoingCalibration) {
+        await this.endDrawCalibration(feature);
       }
-      else if(this.nbActiveLayers > 0) {
-        await this.endDraw(feature);
+      else {
+        if(this.drawCorrection) {
+          await this.endCorrection(feature);
+        }
+        else if(this.nbActiveLayers > 0) {
+          await this.endDraw(feature);
+        }
+
+        this.clearDrawnFeatures();
+      }
+    },
+
+    endDrawCalibration(drawnFeature) {
+      let geom = drawnFeature.getGeometry();
+      if(geom.getType() !== 'LineString' || geom.getCoordinates().length != 2) {
+        this.$nextTick(this.clearDrawnFeatures);
+        this.$notify({type: 'error', text: this.$t('calibration-annotation-must-be-segment')});
+        return;
       }
 
+      this.calibrationFeature = drawnFeature;
+      this.calibrationModal = true;
+    },
+
+    endCalibration(resolution) {
+      this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
+      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+      this.$store.dispatch(this.imageModule + 'endCalibration');
+      this.endDraw(this.calibrationFeature);
       this.clearDrawnFeatures();
     },
 

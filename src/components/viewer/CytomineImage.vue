@@ -142,6 +142,11 @@
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
 
+    <b-message class="info-calibration" v-if="imageWrapper.ongoingCalibration" type="is-info" has-icon icon-size="is-small">
+      <p>{{$t("calibration-mode-explanation")}}</p>
+      <p><a @click="cancelCalibration()">{{$t("leave-calibration-mode")}}</a></p>
+    </b-message>
+
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
@@ -520,6 +525,10 @@ export default {
 
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
+    },
+
+    cancelCalibration() {
+      this.$store.dispatch(this.imageModule + 'endCalibration');
     }
   },
   async created() {
@@ -541,6 +550,10 @@ export default {
         }
       }
       this.$store.commit(this.imageModule + 'setReviewMode', true);
+    }
+
+    else if(this.routedAction === 'calibration') {
+      this.$store.dispatch(this.imageModule + 'startCalibration');
     }
 
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
@@ -715,6 +728,17 @@ $colorOpenedPanelLink: #6c95c8;
 .panels li:nth-child(4) .panel-options {
   top: -5.5em;
   bottom: auto;
+}
+
+.info-calibration {
+  position: absolute;
+  left: 3.5rem;
+  top: 3.5rem;
+  max-width: 32em;
+
+  p:first-child {
+    margin-bottom: 0.5em;
+  }
 }
 
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */

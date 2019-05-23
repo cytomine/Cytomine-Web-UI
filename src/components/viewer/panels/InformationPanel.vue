@@ -56,6 +56,7 @@
     :image="image"
     :active.sync="calibrationModal"
     @setResolution="setResolution"
+    @setScale="startCalibration()"
   />
 </div>
 </template>
@@ -115,6 +116,10 @@ export default {
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+    },
+    startCalibration() {
+      this.calibrationModal = false;
+      this.$store.dispatch(this.imageModule + 'startCalibration');
     },
     async previousImage() {
       try {

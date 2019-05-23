@@ -30,13 +30,18 @@ export default {
   state() {
     return {
       imageInstance: null,
-      activePanel: null
+      activePanel: null,
+      ongoingCalibration: false
     };
   },
 
   mutations: {
     setImageInstance(state, image) {
       state.imageInstance = image;
+    },
+
+    setOngoingCalibration(state, value) {
+      state.ongoingCalibration = value;
     },
 
     setResolution(state, resolution) {
@@ -65,7 +70,17 @@ export default {
     async refreshData({state, commit}) {
       let image = await fetchImage(state.imageInstance.id);
       commit('setImageInstance', image);
-    }
+    },
+
+    startCalibration({dispatch, commit}) {
+      dispatch('activateTool', 'line');
+      commit('setOngoingCalibration', true);
+    },
+
+    endCalibration({commit}) {
+      commit('activateTool', 'select');
+      commit('setOngoingCalibration', false);
+    },
   },
 
   getters: {

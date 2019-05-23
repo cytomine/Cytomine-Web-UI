@@ -180,6 +180,7 @@
     :image="image"
     :active.sync="isCalibrationModalActive"
     @setResolution="(event) => $emit('setResolution', event)"
+    @setScale="$router.push(`/project/${image.project}/image/${image.id}?action=calibration`)"
   />
 
   <image-metadata-modal
