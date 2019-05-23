@@ -1,0 +1,64 @@
+<template>
+<div class="tile is-child box last-actions">
+  <h2>{{$t('activity-logs')}}</h2>
+
+  <b-select v-model="selectedUser">
+    <option :value="null">{{$t('all-users-analyses')}}</option>
+    <optgroup :label="$t('members')">
+      <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
+    </optgroup>
+    <optgroup :label="$t('analyses')">
+      <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
+    </optgroup>
+  </b-select>
+
+  <activity-logs :idUser="selectedUser" :startDate="startDate" :endDate="endDate" :project="project" />
+</div>
+</template>
+
+<script>
+import {UserJobCollection} from 'cytomine-client';
+
+import {get} from '@/utils/store-helpers';
+import {fullName} from '@/utils/user-utils.js';
+
+import ActivityLogs from '@/components/utils/ActivityLogs';
+
+export default {
+  name: 'project-activity-logs',
+  props: {
+    startDate: Number,
+    endDate: Number
+  },
+  components: {ActivityLogs},
+  data() {
+    return {
+      userJobs: [],
+      selectedUser: null,
+    };
+  },
+  computed: {
+    project: get('currentProject/project'),
+    members: get('currentProject/members'),
+  },
+  async created() {
+    try {
+      let userJobs = (await UserJobCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      userJobs.forEach(uJob => uJob.fullName = fullName(uJob));
+      this.userJobs = userJobs;
+    }
+    catch(error) {
+      console.log(error);
+    }
+  }
+};
+</script>
+
+<style scoped>
+.last-actions {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  word-wrap: break-word;
+}
+</style>

@@ -1,0 +1,361 @@
+<template>
+<div class="layers">
+  <h1>{{ $t('annotation-layers') }}</h1>
+  <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+    <p> {{ $t('unexpected-error-info-message') }} </p>
+  </b-message>
+  <template v-else>
+    <b-field>
+      <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
+        <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
+          {{ layerName(layer) }}
+        </option>
+      </b-select>
+      <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t('button-add') }}</button>
+    </b-field>
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="checkbox-column"><span class="far fa-eye"></span></th>
+          <th v-if="!reviewMode" class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
+          <th class="name-column"></th>
+          <th class="checkbox-column"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
+          <td class="checkbox-column">
+            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(idx)" />
+          </td>
+          <td v-if="!reviewMode" class="checkbox-column">
+            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(idx)" />
+          </td>
+
+          <td class="name-column">
+            {{ layerName(layer) }}
+          </td>
+          <td class="checkbox-column">
+            <button v-if="!reviewMode || !layer.isReview" class="button is-small" @click="removeLayer(idx)">
+              <span class="fas fa-times"></span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="opacity">
+      <label>{{ $t('layers-opacity') }}</label>
+      <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
+    </div>
+  </template>
+</div>
+</template>
+
+<script>
+import {get} from '@/utils/store-helpers';
+
+import {fullName} from '@/utils/user-utils.js';
+import {ProjectDefaultLayerCollection} from 'cytomine-client';
+
+export default {
+  name: 'layers-panel',
+  props: {
+    index: String,
+    layersToPreload: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
+      error: false,
+
+      layers: [], // Array<User> (representing user layers)
+      indexLayers: [],
+      selectedLayer: null
+    };
+  },
+  computed: {
+    currentUser: get('currentUser/user'),
+    project: get('currentProject/project'),
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
+    },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
+    imageWrapper() {
+      return this.viewerWrapper.images[this.index];
+    },
+    image() {
+      return this.imageWrapper.imageInstance;
+    },
+    activePanel() {
+      return this.imageWrapper.activePanel;
+    },
+    layersOpacity: {
+      get() {
+        return this.imageWrapper.style.layersOpacity;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setLayersOpacity', Number(value));
+      }
+    },
+    layersIds() {
+      return this.layers.map(layer => layer.id);
+    },
+    selectedLayers() { // Array<User> (representing user layers)
+      return this.imageWrapper.layers.selectedLayers || [];
+    },
+    selectedLayersIds() {
+      return this.selectedLayers.map(layer => layer.id);
+    },
+    unselectedLayers() {
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+    },
+    nbReviewedAnnotations() {
+      return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
+    },
+    hasReviewLayer() {
+      return this.image.inReview || this.image.reviewed;
+    },
+    reviewLayer() {
+      return {id: -1, isReview: true};
+    },
+    reviewMode() {
+      return this.imageWrapper.review.reviewMode;
+    },
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
+    }
+  },
+  watch: {
+    activePanel() {
+      this.fetchIndexLayers();
+    },
+    reviewMode() {
+      if(this.reviewMode) {
+        if(!this.layers.includes(this.reviewLayer)) {
+          this.layers.push(this.reviewLayer);
+        }
+        this.addLayer(this.reviewLayer);
+      }
+      else {
+        if(!this.hasReviewLayer) {
+          let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+          if(index !== -1) {
+            this.removeLayer(index);
+          }
+
+          this.layers = this.layers.filter(layer => !layer.isReview);
+        }
+      }
+    }
+  },
+  methods: {
+    annotationEventHandler(annot) {
+      if(annot.image === this.image.id) {
+        this.fetchIndexLayers();
+      }
+    },
+    reloadAnnotationsHandler({idImage}={}) {
+      if(!idImage || idImage === this.image.id) {
+        this.fetchIndexLayers();
+      }
+    },
+
+    layerName(layer) {
+      if(layer.isReview) {
+        return `${this.$t('review-layer')} (${this.nbReviewedAnnotations})`;
+      }
+
+      let name = fullName(layer);
+
+      let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
+      return `${name} (${indexLayer.countAnnotation || 0})`;
+    },
+
+    canDraw(layer) {
+      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
+    },
+
+    addLayerById(id, visible) {
+      let layer = this.layers.find(layer => layer.id === id);
+      if(layer) {
+        this.addLayer(layer, visible);
+      }
+    },
+
+    addLayer(layer = this.selectedLayer, visible = true) {
+      if(this.selectedLayersIds.includes(layer.id)) {
+        return;
+      }
+
+      layer.visible = visible;
+      layer.drawOn = (layer.id === this.currentUser.id && this.canDraw(layer));
+      this.$store.dispatch(this.imageModule + 'addLayer', layer);
+
+      this.selectedLayer = null;
+    },
+
+    removeLayer(index) {
+      this.$store.dispatch(this.imageModule + 'removeLayer', index);
+    },
+
+    toggleLayerVisibility(index) {
+      this.$store.dispatch(this.imageModule + 'toggleLayerVisibility', index);
+    },
+
+    toggleLayerDrawOn(index) {
+      this.$store.commit(this.imageModule + 'toggleLayerDrawOn', index);
+    },
+
+    async fetchLayers() {
+      this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
+      if(this.hasReviewLayer) {
+        this.layers.push(this.reviewLayer);
+      }
+
+      // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
+      // may not be relevant for the current image => filter them
+      let idLayers = this.layers.map(layer => layer.id);
+      this.$store.commit(this.imageModule + 'filterSelectedLayers', idLayers);
+    },
+
+    async fetchIndexLayers(force=false) {
+      if(!force && this.activePanel !== 'layers') {
+        return;
+      }
+      this.indexLayers = await this.image.fetchAnnotationsIndex();
+    },
+
+    shortkeyHandler(key) {
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
+        return;
+      }
+
+      if(key === 't') { // toggle review layer
+        let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+        if(index !== -1) {
+          this.toggleLayerVisibility(index);
+          return;
+        }
+
+        if(this.layers.includes(this.reviewLayer)) {
+          this.addLayer(this.reviewLayer);
+        }
+      }
+    }
+  },
+  async created() {
+    try {
+      await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
+    }
+    catch(error) {
+      console.log(error);
+      this.error = true;
+      this.$notify({type: 'error', text: this.$t('notif-error-loading-annotation-layers')});
+      return;
+    }
+
+    let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
+
+    if(!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+      if(!this.layersToPreload.includes(this.currentUser.id)) {
+        layersToAdd.push({id: this.currentUser.id, visible: true});
+      }
+
+      try {
+        let defaultLayers = await ProjectDefaultLayerCollection.fetchAll({
+          filterKey: 'project',
+          filterValue: this.project.id
+        });
+
+        let addedIds = layersToAdd.map(layer => layer.id);
+
+        defaultLayers.array.forEach(({user, hideByDefault}) => {
+          if(!addedIds.includes(user)) {
+            layersToAdd.push({id: user, visible: !hideByDefault});
+          }
+        });
+      }
+      catch(error) {
+        console.log(error);
+      }
+    }
+    layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
+  },
+  mounted() {
+    this.$eventBus.$on(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+  }
+};
+</script>
+
+<style scoped>
+>>> select {
+  width: 21em;
+}
+
+.table {
+  margin-bottom: 1em !important;
+  font-size: 0.9em;
+}
+
+.table tbody {
+  display: block;
+  overflow: auto;
+  max-height: 10em;
+}
+
+.table thead tr {
+  display: block;
+}
+
+td, th {
+  padding: 0.25em !important;
+  vertical-align: middle !important;
+}
+
+td .button {
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 0.9em;
+  padding: 0;
+}
+
+.checkbox-column {
+  min-width: 2.2em;
+  text-align: center !important;
+}
+
+.name-column {
+  width: 100%;
+}
+
+>>> .checkbox .control-label {
+  padding: 0 !important;
+}
+
+>>> input[type="range"].slider {
+  margin: 0;
+  padding: 0;
+}
+
+.opacity {
+  display: flex;
+  align-items: center;
+}
+
+.opacity label {
+  text-transform: uppercase;
+  font-size: 0.8em;
+  width: 15em;
+}
+</style>
