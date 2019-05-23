@@ -12,10 +12,8 @@ export default {
 
       currentPage: 1,
       perPage: 10,
-      sort: {
-        field: 'created',
-        order: 'desc'
-      },
+      sortField: null,
+      sortOrder: 'asc',
       openedDetails: []
     };
   },
@@ -37,8 +35,12 @@ export default {
       state.perPage = perPage;
     },
 
-    setSort(state, sort) {
-      state.sort = sort;
+    setSortField(state, field) {
+      state.sortField = field;
+    },
+
+    setSortOrder(state, order) {
+      state.sortOrder = order;
     },
 
     setOpenedDetails(state, value) {

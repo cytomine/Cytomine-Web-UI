@@ -75,8 +75,7 @@ export default {
     UploadedFileStatus
   },
   props: {
-    file: Object, // WARNING: the root of the tree must be the file or its direct parent
-    revision: Number // change its value to force refresh
+    file: Object // WARNING: the root of the tree must be the file or its direct parent
   },
   data() {
     return {
@@ -90,10 +89,6 @@ export default {
   },
   watch: {
     file() {
-      this.findRoot();
-      this.makeTree();
-    },
-    revision() {
       this.findRoot();
       this.makeTree();
     },

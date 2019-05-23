@@ -118,80 +118,64 @@
     <p class="panel-heading">
       {{ $t('storage') }}
     </p>
-    <div class="panel-block" v-if="storageViewError">
-      <b-message type="is-danger" has-icon icon-size="is-small">
-        <h2> {{ $t('error') }} </h2>
-        <p> {{ $t('unexpected-error-info-message') }} </p>
-      </b-message>
-    </div>
-    <div class="panel-block storage" v-else>
-      <b-loading :is-full-page="false" :active="loading" />
-      <template v-if="!loading">
-        <b-input v-model="searchString" class="search-uploaded-file" :placeholder="$t('search-placeholder')" icon="search" />
+    <div class="panel-block storage">
+      <b-input
+        :value="searchString"
+        @input="debounceSearchString"
+        class="search-uploaded-file"
+        :placeholder="$t('search-placeholder')"
+        icon="search"
+      />
 
-        <b-table
-          :data="filteredUploadedFiles"
-          :paginated="true"
-          :per-page="perPage"
-          pagination-size="is-small"
-          detailed
-          detail-key="id"
-        >
-          <template #default="{row: uFile}">
-            <b-table-column :label="$t('preview')" width="80">
-              <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
-              <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
-            </b-table-column>
+      <cytomine-table
+        :collection="uploadedFileCollection"
+        sort="created" order="desc"
+        :revision="revision"
+        :refreshInterval="tableRefreshInterval"
+      >
+        <template #default="{row: uFile}">
+          <b-table-column :label="$t('preview')" width="80">
+            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
+            <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
+          </b-table-column>
 
-            <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200">
-              {{ uFile.originalFilename }}
-            </b-table-column>
+          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200">
+            {{ uFile.originalFilename }}
+          </b-table-column>
 
-            <b-table-column field="created" :label="$t('created')" sortable width="150">
-              {{ Number(uFile.created) | moment('lll') }}
-            </b-table-column>
+          <b-table-column field="created" :label="$t('created')" sortable width="150">
+            {{ Number(uFile.created) | moment('lll') }}
+          </b-table-column>
 
-            <b-table-column field="size" :label="$t('size')" sortable width="80">
-              {{ filesize(uFile.size) }}
-            </b-table-column>
+          <b-table-column field="size" :label="$t('size')" sortable width="80">
+            {{ filesize(uFile.size) }}
+          </b-table-column>
 
-            <b-table-column field="contentType" :label="$t('content-type')" sortable width="100">
-              {{ uFile.contentType }}
-            </b-table-column>
+          <b-table-column field="contentType" :label="$t('content-type')" sortable width="100">
+            {{ uFile.contentType }}
+          </b-table-column>
 
-            <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">
-              {{ filesize(uFile.globalSize) }}
-            </b-table-column>
+          <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">
+            {{ filesize(uFile.globalSize) }}
+          </b-table-column>
 
-            <b-table-column field="status" :label="$t('status')" sortable width="80">
-              <uploaded-file-status :file="uFile" />
-            </b-table-column>
+          <b-table-column field="status" :label="$t('status')" sortable width="80">
+            <uploaded-file-status :file="uFile" />
+          </b-table-column>
 
-            <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
-              {{ uFile.parentFilename ? uFile.parentFilename : "-" }}
-            </b-table-column>
-          </template>
+          <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
+            {{ uFile.parentFilename ? uFile.parentFilename : "-" }}
+          </b-table-column>
+        </template>
 
-          <template #detail="{row: uFile}">
-            <uploaded-file-details :file="uFile" :key="uFile.id" :revision="revision" @update="updatedTree()" />
-          </template>
+        <template #detail="{row: uFile}">
+          <uploaded-file-details :file="uFile" :key="uFile.id" @update="updatedTree()" />
+        </template>
 
-          <template #empty>
-            <div class="content has-text-grey has-text-centered">
-              <p>{{$t('no-uploaded-file')}}</p>
-            </div>
-          </template>
-
-          <template #bottom-left>
-            <b-select v-model="perPage" size="is-small">
-              <option value="10">10 {{$t('per-page')}}</option>
-              <option value="25">25 {{$t('per-page')}}</option>
-              <option value="50">50 {{$t('per-page')}}</option>
-              <option value="100">100 {{$t('per-page')}}</option>
-            </b-select>
-          </template>
-        </b-table>
-      </template>
+        <template #empty>
+          <p>{{$t('no-uploaded-file')}}</p>
+        </template>
+      </cytomine-table>
     </div>
   </div>
 </div>
@@ -203,36 +187,35 @@ import {get} from '@/utils/store-helpers';
 import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
+import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import CytomineTable from '@/components/utils/CytomineTable';
 
 export default {
   name: 'cytomine-storage',
   components: {
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
-    UploadedFileDetails
+    UploadedFileDetails,
+    CytomineTable
   },
   data() {
     return {
       loading: true,
       newUploadError: false,
-      storageViewError: false,
-
-      timeoutRefreshFullList: null,
       timeoutRefreshSessionUploads: null,
+      tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
 
       storages: [],
       selectedStorage: null,
       projects: [],
       selectedProject: null,
 
-      uploadedFiles: [],
       searchString: '',
-      perPage: 25,
 
       dropFiles: [],
 
@@ -277,13 +260,11 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
-    filteredUploadedFiles() {
-      if(!this.searchString) {
-        return this.uploadedFiles;
-      }
-
-      let str = this.searchString.toLowerCase();
-      return this.uploadedFiles.filter(uf => uf.originalFilename.toLowerCase().indexOf(str) >= 0);
+    uploadedFileCollection() {
+      return new UploadedFileCollection({
+        detailed: true,
+        originalFilename: {ilike: this.searchString}
+      });
     }
   },
   watch: {
@@ -320,21 +301,6 @@ export default {
       catch(error) {
         console.log(error); // not mandatory for upload => only log error, no other action
       }
-    },
-    async fetchUploadedFiles() {
-      try {
-        this.uploadedFiles = (await UploadedFileCollection.fetchAll({detailed: true})).array;
-      }
-      catch(error) {
-        console.log(error);
-        this.storageViewError = true;
-        return;
-      }
-
-      this.loading = false;
-
-      clearTimeout(this.timeoutRefreshFullList);
-      this.timeoutRefreshFullList = setTimeout(this.fetchUploadedFiles, constants.STORAGE_REFRESH_INTERVAL);
     },
 
     async refreshStatusSessionUploads() {
@@ -373,7 +339,7 @@ export default {
       }
 
       if(statusChange) {
-        this.fetchUploadedFiles();
+        this.revision++;
       }
 
       if(unfinishedConversions) {
@@ -426,7 +392,7 @@ export default {
       ).then(response => {
         fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadFile.attr);
         this.refreshStatusSessionUploads();
-        this.fetchUploadedFiles();
+        this.revision++;
       }).catch(error => {
         if(!axios.isCancel(error)) {
           console.log(error);
@@ -458,20 +424,23 @@ export default {
       }
     },
 
-    async updatedTree() {
-      await this.fetchUploadedFiles();
-      this.revision++;
-    }
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
+
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500)
   },
   activated() {
     this.fetchStorages();
     this.fetchProjects();
-    this.fetchUploadedFiles();
     this.refreshStatusSessionUploads();
+    this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   deactivated() {
-    clearTimeout(this.timeoutRefreshFullList);
     clearTimeout(this.timeoutRefreshSessionUploads);
+    this.tableRefreshInterval = 0;
   }
 };
 </script>
@@ -553,4 +522,3 @@ export default {
   max-width: 25em;
 }
 </style>
-

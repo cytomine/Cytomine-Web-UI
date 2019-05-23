@@ -84,9 +84,7 @@
       <tr v-if="isPropDisplayed('vendor')">
         <td class="prop-label">{{$t('vendor')}}</td>
         <td class="prop-content">
-          <!-- vendor defined in parent component -->
-          <img v-if="image.vendor" :src="image.vendor.imgPath" :alt="image.vendor.name"
-            :title="image.vendor.name" class="vendor-img">
+          <img v-if="vendor" :src="vendor.imgPath" :alt="vendor.name" :title="vendor.name" class="vendor-img">
           <template v-else>{{$t('unknown')}}</template>
         </td>
       </tr>
@@ -203,6 +201,8 @@ import RenameModal from '@/components/utils/RenameModal';
 
 import {ImageInstance} from 'cytomine-client';
 
+import vendorFromMime from '@/utils/vendor';
+
 export default {
   name: 'image-details',
   components: {
@@ -240,6 +240,9 @@ export default {
     },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
+    },
+    vendor() {
+      return vendorFromMime(this.image.mime);
     }
   },
   methods: {

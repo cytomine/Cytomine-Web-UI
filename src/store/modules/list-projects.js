@@ -15,10 +15,8 @@ function getDefaultState() {
 
     currentPage: 1,
     perPage: 10,
-    sort: {
-      field: 'lastActivity',
-      order: 'desc'
-    },
+    sortField: 'lastActivity',
+    sortOrder: 'desc',
     openedDetails: []
   };
 }
@@ -53,8 +51,12 @@ export default {
       state.perPage = perPage;
     },
 
-    setSort(state, sort) {
-      state.sort = sort;
+    setSortField(state, field) {
+      state.sortField = field;
+    },
+
+    setSortOrder(state, order) {
+      state.sortOrder = order;
     },
 
     setOpenedDetails(state, value) {

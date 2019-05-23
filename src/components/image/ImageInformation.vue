@@ -28,7 +28,6 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 
 import {ImageInstance} from 'cytomine-client';
-import vendorFromMime from '@/utils/vendor';
 
 export default {
   name: 'image-information',
@@ -60,9 +59,7 @@ export default {
       this.permissionError = false;
       this.notFoundError = false;
       try {
-        let image = await ImageInstance.fetch(this.idImage);
-        image.vendor = vendorFromMime(image.mime);
-        this.image = image;
+        this.image = await ImageInstance.fetch(this.idImage);
       }
       catch(error) {
         console.log(error);

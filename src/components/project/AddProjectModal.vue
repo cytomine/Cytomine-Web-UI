@@ -50,13 +50,14 @@
 </template>
 
 <script>
-import {Project, Ontology, OntologyCollection} from 'cytomine-client';
+import {Project, Ontology} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-project-modal',
   props: {
-    active: Boolean
+    active: Boolean,
+    ontologies: Array
   },
   components: {CytomineModal},
   $_veeValidate: {validator: 'new'},
@@ -64,7 +65,6 @@ export default {
     return {
       name: '',
       ontology: 'NO',
-      ontologies: [],
       selectedOntology: null
     };
   },
@@ -103,10 +103,6 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
       }
     }
-  },
-  async created() {
-    this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
-    this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
   }
 };
 </script>

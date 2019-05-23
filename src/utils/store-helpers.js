@@ -1,11 +1,12 @@
 // Helpers for vuex (inspired by https://github.com/davestewart/vuex-pathify)
 
-import {isBoundsFilterActive} from './bounds';
+import _ from 'lodash';
 
 /**
  * @typedef {Object} Options
  * @property {String|Array} rootModuleProp  The name of the component property containing the path to the root module to
  *                                          use; this root path will be prefixed to the provided path
+ * @property {Number} debounced The debounce delay
  */
 
 /**
@@ -53,9 +54,9 @@ export function sync(path, options={}) {
   path = arrayPath(path);
   return {
     ...get(path, options),
-    set(value) {
+    set: debounce(function(value) {
       this.$store.commit(getMutationName(fullPath(path, this, options)), value);
-    }
+    }, options)
   };
 }
 
@@ -98,11 +99,11 @@ export function syncBoundsFilter(modulePath, filterName, maxProp, options={}) {
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : [0, this[maxProp]];
     },
-    set(bounds) {
+    set: debounce(function(bounds) {
       let path = fullPath(modulePath, this, options);
-      let propValue = isBoundsFilterActive(bounds, this[maxProp]) ? bounds : null;
+      let propValue = bounds[0] !== 0 || bounds[1] !== this[maxProp] ? bounds : null;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
-    }
+    }, options)
   };
 }
 
@@ -144,12 +145,22 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : this[optionsProp].slice();
     },
-    set(selectedOptions) {
+    set: debounce(function(selectedOptions) {
       let path = fullPath(modulePath, this, options);
       let propValue = (selectedOptions.length === this[optionsProp].length) ? null : selectedOptions;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
-    }
+    }, options)
   };
+}
+
+// wrapper for lodash debounce that debounces the function iff the debounce delay specified in options is > 0
+function debounce(fct, options) {
+  if(options.debounce) {
+    return _.debounce(fct, options.debounce);
+  }
+  else {
+    return fct;
+  }
 }
 
 function arrayPath(path) {
