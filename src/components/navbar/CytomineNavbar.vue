@@ -81,6 +81,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 
 import NavbarDropdown from './NavbarDropdown';
 import NavigationTree from './NavigationTree';
@@ -98,6 +99,7 @@ export default {
     NavigationTree,
     CytomineSearcher
   },
+  mixins: [changeLanguageMixin],
   data() {
     return {
       openedTopMenu: false,
@@ -172,6 +174,7 @@ export default {
       try {
         await Cytomine.instance.logout();
         this.$store.dispatch('logout');
+        this.changeLanguage();
         this.$router.push('/');
       }
       catch(error) {

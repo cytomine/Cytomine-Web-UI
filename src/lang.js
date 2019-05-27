@@ -11,3 +11,14 @@ export default new VueI18n({
     'fr': require('./locales/json/fr.i18n.json')
   }
 });
+
+export const changeLanguageMixin = {
+  methods: {
+    changeLanguage(language) {
+      language = language || this.$i18n.fallbackLocale;
+      let locale = language.toLowerCase();
+      this.$i18n.locale = locale;
+      this.$moment.locale(locale);
+    }
+  }
+};
