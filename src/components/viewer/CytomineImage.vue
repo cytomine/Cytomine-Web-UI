@@ -379,7 +379,7 @@ export default {
     layersToPreload() {
       let layers = [];
       if(this.routedAnnotation) {
-        layers.push(AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
+        layers.push(this.routedAnnotation.type === AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
       }
       if(this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);
