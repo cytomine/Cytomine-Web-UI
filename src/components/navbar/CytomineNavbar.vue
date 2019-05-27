@@ -10,7 +10,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbActiveProjects > 0" :title="$t('viewers')">
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">
@@ -27,7 +27,7 @@
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
-        {{ $t('admin') }}
+        {{ $t('admin-menu') }}
       </router-link>
     </div>
 

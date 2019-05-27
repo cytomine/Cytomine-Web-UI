@@ -29,7 +29,7 @@
 
   <template #selection="{isOpen}" v-if="multiple && options.length > 0">
     <div class="multiselect__tags-wrap" v-if="!isOpen">
-      <strong v-if="allSelected"> {{$t('all')}} </strong>
+      <strong v-if="allSelected"> {{allPlaceholder || $t('all')}} </strong>
       <template v-else>
         <span v-for="(option, index) in displayedOptions" :key="option[trackBy]">
           {{label ? option[label] : option}}<template v-if="index < displayedOptions.length - 1">,</template>
@@ -66,7 +66,8 @@ export default {
     selectAllAvailable: {type: Boolean, default: true},
     searchable: {type: Boolean, default: true},
     allowEmpty: {type: Boolean, default: true},
-    disabled: {type: Boolean, default: false}
+    disabled: {type: Boolean, default: false},
+    allPlaceholder: {type: String}
   },
   data() {
     return {

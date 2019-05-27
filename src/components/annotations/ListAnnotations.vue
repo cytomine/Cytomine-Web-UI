@@ -87,7 +87,8 @@
                 :options="images"
                 :label="blindMode ? 'blindedName' : 'instanceFilename'"
                 track-by="id"
-                :multiple="true"
+                multiple
+                :allPlaceholder="$t('all-images')"
               />
             </div>
           </div>
@@ -117,7 +118,8 @@
                 :options="userJobs"
                 label="fullName"
                 track-by="id"
-                :multiple="true"
+                multiple
+                :allPlaceholder="$t('all-analyses')"
               />
             </div>
           </div>
@@ -132,7 +134,7 @@
                 :options="filteredMembers"
                 label="fullName"
                 track-by="id"
-                :multiple="true"
+                multiple
               />
             </div>
           </div>
@@ -147,7 +149,7 @@
                 :options="members"
                 label="fullName"
                 track-by="id"
-                :multiple="true"
+                multiple
               />
             </div>
           </div>

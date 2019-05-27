@@ -45,7 +45,7 @@
                 {{$t('format')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true" />
+                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" multiple />
               </div>
             </div>
 
@@ -54,7 +54,7 @@
                 {{$t('vendor')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true" />
+                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" multiple />
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@
                 {{$t('magnification')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect :multiple="true" :searchable="false"
+                <cytomine-multiselect multiple :searchable="false"
                     v-model="selectedMagnifications" :options="availableMagnifications" />
               </div>
             </div>
@@ -75,7 +75,7 @@
                 {{$t('resolution')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect :multiple="true" :searchable="false"
+                <cytomine-multiselect multiple :searchable="false" :allPlaceholder="$t('all-resolutions')"
                     v-model="selectedResolutions" :options="availableResolutions" />
               </div>
             </div>
@@ -212,10 +212,10 @@
 
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
-            <option value="10">10 {{$t('per-page')}}</option>
-            <option value="25">25 {{$t('per-page')}}</option>
-            <option value="50">50 {{$t('per-page')}}</option>
-            <option value="100">100 {{$t('per-page')}}</option>
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
           </b-select>
         </template>
       </b-table>
