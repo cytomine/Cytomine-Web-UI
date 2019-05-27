@@ -58,17 +58,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-    language() {
-      return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
-    },
     project: get('currentProject/project')
-  },
-  watch: {
-    language() {
-      let locale = this.language.toLowerCase();
-      this.$i18n.locale = locale;
-      this.$moment.locale(locale);
-    }
   },
   methods: {
     async loginWithToken() {

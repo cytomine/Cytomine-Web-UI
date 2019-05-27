@@ -80,12 +80,15 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 import {Cytomine} from 'cytomine-client';
 import Register from './Register';
 
 export default {
   name: 'login',
   components: {Register},
+  mixins: [changeLanguageMixin],
   data() {
     return {
       username: '',
@@ -100,23 +103,27 @@ export default {
       registering: false
     };
   },
+  computed: {
+    currentUser: get('currentUser/user')
+  },
   methods: {
     async login() {
       try {
-        let successMessage = this.$t('notif-success-login');
         await this.$store.dispatch('currentUser/login', {
           username: this.username,
           password: this.password,
           rememberMe: this.rememberMe
         });
-        if(this.$store.state.currentUser.user) {
-          this.$notify({type: 'success', text: successMessage});
+        if(this.currentUser) {
+          this.changeLanguage(this.currentUser.language);
+          this.$notify({type: 'success', text: this.$t('notif-success-login')});
         }
         else {
           this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
         }
       }
       catch(error) {
+        console.log(error);
         this.$notify({type: 'error', text: error.response.data.message});
       }
     },
