@@ -166,6 +166,10 @@ export default {
   height: 100%;
 }
 
+.navbar-item:not(.is-active) .navbar-dropdown { /* display dropdown if inactive even on mobile */
+  display: none;
+}
+
 .navbar-dropdown.search-results h2 {
   background: #f1f1f1;
   text-transform: uppercase;
