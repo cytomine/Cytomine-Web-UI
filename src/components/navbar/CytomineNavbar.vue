@@ -114,6 +114,11 @@ export default {
       return Object.keys(this.$store.state.projects).length;
     }
   },
+  watch: {
+    $route(){
+      this.openedTopMenu = false;
+    }
+  },
   methods: {
     // required to use programmatic modal for correct display in IE11
     openHotkeysModal() {
