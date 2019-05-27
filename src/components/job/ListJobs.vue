@@ -25,7 +25,7 @@
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true" />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
             </div>
           </div>
 
@@ -34,7 +34,7 @@
               {{$t('launcher')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true" />
+              <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" multiple />
             </div>
           </div>
 
@@ -46,7 +46,7 @@
               <cytomine-datepicker
                 v-model="selectedDate"
                 :styles="['multiselect', 'bold-placeholder']"
-                :placeholder="$t('all')"
+                :placeholder="$t('all-dates')"
                 :maxDate="new Date()"
               />
             </div>
@@ -58,7 +58,7 @@
             </div>
             <div class="filter-body">
               <cytomine-multiselect v-model="selectedStatus" :options="availableStatus"
-                label="label" track-by="status" :multiple="true" />
+                label="label" track-by="status" multiple />
             </div>
           </div>
         </div>
@@ -117,10 +117,10 @@
 
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
-            <option value="10">10 {{$t('per-page')}}</option>
-            <option value="25">25 {{$t('per-page')}}</option>
-            <option value="50">50 {{$t('per-page')}}</option>
-            <option value="100">100 {{$t('per-page')}}</option>
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
           </b-select>
         </template>
       </b-table>

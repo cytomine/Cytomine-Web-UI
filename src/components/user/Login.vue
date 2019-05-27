@@ -133,11 +133,11 @@ export default {
     async resetPassword() {
       try {
         await Cytomine.instance.forgotPassword(this.username);
-        this.$notify({type: 'success', text: this.$t('notif-success-forgot-username')});
+        this.$notify({type: 'success', text: this.$t('notif-success-forgot-password')});
         this.forgotPassword = false;
       }
       catch(error) {
-        this.$notify({type: 'error', text: this.$t('notif-error-forgot-username')});
+        this.$notify({type: 'error', text: this.$t('notif-error-forgot-password')});
       }
     }
   }
