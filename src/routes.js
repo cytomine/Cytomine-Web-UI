@@ -52,10 +52,6 @@ const routes = [
     component: CytomineProject,
     children: [
       {
-        path: '',
-        redirect: 'images'
-      },
-      {
         path: 'images',
         component: ListImages
       },

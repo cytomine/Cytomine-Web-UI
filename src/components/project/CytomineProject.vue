@@ -33,6 +33,7 @@ export default {
       return this.$route.params.idProject;
     },
     project: get('currentProject/project'),
+    configUI: get('currentProject/configUI'),
     projectModule() {
       return this.$store.state.projects[this.idProject];
     }
@@ -57,6 +58,14 @@ export default {
           this.$store.registerModule(['projects', this.idProject], projectModuleModel);
         }
         await this.$store.dispatch('currentProject/loadProject', this.idProject);
+        if(this.$route.matched.length === 1) { // no match with child route => redirect to default
+          if(this.configUI['project-images-tab']) {
+            this.$router.replace(`/project/${this.idProject}/images`);
+          }
+          else {
+            this.$router.replace(`/project/${this.idProject}/information`);
+          }
+        }
         this.loading = false;
       }
       catch(error) {
