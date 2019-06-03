@@ -16,6 +16,7 @@ import Account from './components/user/Account.vue';
 import AdvancedSearch from './components/search/AdvancedSearch.vue';
 import CytomineViewer from './components/viewer/CytomineViewer.vue';
 import CytomineProject from './components/project/CytomineProject.vue';
+import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
@@ -51,6 +52,10 @@ const routes = [
     path: '/project/:idProject',
     component: CytomineProject,
     children: [
+      {
+        path: '',
+        component: ProjectHome
+      },
       {
         path: 'images',
         component: ListImages
