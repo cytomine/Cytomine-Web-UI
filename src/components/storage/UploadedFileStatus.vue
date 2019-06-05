@@ -1,6 +1,6 @@
 <template>
 <div v-if="!iconOnly">
-  <span v-if="!isSuccessful" class="tag" :class="tagClass">
+  <span v-if="!isSuccessful || file.nbChildren === undefined" class="tag" :class="tagClass">
     {{$t(labels[file.status])}}
   </span>
   <div v-else class="tags has-addons">
