@@ -14,7 +14,9 @@
       @click.stop="startEdition(index)"
     >
         <template v-if="indexEdited !== index">
-          {{Math.round(value * 1000)/1000}}
+          <slot name="default" :value="value" >
+            {{Math.round(value * 1000)/1000}}
+          </slot>
         </template>
         <b-input
           v-else
@@ -53,8 +55,17 @@ export default {
     isArray() {
       return Array.isArray(this.value);
     },
+    middle() {
+      return (this.max - this.min) /2;
+    },
     tooltipPlacement() {
-      return this.isArray ? ['left', 'right'] : ['right'];
+      if (this.isArray)
+        return ['left', 'right'];
+
+      if (this.value >= this.middle)
+        return ['left'];
+
+      return ['right'];
     }
   },
   methods: {

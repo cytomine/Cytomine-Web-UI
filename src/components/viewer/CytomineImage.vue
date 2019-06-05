@@ -132,6 +132,8 @@
       </ul>
     </div>
 
+    <image-controls :index="index" :current-slice="slice" class="image-controls" />
+
     <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
@@ -160,6 +162,7 @@ import AnnotationLayer from './AnnotationLayer';
 import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
 import DrawTools from './DrawTools';
+import ImageControls from './ImageControls';
 
 import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
@@ -203,6 +206,7 @@ export default {
     RotationSelector,
     ScaleLine,
     DrawTools,
+    ImageControls,
 
     AnnotationDetailsContainer,
 
@@ -742,5 +746,15 @@ $colorOpenedPanelLink: #6c95c8;
       display: none;
     }
   }
+}
+
+/* ----- Image controls ----- */
+.image-controls {
+  position: absolute;
+  bottom: 1rem;
+  left: 20%;
+  right: calc(#{$widthPanelBar} + 20%);
+  z-index: 5;
+
 }
 </style>

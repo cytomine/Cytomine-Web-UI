@@ -1,4 +1,4 @@
-import {ImageInstance, AbstractImage, AnnotationType} from 'cytomine-client';
+import {ImageInstance, AbstractImage, AnnotationType, SliceInstanceCollection} from 'cytomine-client';
 
 import constants from '@/utils/constants';
 
@@ -11,6 +11,8 @@ import style from './image_modules/style';
 import tracking from './image_modules/tracking';
 import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
+
+import Vue from 'vue';
 
 import {
   isCluster,
@@ -27,6 +29,9 @@ export default {
   state() {
     return {
       imageInstance: null,
+      sliceInstances: {},
+      referenceSlice: null,
+      activeSlice: null,
       activePanel: null
     };
   },
@@ -43,14 +48,40 @@ export default {
 
     togglePanel(state, panel) {
       state.activePanel = state.activePanel === panel ? null : panel;
-    }
+    },
+
+    setSliceInstances(state, slices) {
+      Object.keys(state.sliceInstances).forEach(rank => {
+        Vue.delete(state.sliceInstances, rank);
+      });
+
+      slices.forEach(slice => {
+        Vue.set(state.sliceInstances, slice.rank, slice);
+      });
+    },
+
+    setReferenceSlice(state, slice) {
+      state.referenceSlice = slice;
+    },
+
+    setActiveSlice(state, slice) {
+      state.activeSlice = slice;
+    },
   },
 
   actions: {
-    async initialize({commit}, image) {
+    async initialize({state, commit, dispatch}, image) {
       let clone = image.clone();
       await fetchImageServers(clone);
       commit('setImageInstance', clone);
+
+      let promises = [
+        dispatch('fetchSliceInstances'),
+        dispatch('fetchReferenceSlice')
+      ];
+
+      await Promise.all(promises);
+      commit('setActiveSlice', state.referenceSlice);
     },
 
     async setImageInstance({dispatch, rootState}, image) {
@@ -60,9 +91,30 @@ export default {
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
 
-    async refreshData({state, commit}) {
+    async refreshData({state, commit, dispatch}) {
       let image = await fetchImage(state.imageInstance.id);
       commit('setImageInstance', image);
+
+      let promises = [
+        dispatch('fetchSliceInstances'),
+        dispatch('fetchReferenceSlice')
+      ];
+
+      await Promise.all(promises);
+    },
+
+    async fetchSliceInstances({state, commit}) {
+      let slices = (await new SliceInstanceCollection({filterKey: 'imageinstance', filterValue: state.imageInstance.id}).fetchAll()).array;
+      commit('setSliceInstances', slices);
+    },
+
+    async fetchReferenceSlice({state, commit}) {
+      let activeSlice = (await state.imageInstance.fetchReferenceSlice());
+      commit('setReferenceSlice', activeSlice);
+    },
+
+    setActiveSliceByRank({state, commit}, dimensions) {
+      commit('setActiveSlice', state.sliceInstances[dimensions.channel + state.imageInstance.channels * (dimensions.zStack + state.imageInstance.depth * dimensions.time)])
     }
   },
 
