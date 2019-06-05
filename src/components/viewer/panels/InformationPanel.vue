@@ -11,11 +11,23 @@
       </tr>
       <tr>
         <td><strong>{{$t('width')}}</strong></td>
-        <td>{{image.width}}</td>
+        <td>{{image.width}} {{$t("pixels")}}</td>
       </tr>
       <tr>
         <td><strong>{{$t('height')}}</strong></td>
-        <td>{{image.height}}</td>
+        <td>{{image.height}} {{$t("pixels")}}</td>
+      </tr>
+      <tr v-if="image.depth > 1">
+        <td><strong>{{$t('image-depth')}}</strong>
+        <td>{{$tc("count-slices", image.depth, {count: image.depth})}}</td>
+      </tr>
+      <tr v-if="image.duration > 1">
+        <td><strong>{{$t('image-time')}}</strong></td>
+        <td>{{$tc("count-frames", image.duration, {count: image.duration})}}</td>
+      </tr>
+      <tr v-if="image.channels > 1">
+        <td><strong>{{$t('image-channels')}}</strong></td>
+        <td>{{$tc("count-bands", image.channels, {count: image.channels})}}</td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
