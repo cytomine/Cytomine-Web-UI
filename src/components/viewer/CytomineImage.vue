@@ -26,9 +26,10 @@
       <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
         <vl-source-zoomify
           :projection="projectionName"
-          :urls="baseLayerURLs"
+          :url="baseLayerURL"
           :size="imageSize"
           :extent="extent"
+          :key="baseLayerURL"
           crossOrigin="Anonymous"
           ref="baseSource"
           @mounted="setBaseSource()"
@@ -257,6 +258,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     projectionName() {
       return `CYTO-${this.image.id}`;
     },
@@ -329,9 +333,9 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-    baseLayerURLs() { // TODO: image filters (see ULiege repo)
-      let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
-      return this.image.imageServerURLs.map(url => url + params);
+    baseLayerURL() { // TODO: image filters (see ULiege repo)
+      let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.slice.mime}`;
+      return `http://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
     },
 
     colorManipulationOn() {
