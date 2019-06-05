@@ -1,4 +1,5 @@
 import {createGeoJsonFmt} from 'vuelayers/lib/ol-ext/format';
+import {annotBelongsToLayer} from '@/utils/annotation-utils';
 
 export default {
   state() {
@@ -29,12 +30,12 @@ export default {
       state.selectedFeatures[indexFeature].properties.annot = annot;
     },
 
-    removeLayerFromSelectedFeatures(state, {idLayer, cache=false}) {
+    removeLayerFromSelectedFeatures(state, {layer, cache=false}) {
       let selectedFeatures = state.selectedFeatures;
       for(let index = selectedFeatures.length - 1; index >= 0; index--) {
         let feature = selectedFeatures[index];
         let annot = feature.properties.annot;
-        if(annot.user === idLayer) {
+        if(annotBelongsToLayer(annot, layer)) {
           selectedFeatures.splice(index, 1);
           if(cache) {
             state.annotsToSelect.push(annot);
@@ -43,7 +44,7 @@ export default {
       }
 
       if(!cache) {
-        state.annotsToSelect = state.annotsToSelect.filter(annot => annot.user !== idLayer);
+        state.annotsToSelect = state.annotsToSelect.filter(annot => !annotBelongsToLayer(annot, layer));
       }
     },
 

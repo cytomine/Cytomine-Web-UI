@@ -19,8 +19,8 @@
 
 <script>
 import WKT from 'ol/format/WKT';
-
-import {AnnotationCollection, AnnotationType} from 'cytomine-client';
+import {AnnotationCollection} from 'cytomine-client';
+import {annotBelongsToLayer} from '@/utils/annotation-utils';
 
 export default {
   name: 'annotation-layer',
@@ -76,18 +76,31 @@ export default {
       this.imageWrapper.style.noTermOpacity;
       this.imageWrapper.properties.selectedPropertyKey;
       this.imageWrapper.properties.selectedPropertyColor;
+      this.imageWrapper.review.reviewMode;
 
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];
       };
+    },
+    reviewMode() {
+      return this.imageWrapper.review.reviewMode;
+    }
+  },
+  watch: {
+    reviewMode() { // in review mode, reviewed annotation no longer displayed => need to force reload
+      this.clearFeatures();
     }
   },
   methods: {
-    annotBelongsToLayer(annot) {
-      if(annot.image !== this.image.id) {
-        return false;
+    clearFeatures() {
+      if(this.$refs.olSource) {
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache: true});
+        this.$refs.olSource.clearFeatures();
       }
-      return this.layer.isReview ? (annot.type === AnnotationType.REVIEWED) : (annot.user === this.layer.id);
+    },
+
+    annotBelongsToLayer(annot) {
+      return annotBelongsToLayer(annot, this.layer, this.image);
     },
 
     addAnnotationHandler(annot) {
@@ -106,9 +119,19 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler(idImage) {
+    reloadAnnotationsHandler({idImage, clear=false}={}) {
       if(!idImage || idImage === this.image.id) {
-        this.loader();
+        if(clear) {
+          this.clearFeatures();
+        }
+        else {
+          this.loader();
+        }
+      }
+    },
+    reviewAnnotationHandler(annot) {
+      if(this.reviewMode) { // if the image is in review mode, reviewed annotation should no longer be displayed on user layer => call delete handler
+        this.deleteAnnotationHandler(annot);
       }
     },
     editAnnotationHandler(annot) {
@@ -176,6 +199,7 @@ export default {
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
         reviewed: this.layer.isReview,
+        notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
         showWKT: true,
         showTerm: true,
@@ -243,14 +267,16 @@ export default {
         return;
       }
 
-      if(arrayAnnots.length === 0 || !this.$refs.olSource) {
+      if(!this.$refs.olSource) {
         return;
       }
 
       let wasClustered = this.clustered;
-      this.clustered = (arrayAnnots[0].count != null);
-      if(!this.clustered && resolution > this.maxResolutionNoClusters) {
-        this.maxResolutionNoClusters = resolution;
+      if(arrayAnnots.length) {
+        this.clustered = (arrayAnnots[0].count != null);
+        if(!this.clustered && resolution > this.maxResolutionNoClusters) {
+          this.maxResolutionNoClusters = resolution;
+        }
       }
 
       let annots = arrayAnnots.reduce((obj, annot) => {
@@ -259,13 +285,8 @@ export default {
       }, {});
       let seenAnnots = [];
 
-      if(wasClustered !== this.clustered) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {
-          idLayer: this.layer.id,
-          cache: true
-        });
-
-        this.$refs.olSource.clearFeatures();
+      if(wasClustered !== null && wasClustered !== this.clustered) {
+        this.clearFeatures(); // clearing features will retrigger the loader
       }
       else {
         let features = this.clustered ? this.$refs.olSource.$source.getFeatures()
@@ -311,6 +332,7 @@ export default {
     this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
     this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
   },
@@ -319,6 +341,7 @@ export default {
     this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
     this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
     this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
   }

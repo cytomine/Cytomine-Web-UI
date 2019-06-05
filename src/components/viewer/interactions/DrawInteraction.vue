@@ -23,7 +23,7 @@ import {get} from '@/utils/store-helpers';
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation} from 'cytomine-client';
+import {Annotation, AnnotationType} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
 
 export default {
@@ -189,18 +189,16 @@ export default {
         return;
       }
 
-      let remove = (this.activeEditTool === 'correct-remove');
-      let review = false; // TODO: handle
-      let location = this.getWktLocation(feature);
       try {
+        let annot = this.selectedFeature.properties.annot;
         let correctedAnnot = await Annotation.correctAnnotations({
-          location,
-          review,
-          remove,
-          annotation: this.selectedFeature.id
+          location: this.getWktLocation(feature),
+          review: annot.type === AnnotationType.REVIEWED,
+          remove: (this.activeEditTool === 'correct-remove'),
+          annotation: annot.id
         });
         if(correctedAnnot) {
-          correctedAnnot.userByTerm = this.selectedFeature.properties.annot.userByTerm; // copy terms from initial annot
+          correctedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
         }

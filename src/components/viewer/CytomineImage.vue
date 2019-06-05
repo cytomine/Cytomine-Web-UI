@@ -103,7 +103,7 @@
             <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
               <i class="fas fa-copy"></i>
             </a>
-            <annotations-panel class="panel-options" v-show="activePanel === 'layers'"
+            <layers-panel class="panel-options" v-show="activePanel === 'layers'"
               :index="index" :layers-to-preload="layersToPreload"
             />
           </li>
@@ -127,6 +127,13 @@
               <i class="fas fa-street-view"></i>
             </a>
             <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
+          </li>
+
+          <li v-if="isPanelDisplayed('review') && canEdit">
+            <a @click="togglePanel('review')" :class="{active: activePanel === 'review'}">
+              <i class="fas fa-check-circle"></i>
+            </a>
+            <review-panel class="panel-options" v-show="activePanel === 'review'" :index="index" />
           </li>
         </template>
       </ul>
@@ -168,10 +175,11 @@ import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
 import ColorManipulation from './panels/ColorManipulation';
 import LinkPanel from './panels/LinkPanel';
-import AnnotationsPanel from './panels/AnnotationsPanel';
+import LayersPanel from './panels/LayersPanel';
 import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
+import ReviewPanel from './panels/ReviewPanel';
 
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 
@@ -214,10 +222,11 @@ export default {
     DigitalZoom,
     ColorManipulation,
     LinkPanel,
-    AnnotationsPanel,
+    LayersPanel,
     OntologyPanel,
     PropertiesPanel,
     FollowPanel,
+    ReviewPanel,
 
     SelectInteraction,
     DrawInteraction,
@@ -243,6 +252,9 @@ export default {
     document() {
       return document;
     },
+    routedAction() {
+      return this.$route.query.action;
+    },
     configUI: get('currentProject/configUI'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
@@ -264,6 +276,9 @@ export default {
     },
     slice() {
       return this.imageWrapper.activeSlice;
+    },
+    canEdit() {
+      return this.$store.getters['currentProject/canEditImage'](this.image);
     },
     projectionName() {
       return `CYTO-${this.image.id}`;
@@ -337,9 +352,11 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-    baseLayerURL() { // TODO: image filters (see ULiege repo)
+
+    baseLayerURL() {
+      let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.slice.mime}`;
-      return `http://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
+      return `${filterPrefix}http://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
     },
 
     colorManipulationOn() {
@@ -360,13 +377,18 @@ export default {
     },
 
     layersToPreload() {
+      let layers = [];
       if(this.routedAnnotation) {
-        return this.routedAnnotation.type === AnnotationType.REVIEWED ? [-1] : [this.routedAnnotation.user];
+        layers.push(AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
       }
+      if(this.routedAction === 'review' && !layers.includes(-1)) {
+        layers.push(-1);
+      }
+      return layers;
     },
 
     overviewCollapsed() {
-      return this.overview ? this.overview.getCollapsed() : null;
+      return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
     },
 
     correction() {
@@ -386,6 +408,9 @@ export default {
     viewState() {
       this.savePosition();
     },
+    overviewCollapsed(value) {
+      this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
+    }
   },
   methods: {
     setInitialZoom() {
@@ -458,11 +483,11 @@ export default {
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
       this.overview = new OverviewMap({
-        collapsed: false,
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
-        target: this.$refs.overview
+        target: this.$refs.overview,
+        collapsed: this.imageWrapper.view.overviewCollapsed
       });
       this.$refs.map.$map.addControl(this.overview);
     },
@@ -511,10 +536,25 @@ export default {
       addProj(projection);
     }
 
+    if(this.routedAction === 'review') {
+      this.togglePanel('review');
+      if(!this.image.inReview) {
+        try {
+          let clone = await this.image.clone().review();
+          this.$store.commit(this.imageModule + 'setImageInstance', clone);
+        }
+        catch(error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
+        }
+      }
+      this.$store.commit(this.imageModule + 'setReviewMode', true);
+    }
+
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {idLayer: layer.id, cache: true});
+      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
     });
 
     let idRoutedAnnot = this.$route.params.idAnnotation;
@@ -523,7 +563,7 @@ export default {
         let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
           this.routedAnnotation = annot;
-          if(this.$route.query.action === 'comments') {
+          if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
@@ -619,7 +659,7 @@ $colorOpenedPanelLink: #6c95c8;
         position: relative;
         display: block;
         width: $widthPanelBar;
-        padding: 0.5rem 0.8rem;
+        padding: 0.35rem 0.8rem;
         font-size: 1.25rem;
         color: $colorPanelLink;
         border-bottom: 1px solid $colorBorderPanelLink;
@@ -725,7 +765,7 @@ $colorOpenedPanelLink: #6c95c8;
   background: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px;
 
   .ol-overviewmap {
     position: static;

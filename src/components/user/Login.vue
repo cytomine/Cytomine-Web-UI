@@ -11,13 +11,14 @@
           <b-input v-model="email" />
         </b-field>
 
-        <div class="buttons">
+        <div class="buttons is-right">
           <button class="button" type="button" @click="forgotUsername = false"> {{$t('button-cancel')}}</button>
           <button class="button is-link"> {{$t('button-get-username')}}</button>
         </div>
       </form>
     </div>
   </template>
+
   <template v-else-if="forgotPassword">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -29,13 +30,16 @@
           <b-input v-model="username" />
         </b-field>
 
-        <div class="buttons">
+        <div class="buttons is-right">
           <button class="button" type="button" @click="forgotPassword = false"> {{$t('button-cancel')}}</button>
           <button class="button is-link"> {{$t('button-reset-password')}}</button>
         </div>
       </form>
     </div>
   </template>
+
+  <register v-else-if="registering" @close="registering=false" />
+
   <template v-else>
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -58,12 +62,8 @@
             </b-field>
           </div>
 
-          <div class="column">
-            <b-field grouped position="is-right">
-              <div class="control">
-                <button class="button is-link"> {{$t('button-login')}}</button>
-              </div>
-            </b-field>
+          <div class="column has-text-right">
+            <button class="button is-link"> {{$t('button-login')}}</button>
           </div>
         </div>
       </form>
@@ -72,16 +72,20 @@
       <a place="username" @click="forgotUsername = true">{{ $t('username') }}</a>
       <a place="password" @click="forgotPassword = true">{{ $t('password') }}</a>
     </i18n>
+    <i18n v-if="allowedRegistration" path="no-account-yet" tag="p" class="is-size-7 has-text-centered">
+      <a place="registerLink" @click="registering = true">{{$t('register')}}</a>
+    </i18n>
   </template>
 </div>
 </template>
 
 <script>
-
 import {Cytomine} from 'cytomine-client';
+import Register from './Register';
 
 export default {
   name: 'login',
+  components: {Register},
   data() {
     return {
       username: '',
@@ -89,8 +93,11 @@ export default {
       email: '',
       rememberMe: true,
 
+      allowedRegistration: false, // TODO: retrieve info from core
+
       forgotUsername: false,
-      forgotPassword: false
+      forgotPassword: false,
+      registering: false
     };
   },
   methods: {
@@ -147,11 +154,6 @@ export default {
 
 .columns, .buttons {
   margin-top: 0.5em;
-}
-
-.buttons {
-  justify-content: flex-end;
-  margin-top: 1em;
 }
 
 .panel-block {

@@ -25,6 +25,13 @@ export default {
     toggleLayerDrawOn(state, indexLayer) {
       let layer = state.selectedLayers[indexLayer];
       layer.drawOn = !layer.drawOn;
+    },
+
+    filterSelectedLayers(state, idLayers) {
+      if(!state.selectedLayers) {
+        return;
+      }
+      state.selectedLayers = state.selectedLayers.filter(layer => idLayers.includes(layer.id));
     }
   },
 
@@ -37,14 +44,14 @@ export default {
       commit('toggleLayerVisibility', indexLayer);
       let layer = state.selectedLayers[indexLayer];
       if(!layer.visible) {
-        commit('removeLayerFromSelectedFeatures', {idLayer: layer.id});
+        commit('removeLayerFromSelectedFeatures', {layer});
       }
     },
 
-    removeLayer({state, commit}, {indexLayer, cacheSelectedFeatures}) {
-      let idLayer = state.selectedLayers[indexLayer].id;
+    removeLayer({state, commit}, indexLayer) {
+      let layer = state.selectedLayers[indexLayer];
       commit('removeLayer', indexLayer);
-      commit('removeLayerFromSelectedFeatures', {idLayer, cache: cacheSelectedFeatures});
+      commit('removeLayerFromSelectedFeatures', {layer});
     }
   },
 

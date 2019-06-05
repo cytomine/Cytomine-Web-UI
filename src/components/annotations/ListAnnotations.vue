@@ -392,7 +392,11 @@ export default {
   },
   methods: {
     async fetchImages() {
-      this.images = (await ImageInstanceCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      this.images = (await ImageInstanceCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id,
+        light: true
+      })).array;
     },
     async fetchUsers() {
       this.users = (await UserCollection.fetchAll()).array;
@@ -402,7 +406,6 @@ export default {
     },
     async fetchUserJobs() {
       this.userJobs = (await UserJobCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      this.userJobs = this.userJobs.filter(uj => uj.id); // HACK because some returned jobs are empty objects
       this.userJobs.forEach(userJob => {
         userJob.fullName = fullName(userJob);
       });

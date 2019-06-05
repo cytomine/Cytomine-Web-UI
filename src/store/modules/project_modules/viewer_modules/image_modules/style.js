@@ -74,7 +74,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit, rootGetters}) {
+    initialize({commit, rootGetters}) {
       let terms = formatTerms(rootGetters['currentProject/terms'], initialLayersOpacity);
       commit('setTerms', terms);
     },
@@ -97,6 +97,15 @@ export default {
     async refreshData({state, commit, rootGetters}) {
       let terms = formatTerms(rootGetters['currentProject/terms'], state.layersOpacity, state.terms);
       commit('setTerms', terms);
+    }
+  },
+
+  getters: {
+    termsMapping: state => {
+      return state.terms.reduce((mapping, term) => {
+        mapping[term.id] = term;
+        return mapping;
+      }, {});
     }
   }
 };

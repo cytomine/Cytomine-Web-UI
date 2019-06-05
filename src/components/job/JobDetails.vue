@@ -119,10 +119,7 @@
 
       <template v-if="deletionTask">
         <hr>
-        <progress class="progress is-info" :value="deletionTask.progress" max="100">
-          {{deletionTask.progress}}%
-        </progress>
-        <p v-if="lastCommentDeletionTask">{{lastCommentDeletionTask}}</p> <!-- WARNING: not translated -->
+        <cytomine-task :task.sync="deletionTask" />
       </template>
 
       <template #footer>
@@ -144,17 +141,20 @@ import {get} from '@/utils/store-helpers';
 import {Job, JobStatus, JobDataCollection, Task} from 'cytomine-client';
 import filesize from 'filesize';
 import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineTask from '@/components/utils/CytomineTask';
 
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
-const REFRESH_INTERVAL_DELETION_TASK = constants.JOB_DELETION_TASK_REFRESH_INTERVAL;
 
 export default {
   name: 'job-details',
   props: {
     job: Object
   },
-  components: {CytomineModal},
+  components: {
+    CytomineModal,
+    CytomineTask
+  },
   data() {
     return {
       loading: true,
@@ -166,8 +166,7 @@ export default {
       timeoutRefresh: null,
 
       deletionModal: false,
-      deletionTask: null,
-      timeoutRefreshDeletionTask: null
+      deletionTask: null
     };
   },
   computed: {
@@ -186,11 +185,6 @@ export default {
     },
     hasFileResult() {
       return this.allData.jobDatas > 0;
-    },
-    lastCommentDeletionTask() {
-      if(this.deletionTask && this.deletionTask.comments && this.deletionTask.comments.length > 0) {
-        return this.deletionTask.comments[0];
-      }
     }
   },
   methods: {
@@ -219,7 +213,6 @@ export default {
       let job = this.job.clone(); // create new job to avoid mutating the prop
       try {
         this.deletionTask = await new Task({project: this.project.id}).save();
-        this.timeoutRefreshDeletionTask = setTimeout(this.refreshDeletionTask, REFRESH_INTERVAL_DELETION_TASK);
         await job.deleteAllData(this.deletionTask.id);
         this.refresh(true);
         this.deletionTask = null;
@@ -231,14 +224,6 @@ export default {
         this.deletionTask = null;
         this.$notify({type: 'error', text: this.$t('notif-error-analysis-data-deletion')});
       }
-    },
-    async refreshDeletionTask() {
-      if(!this.deletionTask) {
-        return;
-      }
-      await this.deletionTask.fetch();
-      clearTimeout(this.timeoutRefreshDeletionTask);
-      this.timeoutRefreshDeletionTask = setTimeout(this.refreshDeletionTask, REFRESH_INTERVAL_DELETION_TASK);
     },
     confirmJobDeletion() {
       this.$dialog.confirm({

@@ -90,6 +90,10 @@ export default {
         if(this.currentUser && !authenticated) {
           await this.$store.dispatch('logout');
         }
+        if(!this.currentUser && authenticated) {
+          await this.$store.dispatch('currentUser/fetchUser');
+        }
+        this.communicationError = false;
       }
       catch(error) {
         console.log(error);
@@ -104,17 +108,8 @@ export default {
     if(this.$route.query.token && this.$route.query.username) {
       await this.loginWithToken();
     }
-    else {
-      try {
-        await this.$store.dispatch('currentUser/fetchUser');
-      }
-      catch(error) {
-        console.log(error);
-        this.communicationError = true;
-      }
-    }
+    await this.ping();
     this.loading = false;
-    this.ping();
     ifvisible.on('wakeup', this.ping);
   }
 };

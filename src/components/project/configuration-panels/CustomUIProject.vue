@@ -78,7 +78,8 @@ export default {
             {key: 'project-explore-image-layers', label: 'annotation-layers', icon: 'fas fa-copy'},
             {key: 'project-explore-ontology', label: 'ontology', icon: 'fas fa-hashtag'},
             {key: 'project-explore-property', label: 'properties', icon: 'fas fa-tag'},
-            {key: 'project-explore-follow', label: 'broadcast', icon: 'fas fa-street-view'}
+            {key: 'project-explore-follow', label: 'broadcast', icon: 'fas fa-street-view'},
+            {key: 'project-explore-review', label: 'review', icon: 'fas fa-check-circle'},
           ]
         },
         {

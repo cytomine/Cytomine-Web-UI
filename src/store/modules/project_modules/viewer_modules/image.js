@@ -11,6 +11,7 @@ import style from './image_modules/style';
 import tracking from './image_modules/tracking';
 import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
+import review from './image_modules/review';
 
 import Vue from 'vue';
 
@@ -20,7 +21,9 @@ import {
   selectStyles,
   verticesStyle,
   reviewedStyles,
-  reviewedSelectStyles
+  reviewedSelectStyles,
+  rejectedStyles,
+  rejectedSelectStyles
 } from '@/utils/style-utils.js';
 
 export default {
@@ -119,7 +122,7 @@ export default {
   },
 
   getters: {
-    genStyleFunction: state => (feature) => {
+    genStyleFunction: (state, getters) => (feature) => {
       let annot = feature.get('annot');
       if(!annot) {
         return;
@@ -140,7 +143,7 @@ export default {
       let terms = state.style.terms;
 
       if(terms && nbTerms === 1) {
-        let wrappedTerm = terms.find(term => term.id === annot.term[0]);
+        let wrappedTerm = getters.termsMapping[annot.term[0]];
         if(wrappedTerm) {
           if(!wrappedTerm.visible) {
             return; // do not display annot
@@ -171,10 +174,11 @@ export default {
       }
 
       let isReviewed = annot.type === AnnotationType.REVIEWED;
+      let isRejected = state.review.reviewMode && !isReviewed;
 
       // Styles for selected elements
       if(state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
-        styles.push(...isReviewed ? reviewedSelectStyles : selectStyles);
+        styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : selectStyles));
 
         // if in modify mode, display vertices
         if(state.draw.activeEditTool === 'modify') {
@@ -183,6 +187,9 @@ export default {
       }
       else if(isReviewed) {
         styles.push(...reviewedStyles);
+      }
+      else if(isRejected) {
+        styles.push(...rejectedStyles);
       }
 
       // Properties
@@ -223,7 +230,8 @@ export default {
     style,
     tracking,
     undoRedo,
-    view
+    view,
+    review
   }
 };
 

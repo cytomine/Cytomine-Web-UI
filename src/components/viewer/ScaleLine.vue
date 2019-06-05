@@ -1,17 +1,13 @@
 <template>
 <div class="scale-line" :class="{'interpolation': interpolation}">
-  <template v-if="resolution">
-    <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}">
-      {{scaleLength}}
-    </div>
-    <div class="scale-line-bottom">
-      <span v-show="magnification">
-        {{$t('magnification')}}: {{magnification}}X
-      </span>
-    </div>
-  </template>
-
-  <div v-else-if="interpolation" class="interpolation-warning">{{$t('digital-zoom')}}</div>
+  <div class="scale-line-top" :style="{width: scaleLineLength + 'px'}">
+    {{scaleLength}}
+  </div>
+  <div class="scale-line-bottom">
+    <span v-show="magnification">
+      {{$t('magnification')}}: {{magnification}}X
+    </span>
+  </div>
 
   <div class="scale-line-position" v-if="mousePosition">
     <div style="float: left;">x: {{Math.round(mousePosition[0])}}</div>
@@ -39,19 +35,21 @@ export default {
       return Math.round(magnification * 100) / 100;
     },
     resolution() {
-      if(this.image.physicalSizeX) {
-        return Math.pow(2, this.image.zoom - this.zoom) * this.image.physicalSizeX;
-      }
+      let resolution = this.image.resolution ? this.image.resolution : 1;
+      return Math.pow(2, this.image.zoom - this.zoom) * resolution;
     },
     scaleLength() {
-      if (this.resolution) {
-        let length = this.scaleLineLength * this.resolution;
+      let length = this.scaleLineLength * this.resolution;
+      if(this.image.resolution) {
         let unit = this.$t('um');
         if (length > 1000) {
           length /= 1000;
           unit = this.$t('mm');
         }
         return `${length.toPrecision(3)} ${unit}`;
+      }
+      else {
+        return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
       }
     },
     interpolation() {
@@ -106,11 +104,5 @@ export default {
   text-align: center;
   padding: 0 0.5em;
   color: black !important;
-}
-
-.interpolation-warning {
-  text-align: center;
-  font-size: 11px;
-  margin-bottom: 0.5em;
 }
 </style>

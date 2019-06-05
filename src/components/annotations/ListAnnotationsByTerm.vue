@@ -11,35 +11,17 @@
     <em class="no-result">{{ $t('no-annotation') }}</em>
   </template>
   <template v-else>
-    <v-popover
+    <annotation-preview
       v-for="annot in annotations" :key="title + annot.id"
-      placement="right"
-      trigger="manual"
-      :open="openedAnnot === annot.id"
-      :auto-hide="false"
-    > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
-
-      <div class="annot-preview" :style="styleAnnotDetails(annot)" @click.self="viewAnnot(annot)">
-        <button class="button is-small" @click="toggle(annot.id)">
-          <i :class="['fas', openedAnnot === annot.id ? 'fa-minus' : 'fa-plus']"></i>
-        </button>
-      </div>
-
-      <template #popover>
-        <annotation-details
-          v-click-outside.capture="(event) => close(event, annot.id)"
-          :annotation="annot"
-          :terms="allTerms"
-          :users="allUsers"
-          :images="allImages"
-          @addTerm="term => $emit('addTerm', term)"
-          @updateTerms="$emit('update', annot.id)"
-          @deletion="$emit('update', annot.id)"
-          v-if="openedAnnot === annot.id"
-        /> <!-- Display component only if it is the currently displayed annotation
-                (prevents fetching unnecessary information) -->
-      </template>
-    </v-popover>
+      :annot="annot"
+      :size="size"
+      :color="color"
+      :terms="allTerms"
+      :users="allUsers"
+      :images="allImages"
+      @addTerm="$emit('addTerm', $event)"
+      @update="$emit('update', annot.id)"
+    />
 
     <b-pagination
       :total="nbAnnotations"
@@ -54,7 +36,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import AnnotationDetails from './AnnotationDetails';
+import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 
@@ -81,7 +63,7 @@ export default {
 
     revision: Number
   },
-  components: {AnnotationDetails},
+  components: {AnnotationPreview},
   data() {
     return {
       loading: false,
@@ -176,34 +158,7 @@ export default {
     viewAnnot(annot) {
       this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
     },
-    toggle(id) {
-      this.openedAnnot = this.openedAnnot === id ? 0 : id;
-    },
-    close(event, id) {
-      // do not close the popover if click was performed in modal or in notification
-      let el = event.target;
-      let isModal = false;
-      while(el && !(isModal = (el.classList.contains('modal') || el.classList.contains('notifications')
-        || el.classList.contains('annot-preview')))
-      ) {
-        el = el.parentElement;
-      }
 
-      if(!isModal && this.openedAnnot === id) {
-        this.openedAnnot = 0;
-      }
-    },
-    cropURL(annot) {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      return `${annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
-    },
-    styleAnnotDetails(annot) {
-      return {
-        backgroundImage: `url(${this.cropURL(annot)})`,
-        width: this.size + 'px',
-        height: this.size + 'px'
-      };
-    }
   },
   created() {
     this.fetchPage();
@@ -214,28 +169,6 @@ export default {
 <style scoped>
 .box {
   position: relative;
-}
-
-.annot-preview {
-  display: inline-block;
-  background-position: center center;
-  background-repeat: no-repeat;
-  margin: 10px;
-  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
-  border: 3px solid white;
-  cursor: pointer;
-  text-align: right;
-}
-
-.annot-preview .button {
-  font-size: 10px;
-  width: 20px;
-  height: 20px;
-  box-sizing: border-box;
-  position: relative;
-  left: 3px;
-  bottom: 3px;
-  border: none;
 }
 
 .no-result {

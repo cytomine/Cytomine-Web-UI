@@ -1,4 +1,3 @@
-<!-- TODO: handle review mode -->
 <template>
 <div class="layers">
   <h1>{{ $t('annotation-layers') }}</h1>
@@ -18,25 +17,25 @@
       <thead>
         <tr>
           <th class="checkbox-column"><span class="far fa-eye"></span></th>
-          <th class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
+          <th v-if="!reviewMode" class="checkbox-column"><span class="fas fa-pencil-alt"></span></th>
           <th class="name-column"></th>
           <th class="checkbox-column"></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(layer, index) in selectedLayers" :key="layer.id">
+        <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
           <td class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(index)" />
+            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(idx)" />
           </td>
-          <td class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(index)" />
+          <td v-if="!reviewMode" class="checkbox-column">
+            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(idx)" />
           </td>
 
           <td class="name-column">
             {{ layerName(layer) }}
           </td>
           <td class="checkbox-column">
-            <button class="button is-small" @click="removeLayer(index)">
+            <button v-if="!reviewMode || !layer.isReview" class="button is-small" @click="removeLayer(idx)">
               <span class="fas fa-times"></span>
             </button>
           </td>
@@ -59,10 +58,13 @@ import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
 
 export default {
-  name: 'annotations-panel',
+  name: 'layers-panel',
   props: {
     index: String,
-    layersToPreload: Array
+    layersToPreload: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     return {
@@ -79,8 +81,11 @@ export default {
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
     imageWrapper() {
-      return this.$store.getters['currentProject/currentViewer'].images[this.index];
+      return this.viewerWrapper.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
@@ -100,22 +105,51 @@ export default {
       return this.layers.map(layer => layer.id);
     },
     selectedLayers() { // Array<User> (representing user layers)
-      // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
-      // may not be relevant for the current image => filter them
-      let layersIds = this.layers.map(layer => layer.id);
-      let selectedLayers = this.imageWrapper.layers.selectedLayers || [];
-      return selectedLayers.filter(layer => layersIds.includes(layer.id));
+      return this.imageWrapper.layers.selectedLayers || [];
     },
     selectedLayersIds() {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
       return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+    },
+    nbReviewedAnnotations() {
+      return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
+    },
+    hasReviewLayer() {
+      return this.image.inReview || this.image.reviewed;
+    },
+    reviewLayer() {
+      return {id: -1, isReview: true};
+    },
+    reviewMode() {
+      return this.imageWrapper.review.reviewMode;
+    },
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
     }
   },
   watch: {
     activePanel() {
       this.fetchIndexLayers();
+    },
+    reviewMode() {
+      if(this.reviewMode) {
+        if(!this.layers.includes(this.reviewLayer)) {
+          this.layers.push(this.reviewLayer);
+        }
+        this.addLayer(this.reviewLayer);
+      }
+      else {
+        if(!this.hasReviewLayer) {
+          let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+          if(index !== -1) {
+            this.removeLayer(index);
+          }
+
+          this.layers = this.layers.filter(layer => !layer.isReview);
+        }
+      }
     }
   },
   methods: {
@@ -124,7 +158,7 @@ export default {
         this.fetchIndexLayers();
       }
     },
-    reloadAnnotationsHandler(idImage) {
+    reloadAnnotationsHandler({idImage}={}) {
       if(!idImage || idImage === this.image.id) {
         this.fetchIndexLayers();
       }
@@ -132,7 +166,7 @@ export default {
 
     layerName(layer) {
       if(layer.isReview) {
-        return this.$t('review-layer');
+        return `${this.$t('review-layer')} (${this.nbReviewedAnnotations})`;
       }
 
       let name = fullName(layer);
@@ -164,8 +198,8 @@ export default {
       this.selectedLayer = null;
     },
 
-    removeLayer(index, cacheSelectedFeatures=false) {
-      this.$store.dispatch(this.imageModule + 'removeLayer', {indexLayer: index, cacheSelectedFeatures});
+    removeLayer(index) {
+      this.$store.dispatch(this.imageModule + 'removeLayer', index);
     },
 
     toggleLayerVisibility(index) {
@@ -178,12 +212,14 @@ export default {
 
     async fetchLayers() {
       this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
-      if(this.image.inReview || this.image.reviewed) {
-        this.layers.push({
-          id: -1,
-          isReview: true
-        });
+      if(this.hasReviewLayer) {
+        this.layers.push(this.reviewLayer);
       }
+
+      // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
+      // may not be relevant for the current image => filter them
+      let idLayers = this.layers.map(layer => layer.id);
+      this.$store.commit(this.imageModule + 'filterSelectedLayers', idLayers);
     },
 
     async fetchIndexLayers(force=false) {
@@ -191,6 +227,24 @@ export default {
         return;
       }
       this.indexLayers = await this.image.fetchAnnotationsIndex();
+    },
+
+    shortkeyHandler(key) {
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
+        return;
+      }
+
+      if(key === 't') { // toggle review layer
+        let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+        if(index !== -1) {
+          this.toggleLayerVisibility(index);
+          return;
+        }
+
+        if(this.layers.includes(this.reviewLayer)) {
+          this.addLayer(this.reviewLayer);
+        }
+      }
     }
   },
   async created() {
@@ -204,13 +258,10 @@ export default {
       return;
     }
 
-    let layersToAdd = [];
-    if(this.layersToPreload) {
-      this.layersToPreload.forEach(id => layersToAdd.push({id, visible: true}));
-    }
+    let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
 
     if(!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-      if(!this.layersToPreload || !this.layersToPreload.includes(this.currentUser.id)) {
+      if(!this.layersToPreload.includes(this.currentUser.id)) {
         layersToAdd.push({id: this.currentUser.id, visible: true});
       }
 
@@ -232,16 +283,17 @@ export default {
         console.log(error);
       }
     }
-
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {
     this.$eventBus.$on(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
     this.$eventBus.$off(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

@@ -1,4 +1,4 @@
-import {AnnotationTermCollection} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -28,4 +28,21 @@ export async function updateTermProperties(annot) {
       annot.userByTerm[mapping[term]].user.push(user);
     }
   });
+}
+
+/**
+ * Checks whether an annotation belongs to the provided layer and image
+ *
+ * @param {Object} annot The annotation
+ * @param {Object} layer The layer
+ * @param {Object} [image] The image
+ *
+ * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
+ */
+export function annotBelongsToLayer(annot, layer, image=null) {
+  if(image && annot.image !== image.id) {
+    return false;
+  }
+  let isReviewed = annot.type === AnnotationType.REVIEWED;
+  return layer.isReview ? isReviewed : (!isReviewed && annot.user === layer.id);
 }
