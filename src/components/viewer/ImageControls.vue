@@ -1,5 +1,5 @@
 <template>
-  <div class="image-controls">
+  <div class="image-controls" v-if="nbSlices > 1">
 
     <div class="image-dimension" v-if="image.channels > 1">
       <strong class="image-dimension-name">C</strong>
@@ -168,6 +168,9 @@ export default {
     },
     currentSlice() {
       return this.imageWrapper.activeSlice;
+    },
+    nbSlices() {
+      return this.image.depth * this.image.duration * this.image.channels;
     },
     currentChannel: {
       get() {
