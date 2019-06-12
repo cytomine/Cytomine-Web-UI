@@ -139,6 +139,7 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import Username from '@/components/user/Username';
 
 import constants from '@/utils/constants.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'members-activity',
@@ -179,14 +180,16 @@ export default {
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredMembers() {
-      let str = this.searchString.toLowerCase();
       let statusKnown = Boolean(this.onlineIds); // whether or not the info regarding online users could be fetched
       let includeOnline = this.selectedStatus.includes(this.onlineStatus);
       let includeOffline = this.selectedStatus.includes(this.offlineStatus);
       return this.members.filter(member => {
         let online = statusKnown ? this.onlineIds.includes(member.id) : null;
-        return (member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0)
+        return (this.regexp.test(member.name) || this.regexp.test(member.username))
                     && (!statusKnown || (includeOnline && online) || (includeOffline && !online))
                     && this.selectedRoles.includes(member.role);
       });

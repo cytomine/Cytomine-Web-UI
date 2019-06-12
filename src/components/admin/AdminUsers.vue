@@ -108,6 +108,7 @@ import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'admin-users',
@@ -130,15 +131,15 @@ export default {
     roles() {
       return rolesMapping;
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredUsers() {
       if(!this.searchString) {
         return this.users;
       }
 
-      let str = this.searchString.toLowerCase();
-      return this.users.filter(user => {
-        return user.name.toLowerCase().indexOf(str) >= 0 || user.username.toLowerCase().indexOf(str) >= 0;
-      });
+      return this.users.filter(user => this.regexp.test(user.name) || this.regexp.test(user.username));
     }
   },
   methods: {

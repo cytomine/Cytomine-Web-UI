@@ -30,6 +30,7 @@ import {get} from '@/utils/store-helpers';
 
 import {Property, PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   data() {
@@ -50,8 +51,8 @@ export default {
         return this.keysAnnotationProps;
       }
 
-      let str = this.searchString.toLowerCase();
-      return this.keysAnnotationProps.filter(key => key.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.keysAnnotationProps.filter(key => regexp.test(key));
     }
   },
   methods: {

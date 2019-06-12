@@ -201,6 +201,7 @@ import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, 
 import axios from 'axios';
 import filesize from 'filesize';
 import constants from '@/utils/constants.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
@@ -279,8 +280,8 @@ export default {
         return this.uploadedFiles;
       }
 
-      let str = this.searchString.toLowerCase();
-      return this.uploadedFiles.filter(uf => uf.originalFilename.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.uploadedFiles.filter(uf => regexp.test(uf.originalFilename));
     }
   },
   watch: {

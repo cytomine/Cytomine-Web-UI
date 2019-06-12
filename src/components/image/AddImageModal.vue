@@ -70,6 +70,7 @@
 import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'add-image-modal',
@@ -89,14 +90,14 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredImages() {
       let filtered = this.images;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(image => {
-          return image.originalFilename.toLowerCase().indexOf(str) >= 0;
-        });
+        filtered = filtered.filter(image => this.regexp.test(image.originalFilename));
       }
 
       return filtered;

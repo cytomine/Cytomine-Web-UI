@@ -55,6 +55,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {SoftwareCollection, SoftwareProject, SoftwareProjectCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'project-softwares',
@@ -73,8 +74,8 @@ export default {
     project: get('currentProject/project'),
 
     filteredSoftwares() {
-      let str = this.searchString.toLowerCase();
-      return this.softwares.filter(software => software.name.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.softwares.filter(software => regexp.test(software.name));
     }
   },
   methods: {

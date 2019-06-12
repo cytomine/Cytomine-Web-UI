@@ -227,6 +227,7 @@ import AddProjectModal from './AddProjectModal';
 
 import {isBetweenBounds} from '@/utils/bounds';
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 import {ProjectCollection} from 'cytomine-client';
 
@@ -312,13 +313,14 @@ export default {
     selectedOntologiesIds() {
       return this.selectedOntologies.map(ontology => ontology.id);
     },
-
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredProjects() {
       let filtered = this.projects;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(project => project.name.toLowerCase().indexOf(str) >= 0);
+        filtered = filtered.filter(project => this.regexp.test(project.name));
       }
 
       let includeContributor = this.selectedRoles.includes(this.contributorLabel);

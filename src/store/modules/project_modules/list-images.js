@@ -1,4 +1,5 @@
 import {isBetweenBounds} from '@/utils/bounds';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   namespaced: true,
@@ -62,10 +63,11 @@ export default {
 
   getters: {
     filteredImages: (state, getters) => images => {
-      let str = state.searchString.toLowerCase();
+      let str = state.searchString;
+      let regexp = getWildcardRegexp(str);
       return images.filter(image => {
-        return (!str || (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
-          (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0)) &&
+        return (!str || (image.instanceFilename && regexp.test(image.instanceFilename)) ||
+          (image.blindedName && regexp.test(image.blindedName))) &&
           getters.checkMultiselectFilter('formats', image.contentType) &&
           getters.checkMultiselectFilter('vendors', image.vendorFormatted) &&
           getters.checkMultiselectFilter('magnifications', image.magnificationFormatted) &&

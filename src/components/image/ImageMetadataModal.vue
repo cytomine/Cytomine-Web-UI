@@ -40,6 +40,7 @@
 <script>
 import {AbstractImage, PropertyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'image-metadata-modal',
@@ -61,10 +62,8 @@ export default {
       if(!this.searchString) {
         return this.properties;
       }
-      let str = this.searchString.toLowerCase();
-      return this.properties.filter(prop => {
-        return prop.key.toLowerCase().indexOf(str) >= 0 || prop.value.toLowerCase().indexOf(str) >= 0;
-      });
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.properties.filter(prop => regexp.test(prop.key) || regexp.test(prop.value));
     },
     styleImagePreview() {
       this.rotationAngle; // to force re-evaluation each time rotationAngle changes
