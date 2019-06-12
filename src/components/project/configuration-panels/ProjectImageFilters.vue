@@ -51,6 +51,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'project-image-filters',
@@ -69,8 +70,8 @@ export default {
     project: get('currentProject/project'),
 
     filteredImageFilters() {
-      let str = this.searchString.toLowerCase();
-      return this.imageFilters.filter(imgFilter => imgFilter.name.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.imageFilters.filter(imgFilter => regexp.test(imgFilter.name));
     }
   },
   methods: {

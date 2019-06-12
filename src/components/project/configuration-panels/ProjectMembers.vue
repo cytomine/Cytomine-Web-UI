@@ -140,6 +140,7 @@ import {get} from '@/utils/store-helpers';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 import {Cytomine, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
 
 export default {
@@ -174,13 +175,15 @@ export default {
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredMembers() {
       let filtered = this.allMembers;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
         filtered = filtered.filter(member => {
-          return member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0;
+          return this.regexp.test(member.name) || this.regexp.test(member.username);
         });
       }
 
