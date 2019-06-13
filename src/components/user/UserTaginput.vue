@@ -36,7 +36,7 @@ export default {
       }
 
       let regexp = getWildcardRegexp(this.searchString);
-      return filtered.filter(user => regexp.match(user.fullName));
+      return filtered.filter(user => regexp.test(user.fullName));
     }
   }
 };
