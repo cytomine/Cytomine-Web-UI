@@ -17,7 +17,10 @@ export default {
   props: {
     active: Boolean,
     title: String,
-    canCancel: Boolean
+    canCancel: {
+      type: Boolean,
+      default: true
+    }
   },
   components: {CytomineModalCard},
   methods: {
