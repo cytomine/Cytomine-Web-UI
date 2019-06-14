@@ -7,5 +7,5 @@ import _ from 'lodash';
  */
 export function getWildcardRegexp(str) {
   let escapedString = _.escapeRegExp(str); // escape all RegExp special characters (only * should have a special behaviour)
-  return new RegExp('(' + escapedString.split('\\*').join('.*') + ')', 'gi');
+  return new RegExp('(' + escapedString.split('\\*').join('.*') + ')', 'i');
 }
