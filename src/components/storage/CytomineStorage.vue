@@ -167,7 +167,7 @@
               <uploaded-file-status :file="uFile" />
             </b-table-column>
 
-            <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
+            <b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">
               {{ uFile.parentFilename ? uFile.parentFilename : "-" }}
             </b-table-column>
           </template>
@@ -184,10 +184,10 @@
 
           <template #bottom-left>
             <b-select v-model="perPage" size="is-small">
-              <option value="10">10 {{$t('per-page')}}</option>
-              <option value="25">25 {{$t('per-page')}}</option>
-              <option value="50">50 {{$t('per-page')}}</option>
-              <option value="100">100 {{$t('per-page')}}</option>
+              <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+              <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+              <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+              <option value="100">{{$t('count-per-page', {count: 100})}}</option>
             </b-select>
           </template>
         </b-table>
@@ -204,6 +204,7 @@ import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, 
 import axios from 'axios';
 import filesize from 'filesize';
 import constants from '@/utils/constants.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
@@ -282,8 +283,8 @@ export default {
         return this.uploadedFiles;
       }
 
-      let str = this.searchString.toLowerCase();
-      return this.uploadedFiles.filter(uf => uf.originalFilename.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.uploadedFiles.filter(uf => regexp.test(uf.originalFilename));
     }
   },
   watch: {

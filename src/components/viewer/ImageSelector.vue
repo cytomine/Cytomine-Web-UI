@@ -51,6 +51,7 @@ import {get} from '@/utils/store-helpers';
 
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'image-selector',
@@ -81,10 +82,8 @@ export default {
       let filtered = this.images;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered =  filtered.filter(image => {
-          return image.instanceFilename.toLowerCase().indexOf(str) >= 0;
-        });
+        let regexp = getWildcardRegexp(this.searchString);
+        filtered =  filtered.filter(image => regexp.test(image.instanceFilename));
       }
 
       return filtered;

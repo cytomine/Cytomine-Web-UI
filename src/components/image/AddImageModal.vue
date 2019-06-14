@@ -52,10 +52,10 @@
 
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
-            <option value="10">10 {{$t('per-page')}}</option>
-            <option value="25">25 {{$t('per-page')}}</option>
-            <option value="50">50 {{$t('per-page')}}</option>
-            <option value="100">100 {{$t('per-page')}}</option>
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
           </b-select>
         </template>
 
@@ -70,6 +70,7 @@
 import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'add-image-modal',
@@ -89,14 +90,14 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredImages() {
       let filtered = this.images;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(image => {
-          return image.originalFilename.toLowerCase().indexOf(str) >= 0;
-        });
+        filtered = filtered.filter(image => this.regexp.test(image.originalFilename));
       }
 
       return filtered;

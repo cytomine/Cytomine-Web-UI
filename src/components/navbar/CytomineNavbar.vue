@@ -10,7 +10,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-eye" iconPack="far" v-if="this.nbActiveProjects > 0" :title="$t('viewers')">
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">
@@ -27,7 +27,7 @@
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
-        {{ $t('admin') }}
+        {{ $t('admin-menu') }}
       </router-link>
     </div>
 
@@ -81,6 +81,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 
 import NavbarDropdown from './NavbarDropdown';
 import NavigationTree from './NavigationTree';
@@ -98,6 +99,7 @@ export default {
     NavigationTree,
     CytomineSearcher
   },
+  mixins: [changeLanguageMixin],
   data() {
     return {
       openedTopMenu: false,
@@ -112,6 +114,11 @@ export default {
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
+    }
+  },
+  watch: {
+    $route(){
+      this.openedTopMenu = false;
     }
   },
   methods: {
@@ -167,6 +174,7 @@ export default {
       try {
         await Cytomine.instance.logout();
         this.$store.dispatch('logout');
+        this.changeLanguage();
         this.$router.push('/');
       }
       catch(error) {

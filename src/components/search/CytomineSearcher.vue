@@ -57,6 +57,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'cytomine-searcher',
@@ -77,8 +78,8 @@ export default {
     displayResults() {
       return this.isActive && !this.error && this.searchString.length > 0;
     },
-    lowCaseSearchString() {
-      return this.searchString.toLowerCase();
+    regexp() {
+      return getWildcardRegexp(this.searchString);
     },
     filteredProjects() {
       if(!this.searchString) {
@@ -86,7 +87,7 @@ export default {
       }
 
       return this.projects.filter(project => {
-        return project.name.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+        return this.regexp.test(project.name);
       });
     },
     subsetProjects() {
@@ -101,7 +102,7 @@ export default {
       }
 
       return this.images.filter(image => {
-        return this.imageName(image).toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+        return this.regexp.test(this.imageName(image));
       });
     },
     subsetImages() {
@@ -149,13 +150,12 @@ export default {
       return String(image.blindedName || image.instanceFilename);
     },
     highlightedName(value) {
-      let regex = new RegExp(`(${this.lowCaseSearchString})`, 'gi');
-      return value.replace(regex, '<strong>$1</strong>');
+      return value.replace(this.regexp, '<strong>$1</strong>');
     },
     htmlImageName(img) {
       let blindIndication = img.blindedName ? `<span class="blind">[${this.$t('blinded-name-indication')}] </span>` : '';
       let inProject = `<span class="in-project">(${this.$t('in-project', {projectName: img.projectName})})</span>`;
-      return `${blindIndication}${this.highlightedName(this.imageName(img))} ${inProject}`;
+      return `${blindIndication}${this.highlightedName(this.imageName(img))}&nbsp;${inProject}`;
     }
   }
 };
@@ -164,6 +164,10 @@ export default {
 <style scoped>
 .navbar-item.search {
   height: 100%;
+}
+
+.navbar-item:not(.is-active) .navbar-dropdown { /* display dropdown if inactive even on mobile */
+  display: none;
 }
 
 .navbar-dropdown.search-results h2 {

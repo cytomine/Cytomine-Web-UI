@@ -165,6 +165,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
 import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
@@ -173,6 +174,7 @@ import copyToClipboard from 'copy-to-clipboard';
 export default {
   name: 'Account',
   $_veeValidate: {validator: 'new'},
+  mixins: [changeLanguageMixin],
   data() {
     return {
       updatedUser: this.$store.state.currentUser.user.clone(),
@@ -224,6 +226,7 @@ export default {
 
       try {
         await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
+        this.changeLanguage(this.currentUser.language);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
       catch(error) {

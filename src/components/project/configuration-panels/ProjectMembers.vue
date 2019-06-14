@@ -16,7 +16,7 @@
           {{$t('role')}}
         </div>
         <div class="filter-body">
-          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
             :searchable="false" />
         </div>
       </div>
@@ -97,10 +97,10 @@
 
       <template #bottom-left>
         <b-select v-model="perPage" size="is-small">
-          <option value="10">10 {{$t('per-page')}}</option>
-          <option value="25">25 {{$t('per-page')}}</option>
-          <option value="50">50 {{$t('per-page')}}</option>
-          <option value="100">100 {{$t('per-page')}}</option>
+          <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+          <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+          <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+          <option value="100">{{$t('count-per-page', {count: 100})}}</option>
         </b-select>
       </template>
     </b-table>
@@ -140,6 +140,7 @@ import {get} from '@/utils/store-helpers';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 import {Cytomine, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
 
 export default {
@@ -174,13 +175,15 @@ export default {
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredMembers() {
       let filtered = this.allMembers;
 
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
         filtered = filtered.filter(member => {
-          return member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0;
+          return this.regexp.test(member.name) || this.regexp.test(member.username);
         });
       }
 

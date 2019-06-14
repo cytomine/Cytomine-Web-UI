@@ -89,10 +89,10 @@
 
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
-            <option value="10">10 {{$t('per-page')}}</option>
-            <option value="25">25 {{$t('per-page')}}</option>
-            <option value="50">50 {{$t('per-page')}}</option>
-            <option value="100">100 {{$t('per-page')}}</option>
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
           </b-select>
         </template>
       </b-table>
@@ -108,6 +108,7 @@ import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'admin-users',
@@ -130,15 +131,15 @@ export default {
     roles() {
       return rolesMapping;
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredUsers() {
       if(!this.searchString) {
         return this.users;
       }
 
-      let str = this.searchString.toLowerCase();
-      return this.users.filter(user => {
-        return user.name.toLowerCase().indexOf(str) >= 0 || user.username.toLowerCase().indexOf(str) >= 0;
-      });
+      return this.users.filter(user => this.regexp.test(user.name) || this.regexp.test(user.username));
     }
   },
   methods: {

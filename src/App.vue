@@ -36,6 +36,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 
 import CytomineNavbar from './components/navbar/CytomineNavbar.vue';
 import Login from './components/user/Login.vue';
@@ -49,6 +50,7 @@ ifvisible.setIdleDuration(constants.IDLE_DURATION);
 export default {
   name: 'app',
   components: {CytomineNavbar, Login},
+  mixins: [changeLanguageMixin],
   data() {
     return {
       communicationError: false,
@@ -58,23 +60,13 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-    language() {
-      return this.currentUser && this.currentUser.language ? this.currentUser.language : this.$i18n.fallbackLocale;
-    },
     project: get('currentProject/project')
-  },
-  watch: {
-    language() {
-      let locale = this.language.toLowerCase();
-      this.$i18n.locale = locale;
-      this.$moment.locale(locale);
-    }
   },
   methods: {
     async loginWithToken() {
       try {
         await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
-        await this.$store.dispatch('currentUser/fetchUser');
+        await this.fetchUser();
       }
       catch(error) {
         console.log(error);
@@ -91,7 +83,7 @@ export default {
           await this.$store.dispatch('logout');
         }
         if(!this.currentUser && authenticated) {
-          await this.$store.dispatch('currentUser/fetchUser');
+          await this.fetchUser();
         }
         this.communicationError = false;
       }
@@ -102,6 +94,12 @@ export default {
 
       clearTimeout(this.timeout);
       this.timeout = setTimeout(this.ping, constants.PING_INTERVAL);
+    },
+    async fetchUser() {
+      await this.$store.dispatch('currentUser/fetchUser');
+      if(this.currentUser) {
+        this.changeLanguage(this.currentUser.language);
+      }
     }
   },
   async created() {
