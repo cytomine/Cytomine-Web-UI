@@ -75,7 +75,7 @@ export default {
         result = result.replace('$currentProject$', this.project.id);
         result = result.replace('$cytomineHost$', Cytomine.instance.host);
         result = result.replace('$currentDate$', new Date().getTime());
-        result = result.replace('$currentOntology$', this.ontology.id);
+        result = result.replace('$currentOntology$', this.ontology ? this.ontology.id : null);
         return result;
       }
     },
