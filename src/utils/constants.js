@@ -1,6 +1,6 @@
 export default Object.freeze({
-  CYTOMINE_CORE_HOST: 'http://localhost-core',
-  CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',
+  CYTOMINE_CORE_HOST: 'https://localhost-core',
+  CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   // Refresh intervals (expressed in milliseconds)

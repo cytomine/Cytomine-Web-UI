@@ -53,6 +53,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     activeTool() {
       return this.imageWrapper.draw.activeTool;
     },
@@ -156,6 +159,7 @@ export default {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
           image: this.image.id,
+          slice: this.slice.id,
           user: layer.id,
           term: this.termsToAssociate
         });

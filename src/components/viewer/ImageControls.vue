@@ -215,6 +215,7 @@ export default {
       let channel = (dimension === 'channel') ? this.currentSlice.channel + increment : this.currentSlice.channel;
       let zStack = (dimension === 'zStack') ? this.currentSlice.zStack + increment : this.currentSlice.zStack;
       this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', {time, channel, zStack});
+      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);

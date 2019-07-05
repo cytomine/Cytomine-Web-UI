@@ -356,7 +356,7 @@ export default {
     baseLayerURL() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.slice.mime}`;
-      return `${filterPrefix}http://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
+      return `${filterPrefix}https://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
     },
 
     colorManipulationOn() {
@@ -503,6 +503,7 @@ export default {
         try {
           await UserPosition.create({
             image: this.image.id,
+            slice: this.slice.id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),

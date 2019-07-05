@@ -48,6 +48,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     annotsIdsToSelect() {
       return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
     },
@@ -198,6 +201,7 @@ export default {
       let annots = await new AnnotationCollection({
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
+        slice: this.slice.id,
         reviewed: this.layer.isReview,
         notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
