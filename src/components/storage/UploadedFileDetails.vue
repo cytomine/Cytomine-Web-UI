@@ -45,6 +45,25 @@
     </template>
   </sl-vue-tree>
 
+  <template v-if="nbUploadedFiles > 10">
+    <div class="level">
+      <b-select v-model="nbPerPage" size="is-small" class="level-left">
+        <option value="10">10 {{$t('per-page')}}</option>
+        <option value="25">25 {{$t('per-page')}}</option>
+        <option value="50">50 {{$t('per-page')}}</option>
+        <option value="100">100 {{$t('per-page')}}</option>
+      </b-select>
+
+      <b-pagination
+        class="level-right"
+        :total="nbUploadedFiles"
+        :current.sync="currentPage"
+        size="is-small"
+        :per-page="nbPerPage"
+      />
+    </div>
+  </template>
+
   <template v-if="samplePreview">
     <h2>
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
@@ -85,8 +104,20 @@ export default {
       nodes: [],
       slidePreview: null,
       samplePreview: null,
-      error: false
+      error: false,
+
+      nbUploadedFiles: 0,
+      currentPage: 1,
+      nbPerPage: 10,
     };
+  },
+  computed: {
+    collection() {
+      return new UploadedFileCollection({
+        root: this.rootId,
+        max: this.nbPerPage
+      });
+    }
   },
   watch: {
     file() {
@@ -95,6 +126,13 @@ export default {
     },
     revision() {
       this.findRoot();
+      this.makeTree();
+    },
+    currentPage() {
+      this.findRoot();
+      this.makeTree();
+    },
+    collection() {
       this.makeTree();
     },
     slidePreview(val) {
@@ -114,18 +152,29 @@ export default {
     },
     async makeTree() {
       try {
-        this.uploadedFiles = (await UploadedFileCollection.fetchAll({root: this.rootId})).array;
-        this.nodes = this.createNodes(null);
+        let data = (await this.collection.fetchPage(this.currentPage - 1));
+        this.uploadedFiles = data.array;
+        this.nbUploadedFiles = data.totalNbItems;
+        this.nodes = (await this.createNodes(null));
       }
       catch(error) {
         console.log(error);
         this.error = true;
       }
     },
-    createNodes(idParent) {
+    async createNodes(idParent) {
       let directChildren = this.uploadedFiles.filter(file => file.parent === idParent);
-      return directChildren.map(file => {
-        let children = this.createNodes(file.id);
+
+      if (directChildren.length === 0 && idParent === null) {
+        let missingIds = this.uploadedFiles[0].lTree.split('.');
+        await Promise.all(missingIds.slice(0, missingIds.length - 1).map(async id => {
+          this.uploadedFiles.push((await UploadedFile.fetch(id)))
+        }));
+        return this.createNodes(null);
+      }
+
+      return await Promise.all(directChildren.map(async file => {
+        let children = await this.createNodes(file.id);
         return {
           title: file.originalFilename,
           isLeaf: children.length === 0,
@@ -134,7 +183,7 @@ export default {
           data: {downloadURL: file.downloadURL, ...file}, // data converted to object by sl-vue-tree => need to define downloadURL as property
           children
         };
-      });
+      }));
     },
     filesize(size) {
       return filesize(size, {base: 10});
@@ -240,5 +289,13 @@ h2 .button {
 
 >>> .sl-vue-tree-gap:nth-last-child(3) {
   border-width: 0 0 1px 1px !important;
+}
+
+>>> ul.pagination-list {
+  justify-content: flex-end;
+}
+
+.level {
+  padding-bottom: 0.5rem !important;
 }
 </style>
