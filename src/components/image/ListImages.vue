@@ -54,7 +54,8 @@
                 {{$t('vendor')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors" :multiple="true" />
+                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors"
+                    :multiple="true" label="label" track-by="value"/>
               </div>
             </div>
           </div>
@@ -65,8 +66,8 @@
                 {{$t('magnification')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect :multiple="true" :searchable="false"
-                    v-model="selectedMagnifications" :options="availableMagnifications" />
+                <cytomine-multiselect v-model="selectedMagnifications" :options="availableMagnifications"
+                    :multiple="true" :searchable="false" label="label" track-by="value"/>
               </div>
             </div>
 
@@ -75,8 +76,8 @@
                 {{$t('resolution')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect :multiple="true" :searchable="false"
-                    v-model="selectedResolutions" :options="availableResolutions" label="label" track-by="value" />
+                <cytomine-multiselect v-model="selectedResolutions" :options="availableResolutions"
+                    :multiple="true" :searchable="false" label="label" track-by="value" />
               </div>
             </div>
 
@@ -218,6 +219,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
+import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection} from 'cytomine-client';
 
@@ -284,7 +286,7 @@ export default {
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
     },
 
-    searchString: sync('searchString', storeOptions, {debounce: 500}),
+    searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
     selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
@@ -300,8 +302,8 @@ export default {
     multiSelectFilters() {
       return [
         {prop: 'extension', selected: this.selectedFormats},
-        {prop: 'vendor', selected: this.selectedVendors},
-        {prop: 'magnification', selected: this.selectedMagnifications},
+        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value)},
+        {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value)},
         {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value)}
       ];
     },
@@ -331,6 +333,7 @@ export default {
         };
       }
       for(let {prop, selected} of this.multiSelectFilters) {
+        if(prop == 'vendor') prop = 'mimeType';
         collection[prop] = {
           in: selected.join()
         };
@@ -349,35 +352,41 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    async fetchMultiselectOptions() {
-      // TODO: let lists = await ImageInstanceCollection.fetchStats({project: this.project.id});
-      // this.availableFormats = lists.format;
-      // this.availableVendors = lists.vendor.map(vendor => vendor || this.$t('unknown');
-      // this.availableMagnifications = lists.magnification(m => m || this.$t('unknown');
-      // this.availableResolutions = lists.resolution(resolution => {
-      //   return {
-      //     value: resolution,
-      //     label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
-      //   };
-      // });
-      // ---
-    },
+    async fetchFilters() {
+      let stats = await new ImageInstanceCollection.fetchBounds({project: this.project.id});
+      this.maxWidth = Math.max(100, stats.width.max);
+      this.maxHeight = Math.max(100, stats.height.max);
+      this.maxNbUserAnnotations = Math.max(100, stats.countImageAnnotations.max);
+      this.maxNbJobAnnotations = Math.max(100, stats.countImageJobAnnotations.max);
+      this.maxNbReviewedAnnotations = Math.max(100, stats.countImageReviewedAnnotations.max);
 
-    async fetchMaxFilters() {
-      // TODO: let stats = await ImageInstanceCollection.fetchOptions();
-      // this.maxNbMembers = max(10, stats.nbMembers.max);
-      // this.maxNbImages = max(10, stats.nbImages.max);
-      // this.maxNbUserAnnotations = max(100, stats.nbUserAnnotations.max);
-      // this.maxNbJobAnnotations = max(100, stats.nbJobAnnotations.max);
-      // this.maxNbReviewedAnnotations = max(100, stats.nbReviewedAnnotations.max);
-      // ---
+
+      this.availableFormats = stats.format.list;
+      this.availableVendors = stats.mimeType.list.map(mime => {
+        let vendor = vendorFromMime(mime);
+        return {
+          value: mime || 'null',
+          label: vendor ? vendor.name : this.$t('unknown')
+        }
+      });
+      this.availableMagnifications = stats.magnification.list.map(m => {
+        return {
+          value: m || 'null',
+          label: m || this.$t('unknown')
+        }
+      });
+      this.availableResolutions = stats.resolution.list.map(resolution => {
+        return {
+          value: resolution || 'null',
+          label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
+        };
+      });
     },
 
     async refreshData() {
       try {
         await Promise.all([
-          this.fetchMaxFilters(),
-          this.fetchMultiselectOptions()
+          this.fetchFilters(),
         ]);
         this.revision++;
       }
@@ -394,8 +403,7 @@ export default {
   async created() {
     try {
       await Promise.all([
-        this.fetchMaxFilters(),
-        this.fetchMultiselectOptions()
+        this.fetchFilters(),
       ]);
       this.loading = false;
     }
