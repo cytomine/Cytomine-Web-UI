@@ -181,6 +181,9 @@ export default {
         username: {
           in: this.selectedLaunchers
         },
+        status: {
+          in: this.selectedStatus.map(option => option.status).join()
+        }
       });
       if(this.selectedDate) {
         collection.created = {
@@ -199,10 +202,9 @@ export default {
   },
   methods: {
     async fetchMultiselectOptions() {
-      // TODO: let lists = await JobCollection.fetchStats();
-      // this.availableSoftwares = lists.softwareName;
-      // this.availableLaunchers = lists.username;
-      // ---
+      let stats = await JobCollection.fetchBounds({project: this.project.id});
+      this.availableSoftwares = stats.software.list.map(option => option.name);
+      this.availableLaunchers = stats.username.list;
     },
 
     async addJob(job) {

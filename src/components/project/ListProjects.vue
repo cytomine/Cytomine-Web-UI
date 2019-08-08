@@ -124,7 +124,7 @@
         :revision="revision"
       >
         <template #default="{row: project}">
-          <b-table-column field="currentUserRoles" label="" centered width="1" sortable>
+          <b-table-column field="currentUserRole" label="" centered width="1" sortable>
             <i
               v-if="project.currentUserRoles.admin"
               class="fas fa-user-cog"
@@ -215,7 +215,6 @@ import AddProjectModal from './AddProjectModal';
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import {ProjectCollection, OntologyCollection} from 'cytomine-client';
-
 export default {
   name: 'list-projects',
   components: {
@@ -268,7 +267,7 @@ export default {
     },
 
     availableOntologies() {
-      return [{id: null, name: this.$t('no-ontology')}, ...this.ontologies];
+      return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },
 
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
@@ -302,15 +301,18 @@ export default {
         withMembersCount: true,
         withLastActivity: true,
         withCurrentUserRoles: true,
-        name: {
-          ilike: this.searchString
-        },
         ontology: {
           in: this.selectedOntologiesIds.join()
         },
-        currentUserContributor: this.selectedRoles.includes(this.contributorLabel),
-        currentUserManager: this.selectedRoles.includes(this.managerLabel),
-      });
+        currentUserRole : {
+          in: this.selectedRoles.join().toLowerCase()
+        }
+      })
+      if(this.searchString) {
+        collection['name'] = {
+          ilike: this.searchString
+        }
+      }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
           gte: bounds[0],
@@ -339,13 +341,13 @@ export default {
       this.ontologies = ontologies;
     },
     async fetchMaxFilters() {
-      // TODO: let stats = await ProjectCollection.fetchStats();
-      // this.maxNbMembers = max(10, stats.nbMembers.max);
-      // this.maxNbImages = max(10, stats.nbImages.max);
-      // this.maxNbUserAnnotations = max(100, stats.nbUserAnnotations.max);
-      // this.maxNbJobAnnotations = max(100, stats.nbJobAnnotations.max);
-      // this.maxNbReviewedAnnotations = max(100, stats.nbReviewedAnnotations.max);
-      // ---
+      let stats = await new ProjectCollection.fetchBounds({withMembersCount:true});
+
+      this.maxNbMembers = Math.max(10, stats.members.max);
+      this.maxNbImages = Math.max(10, stats.numberOfImages.max);
+      this.maxNbUserAnnotations = Math.max(100, stats.numberOfAnnotations.max);
+      this.maxNbJobAnnotations = Math.max(100, stats.numberOfJobAnnotations.max);
+      this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
     },
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
