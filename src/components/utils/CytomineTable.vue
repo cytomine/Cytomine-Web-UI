@@ -23,8 +23,17 @@
     backend-sorting
     :default-sort="sort"
     :default-sort-direction="order"
+    :checkable="checkable"
+    :checked-rows.sync="internalCheckedRows"
+    :is-row-checkable="isRowCheckable"
     @sort="updateSort"
   >
+    <template #header="{column}">
+      <slot name="header" :column="column" :index="index">
+        {{ column.label }}
+      </slot>
+    </template>
+
     <template #default="{row, index}">
       <slot :row="row" :index="index"></slot>
     </template>
@@ -39,6 +48,10 @@
           {{$t('no-result')}}
         </slot>
       </div>
+    </template>
+
+    <template #footer>
+      <slot name="footer"></slot>
     </template>
 
     <template #bottom-left>
@@ -66,7 +79,10 @@ export default {
     sort: {type: String},
     order: {type: String, default: 'asc'},
     revision: Number, // updating this value will result in update of table data
-    refreshInterval: {type: Number, default: 0} // if > 0, table data will be refreshed according to refreshInterval (expressed in ms)
+    refreshInterval: {type: Number, default: 0}, // if > 0, table data will be refreshed according to refreshInterval (expressed in ms)
+    checkable: {type: Boolean, default: false},
+    checkedRows: {type: Array, default: () => []},
+    isRowCheckable: { type: Function }
   },
   data() {
     return {
@@ -74,6 +90,7 @@ export default {
       error: false,
       loading: true,
       total: 0,
+      internalCheckedRows: [],
       internalCurrentPage: null,
       internalPerPage: null,
       internalSort: null,
@@ -99,6 +116,9 @@ export default {
         this.$emit('update:currentPage', page);
         this.fetchPage(true);
       }
+    },
+    internalCheckedRows(chckedRows, previousValue) {
+      this.$emit('update:checkedRows', chckedRows);
     },
     internalPerPage(perPage) {
       this.$emit('update:perPage', perPage);
@@ -132,6 +152,13 @@ export default {
         let data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
         this.data = data.array;
         this.total = data.totalNbItems;
+
+        //as data is refetched, we need to update the selected rows
+        this.internalCheckedRows = this.data.filter(member => {
+          return this.internalCheckedRows.map(u => u.id).includes(member.id);
+        });
+
+        this.$emit('update:checkedRows', this.internalCheckedRows);
       }
       catch(error) {
         if(this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page
@@ -157,6 +184,7 @@ export default {
     this.internalPerPage = this.perPage;
     this.internalSort = this.sort;
     this.internalOrder = this.order;
+    this.internalCheckedRows = this.checkedRows;
   }
 };
 </script>
