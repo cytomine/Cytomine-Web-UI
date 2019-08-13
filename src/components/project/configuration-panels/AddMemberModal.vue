@@ -3,7 +3,7 @@
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
       <b-field>
-        <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
+        <user-taginput v-model="selectedMembers" :users="notMemberUsers" />
       </b-field>
     </template>
 
@@ -39,16 +39,15 @@ export default {
     return {
       loading: true,
       users: [],
-      filteredUsers: [],
-      selectedUsers: []
+      selectedMembers: []
     };
   },
   computed: {
     project: get('currentProject/project'),
     projectMembersIds() {
       let projectMembers = this.$store.state.currentProject.members;
-      let excluded = projectMembers.concat(this.selectedUsers);
-      return excluded.map(u => u.id);
+      let newProjectMembers = projectMembers.concat(this.selectedMembers);
+      return newProjectMembers.map(u => u.id);
     },
     notMemberUsers() {
       return this.users.filter(user => !this.projectMembersIds.includes(user.id));
@@ -56,16 +55,13 @@ export default {
   },
   watch: {
     active() {
-      this.selectedUsers = [];
+      this.selectedMembers = [];
     }
   },
   methods: {
     async addMembers() {
-      let updatedProject = this.project.clone();
-      updatedProject.users = this.projectMembersIds;
-
       try {
-        await updatedProject.save();
+        await this.project.addUsers(this.selectedMembers.map(member => member.id))
         this.$emit('addMembers');
         this.$notify({type: 'success', text: this.$t('notif-success-add-project-members')});
       }
