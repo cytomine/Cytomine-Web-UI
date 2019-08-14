@@ -355,8 +355,8 @@ export default {
 
     baseLayerURL() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.slice.mime}`;
-      return `${filterPrefix}https://localhost-ims/slice/tile?zoomify=${this.slice.path}${params}` // TODO: retrieve IMS url from image server
+      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
+      return `${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`
     },
 
     colorManipulationOn() {
