@@ -203,7 +203,7 @@
 
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
-    :idAbstractImage="image.baseImage"
+    :image="image"
   />
 </div>
 </template>
