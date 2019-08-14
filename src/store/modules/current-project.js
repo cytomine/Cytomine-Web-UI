@@ -1,4 +1,4 @@
-import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from 'cytomine-client';
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
@@ -82,11 +82,13 @@ export default {
     },
 
     async fetchProjectMembers({state, commit}) {
-      let managersPromise = state.project.fetchAdministrators();
-      let membersPromise = state.project.fetchUsers();
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: state.project.id,
+      });
 
-      let managers = (await managersPromise).array;
-      let members = (await membersPromise).array;
+      let members =  (await collection.fetchAll()).array;
+      let managers = members.filter(u => u.role == ProjectMemberRole.MANAGER || u.role == ProjectMemberRole.REPRESENTATIVE );
 
       members.forEach(member => member.fullName = fullName(member));
 
