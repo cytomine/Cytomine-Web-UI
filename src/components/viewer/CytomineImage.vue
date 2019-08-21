@@ -356,7 +356,7 @@ export default {
     baseLayerURL() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
-      return `${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`
+      return `${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`;
     },
 
     colorManipulationOn() {

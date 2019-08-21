@@ -102,6 +102,10 @@ export default {
 
   getters: {
     termsMapping: state => {
+      if(!state.terms) {
+        return {};
+      }
+
       return state.terms.reduce((mapping, term) => {
         mapping[term.id] = term;
         return mapping;
