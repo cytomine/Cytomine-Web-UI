@@ -193,6 +193,24 @@ export default {
         styles.push(...rejectedStyles);
       }
 
+      let nbTracks = annot.track.length;
+      let tracks = state.style.wrappedTracks;
+
+      if (tracks && nbTracks === 1) {
+        let wrappedTrack = getters.tracksMapping[annot.track[0]];
+        if(wrappedTrack) {
+          if(feature.getGeometry().getType() === 'LineString') {
+            styles.push(wrappedTrack.olLineStyle);
+          }
+          else {
+            styles.push(wrappedTrack.olStyle);
+          }
+        }
+      }
+      else if (tracks && nbTracks > 1) {
+        styles.push(state.style.multipleTracksStyle);
+      }
+
       // Properties
       let propValue = state.properties.selectedPropertyValues[annot.id];
       if (propValue) {

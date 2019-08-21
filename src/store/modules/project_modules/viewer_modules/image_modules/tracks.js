@@ -27,6 +27,7 @@ export default {
       ]);
 
       commit('setTracks', tracks);
+      commit('setWrappedTracks', tracks);
     },
 
     async setImageInstance({commit, dispatch}, image) {
@@ -38,6 +39,7 @@ export default {
       let tracks = await fetchTracks(state.idImage);
       commit('filterTracksNewAnnots', tracks || []);
       commit('setTracks', tracks);
+      commit('setWrappedTracks', tracks);
     },
 
     async refreshData({dispatch}) {

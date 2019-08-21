@@ -14,6 +14,29 @@ export function isCluster(feature) {
 
 // -----
 
+export function createStrokeStyle(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  let stroke = new Stroke({color: colorWithOpacity, width: 2});
+
+  return new Style({
+    stroke,
+    image: new Circle({radius:5, stroke: stroke})
+  });
+}
+
+export function createLineStrokeStyle(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  return new Style({stroke: new Stroke({color: colorWithOpacity, width: 5})});
+}
+
+// -----
+
 function createStroke(opacity=0.5) {
   return new Stroke({color: [0, 0, 0, opacity], width: 2});
 }
@@ -41,7 +64,7 @@ export function createColorStyle(color, opacity=0.5) {
 
 // -----
 
-export function createLineStyle(color, opacity=0.5) {
+export function createColorLineStyle(color, opacity=0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
