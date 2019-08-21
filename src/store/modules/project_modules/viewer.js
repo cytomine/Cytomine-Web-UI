@@ -93,6 +93,15 @@ export default {
       }
     },
 
+    refreshTracks({state, dispatch}, {idImage}) {
+      for(let index in state.images) {
+        let image = state.images[index].imageInstance;
+        if(image && image.id === idImage) {
+          dispatch(`images/${index}/refreshTracks`);
+        }
+      }
+    },
+
     setCenter({state, getters, commit}, {index, center}) {
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);

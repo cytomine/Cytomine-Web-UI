@@ -41,6 +41,41 @@
         />
       </div>
     </div>
+    <div
+      v-if="tracks"
+      class="buttons has-addons are-small track-selection"
+      :class="{'has-preview': tracksToAssociate.length > 0}"
+      v-click-outside="() => showTrackSelector = false"
+    >
+      <button
+        v-tooltip="$t('tracks-new-annotation')"
+        class="button"
+        :disabled="disabledDraw"
+        @click="showTrackSelector = !showTrackSelector"
+      >
+        <span class="icon is-small"><i class="fas fa-route"></i></span>
+      </button>
+
+      <div class="color-preview" :style="{'border-color': backgroundTracksNewAnnot}">
+        <span v-if="tracksToAssociate.length > 1">{{tracksToAssociate.length}}</span>
+      </div>
+
+      <div class="tracks-tree-container" v-show="showTrackSelector">
+        <b-input v-model="searchStringTrack" :placeholder="$t('search-placeholder')" size="is-small" />
+        <track-tree
+          class="track-tree"
+          v-model="tracksToAssociate"
+          :tracks="tracks"
+          :searchString="searchStringTrack"
+          :allow-new="true"
+          :allow-edition="true"
+          :image="image"
+          @newTrack="refreshTracks"
+          @updatedTrack="refreshTracks"
+          @deletedTrack="refreshTracks"
+        />
+      </div>
+    </div>
 
     <div class="buttons has-addons are-small">
       <button
@@ -51,7 +86,7 @@
         :class="{'is-selected': activeTool === 'point'}"
         @click="activateTool('point')"
       >
-        <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
+        <span class="icon is-small"><i class="fas fa-map-pin"></i></span>
       </button>
 
       <button
@@ -269,6 +304,7 @@
 import {get} from '@/utils/store-helpers';
 
 import OntologyTree from '@/components/ontology/OntologyTree';
+import TrackTree from '@/components/track/TrackTree';
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
@@ -280,6 +316,7 @@ import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
 export default {
   name: 'draw-tools',
   components: {
+    TrackTree,
     OntologyTree,
     IconPolygonFreeHand,
     IconLineFreeHand
@@ -291,7 +328,9 @@ export default {
     return {
       showTermSelector: false,
       format: new WKT(),
-      searchStringTerm: ''
+      searchStringTerm: '',
+      showTrackSelector: false,
+      searchStringTrack: ''
     };
   },
   computed: {
@@ -303,6 +342,9 @@ export default {
     },
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
+    },
+    viewerModule() {
+      return this.$store.getters['currentProject/currentViewerModule'];
     },
     imageWrapper() {
       return this.viewerWrapper.images[this.index];
@@ -324,6 +366,25 @@ export default {
     backgroundTermsNewAnnot() {
       if(this.termsToAssociate.length === 1) {
         return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
+      }
+      else {
+        return '#e2e2e2';
+      }
+    },
+    tracks() {
+      return this.imageWrapper.tracks.tracks;
+    },
+    tracksToAssociate: {
+      get() {
+        return this.imageWrapper.draw.tracksNewAnnots;
+      },
+      set(tracks) {
+        this.$store.commit(this.imageModule + 'setTracksNewAnnots', tracks);
+      }
+    },
+    backgroundTracksNewAnnot() {
+      if(this.tracksToAssociate.length === 1) {
+        return this.tracks.find(track => this.tracksToAssociate[0] === track.id).color;
       }
       else {
         return '#e2e2e2';
@@ -613,6 +674,10 @@ export default {
       }
     },
 
+    refreshTracks() {
+      this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
+    },
+
     shortkeyHandler(key) {
       if(!this.isActiveImage) { // shortkey should only be applied to active map
         return;
@@ -677,18 +742,18 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection {
+.term-selection, .track-selection {
   position: relative;
 }
 
-.term-selection.has-preview i.fas {
+.term-selection.has-preview i.fas, .track-selection.has-preview i.fas {
   position: relative;
   right: 0.25em;
   top: 0.2em;
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
@@ -702,7 +767,7 @@ export default {
   border-radius: 4px;
 }
 
-.term-selection:not(.has-preview) .color-preview {
+.term-selection:not(.has-preview) .color-preview, .track-selection:not(.has-preview) .color-preview {
   display:none;
 }
 
@@ -722,6 +787,10 @@ export default {
   line-height: 0.9em;
   font-family: Arial;
 }
+
+.track-selection .color-preview {
+  border: 1.5px solid;
+}
 </style>
 
 <style lang="scss">
@@ -729,15 +798,19 @@ $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
 
-  .term-selection .ontology-tree-container {
+  .term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
 
     .control {
       margin: 0.75em;
       margin-bottom: 0;
     }
 
-    .ontology-tree {
+    .ontology-tree, .track-tree {
       padding: 0.75em 0;
+    }
+
+    .sl-vue-tree-sidebar {
+      margin-right: 1.5em;
     }
   }
 

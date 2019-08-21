@@ -1,4 +1,4 @@
-import {ImageInstance, AbstractImage, AnnotationType, SliceInstanceCollection} from 'cytomine-client';
+import {ImageInstance, AnnotationType, SliceInstanceCollection} from 'cytomine-client';
 
 import constants from '@/utils/constants';
 
@@ -12,6 +12,7 @@ import tracking from './image_modules/tracking';
 import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
 import review from './image_modules/review';
+import tracks from './image_modules/tracks';
 
 import Vue from 'vue';
 
@@ -73,18 +74,15 @@ export default {
   },
 
   actions: {
-    async initialize({state, commit, dispatch}, image) {
+    async initialize({commit, dispatch}, image) {
       let clone = image.clone();
-      await fetchImageServers(clone);
       commit('setImageInstance', clone);
 
       let promises = [
+        dispatch('fetchReferenceSlice', true),
         dispatch('fetchSliceInstances'),
-        dispatch('fetchReferenceSlice')
       ];
-
       await Promise.all(promises);
-      commit('setActiveSlice', state.referenceSlice);
     },
 
     async setImageInstance({dispatch, rootState}, image) {
@@ -95,7 +93,7 @@ export default {
     },
 
     async refreshData({state, commit, dispatch}) {
-      let image = await fetchImage(state.imageInstance.id);
+      let image = await ImageInstance.fetch(state.imageInstance.id);
       commit('setImageInstance', image);
 
       let promises = [
@@ -111,13 +109,16 @@ export default {
       commit('setSliceInstances', slices);
     },
 
-    async fetchReferenceSlice({state, commit}) {
+    async fetchReferenceSlice({state, commit}, setAsActive = false) {
       let activeSlice = (await state.imageInstance.fetchReferenceSlice());
       commit('setReferenceSlice', activeSlice);
+      if(setAsActive) {
+        commit('setActiveSlice', state.referenceSlice);
+      }
     },
 
     setActiveSliceByRank({state, commit}, dimensions) {
-      commit('setActiveSlice', state.sliceInstances[dimensions.channel + state.imageInstance.channels * (dimensions.zStack + state.imageInstance.depth * dimensions.time)])
+      commit('setActiveSlice', state.sliceInstances[dimensions.channel + state.imageInstance.channels * (dimensions.zStack + state.imageInstance.depth * dimensions.time)]);
     }
   },
 
@@ -231,18 +232,8 @@ export default {
     tracking,
     undoRedo,
     view,
-    review
+    review,
+    tracks,
   }
 };
 
-async function fetchImage(idImage) {
-  let image = await ImageInstance.fetch(idImage);
-  await fetchImageServers(image);
-  return image;
-}
-
-async function fetchImageServers(image) {
-  if(!image.imageServerURLs) {
-    image.imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
-  }
-}
