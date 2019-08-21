@@ -12,7 +12,7 @@
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="cell && cell.image"
+        v-if="cell && cell.image && cell.slice"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -87,7 +87,8 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        cells[i] = {index, image};
+        let slice = this.viewer.images[index].activeSlice;
+        cells[i] = {index, image, slice};
       }
       return cells;
     },
