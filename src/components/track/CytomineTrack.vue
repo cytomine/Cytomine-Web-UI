@@ -1,6 +1,6 @@
 <template>
 <span v-if="track">
-  <i class="far fa-square" v-if="track.color" :style="{color: track.color}"></i>
+  <i class="far fa-square color-preview" v-if="track.color" :style="{color: track.color}"></i>
   {{track.name}}
 </span>
 </template>
@@ -15,5 +15,7 @@ export default {
 </script>
 
 <style scoped>
-
+  .color-preview {
+    margin-right: 0.25em;
+  }
 </style>
