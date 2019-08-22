@@ -107,6 +107,10 @@ let redStroke = new Stroke({color: red, width: width + 1});
 let lightRedStroke = new Stroke({color: lightRed, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
+export let trackedSelectStyles = [
+  new Style({ stroke: whiteStroke }),
+];
+
 export let selectStyles = [
   new Style({ stroke: whiteStroke }),
   new Style({ stroke: blueStroke }),
