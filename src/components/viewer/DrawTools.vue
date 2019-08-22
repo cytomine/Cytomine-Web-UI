@@ -311,7 +311,7 @@ import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 import WKT from 'ol/format/WKT';
 
 import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
-import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
+import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
 
 export default {
   name: 'draw-tools',
@@ -619,6 +619,7 @@ export default {
         if(jsonAnnot) {
           let annot = new Annotation(jsonAnnot);
           await updateTermProperties(annot);
+          await updateTrackProperties(annot);
           return annot;
         }
       }

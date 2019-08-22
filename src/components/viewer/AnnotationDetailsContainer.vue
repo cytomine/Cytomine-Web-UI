@@ -24,12 +24,16 @@
       <annotation-details
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
+        :images="[image]"
+        :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
         :key="selectedFeature.id"
         :showComments="showComments"
         @addTerm="addTerm"
-        @updateTerms="updateTerms()"
+        @addTrack="addTrack"
+        @updateTerms="updateTermsOrTracks()"
+        @updateTracks="updateTermsOrTracks()"
         @updateProperties="updateProperties()"
         @centerView="centerViewOnAnnot()"
         @deletion="handleDeletion()"
@@ -45,7 +49,7 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
-import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
+import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
 
 import WKT from 'ol/format/WKT';
 
@@ -109,6 +113,9 @@ export default {
     },
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
+    },
+    tracks() {
+      return this.imageWrapper.tracks.tracks;
     }
   },
   watch: {
@@ -143,9 +150,14 @@ export default {
       this.$store.dispatch(this.viewerModule + 'addTerm', term);
     },
 
-    async updateTerms() {
+    addTrack(track) {
+      this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: track.image});
+    },
+
+    async updateTermsOrTracks() {
       let updatedAnnot = await this.annot.clone().fetch();
       await updateTermProperties(updatedAnnot);
+      await updateTrackProperties(updatedAnnot);
 
       this.$eventBus.$emit('editAnnotation', updatedAnnot);
       this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});

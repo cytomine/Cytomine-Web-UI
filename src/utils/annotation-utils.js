@@ -1,4 +1,4 @@
-import {AnnotationTermCollection, AnnotationType} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -28,6 +28,17 @@ export async function updateTermProperties(annot) {
       annot.userByTerm[mapping[term]].user.push(user);
     }
   });
+}
+
+/**
+ * Fetch the tracks associated to the provided annot, and populate track and annotationTrack properties accordingly
+ *
+ * @param {Object} annot The annotation to update
+ */
+export async function updateTrackProperties(annot) {
+  let annotTracks = await AnnotationTrackCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id});
+  annot.track = annotTracks.array.map(at => at.track);
+  annot.annotationTrack = annotTracks.array;
 }
 
 /**

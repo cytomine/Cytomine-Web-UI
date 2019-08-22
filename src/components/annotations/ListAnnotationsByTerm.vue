@@ -19,7 +19,9 @@
       :terms="allTerms"
       :users="allUsers"
       :images="allImages"
+      :tracks="allTracks"
       @addTerm="$emit('addTerm', $event)"
+      @addTrack="$emit('addTrack', $event)"
       @update="$emit('update', annot.id)"
     />
 
@@ -60,6 +62,7 @@ export default {
     allTerms: Array,
     allUsers: Array,
     allImages: Array,
+    allTracks: Array,
 
     revision: Number
   },
@@ -86,6 +89,7 @@ export default {
         multipleTerm: this.multipleTerms,
         showTerm: true,
         showGIS: true,
+        showTrack: true,
         afterThan: this.afterThan,
         beforeThan: this.beforeThan,
         max: this.nbPerPage

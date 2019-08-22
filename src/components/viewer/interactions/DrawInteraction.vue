@@ -50,6 +50,9 @@ export default {
     termsToAssociate() {
       return this.imageWrapper.draw.termsNewAnnots;
     },
+    tracksToAssociate() {
+      return this.imageWrapper.draw.tracksNewAnnots;
+    },
     image() {
       return this.imageWrapper.imageInstance;
     },
@@ -161,7 +164,8 @@ export default {
           image: this.image.id,
           slice: this.slice.id,
           user: layer.id,
-          term: this.termsToAssociate
+          term: this.termsToAssociate,
+          track: this.tracksToAssociate
         });
 
         try {

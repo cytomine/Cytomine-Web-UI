@@ -182,6 +182,7 @@
       :allTerms="terms"
       :allUsers="allUsers"
       :allImages="images"
+      :allTracks="tracks"
 
       :term="term"
       :multipleTerms="term.id === multipleTermsOption.id"
@@ -198,6 +199,7 @@
       v-show="selectedTermsIds.includes(term.id)"
 
       @addTerm="addTerm"
+      @addTrack="addTrack"
       @update="revision++"
     />
 
@@ -222,7 +224,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsByTerm from './ListAnnotationsByTerm';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -248,6 +250,8 @@ export default {
 
       users: [],
       userJobs: [],
+
+      tracks: [],
 
       allowedSizes: [
         {label: this.$t('small'), size: 85},
@@ -410,12 +414,18 @@ export default {
         userJob.fullName = fullName(userJob);
       });
     },
+    async fetchTracks() {
+      this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+    },
     downloadURL(format) {
       return this.collection.getDownloadURL(format);
     },
     addTerm(term) {
       this.terms.push(term);
       this.selectedTermsIds.push(term.id);
+    },
+    addTrack(track) {
+      this.tracks.push(track);
     },
     resetPagesAndFilters() {
       this.$store.commit(this.storeModule + '/resetPagesAndFilters');
@@ -440,7 +450,8 @@ export default {
       await Promise.all([
         this.fetchImages(),
         this.fetchUsers(),
-        this.fetchUserJobs()
+        this.fetchUserJobs(),
+        this.fetchTracks()
       ]);
     }
     catch(error) {

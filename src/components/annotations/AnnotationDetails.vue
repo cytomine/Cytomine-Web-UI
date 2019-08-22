@@ -69,6 +69,45 @@
         </td>
       </tr>
 
+      <!-- TRACKS -->
+      <tr v-if="isPropDisplayed('tracks') && ontology">
+        <td colspan="2">
+          <h5>{{$t('tracks')}}</h5>
+          <b-tag v-for="{track} in associatedTracks" :key="track.id">
+            <cytomine-track :track="track" />
+            <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
+                    @click="removeTrack(track.id)">
+            </button>
+          </b-tag>
+          <div class="add-track-wrapper" v-if="canEdit" v-click-outside="() => showTrackSelector = false">
+            <b-field>
+              <b-input
+                size="is-small"
+                expanded
+                :placeholder="$t('add-track')"
+                v-model="addTrackString"
+                @focus="showTrackSelector = true"
+              />
+            </b-field>
+
+            <div class="track-tree-container" v-show="showTrackSelector">
+              <track-tree
+                class="track-tree"
+                :tracks="availableTracks"
+                :searchString="addTrackString"
+                :selectedNodes="associatedTracksIds"
+                :allowNew="true"
+                :image="image"
+                @newTrack="newTrack"
+                @select="addTrack"
+                @unselect="removeTrack"
+              />
+            </div>
+          </div>
+          <em v-else-if="!associatedTracks.length">{{$t('no-track')}}</em>
+        </td>
+      </tr>
+
       <!-- PROPERTIES -->
       <tr v-if="isPropDisplayed('properties')">
         <td colspan="2">
@@ -150,7 +189,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection} from 'cytomine-client';
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
@@ -158,6 +197,8 @@ import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import OntologyTree from '@/components/ontology/OntologyTree';
+import TrackTree from '@/components/track/TrackTree';
+import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 
 export default {
@@ -169,11 +210,14 @@ export default {
     OntologyTree,
     CytomineProperties,
     AttachedFiles,
-    AnnotationCommentsModal
+    AnnotationCommentsModal,
+    TrackTree,
+    CytomineTrack
   },
   props: {
     annotation: {type: Object},
     terms: {type: Array},
+    tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
     showImageInfo: {type: Boolean, default: true},
@@ -182,9 +226,12 @@ export default {
   data() {
     return {
       addTermString: '',
+      addTrackString: '',
       showTermSelector: false,
+      showTrackSelector: false,
       comments: null,
-      revTerms: 0
+      revTerms: 0,
+      revTracks: 0,
     };
   },
   computed: {
@@ -230,6 +277,24 @@ export default {
     associatedTermsIds() {
       this.revTerms;
       return this.associatedTerms.map(({term}) => term.id);
+    },
+    associatedTracks() {
+      if(this.annotation.annotationTrack) {
+        return this.annotation.annotationTrack.map(at => {
+          let track = this.tracks.find(track => at.track === track.id);
+          return {track};
+        });
+      }
+      else {
+        return [];
+      }
+    },
+    associatedTracksIds() {
+      this.revTracks;
+      return this.associatedTracks.map(({track}) => track.id);
+    },
+    availableTracks() {
+      return this.tracks.filter(track => track.image === this.annotation.image);
     }
   },
   methods: {
@@ -287,6 +352,42 @@ export default {
         let match = this.annotation.userByTerm.find(ubt => ubt.term === idTerm);
         if(match) {
           return match.user[0];
+        }
+      }
+    },
+
+    async newTrack(track) {
+      this.$emit('addTrack', track);
+      this.addTrack(track.id);
+    },
+    async addTrack(idTrack) {
+      if(idTrack) {
+        try {
+          await new AnnotationTrack({annotation: this.annotation.id, track: idTrack}).save();
+          this.$emit('updateTracks');
+          this.showTrackSelector = false;
+        }
+        catch(error) {
+          this.$notify({type: 'error', text: this.$t('notif-error-add-track')});
+          this.revTracks++;
+        }
+        finally {
+          this.addTrackString = '';
+        }
+      }
+    },
+    async removeTrack(idTrack) {
+      if(idTrack) {
+        try {
+          await AnnotationTrack.delete(this.annotation.id, idTrack);
+          this.$emit('updateTracks');
+        }
+        catch(error) {
+          this.$notify({type: 'error', text: this.$t('notif-error-remove-track')});
+          this.revTracks++;
+        }
+        finally {
+          this.addTrackString = '';
         }
       }
     },
@@ -377,11 +478,11 @@ a.is-fullwidth {
   width: auto;
 }
 
-.add-term-wrapper {
+.add-term-wrapper, .add-track-wrapper {
   position: relative;
 }
 
-.ontology-tree-container {
+.ontology-tree-container, .track-tree-container {
   position: absolute;
   top: 100%;
   left: 0;

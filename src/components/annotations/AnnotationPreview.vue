@@ -19,8 +19,11 @@
       :terms="terms"
       :users="users"
       :images="images"
+      :tracks="tracks"
       @addTerm="$emit('addTerm', $event)"
+      @addTrack="$emit('addTrack', $event)"
       @updateTerms="$emit('update')"
+      @updateTracks="$emit('update')"
       @deletion="$emit('update')"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
@@ -40,7 +43,8 @@ export default {
     color: String,
     terms: Array,
     users: Array,
-    images: Array
+    images: Array,
+    tracks: Array,
   },
   components: {AnnotationDetails},
   data() {
