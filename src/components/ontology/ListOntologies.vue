@@ -81,6 +81,7 @@
 
 <script>
 import {get, sync} from '@/utils/store-helpers';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 import {OntologyCollection} from 'cytomine-client';
 import OntologyDetails from './OntologyDetails';
@@ -107,8 +108,8 @@ export default {
     },
     filteredOntologies() {
       if(this.searchString.length > 0) {
-        let str = this.searchString.toLowerCase();
-        return this.ontologies.filter(ontology => ontology.name.toLowerCase().indexOf(str) >= 0);
+        let regexp = getWildcardRegexp(this.searchString);
+        return this.ontologies.filter(ontology => regexp.test(ontology.name));
       }
       return this.ontologies;
     },

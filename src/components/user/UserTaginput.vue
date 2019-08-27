@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import {getWildcardRegexp} from '@/utils/string-utils';
+
 export default {
   name: 'user-taginput',
   props: {
@@ -33,10 +35,8 @@ export default {
         return filtered;
       }
 
-      let str = this.searchString.toLowerCase();
-      return filtered.filter(user => {
-        return user.fullName.toLowerCase().indexOf(str) >= 0;
-      });
+      let regexp = getWildcardRegexp(this.searchString);
+      return filtered.filter(user => regexp.test(user.fullName));
     }
   }
 };

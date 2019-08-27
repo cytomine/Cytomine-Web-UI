@@ -53,6 +53,7 @@ import SlVueTree from 'sl-vue-tree';
 import CytomineTerm from './CytomineTerm';
 import TermModal from './TermModal';
 import {Term} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'ontology-tree',
@@ -84,8 +85,8 @@ export default {
     };
   },
   computed: {
-    lowCaseSearchString() {
-      return this.searchString.toLowerCase();
+    regexp() {
+      return getWildcardRegexp(this.searchString);
     },
     noResult() {
       return this.treeNodes.every(node => node.data.hidden);
@@ -102,7 +103,7 @@ export default {
       this.internalSelectedNodes = this.selectedNodes.slice();
       this.refreshNodeSelection();
     },
-    lowCaseSearchString() {
+    regexp() {
       this.filter();
     }
   },
@@ -144,9 +145,8 @@ export default {
     },
 
     filter() {
-      let str = this.lowCaseSearchString;
       this.applyToAllNodes(node => {
-        let match = node.title.toLowerCase().indexOf(str) >= 0;
+        let match = this.regexp.test(node.title);
         if(node.children) {
           let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
           node.isExpanded = matchInChildren;

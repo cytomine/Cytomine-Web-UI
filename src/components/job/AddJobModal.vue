@@ -121,8 +121,15 @@ export default {
         if(value.id) {
           value = value.id;
         }
-        if(Array.isArray(value) && value.length > 0 && value[0].id) {
-          value = value.map(model => model.id);
+        if(Array.isArray(value)) {
+          if(value.length) {
+            if(value[0].id) {
+              value = value.map(model => model.id).join();
+            }
+          }
+          else {
+            value = null;
+          }
         }
         return new JobParameter({softwareParameter: param.id, value});
       });

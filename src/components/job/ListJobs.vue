@@ -25,7 +25,7 @@
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" :multiple="true" />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
             </div>
           </div>
 
@@ -34,7 +34,7 @@
               {{$t('launcher')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" :multiple="true" />
+              <cytomine-multiselect v-model="selectedLaunchers" :options="availableLaunchers" multiple />
             </div>
           </div>
 
@@ -46,7 +46,7 @@
               <cytomine-datepicker
                 v-model="selectedDate"
                 :styles="['multiselect', 'bold-placeholder']"
-                :placeholder="$t('all')"
+                :placeholder="$t('all-dates')"
                 :maxDate="new Date()"
               />
             </div>
@@ -58,7 +58,7 @@
             </div>
             <div class="filter-body">
               <cytomine-multiselect v-model="selectedStatus" :options="availableStatus"
-                label="label" track-by="status" :multiple="true" />
+                label="label" track-by="status" multiple />
             </div>
           </div>
         </div>
@@ -105,7 +105,9 @@
         </template>
 
         <template #empty>
-          <p>{{$t('no-analysis-run')}}</p>
+          <div class="content has-text-grey has-text-centered">
+            <p>{{$t('no-analysis-run')}}</p>
+          </div>
         </template>
       </cytomine-table>
     </div>

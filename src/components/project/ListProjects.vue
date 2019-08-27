@@ -42,7 +42,7 @@
               </div>
               <div class="filter-body">
                 <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
-                  label="name" track-by="id" :multiple="true" />
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
               </div>
             </div>
 
@@ -51,8 +51,7 @@
                 {{$t('my-role')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-                  :searchable="false" />
+                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
               </div>
             </div>
 
@@ -187,7 +186,9 @@
         </template>
 
         <template #empty>
-          <p>{{$t('no-project')}}</p>
+          <div class="content has-text-grey has-text-centered">
+            <p>{{$t('no-project')}}</p>
+          </div>
         </template>
       </cytomine-table>
 

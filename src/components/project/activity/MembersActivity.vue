@@ -34,7 +34,7 @@
               {{$t('status')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" :multiple="true"
+              <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
                 :searchable="false" />
             </div>
           </div>
@@ -44,7 +44,7 @@
               {{$t('role')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+              <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
                 :searchable="false" />
             </div>
           </div>
@@ -114,10 +114,10 @@
 
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
-            <option value="10">10 {{$t('per-page')}}</option>
-            <option value="25">25 {{$t('per-page')}}</option>
-            <option value="50">50 {{$t('per-page')}}</option>
-            <option value="100">100 {{$t('per-page')}}</option>
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
           </b-select>
         </template>
       </b-table>
@@ -139,6 +139,7 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import Username from '@/components/user/Username';
 
 import constants from '@/utils/constants.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'members-activity',
@@ -179,14 +180,16 @@ export default {
     idManagers() {
       return this.$store.state.currentProject.managers.map(manager => manager.id);
     },
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
     filteredMembers() {
-      let str = this.searchString.toLowerCase();
       let statusKnown = Boolean(this.onlineIds); // whether or not the info regarding online users could be fetched
       let includeOnline = this.selectedStatus.includes(this.onlineStatus);
       let includeOffline = this.selectedStatus.includes(this.offlineStatus);
       return this.members.filter(member => {
         let online = statusKnown ? this.onlineIds.includes(member.id) : null;
-        return (member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0)
+        return (this.regexp.test(member.name) || this.regexp.test(member.username))
                     && (!statusKnown || (includeOnline && online) || (includeOffline && !online))
                     && this.selectedRoles.includes(member.role);
       });

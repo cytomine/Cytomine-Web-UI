@@ -45,7 +45,7 @@
                 {{$t('format')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" :multiple="true" />
+                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" multiple />
               </div>
             </div>
 
@@ -200,7 +200,9 @@
         </template>
 
         <template #empty>
-          <p>{{$t('no-image')}}</p>
+          <div class="content has-text-grey has-text-centered">
+            <p>{{$t('no-image')}}</p>
+          </div>
         </template>
       </cytomine-table>
     </div>

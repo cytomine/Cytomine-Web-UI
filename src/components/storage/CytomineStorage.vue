@@ -120,9 +120,8 @@
     </p>
     <div class="panel-block storage">
       <b-input
-        :value="searchString"
-        @input="debounceSearchString"
         class="search-uploaded-file"
+        v-model="searchString"
         :placeholder="$t('search-placeholder')"
         icon="search"
       />
@@ -187,13 +186,14 @@ import {get} from '@/utils/store-helpers';
 import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
-import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
+
+const storeOptions = {rootModuleProp: 'storeModule'};
 
 export default {
   name: 'cytomine-storage',
@@ -214,8 +214,6 @@ export default {
       selectedStorage: null,
       projects: [],
       selectedProject: null,
-
-      searchString: '',
 
       dropFiles: [],
 
@@ -260,6 +258,7 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
+    searchString: sync('searchString', {...storeOptions, debounce: 500}),
     uploadedFileCollection() {
       return new UploadedFileCollection({
         detailed: true,
@@ -426,11 +425,7 @@ export default {
 
     updatedTree() {
       this.revision++; // updating the table will result in new files objects => the uf details will also be updated
-    },
-
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500)
+    }
   },
   activated() {
     this.fetchStorages();

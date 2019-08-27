@@ -1,6 +1,6 @@
 <template>
-<b-modal :active="active" @close="$emit('close')" has-modal-card>
-  <cytomine-modal-card :title="title" @close="$emit('close', false)">
+<b-modal :active="active" @close="close()" has-modal-card>
+  <cytomine-modal-card :title="title" @close="close()">
     <slot></slot>
     <template #footer>
       <slot name="footer"></slot>

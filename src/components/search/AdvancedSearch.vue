@@ -93,6 +93,7 @@
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'advanced-search',
@@ -115,18 +116,18 @@ export default {
     pathSearchString() {
       return this.$route.params.searchString;
     },
-    lowCaseSearchString() {
-      return this.searchString.toLowerCase();
+    regexp() {
+      return getWildcardRegexp(this.searchString);
     },
     filteredProjects() {
       return this.projects.filter(project => {
-        return project.name.toLowerCase().indexOf(this.lowCaseSearchString) >= 0;
+        return this.regexp.test(project.name);
       });
     },
     filteredImages() {
       return this.images.filter(image => {
-        return (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(this.lowCaseSearchString) >= 0) ||
-          (image.blindedName && String(image.blindedName).toLowerCase().indexOf(this.lowCaseSearchString) >= 0);
+        return (image.instanceFilename && this.regexp.test(image.instanceFilename)) ||
+          (image.blindedName && this.regexp.test(String(image.blindedName)));
       });
     }
   },
