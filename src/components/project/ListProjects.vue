@@ -301,18 +301,22 @@ export default {
       let collection = new ProjectCollection({
         withMembersCount: true,
         withLastActivity: true,
-        withCurrentUserRoles: true,
-        ontology: {
+        withCurrentUserRoles: true
+      });
+      if(this.selectedOntologiesIds.length > 0){
+        collection['ontology'] = {
           in: this.selectedOntologiesIds.join()
-        },
-        currentUserRole : {
+        };
+      }
+      if(this.selectedRoles.length > 0){
+        collection['currentUserRole'] = {
           in: this.selectedRoles.join().toLowerCase()
-        }
-      })
+        };
+      }
       if(this.searchString) {
         collection['name'] = {
           ilike: this.searchString
-        }
+        };
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {

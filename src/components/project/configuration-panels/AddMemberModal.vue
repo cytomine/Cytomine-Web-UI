@@ -61,7 +61,7 @@ export default {
   methods: {
     async addMembers() {
       try {
-        await this.project.addUsers(this.selectedMembers.map(member => member.id))
+        await this.project.addUsers(this.selectedMembers.map(member => member.id));
         this.$emit('addMembers');
         this.$notify({type: 'success', text: this.$t('notif-success-add-project-members')});
       }

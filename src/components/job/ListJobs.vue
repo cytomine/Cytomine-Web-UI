@@ -176,17 +176,23 @@ export default {
 
     jobCollection() {
       let collection = new JobCollection({
-        project: this.project.id,
-        softwareName: {
-          in: this.selectedSoftwares
-        },
-        username: {
-          in: this.selectedLaunchers
-        },
-        status: {
-          in: this.selectedStatus.map(option => option.status).join()
-        }
+        project: this.project.id
       });
+      if(this.selectedSoftwares.length > 0){
+        collection['softwareName'] = {
+          in: this.selectedSoftwares
+        };
+      }
+      if(this.selectedLaunchers.length > 0){
+        collection['username'] = {
+          in: this.selectedLaunchers
+        };
+      }
+      if(this.selectedStatus.length > 0){
+        collection['status'] = {
+          in: this.selectedStatus.map(option => option.status).join()
+        };
+      }
       if(this.selectedDate) {
         collection.created = {
           gte: this.selectedDate.getTime(),

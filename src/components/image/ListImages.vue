@@ -324,10 +324,12 @@ export default {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',
         filterValue: this.project.id,
-        name: {
-          ilike: this.searchString
-        }
       });
+      if(this.searchString) {
+        collection['name'] = {
+          ilike: this.searchString
+        };
+      }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
           gte: bounds[0],
@@ -336,9 +338,11 @@ export default {
       }
       for(let {prop, selected} of this.multiSelectFilters) {
         if(prop == 'vendor') prop = 'mimeType';
-        collection[prop] = {
-          in: selected.join()
-        };
+        if(selected.length > 0) {
+          collection[prop] = {
+            in: selected.join()
+          };
+        }
       }
       return collection;
     },
