@@ -195,7 +195,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition} from 'cytomine-client';
+import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -563,6 +563,10 @@ export default {
       try {
         let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
+          if(annot.slice !== this.slice.id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            this.$store.commit(this.imageModule + 'setActiveSlice', slice);
+          }
           this.routedAnnotation = annot;
           if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
