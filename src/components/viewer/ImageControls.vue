@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import CytomineSlider from "@/components/form/CytomineSlider";
+import CytomineSlider from '@/components/form/CytomineSlider';
 
 import {formatMinutesSeconds} from '@/utils/video-utils.js';
 
@@ -145,7 +145,7 @@ export default {
   data() {
     return {
       step: 2, // TODO: add into configuration
-    }
+    };
   },
   props: {
     index: String
@@ -177,11 +177,7 @@ export default {
         return this.currentSlice.channel;
       },
       set(value) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', {
-          time: this.currentSlice.time,
-          channel: value,
-          zStack: this.currentSlice.zStack
-        });
+        this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
       }
     },
     currentZStack: {
@@ -189,11 +185,7 @@ export default {
         return this.currentSlice.zStack;
       },
       set(value) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', {
-          time: this.currentSlice.time,
-          zStack: value,
-          channel: this.currentSlice.channel
-        });
+        this.seek(this.currentSlice.channel, value, this.currentSlice.time);
       }
     },
     currentTime: {
@@ -201,11 +193,7 @@ export default {
         return this.currentSlice.time;
       },
       set(value) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', {
-          time: value,
-          channel: this.currentSlice.channel,
-          zStack: this.currentSlice.zStack
-        });
+        this.seek(this.currentSlice.channel, this.currentSlice.zStack, value);
       }
     },
   },
@@ -214,6 +202,9 @@ export default {
       let time = (dimension === 'time') ? this.currentSlice.time + increment : this.currentSlice.time;
       let channel = (dimension === 'channel') ? this.currentSlice.channel + increment : this.currentSlice.channel;
       let zStack = (dimension === 'zStack') ? this.currentSlice.zStack + increment : this.currentSlice.zStack;
+      this.seek(channel, zStack, time);
+    },
+    seek(channel, zStack, time) {
       this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', {time, channel, zStack});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
@@ -221,7 +212,7 @@ export default {
       return formatMinutesSeconds(time);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
