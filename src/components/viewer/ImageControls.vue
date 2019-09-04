@@ -10,6 +10,7 @@
           @click="shift('channel', -Math.min(step, currentSlice.channel))"
         >
           <i class="fas fa-fast-backward"></i>
+          <div class="step-counter">-{{step}}</div>
         </button>
         <button
           class="button is-small item"
@@ -36,6 +37,7 @@
           @click="shift('channel', Math.min(step, image.channels - currentSlice.channel - 1))"
         >
           <i class="fas fa-fast-forward"></i>
+          <div class="step-counter">+{{step}}</div>
         </button>
       </div>
     </div>
@@ -49,7 +51,9 @@
           @click="shift('zStack', -Math.min(step, currentSlice.zStack))"
         >
           <i class="fas fa-fast-backward"></i>
+          <div class="step-counter">-{{step}}</div>
         </button>
+
         <button
           class="button is-small"
           :disabled="currentSlice.zStack < 1"
@@ -75,6 +79,7 @@
           @click="shift('zStack', Math.min(step, image.depth - currentSlice.zStack - 1))"
         >
           <i class="fas fa-fast-forward"></i>
+          <div class="step-counter">+{{step}}</div>
         </button>
       </div>
     </div>
@@ -89,6 +94,7 @@
           @click="shift('time', -Math.min(step, currentSlice.time))"
         >
           <i class="fas fa-fast-backward"></i>
+          <div class="step-counter">-{{step}}</div>
         </button>
         <button
           class="button is-small"
@@ -102,7 +108,6 @@
       <div class="buttons has-addons">
         <button
           class="button is-small"
-          @click=""
         >
           <i class="fas fa-play"></i>
         </button>
@@ -128,6 +133,7 @@
           @click="shift('time', Math.min(step, image.duration - currentSlice.time - 1))"
         >
           <i class="fas fa-fast-forward"></i>
+          <div class="step-counter">+{{step}}</div>
         </button>
       </div>
     </div>
@@ -247,6 +253,16 @@ export default {
 
 .image-dimension-slider {
   flex-grow: 3;
+}
+
+.step-counter {
+  position: absolute;
+  top: 0.25em;
+  right: 0.25em;
+  font-size: 0.7em;
+  font-weight: 600;
+  text-align:right;
+  line-height: 0.9em;
 }
 
 </style>
