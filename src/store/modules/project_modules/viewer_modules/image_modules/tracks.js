@@ -19,7 +19,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit}, image) {
+    async initialize({commit}, {image}) {
       commit('setIdImage', image.id);
 
       let [tracks] = await Promise.all([
@@ -30,7 +30,7 @@ export default {
       commit('setWrappedTracks', tracks);
     },
 
-    async setImageInstance({commit, dispatch}, image) {
+    async setImageInstance({commit, dispatch}, {image}) {
       commit('setIdImage', image.id);
       await dispatch('refreshTracks');
     },

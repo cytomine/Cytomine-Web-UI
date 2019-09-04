@@ -136,7 +136,8 @@ export default {
           this.isFirstImage = true;
         }
         else {
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', prev);
+          let slice = await prev.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
         }
       }
       catch(error) {
@@ -152,7 +153,8 @@ export default {
           this.isLastImage = true;
         }
         else {
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', next);
+          let slice = await next.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
         }
       }
       catch(error) {

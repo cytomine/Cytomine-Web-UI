@@ -65,11 +65,19 @@ const routes = [
         component: CytomineViewer
       },
       {
+        path: 'image/:idImages/slice/:idSlices',
+        component: CytomineViewer
+      },
+      {
         path: 'image/:idImage/information',
         component: ImageInformation
       },
       {
         path: 'image/:idImages/annotation/:idAnnotation',
+        component: CytomineViewer
+      },
+      {
+        path: 'image/:idImages/slice/:idSlices/annotation/:idAnnotation',
         component: CytomineViewer
       },
       {

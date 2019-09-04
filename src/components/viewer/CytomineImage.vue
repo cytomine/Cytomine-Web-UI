@@ -565,7 +565,7 @@ export default {
         if(annot.image === this.image.id) {
           if(annot.slice !== this.slice.id) {
             let slice = await SliceInstance.fetch(annot.slice);
-            this.$store.commit(this.imageModule + 'setActiveSlice', slice);
+            this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
           this.routedAnnotation = annot;
           if(this.routedAction === 'comments') {

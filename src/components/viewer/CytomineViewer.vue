@@ -37,7 +37,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
 import constants from '@/utils/constants.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -60,6 +60,9 @@ export default {
     },
     idImages() {
       return this.$route.params.idImages.split('-');
+    },
+    idSlices() {
+      return (this.$route.params.idSlices) ? this.$route.params.idSlices.split('-') : [];
     },
     paramIdViewer() {
       return this.$route.query.viewer;
@@ -163,9 +166,12 @@ export default {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          await Promise.all(this.idImages.map(async id => {
+          await Promise.all(this.idImages.map(async (id, idx) => {
             let image = await ImageInstance.fetch(id);
-            await this.$store.dispatch(this.viewerModule + 'addImage', image);
+
+            let idSlice = this.idSlices[idx];
+            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
           }));
         }
         else {

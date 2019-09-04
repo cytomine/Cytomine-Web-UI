@@ -70,11 +70,11 @@ export default {
       router.replace(getters.pathViewer({idAnnotation, action}));
     },
 
-    async addImage({state, commit, getters, dispatch}, image) {
+    async addImage({state, commit, getters, dispatch}, {image, slice}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
-      await dispatch(`images/${index}/initialize`, image);
+      await dispatch(`images/${index}/initialize`, {image, slice});
       dispatch('changePath');
     },
 
@@ -161,9 +161,10 @@ export default {
       let idViewer = getters.pathModule[3];
       // ---
       let imagesIds = Object.values(state.images).map(img => img.imageInstance ? img.imageInstance.id : 0);
+      let slicesIds = Object.values(state.images).map(img => img.activeSlice ? img.activeSlice.id : 0);
       let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
       let actionStr = action ? '&action=' + action : '';
-      return `/project/${idProject}/image/${imagesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
+      return `/project/${idProject}/image/${imagesIds.join('-')}/slice/${slicesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
     },
 
     getLinkedIndexes: state => index => { // find all indexes linked to provided index (if image is not linked, return only its index)
