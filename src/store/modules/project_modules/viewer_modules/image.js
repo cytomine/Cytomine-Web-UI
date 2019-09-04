@@ -174,23 +174,6 @@ export default {
       }
 
       let nbTracks = annot.track.length;
-      let tracks = state.style.wrappedTracks;
-
-      if (tracks && nbTracks === 1) {
-        let wrappedTrack = getters.tracksMapping[annot.track[0]];
-        if(wrappedTrack) {
-          if(feature.getGeometry().getType() === 'LineString') {
-            styles.push(wrappedTrack.olLineStyle);
-          }
-          else {
-            styles.push(wrappedTrack.olStyle);
-          }
-        }
-      }
-      else if (tracks && nbTracks > 1) {
-        styles.push(state.style.multipleTracksStyle);
-      }
-
       let isReviewed = annot.type === AnnotationType.REVIEWED;
       let isRejected = state.review.reviewMode && !isReviewed;
 
@@ -208,6 +191,23 @@ export default {
       }
       else if(isRejected) {
         styles.push(...rejectedStyles);
+      }
+
+      let tracks = state.style.wrappedTracks;
+
+      if (tracks && nbTracks === 1) {
+        let wrappedTrack = getters.tracksMapping[annot.track[0]];
+        if(wrappedTrack) {
+          if(feature.getGeometry().getType() === 'LineString') {
+            styles.unshift(wrappedTrack.olLineStyle);
+          }
+          else {
+            styles.push(wrappedTrack.olStyle);
+          }
+        }
+      }
+      else if (tracks && nbTracks > 1) {
+        styles.push(state.style.multipleTracksStyle);
       }
 
       // Properties

@@ -109,6 +109,7 @@ let whiteStroke = new Stroke({color: white, width: width + 2});
 
 export let trackedSelectStyles = [
   new Style({ stroke: whiteStroke }),
+  new Style({ image: new Circle({radius: 6, stroke: whiteStroke}) })
 ];
 
 export let selectStyles = [
