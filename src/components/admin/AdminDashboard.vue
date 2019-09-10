@@ -36,7 +36,7 @@
         <router-link :to="`/project/${currentStats.mostActiveProject.project.id}`">
           {{currentStats.mostActiveProject.project.name}}
         </router-link>
-        ({{$tc("count-active-users", currentStats.mostActiveProject.users, {count: currentStats.mostActiveProject.project})}})
+        ({{$tc("count-active-users", currentStats.mostActiveProject.users, {count: currentStats.mostActiveProject.users})}})
       </p>
     </template>
 
@@ -221,4 +221,3 @@ td:first-child {
   width: 100%;
 }
 </style>
-
