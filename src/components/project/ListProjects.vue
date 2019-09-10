@@ -303,7 +303,7 @@ export default {
         withLastActivity: true,
         withCurrentUserRoles: true
       });
-      if(this.selectedOntologiesIds.length > 0){
+      if(this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length){
         collection['ontology'] = {
           in: this.selectedOntologiesIds.join()
         };
