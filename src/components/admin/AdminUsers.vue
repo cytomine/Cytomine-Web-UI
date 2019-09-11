@@ -133,7 +133,7 @@ export default {
       });
       if(this.searchString) {
         collection['fullName'] = {
-          ilike: this.searchString
+          ilike: encodeURIComponent(this.searchString)
         };
       }
 

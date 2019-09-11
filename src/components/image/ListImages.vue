@@ -327,7 +327,7 @@ export default {
       });
       if(this.searchString) {
         collection['name'] = {
-          ilike: this.searchString
+          ilike: encodeURIComponent(this.searchString)
         };
       }
       for(let {prop, bounds} of this.boundsFilters) {
