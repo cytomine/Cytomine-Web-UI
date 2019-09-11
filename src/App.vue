@@ -20,7 +20,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <login v-else-if="!currentUser" />
+    <!--<login v-else-if="!currentUser" />-->
 
     <template v-else>
       <cytomine-navbar />
@@ -84,6 +84,10 @@ export default {
         }
         if(!this.currentUser && authenticated) {
           await this.fetchUser();
+        }
+        if(!this.currentUser) {
+          let redirect = encodeURIComponent(window.location.href);
+          window.location = '/login/Shibboleth?cytomine_redirect='+redirect;
         }
         this.communicationError = false;
       }
