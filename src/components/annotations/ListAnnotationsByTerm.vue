@@ -1,6 +1,6 @@
 <template>
 <div class="box">
-  <b-loading :is-full-page="false" class="small" :active="loading" />
+  <b-loading :is-full-page="false" class="small" :active="loading" v-if="!isInViewer" />
   <h2> {{ title }} ({{nbAnnotations}}) </h2>
   <template v-if="error">
     <b-message type="is-danger" has-icon icon-size="is-small">
@@ -12,7 +12,7 @@
   </template>
   <template v-else>
     <annotation-preview
-      v-for="annot in annotations" :key="title + annot.id"
+      v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
       :annot="annot"
       :size="size"
       :color="color"
@@ -20,9 +20,14 @@
       :users="allUsers"
       :images="allImages"
       :tracks="allTracks"
+      :show-image-info="!isInViewer"
       @addTerm="$emit('addTerm', $event)"
       @addTrack="$emit('addTrack', $event)"
-      @update="$emit('update', annot.id)"
+      @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
+      @updateProperties="$emit('updateProperties')"
+      @centerView="$emit('centerView', annot)"
+      @deletion="$emit('delete', annot)"
+      @selectAnnotation="$emit('select', annot)"
     />
 
     <b-pagination
@@ -53,18 +58,21 @@ export default {
     multipleTerms: Boolean,
     noTerm: Boolean,
     imagesIds: Array,
+    slicesIds: {type: Array, default: null},
     usersIds: Array,
     reviewed: Boolean,
-    reviewUsersIds: Array,
-    afterThan: Number,
-    beforeThan: Number,
+    reviewUsersIds: {type: Array, default: null},
+    afterThan: {type: Number, default: null},
+    beforeThan: {type: Number, default: null},
 
     allTerms: Array,
     allUsers: Array,
     allImages: Array,
     allTracks: Array,
 
-    revision: Number
+    revision: Number,
+    visible: {type: Boolean, default: true},
+    index: String
   },
   components: {AnnotationPreview},
   data() {
@@ -73,7 +81,7 @@ export default {
       error: false,
       annotations: [],
       nbAnnotations: 0,
-      openedAnnot: 0
+      pendingReload: true,
     };
   },
   computed: {
@@ -81,6 +89,7 @@ export default {
       this.revision; // to ensure that collection is reloaded if revision changes
       return new AnnotationCollection({
         images: this.imagesIds,
+        slices: (this.isInViewer) ? this.slicesIds : null,
         term: this.multipleTerms || this.noTerm ? null : this.term.id,
         noTerm: this.noTerm,
         users: this.usersIds,
@@ -90,6 +99,7 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showWKT: this.isInViewer,
         afterThan: this.afterThan,
         beforeThan: this.beforeThan,
         max: this.nbPerPage
@@ -104,15 +114,30 @@ export default {
       }
       return this.term.name;
     },
+    isInViewer() {
+      return (this.index !== undefined);
+    },
     currentProject: get('currentProject/project'),
     projectModule() {
       return this.$store.getters['currentProject/currentProjectModule'];
     },
+    imageModule() {
+      return (this.isInViewer) ? this.$store.getters['currentProject/imageModule'](this.index) : null;
+    },
+    imageWrapper() {
+      return (this.isInViewer) ? this.$store.getters['currentProject/currentViewer'].images[this.index] : null;
+    },
     currentPage: {
       get() {
+        if (this.isInViewer) {
+          return this.imageWrapper.annotationsList.currentPage || 1;
+        }
         return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.term.id] || 1;
       },
       set(page) {
+        if (this.isInViewer) {
+          this.$store.commit(this.imageModule + 'setCurrentPage', page);
+        }
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {term: this.term.id, page});
       }
     }
@@ -123,10 +148,22 @@ export default {
     },
     collection() {
       this.fetchPage();
-    }
+    },
+    visible() {
+      if(this.pendingReload) {
+        this.fetchPage();
+      }
+    },
   },
   methods: {
     async fetchPage() {
+      if(!this.visible) { // prevent unnecessary reload if list not visible but schedule a reload at next opening
+        this.pendingReload = true;
+        return;
+      }
+
+      this.pendingReload = false;
+
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
                     || (this.reviewed && !this.reviewUsersIds.length)) {
         this.annotations = [];
@@ -140,12 +177,6 @@ export default {
         let data = await this.collection.fetchPage(this.currentPage - 1);
         this.annotations = data.array;
         this.nbAnnotations = data.totalNbItems;
-
-        // if openedAnnot no longer in collection (can happen if term was removed from annotation),
-        // reset openedAnnot value (otherwise, if annot added again to collection, popover reopens)
-        if(!this.annotations.map(annot => annot.id).includes(this.openedAnnot)) {
-          this.openedAnnot = 0;
-        }
       }
       catch(error) {
         if(this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page

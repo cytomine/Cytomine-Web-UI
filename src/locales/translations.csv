@@ -820,3 +820,6 @@ multiple-tracks,Multiple tracks,Traces multiples
 no-track-to-add,No track to add,Pas de trace à ajouter
 notif-error-add-track,Failed to add the track,Impossible d'ajouter la trace
 notif-error-remove-track,Failed to remove the track,Impossible de retirer la trace
+by-term,By term,Par terme
+by-track,By track,Par trace
+annotations-list,Annotation list, Liste des annotations

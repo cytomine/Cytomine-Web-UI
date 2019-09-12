@@ -202,6 +202,8 @@
 
       @addTerm="addTerm"
       @addTrack="addTrack"
+      @updateTermsOrTracks="revision++"
+      @delete="revision++"
       @update="revision++"
     />
 

@@ -149,7 +149,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
+    <annotations-container :index="index" :view="$refs.view" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -170,6 +170,7 @@ import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
 import DrawTools from './DrawTools';
 import ImageControls from './ImageControls';
+import AnnotationsContainer from './AnnotationsContainer';
 
 import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
@@ -180,8 +181,6 @@ import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
 import ReviewPanel from './panels/ReviewPanel';
-
-import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
@@ -215,8 +214,7 @@ export default {
     ScaleLine,
     DrawTools,
     ImageControls,
-
-    AnnotationDetailsContainer,
+    AnnotationsContainer,
 
     InformationPanel,
     DigitalZoom,
@@ -802,5 +800,13 @@ $colorOpenedPanelLink: #6c95c8;
   z-index: 5;
 }
 
+/* ----- Annotation list ----- */
+.annotations-table-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: $widthPanelBar;
+  z-index: 5;
+  pointer-events: none;
 }
 </style>

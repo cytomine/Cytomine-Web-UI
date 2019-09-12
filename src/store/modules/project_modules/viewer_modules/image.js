@@ -13,6 +13,7 @@ import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
 import review from './image_modules/review';
 import tracks from './image_modules/tracks';
+import annotationsList from './image_modules/annotations-list';
 
 import Vue from 'vue';
 
@@ -251,6 +252,7 @@ export default {
     view,
     review,
     tracks,
+    annotationsList,
   }
 };
 
