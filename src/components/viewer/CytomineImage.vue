@@ -806,7 +806,7 @@ $colorOpenedPanelLink: #6c95c8;
   bottom: 0;
   left: 0;
   right: $widthPanelBar;
-  z-index: 5;
+  z-index: 20;
   pointer-events: none;
 }
 </style>
