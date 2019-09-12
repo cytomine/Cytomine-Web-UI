@@ -90,6 +90,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
@@ -226,7 +229,7 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.image.fetchAnnotationsIndex();
+      this.indexLayers = await this.slice.fetchAnnotationsIndex();
     },
 
     shortkeyHandler(key) {
