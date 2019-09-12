@@ -71,7 +71,8 @@ export default {
     multipleSelection: {type: Boolean, default: true},
     allowDrag: {type: Boolean, default: false},
     allowEdition: {type: Boolean, default: false},
-    allowNew: {type: Boolean, default: false}
+    allowNew: {type: Boolean, default: false},
+    hiddenNodes: {type: Array, default: () => []}
   },
   components: {
     SlVueTree,
@@ -104,6 +105,9 @@ export default {
       this.refreshNodeSelection();
     },
     regexp() {
+      this.filter();
+    },
+    hiddenNodes() {
       this.filter();
     }
   },
@@ -146,7 +150,7 @@ export default {
 
     filter() {
       this.applyToAllNodes(node => {
-        let match = this.regexp.test(node.title);
+        let match = this.regexp.test(node.title) && !this.hiddenNodes.includes(node.data.id);
         if(node.children) {
           let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
           node.isExpanded = matchInChildren;
