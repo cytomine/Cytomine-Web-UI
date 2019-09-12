@@ -139,7 +139,7 @@
       </ul>
     </div>
 
-    <image-controls :index="index" :current-slice="slice" class="image-controls" />
+    <image-controls :index="index" class="image-controls-wrapper" />
 
     <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
@@ -794,12 +794,13 @@ $colorOpenedPanelLink: #6c95c8;
 }
 
 /* ----- Image controls ----- */
-.image-controls {
+.image-controls-wrapper {
   position: absolute;
-  bottom: 1rem;
+  bottom: 1.5rem;
   left: 20%;
   right: calc(#{$widthPanelBar} + 20%);
   z-index: 5;
+}
 
 }
 </style>

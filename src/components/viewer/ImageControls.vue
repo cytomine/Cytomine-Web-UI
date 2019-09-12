@@ -1,5 +1,5 @@
 <template>
-  <div class="image-controls" v-if="nbSlices > 1">
+  <div class="image-controls-container" v-if="nbSlices > 1">
 
     <div class="image-dimension" v-if="image.channels > 1">
       <strong class="image-dimension-name">C</strong>
@@ -222,7 +222,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.image-controls {
+.image-controls-container {
   padding: 0.5rem;
   border-radius: 4px;
   box-shadow: 0 0 1px #777;
