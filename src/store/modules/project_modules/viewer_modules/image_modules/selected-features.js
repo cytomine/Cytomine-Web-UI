@@ -93,6 +93,10 @@ export default {
 
     setImageInstance({commit}) {
       commit('clearSelectedFeatures');
+    },
+
+    setActiveSlice({commit}) {
+      commit('clearSelectedFeatures');
     }
   },
 

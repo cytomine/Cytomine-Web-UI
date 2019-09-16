@@ -11,7 +11,13 @@
       <button class="button is-small" @click="opened = !opened" ref="previewButton">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
       </button>
+
     </div>
+    <template v-if="showSliceInfo">
+      <div v-if="image.channels > 1">C: {{annot.channel}}</div>
+      <div v-if="image.depth > 1">Z: {{annot.zStack}}</div>
+      <div v-if="image.duration > 1">T: {{annot.time}}</div>
+    </template>
   </div>
 
   <template #popover>
@@ -50,7 +56,8 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
-    showImageInfo: {type: Boolean, default: true}
+    showImageInfo: {type: Boolean, default: true},
+    showSliceInfo: {type: Boolean, default: false}
   },
   components: {AnnotationDetails},
   data() {
@@ -68,6 +75,9 @@ export default {
         width: this.size + 'px',
         height: this.size + 'px'
       };
+    },
+    image() {
+      return this.images.find(image => image.id === this.annot.image);
     }
   },
   methods: {

@@ -32,6 +32,7 @@
 
       <div class="annotations-list-container">
         <list-annotations-by-term
+          v-if="isDisplayedByTerm"
           :size="85"
           color="000000"
           :nb-per-page="nbPerPage"
@@ -44,6 +45,35 @@
           :term="findTerm(selectedTermId)"
           :multiple-terms="false"
           :no-term="noTerm"
+          :images-ids="[image.id]"
+          :slices-ids="[slice.id]"
+          :users-ids="layersIds"
+          :reviewed="false"
+
+          :visible="opened"
+          :index="index"
+          :revision="revision"
+
+          @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
+          @updateProperties="$emit('updateProperties')"
+          @centerView="$emit('centerView', $event)"
+          @delete="$emit('delete', $event)"
+          @select="select($event)"
+        />
+        <list-annotations-by-track
+          v-else
+          :size="85"
+          color="000000"
+          :nb-per-page="nbPerPage"
+
+          :all-terms="terms"
+          :all-users="allUsers"
+          :all-images="[image]"
+          :all-tracks="tracks"
+
+          :track="findTrack(selectedTrackId)"
+          :multiple-track="false"
+          :no-track="false"
           :images-ids="[image.id]"
           :slices-ids="[slice.id]"
           :users-ids="layersIds"
@@ -76,6 +106,7 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import ListAnnotationsByTerm from '@/components/annotations/ListAnnotationsByTerm';
+import ListAnnotationsByTrack from '@/components/annotations/ListAnnotationsByTrack';
 
 import {fullName} from '@/utils/user-utils.js';
 import {get} from '@/utils/store-helpers';
@@ -85,6 +116,7 @@ export default {
   name: 'annotations-list',
   components: {
     ListAnnotationsByTerm,
+    ListAnnotationsByTrack,
     OntologyTree,
     TrackTree,
     CytomineTerm,
@@ -171,6 +203,9 @@ export default {
     selectedTermId() {
       return (this.selectedTermsIds.length > 0) ? this.selectedTermsIds[0] : null;
     },
+    selectedTrackId() {
+      return (this.selectedTracksIds.length > 0) ? this.selectedTracksIds[0] : null;
+    },
   },
   watch: {
     hasTracks(value) {
@@ -182,6 +217,9 @@ export default {
   methods: {
     findTerm(idTerm) {
       return this.terms.find(term => term.id === idTerm);
+    },
+    findTrack(idTrack) {
+      return this.tracks.find(track => track.id === idTrack);
     },
     async fetchUsers() { // TODO in vuex (project module)
       this.users = (await UserCollection.fetchAll()).array;
@@ -213,7 +251,16 @@ export default {
       }
     },
     select(annot) {
-      this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+      if (annot.slice !== this.slice.id) {
+        this.$store.dispatch(this.imageModule + 'setActiveSliceByRank',
+          {time: annot.time, channel: annot.channel, zStack: annot.zStack});
+        this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+      }
+      else {
+        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+      }
+
       this.$emit('centerView', annot);
     },
   },

@@ -107,7 +107,7 @@ export default {
     },
 
     annotBelongsToLayer(annot) {
-      return annotBelongsToLayer(annot, this.layer, this.image);
+      return annotBelongsToLayer(annot, this.layer, this.slice);
     },
 
     addAnnotationHandler(annot) {
@@ -126,10 +126,14 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear=false}={}) {
+    reloadAnnotationsHandler({idImage, clear=false, hard=false}={}) {
       if(!idImage || idImage === this.image.id) {
         if(clear) {
           this.clearFeatures();
+        }
+        else if(hard) {
+          this.clearFeatures();
+          this.loader();
         }
         else {
           this.loader();
