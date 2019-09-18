@@ -37,6 +37,7 @@ export default {
     return {
       imageInstance: null,
       sliceInstances: {},
+      loadedSlicePages: [],
       activeSlice: null,
       activePanel: null
     };
@@ -56,14 +57,17 @@ export default {
       state.activePanel = state.activePanel === panel ? null : panel;
     },
 
-    setSliceInstances(state, slices) {
-      Object.keys(state.sliceInstances).forEach(rank => {
-        Vue.delete(state.sliceInstances, rank);
-      });
+    clearSliceInstances(state) {
+      state.sliceInstances = {};
+      state.loadedSlicePages = [];
+    },
 
-      slices.forEach(slice => {
-        Vue.set(state.sliceInstances, slice.rank, slice);
-      });
+    setSliceInstance(state, slice) {
+      Vue.set(state.sliceInstances, slice.rank, slice);
+    },
+
+    setLoadedSlicePage(state, page) {
+      state.loadedSlicePages.push(page);
     },
 
     setActiveSlice(state, slice) {
@@ -79,12 +83,8 @@ export default {
       clone = slice.clone();
       commit('setActiveSlice', clone);
 
-      let promises = [
-        dispatch('fetchSliceInstances'),
-      ];
-      await Promise.all(promises);
+      await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
     },
-
     async setImageInstance({dispatch, rootState}, {image, slice}) {
       await dispatch('initialize', {image, slice});
       let idProject = rootState.currentProject.project.id;
@@ -92,19 +92,29 @@ export default {
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
 
-    setActiveSlice({commit, dispatch, rootState}, slice) {
+    async setActiveSlice({commit, dispatch, rootState}, slice) {
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       commit('setActiveSlice', slice);
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
     },
-
-    setActiveSliceByPosition({state, dispatch}, {channel, zStack, time}) {
-      dispatch('setActiveSlice', state.sliceInstances[slicePositionToRank({channel, zStack, time}, state.imageInstance)]);
+    async setActiveSliceByPosition({state, dispatch}, {channel, zStack, time}) {
+      let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
+      await dispatch('setActiveSliceByRank', rank);
     },
+    async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
+      let slice = state.sliceInstances[rank];
+      if (!slice) {
+        await dispatch('fetchSliceInstancesAround', {rank, setActive: true});
+      }
+      else {
+        commit('setActiveSlice', slice);
+      }
 
-    setActiveSliceByRank({dispatch, state}, rank) {
-      dispatch('setActiveSlice', state.sliceInstances[rank]);
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
 
     async refreshData({state, commit, dispatch}) {
@@ -114,17 +124,42 @@ export default {
       let slice = await SliceInstance.fetch(state.activeSlice.id);
       commit('setActiveSlice', slice);
 
-      let promises = [
-        dispatch('fetchSliceInstances'),
-      ];
+      commit('clearSliceInstances');
+      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+    },
+
+    async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {
+      let promises = [];
+      let props = {filterKey: 'imageinstance', filterValue: state.imageInstance.id, max: constants.PRELOADED_SLICES};
+
+      let page = findRankPage(rank);
+      if (!state.loadedSlicePages.includes(page)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(page).then(data => {
+          data.array.forEach(slice => {
+            commit('setSliceInstance', slice);
+            if (setActive && slice.rank === rank) {
+              commit('setActiveSlice', slice);
+            }
+          });
+        }).then(() => commit('setLoadedSlicePage', page)));
+      }
+
+      let previous = page - 1;
+      if (previous >= 0 && !state.loadedSlicePages.includes(previous)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(previous).then(data => {
+          data.array.forEach(slice => commit('setSliceInstance', slice));
+        }).then(() => commit('setLoadedSlicePage', previous)));
+      }
+
+      let next = page + 1;
+      if (next < findSliceInstanceNbPage(state.imageInstance) && !state.loadedSlicePages.includes(previous)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(next).then(data => {
+          data.array.forEach(slice => commit('setSliceInstance', slice));
+        }).then(() => commit('setLoadedSlicePage', next)));
+      }
 
       await Promise.all(promises);
-    },
-
-    async fetchSliceInstances({state, commit}) {
-      let slices = (await new SliceInstanceCollection({filterKey: 'imageinstance', filterValue: state.imageInstance.id}).fetchAll()).array;
-      commit('setSliceInstances', slices);
-    },
+    }
   },
 
   getters: {
@@ -260,4 +295,12 @@ export default {
     annotationsList,
   }
 };
+
+function findRankPage(rank) {
+  return Math.ceil((rank + 1) / constants.PRELOADED_SLICES) - 1;
+}
+
+function findSliceInstanceNbPage(image) {
+  return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
+}
 

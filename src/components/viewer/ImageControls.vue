@@ -202,24 +202,24 @@ export default {
       get() {
         return this.currentSlice.channel;
       },
-      set(value) {
-        this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
+      async set(value) {
+        await this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
       }
     },
     currentZStack: {
       get() {
         return this.currentSlice.zStack;
       },
-      set(value) {
-        this.seek(this.currentSlice.channel, value, this.currentSlice.time);
+      async set(value) {
+        await this.seek(this.currentSlice.channel, value, this.currentSlice.time);
       }
     },
     currentTime: {
       get() {
         return this.currentSlice.time;
       },
-      set(value) {
-        this.seek(this.currentSlice.channel, this.currentSlice.zStack, value);
+      async set(value) {
+        await this.seek(this.currentSlice.channel, this.currentSlice.zStack, value);
       }
     },
     hasChannels() {
@@ -241,19 +241,19 @@ export default {
       return formatMinutesSeconds(time);
     },
 
-    goToRank(rank) {
-      this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
+    async goToRank(rank) {
+      await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
-    seek(channel, zStack, time) {
-      this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition', {time, channel, zStack});
+    async seek(channel, zStack, time) {
+      await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition', {time, channel, zStack});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
-    shift(dimension, increment) {
+    async shift(dimension, increment) {
       let time = (dimension === 'time') ? this.currentSlice.time + increment : this.currentSlice.time;
       let channel = (dimension === 'channel') ? this.currentSlice.channel + increment : this.currentSlice.channel;
       let zStack = (dimension === 'zStack') ? this.currentSlice.zStack + increment : this.currentSlice.zStack;
-      this.seek(channel, zStack, time);
+      await this.seek(channel, zStack, time);
     },
     canShiftForward(dimension) {
       switch (dimension) {
@@ -280,7 +280,7 @@ export default {
       }
     },
 
-    shortkeyHandler(key) {
+    async shortkeyHandler(key) {
       if (!this.isActiveImage) {
         return;
       }
@@ -288,12 +288,12 @@ export default {
       switch (key) {
         case 'nav-next-t':
           if (this.canShiftForward('time')) {
-            this.currentTime++;
+            await this.shift('time', 1);
           }
           return;
         case 'nav-previous-t':
           if (this.canShiftBackward('time')) {
-            this.currentTime--;
+            await this.shift('time', -1);
           }
           return;
         case 'nav-first-t':
@@ -336,19 +336,19 @@ export default {
           return;
         case 'nav-next-slice':
           if (this.canShiftForward('rank')) {
-            this.goToRank(this.activeSlice.rank + 1);
+            await this.goToRank(this.activeSlice.rank + 1);
           }
           return;
         case 'nav-previous-slice':
           if (this.canShiftBackward('rank')) {
-            this.goToRank(this.activeSlice.rank - 1);
+            await this.goToRank(this.activeSlice.rank - 1);
           }
           return;
         case 'nav-first-slice':
-          this.seek(0, 0, 0);
+          await this.seek(0, 0, 0);
           return;
         case 'nav-last-slice':
-          this.seek(this.image.channels - 1, this.image.depth - 1, this.image.duration - 1);
+          await this.seek(this.image.channels - 1, this.image.depth - 1, this.image.duration - 1);
           return;
       }
     }

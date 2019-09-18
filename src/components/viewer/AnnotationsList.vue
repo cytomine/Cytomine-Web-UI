@@ -256,9 +256,9 @@ export default {
         this.revision++;
       }
     },
-    select(annot) {
+    async select(annot) {
       if (annot.slice !== this.slice.id) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
+        await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
           {time: annot.time, channel: annot.channel, zStack: annot.zStack});
         this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
