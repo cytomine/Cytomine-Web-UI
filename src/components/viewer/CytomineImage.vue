@@ -33,6 +33,7 @@
           crossOrigin="Anonymous"
           ref="baseSource"
           @mounted="setBaseSource()"
+          :transition="0"
         />
       </vl-layer-tile>
 
