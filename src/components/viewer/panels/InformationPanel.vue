@@ -169,10 +169,10 @@ export default {
         return;
       }
 
-      if(key === 'n') {
+      if(key === 'nav-next-image') {
         this.nextImage();
       }
-      else if(key === 'p') {
+      else if(key === 'nav-previous-image') {
         this.previousImage();
       }
     }

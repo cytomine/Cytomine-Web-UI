@@ -121,6 +121,16 @@ export default {
 
     more() {
       this.nbImagesDisplayed += 20;
+    },
+
+    toggle() {
+      this.imageSelectorEnabled = !this.imageSelectorEnabled;
+    },
+
+    shortkeyHandler(key) {
+      if (key === 'toggle-add-image') {
+        this.toggle();
+      }
     }
   },
   async created() {
@@ -135,6 +145,12 @@ export default {
       this.error = true;
     }
     this.loading = false;
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>
