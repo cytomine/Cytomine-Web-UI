@@ -68,7 +68,7 @@
 
       <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
         <a class="navbar-item" @click="openHotkeysModal()">
-          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('hotkeys')}}
+          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
         </a>
         <a class="navbar-item" @click="openAboutModal()">
           <span class="icon"><i class="fas fa-info-circle fa-xs"></i></span> {{$t('about-cytomine')}}

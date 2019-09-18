@@ -9,3 +9,7 @@ export function formatMinutesSeconds(time) {
     milliseconds.toString().padStart(3, '0')
   ].join(':');
 }
+
+export function slicePositionToRank({channel, zStack, time}, image) {
+  return channel + image.channels * (zStack + image.depth * time);
+}

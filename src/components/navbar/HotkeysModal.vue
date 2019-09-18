@@ -1,48 +1,67 @@
 <template>
-<cytomine-modal-card :title="$t('hotkeys')" @close="$parent.close()">
-  <div class="columns">
-    <div class="column">
-      <h2>{{$t('view')}}</h2>
-      <ul>
-        <li><i class="key fas fa-arrow-up"></i>{{$t('hotkey-move-up')}}</li>
-        <li><i class="key fas fa-arrow-left"></i>{{$t('hotkey-move-left')}}</li>
-        <li><i class="key fas fa-arrow-right"></i>{{$t('hotkey-move-right')}}</li>
-        <li><i class="key fas fa-arrow-down"></i>{{$t('hotkey-move-down')}}</li>
-        <li><i class="key fas fa-plus"></i>{{$t('hotkey-zoom-in')}}</li>
-        <li><i class="key fas fa-minus"></i>{{$t('hotkey-zoom-out')}}</li>
-        <li><span class="key">n</span> {{$t('hotkey-next-image')}}</li>
-        <li><span class="key">p</span> {{$t('hotkey-previous-image')}}</li>
-      </ul>
-    </div>
-    <div class="column">
-      <h2>{{$t('draw')}}</h2>
-      <ul>
-        <li><span class="key">s</span> {{$t('hotkey-select')}}</li>
-        <li><span class="key">o</span> {{$t('hotkey-point')}}</li>
-        <li><span class="key">f</span> {{$t('hotkey-freehand')}}</li>
-        <li><span class="key">d</span> {{$t('hotkey-delete')}}</li>
-        <li><span class="key">Ctrl + Z</span> {{$t('hotkey-undo')}}</li>
-        <li><span class="key">Ctrl + Y</span> {{$t('hotkey-redo')}}</li>
-      </ul>
-    </div>
-    <div class="column">
-      <h2>{{$t('review')}}</h2>
-      <ul>
-        <li><span class="key">a</span> {{$t('hotkey-accept-annotation')}}</li>
-        <li><span class="key">r</span> {{$t('hotkey-reject-annotation')}}</li>
-        <li><span class="key">t</span> {{$t('hotkey-toggle-review')}}</li>
-      </ul>
-    </div>
+<cytomine-modal-card :title="$t('shortcuts')" @close="$parent.close()">
+  <div v-for="category in categories" :key="category">
+    <h2>{{$t(`shortcut-${category}`)}}</h2>
+    <b-table :data="filteredShortcuts(category)" class="shortcut-list">
+      <template #default="{row: shortcut}">
+        <b-table-column field="name" :label="$t('description')">
+          {{$t(`shortcut-${shortcut.name}`)}}
+        </b-table-column>
+
+        <b-table-column field="val" :label="$t('shortcut')">
+          <span v-for="(k, index) in shortcut.key" :key="`${category}${shortcut.name}${k}`">
+            <span class="key">
+              <i v-if="k === 'click'" class="fas fa-mouse-pointer"></i>
+              <i v-else-if="k === 'drag'" class="fas fa-hand-pointer"></i>
+              <i v-else-if="k === '+'" class="fas fa-plus"></i>
+              <i v-else-if="k === '-'" class="fas fa-minus"></i>
+              <i v-else-if="k === 'arrowleft'" class="fas fa-arrow-left"></i>
+              <i v-else-if="k === 'arrowright'" class="fas fa-arrow-right"></i>
+              <i v-else-if="k === 'arrowup'" class="fas fa-arrow-up"></i>
+              <i v-else-if="k === 'arrowdown'" class="fas fa-arrow-down"></i>
+              <span v-else-if="k === 'meta'">&#8984; Cmd</span>
+              <span v-else-if="k === 'shift'">&#8679; Shift</span>
+              <span v-else-if="k === 'alt'">&#8997; Alt</span>
+              <span v-else-if="k === 'pageup'">Page Up</span>
+              <span v-else-if="k === 'pagedown'">Page Down</span>
+              <span v-else-if="k === 'del'">Delete</span>
+              <span v-else>{{k}}</span>
+            </span>
+            <template v-if="index < shortcut.key.length - 1">+</template>
+          </span>
+        </b-table-column>
+      </template>
+    </b-table>
   </div>
 </cytomine-modal-card>
 </template>
 
 <script>
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import shortcuts from '@/utils/shortcuts.js';
 
 export default {
   name: 'hotkeys-modal',
-  components: {CytomineModalCard}
+  components: {CytomineModalCard},
+  data() {
+    return {
+      categories: ['general', 'viewer-nav', 'viewer-tool', 'viewer-toggle', 'text-editor']
+    };
+  },
+  computed: {
+    shortcuts() {
+      return Object.entries(shortcuts).map(([name, key]) => {
+        return {name, key};
+      });
+    }
+  },
+  methods: {
+    filteredShortcuts(category) {
+      return this.shortcuts.filter(shortcut => {
+        return shortcut.name.startsWith(`${category}-`);
+      });
+    }
+  }
 };
 </script>
 
@@ -58,7 +77,7 @@ export default {
   height: 2.25rem;
   border: 1px solid #ddd;
   padding: 0.5em 1em !important;
-  margin: 0 0.9em 0.7em 0;
+  margin: 0 0.3em 0 0.3em;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -66,6 +85,16 @@ export default {
   color: #888;
   background: #f8f8f8;
   font-weight: 600;
+  text-transform: capitalize;
+}
+
+.shortcut-list {
+  margin-bottom: 2em;
+}
+
+>>> td, >>> th {
+  vertical-align: middle !important;
+  width: 50%;
 }
 </style>
 

@@ -1,6 +1,7 @@
 import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance} from 'cytomine-client';
 
 import constants from '@/utils/constants';
+import {slicePositionToRank} from '@/utils/slice-utils';
 
 import colors from './image_modules/colors';
 import draw from './image_modules/draw';
@@ -98,8 +99,12 @@ export default {
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
 
-    setActiveSliceByRank({state, dispatch}, dimensions) {
-      dispatch('setActiveSlice', state.sliceInstances[dimensions.channel + state.imageInstance.channels * (dimensions.zStack + state.imageInstance.depth * dimensions.time)]);
+    setActiveSliceByPosition({state, dispatch}, {channel, zStack, time}) {
+      dispatch('setActiveSlice', state.sliceInstances[slicePositionToRank({channel, zStack, time}, state.imageInstance)]);
+    },
+
+    setActiveSliceByRank({dispatch, state}, rank) {
+      dispatch('setActiveSlice', state.sliceInstances[rank]);
     },
 
     async refreshData({state, commit, dispatch}) {

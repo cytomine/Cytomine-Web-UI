@@ -237,7 +237,7 @@ export default {
         return;
       }
 
-      if(key === 't') { // toggle review layer
+      if(key === 'tool-review-toggle') { // toggle review layer
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if(index !== -1) {
           this.toggleLayerVisibility(index);

@@ -268,7 +268,7 @@ import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
 
-import {formatMinutesSeconds} from '@/utils/video-utils.js';
+import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance} from 'cytomine-client';
 

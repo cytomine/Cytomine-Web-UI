@@ -151,6 +151,9 @@ export default {
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
     },
@@ -162,6 +165,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
     },
     slice() {
       return this.imageWrapper.activeSlice;
@@ -252,7 +258,7 @@ export default {
     },
     select(annot) {
       if (annot.slice !== this.slice.id) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByRank',
+        this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
           {time: annot.time, channel: annot.channel, zStack: annot.zStack});
         this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -263,6 +269,16 @@ export default {
 
       this.$emit('centerView', annot);
     },
+
+    shortkeyHandler(key) {
+      if (!this.isActiveImage) {
+        return;
+      }
+
+      if (key === 'toggle-annotations') {
+        this.opened = !this.opened;
+      }
+    }
   },
   async created() {
     let availableTerms = [...this.terms, this.noTermOption];
@@ -277,6 +293,7 @@ export default {
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
@@ -284,6 +301,7 @@ export default {
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
     this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>
