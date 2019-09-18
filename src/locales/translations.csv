@@ -482,7 +482,7 @@ shortcut-viewer-tool-point,Draw a point,Dessiner un point
 shortcut-viewer-tool-freehand-polygon,Draw a freehand polygon,Dessiner un polygone à main levée
 shortcut-viewer-tool-delete,Delete selected annotation,Supprimer l'annotation sélectionnée
 shortcut-viewer-tool-undo,Undo annotation action,Annuler une action sur les annotations
-shortcut-viewer-tool-redo,Redo annotation action,Refaire une action sur les annotation
+shortcut-viewer-tool-redo,Redo annotation action,Refaire une action sur les annotations
 review,Review,Validation
 shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Valider l'annotation sélectionnée en mode validation
 shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation
