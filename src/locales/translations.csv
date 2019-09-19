@@ -90,7 +90,7 @@ filename,Filename,Nom de fichier
 height,Height,Hauteur
 width,Width,Largeur
 magnification,Magnification,Grossissement
-resolution,Resolution,Résolution
+resolution,Resolution X/Y,Résolution X/Y
 unknown,Unknown,Inconnu
 information,Information,Information
 name,Name,Nom
@@ -121,6 +121,8 @@ nm-per-pixel,nm/pixel,nm/pixel
 um-per-pixel,µm/pixel,µm/pixel
 mm-per-pixel,mm/pixel,mm/pixel
 um-per-slice,µm/slice,µm/plan
+nm-per-slice,nm/slice,nm/plan
+mm-per-slice,mm/slice,mm/plan
 vendor,Vendor,Marque du scanner
 image-size,Image size,Taille de l'image
 status,Status,Statut

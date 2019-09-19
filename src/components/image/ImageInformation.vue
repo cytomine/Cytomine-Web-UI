@@ -79,8 +79,10 @@ export default {
       this.$router.push(`/project/${this.image.project}`);
     },
     setResolution(resolution) {
-      this.image.physicalSizeX = resolution;
-      this.image.physicalSizeY = resolution;
+      this.image.physicalSizeX = resolution.x;
+      this.image.physicalSizeY = resolution.y;
+      this.image.physicalSizeZ = resolution.z;
+      this.image.fps = resolution.t;
     }
   },
   created() {

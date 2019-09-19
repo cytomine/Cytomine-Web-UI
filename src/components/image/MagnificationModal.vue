@@ -6,7 +6,7 @@
     </b-message>
 
     <b-field :label="$t('magnification')" :type="fieldType" :message="errors.first('magnification')">
-      <b-input v-model="newMagnification" name="magnification" v-validate="'required|decimal|positive'" />
+      <b-input v-model="newMagnification" name="magnification" v-validate="'decimal|positive'" />
     </b-field>
 
     <template #footer>

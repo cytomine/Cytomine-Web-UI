@@ -398,8 +398,10 @@ export default {
     },
 
     setResolution(image, resolution) {
-      image.physicalSizeX = resolution;
-      image.physicalSizeY = resolution;
+      image.physicalSizeX = resolution.x;
+      image.physicalSizeY = resolution.y;
+      image.physicalSizeZ = resolution.z;
+      image.fps = resolution.t;
       this.formatImage(image);
     },
 
