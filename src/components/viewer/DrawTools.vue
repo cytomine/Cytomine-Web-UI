@@ -726,17 +726,17 @@ export default {
           }
           return;
         case 'tool-delete':
-          if (this.isToolDisplayed('delete') && !this.isToolDisplayed('delete')) {
+          if (this.isToolDisplayed('delete') && !this.disabledDraw) {
             this.confirmDeletion();
           }
           return;
         case 'tool-undo':
-          if (this.isToolDisplayed('undo')) {
+          if (this.isToolDisplayed('undo-redo')) {
             this.undo();
           }
           return;
         case 'tool-redo':
-          if (this.isToolDisplayed('redo')) {
+          if (this.isToolDisplayed('undo-redo')) {
             this.redo();
           }
           return;
