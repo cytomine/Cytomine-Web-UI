@@ -336,12 +336,12 @@ export default {
           return;
         case 'nav-next-slice':
           if (this.canShiftForward('rank')) {
-            await this.goToRank(this.activeSlice.rank + 1);
+            await this.goToRank(this.currentSlice.rank + 1);
           }
           return;
         case 'nav-previous-slice':
           if (this.canShiftBackward('rank')) {
-            await this.goToRank(this.activeSlice.rank - 1);
+            await this.goToRank(this.currentSlice.rank - 1);
           }
           return;
         case 'nav-first-slice':
