@@ -31,11 +31,23 @@
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
-        <td>{{resolution}}</td>
+        <td v-if="image.physicalSizeX">{{image.physicalSizeX.toFixed(3)}} {{$t("um-per-pixel")}}</td>
+        <td v-else>{{$t("unknown")}}</td>
+      </tr>
+      <tr v-if="image.depth > 1">
+        <td><strong>{{$t('z-resolution')}}</strong></td>
+        <td v-if="image.physicalSizeZ">{{image.physicalSizeZ.toFixed(3)}} {{$t("um-per-slice")}}</td>
+        <td v-else>{{$t("unknown")}}</td>
+      </tr>
+      <tr v-if="image.duration > 1">
+        <td><strong>{{$t('frame-rate')}}</strong></td>
+        <td v-if="image.fps">{{image.fps.toFixed(3)}} {{$t("frame-per-second")}}</td>
+        <td v-else>{{$t("unknown")}}</td>
       </tr>
       <tr>
         <td><strong>{{$t('magnification')}}</strong></td>
-        <td>{{magnification}}</td>
+        <td v-if="image.magnification">{{image.magnification}}</td>
+        <td v-else>{{$t('unknown')}}</td>
       </tr>
       <tr>
         <td colspan="2">
@@ -104,17 +116,6 @@ export default {
     },
     image() {
       return this.viewerWrapper.images[this.index].imageInstance;
-    },
-    resolution() {
-      if(this.image.physicalSizeX) {
-        return this.image.physicalSizeX.toFixed(3);
-      }
-      else {
-        return this.$t('unknown');
-      }
-    },
-    magnification() {
-      return this.image.magnification || this.$t('unknown');
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
