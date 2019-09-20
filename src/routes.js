@@ -21,6 +21,7 @@ import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
+import ListSoftware from './components/software/ListSoftware.vue';
 import ListImages from './components/image/ListImages.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
@@ -55,6 +56,10 @@ const routes = [
   {
     path: '/ontology/:idOntology?',
     component: ListOntologies
+  },
+  {
+    path: '/software',
+    component: ListSoftware
   },
   {
     path: '/advanced-search/:searchString?',

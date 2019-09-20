@@ -860,3 +860,22 @@ shortcut-viewer-tool,Viewer: Tools, Visualisateur : Outils
 shortcut-viewer-nav,Viewer: Navigation,Visualisateur : Naviguation
 shortcut-general,General,Général
 shortcut,Keyboard shortcut,Raccourci clavier
+new-algorithm,New algorithm,Nouvel algorithme
+nb-jobs,Number of jobs,Nombre d'exécutions
+nb-success-jobs,Number of successful jobs,Nombre d'exécutions réussies
+only-last-release,Only last releases,Seulement les dernières versions
+only-UI-runnable,Only runnable algorithms,Seulement les algorithmes exécutables
+yes,Yes,Oui
+no,No,Non
+creation-date,Creation date,Date de création
+no-software,No algorithm,Pas d'algorithme
+notif-success-algorithm-deletion,Algorithm correctly deleted,L'algorithme a été supprimé
+notif-error-algortihm-deletion,Error during algorithm deletion,Erreur durant la suppression de l'algoritme
+github,Github,Github
+dockerhub,DockerHub,DockerHub
+no-info,No information,Pas d'information
+deprecated,Deprecated,Déprécié
+last-release,Last release,Dernière version
+ui-runnable,Runnable,Exécutable
+number-jobs,Jobs,Exécutions
+number-success,Successful jobs,Exécutions réussies

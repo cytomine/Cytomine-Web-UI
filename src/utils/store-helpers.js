@@ -77,6 +77,49 @@ export function sync(path, options={}) {
 }
 
 /**
+ * Provides getter and setter for a computed property that should be synchronized with a simple filter
+ * stored in Vuex
+ * This function must be called from a Vue.js component and the targetted module should be constructed as shown
+ * in the example
+ * @example
+ * // Vue.js component
+ * computed: {
+ *   myFilter: sync('myModule', 'myFilter'),
+ * }
+ * // myModule structure
+ * namespaced: true,
+ * state: {
+ *   filters: {
+ *     myFilter: null // null value for inactive filter
+ *   }
+ * },
+ * mutations: {
+ *   setFilter(state, {filterName, propValue}) {
+ *     state.filters[filterName] = propValue;
+ *   },
+ * }
+ *
+ *
+ * @param {String|Array<String>} modulePath Path to the store module containing the filters
+ * @param {String} filterName The name of the filter property
+ * @param {Options} [options] Options refining the way to sync the filter
+ * @returns Computed getter and setter for the targetted filter
+ */
+export function syncFilter(modulePath, filterName, options={}) {
+  modulePath = arrayPath(modulePath);
+
+  return {
+    get() {
+      return getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
+    },
+    set(propValue) {
+      let path = fullPath(modulePath, this, options);
+      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
+    }
+  };
+}
+
+/**
  * Provides getter and setter for a computed property that should be synchronized with a bounds filter (min, max bounds)
  * stored in Vuex
  * This function must be called from a Vue.js component, that also defines a property giving the max upper bound, and the
@@ -101,7 +144,7 @@ export function sync(path, options={}) {
  * }
  *
  *
- * @param {String|Array<String>} path Path to the store module containing the filters
+ * @param {String|Array<String>} modulePath Path to the store module containing the filters
  * @param {String} filterName The name of the filter property
  * @param {String} maxProp The name of the component property containing the max allowed value
  * @param {Options} [options] Options refining the way to sync the filter
