@@ -100,7 +100,7 @@
         <template #default="{row: software}">
           <b-table-column field="name" :label="$t('name')" sortable width="250">
             <router-link :to="`/software/${software.id}`">
-              {{ software.name }}
+              {{ software.fullName }}
             </router-link>
           </b-table-column>
 
@@ -193,7 +193,11 @@ export default {
 
       excludedProperties: [
         'name',
-        'created'
+        'created',
+        'executable',
+        'status',
+        'pullingCommand',
+        'executeCommand'
       ]
     };
   },

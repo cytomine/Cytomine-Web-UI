@@ -22,6 +22,7 @@ import MemberActivityDetails from './components/project/activity/MemberActivityD
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
+import SoftwareInformation from './components/software/SoftwareInformation.vue';
 
 // Define routes
 const routes = [
@@ -44,6 +45,10 @@ const routes = [
   {
     path: '/software',
     component: ListSoftware
+  },
+  {
+    path: '/software/:idSoftware',
+    component: SoftwareInformation
   },
   {
     path: '/advanced-search/:searchString?',
