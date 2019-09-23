@@ -565,6 +565,7 @@ failed,Failed,Échoué
 indeterminate,Indeterminate,Inconnu
 wait,Wait,En attente
 previewed,Previewed,Prévisualisé
+killed,Killed,Arrêté
 no-analysis-run,No analysis run,Aucune analyse lancée
 launcher,Launcher,Créateur
 status-comment,Status comment,Commentaire
@@ -879,3 +880,20 @@ last-release,Last release,Dernière version
 ui-runnable,Runnable,Exécutable
 number-jobs,Jobs,Exécutions
 number-success,Successful jobs,Exécutions réussies
+software-parameters,Algorithm parameters,Paramètres de l'algorithme
+default-value,Default value,Valeur par défaut
+mandatory,Mandatory,Obligatoire
+domain,Cytomine domain,Domaine Cytomine
+listdomain,List of Cytomine domains,Liste de domaines Cytomine
+list,List,Liste
+number,Number,Nombre
+string,String,Chaîne de caractères
+boolean,Boolean,Booléen
+value-key,Value key,Valeur de la clé
+command-line-flag,Command line flag,Argument de la ligne de commande
+other-information,Other information,Autres informations
+execute-command,Execute command,Commande d'exécution
+pulling-command,Pulling command,Commande de récupération
+trusted-source,Trusted source,Source de confiance
+see-source-code-on,See source code on,Voir le code source sur
+see-environment-on,See environment on,Voir l'environnement sur
