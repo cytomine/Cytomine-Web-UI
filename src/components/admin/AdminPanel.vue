@@ -28,6 +28,10 @@
       {{$t('users')}}
     </b-radio-button>
 
+    <b-radio-button v-model="activeTab" native-value="trusted-sources" type="is-link">
+      {{$t('trusted-sources')}}
+    </b-radio-button>
+
     <b-radio-button v-model="activeTab" native-value="configuration" type="is-link">
       {{$t('configuration')}}
     </b-radio-button>
@@ -46,6 +50,7 @@ import {get} from '@/utils/store-helpers';
 
 import AdminDashboard from './AdminDashboard';
 import AdminUsers from './AdminUsers';
+import AdminSoftware from './AdminSoftware';
 import AdminConfiguration from './AdminConfiguration';
 
 const defaultTab = 'dashboard';
@@ -58,6 +63,7 @@ export default {
       tabNames: [
         'dashboard',
         'users',
+        'trusted-sources',
         'configuration'
       ]
     };
@@ -75,6 +81,8 @@ export default {
           return AdminUsers;
         case 'configuration':
           return AdminConfiguration;
+        case 'trusted-sources':
+          return AdminSoftware;
       }
     }
   },

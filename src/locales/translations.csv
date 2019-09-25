@@ -901,4 +901,20 @@ button-kill,Kill,Arrêter
 notif-success-analysis-kill,Analysis was successfully killed,L'analyse a bien été arrêtée
 notif-error-analysis-kill,Failed to kill analysis,Une erreur a empêché l'arrêt de l'analyse
 execution-log,Execution log,Log d'exécution
-log-being-collected,Execution log is being collected...,Le log d'exécution est en train d'être collecté...
+log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté
+trusted-sources,Trusted sources,Sources de confiance
+button-refresh,Refresh,Rafraîchir
+button-new-trusted-source,New trusted source,Nouvelle source de confiance
+source-provider,Source code provider,Fournisseur du code source
+source-provider-name,Source code provider username,Nom d'utilisateur du fournisseur de code source
+environment-provider,Environment provider,Fournisseur de l'environnement d'exécution
+environment-provider-name,Environment provider username,Nom d'utilisateur du fournisseur de l'environnement d'exécution
+prefix,Prefix,Préfixe
+create-source,Create trusted source,Créer une source de confiance
+update-source,Update trusted source,Modifier une source de confiance
+notif-success-source-creation,Trusted source successfully created,La source de confiance a bien été créée
+notif-error-source-creation,Failed to create the trusted source,Une erreur a empêché la création de la source de confiance
+notif-success-source-update,Trusted source successfully updated,La source de confiance a bien été modifiée
+notif-error-source-update,Failed to update the trusted source,Une erreur a empêché la modification de la source de confiance
+notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée
+notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance
