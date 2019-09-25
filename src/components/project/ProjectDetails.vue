@@ -54,6 +54,12 @@
         <cytomine-description :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
+    <tr v-if="isPropDisplayed('tags')">
+      <td class="prop-label">{{$t('tags')}}</td>
+      <td class="prop-content">
+        <cytomine-tags :object="project" :canEdit="canManageProject" />
+      </td>
+    </tr>
     <tr v-if="isPropDisplayed('properties')">
       <td class="prop-label">{{$t('properties')}}</td>
       <td class="prop-content">
@@ -129,6 +135,7 @@ import ListUsernames from '@/components/user/ListUsernames';
 import ProjectActions from './ProjectActions';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 
 export default {
@@ -139,6 +146,7 @@ export default {
     ProjectActions,
     CytomineDescription,
     CytomineProperties,
+    CytomineTags,
     AttachedFiles
   },
   props: {

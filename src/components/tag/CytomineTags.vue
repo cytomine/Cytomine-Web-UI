@@ -1,0 +1,149 @@
+<template>
+<div class="tags-wrapper">
+  <b-loading :is-full-page="false" :active="loading" />
+  <template v-if="!loading">
+    <b-field grouped group-multiline>
+      <em v-if="error">{{$t('error-fetch-tags')}}</em>
+      <div class="control" v-else v-for="(association, idx) in associatedTags" :key="association.id">
+        <b-taglist attached>
+          <b-tag type="is-info">{{association.tagName.toUpperCase()}}</b-tag>
+          <b-tag>
+            <template v-if="canEdit">
+              <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
+              </button>
+            </template>
+          </b-tag>
+        </b-taglist>
+      </div>
+
+      <button v-if="canEdit" class="button is-small add-tag" @click="displayModal()" key="showForm">
+        {{$t('button-add')}}
+      </button>
+      <em v-else-if="tags.length === 0">{{$t('no-tags')}}</em>
+    </b-field>
+    <add-tag-modal :active.sync="addTagModal" :associatedTags="associatedTags" @addObjects="addAssociations" />
+  </template>
+</div>
+</template>
+
+<script>
+import {get} from '@/utils/store-helpers';
+
+import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
+import DomainTagInput from '@/components/utils/DomainTagInput';
+import AddTagModal from '@/components/tag/AddTagModal';
+
+export default {
+  name: 'cytomine-tags',
+  props: {
+    object: {type: Object},
+    canEdit: {type: Boolean, default: true}
+  },
+  components: {
+    DomainTagInput,
+    AddTagModal
+  },
+  data() {
+    return {
+      loading: true,
+      error: false,
+      addTagModal:false,
+      associatedTags: []
+    };
+  },
+  methods: {
+    displayModal() {
+      this.addTagModal = true;
+    },
+    async addAssociations(tags){
+
+      let [existingTags, newTags] = tags.reduce(
+        (result, element) => {
+          result[element instanceof Tag ? 0 : 1].push(element); // Determine and push to which arr
+          return result;
+        },
+        [[], []] // Default values
+      );
+
+      try{
+        let tagPromises = [];
+        for(let i = 0; i < newTags.length; i++) {
+          tagPromises.push(new Tag({name : newTags[i], user : get('currentUser/user')}, this.object).save());
+        }
+        newTags = await Promise.all(tagPromises).then(function(values) {
+          return values;
+        });
+        tags = existingTags.concat(newTags);
+      }
+      catch(error){
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-add-tags')});
+      }
+
+      try{
+        let associationPromises = [];
+        for(let i = 0; i < tags.length; i++) {
+          associationPromises.push(new TagDomainAssociation({tag : tags[i].id}, this.object).save());
+        }
+        let newAssocations = await Promise.all(associationPromises).then(function(values) {
+          return values;
+        });
+        this.associatedTags = this.associatedTags.concat(newAssocations);
+        this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
+      }
+      catch(error){
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
+      }
+    },
+    async removeTag(association, idx) {
+      try {
+        await TagDomainAssociation.delete(association.id);
+        this.associatedTags.splice(idx, 1);
+        this.$emit('update');
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-remove-tag')});
+      }
+    },
+  },
+  async created() {
+    try {
+      this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
+    }
+    catch(error) {
+      console.log(error);
+      this.error = true;
+    }
+    this.loading = false;
+  }
+};
+</script>
+
+<style scoped>
+em {
+  margin-right: 0.5em;
+}
+</style>
+
+<style>
+.tags-wrapper .control, .tags-wrapper .tags {
+  margin-bottom: 0 !important;
+}
+
+.tags-wrapper .tag {
+  margin-right: 0.5em;
+  margin-bottom: 0.3em !important;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.tags-wrapper .tag.is-dark {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.tags-wrapper .field.is-grouped.is-grouped-multiline {
+  margin-bottom: 0 !important;
+}
+</style>
