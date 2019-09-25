@@ -142,7 +142,8 @@ import AddJobModal from './AddJobModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
+import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -175,8 +176,8 @@ export default {
     configUI: get('currentProject/configUI'),
 
     availableStatus() {
-      return Object.keys(jobStatusLabelMapping).map(key => {
-        return {label: this.$t(jobStatusLabelMapping[key]), status: key};
+      return Object.keys(jobStatusMapping).map(key => {
+        return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
 

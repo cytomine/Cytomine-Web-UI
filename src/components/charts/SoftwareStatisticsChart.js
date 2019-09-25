@@ -1,6 +1,6 @@
 import {HorizontalBar} from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {jobStatusMapping} from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 
 import {asArray as hexToRgb} from 'ol/color';
 
