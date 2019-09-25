@@ -915,3 +915,8 @@ pulling-command,Pulling command,Commande de récupération
 trusted-source,Trusted source,Source de confiance
 see-source-code-on,See source code on,Voir le code source sur
 see-environment-on,See environment on,Voir l'environnement sur
+button-kill,Kill,Arrêter
+notif-success-analysis-kill,Analysis was successfully killed,L'analyse a bien été arrêtée
+notif-error-analysis-kill,Failed to kill analysis,Une erreur a empêché l'arrêt de l'analyse
+execution-log,Execution log,Log d'exécution
+log-being-collected,Execution log is being collected...,Le log d'exécution est en train d'être collecté...

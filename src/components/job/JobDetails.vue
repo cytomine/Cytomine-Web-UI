@@ -47,6 +47,26 @@
               </b-collapse>
             </td>
           </tr>
+          <tr v-if="isFinished">
+            <td>{{$t('execution-log')}}</td>
+            <td v-if="isJustFinished && !log">
+              <div class="loading">
+                <i class="fas fa-spinner fa-spin fa-fw"></i>&nbsp;
+                <em class="has-text-grey">{{$t('log-being-collected')}}</em>
+              </div>
+            </td>
+            <td v-else-if="log">
+              <button class="button is-small" @click="showLog = !showLog">
+                <span>{{showLog ? $t('button-hide') : $t('button-show')}}</span>
+              </button>
+              <b-collapse :open="showLog">
+                <pre>{{log.data}}</pre>
+              </b-collapse>
+            </td>
+            <td v-else>
+              <em class="has-text-grey">{{$t('not-found')}}</em>
+            </td>
+          </tr>
           <tr v-if="hasAnnotationResult">
             <td>{{$t('data')}}</td>
             <td v-if="hasAnnotationResult">
@@ -94,11 +114,14 @@
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
-                <button v-if="!job.dataDeleted" class="button" @click="deletionModal = true">
+                <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">
                   {{$t('delete-data')}}
                 </button>
-                <button class="button is-danger" @click="confirmJobDeletion()">
+                <button v-if="isFinished" class="button is-danger" @click="confirmJobDeletion()">
                   {{$t('button-delete')}}
+                </button>
+                <button v-else class="button is-danger" @click="confirmJobKilling()">
+                  {{$t('button-kill')}}
                 </button>
               </div>
             </td>
@@ -145,6 +168,7 @@ import CytomineTask from '@/components/utils/CytomineTask';
 
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
+const REFRESH_LOG_INTERVAL = constants.JOB_LOGS_REFRESH_INTERVAL;
 
 export default {
   name: 'job-details',
@@ -158,11 +182,14 @@ export default {
   data() {
     return {
       loading: true,
+      justFinishedInterval: 60000, // in milliseconds
 
       showParameters: false,
+      showLog: false,
 
       allData: null,
       jobData: [],
+      log: null,
       timeoutRefresh: null,
 
       deletionModal: false,
@@ -178,7 +205,10 @@ export default {
       return this.job.status === JobStatus.SUCCESS;
     },
     isFinished() {
-      return this.isSuccessful || this.job.status === JobStatus.FAILED;
+      return this.isSuccessful || this.job.status === JobStatus.FAILED || this.job.status === JobStatus.KILLED;
+    },
+    isJustFinished() {
+      return this.isFinished && (Date.now() - Number(this.job.created) < this.justFinishedInterval);
     },
     hasAnnotationResult() {
       return this.allData.annotations > 0;
@@ -196,12 +226,29 @@ export default {
       let job = await Job.fetch(this.job.id);
       this.$emit('update', job);
       await this.fetchData();
+      this.fetchLog();
 
       clearTimeout(this.timeoutRefresh);
       this.timeoutRefresh = setTimeout(this.refresh, REFRESH_INTERVAL);
     },
     filesize(size) {
       return filesize(size, {base: 10});
+    },
+    async fetchLog() {
+      if (this.isFinished) {
+        let maxRetries = Math.round(this.justFinishedInterval / REFRESH_LOG_INTERVAL);
+        while (!this.log && maxRetries > 0) {
+          try {
+            this.log = await this.job.fetchLog();
+          }
+          catch (e) {
+            // Do nothing as a 404 error has meaning: no log found
+            await new Promise(resolve => setTimeout(resolve, REFRESH_LOG_INTERVAL));
+            maxRetries--;
+          }
+        }
+
+      }
     },
     async fetchData() {
       this.allData = await this.job.fetchAllData();
@@ -225,6 +272,18 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-analysis-data-deletion')});
       }
     },
+    async killJob() {
+      let job = this.job.clone();
+      try {
+        await job.kill();
+        this.$emit('update', job);
+        this.$notify({type: 'success', text: this.$t('notif-success-analysis-kill')});
+      }
+      catch (error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-analysis-data-kill')});
+      }
+    },
     confirmJobDeletion() {
       this.$dialog.confirm({
         title: this.$t('delete-analysis'),
@@ -234,10 +293,21 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.$emit('delete')
       });
+    },
+    confirmJobKilling() {
+      this.$dialog.confirm({
+        title: this.$t('kill-analysis'),
+        message: this.$t('kill-analysis-confirmation-message'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => this.killJob()
+      });
     }
   },
   async created() {
     await this.fetchData();
+    this.fetchLog();
     this.loading = false;
     this.timeoutRefresh = setTimeout(this.refresh, REFRESH_INTERVAL);
   },
@@ -287,5 +357,9 @@ ul {
 
 .has-margin-top {
   margin-top: 1.5em;
+}
+
+.loading {
+  display: block;
 }
 </style>

@@ -140,7 +140,7 @@ import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
@@ -177,8 +177,8 @@ export default {
       return [...new Set(this.jobs.map(job => job.username))].filter(name => name); // TODO: remove filter (HACK to remove empty username)
     },
     availableStatus() {
-      return Object.keys(jobStatusLabelMapping).map(key => {
-        return {label: this.$t(jobStatusLabelMapping[key]), status: key};
+      return Object.keys(jobStatusMapping).map(key => {
+        return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
 

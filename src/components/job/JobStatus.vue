@@ -1,12 +1,12 @@
 <template>
 <span class="tag" :class="tagClass">
-  {{$t(labels[status])}}
+  {{$t(labels[status].label)}}
 </span>
 </template>
 
 <script>
 import {JobStatus} from 'cytomine-client';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 
 export default {
   name: 'job-status',
@@ -15,10 +15,12 @@ export default {
   },
   computed: {
     labels() {
-      return jobStatusLabelMapping;
+      return jobStatusMapping;
     },
     result() {
       switch(this.status) {
+        case JobStatus.KILLED:
+          return 'dark';
         case JobStatus.NOTLAUNCH:
         case JobStatus.INQUEUE:
         case JobStatus.WAIT:

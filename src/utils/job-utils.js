@@ -1,17 +1,6 @@
 import {JobStatus} from 'cytomine-client';
 
-export const jobStatusLabelMapping = Object.freeze({
-  [JobStatus.NOTLAUNCH]: 'not-launch',
-  [JobStatus.WAIT]: 'wait',
-  [JobStatus.INQUEUE]: 'in-queue',
-  [JobStatus.RUNNING]: 'running',
-  [JobStatus.SUCCESS]: 'success',
-  [JobStatus.FAILED]: 'failed',
-  [JobStatus.INDETERMINATE]: 'indeterminate',
-  // [JobStatus.PREVIEWED]: 'previewed'
-});
-
-export const jobStatusMapping = Object.freeze({
+const jobStatusMapping = Object.freeze({
   [JobStatus.RUNNING]: {
     label: 'running',
     statLabel: 'numberOfRunning',
@@ -53,3 +42,5 @@ export const jobStatusMapping = Object.freeze({
     color: '#363636'
   }
 });
+
+export default jobStatusMapping;
