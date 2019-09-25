@@ -55,7 +55,7 @@
                     <tr v-for="param in job.jobParameters.array" :key="param.id">
                       <td>{{param.humanName}}</td>
                       <td>{{param.value}}</td>
-                      <td>{{param.type}}</td>
+                      <td>{{$t(param.type.toLowerCase())}}</td>
                     </tr>
                   </tbody>
                 </table>
