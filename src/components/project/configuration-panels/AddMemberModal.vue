@@ -3,7 +3,7 @@
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
       <b-field>
-        <user-taginput v-model="selectedMembers" :users="notMemberUsers" />
+        <domain-tag-input v-model="selectedMembers" :domains="notMemberUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>
       </b-field>
     </template>
 
@@ -22,7 +22,7 @@
 import {get} from '@/utils/store-helpers';
 
 import {UserCollection} from 'cytomine-client';
-import UserTaginput from '@/components/user/UserTaginput';
+import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
 
@@ -33,7 +33,7 @@ export default {
   },
   components: {
     CytomineModal,
-    UserTaginput
+    DomainTagInput,
   },
   data() {
     return {

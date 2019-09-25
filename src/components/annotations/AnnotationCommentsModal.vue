@@ -39,7 +39,7 @@
       </b-radio>
     </b-field>
     <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
-      <user-taginput v-model="selectedMembers" :users="members" name="members" v-validate="'required'" />
+      <domain-tag-input v-model="selectedMembers" :domains="members" placeholder="search-user" name="members" v-validate="'required'" searchedProperty="fullName" displayedProperty="fullName" />
     </b-field>
     <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
       <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
@@ -61,14 +61,14 @@
 import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
-import UserTaginput from '@/components/user/UserTaginput';
+import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'annotation-comments-modal',
   components: {
-    UserTaginput,
+    DomainTagInput,
     CytomineModalCard
   },
   $_veeValidate: {validator: 'new'},

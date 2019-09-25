@@ -373,13 +373,13 @@ export default {
         return {
           value: mime || 'null',
           label: vendor ? vendor.name : this.$t('unknown')
-        }
+        };
       });
       this.availableMagnifications = stats.magnification.list.map(m => {
         return {
           value: m || 'null',
           label: m || this.$t('unknown')
-        }
+        };
       });
       this.availableResolutions = stats.resolution.list.map(resolution => {
         return {
