@@ -110,7 +110,7 @@
               {{$t('deleted-analysis-data')}}
             </td>
           </tr>
-          <tr>
+          <tr v-if="canEdit">
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
@@ -198,6 +198,9 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    canEdit() {
+      return this.$store.getters['currentProject/canDeleteJob'](this.job);
+    },
     isRunning() {
       return this.job.status === JobStatus.RUNNING;
     },
