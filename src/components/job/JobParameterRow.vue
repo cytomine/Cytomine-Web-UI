@@ -33,6 +33,9 @@
               {{ option[param.uriPrintAttribut] }}
             </span>
           </div>
+          <div class="is-flex" v-else-if="option.color">
+            <cytomine-term :term="option" />
+          </div>
         </template>
       </cytomine-multiselect>
 
@@ -49,11 +52,12 @@ import {get} from '@/utils/store-helpers';
 
 import {Cytomine} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import CytomineTerm from '@/components/ontology/CytomineTerm';
 
 export default {
   name: 'job-parameter-row',
   inject: ['$validator'],
-  components: {CytomineMultiselect},
+  components: {CytomineTerm, CytomineMultiselect},
   props: {
     param: Object,
     value: null
