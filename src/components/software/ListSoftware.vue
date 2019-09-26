@@ -104,15 +104,15 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="status" :label="$t('status')" centered sortable width="150">
+          <b-table-column field="softwareStatus" :label="$t('version')" centered sortable width="150" :custom-sort="sortBySoftwareStatus">
             <software-status :software="software" />
           </b-table-column>
 
-          <b-table-column field="UIrunnable" :label="$t('ui-runnable')" centered sortable width="150">
+          <b-table-column field="executable" :label="$t('ui-runnable')" centered sortable width="150">
             <boolean-item :value="software.executable" />
           </b-table-column>
 
-          <b-table-column field="numberOfJobs" :label="$t('number-jobs')" centered sortable width="150">
+          <b-table-column field="numberOfJob" :label="$t('number-jobs')" centered sortable width="150">
             {{ software.numberOfJob }}
           </b-table-column>
 
@@ -262,6 +262,14 @@ export default {
     },
     updateSort(field, order) {
       this.sort = {field, order};
+    },
+    sortBySoftwareStatus(a, b, asc) {
+      return ((asc) ? 1 : -1) * (this.getSoftwareStatusValue(a) - this.getSoftwareStatusValue(b));
+    },
+    getSoftwareStatusValue(software) {
+      if (!software.softwareVersion) return 0;
+      if (software.deprecated) return 1;
+      return 2;
     },
     updateSoftware(updatedSoftware) {
       let software = this.softwares.find(software => software.id === updatedSoftware.id);
