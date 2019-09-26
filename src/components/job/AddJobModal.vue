@@ -28,6 +28,7 @@
       <table class="table is-fullwidth">
         <thead>
           <tr>
+            <th></th>
             <th>{{$t('name')}}</th>
             <th>{{$t('value')}}</th>
           </tr>
@@ -221,10 +222,14 @@ export default {
 }
 
 th:first-child {
-  width: 20%;
+  width: 5%;
 }
 
-td {
+th:nth-child(2) {
+  width: 30%;
+}
+
+td, >>> td {
   vertical-align: middle !important;
 }
 

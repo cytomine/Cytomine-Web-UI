@@ -15,7 +15,17 @@
 
 <template>
 <tr class="job-param-row-wrapper">
-  <td>{{param.name}}</td>
+  <td>
+    <div v-if="description">
+      <v-popover :popover-base-class="'tooltip popover job-description-popover'">
+        <i class="fas fa-info-circle"></i>
+        <template #popover>
+          <p v-html="description.data"></p>
+        </template>
+      </v-popover>
+    </div>
+  </td>
+  <td>{{param.humanName}}</td>
   <td>
     <b-field :type="{'is-danger': errors.has(validationName)}" :message="errors.first(validationName)">
       <b-input v-if="loading" loading disabled />
@@ -62,7 +72,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Cytomine} from 'cytomine-client';
+import {Cytomine, Description} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
@@ -77,6 +87,7 @@ export default {
     return {
       internalValue: null,
       options: null,
+      description: null,
       loading: true
     };
   },
@@ -148,6 +159,13 @@ export default {
   async created() {
     this.internalValue = this.getInitialValue();
 
+    try {
+      this.description = await Description.fetch(this.param);
+    }
+    catch(error) {
+      // Do nothing as a 404 error means no description
+    }
+
     if(this.processedUri) {
       try {
         let {data} = await Cytomine.instance.api.get(this.processedUri);
@@ -178,5 +196,13 @@ export default {
     max-width: 3em;
     background: white;
   }
+}
+
+.job-description-popover {
+  z-index: 5000 !important;
+}
+
+.fas.fa-info-circle {
+  cursor: pointer;
 }
 </style>
