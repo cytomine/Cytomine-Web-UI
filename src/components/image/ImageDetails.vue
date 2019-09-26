@@ -169,9 +169,11 @@
               <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
-                {{$t('button-download')}}
-              </a>
+            </template>
+            <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
+              {{$t('button-download')}}
+            </a>
+            <template v-if="canEdit">
               <button class="button is-danger" @click="confirmDeletion()">
                 {{$t('button-delete')}}
               </button>

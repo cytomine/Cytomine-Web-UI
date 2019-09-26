@@ -27,7 +27,7 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('analysis')}}
-      <button class="button is-link" @click="launchModal = true">
+      <button v-if="canAddJob" class="button is-link" @click="launchModal = true">
         {{$t('button-launch-new-analysis')}}
       </button>
     </p>
@@ -174,6 +174,12 @@ export default {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
+    canAddJob() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
 
     availableStatus() {
       return Object.keys(jobStatusMapping).map(key => {

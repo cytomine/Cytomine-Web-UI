@@ -85,7 +85,7 @@
           <tr>
             <td class="prop-label">{{$t('tags')}}</td>
             <td class="prop-content">
-              <cytomine-tags :object="job" :canEdit="canManageProject" />
+              <cytomine-tags :object="job" :canEdit="canManageJob" />
             </td>
           </tr>
           <tr v-if="hasAnnotationResult">
@@ -131,7 +131,7 @@
               {{$t('deleted-analysis-data')}}
             </td>
           </tr>
-          <tr>
+          <tr v-if="canManageJob">
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
@@ -221,8 +221,8 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
-    canManageProject() {
-      return this.$store.getters['currentProject/canManageProject'];
+    canManageJob() {
+      return this.$store.getters['currentProject/canManageJob'](this.job);
     },
     isRunning() {
       return this.job.status === JobStatus.RUNNING;
