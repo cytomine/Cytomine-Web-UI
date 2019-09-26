@@ -13,6 +13,7 @@
       <table class="table is-fullwidth">
         <thead>
           <tr>
+            <th></th>
             <th>{{$t('name')}}</th>
             <th>{{$t('value')}}</th>
           </tr>
@@ -26,7 +27,7 @@
           />
 
           <tr class="row-separator" v-if="optionalParams.length > 0">
-            <td colspan="2">
+            <td colspan="3">
               {{$t('optional-parameters')}}
               <button class="button is-small" type="button" @click="showOptional = !showOptional">
                 {{$t(showOptional ? 'button-hide' : 'button-show')}}
@@ -43,7 +44,7 @@
           </template>
 
           <tr class="row-separator" v-if="prefilledParams.length > 0">
-            <td colspan="2">
+            <td colspan="3">
               {{$t('prefilled-parameters')}}
               <button class="button is-small" type="button" @click="showPrefilled = !showPrefilled">
                 {{$t(showPrefilled ? 'button-hide' : 'button-show')}}
@@ -203,10 +204,14 @@ export default {
 }
 
 th:first-child {
-  width: 20%;
+  width: 5%;
 }
 
-td {
+th:nth-child(2) {
+  width: 30%;
+}
+
+td, >>> td {
   vertical-align: middle !important;
 }
 
