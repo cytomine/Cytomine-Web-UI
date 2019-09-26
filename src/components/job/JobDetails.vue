@@ -236,7 +236,7 @@ export default {
     },
     async fetchLog() {
       if (this.isFinished) {
-        let maxRetries = Math.round(this.justFinishedInterval / REFRESH_LOG_INTERVAL);
+        let maxRetries = (this.isJustFinished) ? Math.round(this.justFinishedInterval / REFRESH_LOG_INTERVAL) : 1;
         while (!this.log && maxRetries > 0) {
           try {
             this.log = await this.job.fetchLog();
