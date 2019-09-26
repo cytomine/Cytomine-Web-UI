@@ -20,7 +20,7 @@
       <div class="filters">
         <h2>{{$t('filters')}}</h2>
         <div class="columns">
-          <div class="column filter">
+          <div class="column filter is-one-third">
             <div class="filter-label">
               {{$t('algorithm')}}
             </div>
@@ -61,6 +61,16 @@
                 label="label" track-by="status" multiple />
             </div>
           </div>
+
+          <div class="column">
+            <div class="filter-label">
+              {{$t('favorite')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
+                label="label" track-by="value" multiple />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -79,6 +89,12 @@
       >
 
         <template #default="{row: job}">
+          <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
+            <a @click="toggleFavorite(job)" v-if="canEdit(job)">
+              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+            </a>
+            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+          </b-table-column>
           <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
             {{job.softwareName}}
           </b-table-column>
@@ -87,15 +103,15 @@
             {{job.number}}
           </b-table-column>
 
-          <b-table-column field="username" :label="$t('launched-by')" sortable width="1000">
+          <b-table-column field="username" :label="$t('launched-by')" sortable width="600">
             {{ job.username }}
           </b-table-column>
 
-          <b-table-column field="created" :label="$t('execution-date')" sortable width="1000">
+          <b-table-column field="created" :label="$t('execution-date')" sortable width="600">
             {{ Number(job.created) | moment('ll LT') }}
           </b-table-column>
 
-          <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
+          <b-table-column field="status" :label="$t('status')" sortable centered width="600">
             <job-status :status="job.status" />
           </b-table-column>
         </template>
@@ -187,6 +203,12 @@ export default {
         return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
+    availableFavorites() {
+      return [
+        {label: this.$t('yes'), value: true},
+        {label: this.$t('no'), value: false}
+      ];
+    },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listJobs)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listJobs';
@@ -196,15 +218,18 @@ export default {
     selectedLaunchers: localSyncMultiselectFilter('launchers', 'availableLaunchers'),
     selectedDate: sync('executionDate', storeOptions),
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
+    selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
 
     filteredJobs() {
       let selectedStatusValues = this.selectedStatus.map(obj => Number(obj.status));
+      let selectedFavoritesValues = this.selectedFavorites.map(obj => Boolean(obj.value));
       return this.jobs.filter(job => {
         let correctDate = this.selectedDate ? moment(Number(job.created)).isSame(this.selectedDate, 'day') : true;
         return this.selectedSoftwares.includes(job.softwareName) &&
                     this.selectedLaunchers.includes(job.username) &&
                     correctDate &&
-                    selectedStatusValues.includes(job.status);
+                    selectedStatusValues.includes(job.status) &&
+                    selectedFavoritesValues.includes(job.favorite);
       });
     },
 
@@ -222,12 +247,20 @@ export default {
     }
   },
   methods: {
+    canEdit(job) {
+      return this.$store.getters['currentProject/canDeleteJob'](job);
+    },
     updateSort(field, order) {
       this.sort = {field, order};
     },
     addJob(job) {
       this.jobs.unshift(job);
       this.openedDetails = [job.id, ...this.openedDetails];
+    },
+    async toggleFavorite(job) {
+      job.favorite = !job.favorite;
+      await job.setFavorite();
+      await this.refreshJobs();
     },
     async deleteJob(jobToDelete) {
       try {
@@ -244,23 +277,25 @@ export default {
           text: this.$t('notif-error-analysis-deletion')
         });
       }
+    },
+    async refreshJobs() {
+      try {
+        this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
+
+        // if a job was deleted, the currentPage value might not be valid => reinitialize it
+        if((this.currentPage - 1)*this.perPage >= this.filteredJobs.length) {
+          this.currentPage = 1;
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
     }
   },
   async created() {
-    try {
-      this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-
-      // if a job was deleted, the currentPage value might not be valid => reinitialize it
-      if((this.currentPage - 1)*this.perPage >= this.filteredJobs.length) {
-        this.currentPage = 1;
-      }
-
-      this.loading = false;
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    await this.refreshJobs();
+    this.loading = false;
   }
 };
 </script>
@@ -274,5 +309,28 @@ export default {
 
 .filters {
   margin-bottom: 1.5em;
+}
+
+a:hover .fas {
+  color: rgb(35, 102, 216);
+}
+
+a:hover .fas.disabled, a:hover .disabled .fas {
+  color: rgba(35, 102, 216, 0.5);
+}
+
+.fas {
+  color: black;
+  width: 20px;
+  position: relative;
+}
+
+.fas.fa-flag {
+  font-size: 0.8em;
+  bottom: 0.5em;
+}
+
+.fas.disabled, .disabled .fas {
+  color: rgba(0, 0, 0, 0.1);
 }
 </style>

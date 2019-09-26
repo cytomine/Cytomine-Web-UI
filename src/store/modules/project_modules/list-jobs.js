@@ -6,7 +6,8 @@ export default {
       filters: {
         softwares: null,
         launchers: null,
-        statuses: null
+        statuses: null,
+        favorites: null,
       },
       executionDate: null,
 
