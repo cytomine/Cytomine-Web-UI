@@ -21,7 +21,6 @@
       </button>
       <em v-else-if="associatedTags.length === 0">{{$t('no-tags')}}</em>
     </b-field>
-    <add-tag-modal :active.sync="addTagModal" :associatedTags="associatedTags" @addObjects="addAssociations" />
   </template>
 </div>
 </template>
@@ -53,7 +52,18 @@ export default {
   },
   methods: {
     displayModal() {
-      this.addTagModal = true;
+      //this.addTagModal = true;
+      // required to use programmatic modal because the description is sometimes displayed in elements with a
+      // CSS transform (e.g. popover) that conflict with the fixed position of the modal
+      // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
+
+      this.$modal.open({
+        parent: this,
+        component: AddTagModal,
+        props: {associatedTags: this.associatedTags},
+        hasModalCard: true,
+        events: {'addObjects': this.addAssociations}
+      });
     },
     async addAssociations(tags){
 

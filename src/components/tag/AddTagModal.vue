@@ -1,14 +1,13 @@
 <template>
-<cytomine-modal :active="active" :title="$t('associate-tags')" @close="$emit('update:active', false)">
-    <b-loading :is-full-page="false" :active="loading" class="small" />
-    <template v-if="!loading">
+<cytomine-modal :title="$t('associate-tags')" active>
+    <template>
       <b-field>
         <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-tag" allowNew />
       </b-field>
     </template>
 
     <template #footer>
-      <button class="button" @click="$emit('update:active', false)">
+      <button class="button" @click="$parent.close()">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" @click="addAssociations">
@@ -27,7 +26,6 @@ import CytomineModal from '@/components/utils/CytomineModal';
 export default {
   name: 'add-tag-modal',
   props: {
-    active: Boolean,
     associatedTags: Array
   },
   components: {
@@ -36,7 +34,6 @@ export default {
   },
   data() {
     return {
-      loading: true,
       tags: [],
       selectedTags: []
     };
@@ -46,18 +43,10 @@ export default {
       return this.tags.filter(tag => !this.associatedTags.map(u => u.tag).includes(tag.id));
     }
   },
-  watch: {
-    active(val) {
-      this.selectedTags = [];
-      if(val) {
-        this.fetchTags();
-      }
-    }
-  },
   methods: {
     async addAssociations() {
       this.$emit('addObjects', this.selectedTags);
-      this.$emit('update:active', false);
+      this.$parent.close();
     },
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;
@@ -66,7 +55,6 @@ export default {
   },
   async created() {
     this.fetchTags();
-    this.loading = false;
   }
 };
 </script>
