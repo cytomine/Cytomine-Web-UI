@@ -47,6 +47,12 @@
               </b-collapse>
             </td>
           </tr>
+          <tr>
+            <td class="prop-label">{{$t('tags')}}</td>
+            <td class="prop-content">
+              <cytomine-tags :object="job" :canEdit="canManageProject" />
+            </td>
+          </tr>
           <tr v-if="hasAnnotationResult">
             <td>{{$t('data')}}</td>
             <td v-if="hasAnnotationResult">
@@ -142,6 +148,7 @@ import {Job, JobStatus, JobDataCollection, Task} from 'cytomine-client';
 import filesize from 'filesize';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTask from '@/components/utils/CytomineTask';
+import CytomineTags from '@/components/tag/CytomineTags';
 
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
@@ -153,7 +160,8 @@ export default {
   },
   components: {
     CytomineModal,
-    CytomineTask
+    CytomineTask,
+    CytomineTags
   },
   data() {
     return {
@@ -171,6 +179,9 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
     isRunning() {
       return this.job.status === JobStatus.RUNNING;
     },
