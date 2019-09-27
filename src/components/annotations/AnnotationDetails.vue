@@ -69,6 +69,13 @@
         </td>
       </tr>
 
+      <tr>
+        <td colspan="2">
+          <h5>{{$t('tags')}}</h5>
+          <cytomine-tags :object="annotation" :canEdit="canEdit" />
+        </td>
+      </tr>
+
       <!-- PROPERTIES -->
       <tr v-if="isPropDisplayed('properties')">
         <td colspan="2">
@@ -155,6 +162,7 @@ import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import OntologyTree from '@/components/ontology/OntologyTree';
@@ -167,6 +175,7 @@ export default {
     CytomineDescription,
     CytomineTerm,
     OntologyTree,
+    CytomineTags,
     CytomineProperties,
     AttachedFiles,
     AnnotationCommentsModal
