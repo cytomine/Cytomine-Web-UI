@@ -86,6 +86,9 @@ export default {
   },
   data() {
     return {
+      index: 0,
+      row: null,
+
       data: null,
       error: false,
       loading: true,
@@ -117,7 +120,7 @@ export default {
         this.fetchPage(true);
       }
     },
-    internalCheckedRows(chckedRows, previousValue) {
+    internalCheckedRows(chckedRows) {
       this.$emit('update:checkedRows', chckedRows);
     },
     internalPerPage(perPage) {
