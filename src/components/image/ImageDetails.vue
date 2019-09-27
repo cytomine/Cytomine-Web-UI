@@ -46,6 +46,12 @@
           <cytomine-description :object="image" :canEdit="canEdit" />
         </td>
       </tr>
+      <tr v-if="isPropDisplayed('tags')">
+        <td class="prop-label">{{$t('tags')}}</td>
+        <td class="prop-content">
+          <cytomine-tags :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content">
@@ -192,6 +198,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
@@ -207,6 +214,7 @@ export default {
   name: 'image-details',
   components: {
     CytomineDescription,
+    CytomineTags,
     CytomineProperties,
     AttachedFiles,
     MagnificationModal,

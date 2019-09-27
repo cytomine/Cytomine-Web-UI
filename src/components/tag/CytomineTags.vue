@@ -19,7 +19,7 @@
       <button v-if="canEdit" class="button is-small add-tag" @click="displayModal()" key="showForm">
         {{$t('button-add')}}
       </button>
-      <em v-else-if="tags.length === 0">{{$t('no-tags')}}</em>
+      <em v-else-if="associatedTags.length === 0">{{$t('no-tags')}}</em>
     </b-field>
     <add-tag-modal :active.sync="addTagModal" :associatedTags="associatedTags" @addObjects="addAssociations" />
   </template>
