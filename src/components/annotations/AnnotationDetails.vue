@@ -75,11 +75,11 @@
           <h5>{{$t('tracks')}}</h5>
           <b-tag v-for="{track} in associatedTracks" :key="track.id">
             <cytomine-track :track="track" />
-            <button v-if="canEdit" class="delete is-small" :title="$t('button-delete')"
+            <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
                     @click="removeTrack(track.id)">
             </button>
           </b-tag>
-          <div class="add-track-wrapper" v-if="canEdit" v-click-outside="() => showTrackSelector = false">
+          <div class="add-track-wrapper" v-if="canEditTerms" v-click-outside="() => showTrackSelector = false">
             <b-field>
               <b-input
                 size="is-small"
