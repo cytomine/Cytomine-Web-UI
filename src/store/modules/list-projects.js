@@ -6,6 +6,7 @@ function getDefaultState() {
     filters: {
       selectedOntologies: null,
       selectedRoles: null,
+      selectedTags: null,
       boundsMembers: null,
       boundsImages: null,
       boundsUserAnnotations: null,

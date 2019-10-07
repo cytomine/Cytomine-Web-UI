@@ -151,7 +151,8 @@ export default {
   },
   props: {
     project: {type: Object},
-    excludedProperties: {type: Array, default: () => []}
+    excludedProperties: {type: Array, default: () => []},
+    editable: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -168,7 +169,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     canManageProject() {
-      return this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id);
+      return this.editable && (this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id));
     },
     managersIds() {
       return this.managers.map(manager => manager.id);
