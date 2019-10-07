@@ -15,6 +15,7 @@
     <image-details
       v-if="image"
       :image="image"
+      editable
       @setResolution="resolution => image.resolution = resolution"
       @setMagnification="magnification => image.magnification = magnification"
       @delete="deleteImage()"

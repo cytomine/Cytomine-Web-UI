@@ -225,7 +225,8 @@ export default {
   },
   props: {
     image: {type: Object},
-    excludedProperties: {type: Array, default: () => []}
+    excludedProperties: {type: Array, default: () => []},
+    editable: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -238,13 +239,13 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     blindMode() {
-      return this.$store.state.currentProject.project.blindMode;
+      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
     },
     canEdit() {
-      return this.$store.getters['currentProject/canEditImage'](this.image);
+      return this.editable && this.$store.getters['currentProject/canEditImage'](this.image);
     },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
