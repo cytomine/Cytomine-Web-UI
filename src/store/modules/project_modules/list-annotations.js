@@ -15,7 +15,8 @@ export default {
         reviewers: null,
         userJobs: null,
         images: null,
-        termsIds: null
+        termsIds: null,
+        tags: null
       },
       fromDate: null,
       toDate: null,
