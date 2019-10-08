@@ -385,3 +385,10 @@ ul {
   display: block;
 }
 </style>
+
+<style scoped lang="scss">
+pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+</style>
