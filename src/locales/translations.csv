@@ -919,3 +919,6 @@ notif-error-source-update,Failed to update the trusted source,Une erreur a empê
 notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée
 notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance
 version,Version,Version
+fav,Fav.,Fav.
+favorite,Favorite,Favori
+no-selected-layers,No selected layers.,
