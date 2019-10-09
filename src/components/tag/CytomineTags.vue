@@ -16,10 +16,10 @@
         </b-taglist>
       </div>
 
-      <button v-if="canEdit" class="button is-small add-tag" @click="displayModal()" key="showForm">
+      <button v-if="canEdit" class="button is-small add-tag" @click="displayModal()">
         {{$t('button-add')}}
       </button>
-      <em v-else-if="associatedTags.length === 0">{{$t('no-tags')}}</em>
+      <em v-else-if="associatedTags.length === 0">{{$t('no-tag')}}</em>
     </b-field>
   </template>
 </div>
@@ -66,6 +66,11 @@ export default {
       });
     },
     async addAssociations(tags){
+
+      if(tags.length == 0) {
+        this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
+        return;
+      }
 
       let [existingTags, newTags] = tags.reduce(
         (result, element) => {

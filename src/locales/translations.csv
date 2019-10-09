@@ -172,12 +172,13 @@ created-by,Created by,Créé par
 properties,Properties,Propriétés
 no-properties,No properties,Aucune propriété
 tags,Tags,Tags
-no-tags,No tags,Aucun tag
+no-tag,No tags,Aucun tag
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
 associate-tags,Associate tags,Associer des tags
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés
 notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
 search-tag,Search tag...,Rechercher un tag...
+how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
 area,Area,Aire
 perimeter,Perimeter,Périmètre
 button-view-in-image,View in image,Voir dans l'image

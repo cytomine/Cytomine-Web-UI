@@ -1,10 +1,14 @@
 <template>
-<cytomine-modal :title="$t('associate-tags')" active>
+<cytomine-modal-card :title="$t('associate-tags')" active>
     <template>
       <b-field>
         <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-tag" allowNew />
       </b-field>
     </template>
+
+    <div class="explaination">
+        <p>{{$t('how-to-add-not-yet-existing-tag')}}</p>
+    </div>
 
     <template #footer>
       <button class="button" @click="$parent.close()">
@@ -14,14 +18,14 @@
         {{$t('button-add')}}
       </button>
     </template>
-</cytomine-modal>
+</cytomine-modal-card>
 </template>
 
 <script>
 
 import {TagCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
   name: 'add-tag-modal',
@@ -29,7 +33,7 @@ export default {
     associatedTags: Array
   },
   components: {
-    CytomineModal,
+    CytomineModalCard,
     DomainTagInput,
   },
   data() {
@@ -64,4 +68,10 @@ export default {
   overflow: visible !important;
   width: 60vw !important;
 }
+
+.explaination {
+  margin-top: 2rem;
+  padding-right: 1.5em;
+}
+
 </style>
