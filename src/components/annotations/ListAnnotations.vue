@@ -160,7 +160,7 @@
             </div>
             <div class="filter-body">
               <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-tags')" />
+                label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
             </div>
           </div>
           <div class="column filter is-one-quarter"></div>
