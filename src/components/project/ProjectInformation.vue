@@ -8,6 +8,7 @@
     <project-details
       :project="project"
       :excluded-properties="['imagesPreview']"
+      editable
       @update="updateProject"
       @delete="deleteProject()"
     />
