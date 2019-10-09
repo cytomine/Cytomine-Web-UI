@@ -4,9 +4,9 @@ export default {
   state() {
     return {
       filters: {
-        softwares: null,
-        launchers: null,
-        statuses: null
+        softwares: [],
+        launchers: [],
+        statuses: []
       },
       executionDate: null,
 

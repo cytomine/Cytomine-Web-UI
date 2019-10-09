@@ -7,10 +7,11 @@ export default {
 
       filtersOpened: false,
       filters: {
-        formats: null,
-        vendors: null,
-        magnifications: null,
-        resolutions: null,
+        formats: [],
+        vendors: [],
+        selectedTags: [],
+        magnifications: [],
+        resolutions: [],
         boundsWidth: null,
         boundsHeight: null,
         boundsUserAnnotations: null,
@@ -62,7 +63,7 @@ export default {
 
   getters: {
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
     }
   }
 };

@@ -4,9 +4,9 @@ function getDefaultState() {
 
     filtersOpened: false,
     filters: {
-      selectedOntologies: null,
-      selectedRoles: null,
-      selectedTags: null,
+      selectedOntologies: [],
+      selectedRoles: [],
+      selectedTags: [],
       boundsMembers: null,
       boundsImages: null,
       boundsUserAnnotations: null,
@@ -67,7 +67,7 @@ export default {
 
   getters: {
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
     }
   }
 };
