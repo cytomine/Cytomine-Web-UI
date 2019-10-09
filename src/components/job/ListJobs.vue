@@ -96,7 +96,9 @@
             <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
           </b-table-column>
           <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
-            {{job.softwareName}}
+            <router-link :to="`/software/${job.software}`">
+              {{job.softwareName}}
+            </router-link>
           </b-table-column>
 
           <b-table-column :label="$t('run-number')" width="500" centered>
