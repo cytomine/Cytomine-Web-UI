@@ -37,10 +37,10 @@
     </div>
     <p class="panel-tabs">
       <a :class="{'is-active': activeTab === 'projects'}" @click="activeTab = 'projects'">
-        {{$t('projects')}} ({{filteredProjects.length}})
+        {{$t('projects')}} ({{this.projects.totalNbItems}})
       </a>
       <a :class="{'is-active': activeTab === 'images'}" @click="activeTab = 'images'">
-        {{$t('images')}} ({{filteredImages.length}})
+        {{$t('images')}} ({{this.images.totalNbItems}})
       </a>
     </p>
     <div class="panel-block">
@@ -58,6 +58,7 @@
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
+          :data.sync="projects"
           :revision="revision"
         >
           <template #default="{row: project}">
@@ -151,6 +152,7 @@
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
+          :data.sync="images"
           :revision="revision"
         >
           <template #default="{row: image}">
@@ -240,7 +242,7 @@ export default {
       error: false,
 
       searchString: '',
-      projects: [],
+      projects:[],
       images: [],
       activeTab: 'projects',
       perPage: 10,
@@ -272,20 +274,6 @@ export default {
     regexp() {
       return getWildcardRegexp(this.searchString);
     },
-    filteredProjects() {
-      return this.projects.filter(project => {
-        return this.regexp.test(project.name);
-      });
-    },
-    filteredImages() {
-      return this.images.filter(image => {
-        return (image.instanceFilename && this.regexp.test(image.instanceFilename)) ||
-          (image.blindedName && this.regexp.test(String(image.blindedName)));
-      });
-    },
-
-
-
     projectCollection() {
       let collection = new ProjectCollection({
         withMembersCount: true,
@@ -334,26 +322,10 @@ export default {
       }
     }
   },
-  methods: {
-    async fetchImages() {
-      this.images = await ImageInstanceCollection.fetchAllLight();
-    },
-    async fetchProjects() {
-      this.projects = (await new ProjectCollection({
-        light: true,
-        filterKey: 'user',
-        filterValue: this.currentUser.id
-      }).fetchAll()).array;
-    }
-  },
   async created() {
     this.searchString = this.pathSearchString || '';
-    this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     try {
-      await Promise.all([
-        this.fetchImages(),
-        this.fetchProjects()
-      ]);
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
     catch(error) {
       console.log(error);
