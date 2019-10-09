@@ -108,33 +108,39 @@ export default {
       }
     },
 
-    setCenter({state, getters, commit}, {index, center}) {
+    setCenter({state, getters, commit}, {index, center, relative=false}) {
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);
       let refZoom = refImage.imageInstance.zoom - refImage.view.zoom;
 
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        let image = state.images[idx];
-        let diffZoom = image.imageInstance.zoom - image.view.zoom - refZoom;
-        let zoomFactor = Math.pow(2, diffZoom);
-        commit(`images/${idx}/setCenter`, image.view.center.map((val, i) => val + increments[i]*zoomFactor));
+        let newCenter = center;
+        if (relative) {
+          let image = state.images[idx];
+          let diffZoom = image.imageInstance.zoom - image.view.zoom - refZoom;
+          let zoomFactor = Math.pow(2, diffZoom);
+          newCenter = image.view.center.map((val, i) => val + increments[i]*zoomFactor);
+        }
+        commit(`images/${idx}/setCenter`, newCenter);
       });
     },
 
-    setZoom({state, getters, commit}, {index, zoom}) {
+    setZoom({state, getters, commit}, {index, zoom, relative=false}) {
       let zoomIncrement = zoom - state.images[index].view.zoom;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        commit(`images/${idx}/setZoom`, (state.images[idx].view.zoom + zoomIncrement));
+        let newZoom = (relative) ? (state.images[idx].view.zoom + zoomIncrement) : zoom;
+        commit(`images/${idx}/setZoom`, newZoom);
       });
     },
 
-    setRotation({state, getters, commit}, {index, rotation}) {
+    setRotation({state, getters, commit}, {index, rotation, relative=false}) {
       let rotationInc = rotation - state.images[index].view.rotation + 2*Math.PI;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        commit(`images/${idx}/setRotation`, (state.images[idx].view.rotation + rotationInc) % (2*Math.PI));
+        let newRotation = (relative) ? (state.images[idx].view.rotation + rotationInc) % (2*Math.PI) : rotation;
+        commit(`images/${idx}/setRotation`, newRotation);
       });
     },
 
