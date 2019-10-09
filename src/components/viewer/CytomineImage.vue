@@ -82,7 +82,9 @@
             <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
               <i class="fas fa-search"></i>
             </a>
-            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index"
+                          @resetZoom="$refs.view.animate({zoom: image.zoom})"
+                          @fitZoom="fitZoom" />
           </li>
 
           <li v-if="isPanelDisplayed('link') && nbImages > 1">
@@ -400,6 +402,19 @@ export default {
     },
     activeModifyInteraction() {
       return this.activeSelectInteraction && this.activeEditTool && !this.correction;
+    },
+    idealZoom() {
+      let container = this.$refs.container;
+      let idealZoom = this.maxZoom;
+      let factor = this.maxZoom - this.image.zoom;
+      let mapWidth = this.image.width * Math.pow(2, factor);
+      let mapHeight = this.image.height * Math.pow(2, factor);
+      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
+        mapWidth /= 2;
+        mapHeight /= 2;
+        idealZoom --;
+      }
+      return idealZoom;
     }
   },
   watch: {
@@ -415,17 +430,7 @@ export default {
       if(this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
       }
-
-      let container = this.$refs.container;
-      let mapWidth = this.image.width;
-      let mapHeight = this.image.height;
-      let idealZoom = this.image.zoom;
-      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
-        mapWidth /= 2;
-        mapHeight /= 2;
-        idealZoom --;
-      }
-      this.zoom = idealZoom;
+      this.zoom = this.idealZoom;
     },
 
     async updateMapSize() {
@@ -530,6 +535,13 @@ export default {
         this.timeoutSavePosition = setTimeout(this.savePosition, constants.SAVE_POSITION_IN_IMAGE_INTERVAL);
       }
     }, 500),
+
+    fitZoom() {
+      this.$refs.view.animate({
+        zoom: this.idealZoom,
+        center: [this.image.width/2, this.image.height/2]
+      });
+    },
 
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];

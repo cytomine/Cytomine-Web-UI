@@ -4,6 +4,16 @@
   <b-checkbox v-model="digitalZoom">
     {{$t('digital-zoom-checkbox-label')}}
   </b-checkbox>
+
+  <div class="actions level">
+    <button class="button is-small level-item" @click="$emit('fitZoom')">
+      {{ $t('button-best-fit-zoom') }}
+    </button>
+    <button class="button is-small level-item" @click="$emit('resetZoom')">
+      {{ $t('button-reset-zoom') }}
+    </button>
+  </div>
+
 </div>
 </template>
 
@@ -31,3 +41,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .actions .button {
+    margin: 3px;
+    box-sizing: border-box;
+  }
+</style>
