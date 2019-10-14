@@ -38,6 +38,27 @@
         </b-select>
       </td>
     </tr>
+    <tr>
+      <td>{{ $t('contrast') }}</td>
+      <td>
+        <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ $t('gamma') }}</td>
+      <td>
+        <cytomine-slider v-model="gamma" :min="0.1" :max="4" :interval="0.1" :integer-only="false"/>
+      </td>
+    </tr>
+    <tr>
+      <td>{{$t('inverse')}}</td>
+      <td>
+        <b-switch v-model="inverse" class="switch">
+          <template v-if="inverse">{{$t('yes')}}</template>
+          <template v-else>{{$t('no')}}</template>
+        </b-switch>
+      </td>
+    </tr>
   </table>
 
   <div class="actions">
@@ -97,6 +118,31 @@ export default {
       },
       set(value) {
         this.$store.commit(this.imageModule + 'setFilter', value);
+      }
+    },
+
+    contrast: {
+      get() {
+        return this.imageWrapper.colors.contrast;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setContrast', value);
+      }
+    },
+    gamma: {
+      get() {
+        return this.imageWrapper.colors.gamma;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setGamma', value);
+      }
+    },
+    inverse: {
+      get() {
+        return this.imageWrapper.colors.inverse;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setInverse', value);
       }
     },
 
@@ -168,7 +214,9 @@ export default {
   async created() {
     try {
       let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
+      filters.forEach(filter => {
+        filter.prefix = filter.imagingServer + ((filter.baseUrl[0] !== '/') ? '/' : '') + filter.baseUrl;
+      });
       let prefixes = filters.map(filter => filter.prefix);
       if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
