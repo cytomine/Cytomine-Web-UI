@@ -73,6 +73,7 @@ modify,Modify,Modifier
 move,Move,Déplacer
 rotate,Rotate,Pivoter
 delete,Delete,Supprimer
+rename,Rename,Renommer
 undo,Undo,Annuler
 redo,Redo,Refaire
 confirm-deletion,Confirm deletion,Confirmer la suppression
@@ -179,6 +180,12 @@ notif-success-add-tag-domain-association,The selected tags were correctly associ
 notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
 search-tag,Search tag...,Rechercher un tag...
 how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
+delete-tag,Delete tag,Supprimer le tag
+delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues
+notif-success-tag-rename,Tag {tagName} was successfully renamed,Le tag {tagName} a bien été renommé
+notif-error-tag-rename,Failed to rename tag {tagName},Une erreur a empêché de renommer le tag {tagName}
+notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé
+notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName}
 area,Area,Aire
 perimeter,Perimeter,Périmètre
 button-view-in-image,View in image,Voir dans l'image
