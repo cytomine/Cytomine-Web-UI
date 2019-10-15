@@ -50,7 +50,7 @@
         <td v-else>{{$t('unknown')}}</td>
       </tr>
       <tr>
-        <td colspan="2">
+        <td colspan="2" class="buttons-wrapper">
           <div class="buttons">
             <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
               {{$t('button-set-calibration')}}
@@ -58,11 +58,14 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
+            <a class="button is-small" :href="image.downloadURL">
+              {{$t('button-download')}}
+            </a>
           </div>
         </td>
       </tr>
       <tr>
-        <td colspan="2">
+        <td colspan="2" class="buttons-wrapper">
           <div class="buttons navigation has-addons">
             <button class="button is-small" @click="previousImage()" :disabled="isFirstImage">
               <i class="fas fa-angle-left fa-lg"></i> {{$t('button-previous-image')}}
@@ -199,6 +202,11 @@ td {
 
 td:first-child {
   width: 10em;
+}
+
+.buttons-wrapper {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .buttons {
