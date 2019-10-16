@@ -121,6 +121,10 @@ export default {
           type: 'success',
           text: this.$t('notif-success-add-image', propsTranslation)
         });
+
+        let updatedProject = this.project.clone();
+        updatedProject.numberOfImages++;
+        this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
       catch(error) {
         console.log(error);

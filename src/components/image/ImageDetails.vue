@@ -308,6 +308,10 @@ export default {
           text: this.$t('notif-success-image-deletion', {imageName: this.imageNameNotif})
         });
         this.$emit('delete');
+
+        let updatedProject = this.$store.state.currentProject.project.clone();
+        updatedProject.numberOfImages--;
+        this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
       catch(err) {
         console.log(err);

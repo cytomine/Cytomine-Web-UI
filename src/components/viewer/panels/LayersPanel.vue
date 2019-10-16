@@ -153,6 +153,32 @@ export default {
     }
   },
   methods: {
+    addAnnotationEventHandler(annot, saved = true) {
+      this.annotationEventHandler(annot);
+      let updatedProject = this.$store.state.currentProject.project.clone();
+
+      if(annot.type === 'UserAnnotation') {
+        if(saved) updatedProject.numberOfAnnotations++;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations++;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
+    },
+    deleteAnnotationEventHandler(annot) {
+      this.annotationEventHandler(annot);
+
+      let updatedProject = this.$store.state.currentProject.project.clone();
+      if(annot.type === 'UserAnnotation') {
+        updatedProject.numberOfAnnotations--;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations--;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
+    },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {
         this.fetchIndexLayers();
@@ -286,12 +312,14 @@ export default {
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {
-    this.$eventBus.$on(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$on('addAnnotation', this.addAnnotationEventHandler);
+    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
+    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }

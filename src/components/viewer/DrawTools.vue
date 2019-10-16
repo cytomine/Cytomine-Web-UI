@@ -604,7 +604,7 @@ export default {
         annot.userByTerm = reviewedAnnot.userByTerm; // copy terms from reviewed annot
         await annot.cancelReview();
         this.$eventBus.$emit('deleteAnnotation', reviewedAnnot);
-        this.$eventBus.$emit('addAnnotation', annot);
+        this.$eventBus.$emit('addAnnotation', annot, false);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
       }
       catch(error) {
