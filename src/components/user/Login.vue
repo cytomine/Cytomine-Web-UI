@@ -4,7 +4,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-username')}}
-      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="sendUsername">
@@ -24,7 +24,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-password')}}
-      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="resetPassword()">
@@ -46,7 +46,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('login')}}
-      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="login()">
