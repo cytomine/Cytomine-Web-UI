@@ -4,6 +4,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-username')}}
+      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </p>
     <div class="panel-block">
       <form @submit.prevent="sendUsername">
@@ -23,6 +24,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-password')}}
+      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </p>
     <div class="panel-block">
       <form @submit.prevent="resetPassword()">
@@ -44,6 +46,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('login')}}
+      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </p>
     <div class="panel-block">
       <form @submit.prevent="login()">
@@ -169,5 +172,9 @@ export default {
 
 .forgot-credentials a {
   text-transform: lowercase;
+}
+
+.panel-heading img {
+  float: right;
 }
 </style>
