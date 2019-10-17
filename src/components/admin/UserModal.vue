@@ -79,7 +79,7 @@ export default {
       return [
         {field: 'firstname', validationRules: 'required'},
         {field: 'lastname', validationRules: 'required'},
-        {field: 'username', validationRules: 'required'},
+        //{field: 'username', validationRules: 'required'},
         {field: 'email', validationRules: 'required|email'},
         {field: 'password', validationRules: this.editionMode ? 'min:4' : 'required|min:4'}
       ];
