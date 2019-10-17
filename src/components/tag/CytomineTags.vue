@@ -30,7 +30,7 @@ import {get} from '@/utils/store-helpers';
 
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
-import AddTagModal from '@/components/tag/AddTagModal';
+import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
 
 export default {
   name: 'cytomine-tags',
@@ -40,7 +40,7 @@ export default {
   },
   components: {
     DomainTagInput,
-    AddTagModal
+    AddTagDomainAssociationModal
   },
   data() {
     return {
@@ -59,7 +59,7 @@ export default {
 
       this.$modal.open({
         parent: this,
-        component: AddTagModal,
+        component: AddTagDomainAssociationModal,
         props: {associatedTags: this.associatedTags},
         hasModalCard: true,
         events: {'addObjects': this.addAssociations}

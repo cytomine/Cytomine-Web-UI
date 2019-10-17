@@ -1,77 +1,64 @@
 <template>
-<cytomine-modal-card :title="$t('associate-tags')" active>
-    <template>
-      <b-field>
-        <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-tag" allowNew />
-      </b-field>
-    </template>
-
-    <div class="explaination">
-        <p>{{$t('how-to-add-not-yet-existing-tag')}}</p>
-    </div>
+<form @submit.prevent="createTag()">
+  <cytomine-modal :active="active" :title="$t('new-tag')" @close="$emit('update:active', false)">
+    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
+      <b-input v-model="name" name="name" v-validate="'required'" />
+    </b-field>
 
     <template #footer>
-      <button class="button" @click="$parent.close()">
+      <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" @click="addAssociations">
-        {{$t('button-add')}}
+      <button class="button is-link" :disabled="errors.any()">
+        {{$t('button-save')}}
       </button>
     </template>
-</cytomine-modal-card>
+  </cytomine-modal>
+</form>
 </template>
 
 <script>
-
-import {TagCollection} from 'cytomine-client';
-import DomainTagInput from '@/components/utils/DomainTagInput';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import {get} from '@/utils/store-helpers';
+import {Tag} from 'cytomine-client';
+import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-tag-modal',
   props: {
-    associatedTags: Array
+    active: Boolean
   },
-  components: {
-    CytomineModalCard,
-    DomainTagInput,
-  },
+  components: {CytomineModal},
+  $_veeValidate: {validator: 'new'},
   data() {
     return {
-      tags: [],
-      selectedTags: []
+      name: ''
     };
   },
-  computed: {
-    notAssociatedTags() {
-      return this.tags.filter(tag => !this.associatedTags.map(u => u.tag).includes(tag.id));
+  watch: {
+    active(val) {
+      if(val) {
+        this.name = '';
+      }
     }
   },
   methods: {
-    async addAssociations() {
-      this.$emit('addObjects', this.selectedTags);
-      this.$parent.close();
-    },
-    async fetchTags() {
-      this.tags = (await TagCollection.fetchAll()).array;
-    },
+    async createTag() {
+      let result = await this.$validator.validateAll();
+      if(!result) {
+        return;
+      }
 
-  },
-  async created() {
-    this.fetchTags();
+      try {
+        await new Tag({name: this.name, user : get('currentUser/user')}).save();
+        this.$notify({type: 'success', text: this.$t('notif-success-tag-creation')});
+        this.$emit('update:active', false);
+        this.$emit('addTag');
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-tag-creation')});
+      }
+    }
   }
 };
 </script>
-
-<style scoped>
->>> .modal-card, >>> .modal-card-body {
-  overflow: visible !important;
-  width: 60vw !important;
-}
-
-.explaination {
-  margin-top: 2rem;
-  padding-right: 1.5em;
-}
-
-</style>

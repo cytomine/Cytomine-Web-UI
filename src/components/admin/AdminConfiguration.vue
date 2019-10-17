@@ -26,6 +26,11 @@
         v-show="activeTab === 'tags'"
         :key="'tags'"
       >
+
+      <button class="button is-link addButton" @click="creationModal = true">
+        {{$t('new-tag')}}
+      </button>
+
         <b-table
           :data="tags"
           :paginated="true"
@@ -87,21 +92,24 @@
       </div>
     </div>
 
+    <add-tag-modal :active.sync="creationModal" @addTag="refreshTags"/>
   </div>
 </template>
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
 import RenameModal from '@/components/utils/RenameModal';
+import AddTagModal from '@/components/tag/AddTagModal';
 import {Configuration, TagCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor, RenameModal},
+  components: {CytomineQuillEditor, RenameModal, AddTagModal},
   data() {
     return {
       activeTab: 'welcome',
+      creationModal : false,
       tags : [],
       currentTag : null,
       perPage: 25,
@@ -178,8 +186,10 @@ export default {
           text: this.$t('notif-error-tag-delete', {tagName: this.currentTag.name})
         });
       }
+    },
+    async refreshTags(){
+      this.tags = (await TagCollection.fetchAll()).array;
     }
-
 
   },
   async created() {
@@ -202,5 +212,8 @@ export default {
 
 .button {
   margin-top: 1em;
+}
+.addButton {
+  float: right;
 }
 </style>
