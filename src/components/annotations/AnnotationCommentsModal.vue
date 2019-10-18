@@ -29,7 +29,7 @@
       {{$t('comment-will-be-sent-by-email')}}
     </b-message>
     <b-field>
-      <b-radio v-model="sendToAllMembers" :native-value="true">
+      <b-radio v-model="sendToAllMembers" :native-value="true" :disabled="members.length == 0">
         {{$t('send-to-all-project-members')}}
       </b-radio>
     </b-field>
@@ -49,7 +49,7 @@
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :class="{'is-loading': loading}"
-        :disabled="loading || errors.any()" @click="share()">
+        :disabled="loading || members.length == 0 || errors.any()" @click="share()">
         {{$t('button-share')}}
       </button>
     </p>
