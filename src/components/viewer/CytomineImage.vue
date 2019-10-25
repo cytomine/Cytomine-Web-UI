@@ -26,10 +26,9 @@
       <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
         <vl-source-zoomify
           :projection="projectionName"
-          :url="baseLayerURL"
+          :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          :key="baseLayerURL"
           crossOrigin="Anonymous"
           ref="baseSource"
           @mounted="setBaseSource()"
@@ -352,10 +351,10 @@ export default {
       return [this.image.width, this.image.height];
     },
 
-    baseLayerURL() {
+    baseLayerURLs() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
-      return `${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`;
+      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
     },
 
     colorManipulationOn() {
