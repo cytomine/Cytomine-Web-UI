@@ -10,7 +10,7 @@
     </p>
     <div class="panel-block">
       <div class="search-block">
-        <b-input class="search-projects" v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
+        <b-input class="search-projects" :value="searchString" @input="debounceSearchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
       </div>
 
       <b-collapse open>
@@ -173,6 +173,16 @@
               </router-link>
             </b-table-column>
 
+            <b-table-column
+              :field="'projectName'"
+              :label="$t('project')"
+              width="200"
+            >
+              <router-link :to="`/project/${image.project}`">
+                {{ image.projectName }}
+              </router-link>
+            </b-table-column>
+
             <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
               {{ image.magnification || $t('unknown') }}
             </b-table-column>
@@ -224,6 +234,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineTable from '@/components/utils/CytomineTable';
@@ -264,6 +275,11 @@ export default {
 
 
     };
+  },
+  methods: {
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500)
   },
   computed: {
     currentUser: get('currentUser/user'),
