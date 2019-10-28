@@ -6,6 +6,22 @@
     <input id="password" class="hidden" type="password">
 
     <b-field
+      :key="'username'"
+      :label="$t('username')"
+      horizontal
+      :type="{'is-danger': errors.has('username')}"
+      :message="errors.first('username')"
+    >
+      <b-input
+        v-model="internalUser['username']"
+        :name="'username'"
+        v-validate="'required'"
+        :type="'text'"
+        :disabled="internalUser.id"
+      />
+    </b-field>
+
+    <b-field
       v-for="{field, validationRules} in editableFields"
       :key="field"
       :label="$t(field === 'password' && editionMode ? 'password-new' : field)"
