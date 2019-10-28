@@ -46,6 +46,14 @@
       </b-select>
     </b-field>
 
+    <b-field :label="$t('language')" horizontal>
+      <b-select v-model="internalUser['language']">
+        <option v-for="{value, name} in languages" :key="value" :value="value">
+          {{name}}
+        </option>
+      </b-select>
+    </b-field>
+
     <template #footer>
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
@@ -62,6 +70,7 @@
 import {User, RoleCollection} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
+const defaultLanguage = {value: 'EN', name:'English'};
 
 import CytomineModal from '@/components/utils/CytomineModal';
 
@@ -78,7 +87,11 @@ export default {
       internalUser: {},
       rolesWithIds: null,
       selectedRole: defaultRole,
-      displayErrors: false
+      displayErrors: false,
+      languages: [
+        {value: 'EN', name:'English'},
+        {value: 'FR', name:'Français'}
+      ]
     };
   },
   computed: {
@@ -114,6 +127,7 @@ export default {
         }
         this.internalUser = this.user ? this.user.clone() : new User();
         this.selectedRole = this.user ? this.user.role : defaultRole;
+        this.internalUser.language = this.user ? languages : defaultLanguage.value;
         this.displayErrors = false;
       }
     }
