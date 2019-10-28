@@ -104,6 +104,7 @@ export default {
           return values;
         });
         this.associatedTags = this.associatedTags.concat(newAssocations);
+        this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
         this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
       }
       catch(error){
@@ -126,6 +127,7 @@ export default {
   async created() {
     try {
       this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
+      this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
     }
     catch(error) {
       console.log(error);
