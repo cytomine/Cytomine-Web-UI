@@ -62,6 +62,8 @@ export default Object.freeze({
   'viewer-tool-move': ['t'],
   'viewer-tool-rotate': ['shift', 't'],
   'viewer-tool-delete': ['del'],
+  'viewer-tool-copy': [shortkey, 'c'],
+  'viewer-tool-paste': [shortkey, 'v'],
   'viewer-tool-undo': [shortkey, 'z'],
   'viewer-tool-redo': [shortkey, 'y'],
   'viewer-tool-review-accept': ['j'],

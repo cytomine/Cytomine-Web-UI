@@ -125,6 +125,8 @@ export default {
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt'},
 
+            {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy'},
+
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo'},
           ]
         }

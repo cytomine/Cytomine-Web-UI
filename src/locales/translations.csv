@@ -940,3 +940,8 @@ version,Version,Version
 fav,Fav.,Fav.
 favorite,Favorite,Favori
 no-selected-layers,No selected layers.,
+copy,Copy,Copy
+paste,Paste,Coller
+copy-paste,Copy/Paste,Copier/Coller
+notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée
+notif-error-annotation-paste,Failed to paste the annotation. It is too large for this image.,L'annotation n'a pu être collée car elle est trop large pour cette image

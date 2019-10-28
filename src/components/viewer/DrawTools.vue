@@ -278,6 +278,25 @@
     </button>
   </div>
 
+  <div class="buttons has-addons are-small" v-if="isToolDisplayed('copy-paste')">
+    <button
+      :disabled="isToolDisabled('copy')"
+      v-tooltip="$t('copy')"
+      class="button"
+      @click="copy()"
+    >
+      <span class="icon is-small"><i class="fas fa-copy"></i></span>
+    </button>
+    <button
+      :disabled="disabledPaste"
+      v-tooltip="$t('paste')"
+      class="button"
+      @click="paste()"
+    >
+      <span class="icon is-small"><i class="fas fa-paste"></i></span>
+    </button>
+  </div>
+
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
     <button
       :disabled="actions.length === 0"
@@ -309,6 +328,7 @@ import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
 import WKT from 'ol/format/WKT';
+import {containsExtent} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
 import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
@@ -336,6 +356,7 @@ export default {
   computed: {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
+    currentUser: get('currentUser/user'),
 
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -351,6 +372,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
     },
     terms() {
       return this.$store.getters['currentProject/terms'];
@@ -437,7 +461,21 @@ export default {
     },
     reviewMode() {
       return this.imageWrapper.review.reviewMode;
-    }
+    },
+    copiedAnnot: {
+      get() {
+        return this.viewerWrapper.copiedAnnot;
+      },
+      set(annot) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
+    disabledPaste() {
+      return this.disabledDraw || !this.copiedAnnot;
+    },
+    imageExtent() {
+      return [0, 0, this.image.width, this.image.height];
+    },
   },
   watch: {
     noActiveLayer(value) {
@@ -465,6 +503,10 @@ export default {
     isToolDisabled(tool) {
       if(!this.selectedFeature) {
         return true; // no feature selected -> all edit tools disabled
+      }
+
+      if (tool === 'copy') {
+        return false;
       }
 
       let ftr = this.selectedFeature;
@@ -551,6 +593,65 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.deleteAnnot()
       });
+    },
+
+    copy() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.copiedAnnot = feature.properties.annot.clone();
+      this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
+    },
+    async paste() {
+      let location;
+      let geometry = new WKT().readGeometry(this.copiedAnnot.location);
+
+      if (this.image.id === this.copiedAnnot.image || containsExtent(this.imageExtent, geometry.getExtent())) {
+        location = this.copiedAnnot.location;
+      }
+      else {
+        let extent = geometry.getExtent();
+        let center = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
+        geometry.translate(this.image.width / 2 - center[0], this.image.height / 2 - center[1]);
+        if (containsExtent(this.imageExtent, geometry.getExtent())) {
+          location = new WKT().writeGeometry(geometry);
+        }
+      }
+
+      if (!location) {
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
+        return;
+      }
+
+      let annot = new Annotation({
+        location: location,
+        image: this.image.id,
+        slice: this.slice.id,
+        user: this.currentUser.id,
+        term: this.copiedAnnot.term,
+        track: this.copiedAnnot.track
+      });
+
+      try {
+        await annot.save();
+        // TODO in backend: response should include userByTerm and correct value for term
+        // (https://github.com/cytomine/Cytomine-core/issues/1143)
+        annot.term = this.copiedAnnot.term.slice();
+        annot.userByTerm = this.copiedAnnot.term.map(term => {
+          return {term, user: [this.currentUser.id]};
+        });
+        // ----
+
+        this.$eventBus.$emit('addAnnotation', annot);
+        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+        this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+      }
     },
 
 
@@ -783,6 +884,16 @@ export default {
         case 'toggle-current':
           if (this.configUI['project-explore-annotation-main'] && this.selectedFeature) {
             this.displayAnnotDetails = !this.displayAnnotDetails;
+          }
+          return;
+        case 'tool-copy':
+          if (this.isToolDisplayed('copy-paste') && !this.isToolDisabled('copy')) {
+            this.copy();
+          }
+          return;
+        case 'tool-paste':
+          if (this.isToolDisplayed('copy-paste') && !this.disabledPaste) {
+            this.paste();
           }
           return;
       }

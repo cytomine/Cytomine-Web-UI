@@ -10,7 +10,9 @@ export default {
       links: [],
       imageSelector: false,
       activeImage: 0,
-      indexNextImage: 0
+      indexNextImage: 0,
+
+      copiedAnnot: null
     };
   },
 
@@ -27,6 +29,10 @@ export default {
 
     setActiveImage(state, index) {
       state.activeImage = index;
+    },
+
+    setCopiedAnnot(state, annot) {
+      state.copiedAnnot = annot;
     },
 
     // ----- View links
