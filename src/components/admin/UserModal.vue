@@ -127,7 +127,7 @@ export default {
         }
         this.internalUser = this.user ? this.user.clone() : new User();
         this.selectedRole = this.user ? this.user.role : defaultRole;
-        this.internalUser.language = this.user ? languages : defaultLanguage.value;
+        this.internalUser.language = this.user ? this.user.language : defaultLanguage.value;
         this.displayErrors = false;
       }
     }
