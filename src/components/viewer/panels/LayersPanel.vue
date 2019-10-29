@@ -40,6 +40,9 @@
             </button>
           </td>
         </tr>
+        <tr v-if="selectedLayers.length === 0">
+          <td colspan="4" class="has-text-grey is-italic">{{$t('no-selected-layers')}}</td>
+        </tr>
       </tbody>
     </table>
 

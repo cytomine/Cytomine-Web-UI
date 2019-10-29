@@ -4,7 +4,7 @@
   <template v-if="!loading">
     <b-field grouped group-multiline>
       <em v-if="error">{{$t('error-fetch-properties')}}</em>
-      <div class="control" v-else v-for="(prop, idx) in notEditedProperties" :key="prop.id">
+      <div class="control" v-else-if="properties.length > 0" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
         <b-taglist attached>
           <b-tag type="is-dark">{{prop.key}}</b-tag>
           <b-tag>
@@ -19,6 +19,7 @@
           </b-tag>
         </b-taglist>
       </div>
+      <em v-else-if="properties.length === 0">{{$t('no-properties')}}</em>
 
       <button v-if="canEdit" class="button is-small add-prop" @click="addNewProp()" key="showForm">
         {{$t('button-add')}}

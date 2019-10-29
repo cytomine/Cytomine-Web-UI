@@ -28,7 +28,7 @@
                 <span>{{showParameters ? $t('button-hide') : $t('button-show')}}</span>
               </button>
               <b-collapse :open="showParameters">
-                <table class="table inline-table">
+                <table class="table is-narrow inline-table is-fullwidth">
                   <thead>
                     <tr>
                       <th>{{$t('name')}}</th>
@@ -38,7 +38,7 @@
                   </thead>
                   <tbody>
                     <tr v-for="param in job.jobParameters.array" :key="param.id">
-                      <td>{{param.name}}</td>
+                      <td>{{param.humanName}}</td>
                       <td>{{param.value}}</td>
                       <td>{{param.type}}</td>
                     </tr>
@@ -64,7 +64,7 @@
           <tr v-if="hasFileResult">
             <td>{{$t('files')}}</td>
             <td>
-              <table v-if="jobData.length > 0" class="table inline-table">
+              <table v-if="jobData.length > 0" class="table inline-table is-fullwidth is-narrow">
                 <thead>
                   <tr>
                     <th>{{$t('filename')}}</th>
@@ -277,10 +277,6 @@ td:first-child {
 
 td:not(:first-child) {
   width: 100%;
-}
-
-.inline-table {
-  width: auto !important;
 }
 
 .inline-table td:first-child {

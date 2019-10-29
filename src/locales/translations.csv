@@ -171,9 +171,9 @@ annotation-type,Annotation type,Type d'annotation
 multiple-terms,Multiple terms,Plusieurs termes
 created-by,Created by,Créé par
 properties,Properties,Propriétés
-no-properties,No properties,Aucune propriété
+no-properties,No property,Aucune propriété
 tags,Tags,Tags
-no-tag,No tags,Aucun tag
+no-tag,No tag,Aucun tag
 new-tag,New tag,Nouveau tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
@@ -335,6 +335,7 @@ button-remove,Remove,Supprimer
 notif-error-default-layer-add,Failed to add a default layer,Une erreur a empêché d'ajouter le calque aux calques par défaut
 notif-error-default-layer-update,Error during update of default layer,Une erreur a empêché de mettre à jour le calque par défaut
 notif-error-default-layer-delete,Failed to delete default layer,Une erreur a empêché de supprimer le calque par défaut
+no-selected-layers,No selected layers,Pas de calque sélectionné
 button-add-members,Add members,Ajouter des membres
 button-details,Details,Détails
 button-view-activity,View activity,Voir l'activité

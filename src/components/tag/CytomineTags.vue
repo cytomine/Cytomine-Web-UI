@@ -4,7 +4,7 @@
   <template v-if="!loading">
     <b-field grouped group-multiline>
       <em v-if="error">{{$t('error-fetch-tags')}}</em>
-      <div class="control" v-else v-for="(association, idx) in associatedTags" :key="association.id">
+      <div class="control" v-else-if="associatedTags.length > 0" v-for="(association, idx) in associatedTags" :key="association.id">
         <b-taglist attached>
           <b-tag type="is-info">{{association.tagName.toUpperCase()}}</b-tag>
           <b-tag>
@@ -15,11 +15,11 @@
           </b-tag>
         </b-taglist>
       </div>
+      <em v-else-if="associatedTags.length === 0">{{$t('no-tag')}}</em>
 
       <button v-if="canEdit" class="button is-small add-tag" @click="displayModal()">
         {{$t('button-add')}}
       </button>
-      <em v-else-if="associatedTags.length === 0">{{$t('no-tag')}}</em>
     </b-field>
   </template>
 </div>
