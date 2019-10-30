@@ -65,10 +65,6 @@ Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
   clamp: true
 });
 
-import {Cytomine} from 'cytomine-client';
-import constants from './utils/constants.js';
-new Cytomine(constants.CYTOMINE_CORE_HOST);
-
 import App from './App.vue';
 
 Vue.config.productionTip = false;

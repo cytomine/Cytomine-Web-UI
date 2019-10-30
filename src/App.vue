@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 
@@ -103,6 +104,20 @@ export default {
     }
   },
   async created() {
+    let Settings;
+    await axios
+      .get('configuration.json')
+      .then(response => (Settings = response.data));
+
+    for(var i in constants){
+      if(Settings.hasOwnProperty(i)) {
+        constants[i] = Settings[i];
+      }
+    }
+    Object.freeze(constants);
+
+    new Cytomine(constants.CYTOMINE_CORE_HOST);
+
     if(this.$route.query.token && this.$route.query.username) {
       await this.loginWithToken();
     }
