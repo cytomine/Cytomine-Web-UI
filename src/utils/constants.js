@@ -1,4 +1,4 @@
-export default Object.freeze({
+export default {
   CYTOMINE_CORE_HOST: 'http://localhost-core',
   CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
@@ -19,4 +19,4 @@ export default Object.freeze({
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
-});
+};
