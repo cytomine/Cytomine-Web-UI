@@ -6,8 +6,8 @@
     </b-field>
 
     <b-field :label="$t('ontology')">
-      <b-radio v-model="ontology" native-value="NEW">
-        {{$t('create-ontology-for-project')}}
+      <b-radio v-model="ontology" native-value="NO">
+        {{$t('no-ontology')}}
       </b-radio>
     </b-field>
     <b-field>
@@ -16,8 +16,8 @@
       </b-radio>
     </b-field>
     <b-field>
-      <b-radio v-model="ontology" native-value="NO">
-        {{$t('no-ontology')}}
+      <b-radio v-model="ontology" native-value="NEW">
+        {{$t('create-ontology-for-project')}}
       </b-radio>
     </b-field>
 
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       name: '',
-      ontology: 'NEW',
+      ontology: 'NO',
       selectedOntology: null
     };
   },
@@ -72,7 +72,7 @@ export default {
     active(val) {
       if(val) {
         this.name = '';
-        this.ontology = 'NEW';
+        this.ontology = 'NO';
         this.selectedOntology = null;
       }
     }
