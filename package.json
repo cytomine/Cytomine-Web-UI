@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.7.2",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "buefy": "^0.7.3",
     "bulma": "^0.7.4",
     "bulma-slider": "^2.0.0",
@@ -20,7 +20,7 @@
     "cytomine-client": "^1.2.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "npm-font-open-sans": "^1.1.0",
     "ol": "^5.3.1",
     "ol-rotate-feature": "^2.0.1",
