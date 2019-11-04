@@ -945,3 +945,7 @@ paste,Paste,Coller
 copy-paste,Copy/Paste,Copier/Coller
 notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée
 notif-error-annotation-paste,Failed to paste the annotation. It is too large for this image.,L'annotation n'a pu être collée car elle est trop large pour cette image
+paste-repeat,Repeat,Répéter
+paste-repeat-info,Repeat on {input} next slices.,Répéter sur les {input} plans suivants.
+notif-success-annotation-repeat,Annotation has been repeated,L'annotation a été répétée
+notif-error-annotation-repeat,Failed to repeat the annotation,L'annotation n'a pu être répétée

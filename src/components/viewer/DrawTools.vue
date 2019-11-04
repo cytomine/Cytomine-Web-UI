@@ -295,6 +295,32 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
+    <div class="repeat-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+      <button
+        :disabled="disabledPaste"
+        v-tooltip="$t('paste-repeat')"
+        class="button"
+        @click="showRepeatSelector = !showRepeatSelector"
+      >
+      <span class="icon is-small">
+        <i class="fas fa-paste"></i>
+        <i class="fas fa-star"></i>
+      </span>
+      </button>
+
+      <div class="repeat-container" v-show="showRepeatSelector">
+        <p>
+          <i18n path="paste-repeat-info">
+            <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
+          </i18n>
+          <br>
+        </p>
+        <div class="repeat-button-container">
+          <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
@@ -350,7 +376,9 @@ export default {
       format: new WKT(),
       searchStringTerm: '',
       showTrackSelector: false,
-      searchStringTrack: ''
+      searchStringTrack: '',
+      showRepeatSelector: false,
+      nbRepeats: 2,
     };
   },
   computed: {
@@ -375,6 +403,9 @@ export default {
     },
     slice() {
       return this.imageWrapper.activeSlice;
+    },
+    maxRank() {
+      return this.$store.getters[this.imageModule + 'maxRank'];
     },
     terms() {
       return this.$store.getters['currentProject/terms'];
@@ -476,6 +507,9 @@ export default {
     imageExtent() {
       return [0, 0, this.image.width, this.image.height];
     },
+    maxRepeats() {
+      return this.maxRank - this.slice.rank - 1;
+    }
   },
   watch: {
     noActiveLayer(value) {
@@ -605,6 +639,10 @@ export default {
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
     async paste() {
+      if (!this.copiedAnnot) {
+        return;
+      }
+
       let location;
       let geometry = new WKT().readGeometry(this.copiedAnnot.location);
 
@@ -651,6 +689,21 @@ export default {
       catch(err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+      }
+    },
+    async repeat() {
+      if (!this.copiedAnnot) {
+        return;
+      }
+
+      try {
+        await this.copiedAnnot.repeat(this.slice.id, this.nbRepeats);
+        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
+        this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
       }
     },
 
@@ -930,7 +983,7 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection, .track-selection {
+.term-selection, .track-selection, .repeat-selection {
   position: relative;
 }
 
@@ -941,7 +994,7 @@ export default {
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .repeat-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
@@ -979,12 +1032,28 @@ export default {
 .track-selection .color-preview {
   border: 1.5px solid;
 }
+
+.repeat-input {
+  width: 50px;
+}
+
+.repeat-button-container {
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
 </style>
 
 <style lang="scss">
 $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
+  .repeat-selection .repeat-container {
+    p {
+      margin: 0.75em;
+      font-size: 0.9em;
+    }
+  }
 
   .term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
 
@@ -1013,6 +1082,13 @@ $colorActiveIcon: #fff;
 
   .icon svg {
     height: 1.15em !important;
+  }
+
+  .icon .fa-star {
+    font-size: 0.5em;
+    position: absolute;
+    right: 0.2rem;
+    top: 0.2rem;
   }
 }
 </style>
