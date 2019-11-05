@@ -59,7 +59,7 @@
       <dt>{{$t('documentation')}}</dt>
       <dd>
         <i18n path="documentation-info">
-          <a place="docLink" href="https://doc.cytomine.be/" target="_blank">{{$t('here')}}</a>
+          <a place="docLink" href="https://documentation.cytomine.org/" target="_blank">{{$t('here')}}</a>
           <a place="apiDocLink" :href="apiDocLink" target="_blank">{{$t('here')}}</a>
         </i18n>
       </dd>
