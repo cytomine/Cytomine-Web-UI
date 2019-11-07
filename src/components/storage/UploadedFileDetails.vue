@@ -168,7 +168,7 @@ export default {
       if (directChildren.length === 0 && idParent === null) {
         let missingIds = this.uploadedFiles[0].lTree.split('.');
         await Promise.all(missingIds.slice(0, missingIds.length - 1).map(async id => {
-          this.uploadedFiles.push((await UploadedFile.fetch(id)));
+          this.uploadedFiles.unshift((await UploadedFile.fetch(id)));
         }));
         return this.createNodes(null);
       }
