@@ -177,10 +177,18 @@ export default {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          await Promise.all(this.idImages.map(async id => {
+
+          let images = {};
+          //don't fetch multiple times the same image.
+          let idImages = [...new Set(this.idImages)];
+          await Promise.all(idImages.map(async id => {
             let image = await ImageInstance.fetch(id);
-            await this.$store.dispatch(this.viewerModule + 'addImage', image);
+            images[id] = image;
           }));
+
+          this.idImages.forEach(async id => {
+            await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
+          });
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
