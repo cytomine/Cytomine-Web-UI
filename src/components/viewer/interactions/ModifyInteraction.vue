@@ -4,6 +4,7 @@
     v-if="activeEditTool === 'modify'"
     ref="olModifyInteraction"
     :source="`select-target-${index}`"
+    :delete-condition="deleteCondition"
     @modifystart="startEdit"
     @modifyend="endEdit"
   />
@@ -27,6 +28,7 @@
 <script>
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
+import {altKeyOnly, singleClick} from 'ol/events/condition';
 
 export default {
   name: 'modify-interaction',
@@ -59,6 +61,11 @@ export default {
         this.$store.commit(this.imageModule + 'setOngoingEdit', value);
       }
     },
+    deleteCondition() {
+      return function(mapBrowserEvent) {
+        return altKeyOnly(mapBrowserEvent) && singleClick(mapBrowserEvent);
+      };
+    }
   },
   methods: {
     startEdit() {
