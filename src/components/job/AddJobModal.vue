@@ -6,7 +6,7 @@
         <strong>{{$t('algorithm')}}</strong>
       </div>
       <div class="column">
-        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="name" />
+        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="fullName" />
       </div>
     </div>
     <template v-if="selectedSoftware">
@@ -26,7 +26,7 @@
             v-model="param.value"
           />
 
-          <tr class="row-separator" v-if="optionalParams.length > 0">
+          <tr class="row-separator" v-show="optionalParams.length > 0">
             <td colspan="3">
               {{$t('optional-parameters')}}
               <button class="button is-small" type="button" @click="showOptional = !showOptional">
@@ -43,7 +43,7 @@
             />
           </template>
 
-          <tr class="row-separator" v-if="prefilledParams.length > 0">
+          <tr class="row-separator" v-show="prefilledParams.length > 0">
             <td colspan="3">
               {{$t('prefilled-parameters')}}
               <button class="button is-small" type="button" @click="showPrefilled = !showPrefilled">
