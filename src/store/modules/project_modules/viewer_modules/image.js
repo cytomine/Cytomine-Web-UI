@@ -1,4 +1,4 @@
-import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance} from 'cytomine-client';
+import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance, CompanionFileCollection} from 'cytomine-client';
 
 import constants from '@/utils/constants';
 import {slicePositionToRank} from '@/utils/slice-utils';
@@ -36,6 +36,7 @@ export default {
   state() {
     return {
       imageInstance: null,
+      profile: null,
       sliceInstances: {},
       loadedSlicePages: [],
       activeSlice: null,
@@ -75,6 +76,10 @@ export default {
     setActiveSlice(state, slice) {
       state.activeSlice = slice;
     },
+
+    setProfile(state, profile) {
+      state.profile = profile;
+    }
   },
 
   actions: {
@@ -84,6 +89,9 @@ export default {
 
       clone = slice.clone();
       commit('setActiveSlice', clone);
+
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      commit('setProfile', profile);
 
       await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
     },
@@ -125,6 +133,9 @@ export default {
 
       let slice = await SliceInstance.fetch(state.activeSlice.id);
       commit('setActiveSlice', slice);
+
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      commit('setProfile', profile);
 
       commit('clearSliceInstances');
       await dispatch('fetchSliceInstancesAround', {rank: slice.rank});

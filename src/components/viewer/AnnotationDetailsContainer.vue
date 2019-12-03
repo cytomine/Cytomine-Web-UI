@@ -25,6 +25,7 @@
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
         :images="[image]"
+        :profiles="[profile]"
         :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
@@ -79,6 +80,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    profile() {
+      return this.imageWrapper.profile;
     },
     displayAnnotDetails: {
       get() {

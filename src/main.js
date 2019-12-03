@@ -57,6 +57,8 @@ Vue.use(RotateInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartZoom from 'chartjs-plugin-zoom';
+Chart.plugins.unregister(ChartZoom);
 Chart.plugins.unregister(ChartDataLabels);
 Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
   anchor: 'end',

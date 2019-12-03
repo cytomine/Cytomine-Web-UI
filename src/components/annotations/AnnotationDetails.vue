@@ -21,6 +21,11 @@
           <td><strong>{{$t(annotation.area > 0 ? 'perimeter' : 'length')}}</strong></td>
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
+
+        <tr v-if="profile && isPoint">
+          <td><strong>{{$t('profile')}}</strong></td>
+          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
       </template>
 
       <tr v-if="isPropDisplayed('description')">
@@ -200,6 +205,7 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import ProfileModal from '@/components/viewer/ProfileModal';
 
 export default {
   name: 'annotations-details',
@@ -220,6 +226,7 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    profiles: {type: Array},
     showImageInfo: {type: Boolean, default: true},
     showComments: {type: Boolean, default: false}
   },
@@ -259,6 +266,9 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) || {};
     },
+    profile() {
+      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
+    },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
     },
@@ -295,6 +305,9 @@ export default {
     },
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
+    },
+    isPoint() {
+      return this.annotation.location.includes('POINT');
     }
   },
   methods: {
@@ -404,6 +417,15 @@ export default {
 
     addComment(comment) {
       this.comments.unshift(comment);
+    },
+
+    openProfileModal() {
+      this.$modal.open({
+        parent: this,
+        component: ProfileModal,
+        props: {annotation: this.annotation, image: this.image},
+        hasModalCard: true
+      });
     },
 
     confirmDeletion() {

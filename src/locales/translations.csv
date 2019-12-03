@@ -940,6 +940,8 @@ version,Version,Version
 fav,Fav.,Fav.
 favorite,Favorite,Favori
 no-selected-layers,No selected layers.,
+button-best-fit-zoom,Fit zoom to viewport,
+button-reset-zoom,Reset zoom,
 copy,Copy,Copy
 paste,Paste,Coller
 copy-paste,Copy/Paste,Copier/Coller
@@ -949,3 +951,9 @@ paste-repeat,Repeat,Répéter
 paste-repeat-info,Repeat on {input} next slices.,Répéter sur les {input} plans suivants.
 notif-success-annotation-repeat,Annotation has been repeated,L'annotation a été répétée
 notif-error-annotation-repeat,Failed to repeat the annotation,L'annotation n'a pu être répétée
+button-compute-profile,Compute profile,Calculer le profil
+slice,Slice,Plan
+pixel-intensity,Intensity,Intensité
+profile,Profile,Profil
+inspect-button,Inspect,Inspecter
+failed-fetch-profile,
