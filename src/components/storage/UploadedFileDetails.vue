@@ -78,18 +78,34 @@
     </h2>
     <img :src="slidePreview.macroURL">
   </template>
+
+  <template v-if="image">
+    <h2>{{$t('companion-files')}}</h2>
+    <table class="table">
+      <tbody>
+      <tr>
+        <td class="prop-label">{{$t('profile')}}</td>
+        <td class="prop-content">
+          <profile-status :image="image" @update="$emit('update')"></profile-status>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </template>
 </div>
 </template>
 
 <script>
 import SlVueTree from 'sl-vue-tree';
-import {UploadedFile, UploadedFileCollection} from 'cytomine-client';
+import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
+import ProfileStatus from './ProfileStatus';
 
 export default {
   name: 'uploaded-file-details',
   components: {
+    ProfileStatus,
     SlVueTree,
     UploadedFileStatus
   },
@@ -102,6 +118,7 @@ export default {
       rootId: null,
       uploadedFiles: [],
       nodes: [],
+      image: null,
       slidePreview: null,
       samplePreview: null,
       error: false,
@@ -117,23 +134,19 @@ export default {
         root: this.rootId,
         max: this.nbPerPage
       });
-    }
+    },
   },
   watch: {
-    file() {
+    async file() {
       this.findRoot();
-      this.makeTree();
+      await Promise.all([this.fetchAbstractImage(), this.makeTree()]);
     },
-    revision() {
+    async currentPage() {
       this.findRoot();
-      this.makeTree();
+      await this.makeTree();
     },
-    currentPage() {
-      this.findRoot();
-      this.makeTree();
-    },
-    collection() {
-      this.makeTree();
+    async collection() {
+      await this.makeTree();
     },
     slidePreview(val) {
       if(val) {
@@ -149,6 +162,17 @@ export default {
   methods: {
     findRoot() {
       this.rootId = this.file.root || this.file.id;
+    },
+    async fetchAbstractImage() {
+      if (this.file.image && (this.file.status === UFStatus.CONVERTED || this.file.status === UFStatus.DEPLOYED)) {
+        try {
+          this.image = await AbstractImage.fetch(this.file.image);
+        }
+        catch(error) {
+          console.log(error);
+          this.error = true;
+        }
+      }
     },
     async makeTree() {
       try {
@@ -222,7 +246,7 @@ export default {
   },
   created() {
     this.findRoot();
-    this.makeTree();
+    this.fetchAbstractImage();
   }
 };
 </script>
@@ -258,7 +282,7 @@ export default {
 
 h2:not(:first-child) {
   margin-top: 1em;
-  border-bottom: 2px solid #ddd;
+  /*border-bottom: 2px solid #ddd;*/
 }
 
 h2 .button {
@@ -297,5 +321,20 @@ h2 .button {
 
 .level {
   padding-bottom: 0.5rem !important;
+}
+
+.table {
+  /*background: none;*/
+  position: relative;
+  height: 3em;
+}
+
+td.prop-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+td.prop-content {
+  width: 100%;
 }
 </style>
