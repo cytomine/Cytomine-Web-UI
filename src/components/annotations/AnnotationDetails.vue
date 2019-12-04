@@ -233,7 +233,7 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
-    profiles: {type: Array},
+    profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
     showComments: {type: Boolean, default: false}
   },
@@ -315,7 +315,7 @@ export default {
       return this.tracks.filter(track => track.image === this.annotation.image);
     },
     isPoint() {
-      return this.annotation.location.includes('POINT');
+      return this.annotation.location && this.annotation.location.includes('POINT');
     }
   },
   methods: {
