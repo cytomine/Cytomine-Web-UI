@@ -21,7 +21,7 @@
         <strong>{{$t('algorithm')}}</strong>
       </div>
       <div class="column">
-        <cytomine-multiselect v-model="selectedSoftware" :options="softwares" track-by="id" label="fullName" />
+        <cytomine-multiselect v-model="selectedSoftware" :options="executableSoftwares" track-by="id" label="fullName" />
       </div>
     </div>
     <template v-if="selectedSoftware">
@@ -148,6 +148,9 @@ export default {
         }
         return new JobParameter({softwareParameter: param.id, value});
       });
+    },
+    executableSoftwares() {
+      return this.softwares.filter(s => s.executable);
     }
   },
   watch: {
