@@ -42,7 +42,7 @@
       </div>
     </div>
     <div
-      v-if="tracks"
+      v-if="tracks && maxRank > 1"
       class="buttons has-addons are-small track-selection"
       :class="{'has-preview': tracksToAssociate.length > 0}"
       v-click-outside="() => showTrackSelector = false"
