@@ -960,3 +960,7 @@ failed-fetch-profile,
 companion-files,Companion files,
 not-available,Not available.,Indisponible.
 no-profile,No profile.,Pas de profil.
+developer-mode,Developer mode,Mode développeur
+id,ID,ID
+job-id,Analysis ID,ID de l'analyse
+userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse

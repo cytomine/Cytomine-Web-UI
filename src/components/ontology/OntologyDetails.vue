@@ -15,6 +15,10 @@
           </ontology-tree>
         </td>
       </tr>
+      <tr v-if="currentUser.isDeveloper">
+        <td><strong>{{$t('id')}}</strong></td>
+        <td>{{ontology.id}}</td>
+      </tr>
       <tr>
         <td><strong>{{$t('projects')}}</strong></td>
         <td>

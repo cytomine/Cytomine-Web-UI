@@ -177,8 +177,10 @@ export default {
 
       let name = fullName(layer);
 
+      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${name} (${indexLayer.countAnnotation || 0})`;
+      return `${name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {

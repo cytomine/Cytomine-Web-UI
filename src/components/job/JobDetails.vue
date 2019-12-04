@@ -21,6 +21,14 @@
             <td>{{$t('execution-duration')}}</td>
             <td>{{Number(job.updated) - Number(job.created) | duration('humanize')}}</td>
           </tr>
+          <tr v-if="currentUser.isDeveloper">
+            <td>{{$t('job-id')}}</td>
+            <td>{{job.id}}</td>
+          </tr>
+          <tr v-if="currentUser.isDeveloper">
+            <td>{{$t('userjob-id')}}</td>
+            <td>{{job.userJob}}</td>
+          </tr>
           <tr>
             <td>{{$t('parameters')}}</td>
             <td>
@@ -31,6 +39,7 @@
                 <table class="table is-narrow inline-table is-fullwidth">
                   <thead>
                     <tr>
+                      <th v-if="currentUser.isDeveloper">{{$t('id')}}</th>
                       <th>{{$t('name')}}</th>
                       <th>{{$t('value')}}</th>
                       <th>{{$t('type')}}</th>
@@ -38,6 +47,7 @@
                   </thead>
                   <tbody>
                     <tr v-for="param in job.jobParameters.array" :key="param.id">
+                      <td v-if="currentUser.isDeveloper">{{param.id}}</td>
                       <td>{{param.humanName}}</td>
                       <td>{{param.value}}</td>
                       <td>{{$t(param.type.toLowerCase())}}</td>
@@ -198,6 +208,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    currentUser: get('currentUser/user'),
     canEdit() {
       return this.$store.getters['currentProject/canDeleteJob'](this.job);
     },

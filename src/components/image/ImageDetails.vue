@@ -10,6 +10,10 @@
           </router-link>
         </td>
       </tr>
+      <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+        <td class="prop-label">{{$t('id')}}</td>
+        <td class="prop-content" colspan="3">{{image.id}}</td>
+      </tr>
       <tr v-if="isPropDisplayed('status')">
         <td class="prop-label">{{$t('status')}}</td>
         <td class="prop-content" colspan="3">

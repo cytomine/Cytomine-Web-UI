@@ -27,7 +27,14 @@
           <strong>{{$t('storage')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false" />
+          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false">
+            <template #option="{option}">
+              {{option.name}}
+              <template v-if="currentUser.isDeveloper">
+                 ({{$t('id')}}: {{option.id}})
+              </template>
+            </template>
+          </cytomine-multiselect>
         </div>
       </div>
 

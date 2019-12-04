@@ -5,6 +5,10 @@
   </h1>
   <table class="table">
     <tbody>
+      <tr v-if="currentUser.isDeveloper">
+        <td><strong>{{$t('id')}}</strong></td>
+        <td>{{image.id}}</td>
+      </tr>
       <tr>
         <td><strong>{{$t('name')}}</strong></td>
         <td><image-name :image="image" showBothNames /></td>
@@ -88,6 +92,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CalibrationModal from '@/components/image/CalibrationModal';
 
@@ -108,6 +113,7 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },

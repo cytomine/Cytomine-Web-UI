@@ -31,6 +31,10 @@
         :key="'projects'"
       >
         <template #default="{row: project}">
+          <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+            {{project.id}}
+          </b-table-column>
+
           <b-table-column :label="$t('name')" width="100">
             <router-link :to="`/project/${project.id}`">
               {{ project.name }}
@@ -59,6 +63,10 @@
         :key="'images'"
       >
         <template #default="{row: image}">
+          <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+            {{image.id}}
+          </b-table-column>
+
           <b-table-column :label="$t('name')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
               <image-name :image="image" showBothNames />
@@ -121,13 +129,14 @@ export default {
     },
     filteredProjects() {
       return this.projects.filter(project => {
-        return this.regexp.test(project.name);
+        return this.regexp.test(project.name) || this.regexp.test(project.id);
       });
     },
     filteredImages() {
       return this.images.filter(image => {
         return (image.instanceFilename && this.regexp.test(image.instanceFilename)) ||
-          (image.blindedName && this.regexp.test(String(image.blindedName)));
+          (image.blindedName && this.regexp.test(String(image.blindedName))) ||
+          this.regexp.test(image.id);
       });
     }
   },
