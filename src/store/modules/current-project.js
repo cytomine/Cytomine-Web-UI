@@ -109,6 +109,9 @@ export default {
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
+      if (annot.type === AnnotationType.ALGO) {
+        return false;
+      }
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {

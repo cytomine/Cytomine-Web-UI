@@ -184,7 +184,7 @@ export default {
     },
 
     canDraw(layer) {
-      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
+      return !layer.isReview && !layer.algo && this.$store.getters['currentProject/canEditLayer'](layer.id);
     },
 
     addLayerById(id, visible) {
