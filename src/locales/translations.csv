@@ -965,3 +965,8 @@ developer-mode,Developer mode,Mode développeur
 id,ID,ID
 job-id,Analysis ID,ID de l'analyse
 userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse
+per-term,Per term,Par terme
+per-track,Per track,Par trace
+per-user,Per user,Par utilisateur
+per-image,Per image,Par image
+categorization,Categorization,Catégorisation

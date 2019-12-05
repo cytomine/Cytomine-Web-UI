@@ -6,6 +6,7 @@ export default {
   state() {
     return {
       previewSize: null,
+      categorization: null,
       perPage: 25,
       outlineColor: null,
 
@@ -27,6 +28,10 @@ export default {
   mutations: {
     setPreviewSize(state, size) {
       state.previewSize = size;
+    },
+
+    setCategorization(state, categorization) {
+      state.categorization = categorization;
     },
 
     setPerPage(state, perPage) {

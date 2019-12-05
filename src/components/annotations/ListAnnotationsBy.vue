@@ -44,21 +44,28 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {fullName} from '@/utils/user-utils.js';
 
 import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 
 export default {
-  name: 'list-annotations-by-track',
+  name: 'list-annotations-by',
   props: {
+    categorization: String,
     nbPerPage: Number,
     size: Number,
     color: String,
 
-    track: Object,
-    multipleTracks: Boolean, //not used
-    noTrack: Boolean, //not used
+    prop: Object,
+
+    multipleTerms: Boolean,
+    noTerm: Boolean,
+    multipleTracks: Boolean,
+    noTrack: Boolean,
+
+    termsIds: Array,
     imagesIds: Array,
     slicesIds: {type: Array, default: null},
     usersIds: Array,
@@ -87,14 +94,40 @@ export default {
     };
   },
   computed: {
+    isByTerm() {
+      return this.categorization === 'TERM';
+    },
+    isByTrack() {
+      return this.categorization === 'TRACK';
+    },
+    isByUser() {
+      return this.categorization === 'USER';
+    },
+    isByImage() {
+      return this.categorization === 'IMAGE';
+    },
+
     collection() {
       this.revision; // to ensure that collection is reloaded if revision changes
       return new AnnotationCollection({
-        images: this.imagesIds,
-        track: this.multipleTracks || this.noTrack ? null : this.track.id,
-        users: this.usersIds,
+        slices: (this.isByTerm && this.isInViewer) ? this.slicesIds : null,
+
+        term: (this.isByTerm && !this.multipleTerms && !this.noTerm) ? this.prop.id : null,
+        track: (this.isByTrack && !this.multipleTracks && !this.noTrack) ? this.prop.id : null,
+        user: (this.isByUser) ? this.prop.id : null,
+        image: (this.isByImage) ? this.prop.id : null,
+
+        noTerm: this.noTerm,
+        multipleTerm: this.multipleTerms,
+        // noTrack: this.noTrack,
+        // multipleTrack: this.multipleTracks,
+
+        terms: (!this.isByTerm) ? this.termsIds : null,
+        users: (!this.isByUser) ? this.usersIds : null,
+        images: (!this.isByImage) ?this.imagesIds : null,
+
         reviewed: this.reviewed,
-        reviewUsers: this.reviewUsersIds,
+        reviewUsers: this.reviewUsersIds, //TODO
         showTerm: true,
         showGIS: true,
         showTrack: true,
@@ -106,13 +139,27 @@ export default {
       });
     },
     title() {
-      if(this.multipleTracks) {
+      if (this.isByUser) {
+        return fullName(this.prop);
+      }
+      else if (this.isByImage) {
+        return (this.prop.blindedName) ? this.prop.blindedName : this.prop.instanceFilename;
+      }
+      else if (this.isByTerm && this.multipleTerms) {
+        return this.$t('multiple-terms');
+      }
+      else if (this.isByTerm && this.noTerm) {
+        return this.$t('no-term');
+      }
+      else if (this.isByTrack && this.multipleTracks) {
         return this.$t('multiple-tracks');
       }
-      if(this.noTrack) {
+      else if (this.isByTrack && this.noTrack) {
         return this.$t('no-track');
       }
-      return this.track.name;
+      else {
+        return this.prop.name;
+      }
     },
     isInViewer() {
       return (this.index !== undefined);
@@ -132,17 +179,17 @@ export default {
         if (this.isInViewer) {
           return this.imageWrapper.annotationsList.currentPage || 1;
         }
-        return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.track.id] || 1;
+        return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.prop.id] || 1;
       },
       set(page) {
         if (this.isInViewer) {
           this.$store.commit(this.imageModule + 'setCurrentPage', page);
         }
-        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {track: this.track.id, page}); //TODO
+        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page}); //TODO
       }
     },
     activeSlice() {
-      return this.imageWrapper.activeSlice;
+      return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
     }
   },
   watch: {
@@ -188,7 +235,7 @@ export default {
       this.pendingReload = false;
 
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length)) {
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;
