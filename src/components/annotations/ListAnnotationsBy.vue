@@ -2,7 +2,10 @@
 <div class="box">
   <b-loading :is-full-page="false" class="small" :active="loading"  />
   <div v-if="!isInViewer || (isInViewer && !loading)">
-    <h2> {{ title }} ({{nbAnnotations}}) </h2>
+    <h2>
+      <template v-if="titlePrefix">{{titlePrefix}} </template>
+      <span :class="{'has-text-weight-bold': titlePrefix || titleSuffix}">{{title}}</span>
+      <template v-if="titleSuffix"> {{titleSuffix}}</template> ({{nbAnnotations}}) </h2>
     <template v-if="error">
       <b-message type="is-danger" has-icon icon-size="is-small">
         {{$t('failed-fetch-annots')}}
@@ -165,6 +168,31 @@ export default {
       else {
         return this.prop.name;
       }
+    },
+    titlePrefix() {
+      if (!this.isInViewer)
+        return '';
+
+      let prefix = '';
+      if (this.isByTerm) {
+        prefix += this.$t('currently-visible-annotations-with');
+        if (!this.noTerm) {
+          prefix += ` ${this.$t('the-term')}`;
+        }
+      }
+      else if (this.isByTrack) {
+        prefix += this.$t('currently-visible-annotations-for-track');
+      }
+
+      return prefix;
+    },
+    titleSuffix() {
+      if (!this.isInViewer)
+        return;
+      else if (this.isByTerm)
+        return this.$t('in-this-slice');
+      else
+        return this.$t('in-this-image');
     },
     isInViewer() {
       return (this.index !== undefined);
