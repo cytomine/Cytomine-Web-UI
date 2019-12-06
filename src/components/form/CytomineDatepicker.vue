@@ -29,7 +29,7 @@ export default {
     minDate: Date,
     placeholder: String,
     styles: {type: Array, default: () => []}, // accept "multiselect", "bold-placeholder",
-    position: {type: String, default: 'is-bottom-right'}
+    position: {type: String, default: null}
   },
   computed: {
     moment() {
