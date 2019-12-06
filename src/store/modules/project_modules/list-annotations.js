@@ -16,12 +16,13 @@ export default {
         reviewers: null,
         userJobs: null,
         images: null,
-        termsIds: null
+        termsIds: null,
+        tracksIds: null
       },
       fromDate: null,
       toDate: null,
 
-      currentPages: {} // mapping of type {idTerm: currentPage}
+      currentPages: {} // mapping of type {idProp: currentPage}
     };
   },
 
@@ -67,8 +68,8 @@ export default {
       state.currentPages = {};
     },
 
-    setCurrentPage(state, {term, page}) {
-      Vue.set(state.currentPages, term, page);
+    setCurrentPage(state, {prop, page}) {
+      Vue.set(state.currentPages, prop, page);
     }
   }
 };

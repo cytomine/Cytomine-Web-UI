@@ -14,9 +14,9 @@
 
     </div>
     <template v-if="showSliceInfo">
-      <div v-if="image.channels > 1">C: {{annot.channel}}</div>
-      <div v-if="image.depth > 1">Z: {{annot.zStack}}</div>
-      <div v-if="image.duration > 1">T: {{annot.time}}</div>
+      <div v-if="image.channels > 1 || image.channels == null">C: {{annot.channel}}</div>
+      <div v-if="image.depth > 1 || image.depth == null">Z: {{annot.zStack}}</div>
+      <div v-if="image.duration > 1 || image.duration == null">T: {{annot.time}}</div>
     </template>
   </div>
 

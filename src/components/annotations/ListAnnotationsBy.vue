@@ -1,44 +1,46 @@
 <template>
 <div class="box">
-  <b-loading :is-full-page="false" class="small" :active="loading" v-if="!isInViewer" />
-  <h2> {{ title }} ({{nbAnnotations}}) </h2>
-  <template v-if="error">
-    <b-message type="is-danger" has-icon icon-size="is-small">
-      {{$t('failed-fetch-annots')}}
-    </b-message>
-  </template>
-  <template v-else-if="!annotations.length">
-    <em class="no-result">{{ $t('no-annotation') }}</em>
-  </template>
-  <template v-else>
-    <annotation-preview
-      v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
-      :class="{active: isInViewer && annot.slice === imageWrapper.activeSlice.id}"
-      :annot="annot"
-      :size="size"
-      :color="color"
-      :terms="allTerms"
-      :users="allUsers"
-      :images="allImages"
-      :tracks="allTracks"
-      :show-image-info="!isInViewer"
-      :show-slice-info="isInViewer"
-      @addTerm="$emit('addTerm', $event)"
-      @addTrack="$emit('addTrack', $event)"
-      @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
-      @updateProperties="$emit('updateProperties')"
-      @centerView="$emit('centerView', annot)"
-      @deletion="$emit('delete', annot)"
-      @selectAnnotation="$emit('select', annot)"
-    />
+  <b-loading :is-full-page="false" class="small" :active="loading"  />
+  <div v-if="!isInViewer || (isInViewer && !loading)">
+    <h2> {{ title }} ({{nbAnnotations}}) </h2>
+    <template v-if="error">
+      <b-message type="is-danger" has-icon icon-size="is-small">
+        {{$t('failed-fetch-annots')}}
+      </b-message>
+    </template>
+    <template v-else-if="!annotations.length">
+      <em class="no-result">{{ $t('no-annotation') }}</em>
+    </template>
+    <template v-else>
+      <annotation-preview
+        v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
+        :class="{active: isInViewer && annot.slice === imageWrapper.activeSlice.id}"
+        :annot="annot"
+        :size="size"
+        :color="color"
+        :terms="allTerms"
+        :users="allUsers"
+        :images="allImages"
+        :tracks="allTracks"
+        :show-image-info="!isInViewer"
+        :show-slice-info="isByTrack && !noTrack"
+        @addTerm="$emit('addTerm', $event)"
+        @addTrack="$emit('addTrack', $event)"
+        @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
+        @updateProperties="$emit('updateProperties')"
+        @centerView="$emit('centerView', annot)"
+        @deletion="$emit('delete', annot)"
+        @selectAnnotation="$emit('select', annot)"
+      />
 
-    <b-pagination
-      :total="nbAnnotations"
-      :current.sync="currentPage"
-      size="is-small"
-      :per-page="nbPerPage"
-    />
-  </template>
+      <b-pagination
+        :total="nbAnnotations"
+        :current.sync="currentPage"
+        size="is-small"
+        :per-page="nbPerPage"
+      />
+    </template>
+  </div>
 </div>
 </template>
 
@@ -66,13 +68,14 @@ export default {
     noTrack: Boolean,
 
     termsIds: Array,
+    tracksIds: Array,
     imagesIds: Array,
-    slicesIds: {type: Array, default: null},
     usersIds: Array,
     reviewed: Boolean,
     reviewUsersIds: {type: Array, default: null},
     afterThan: {type: Number, default: null},
     beforeThan: {type: Number, default: null},
+    slicesIds: {type: Array, default: null},
 
     allTerms: Array,
     allUsers: Array,
@@ -86,11 +89,12 @@ export default {
   components: {AnnotationPreview},
   data() {
     return {
-      loading: false,
+      loading: true,
       error: false,
       annotations: [],
       nbAnnotations: 0,
       pendingReload: true,
+      savedSlice: null
     };
   },
   computed: {
@@ -119,15 +123,16 @@ export default {
 
         noTerm: this.noTerm,
         multipleTerm: this.multipleTerms,
-        // noTrack: this.noTrack,
-        // multipleTrack: this.multipleTracks,
+        noTrack: this.noTrack,
+        multipleTrack: this.multipleTracks,
 
-        terms: (!this.isByTerm) ? this.termsIds : null,
+        terms: (!this.isByTerm) ? this.termsIds.filter(id => id > 0) : null,
         users: (!this.isByUser) ? this.usersIds : null,
-        images: (!this.isByImage) ?this.imagesIds : null,
+        images: (!this.isByImage) ? this.imagesIds : null,
+        tracks: (!this.isByTrack) ? this.tracksIds.filter(id => id > 0) : null,
 
         reviewed: this.reviewed,
-        reviewUsers: this.reviewUsersIds, //TODO
+        reviewUsers: (!this.isByUser) ? this.reviewUsersIds : null,
         showTerm: true,
         showGIS: true,
         showTrack: true,
@@ -185,7 +190,7 @@ export default {
         if (this.isInViewer) {
           this.$store.commit(this.imageModule + 'setCurrentPage', page);
         }
-        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page}); //TODO
+        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
     },
     activeSlice() {
@@ -197,7 +202,7 @@ export default {
       this.fetchPage();
     },
     collection(newCollection, oldCollection) {
-      if (newCollection.track !== oldCollection.track) {
+      if (oldCollection && newCollection.track !== oldCollection.track) {
         this.initialize();
       }
       else {
@@ -216,7 +221,7 @@ export default {
   methods: {
     async initialize() {
       await this.findPage();
-      await this.fetchPage();
+      await this.fetchPage(true);
     },
     async findPage() {
       if (this.isInViewer) {
@@ -226,7 +231,7 @@ export default {
         this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
       }
     },
-    async fetchPage() {
+    async fetchPage(setLoading=false) {
       if(!this.visible) { // prevent unnecessary reload if list not visible but schedule a reload at next opening
         this.pendingReload = true;
         return;
@@ -235,13 +240,14 @@ export default {
       this.pendingReload = false;
 
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length) {
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;
       }
 
-      this.loading = true;
+      if (setLoading)
+        this.loading = true;
 
       try {
         let data = await this.collection.fetchPage(this.currentPage - 1);

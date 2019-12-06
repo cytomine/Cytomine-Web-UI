@@ -164,27 +164,24 @@
               <div class="filter-body">
                 <ontology-tree-multiselect
                   :ontology="ontology"
-                  :additionalNodes="additionalNodes"
+                  :additionalNodes="additionalTermNodes"
                   v-model="selectedTermsIds"
                 />
               </div>
           </div>
 
-<!--          <div v-if="tracks" class="column filter is-one-third">-->
-<!--            <div class="filter-label">-->
-<!--              {{$t('tracks')}}-->
-<!--            </div>-->
-<!--            <div class="filter-body">-->
-<!--              <cytomine-multiselect-->
-<!--                v-model="selectedTracks"-->
-<!--                :options="tracks"-->
-<!--                label="name"-->
-<!--                track-by="id"-->
-<!--                multiple-->
-<!--                :allPlaceholder="$t('all-tracks')"-->
-<!--              />-->
-<!--            </div>-->
-<!--          </div>-->
+          <div v-if="tracks" class="column filter is-one-third">
+            <div class="filter-label">
+              {{$t('tracks')}}
+            </div>
+            <div class="filter-body">
+              <track-tree-multiselect
+                :tracks="filteredTracks"
+                :additional-nodes="additionalTrackNodes"
+                v-model="selectedTracksIds"
+              />
+            </div>
+          </div>
 
           <div class="column filter">
             <div class="filter-label">
@@ -208,7 +205,7 @@
       </div>
     </div>
 
-    <list-annotations-by v-for="prop in categoryOptions" :key="prop.id"
+    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
       :categorization="selectedCategorization.categorization"
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
@@ -222,9 +219,10 @@
       :prop="prop"
       :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
       :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
-      :multiple-tracks="false"
-      :no-track="true"
+      :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
+      :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
       :terms-ids="selectedTermsIds"
+      :tracks-ids="selectedTracksIds"
       :imagesIds="selectedImagesIds"
       :usersIds="selectedUsersIds"
       :reviewed="reviewed"
@@ -235,6 +233,7 @@
       :revision="revision"
 
       v-show="showList(prop)"
+      :visible="showList(prop)"
 
       @addTerm="addTerm"
       @addTrack="addTrack"
@@ -268,6 +267,7 @@ import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCo
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
+import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -277,6 +277,7 @@ const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilte
 export default {
   name: 'list-annotations',
   components: {
+    TrackTreeMultiselect,
     CytomineMultiselect,
     CytomineDatepicker,
     OntologyTreeMultiselect,
@@ -315,7 +316,10 @@ export default {
       images: [],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
-      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')}
+      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
+
+      noTrackOption: {id: 0, name: this.$t('no-track')},
+      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')}
     };
   },
   computed: {
@@ -379,7 +383,7 @@ export default {
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
     },
-    additionalNodes() {
+    additionalTermNodes() {
       let additionalNodes = [this.noTermOption];
       if(this.terms.length > 1 && this.isByTerm) {
         additionalNodes.push(this.multipleTermsOption);
@@ -387,10 +391,30 @@ export default {
       return additionalNodes;
     },
     termsOptions() {
-      return this.terms.concat(this.additionalNodes);
+      return this.terms.concat(this.additionalTermNodes);
     },
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
+    },
+
+    filteredTracks() {
+      return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
+    },
+    filteredTracksIds() {
+      return this.filteredTracks.map(track => track.id);
+    },
+    additionalTrackNodes() {
+      let additionalNodes = [this.noTrackOption];
+      if (this.tracks.length > 1 && this.isByTrack) {
+        additionalNodes.push(this.multipleTracksOption);
+      }
+      return additionalNodes;
+    },
+    tracksOptions() {
+      return this.filteredTracks.concat(this.additionalTrackNodes);
+    },
+    trackOptionsIds() {
+      return this.tracksOptions.map(option => option.id);
     },
 
     selectedAnnotationType: sync('annotationType', storeOptions),
@@ -398,6 +422,7 @@ export default {
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
+    selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
     toDate: sync('toDate', storeOptions),
@@ -440,7 +465,7 @@ export default {
             return this.selectedReviewers;
           return this.selectedMembers;
         case 'TRACK':
-          return this.tracks; //TODO
+          return this.tracksOptions;
       }
     },
     isByTerm() {
@@ -451,6 +476,9 @@ export default {
     },
     noTerm() {
       return this.selectedTermsIds.includes(this.noTermOption.id);
+    },
+    noTrack() {
+      return this.selectedTracksIds.includes(this.noTrackOption.id);
     },
 
     collection() {
@@ -511,9 +539,9 @@ export default {
         case 'IMAGE':
           return this.selectedImagesIds.includes(prop.id);
         case 'USER':
-          return this.reviewed ? this.reviewUsersIds : this.selectedUsersIds;
+          return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
         case 'TRACK':
-          return true; //TODO
+          return this.selectedTracksIds.includes(prop.id);
       }
     }
   },
