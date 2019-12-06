@@ -197,7 +197,7 @@
               {{$t('to')}}
             </div>
             <div class="filter-body">
-              <cytomine-datepicker v-model="toDate" :styles="['multiselect']" :minDate="fromDate" />
+              <cytomine-datepicker v-model="toDate" :styles="['multiselect']" :minDate="fromDate" position="is-bottom-left" />
             </div>
           </div>
 
