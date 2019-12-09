@@ -70,6 +70,7 @@ export default {
 
       return {
         backgroundImage: `url(${url})`,
+        backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
       };
