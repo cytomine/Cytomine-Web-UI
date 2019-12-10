@@ -8,6 +8,7 @@ export default {
   state() {
     return {
       links: [],
+      linkMode: 'ABSOLUTE',
       imageSelector: false,
       activeImage: 0,
       indexNextImage: 0,
@@ -33,6 +34,10 @@ export default {
 
     setCopiedAnnot(state, annot) {
       state.copiedAnnot = annot;
+    },
+
+    setLinkMode(state, mode) {
+      state.linkMode = mode;
     },
 
     // ----- View links
@@ -108,7 +113,8 @@ export default {
       }
     },
 
-    setCenter({state, getters, commit}, {index, center, relative=false}) {
+    setCenter({state, getters, commit}, {index, center}) {
+      let relative = state.linkMode === 'RELATIVE';
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);
       let refZoom = refImage.imageInstance.zoom - refImage.view.zoom;
@@ -126,7 +132,8 @@ export default {
       });
     },
 
-    setZoom({state, getters, commit}, {index, zoom, relative=false}) {
+    setZoom({state, getters, commit}, {index, zoom}) {
+      let relative = state.linkMode === 'RELATIVE';
       let zoomIncrement = zoom - state.images[index].view.zoom;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
@@ -135,7 +142,8 @@ export default {
       });
     },
 
-    setRotation({state, getters, commit}, {index, rotation, relative=false}) {
+    setRotation({state, getters, commit}, {index, rotation}) {
+      let relative = state.linkMode === 'RELATIVE';
       let rotationInc = rotation - state.images[index].view.rotation + 2*Math.PI;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {

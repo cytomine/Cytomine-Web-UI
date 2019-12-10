@@ -975,3 +975,6 @@ currently-visible-annotations-for-track,Currently visible annotations for track,
 the-term,term,le terme
 in-this-image,in this image,dans cette image
 in-this-slice,in this slice,dans ce plan
+link-mode,Mode,Mode
+absolute-link-mode,Absolute,Absolu
+relative-link-mode,Relative,Relatif
