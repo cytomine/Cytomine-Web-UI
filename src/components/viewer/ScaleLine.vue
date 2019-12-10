@@ -35,12 +35,12 @@ export default {
       return Math.round(magnification * 100) / 100;
     },
     resolution() {
-      let resolution = this.image.resolution ? this.image.resolution : 1;
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
       return Math.pow(2, this.image.zoom - this.zoom) * resolution;
     },
     scaleLength() {
       let length = this.scaleLineLength * this.resolution;
-      if(this.image.resolution) {
+      if(this.image.physicalSizeX) {
         let unit = this.$t('um');
         if (length > 1000) {
           length /= 1000;
