@@ -298,7 +298,8 @@ export default {
 
   },
   async created() {
-    this.initialize();
+    await this.initialize();
+    this.loading = false;
   }
 };
 </script>
