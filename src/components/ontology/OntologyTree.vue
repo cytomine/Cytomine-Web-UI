@@ -113,12 +113,7 @@ export default {
   },
   methods: {
     makeTree() {
-      if(!this.ontology) {
-        this.treeNodes = [];
-        return;
-      }
-
-      let nodes = this.createSubTree(this.ontology.children.array.slice());
+      let nodes = (this.ontology) ? this.createSubTree(this.ontology.children.array.slice()) : [];
       let additionalNodes = this.createSubTree(this.additionalNodes.slice());
       this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
@@ -141,7 +136,7 @@ export default {
           name: term.name,
           color: term.color,
           parent: term.parent,
-          ontology: this.ontology.id,
+          ontology: (this.ontology) ? this.ontology.id : null,
           hidden: false
         },
         children: term.children && term.children.length > 0 ? this.createSubTree(term.children) : []
