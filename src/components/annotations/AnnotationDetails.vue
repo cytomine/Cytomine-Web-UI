@@ -75,7 +75,7 @@
       </tr>
 
       <!-- TRACKS -->
-      <tr v-if="isPropDisplayed('tracks') && ontology">
+      <tr v-if="isPropDisplayed('tracks') && maxRank > 1">
         <td colspan="2">
           <h5>{{$t('tracks')}}</h5>
           <b-tag v-for="{track} in associatedTracks" :key="track.id">
@@ -273,6 +273,9 @@ export default {
     },
     image() {
       return this.images.find(image => image.id === this.annotation.image) || {};
+    },
+    maxRank() {
+      return this.image.depth * this.image.duration * this.image.channels;
     },
     profile() {
       return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
