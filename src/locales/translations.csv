@@ -15,775 +15,791 @@ annotations,Annotations,Annotations
 activity,Activity,Activité
 analysis,Analysis,Analyse
 analyses,Analyses,Analyses
-configuration,Configuration,
-no-project,No project to display,
-no-image,No image to display,
+configuration,Configuration,Configuration
+no-project,No project to display,Aucun projet à afficher
+no-image,No image to display,Aucune image à afficher
 statistics,Statistics,Statistiques
 user-annotations,Manual Annotations,Annotations manuelles
 analysis-annotations,Analysis Annotations,Annotations d'analyse
-reviewed-annotations,Reviewed Annotations,Annotations revues
+reviewed-annotations,Reviewed Annotations,Annotations validées
 profile,Profile,Profil
 username,Username,Nom d'utilisateur
 firstname,First name,Prénom
 lastname,Last name,Nom
-email,Email address,Adresse mail
-button-go,Go,Go
+email,Email address,Adresse e-mail
 button-save,Save,Sauvegarder
-notif-success-user-details-saved,User details correctly updated,
-notif-error-user-details-not-saved,Error during update of user details,
+notif-success-user-details-saved,User details correctly updated,Profil mis à jour avec succès
+notif-error-user-details-not-saved,Error during update of user details,Une erreur a empêché la mise à jour du profil
 password,Password,Mot de passe
 password-current,Current password,Mot de passe actuel
 password-new,New password,Nouveau mot de passe
 password-confirm,New password (confirm),Nouveau mot de passe (confirmation)
-notif-success-password-saved,Password correctly updated,
-notif-error-password-not-saved,Error during update of password,
+notif-success-password-saved,Password correctly updated,Mot de passe mis à jour avec succès
+notif-error-password-not-saved,Error during update of password,Une erreur a empêché de sauvegarder le mot de passe
 api-keys,API keys,Clés API
 public-key,Public key,Clé publique
 private-key,Private key,Clé privée
 regenerate-api-keys,Regenerate,Regénérer
-notif-success-keys-regenerated,API keys correctly updated,
-notif-error-keys-not-regenerated,Error during the regeneration of API keys,
-login,Login,Authentification
-remember-me,Remember me,
+notif-success-keys-regenerated,API keys correctly updated,Clés API mises à jour avec succès
+notif-error-keys-not-regenerated,Error during the regeneration of API keys,Une erreur a empêché de regénérer les clés API
+login,Log in,Authentification
+remember-me,Remember me,Se rappeler de moi
 notif-success-login,Welcome on Cytomine,Bienvenue sur Cytomine
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite
-annotation-layers,Annotation layers,
-select-layer,Select a layer,
-button-add,Add,
-button-added,Added,
-layers-opacity,Layers opacity,
-terms,Terms,
-no-term,No term,
-brightness,Brightness,
-contrast,Contrast,
-hue,Hue,
-saturation,Saturation,
-select,Select,
-point,Point,
-line,Line,
-freehand-line,Freehand line,
-rectangle,Rectangle,
-circle,Circle,
-polygon,Polygon,
-freehand-polygon,Freehand polygon,
-freehand-correct-add,Correct an annotation by adding a freehand area,
-freehand-correct-remove,Correct an annotation by removing a freehand area,
-display-annot-details,Display details of currently selected annotation,
-fill,Fill,
-modify,Modify,
-move,Move,
-rotate,Rotate,
-delete,Delete,
-undo,Undo,
-redo,Redo,
-confirm-deletion,Confirm deletion,
-confirm-deletion-annotation,Are you sure you want to delete this annotation?,
-button-confirm,Confirm,
-button-cancel,Cancel,
-notif-error-annotation-update,Error during annotation update,
-notif-error-undo,Failed to undo last action,
-notif-error-redo,Failed to redo last action,
-notif-error-annotation-deletion,Error during annotation deletion,
-notif-error-annotation-creation,Error during annotation creation,
-notif-error-annotation-correction,Error during annotation correction,
-notif-error-annotation-fill,Error during annotation fill,
-filename,Filename,
-height,Height,
-width,Width,
-magnification,Magnification,
-resolution,Resolution,
-unknown,Unknown,
-information,Information,
-name,Name,
-button-open,Open,
-description,Description,
-ontology,Ontology,
-number-user-annotations,Number of user annotations,
-number-analysis-annotations,Number of analysis annotations,
-number-reviewed-annotations,Number of reviewed annotations,
-no-description,No description.,
+annotation-layers,Annotation layers,Calques d'annotations
+select-layer,Select a layer,Sélectionner un calque
+button-add,Add,Ajouter
+button-added,Added,Ajouté
+layers-opacity,Layers opacity,Opacité des calques
+terms,Terms,Termes
+no-term,No term,Aucun terme
+brightness,Brightness,Luminosité
+contrast,Contrast,Contraste
+hue,Hue,Teinte
+saturation,Saturation,Saturation
+select,Select,Sélectionner
+point,Point,Point
+line,Line,Ligne
+freehand-line,Freehand line,Ligne à main levée
+rectangle,Rectangle,Rectangle
+circle,Circle,Cercle
+polygon,Polygon,Polygone
+freehand-polygon,Freehand polygon,Polygone à main levée
+freehand-correct-add,Correct annotation by adding a freehand area,Corriger l'annotation en lui ajoutant un polygone à main levée
+freehand-correct-remove,Correct annotation by removing a freehand area,Corriger l'annotation en lui soustrayant un polygone à main levée
+display-annot-details,Display details of currently selected annotation,Afficher les détails de l'annotation sélectionnée
+fill,Fill,Remplir
+modify,Modify,Modifier
+move,Move,Déplacer
+rotate,Rotate,Pivoter
+delete,Delete,Supprimer
+rename,Rename,Renommer
+undo,Undo,Annuler
+redo,Redo,Refaire
+confirm-deletion,Confirm deletion,Confirmer la suppression
+confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?
+button-confirm,Confirm,Confirmer
+button-cancel,Cancel,Annuler
+notif-error-annotation-update,Error during annotation update,Une erreur a empêché de modifier l'annotation
+notif-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action
+notif-error-redo,Failed to redo last action,Une erreur a empêché de rétablir la dernière action
+notif-error-annotation-deletion,Error during annotation deletion,Une erreur a empêché la suppression de l'annotation
+notif-error-annotation-creation,Error during annotation creation,Une erreur a empêché la création de l'annotation
+notif-error-annotation-correction,Error during annotation correction,Une erreur a empêché la correction de l'annotation
+notif-error-annotation-fill,Error during annotation fill,Une erreur a empêché le remplissage de l'annotation
+filename,Filename,Nom de fichier
+height,Height,Hauteur
+width,Width,Largeur
+magnification,Magnification,Grossissement
+resolution,Resolution,Résolution
+unknown,Unknown,Inconnu
+information,Information,Information
+name,Name,Nom
+button-open,Open,Ouvrir
+description,Description,Description
+ontology,Ontology,Ontologie
+number-user-annotations,Number of user annotations,Nombre d'annotations manuelles
+number-analysis-annotations,Number of analysis annotations,Nombre d'annotations d'analyse
+number-reviewed-annotations,Number of reviewed annotations,Nombre d'annotations validées
+no-description,No description.,Pas de description.
 search-placeholder,Search,Recherche
-creator,Creator,
-managers,Managers,
-contributors,Contributors,
-online,Online,
-representatives,Representatives,
-manager,Manager,
-role,Role,
-contributor,Contributor,
-button-less,Less,
-button-more,More,
-per-page,per page,
-overview,Overview,
-originalFilename,Original filename,
-format,Format,
-pixels,pixels,
-nm-per-pixel,nm/pixel,
-um-per-pixel,µm/pixel,
-mm-per-pixel,mm/pixel,
-vendor,Vendor,
-image-size,Image size,
-status,Status,
-button-add-image,Add image,
-actions,Actions,
-button-rename,Rename,
-button-properties,Properties,
-button-download,Download,
-button-delete,Delete,
-recently-opened,Recently opened,Ouverts récemment
-last-opened-image,Last opened image,Dernière image ouverte
+creator,Creator,Créateur
+managers,Managers,Responsables
+contributors,Contributors,Contributeurs
+online,Online,En ligne
+representatives,Representatives,Personnes de contact
+manager,Manager,Responsable
+role,Role,Rôle
+contributor,Contributor,Contributeur
+button-less,Less,Moins
+button-more,More,Plus
+count-per-page,{count} per page,{count} par page
+overview,Overview,Aperçu
+originalFilename,Original filename,Nom du fichier d'origine
+format,Format,Format
+pixels,pixels,pixels
+nm-per-pixel,nm/pixel,nm/pixel
+um-per-pixel,µm/pixel,µm/pixel
+mm-per-pixel,mm/pixel,mm/pixel
+vendor,Vendor,Marque du scanner
+image-size,Image size,Taille de l'image
+status,Status,Statut
+button-add-image,Add image,Ajouter une image
+actions,Actions,Actions
+button-rename,Rename,Renommer
+button-properties,Properties,Propriétés
+button-download,Download,Télécharger
+button-delete,Delete,Supprimer
+recently-opened,Recently opened,Consultés récemment
+last-opened-image,Last opened image,Dernière image consultée
 view-all-projects,View all projects,Voir tous les projets
-no-recent-project,No project recently opened,
-no-recent-image,No image recently opened,
-advanced-search,Advanced search,
+no-recent-project,No project recently opened,Aucun projet consulté récemment
+no-recent-image,No image recently opened,Aucune image consultée récemment
+advanced-search,Advanced search,Recherche avancée
 button-view-all,View all,Tout voir
-members,Members,
-new-project,New project,
-last-activity,Last activity,
-created-on,Created on,
-button-show-filters,Show filters,
-button-hide-filters,Hide filters,
-all,All,
-my-role,My role,
-legend,Legend,
-manager-icon-label,You are a manager of this project,
-representative-icon-label,You are a representative of this project,
-and-count-others,- | and one other | and {count} others,
-select-options,Select options,
-select-all,Select all,
-delete-project,Delete project,
-delete-project-confirmation-message,Do you really want to delete project {projectName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,
-notif-success-project-deletion,Project {projectName} was successfully deleted,
-notif-error-project-deletion,Failed to delete project {projectName},
-delete-image,Delete image,
-delete-image-confirmation-message,Do you really want to delete image {imageName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,
-notif-success-image-deletion,Image {imageName} was successfully deleted,
-notif-error-image-deletion,Failed to delete image {imageName},
-notif-success-add-image,Image {imageName} was successfully added to project {projectName},
-notif-error-add-image,Failed to add image {imageName} to project {projectName},
+members,Members,Membres
+new-project,New project,Nouveau projet
+last-activity,Last activity,Dernière activité
+created-on,Created on,Créé le
+button-show-filters,Show filters,Montrer les filtres
+button-hide-filters,Hide filters,Cacher les filtres
+all,All,Tous
+all-images,All,Toutes
+all-analyses,All,Toutes
+all-ontologies,All,Toutes
+all-resolutions,All,Toutes
+all-dates,All,Toutes
+my-role,My role,Mon rôle
+legend,Legend,Légende
+manager-icon-label,You are a manager of this project,Vous êtes un responsable du projet
+representative-icon-label,You are a representative of this project,Vous êtes une personne de contact du projet
+and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres
+select-options,Select options,Sélectionner les options
+select-all,Select all,Tout sélectionner
+delete-project,Delete project,Supprimer le projet
+delete-project-confirmation-message,Do you really want to delete project {projectName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le projet {projectName} ? <br> Toutes les données de ce projet seront irrémédiablement perdues
+notif-success-project-deletion,Project {projectName} was successfully deleted,Le projet {projectName} a été supprimé
+notif-error-project-deletion,Failed to delete project {projectName},Une erreur a empêché la suppression du projet {projectName}
+delete-image,Delete image,Supprimer l'image
+delete-image-confirmation-message,Do you really want to delete image {imageName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer l'image {imageName} ? <br> Cette action ne pourra être annulée
+notif-success-image-deletion,Image {imageName} was successfully deleted,L'image {imageName} a été supprimée
+notif-error-image-deletion,Failed to delete image {imageName},Une erreur a empêché la suppression de l'image {imageName}
+notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName}
+notif-error-add-image,Failed to add image {imageName} to project {projectName},Une erreur a empêché d'ajouter l'image {imageName} au projet {projectName}
 in-project,in {projectName},dans {projectName}
-annotation-type,Annotation type,
-multiple-terms,Multiple terms,
-created-by,Created by,
-properties,Properties,
-no-properties,No properties,
-area,Area,
-perimeter,Perimeter,
-button-view-in-image,View in image,
-button-center-view-on-annot,Center view on this annotation,
-button-view-crop,View crop,
-button-copy-url,Copy URL,
-button-comments,Comments,
-filters,Filters,
-failed-fetch-annots,Failed to fetch annotations,
-no-annotation,No annotation,
-button-edit,Edit,
-associated-by,associated by {username},
-add-term,Add a term,
-key,Key,
-value,Value,
-notif-error-add-term,Failed to add the term,
-notif-error-remove-term,Failed to remove the term,
-notif-error-save-prop,Failed to save the property,
-notif-error-remove-prop,Failed to remove the property,
-no-term-to-add,No term to add,
-error-load-annotations-filters,Failed to load all annotation filters,
-button-full-text,See full text,
-button-close,Close,
-enter-description,Enter description,
-ql-paragraph,Paragraph,
-ql-header-1,Header 1,
-ql-header-2,Header 2,
-ql-header-3,Header 3,
-ql-header-4,Header 4,
-ql-font,Font,
-ql-bold,Bold,
-ql-italic,Italic,
-ql-underline,Underline,
-ql-subscript,Subscript,
-ql-superscript,Superscript,
-ql-font-color,Font color,
-ql-background-color,Background color,
-ql-align,Text align,
-ql-ordered-list,Ordered list,
-ql-bullet-list,Bullet list,
-ql-blockquote,Quote,
-ql-code-block,Code,
-ql-clean-format,Remove formatting,
-ql-link,Add a link,
-ql-image,Add an image,
-ql-video,Add a video,
-ql-indent-left,Indent left,
-ql-indent-right,Indent right,
-ql-special-character,Special character,
-info-keyword-stop-preview-description,Add the keyword {keyword} where you want to delimit the preview text.,
-notif-error-update-description,Failed to update description,
-current-selection,Current selection,
-digital-zoom,Digital zoom,
-digital-zoom-checkbox-label,Enable digital zoom (interpolation),
-notif-success-annot-URL-copied,Annotation URL copied to clipboard,
-black,Black,
-white,White,
-red,Red,
-orange,Orange,
-yellow,Yellow,
-green,Green,
-blue,Blue,
-purple,Purple,
-color,Color,
-no-key-selected,No key selected,
-button-reset,Reset,
-select-image-to-add,Select an image to add,
-button-add-viewer,Add a viewer,
-link-images,Link images,
-link-view-with,Link this view with...,
-link-other-images-to-this-group,Link this group with additional images...,
-view-linked-with,This view is linked with,
-viewer-view,View {number},
-link-group,Group {number},
-button-unlink,Unlink,
-terms-new-annotation,Term(s) to associate to new annotations,
-core-cannot-be-reached,Error of communication with Cytomine core,
-communication-error,Communication error,
-follow-user,Follow a user,
-online-managers,Online managers,
-online-contributors,Online contributors,
-no-tracking,No tracking,
-end-tracking-user-no-longer-broadcasting,Stopped following {username} on image {imageName} because he/she no longer broadcasts his/her position,
-um,µm,
-mm,mm,
-error,Error,
-error-loading-image,An error occurred during image loading,
-live,Live,
-broadcast,Broadcast,
-broadcast-my-position,Broadcast my position and allow other users to follow me,
-possible-conflict,Possible conflict,
-confirm-unlink-view-to-track,"This view is linked with another one on which you are following a user. This may cause conflicts and flickering behaviour. If you confirm, this view will be unlinked from any other to prevent such conflict.",
-confirm-untrack-to-link-view,"This view is currently synchronized with that of another user. This may cause conflicts and flickering behaviour. If you confirm, the tracking of this user will be cancelled.",
-add-images,Add images,
-already-in-project,Already in project,
-rename-image,Rename the image,
-enter-new-name-of-image,Enter the new name to use for this image,
-notif-success-image-rename,Image {imageName} was successfully renamed,
-notif-error-image-rename,Failed to rename image {imageName},
-field-cannot-be-empty,Cannot be empty,
-colors,Colors,
-button-lock,Lock,
-button-set-calibration,Set calibration,
-calibrate-image,Calibrate image,
-warning-change-applies-in-project-only,"If you change this value, the modification will only be performed in this project (it will not be propagated to other projects containing the image)",
-notif-success-image-calibration,Image {imageName} was correctly calibrated,
-notif-error-image-calibration,Failed to calibrate image {imageName},
-general,General,
-custom-ui,Custom UI,
-algorithms,Algorithms,
-image-filters,Image filters,
-project-side-bar,Project side bar,
-viewer-panels,Viewer panels,
-all-panels,All panels,
-annotation-details,Annotation details,
-annotation-details-box,Annotation details box,
-geometry-info,"Geometry information (area, length)",
-creation-info,Creation information,
-comments,Comments,
-draw-tools,Draw tools,
-all-draw-tools,All draw tools,
-undo-redo,Undo/Redo,
-notif-error-custom-ui-change,Failed to change custom UI property,
-editing-mode,Editing mode,
-editing-mode-explanation,"Editing mode will change authorisations of contributors. Project managers will still be able to see, add, edit or delete data for this project.",
-classic,Classic,
-classic-mode-explanation,"Contributors will be able to add, edit or delete project data, annotations, properties and descriptions on all layers.",
-restricted,Restricted,
-restricted-mode-explanation,"Contributors will not be able to add, edit or delete project data except annotations, properties and descriptions on their own layers.",
-read-only,Read only,
-read-only-mode-explanation," Contributors will not be able to add, edit or delete project data, annotations, properties and descriptions even on their own layers.",
-blind-mode,Blind mode,
-blind-mode-explanation,"If blind mode is enabled, a contributor will not see image filename. The filename will not influence his work. Filename potentially contains the type of experiment.",
-hide-managers-layers,Hide managers layers,
-hide-managers-layers-explanation,"If you check ""Hide managers layers"", a ""simple"" contributor will not be able to see the layers of project managers. Project managers will still be able to see all layers.",
-hide-contributors-layers,Hide contributors layers,
-hide-contributors-layers-explanation,"If you check ""Hide contributos layers"", a ""simple"" contributor will not be able to see the layers of other contributors. Project managers will still be able to see all layers.",
-default-annotation-layers,Default annotation layers,
-select-layer-placeholder,Select a layer,
-default-property,Default property,
-no-default-property,No default property,
-notif-error-general-config-update,Error during update of configuration,
-layer,Layer,
-hide-by-default,Hide layer by default,
-button-remove,Remove,
-notif-error-default-layer-add,Failed to add a default layer,
-notif-error-default-layer-update,Error during update of default layer,
-notif-error-default-layer-delete,Failed to delete default layer,
-button-add-members,Add members,
-button-details,Details,
-button-view-activity,View activity,
-source,Source,
-ldap,LDAP,
-manual,Manual,
-last-image,Last image,
-last-connection,Last connection,
-number-connections,# connections,
-no-member-fitting-criteria,No member fitting criteria,
-button-remove-selected-members,Remove selected members,
-remove-members,Remove members,
-remove-members-confirmation-message,- | Do you really want to remove user {username} from project? | Do you really want to remove the {count} selected users from project?,
-notif-success-remove-project-members,The selected members were correctly removed from project,
-notif-error-remove-project-members,Failed to remove the selected members from project,
-button-export-as-csv,Export as CSV,
-add-members-to-project,Add members to project,
-search-user,Search user...,
-notif-success-add-project-members,The selected users were correctly added as project members,
-notif-error-add-project-members,Failed to add the selected user to the project,
-project-contributor,Project contributor,
-project-manager,Project manager,
-project-representative,Project representative,
-representative,Representative,
-remove-yourself-from-manager,Remove management rights,
-remove-yourself-from-manager-confirmation-message,Are you sure you want to remove yourself from the project managers? You will not be able to undo this action,
-status,Status,
-offline,Offline users,
-notif-error-change-role,Failed to change the role of {username},
-enabled,Enabled,
-disabled,Disabled,
-no-algorithm,No algorithm to display,
-notif-error-change-status-algorithm-project,Failed to change the status of algorithm {softwareName},
-no-image-filter,No image filter to display,
-notif-error-change-status-image-filter-project,Failed to change the status of filter {filterName},
-rename-project,Rename the project,
-new-name,New name,
-notif-success-project-rename,Project {projectName} was successfully renamed,
-notif-error-project-rename,Failed to rename project {projectName},
-button-set-magnification,Set magnification,
-set-magnification,Set magnification,
-notif-success-magnification-update,Magnification of image {imageName} was correctly updated,
-notif-error-magnification-update,Failed to update the magnification image {imageName},
-length,Length,
-create-project,Create project,
-notif-success-project-creation,The project was successfully created,
-notif-error-project-creation,Failed to create the project,
-create-ontology-for-project,Create ontology using project name,
-use-existing-ontology,Use existing ontology,
-select-ontology,Select ontology,
-ontology-must-be-selected,An ontology must be selected,
-type,Type,
-attached-files,Attached files,
-no-attached-file,No attached file.,
-add-attached-file,Add an attached file,
-choose-file-or-drop,Click and choose a file or drop it here,
-click-or-drop-new-file,Click or drop new file to replace current one,
-notif-success-attached-file-creation,File correctly attached,
-notif-error-attached-file-creation,Failed to attach the selected file,
-notif-success-attached-file-deletion,Attached file {filename} correctly deleted,
-notif-error-attached-file-deletion,Failed to delete attached file {filename},
-confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,
-opacity,Opacity,
-button-reset-opacities,Reset opacities,
-preview-size,Preview size,
-small,Small,
-medium,Medium,
-large,Large,
-huge,Huge,
-number-per-page,Number per page,
-display,Display,
-add-image,Add image,
-detailed-image-information,Detailed information of image {imageName},
-button-more-info,More information,
-access-denied,Access denied,
-insufficient-permission,You don't have the permission to view this page,
-open-admin-session,Open admin session,
-close-admin-session,Close admin session,
-admin,Admin,
-page-not-found,Page not found,
-not-found,Not found,
-not-found-error,The requested resource could not be loaded,
-notif-error-logout,Error during logout,
-download-results,Download results,
-download-PDF,Download PDF,
-download-CSV,Download CSV,
-download-excel,Download Excel,
-no-result,No result,
-upload,Upload,
-important-notes,Important notes,
-max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI) are allowed",
-vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.",
-zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)",
-drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.",
-link-to-project-upload-info,You are also able to link images with project manually after upload is done.,
-link-with-project,Link with projects,
-files,Files,
-no-file,No file,
-button-start,Start,
-button-hide,Hide,
-upload-error,Upload error,
-add-files,Add files...,
-start-upload,Start upload,
-cancel-upload,Cancel upload,
-preview,Preview,
-created,Created,
-size,Size,
-content-type,Content type,
-global-size,Global size,
-from,From,
-no-preview-available,No preview available,
-uploaded,Uploaded,
-converted,Converted,
-deployed,Deployed,
-error-format,Format error,
-error-convert,Conversion error,
-uncompressed,Uncompressed,
-to-deploy,To deploy,
-to-convert,To convert,
-error-deployment,Deployment error,
-no-uploaded-file,No uploaded file,
-count-files,0 file | 1 file | {count} files,
-sample-preview,Sample preview,
-slide-preview,Slide preview,
-sample-preview-of,Sample preview of {filename},
-slide-preview-of,Slide preview of {filename},
-file-tree,File tree,
-confirm-deletion-file,Are you sure you want to delete this file?,
-view,View,
-hotkey-move-up,Move up,
-hotkey-move-down,Move down,
-hotkey-move-left,Move left,
-hotkey-move-right,Move right,
-hotkey-zoom-in,Zoom in,
-hotkey-zoom-out,Zoom out,
-hotkey-next-image,Next image,
-hotkey-previous-image,Previous image,
-draw,Draw,
-hotkey-select,Select,
-hotkey-point,Point,
-hotkey-freehand,Freehand polygon,
-hotkey-delete,Delete,
-hotkey-undo,Undo,
-hotkey-redo,Redo,
-review,Review,
-hotkey-accept-annotation,Accept annotation,
-hotkey-reject-annotation,Reject annotation,
-hotkey-toggle-review,Toggle review layer,
-version,Version,
-sponsors,Sponsors,
-website,Website,
-source-code,Source code,
-documentation,Documentation,
-contact,Contact,
-cytomine-sponsors-info,"Cytomine is developed by the {cytomineCompanyLink} in collaboration with the University of Liège and was previously funded by research grants of the Wallonia.",
-cytomine-company,Cytomine company,
-cytomine-website-info,"You can find more information on the website of the Cytomine project located at {websiteLink}.",
-source-code-info,"Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code is available on our {githubLink}.",
-github-repository,GitHub repository,
-documentation-info,"A complete documentation is available {docLink}. More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.",
-here,here,
-contact-info,You can contact the Cytomine Team at {contactMail},
-button-previous-image,Previous image,
-button-next-image,Next image,
-notif-error-first-image,This is the first image of the project,
-notif-error-last-image,This is the last image of the project,
-notif-error-fetch-previous-image,Failed to load previous image,
-notif-error-fetch-next-image,Failed to load next image,
-viewer-group,Viewer group ({nbImages} images),
-activity-charts,Activity charts,
-activity-logs,Activity logs,
-project-connections,Project Connections,
-image-consultations,Image Consultations,
-number-annotations,Number of annotations,
-manual-annotations-vs-term,Manual annotations VS. term,
-annotated-images-vs-term,Annotated images VS. term,
-manual-annotations-vs-contributor,Manual annotations VS. contributor,
-annotated-images-vs-contributor,Annotated images VS. contributor,
-nothing-more-to-load,Nothing more to load,
-all-users-analyses,All users/analyses,
-time-period,Time period,
-button-clear,Clear,
-to,To,
-no-log-to-display,No log to display,
-term,Term,
-ontologies,Ontologies,
-confirm-deletion-term,Are you sure you want to delete term {name}?,
-notif-error-term-deletion,Failed to delete the term. Ensure that no annotation is associated to this term.,
-not-used-in-any-project,Not used in any project,
-used-in-project-no-access,Used in projects that you are not allowed to see,
-confirm-deletion-ontology,Are you sure you want to delete ontology {name}?,
-notif-error-ontology-deletion,Failed to delete the ontology,
-notif-success-ontology-deletion,Ontology {name} was successfully deleted,
-cannot-delete-ontology-with-projects,Cannot delete the ontology: it is used in projects,
-rename-ontology,Rename ontology,
-notif-success-ontology-rename,Ontology {name} was successfully renamed,
-notif-error-ontology-rename,Failed to rename ontology {name},
-new-ontology,New ontology,
-create-ontology,Create ontology,
-notif-success-ontology-creation,The ontology was successfully created,
-notif-error-ontology-creation,Failed to create the ontology,
-create-term,Create term,
-update-term,Update term,
-notif-success-term-creation,The term was successfully created,
-notif-error-term-creation,Failed to create the term,
-notif-success-term-update,The term was successfully updated,
-notif-error-term-update,Failed to update the term,
-notif-error-ontology-tree-update,Failed to update the ontology tree organization,
-notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,
-viewers,Viewers,
-outline-color,Outline color,
-no-outline,No outline,
-button-launch-new-analysis,Launch new analysis,
-launch-new-analysis,Launch new analysis,
-algorithm,Algorithm,
-run-number,Run number,
-execution-date,Execution date,
-launched-by,Launched by,
-not-launch,Not launched,
-in-queue,In queue,
-running,Running,
-success,Success,
-failed,Failed,
-indeterminate,Indeterminate,
-wait,Wait,
-previewed,Previewed,
-no-analysis-run,No analysis run,
-launcher,Launcher,
-status-comment,Status comment,
-execution-duration,Execution duration,
-parameters,Parameters,
-button-show,Show,
-results,Results,
-comment,Comment,
-no-result-file,No result file,
-button-view,View,
-data,Data,
-delete-data,Delete data,
-count-annotations,0 annotation | 1 annotation | {count} annotations,
-deleted-analysis-data,Analysis data was deleted,
-delete-analysis-data,Delete analysis data,
-confirm-deletion-analysis-data,Do you confirm you want to delete the following analysis data:,
-count-reviewed-annotations,0 reviewed annotation | 1 reviewed annotation | {count} reviewed annotations,
-count-annotation-terms,0 term associated to an annotation | 1 term associated to an annotation | {count} terms associated to annotations,
-remark-long-operation,Remark: this operation may take some time,
-progress,Progress,
-notif-success-analysis-data-deletion,Analysis data was successfully deleted,
-notif-error-analysis-data-deletion,Failed to delete analysis data,
-optional-parameters,Optional parameters,
-prefilled-parameters,Pre-filled parameters,
-mandatory-parameter,Mandatory parameter,
-must-be-number,Must be a valid number,
-notif-success-analysis-launch,Successfully launched the analysis,
-notif-error-analysis-launch,Failed to launch the analysis,
-notif-error-analysis-parameters-options,Failed to retrieve the options for parameter {paramName},
-activity-of-user,Activity of {username},
-project-connections,Project connections,
-image-consultations,Image consultations,
-annotation-selections,Annotation selections,
-detailed-project-connections,Detailed project connections,
-detailed-image-consultations,Detailed image consultations,
-date,Date,
-duration,Duration,
-number-viewed-images,Number of viewed images,
-number-annotation-creations,Number of annotation creations,
-annotation-creations,Annotation creations,
-no-project-connection,No project connection,
-no-image-consultation,No image consultation,
-operating-system,Operating system,
-browser,Browser,
-first-consultation,First consultation,
-last-consultation,Last consultation,
-number-consultations,Number of consultations,
-error-failed-to-fetch-image-consultations,Error: failed to fetch image consultations,
-average-connections,Average connections,
-users,Users,
-currently,Currently,
-online-users,Online users,
-active-projects,Active projects,
-most-active-project,Most active project,
-used-storage-space,Used storage space,
-total,Total,
-count-active-users,no active user | one active user | {count} active users,
-welcome-message,Welcome message,
-enter-text,Enter text,
-notif-success-welcome-message-update,Welcome message successfully updated,
-notif-error-welcome-message-update,Failed to update the welcome message,
-super-admin,Super admin,
-user,User,
-guest,Guest,
-updated,Updated,
-button-new-user,New user,
-button-unlock,Unlock,
-notif-error-user-lock,Failed to lock the user,
-notif-error-user-lock,Failed to unlock the user,
-no-user-fitting-criteria,No user fitting search criteria,
-members-activity,Members activity,
-select-date,Select a date,
-no-record,No record,
-button-manage-members,Manage members,
-barchart-hover-mouse-for-details,Hover the mouse over a bar to display details related to this bar,
-barchart-click-label-to-toggle-visibility,Click on a label at the top of the chart to toggle the visibility of this data in the chart,
-activity-chart-info-message,This chart presents the activity performed in the selected period,
-project-connections-info-message,A project connection is recorded each time a user opens a project in Cytomine,
-image-consultations-info-message,An image consultation is recorded each time a user opens an image in Cytomine,
-annotation-selections-info-message,"An annotation selection is recorded each time a user selects an annotation",
-manual-annotations-info-message,"Annotations created by a user",
-analysis-annotations-info-message,"Annotations created by an automatic analysis (run of an algorithm)",
-reviewed-annotations-info-message,"Annotations validated during the review process",
-number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,
-annotations-vs-terms-chart-info-message,"This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.",
-annotated-images-vs-terms-chart-info-message,"This chart presents for each term the number of images having at least one user annotation associated with this term. Only annotations created during the selected period are taken into account.",
-annotations-vs-contributors-chart-info-message,"This chart presents the number of annotation created by each project member during the selected period",
-annotated-images-vs-contributors-chart-info-message,"This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.",
-data-last-updated-on,Data refreshed at {time},
-ongoing,Ongoing,
-last-connections,Last connections,
-last-day,Last day,
-last-week,Last week,
-last-year,Last year,
-period,Period,
-by,By,
-day,Day,
-hour,Hour,
-week,Week,
-connections-chart,Connections chart,
-create-user,Create user,
-update-user,Update user,
-field-invalid-email-address,Must be a valid email address,
-notif-success-user-creation,User successfully created,
-notif-error-user-creation,Failed to create the user,
-notif-success-user-update,User successfully updated,
-notif-error-user-update,Failed to update the user,
-button-login,Login,
-button-get-username,Get username,
-forgot-username,Forgot username,
-forgot-password,Forgot password,
-button-reset-password,Reset password,
-notif-success-forgot-username,A mail containing your username was sent to your email address,
-notif-error-forgot-username,Failed to send an email to the provided email address,
-notif-success-forgot-password,A mail containing a connection link was sent to your email address,
-notif-error-forgot-password,Failed to send an email allowing to reset the password,
-forgot-credentials,Forgot your {username} or your {password}?,
-password-expired-info-message,"Your password has expired. Please choose a new one.",
-failed-fetch-current-stats,Failed to fetch current statistics,
-failed-fetch-total-counts,Failed to fetch the total counts,
-unexpected-error-info-message,An unexpected error occurred,
-error-attached-files,Error fetching attached files,
-error-fetch-properties,Error fetching properties,
-failed-fetch-recent-projects,Failed to fetch recent projects,
-error-cannot-upload,Unexpected error prevents upload,
-notif-error-fetch-annotations-viewer,An error occurred while fetching annotations,
-notif-error-save-user-position,Failed to save your position in the image,
-notif-error-save-image-consultation,Failed to save image consultation,
-notif-error-target-annotation,Failed to fetch the requested annotation,
-notif-error-add-viewer-image,Failed to add the image,
-notif-error-loading-annotation-layers,Failed to fetch annotation layers,
-notif-error-tracked-user-position,Failed to retrieve the position of the followed user,
-annotation-comments,Annotation comments,
-notif-error-fetch-annotation-comments,Failed to retrieve the comments of this annotation,
-no-annotation-comments,No comment for this annotation so far,
-button-share,Share,
-enter-comment,Enter your comment,
-send-to-all-project-members,Send to all project members,
-send-to-some-members,Send to some project members only,
-send-to-specific-email,Send to specific email addresses,
-add-new-comment,Add new comment,
-button-add-comment,Add comment,
-comment-will-be-sent-by-email,The comment will be sent by email to the selected users,
-notif-error-new-comment,Failed to add a comment to the annotation,
-notif-success-new-comment,Your comment was successfully send by email,
-reviewers,Reviewers,
-review-layer,Review layer,
-reviewed-by,Reviewed by,
-reviewed-on,Reviewed on,
-button-metadata,Metadata,
-image-metadata,Image metadata,
-registration-date,Registration date,
-first-project-connection,First project connection,
-last-project-connection,Last project connection,
-notif-error-already-broadcasting-this-image,You are already broadcasting this image on another view,
-delete-analysis,Delete analysis,
-delete-analysis-confirmation-message,Do you really want to delete this analysis? <br> All data will be deleted! This operation will not be recoverable with undo button!,
-notif-success-analysis-deletion,The analysis was successfully deleted,
-notif-error-analysis-deletion,Failed to delete the analysis,
-number-projects-info-message,The number of projects of which you are a member,
-number-images-info-message,The number of images available in the projects of which you are a member,
-number-annotations-info-message,The number of annotations that you created,
-number-reviewed-annotations-info-message,The number of annotations that you validated during a review,
-blinded-name-indication,Blind,
+annotation-type,Annotation type,Type d'annotation
+multiple-terms,Multiple terms,Plusieurs termes
+created-by,Created by,Créé par
+properties,Properties,Propriétés
+no-properties,No property,Aucune propriété
+tags,Tags,Tags
+no-tag,No tag,Aucun tag
+new-tag,New tag,Nouveau tag
+notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
+notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
+notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
+associate-tags,Associate tags,Associer des tags
+notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés
+notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
+search-tag,Search tag...,Rechercher un tag...
+how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
+delete-tag,Delete tag,Supprimer le tag
+delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues
+notif-success-tag-rename,Tag {tagName} was successfully renamed,Le tag {tagName} a bien été renommé
+notif-error-tag-rename,Failed to rename tag {tagName},Une erreur a empêché de renommer le tag {tagName}
+notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé
+notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName}
+area,Area,Aire
+perimeter,Perimeter,Périmètre
+button-view-in-image,View in image,Voir dans l'image
+button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation
+button-view-crop,View crop,Voir le crop
+button-copy-url,Copy URL,Copier l'URL
+button-comments,Comments,Commentaires
+filters,Filters,Filtres
+failed-fetch-annots,Failed to fetch annotations,Une erreur a empêché le chargement des annotations
+no-annotation,No annotation,Aucune annotation
+button-edit,Edit,Modifier
+associated-by,associated by {username},associé par {username}
+add-term,Add a term,Nouveau terme
+key,Key,Clé
+value,Value,Valeur
+notif-error-add-term,Failed to add the term,Une erreur a empêché d'associer le terme
+notif-error-remove-term,Failed to remove the term,Une erreur a empêché de retirer le terme
+notif-error-save-prop,Failed to save the property,Une erreur a empêché de créer la propriété
+notif-error-remove-prop,Failed to remove the property,Une erreur a empêché de supprimer la propriété
+no-term-to-add,No term to add,Aucun terme à ajouter
+error-load-annotations-filters,Failed to load all annotation filters,Une erreur a eu lieu lors du chargement des filtres d'annotations
+button-full-text,See full text,Voir l'entièreté
+button-close,Close,Fermer
+enter-description,Enter description,Saisissez une description
+ql-paragraph,Paragraph,Paragraphe
+ql-header-1,Header 1,Titre 1
+ql-header-2,Header 2,Titre 1
+ql-header-3,Header 3,Titre 3
+ql-header-4,Header 4,Titre 4
+ql-font,Font,Police
+ql-bold,Bold,Gras
+ql-italic,Italic,Italique
+ql-underline,Underline,Souliqué
+ql-subscript,Subscript,Indice
+ql-superscript,Superscript,Exposant
+ql-font-color,Font color,Couleur du texte
+ql-background-color,Background color,Couleur du fond
+ql-align,Text align,Alignement du texte
+ql-ordered-list,Ordered list,Liste ordonnée
+ql-bullet-list,Bullet list,Liste à puces
+ql-blockquote,Quote,Citation
+ql-code-block,Code,Code
+ql-clean-format,Remove formatting,Supprimer la mise en forme
+ql-link,Add a link,Ajouter un lien
+ql-image,Add an image,Ajouter une image
+ql-video,Add a video,Ajouter une vidéo
+ql-indent-left,Indent left,Indentater vers la gauche
+ql-indent-right,Indent right,Indenter vers la droit
+ql-special-character,Special characters,Caractères spéciaux
+info-keyword-stop-preview-description,Add the keyword {keyword} where you want to delimit the preview text.,Insérez le mot-clé {keyword} à l'endroit où vous désirez que le texte de prévisualisation s'arrête.
+notif-error-update-description,Failed to update description,Une erreur a empêché de sauvegarder la description
+current-selection,Current selection,Sélection
+digital-zoom,Digital zoom,Zoom digital
+digital-zoom-checkbox-label,Enable digital zoom (interpolation),Activer le zoom digital (par interpolation)
+notif-success-annot-URL-copied,Annotation URL copied to clipboard,L'URL de l'annotation a été copiée dans le presse-papier
+black,Black,Noir
+white,White,Blanc
+red,Red,Rouge
+orange,Orange,Orange
+yellow,Yellow,Jaune
+green,Green,Vert
+blue,Blue,Bleu
+purple,Purple,Violet
+color,Color,Couleur
+no-key-selected,No key selected,Aucune clé choisie
+button-reset,Reset,Réinitialiser
+select-image-to-add,Select an image to add,Sélectionner une image à ajouter
+link-images,Link images,Synchronisation d'images
+link-view-with,Link this view with...,Synchroniser cette image avec...
+link-other-images-to-this-group,Link this group with additional images...,Synchroniser ce groupe avec d'autres images...
+view-linked-with,This view is linked with,Cette image est synchronisée avec :
+viewer-view,View {number},Image {number}
+link-group,Group {number},Groupe {number}
+button-unlink,Unlink,Séparer
+terms-new-annotation,Term(s) to associate to new annotations,Terme(s) à associer aux nouvelles annotations
+core-cannot-be-reached,Error of communication with Cytomine core,Erreur de communication avec le backend de Cytomine
+communication-error,Communication error,Erreur de communication
+follow-user,Follow a user,Suivi d'utilisateur
+online-managers,Online managers,Responsables en ligne
+online-contributors,Online contributors,Contributeurs en ligne
+no-tracking,No tracking,Pas de suivi
+end-tracking-user-no-longer-broadcasting,Stopped following {username} on image {imageName} because he/she no longer broadcasts his/her position,Le suivi de {username} dans l'image {imageName} a été interrompu car il/elle a cessé de diffuser sa position.
+um,µm,µm
+mm,mm,mm
+error,Error,Erreur
+error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image
+live,Live,Live
+broadcast,Broadcast,Diffusion et suivi
+broadcast-my-position,Broadcast my position and allow other users to follow me,Diffuser ma position dans l'image et autoriser d'autres utilisateurs à me suivre
+possible-conflict,Possible conflict,Conflit potentiel
+confirm-unlink-view-to-track,"This view is linked with another one on which you are following a user. This may cause conflicts and flickering behaviour. If you confirm, this view will be unlinked from any other to prevent such conflict.","Cette image est synchronisée avec une autre image dans laquelle vous suivez un utilisateur. Cela pourrait mener à des conflits et à un comportement erratique. Si vous confirmez, la synchronisation sera interrompue de façon à éviter un tel conflit"
+confirm-untrack-to-link-view,"This view is currently synchronized with that of another user. This may cause conflicts and flickering behaviour. If you confirm, the tracking of this user will be cancelled.","Cette image est actuellement synchronisée avec les mouvements d'un autre utilisateur. Cela pourrait mener à des conflits et à un comportement erratique. Si vous confirmez, la synchronisation sera interrompue de façon à éviter un tel conflit"
+add-images,Add images,Ajout d'images
+already-in-project,Already in project,Déjà dans le projet
+rename-image,Rename the image,Renommer l'image
+enter-new-name-of-image,Enter the new name to use for this image,Nouveau nom de l'image
+notif-success-image-rename,Image {imageName} was successfully renamed,L'image {imageName} a été renommée avec succès
+notif-error-image-rename,Failed to rename image {imageName},Une erreur a empêché de renommer l'image {imageName}
+colors,Colors,Couleurs
+button-lock,Lock,Verrouiller
+button-set-calibration,Set calibration,Calibrer
+calibrate-image,Calibrate image,Calibrer l'image
+warning-change-applies-in-project-only,"If you change this value, the modification will only be performed in this project (it will not be propagated to other projects containing the image)","Si vous changez cette valeur, la modification ne sera appliquée que dans ce projet (elle ne sera pas propagée à d'autres projets contenant cette image)"
+notif-success-image-calibration,Image {imageName} was correctly calibrated,La résolution de l'image {imageName} a été mise à jour
+notif-error-image-calibration,Failed to calibrate image {imageName},Une erreur a empêché de calibrer l'image {imageName}
+general,General,Général
+custom-ui,Custom UI,Personnalisation de l'interface
+algorithms,Algorithms,Algorithmes
+image-filters,Image filters,Filtres d'images
+project-side-bar,Project side bar,Barre latérale du projet
+viewer-panels,Viewer panels,Visualisateur d'images
+all-panels,All panels,Tous les outils
+annotation-details,Annotation details,Détails de l'annotation
+annotation-details-box,Annotation details box,Boîte de détails
+geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)"
+creation-info,Creation information,Informations sur la création
+comments,Comments,Commentaires
+draw-tools,Draw tools,Outils de tracé
+all-draw-tools,All draw tools,Tous les outils de tracé
+undo-redo,Undo/Redo,Annuler/Refaire
+notif-error-custom-ui-change,Failed to change custom UI property,Une erreur a empêché de mettre à jour les choix de personnalisation de l'interface
+editing-mode,Editing mode,Mode d'édition
+editing-mode-explanation,"Editing mode will change authorisations of contributors. Project managers will still be able to see, add, edit or delete data for this project.","Le mode d'édition détermine les permissions des contributeurs. Les responsables du projet auront toujours la possibilité de voir, ajouter, éditer et supprimer les données de ce projet"
+classic,Classic (fully collaborative),Classique (collaboratif)
+classic-mode-explanation,"Contributors will be able to add, edit or delete project data, annotations, properties and descriptions on all layers.","Les contributeurs auront le droit d'ajouter, d'éditer et de supprimer des données dans ce projet sans restriction, y compris des annotations, des propriétés et des descriptions sur les calques d'autres utilisateurs."
+restricted,Restricted,Restreint
+restricted-mode-explanation,"Contributors will not be able to add, edit or delete project data except annotations, properties and descriptions on their own layers.","Les contributeurs ne pourront ajouter, éditer et supprimer que les annotations de leurs propres calques."
+read-only,Read only,Lecture seule
+read-only-mode-explanation," Contributors will not be able to add, edit or delete project data, annotations, properties and descriptions even on their own layers.","Les contributeurs ne pourront ni ajouter, ni éditer, ni supprimer d'annotation (pas même sur leurs propres calques)."
+blind-mode,Blind mode,Mode aveugle
+blind-mode-explanation,"If blind mode is enabled, a contributor will not see image filename. The filename will not influence his work. Filename potentially contains the type of experiment.","Si le mode aveugle est activé, les contributeurs ne verront pas les noms des images du projet. Cela peut être utile lorsque les noms des images contiennent des informations (par exemple sur le type d'expérience) qui pourraient potentiellement influencer le travail des contributeurs."
+hide-managers-layers,Hide managers layers,Cacher les calques des responsables
+hide-managers-layers-explanation,"If you check ""Hide managers layers"", a ""simple"" contributor will not be able to see the layers of project managers. Project managers will still be able to see all layers.","Si cette case est cochée, un ""simple"" contributeur ne pourra pas voir les calques des responsables du projet. Les responsables du projet seront quant à eux toujours en mesure de visualiser tous les calques."
+hide-contributors-layers,Hide contributors layers,Cacher les calques des contributeurs
+hide-contributors-layers-explanation,"If you check ""Hide contributos layers"", a ""simple"" contributor will not be able to see the layers of other contributors. Project managers will still be able to see all layers.","Si cette case est cochée, un ""simple"" contributeur ne pourra pas voir les calques des autres contributeurs du projet. Les responsables du projet seront quant à eux toujours en mesure de visualiser tous les calques."
+default-annotation-layers,Default annotation layers,Calques chargés par défaut
+select-layer-placeholder,Select a layer,Sélectionner un calque
+default-property,Default property,Propriété par défaut
+no-default-property,No default property,Pas de propriété par défaut
+notif-error-general-config-update,Error during update of configuration,Une erreur a empêché de mettre à jour la configuration
+layer,Layer,Calque
+hide-by-default,Hide layer by default,Caché par défaut
+button-remove,Remove,Supprimer
+notif-error-default-layer-add,Failed to add a default layer,Une erreur a empêché d'ajouter le calque aux calques par défaut
+notif-error-default-layer-update,Error during update of default layer,Une erreur a empêché de mettre à jour le calque par défaut
+notif-error-default-layer-delete,Failed to delete default layer,Une erreur a empêché de supprimer le calque par défaut
+no-selected-layers,No selected layers,Pas de calque sélectionné
+button-add-members,Add members,Ajouter des membres
+button-details,Details,Détails
+button-view-activity,View activity,Voir l'activité
+source,Source,Source
+ldap,LDAP,LDAP
+manual,Manual,Manuelle
+last-image,Last image,Dernière image
+last-connection,Last connection,Dernière connexion
+number-connections,# connections,# connexions
+no-member-fitting-criteria,No member fitting criteria,Aucun membre ne remplissant les critères de recherche
+button-remove-selected-members,Remove selected members,Retirer les membres sélectionnés
+remove-members,Remove members,Retirer les membres
+remove-members-confirmation-message,- | Do you really want to remove user {username} from project? | Do you really want to remove the {count} selected users from project?,- | Êtes-vous sûr de vouloir retirer {username} du projet ? | Êtes-vous sûr de vouloir supprimer les {count} membres sélectionnés du projet ?
+notif-success-remove-project-members,The selected members were correctly removed from project,Les membres sélectionnés ont bien été retirés du projet
+notif-error-remove-project-members,Failed to remove the selected members from project,Une erreur a empêché de retirer les membres sélectionnés du projet
+button-export-as-csv,Export as CSV,Exporter CSV
+add-members-to-project,Add members to project,Ajouter des membres au projet
+search-user,Search user...,Rechercher un utilisateur...
+notif-success-add-project-members,The selected users were correctly added as project members,Les utilisateurs sélectionnés ont été ajoutés au projet
+notif-error-add-project-members,Failed to add the selected user to the project,Une erreur a empêché d'ajouter les utilisateurs sélectionnés au projet
+project-contributor,Project contributor,Contributeur du projet
+project-manager,Project manager,Responsable du projet
+project-representative,Project representative,Personne de contact du projet
+remove-yourself-from-manager,Remove management rights,Retrait des droits de gestion
+remove-yourself-from-manager-confirmation-message,Are you sure you want to remove yourself from the project managers? You will not be able to undo this action,Êtes-vous sûr de souhaiter vous retirer des responsables du projet ? Cette action est irréversible
+status,Status,Statut
+offline,Offline users,Utilisateurs hors ligne
+notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username}
+enabled,Enabled,Activé
+disabled,Disabled,Désactivé
+no-algorithm,No algorithm to display,Aucun algorithme à afficher
+notif-error-change-status-algorithm-project,Failed to change the status of algorithm {softwareName},Une erreur a empêché de changer le statut de l'algorithme {softwareName}
+no-image-filter,No image filter to display,Aucun filtre à afficher
+notif-error-change-status-image-filter-project,Failed to change the status of filter {filterName},Une erreur a empêché de changer le statut du filtre {filterName}
+rename-project,Rename the project,Renommer le projet
+new-name,New name,Nouveau nom
+notif-success-project-rename,Project {projectName} was successfully renamed,Le projet {projectName} a bien été renommé
+notif-error-project-rename,Failed to rename project {projectName},Une erreur a empêché de renommer le projet {projectName}
+button-set-magnification,Set magnification,Changer le grossissement
+set-magnification,Set magnification,Changer le grossissement
+notif-success-magnification-update,Magnification of image {imageName} was correctly updated,Le grossissement de l'image {imageName} a bien été mis à jour
+notif-error-magnification-update,Failed to update the magnification image {imageName},Une erreur a empêché de mettre à jour le grossissement de l'image {imageName}
+length,Length,Longueur
+create-project,Create project,Créer un projet
+notif-success-project-creation,The project was successfully created,Le projet a bien été créé
+notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet
+create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet
+use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
+select-ontology,Select ontology,Choisir l'ontologie
+type,Type,Type
+attached-files,Attached files,Fichiers joints
+no-attached-file,No attached file.,Aucun fichier joint.
+add-attached-file,Add an attached file,Ajouter un fichier joint
+choose-file-or-drop,Click and choose a file or drop it here,Cliquez ici ou glissez-déposez le fichier de votre choix
+click-or-drop-new-file,Click or drop new file to replace current one,Cliquez ici our glissez-déposez un nouveau fichier pour remplacer le fichier actuel
+notif-success-attached-file-creation,File correctly attached,Le fichier joint a bien été uploadé
+notif-error-attached-file-creation,Failed to attach the selected file,Une erreur a empêché l'upload du fichier joint
+notif-success-attached-file-deletion,Attached file {filename} correctly deleted,Le fichier joint {filename} a bien été supprimé
+notif-error-attached-file-deletion,Failed to delete attached file {filename},Une erreur a empêché la suppression du fichier joint {filename}
+confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?
+opacity,Opacity,Opacité
+button-reset-opacities,Reset opacities,Réinitialiser les opacités
+preview-size,Preview size,Taille de l'aperçu
+small,Small,Petit
+medium,Medium,Moyen
+large,Large,Grand
+huge,Huge,Très grand
+number-per-page,Number per page,Nombre par page
+display,Display,Affichage
+add-image,Add image,Ajouter une image
+detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName}
+button-more-info,More information,Plus d'informations
+access-denied,Access denied,Accès non autorisé
+insufficient-permission,You don't have the permission to view this page,Vous n'avez pas la permission de consulter cette page
+open-admin-session,Open admin session,Ouvrir une session admin
+close-admin-session,Close admin session,Fermer la session admin
+admin,Admin,Admin
+admin-menu,Admin,Administration
+page-not-found,Page not found,Page non trouvée
+not-found,Not found,Introuvable
+not-found-error,The requested resource could not be loaded,La ressource demandée n'a pas pu être chargée
+notif-error-logout,Error during logout,Erreur lors de la déconnexion
+download-results,Download results,Télécharger les résultats
+download-PDF,Download PDF,Télécharger le PDF
+download-CSV,Download CSV,Télécharger le CSV
+download-excel,Download Excel,Télécharger l'Excel
+no-result,No result,Aucun résultat
+upload,Upload,Upload
+important-notes,Important notes,Remarques importantes
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
+allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
+vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.","Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés)."
+zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)","Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS)."
+drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}""."
+link-to-project-upload-info,You are also able to link images with project manually after upload is done.,Vous aurez la possibilité d'associer manuellement les images à des projets lorsque l'upload sera terminé.
+link-with-project,Link with project,Associer à un projet
+files,Files,Fichiers
+no-file,No file,Aucun fichier
+button-start,Start,Uploader
+button-hide,Hide,Masquer
+upload-error,Upload error,Erreur d'upload
+add-files,Add files...,Ajouter des fichiers...
+start-upload,Start upload,Lancer l'upload
+cancel-upload,Cancel upload,Annuler l'upload
+preview,Preview,Aperçu
+created,Created,Créé
+size,Size,Taille
+content-type,Content type,Type de contenu
+global-size,Global size,Taille globale
+from,From,Depuis
+from-file,From,Fichier parent
+no-preview-available,No preview available,Pas d'aperçu disponible
+uploaded,Uploaded,Téléchargé
+converted,Converted,Converti
+deployed,Deployed,Déployé
+error-format,Format error,Erreur de format
+error-convert,Conversion error,Erreur de conversion
+uncompressed,Uncompressed,Décompressé
+to-deploy,To deploy,À déployer
+to-convert,To convert,À convertir
+error-deployment,Deployment error,Erreur de déploiement
+no-uploaded-file,No uploaded file,Aucun fichier
+count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers
+sample-preview,Sample preview,Aperçu de l'image
+slide-preview,Slide preview,Aperçu de la lame
+sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename}
+slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename}
+file-tree,File tree,Arborescence de fichiers
+confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?
+view,View,Visualisation d'images
+hotkey-move-up,Move up,Déplacer vers le haut
+hotkey-move-down,Move down,Déplacer vers le bas
+hotkey-move-left,Move left,Déplacer vers la gauche
+hotkey-move-right,Move right,Déplacer vers la droite
+hotkey-zoom-in,Zoom in,Zoomer
+hotkey-zoom-out,Zoom out,Dézoomer
+hotkey-next-image,Next image,Image suivante
+hotkey-previous-image,Previous image,Image précédente
+draw,Draw,Outils d'annotations
+hotkey-select,Select,Sélectionner
+hotkey-point,Point,Point
+hotkey-freehand,Freehand polygon,Polygone à main levée
+hotkey-delete,Delete,Supprimer
+hotkey-undo,Undo,Annuler
+hotkey-redo,Redo,Refaire
+review,Review,Validation
+hotkey-accept-annotation,Accept annotation,Valider l'annotation
+hotkey-reject-annotation,Reject annotation,Rejeter l'annotation
+hotkey-toggle-review,Toggle review layer,Afficher/masquer le calque de validation
+version,Version,Version
+sponsors,Sponsors,Sponsors
+website,Website,Site web
+source-code,Source code,Code source
+documentation,Documentation,Documentation
+contact,Contact,Contact
+cytomine-sponsors-info,"Cytomine is developed by the {cytomineCompanyLink} in collaboration with the University of Liège and was previously funded by research grants of the Wallonia.","Cytomine est développé par la {cytomineCompanyLink} en collaboration avec l'Université de Liège et a été subventionné par des conventions de recherche de la Région Wallone."
+cytomine-company,Cytomine company,société Cytomine
+cytomine-website-info,"You can find more information on the website of the Cytomine project located at {websiteLink}.",Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.
+source-code-info,"Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code is available on our {githubLink}.",Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.
+github-repository,GitHub repository,répertoire GitHub
+documentation-info,"A complete documentation is available {docLink}. More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.","Une documentation complète est disponible {docLink}. Des informations plus détaillées sur l'API de Cytomine sont aussi disponibles {apiDocLink}."
+here,here,ici
+contact-info,You can contact the Cytomine Team at {contactMail},Vous pouvez contacter l'équipe de Cytomine à l'adresse {contactMail}.
+button-previous-image,Previous image,Image précédente
+button-next-image,Next image,Image suivante
+notif-error-first-image,This is the first image of the project,Il s'agit de la première image du projet
+notif-error-last-image,This is the last image of the project,Il s'agit de la dernière image du projet
+notif-error-fetch-previous-image,Failed to load previous image,Une erreur a empêché de charger l'image précédente
+notif-error-fetch-next-image,Failed to load next image,Une erreur a empêché de charger l'image suivante
+viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images)
+activity-charts,Activity charts,Graphiques d'activité
+activity-logs,Activity logs,Logs d'activité
+project-connections,Project Connections,Connexions au projet
+image-consultations,Image Consultations,Consultations d'images
+number-annotations,Number of annotations,Nombre d'annotations
+manual-annotations-vs-term,Manual annotations VS. term,Annotations manuelles VS. terme
+annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme
+manual-annotations-vs-contributor,Manual annotations VS. contributor,Annotations manuelles VS. contributeur
+annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur
+nothing-more-to-load,Nothing more to load,Tout a été chargé
+all-users-analyses,All users/analyses,Tous les utilisateurs/analyses
+time-period,Time period,Période de temps
+button-clear,Clear,Réinitialiser
+to,To,Jusqu'à
+no-log-to-display,No log to display,Aucun log disponible
+term,Term,Terme
+ontologies,Ontologies,Ontologies
+confirm-deletion-term,Are you sure you want to delete term {name}?,Êtes-vous sûr de vouloir supprimer le terme {name} ?
+notif-error-term-deletion,Failed to delete the term. Ensure that no annotation is associated to this term.,Le terme n'a pas pu être supprimé. Assurez-vous qu'aucune annotation n'est associée à ce terme.
+not-used-in-any-project,Not used in any project,N'est utilisée dans aucun projet
+used-in-project-no-access,Used in projects that you are not allowed to see,Utilisée dans des projets auxquels vous n'avez pas accès
+confirm-deletion-ontology,Are you sure you want to delete ontology {name}?,Êtes-vous sûr de vouloir supprimer l'ontologie {name} ?
+notif-error-ontology-deletion,Failed to delete the ontology,Une erreur a empêché la suppression de l'ontologie
+notif-success-ontology-deletion,Ontology {name} was successfully deleted,L'ontologie {name} a bien été supprimée
+cannot-delete-ontology-with-projects,Cannot delete the ontology: it is used in projects,Cette ontologie ne peut être supprimée : elle est utilisée dans des projets.
+rename-ontology,Rename ontology,Renommer l'ontologie
+notif-success-ontology-rename,Ontology {name} was successfully renamed,L'ontologie {name} a bien été renommée
+notif-error-ontology-rename,Failed to rename ontology {name},Une erreur a empêché de renommer l'ontologie {name}
+new-ontology,New ontology,Nouvelle ontologie
+create-ontology,Create ontology,Créer une ontologie
+notif-success-ontology-creation,The ontology was successfully created,L'ontologie a bien été créée
+notif-error-ontology-creation,Failed to create the ontology,Une erreur a empêché la création de l'ontologie
+create-term,Create term,Créer un terme
+update-term,Update term,Modifier un terme
+notif-success-term-creation,The term was successfully created,Le terme a bien été créé
+notif-error-term-creation,Failed to create the term,Une erreur a empêché la création du terme
+notif-success-term-update,The term was successfully updated,Le terme a bien été mis à jour
+notif-error-term-update,Failed to update the term,Une erreur a empêche la modification du terme
+notif-error-ontology-tree-update,Failed to update the ontology tree organization,Une erreur a empêché de modifir l'arborescence de l'ontologie
+notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données
+workspace,Workspace,Espace de travail
+outline-color,Outline color,Couleur du contour
+no-outline,No outline,Pas de contour
+button-launch-new-analysis,Launch new analysis,Lancer une nouvelle analyse
+launch-new-analysis,Launch new analysis,Lancement d'une nouvelle analyse
+algorithm,Algorithm,Algorithme
+run-number,Run number,#
+execution-date,Execution date,Date d'exécution
+launched-by,Launched by,Lancé par
+not-launch,Not launched,Pas commencé
+in-queue,In queue,Dans la file
+running,Running,En cours
+success,Success,Réussi
+failed,Failed,Échoué
+indeterminate,Indeterminate,Inconnu
+wait,Wait,En attente
+previewed,Previewed,Prévisualisé
+no-analysis-run,No analysis run,Aucune analyse lancée
+launcher,Launcher,Créateur
+status-comment,Status comment,Commentaire
+execution-duration,Execution duration,Durée de l'exécution
+parameters,Parameters,Paramètres
+button-show,Show,Montrer
+results,Results,Résultats
+comment,Comment,Commentaire
+no-result-file,No result file,Aucun fichier de résultat
+button-view,View,Voir
+data,Data,Données
+delete-data,Delete data,Supprimer les données
+count-annotations,0 annotation | 1 annotation | {count} annotations,0 annotation | 1 annotation | {count} annotations
+deleted-analysis-data,Analysis data was deleted,Données de l'analyse supprimées
+delete-analysis-data,Delete analysis data,Suppression des données de l'analyse
+confirm-deletion-analysis-data,Do you confirm you want to delete the following analysis data:,Êtes-vous sûr de vouloir supprimer les données d'analyse suivantes :
+count-reviewed-annotations,0 reviewed annotation | 1 reviewed annotation | {count} reviewed annotations,0 annotation validée | 1 annotation validée | {count} annotations validées
+count-annotation-terms,0 term associated to an annotation | 1 term associated to an annotation | {count} terms associated to annotations,0 association de terme | 1 association de terme | {count} associations de terme
+remark-long-operation,Remark: this operation may take some time,Remarque : cette opération pourrait prendre un certain temps
+progress,Progress,Progrès
+notif-success-analysis-data-deletion,Analysis data was successfully deleted,Les données de l'analyse ont bien été supprimées
+notif-error-analysis-data-deletion,Failed to delete analysis data,Une erreur a empêché la suppression des données de l'analyse
+optional-parameters,Optional parameters,Paramètres optionnels
+prefilled-parameters,Pre-filled parameters,Paramètres pré-remplis
+notif-success-analysis-launch,Successfully launched the analysis,L'analyse a bien été lancée
+notif-error-analysis-launch,Failed to launch the analysis,Une erreur a empêché de lancer l'analyse
+notif-error-analysis-parameters-options,Failed to retrieve the options for parameter {paramName},Une erreur a empêché de récupérer les options disponibles pour le paramètre {paramName}
+activity-of-user,Activity of {username},Activité de l'utilisateur {username}
+project-connections,Project connections,Connexions au projet
+image-consultations,Image consultations,Consultations d'images
+annotation-selections,Annotation selections,Sélections d'annotations
+detailed-project-connections,Detailed project connections,Détails des connexions au projet
+detailed-image-consultations,Detailed image consultations,Détails des consultations d'image
+date,Date,Date
+duration,Duration,Durée
+number-viewed-images,Number of viewed images,Nombre d'images consultées
+number-annotation-creations,Number of annotation creations,Nombre d'annotations créées
+annotation-creations,Annotation creations,Créations d'annotations
+no-project-connection,No project connection,Aucune connexion au projet
+no-image-consultation,No image consultation,Aucune consultation d'image
+operating-system,Operating system,Système d'exploitation
+system,System,Système
+browser,Browser,Navigateur
+first-consultation,First consultation,Première consultation
+last-consultation,Last consultation,Dernière consultation
+number-consultations,Number of consultations,Nombre de consultations
+error-failed-to-fetch-image-consultations,Error: failed to fetch image consultations,Une erreur a eu lieu lors de la récupération des consultations d'images
+users,Users,Utilisateurs
+currently,Currently,Actuellement
+online-users,Online users,Utilisateurs en ligne
+active-projects,Active projects,Projets actifs
+most-active-project,Most active project,Projet le plus actif
+used-storage-space,Used storage space,Espace de stockage utilisé
+total,Total,Total
+count-active-users,no active user | one active user | {count} active users,aucun utilisateur actif | un utilisateur actif | {count} utilisateurs actifs
+welcome-message,Welcome message,Message de bienvenue
+enter-text,Enter text,Saisissez du texte
+notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour
+notif-error-welcome-message-update,Failed to update the welcome message,Une erreur a empêché de mettre à jour le message de bienvenue
+super-admin,Super admin,Super admin
+user,User,Utilisateur
+guest,Guest,Invité
+updated,Updated,Mis à jour
+button-new-user,New user,Nouvel utilisateur
+button-unlock,Unlock,Déverrouiller
+notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur
+notif-error-user-lock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur
+no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche
+members-activity,Members activity,Activité des membres
+select-date,Select a date,Choisir une date
+no-record,No record,Aucune entrée
+button-manage-members,Manage members,Gestion des membres
+barchart-hover-mouse-for-details,Hover the mouse over a bar to display details related to this bar,Passez la souris sur une barre pour afficher les détails relatifs à cette barre
+barchart-click-label-to-toggle-visibility,Click on a label at the top of the chart to toggle the visibility of this data in the chart,Cliquez sur un label au-dessus du graphique pour afficher/masquer les données associées à ce label dans le graphique
+activity-chart-info-message,This chart presents the activity performed in the selected period,Ce graphique présente un résumé de l'activité ayant eu lieu durant la période sélectionnée
+project-connections-info-message,A project connection is recorded each time a user opens a project in Cytomine,Une connexion au projet est enregistrée à chaque ouverture de projet dans Cytomine
+image-consultations-info-message,An image consultation is recorded each time a user opens an image in Cytomine,Une consultation d'image est enregistrée à chaque ouverture d'image dans Cytomine
+annotation-selections-info-message,"An annotation selection is recorded each time a user selects an annotation","À chaque fois qu'un utilisateur clique sur une annotation dans une image, une sélection d'annotation est enregistrée"
+manual-annotations-info-message,"Annotations created by a user",Annotations créées par un utilisateur
+analysis-annotations-info-message,"Annotations created by an automatic analysis (run of an algorithm)",Annotations créées par une analyse automatique (exécution d'un algorithme)
+reviewed-annotations-info-message,"Annotations validated during the review process",Annotations validées durant le processus de validaion
+number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,Ce graphique présente le nombre d'annotations créées durant la période sélectionnée
+annotations-vs-terms-chart-info-message,"This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.",Ce graphique présente le nombre d'annotations manuelles associées à chaque terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.
+annotated-images-vs-terms-chart-info-message,"This chart presents for each term the number of images having at least one user annotation associated with this term. Only annotations created during the selected period are taken into account.","Ce graphique présente, pour chaque terme, le nombre d'images ayant au moins une annotation associée à ce terme. Seules les annotations créées durant la période sélectionnée sont prises en compte."
+annotations-vs-contributors-chart-info-message,"This chart presents the number of annotation created by each project member during the selected period",Ce graphique présente le nombre d'annotations créées par chaque membre durant la période sélectionnée
+annotated-images-vs-contributors-chart-info-message,"This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.",ce graphique présente le nombre d'images annotées par chaque membre. Seules les annotations créées durant la période sélectionnée sont prises en compte.
+data-last-updated-on,Data refreshed at {time},Données mises à jours à {time}
+ongoing,Ongoing,En cours
+last-connections,Last connections,Dernières connexions
+last-day,Last day,Dernier jour
+last-week,Last week,Dernière semaine
+last-year,Last year,Dernière année
+period,Period,Période
+by,By,Par
+day,Day,Jour
+hour,Hour,Heure
+week,Week,Semaine
+connections-chart,Connections chart,Graphique des connexions
+create-user,Create user,Créer un utilisateur
+update-user,Update user,Modifier un utilisateur
+notif-success-user-creation,User successfully created,L'utilisateur a bien été créé
+notif-error-user-creation,Failed to create the user,Une erreur a empêché la création de l'utilisateur
+notif-success-user-update,User successfully updated,L'utilisateur a bien été modifié
+notif-error-user-update,Failed to update the user,Une erreur a empêché la modification de l'utilisateur
+button-login,Log in,Se connecter
+button-get-username,Get username,Récupérer le nom d'utilisateur
+forgot-username,Forgot username,Nom d'utilisateur oublié
+forgot-password,Forgot password,Mot de passe oublié
+button-reset-password,Reset password,Réinitaliser le mot de passe
+notif-success-forgot-username,A mail containing your username was sent to your email address,Un e-mail contenant votre nom d'utilisateur a été envoyé à votre adresse e-mail
+notif-error-forgot-username,Failed to send an email to the provided email address,Une erreur a empêché de vous envoyer un e-mail
+notif-success-forgot-password,A mail containing a connection link was sent to your email address,Un e-mail permettant de réinitialiser votre mot de passe a été envoyé à votre adresse e-mail
+notif-error-forgot-password,Failed to send an email allowing to reset the password,Une erreur a empêché de vous envoyer un e-mail
+forgot-credentials,Forgot your {username} or your {password}?,Vous avez oublié votre {username} ou votre {password} ?
+password-expired-info-message,"Your password has expired. Please choose a new one.",Votre mot de passe a expiré. Veuillez en choisir un nouveau
+failed-fetch-current-stats,Failed to fetch current statistics,Une erreur a eu lieu lors du chargement des statistiques sur l'activité en cours
+failed-fetch-total-counts,Failed to fetch the total counts,Une erreur a eu lieu lors du chargement des statistiques
+unexpected-error-info-message,An unexpected error occurred,Une erreur inattendue s'est produite
+error-attached-files,Error fetching attached files,Erreur lors du chargement des fichiers joints
+error-fetch-properties,Error fetching properties,Erreur lors du chargement des propriétés
+failed-fetch-recent-projects,Failed to fetch recent projects,Erreur lors du chargement des projets récents
+error-cannot-upload,Unexpected error prevents upload,Une erreur inattendue empêche les uploads
+notif-error-fetch-annotations-viewer,An error occurred while fetching annotations,Erreur lors du chargement des annotations
+notif-error-save-user-position,Failed to save your position in the image,Une erreur empêche de sauvegarder votre position dans l'image
+notif-error-save-image-consultation,Failed to save image consultation,Une erreur empêche de sauvegarder la consultation de l'image
+notif-error-target-annotation,Failed to fetch the requested annotation,Impossible d'afficher l'annotation demandée
+notif-error-add-viewer-image,Failed to add the image,Une erreur a empêché l'ajout de l'image
+notif-error-loading-annotation-layers,Failed to fetch annotation layers,Erreur lors du chargement de la liste des calques d'annotations
+notif-error-tracked-user-position,Failed to retrieve the position of the followed user,Erreur lors de la récupération de la position de l'utilisateur suivi
+annotation-comments,Annotation comments,Commentaires
+notif-error-fetch-annotation-comments,Failed to retrieve the comments of this annotation,Erreur lors de la récupération des commentaires
+no-annotation-comments,No comment for this annotation so far,Aucun commentaire pour cette annotation
+button-share,Share,Partager
+enter-comment,Enter your comment,Saisissez votre commentaire
+send-to-all-project-members,Send to all project members,Envoyer à tous les membres du projet
+send-to-some-members,Send to some project members only,Envoyer à certains membres seulement
+add-new-comment,Add new comment,Ajouter un commentaire
+button-add-comment,Add comment,Ajouter un commentaire
+comment-will-be-sent-by-email,The comment will be sent by email to the selected users,Le commentaire sera envoyé par e-mail aux utilisateurs sélectionnés
+notif-error-new-comment,Failed to add a comment to the annotation,Une erreur a empêché la création du commentaire
+notif-success-new-comment,Your comment was successfully send by email,Votre commentaire a bien été envoyé par e-mail
+reviewers,Reviewers,Validateurs
+review-layer,Review layer,Calque de validation
+reviewed-by,Reviewed by,Validé par
+reviewed-on,Reviewed on,Validé le
+button-metadata,Metadata,Métadonnées
+image-metadata,Image metadata,Métadonnées de l'image
+registration-date,Registration date,Date d'inscription
+first-project-connection,First project connection,Première connexion au projet
+last-project-connection,Last project connection,Dernière connexion au projet
+notif-error-already-broadcasting-this-image,You are already broadcasting this image on another view,Vous diffusez déjà cette image
+delete-analysis,Delete analysis,Supprimer l'analyse
+delete-analysis-confirmation-message,Do you really want to delete this analysis? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer cette analyse ? Toutes les données de ce projet seront irrémédiablement perdues
+notif-success-analysis-deletion,The analysis was successfully deleted,L'analyse a bien été supprimée
+notif-error-analysis-deletion,Failed to delete the analysis,Une erreur a empêché la suppression de l'analyse
+number-projects-info-message,The number of projects of which you are a member,Le nombre de projets dont vous êtes membre
+number-images-info-message,The number of images available in the projects of which you are a member,Le nombre d'images disponibles dans les projets dont vous êtes membre
+number-annotations-info-message,The number of annotations that you created,Le nombre d'annotations que vous avez créées
+number-reviewed-annotations-info-message,The number of annotations that you validated during a review,Le nombre d'annotations que vous avez validées
+blinded-name-indication,Blind,Masqué
 language,Language,Langue
-no-property-matching-search-string,No existing property matching {searchString},
-confirm-default-property,Confirm default property,
-confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,
-notif-success-default-property-update,Default property successfully updated,
-notif-error-default-property-update,Failed to update the default property,
-notif-error-delete-uploaded-file,Failed to delete the uploaded file (unexpected error),
-notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},
-no-ontology,No ontology,
-button-change-ontology,Change ontology,
-change-ontology,Change ontology,
-change-ontology-warning-message,Changing the ontology will result in the deletion of all existing terms associations. This operation will not be recoverable with undo button!,
-notif-success-project-ontology-change,Ontology of project {projectName} was successfully updated,
-notif-error-project-ontology-change,Failed to change the ontology of project {projectName},
-notif-error-project-ontology-change-job-terms,Cannot change the ontology of this project: some analyses associated terms to annotations. You must clean these associations prior to the ontology change.,
-notif-error-project-ontology-change-reviewed-terms,Cannot change the ontology of this project: some terms are associated to reviewed annotations. You must remove these associations prior to the ontology change.,
-confirm-ontology-change,Confirm ontology change,
-confirm-ontology-change-delete-user-terms,Some members of this project have associated terms to annotations ({count} associations). <br> Are you sure you want to delete those associations to change the ontology?,
-invalid-token,Invalid token,
-slide-preview-not-available,No slide preview,
-button-load-more,Load more,
-dont-have-access-to-any-ontology,You don't have access to any ontology,
-managed-projects,Managed projects,
-connect-as-user,Connect as {username},
-notif-error-failed-to-connect-as-user,Failed to connect as the selected user,
-switch-back-to-user,Switch back to {username},
-notif-error-failed-to-switch-back-as-real-user,Failed to switch back to real account,
-notif-error-invalid-key-prefix,The property key cannot start by {prefix}: this prefix is reserved for internal use,
-button-copy,Copy,
-notif-success-key-copied,Key copied to clipboard,
-confirm-close-project,Close project,
-confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,
-count-viewers,no viewer | viewer | {count} viewers,
-validations.messages._default,Invalid field,
-validations.messages.required,This field is required,
-validations.messages.email,Must be a valid email address,
-validations.messages.is,Invalid confirmation,
-validations.messages.min,Must have at least {1} characters,
-validations.messages.decimal,Must be a number,
-validations.messages.positive,Must be positive,
-invalid-password,Invalid password,
-activity-history,Activity history,
-image-not-reviewed,This image has not been reviewed,
-button-start-review,Start review,
-notif-error-start-review,Failed to start reviewing the image,
-you-are-reviewing-image-since,You are reviewing this image since {date},
-button-continue-review,Continue review,
-you-have-validated-image-on,You have validated this image on {date},
-image-validated-by-on,This image has been validated by {user} on {date},
-button-unvalidate-review,Unvalidate my review,
-button-unvalidate-and-continue-review,Unvalidate and continue my review,
-notif-error-review-accept-all,Failed to accept all annotations,
-notif-error-review-reject-all,Failed to reject all annotations,
-image-in-review-by-since,This image is reviewed by {user} since {date},
-review-mode,You are in review mode,
-button-continue-review-later,Continue my review later,
-button-cancel-review,Cancel my review,
-button-validate-review,Validate my review,
-notif-error-cancel-review,Failed to cancel the review of the image,
-notif-error-validate-review,Failed to validate the image,
-notif-error-unvalidate-review,Failed to unvalidate the image review,
-review-list-visible-layers,The following layers are currently displayed: {visibleLayers}.,
-button-accept-all,Accept all,
-button-reject-all,Reject all,
-review-explanation,"You can review the visible annotations individually using the select tool or treat them all in batch with below buttons.",
-validate-annotation,Validate annotation,
-reject-annotation,Reject annotation,
-notif-error-annotation-validation,Failed to validate the annotation,
-notif-error-annotation-rejection,Failed to reject the annotation,
-in-review,In review,
-reviewed,Reviewed,
-none,None,
-button-register,Register,
-register,Register,
-notif-error-register,Error during registration,
-notif-error-register-username-exists,This username is already used,
-no-account-yet,Don't have an account yet ? {registerLink},
-successful-registration,Your account was successfully created. Check your inbox to enable it.,
-back-to-login,Back to login form,
-filter,Filter,
-original-no-filter,Original (no filter),
+no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché
+confirm-default-property,Confirm default property,Confirmer la propriété par défaut
+confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut"
+notif-success-default-property-update,Default property successfully updated,La propriété par défaut a bien été mise à jour
+notif-error-default-property-update,Failed to update the default property,Une erreur a empêché la modification de la propriété par défaut
+notif-error-delete-uploaded-file,Failed to delete the uploaded file (unexpected error),Une erreur a empêché de supprimer le fichier
+notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},Cette image est utilisée dans des projets ({projects}) sous les noms suivants : {names}
+no-ontology,No ontology,Pas d'ontologie
+button-change-ontology,Change ontology,Changer l'ontologie
+change-ontology,Change ontology,Changer l'ontologie
+change-ontology-warning-message,Changing the ontology will result in the deletion of all existing terms associations. This operation will not be recoverable with undo button!,Changer l'ontologie aura pour effet de supprimer toutes les associations annotation-terme existantes. Cette action est irréversible.
+notif-success-project-ontology-change,Ontology of project {projectName} was successfully updated,L'ontologie du projet {projectName} a bien été modifiée
+notif-error-project-ontology-change,Failed to change the ontology of project {projectName},Une erreur a empêché de modifier l'ontologie du projet {projectName}
+notif-error-project-ontology-change-job-terms,Cannot change the ontology of this project: some analyses associated terms to annotations. You must clean these associations prior to the ontology change.,Impossible de changer l'ontologie de ce projet : des analyses ont associé des termes à des annotations.
+notif-error-project-ontology-change-reviewed-terms,Cannot change the ontology of this project: some terms are associated to reviewed annotations. You must remove these associations prior to the ontology change.,Impossible de changer l'ontologie de ce projet : des termes sont associés à des annotations validées.
+confirm-ontology-change,Confirm ontology change,Confirmer le changement d'ontologie
+confirm-ontology-change-delete-user-terms,Some members of this project have associated terms to annotations ({count} associations). <br> Are you sure you want to delete those associations to change the ontology?,Des membres du projet ont associé des termes à des annotations ({count} associations). Êtes-vous sûr de vouloir supprimer ces associations ?
+invalid-token,Invalid token,Token invalide
+slide-preview-not-available,No slide preview,Aperçu de la lame non disponible
+button-load-more,Load more,Plus
+dont-have-access-to-any-ontology,You don't have access to any ontology,Vous n'avez accès à aucune ontologie
+managed-projects,Managed projects,Projets supervisés
+connect-as-user,Connect as {username},Se connecter en tant que {username}
+notif-error-failed-to-connect-as-user,Failed to connect as the selected user,Une erreur a empêché la connexion
+switch-back-to-user,Switch back to {username},Retour à {username}
+notif-error-failed-to-switch-back-as-real-user,Failed to switch back to real account,Une erreur a empêché de vous reconnecter sous votre vrai compte
+notif-error-invalid-key-prefix,The property key cannot start by {prefix}: this prefix is reserved for internal use,La clé ne peut commencer par {prefix} : ce préfixe est réservé par Cytomine pour une utilisation interne.
+button-copy,Copy,Copier
+notif-success-key-copied,Key copied to clipboard,Clé copiée dans le presse-papier
+confirm-close-project,Close project,Fermer le projet
+confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,Êtes-vous sûr de vouloir fermer ce projet ? Les {viewers} qu'il contient seront également fermés.
+count-viewers,no viewer | viewer | {count} viewers,aucun visualisateur | visualisateurs | {count} visualisateurs
+validations.messages._default,Invalid field,Champ incorrect
+validations.messages.required,This field is required,Champ obligatoire
+validations.messages.email,Must be a valid email address,Doit être une adresse e-mail valide
+validations.messages.is,Invalid confirmation,Confirmation incorrecte
+validations.messages.min,Must have at least {1} characters,Doit contenir au moins {1} caractères
+validations.messages.decimal,Must be a number,Doit être un nombre
+validations.messages.positive,Must be positive,Doit être positif
+invalid-password,Invalid password,Mot de passe incorrect
+activity-history,Activity history,Historique de l'activité
+image-not-reviewed,This image has not been reviewed,Cette image n'a pas été validée
+button-start-review,Start review,Commencer la validation
+notif-error-start-review,Failed to start reviewing the image,Une erreur a empêché de commencer la validation de l'image
+you-are-reviewing-image-since,You are reviewing this image since {date},Cette image est en cours de validation depuis le {date}
+button-continue-review,Continue review,Continuer la validation
+you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date}
+image-validated-by-on,This image has been validated by {user} on {date},Cette image a été validée par {user} le {date}
+button-unvalidate-review,Unvalidate my review,Annuler la validation
+button-unvalidate-and-continue-review,Unvalidate and continue my review,Annuler la validation
+notif-error-review-accept-all,Failed to accept all annotations,Une erreur a empêché de valider toutes les annotations
+notif-error-review-reject-all,Failed to reject all annotations,Une erreur a empêché de rejeter toutes les annotations
+image-in-review-by-since,This image is reviewed by {user} since {date},Cette image est en cours de validation par depuis le {date}
+button-continue-review-later,Continue my review later,Continuer la validation plus tard
+button-cancel-review,Cancel my review,Annuler la validation
+button-validate-review,Validate my review,Valider l'image
+notif-error-cancel-review,Failed to cancel the review of the image,Une erreur a empêché d'annuler la validation de l'image
+notif-error-validate-review,Failed to validate the image,Une erreur a empêché la validation de l'image
+notif-error-unvalidate-review,Failed to unvalidate the image review,Une erreur a empêché d'annuler la validation de l'image
+review-list-visible-layers,The following layers are currently displayed: {visibleLayers}.,Les calques suivant sont affichés : {visibleLayers}.
+button-accept-all,Accept all,Tout valider
+button-reject-all,Reject all,Tout rejeter
+review-explanation,"You can review the visible annotations individually using the select tool or treat them all in batch with below buttons.","Vous pouvez valider les annotations en les sélectionnant une par une ou les traiter toutes à la fois avec les boutons ci-dessous"
+validate-annotation,Validate annotation,Valider l'annotation
+reject-annotation,Reject annotation,Rejeter l'annotation
+notif-error-annotation-validation,Failed to validate the annotation,Une erreur a empêché de valider l'annotation
+notif-error-annotation-rejection,Failed to reject the annotation,Une erreur a empêché de rejeter l'annotation
+in-review,In review,En cours de validation
+reviewed,Reviewed,Validée
+none,None,Aucun
+button-register,Register,S'inscrire
+register,Register,Inscription
+notif-error-register,Error during registration,Une erreur s'est produite lors de l'inscription
+notif-error-register-username-exists,This username is already used,Ce nom d'utilisateur est déjà utilisé
+no-account-yet,Don't have an account yet ? {registerLink},Pas encore de compte ? {registerLink}
+successful-registration,Your account was successfully created. Check your inbox to enable it.,Votre compte a été créé avec succès. Consultez votre boîte mail pour l'activer.
+back-to-login,Back to login form,Retour au formulaire d'authentification
+filter,Filter,Filtre
+original-no-filter,Original (no filter),Pas de filtre

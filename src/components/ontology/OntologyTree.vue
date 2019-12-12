@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
   <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
@@ -53,6 +67,7 @@ import SlVueTree from 'sl-vue-tree';
 import CytomineTerm from './CytomineTerm';
 import TermModal from './TermModal';
 import {Term} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'ontology-tree',
@@ -84,8 +99,8 @@ export default {
     };
   },
   computed: {
-    lowCaseSearchString() {
-      return this.searchString.toLowerCase();
+    regexp() {
+      return getWildcardRegexp(this.searchString);
     },
     noResult() {
       return this.treeNodes.every(node => node.data.hidden);
@@ -102,7 +117,7 @@ export default {
       this.internalSelectedNodes = this.selectedNodes.slice();
       this.refreshNodeSelection();
     },
-    lowCaseSearchString() {
+    regexp() {
       this.filter();
     }
   },
@@ -144,9 +159,8 @@ export default {
     },
 
     filter() {
-      let str = this.lowCaseSearchString;
       this.applyToAllNodes(node => {
-        let match = node.title.toLowerCase().indexOf(str) >= 0;
+        let match = this.regexp.test(node.title);
         if(node.children) {
           let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
           node.isExpanded = matchInChildren;

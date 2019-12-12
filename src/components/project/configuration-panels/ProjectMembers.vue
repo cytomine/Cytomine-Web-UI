@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="list-members-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -17,7 +31,7 @@
         </div>
         <div class="filter-body">
           <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
-            :searchable="false" />
+            :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
       <div class="column is-one-half has-text-right-desktop buttons">
@@ -31,48 +45,42 @@
       </div>
     </div>
 
-    <b-table
-      :data="filteredMembers"
-      class="table-members"
-      default-sort="username"
-      :paginated="true"
-      :per-page="perPage"
-      pagination-size="is-small"
+    <cytomine-table
+      :collection="MemberCollection"
+      :currentPage.sync="currentPage"
+      :perPage.sync="perPage"
+      :sort.sync="sortField"
+      :order.sync="sortOrder"
+      :detailed=false
+      :checkable=true
+      :isRowCheckable="(row) => row.id !== currentUser.id"
+      :checkedRows.sync="selectedMembers"
+      :revision="revision"
     >
-      <template #header="{column}">
-        <template v-if="column.label === 'SELECTOR'">
-          <b-checkbox v-model="selectAll" :disabled="filteredMembers.length === 0" />
-        </template>
-        <template v-else>{{ column.label }}</template>
-      </template>
 
       <template #default="{row: member}">
-        <b-table-column label="SELECTOR" width="20">
-          <b-checkbox v-model="member.selected" :disabled="member.id === currentUser.id" />
-        </b-table-column>
-
         <b-table-column field="username" :label="$t('username')" sortable width="100">
           {{member.username}}
         </b-table-column>
 
-        <b-table-column field="name" :label="$t('name')" sortable width="150">
-          {{ member.name }}
+        <b-table-column field="fullName" :label="$t('name')" sortable width="150">
+          {{member.firstname}} {{member.lastname}}
         </b-table-column>
 
-        <b-table-column field="indexRole" :label="$t('role')" sortable width="50">
+        <b-table-column field="projectRole" :label="$t('role')" sortable width="50">
           <span class="icons">
             <a @click="confirmToggleManager(member)">
-              <i class="fas fa-user-cog" :class="{disabled: member.role === contributorRole}"></i>
+              <i class="fas fa-user-cog" :class="{disabled: member.role === contributorRole.value}"></i>
             </a>
-            <a v-if="member.role !== contributorRole" @click="toggleRepresentative(member)">
-              <i class="fas fa-flag" :class="{disabled: !member.representativeId}"></i>
+            <a v-if="member.role !== contributorRole.value" @click="toggleRepresentative(member)">
+              <i class="fas fa-flag" :class="{disabled: member.role !== representativeRole.value}"></i>
             </a>
           </span>
         </b-table-column>
 
-        <b-table-column field="LDAP" :label="$t('source')" centered sortable width="50">
+        <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
           <span class="tag ldap is-rounded is-info" :class="{ldap: member.LDAP}">
-            {{$t(member.LDAP ? 'LDAP' : 'manual')}}
+            {{displayMemberOrigin(member)}}
           </span>
         </b-table-column>
 
@@ -94,16 +102,7 @@
           <a :href="exportURL" target="_self" class="button is-link">{{$t('button-export-as-csv')}}</a>
         </div>
       </template>
-
-      <template #bottom-left>
-        <b-select v-model="perPage" size="is-small">
-          <option value="10">10 {{$t('per-page')}}</option>
-          <option value="25">25 {{$t('per-page')}}</option>
-          <option value="50">50 {{$t('per-page')}}</option>
-          <option value="100">100 {{$t('per-page')}}</option>
-        </b-select>
-      </template>
-    </b-table>
+    </cytomine-table>
 
     <div class="legend">
       <h2>{{$t('legend')}}</h2>
@@ -135,16 +134,18 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
+import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
-import {Cytomine, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
+import {Cytomine, UserCollection, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
 
 export default {
   name: 'projet-members',
   components: {
+    CytomineTable,
     CytomineMultiselect,
     AddMemberModal
   },
@@ -155,91 +156,72 @@ export default {
 
       addMemberModal: false,
 
+      currentPage: 1,
       perPage: 25,
+      sortField: '',
+      sortOrder: '',
+
       searchString: '',
 
-      contributorRole: this.$t('contributor'),
-      managerRole: this.$t('manager'),
+      contributorRole: {label:this.$t('contributor'), value : 'contributor'},
+      managerRole: {label:this.$t('manager'), value: 'manager'},
+      representativeRole: {label:this.$t('representative'), value: 'representative'},
       availableRoles: [],
       selectedRoles: [],
+      selectedMembers: [],
 
-      allMembers: [],
-      representatives: [],
+
+      revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
-    unformattedMembers: get('currentProject/members'),
-    idManagers() {
-      return this.$store.state.currentProject.managers.map(manager => manager.id);
-    },
-    filteredMembers() {
-      let filtered = this.allMembers;
 
+    MemberCollection() {
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+      if(this.selectedRoles.length > 0){
+        collection['projectRole'] = {
+          in: this.selectedRoles.map(option => option.value).join()
+        };
+      }
       if(this.searchString) {
-        let str = this.searchString.toLowerCase();
-        filtered = filtered.filter(member => {
-          return member.name.toLowerCase().indexOf(str) >= 0 || member.username.toLowerCase().indexOf(str) >= 0;
-        });
+        collection['fullName'] = {
+          ilike: encodeURIComponent(this.searchString)
+        };
       }
 
-      filtered = filtered.filter(member => this.selectedRoles.includes(member.role));
+      return collection;
+    },
 
-      return filtered;
-    },
-    selectedMembers() {
-      return this.allMembers.filter(member => member.selected);
-    },
-    selectAll: {
-      get() {
-        return this.filteredMembers.length > 0 && this.filteredMembers.every(member => {
-          return member.selected || member.id === this.currentUser.id;
-        });
-      },
-      set(value) {
-        this.filteredMembers.forEach(member => {
-          member.selected = (member.id !== this.currentUser.id && value);
-        });
-      }
-    },
+
     exportURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
-    }
-  },
-  methods: {
-    formatMembers() {
-      let selectedIds = this.selectedMembers.map(m => m.id); // store current selection to be able to reselect it
-
-      this.allMembers = this.unformattedMembers.map(uMember => {
-        let member = uMember.clone();
-        member.selected = selectedIds.includes(member.id);
-        member.name = `${member.firstname} ${member.lastname}`;
-
-        if(this.idManagers.includes(member.id)) {
-          member.role = this.managerRole;
-          member.indexRole = 1; // to allow sorting
-        }
-        else {
-          member.role = this.contributorRole;
-          member.indexRole = 0; // to allow sorting
-        }
-
-        let representative = this.representatives.find(r => r.user === member.id);
-        if(representative) {
-          member.representativeId = representative.id;
-          member.indexRole = 2; // to allow sorting
-        }
-
-        return member;
-      });
     },
-    async fetchRepresentatives() {
-      this.representatives = (await ProjectRepresentativeCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id
-      })).array;
+  },
+
+  methods: {
+    displayMemberOrigin(member){
+      let key;
+      if(member.origin === 'LDAP') key = 'LDAP';
+      if(member.origin === 'BOOTSTRAP') key = 'system';
+      else key = 'manual';
+
+      return this.$t(key)
+    },
+    async refreshMembers() {
+      try {
+        this.revision++;
+        await this.$store.dispatch('currentProject/fetchProjectMembers');
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
     },
 
     confirmMembersRemoval() {
@@ -256,22 +238,8 @@ export default {
       });
     },
     async removeSelectedMembers() {
-      let updatedProject = this.project.clone();
-      let users = [];
-      let admins = [];
-      this.allMembers.forEach(member => {
-        if(!member.selected) { // keep only the members not selected for deletion
-          users.push(member.id);
-          if(member.role !== this.contributorRole) {
-            admins.push(member.id);
-          }
-        }
-      });
-      updatedProject.users = users;
-      updatedProject.admins = admins;
-
       try {
-        await updatedProject.save();
+        await this.project.deleteUsers(this.selectedMembers.map(member => member.id))
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
       }
@@ -282,7 +250,7 @@ export default {
     },
 
     confirmToggleManager(member) {
-      if(member.id === this.currentUser.id && member.role !== this.contributorRole) {
+      if(member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
         this.$dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
           message: this.$tc('remove-yourself-from-manager-confirmation-message'),
@@ -298,17 +266,16 @@ export default {
     },
     async toggleManager(member) {
       try {
-        if(member.role !== this.contributorRole) {
-          if(member.representativeId) {
-            await ProjectRepresentative.delete(member.representativeId, this.project.id);
-            await this.fetchRepresentatives();
+        if(member.role !== this.contributorRole.value) {
+          if(member.role == this.representativeRole.value) {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
           await this.project.deleteAdmin(member.id);
         }
         else {
           await this.project.addAdmin(member.id);
         }
-        await this.refreshMembers();
+        this.revision++;
 
         if(member.id === this.currentUser.id) {
           await this.$store.dispatch('currentProject/fetchUIConfig');
@@ -324,38 +291,24 @@ export default {
     },
     async toggleRepresentative(member) {
       try {
-        if(member.representativeId) {
-          await ProjectRepresentative.delete(member.representativeId, this.project.id);
+        if(member.role === this.representativeRole.value) {
+          await ProjectRepresentative.delete(0, this.project.id, member.id);
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
         }
-        await this.fetchRepresentatives();
-        this.formatMembers();
+        this.revision++;
       }
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
-
-    async refreshMembers() {
-      try {
-        await this.$store.dispatch('currentProject/fetchProjectMembers');
-        await this.fetchRepresentatives();
-        this.formatMembers();
-      }
-      catch(error) {
-        console.log(error);
-        this.error = true;
-      }
-    }
-
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole];
     this.selectedRoles = this.availableRoles;
-    await this.refreshMembers();
+    this.revision++;
     this.loading = false;
   }
 };

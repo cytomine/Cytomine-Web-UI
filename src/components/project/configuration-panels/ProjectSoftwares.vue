@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="project-softwares-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -41,10 +55,10 @@
 
       <template #bottom-left>
         <b-select v-model="perPage" size="is-small">
-          <option value="10">10 {{$t('per-page')}}</option>
-          <option value="25">25 {{$t('per-page')}}</option>
-          <option value="50">50 {{$t('per-page')}}</option>
-          <option value="100">100 {{$t('per-page')}}</option>
+          <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+          <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+          <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+          <option value="100">{{$t('count-per-page', {count: 100})}}</option>
         </b-select>
       </template>
     </b-table>
@@ -55,6 +69,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {SoftwareCollection, SoftwareProject, SoftwareProjectCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'project-softwares',
@@ -73,8 +88,8 @@ export default {
     project: get('currentProject/project'),
 
     filteredSoftwares() {
-      let str = this.searchString.toLowerCase();
-      return this.softwares.filter(software => software.name.toLowerCase().indexOf(str) >= 0);
+      let regexp = getWildcardRegexp(this.searchString);
+      return this.softwares.filter(software => regexp.test(software.name));
     }
   },
   methods: {

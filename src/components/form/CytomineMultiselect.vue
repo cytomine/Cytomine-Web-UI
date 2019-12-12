@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <multiselect
   :value="value" @input="$emit('input', $event)"
@@ -29,7 +43,7 @@
 
   <template #selection="{isOpen}" v-if="multiple && options.length > 0">
     <div class="multiselect__tags-wrap" v-if="!isOpen">
-      <strong v-if="allSelected"> {{$t('all')}} </strong>
+      <strong v-if="allSelected"> {{allPlaceholder || $t('all')}} </strong>
       <template v-else>
         <span v-for="(option, index) in displayedOptions" :key="option[trackBy]">
           {{label ? option[label] : option}}<template v-if="index < displayedOptions.length - 1">,</template>
@@ -66,7 +80,8 @@ export default {
     selectAllAvailable: {type: Boolean, default: true},
     searchable: {type: Boolean, default: true},
     allowEmpty: {type: Boolean, default: true},
-    disabled: {type: Boolean, default: false}
+    disabled: {type: Boolean, default: false},
+    allPlaceholder: {type: String}
   },
   data() {
     return {

@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="annotation-details">
   <table class="table">
@@ -66,6 +80,13 @@
             </div>
           </div>
           <em v-else-if="!associatedTerms.length">{{$t('no-term')}}</em>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <h5>{{$t('tags')}}</h5>
+          <cytomine-tags :object="annotation" :canEdit="canEdit" />
         </td>
       </tr>
 
@@ -155,6 +176,7 @@ import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import OntologyTree from '@/components/ontology/OntologyTree';
@@ -167,6 +189,7 @@ export default {
     CytomineDescription,
     CytomineTerm,
     OntologyTree,
+    CytomineTags,
     CytomineProperties,
     AttachedFiles,
     AnnotationCommentsModal

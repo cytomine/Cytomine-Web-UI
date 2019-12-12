@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -81,6 +95,7 @@
 
 <script>
 import {get, sync} from '@/utils/store-helpers';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 import {OntologyCollection} from 'cytomine-client';
 import OntologyDetails from './OntologyDetails';
@@ -107,8 +122,8 @@ export default {
     },
     filteredOntologies() {
       if(this.searchString.length > 0) {
-        let str = this.searchString.toLowerCase();
-        return this.ontologies.filter(ontology => ontology.name.toLowerCase().indexOf(str) >= 0);
+        let regexp = getWildcardRegexp(this.searchString);
+        return this.ontologies.filter(ontology => regexp.test(ontology.name));
       }
       return this.ontologies;
     },

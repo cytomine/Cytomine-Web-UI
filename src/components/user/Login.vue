@@ -1,9 +1,24 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="panel">
   <template v-if="forgotUsername">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-username')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="sendUsername">
@@ -23,6 +38,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-password')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="resetPassword()">
@@ -44,6 +60,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('login')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="login()">
@@ -80,12 +97,15 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+import {changeLanguageMixin} from '@/lang.js';
 import {Cytomine} from 'cytomine-client';
 import Register from './Register';
 
 export default {
   name: 'login',
   components: {Register},
+  mixins: [changeLanguageMixin],
   data() {
     return {
       username: '',
@@ -100,23 +120,27 @@ export default {
       registering: false
     };
   },
+  computed: {
+    currentUser: get('currentUser/user')
+  },
   methods: {
     async login() {
       try {
-        let successMessage = this.$t('notif-success-login');
         await this.$store.dispatch('currentUser/login', {
           username: this.username,
           password: this.password,
           rememberMe: this.rememberMe
         });
-        if(this.$store.state.currentUser.user) {
-          this.$notify({type: 'success', text: successMessage});
+        if(this.currentUser) {
+          this.changeLanguage(this.currentUser.language);
+          this.$notify({type: 'success', text: this.$t('notif-success-login')});
         }
         else {
           this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
         }
       }
       catch(error) {
+        console.log(error);
         this.$notify({type: 'error', text: error.response.data.message});
       }
     },
@@ -133,11 +157,11 @@ export default {
     async resetPassword() {
       try {
         await Cytomine.instance.forgotPassword(this.username);
-        this.$notify({type: 'success', text: this.$t('notif-success-forgot-username')});
+        this.$notify({type: 'success', text: this.$t('notif-success-forgot-password')});
         this.forgotPassword = false;
       }
       catch(error) {
-        this.$notify({type: 'error', text: this.$t('notif-error-forgot-username')});
+        this.$notify({type: 'error', text: this.$t('notif-error-forgot-password')});
       }
     }
   }
@@ -162,5 +186,9 @@ export default {
 
 .forgot-credentials a {
   text-transform: lowercase;
+}
+
+.panel-heading img {
+  float: right;
 }
 </style>

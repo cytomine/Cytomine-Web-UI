@@ -1,4 +1,18 @@
-import {isBetweenBounds} from '@/utils/bounds';
+/*
+* Copyright (c) 2009-2019. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 export default {
   namespaced: true,
@@ -9,10 +23,11 @@ export default {
 
       filtersOpened: false,
       filters: {
-        formats: null,
-        vendors: null,
-        magnifications: null,
-        resolutions: null,
+        formats: [],
+        vendors: [],
+        selectedTags: [],
+        magnifications: [],
+        resolutions: [],
         boundsWidth: null,
         boundsHeight: null,
         boundsUserAnnotations: null,
@@ -22,10 +37,8 @@ export default {
 
       currentPage: 1,
       perPage: 10,
-      sort: {
-        field: null,
-        order: 'asc'
-      },
+      sortField: null,
+      sortOrder: 'asc',
       openedDetails: []
     };
   },
@@ -51,8 +64,12 @@ export default {
       state.perPage = perPage;
     },
 
-    setSort(state, sort) {
-      state.sort = sort;
+    setSortField(state, field) {
+      state.sortField = field;
+    },
+
+    setSortOrder(state, order) {
+      state.sortOrder = order;
     },
 
     setOpenedDetails(state, value) {
@@ -61,35 +78,8 @@ export default {
   },
 
   getters: {
-    filteredImages: (state, getters) => images => {
-      let str = state.searchString.toLowerCase();
-      return images.filter(image => {
-        return (!str || (image.instanceFilename && image.instanceFilename.toLowerCase().indexOf(str) >= 0) ||
-          (image.blindedName && image.blindedName.toLowerCase().indexOf(str) >= 0)) &&
-          getters.checkMultiselectFilter('formats', image.extension) &&
-          getters.checkMultiselectFilter('vendors', image.vendorFormatted) &&
-          getters.checkMultiselectFilter('magnifications', image.magnificationFormatted) &&
-          getters.checkMultiselectFilter('resolutions', image.resolutionFormatted) &&
-          getters.checkBoundsFilter('boundsWidth', image.width) &&
-          getters.checkBoundsFilter('boundsHeight', image.height) &&
-          getters.checkBoundsFilter('boundsUserAnnotations', image.numberOfAnnotations) &&
-          getters.checkBoundsFilter('boundsJobAnnotations', image.numberOfJobAnnotations) &&
-          getters.checkBoundsFilter('boundsReviewedAnnotations', image.numberOfReviewedAnnotations);
-      });
-    },
-
-    checkMultiselectFilter: state => (filterName, value) => {
-      let selected = state.filters[filterName];
-      return !selected || selected.includes(value);
-    },
-
-    checkBoundsFilter: state => (filterName, value) => {
-      let bounds = state.filters[filterName];
-      return !bounds || isBetweenBounds(value, bounds);
-    },
-
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
     }
   }
 };

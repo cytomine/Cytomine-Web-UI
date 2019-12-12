@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="layers">
   <h1>{{ $t('annotation-layers') }}</h1>
@@ -39,6 +53,9 @@
               <span class="fas fa-times"></span>
             </button>
           </td>
+        </tr>
+        <tr v-if="selectedLayers.length === 0">
+          <td colspan="4" class="has-text-grey is-italic">{{$t('no-selected-layers')}}</td>
         </tr>
       </tbody>
     </table>
@@ -153,6 +170,32 @@ export default {
     }
   },
   methods: {
+    addAnnotationEventHandler(annot, saved = true) {
+      this.annotationEventHandler(annot);
+      let updatedProject = this.$store.state.currentProject.project.clone();
+
+      if(annot.type === 'UserAnnotation') {
+        if(saved) updatedProject.numberOfAnnotations++;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations++;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
+    },
+    deleteAnnotationEventHandler(annot) {
+      this.annotationEventHandler(annot);
+
+      let updatedProject = this.$store.state.currentProject.project.clone();
+      if(annot.type === 'UserAnnotation') {
+        updatedProject.numberOfAnnotations--;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations--;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
+    },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {
         this.fetchIndexLayers();
@@ -286,12 +329,14 @@ export default {
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {
-    this.$eventBus.$on(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$on('addAnnotation', this.addAnnotationEventHandler);
+    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off(['addAnnotation', 'deleteAnnotation'], this.annotationEventHandler);
+    this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
+    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }

@@ -1,11 +1,28 @@
+/*
+* Copyright (c) 2009-2019. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 function getDefaultState() {
   return {
     searchString: '',
 
     filtersOpened: false,
     filters: {
-      selectedOntologies: null,
-      selectedRoles: null,
+      selectedOntologies: [],
+      selectedRoles: [],
+      selectedTags: [],
       boundsMembers: null,
       boundsImages: null,
       boundsUserAnnotations: null,
@@ -15,10 +32,8 @@ function getDefaultState() {
 
     currentPage: 1,
     perPage: 10,
-    sort: {
-      field: 'lastActivity',
-      order: 'desc'
-    },
+    sortField: 'lastActivity',
+    sortOrder: 'desc',
     openedDetails: []
   };
 }
@@ -53,8 +68,12 @@ export default {
       state.perPage = perPage;
     },
 
-    setSort(state, sort) {
-      state.sort = sort;
+    setSortField(state, field) {
+      state.sortField = field;
+    },
+
+    setSortOrder(state, order) {
+      state.sortOrder = order;
     },
 
     setOpenedDetails(state, value) {
@@ -64,7 +83,7 @@ export default {
 
   getters: {
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
     }
   }
 };

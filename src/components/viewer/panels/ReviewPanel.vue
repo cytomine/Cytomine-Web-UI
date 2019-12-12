@@ -1,29 +1,37 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div>
   <h1>{{$t('review')}}</h1>
   <template v-if="image.reviewed">
-    <template v-if="isReviewer">
-      <b-message type="is-success" size="is-small" has-icon>
-        <i18n path="you-have-validated-image-on">
-          <span place="date">{{ Number(image.reviewStop) | moment('ll LT') }}</span>
-        </i18n>
-      </b-message>
-      <button class="button is-small is-fullwidth" @click="unvalidate()">
-        <span class="icon"><i class="fas fa-thumbs-down"></i></span>
-        <span>{{$t('button-unvalidate-and-continue-review')}}</span>
-      </button>
-    </template>
-
-    <b-message type="is-success" size="is-small" has-icon v-else>
-      <i18n path="image-validated-by-on">
-        <username place="user" :user="reviewer" />
+    <b-message type="is-success" size="is-small" has-icon>
+      <i18n :path="isReviewer ? 'you-have-validated-image-on' : 'image-validated-by-on'">
+        <username v-if="!isReviewer" place="user" :user="reviewer" />
         <span place="date">{{ Number(image.reviewStop) | moment('ll LT') }}</span>
       </i18n>
     </b-message>
+
+    <button v-if="isReviewer" class="button is-small is-fullwidth" @click="unvalidate()">
+      <span class="icon"><i class="fas fa-thumbs-down"></i></span>
+      <span>{{$t('button-unvalidate-and-continue-review')}}</span>
+    </button>
   </template>
 
   <template v-else-if="image.inReview">
-      <div v-if="isReviewer && !reviewMode">
+    <template v-if="isReviewer">
+      <div v-if="!reviewMode">
         <b-message type="is-info" size="is-small" has-icon>
           <i18n path="you-are-reviewing-image-since">
             <span place="date">{{ Number(image.reviewStart) | moment('ll LT') }}</span>
@@ -35,7 +43,7 @@
         </button>
       </div>
 
-      <div v-else-if="isReviewer && reviewMode">
+      <div v-else>
           <div class="small">
             <i18n path="review-list-visible-layers">
               <list-usernames place="visibleLayers" :users="visibleUserLayers" />
@@ -72,13 +80,14 @@
             </button>
           </div>
       </div>
+    </template>
 
-      <b-message v-else type="is-info" size="is-small" has-icon>
-        <i18n path="image-in-review-by-since">
-          <username place="user" :user="reviewer" />
-          <span place="date">{{ Number(image.reviewStart) | moment('ll LT') }}</span>
-        </i18n>
-      </b-message>
+    <b-message v-else type="is-info" size="is-small" has-icon>
+      <i18n path="image-in-review-by-since">
+        <username place="user" :user="reviewer" />
+        <span place="date">{{ Number(image.reviewStart) | moment('ll LT') }}</span>
+      </i18n>
+    </b-message>
   </template>
 
   <template v-else>
