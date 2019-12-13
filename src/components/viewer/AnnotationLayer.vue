@@ -1,9 +1,23 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <vl-layer-vector
   :visible="layer.visible"
   :extent="imageExtent"
   :update-while-interacting="false"
-> <!-- TODO: set to true to compare perfs -->
+>
 
   <vl-source-vector
     ref="olSource"
@@ -169,7 +183,6 @@ export default {
         if(!olFeature) {
           return;
         }
-        olFeature.set('deleted', true); // TODO: is it still needed?
         this.$refs.olSource.removeFeature(olFeature);
 
         if(this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
@@ -267,9 +280,6 @@ export default {
         return;
       }
 
-      // TODO: test performances
-      // TODO: in core, add method allowing to retrieve only created/updated/deleted annotations since a given
-      // timestamp? would probably be more efficient than current approach
       let arrayAnnots;
       try {
         arrayAnnots = await this.fetchAnnots(extent);

@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="box error" v-if="!configUI['project-annotations-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -78,7 +92,7 @@
       <h2> {{ $t('filters') }} </h2>
       <div class="filters">
         <div class="columns">
-          <div class="column filter is-one-third">
+          <div class="column filter is-one-quarter">
             <div class="filter-label">
               {{$t('annotation-type')}}
             </div>
@@ -92,7 +106,7 @@
             </div>
           </div>
 
-          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-third">
+          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-quarter">
             <div class="filter-label">
               {{$t('analyses')}}
             </div>
@@ -108,7 +122,7 @@
             </div>
           </div>
 
-          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-third">
+          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-quarter">
             <div class="filter-label">
               {{$t('members')}}
             </div>
@@ -123,7 +137,7 @@
             </div>
           </div>
 
-          <div v-else class="column filter is-one-third">
+          <div v-else class="column filter is-one-quarter">
             <div class="filter-label">
               {{$t('reviewers')}}
             </div>
@@ -183,6 +197,16 @@
             </div>
           </div>
 
+          <div class="column filter is-one-quarter">
+            <div class="filter-label">
+              {{$t('tags')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                                    label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+            </div>
+          </div>
+
           <div class="column filter">
             <div class="filter-label">
               {{$t('from')}}
@@ -225,6 +249,8 @@
       :tracks-ids="selectedTracksIds"
       :imagesIds="selectedImagesIds"
       :usersIds="selectedUsersIds"
+      :tagsIds="tagsIdsNotNull"
+      :noTag="noTag"
       :reviewed="reviewed"
       :reviewUsersIds="reviewUsersIds"
       :afterThan="afterThan"
@@ -263,7 +289,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -314,6 +340,7 @@ export default {
       annotationTypes: [],
 
       images: [],
+      availableTags:[],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
       multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
@@ -422,6 +449,7 @@ export default {
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
+    selectedTags: localSyncMultiselectFilter('tags', 'availableTags'),
     selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
@@ -481,8 +509,22 @@ export default {
       return this.selectedTracksIds.includes(this.noTrackOption.id);
     },
 
+    selectedTagsIds() {
+      return this.selectedTags.map(t => t.id);
+    },
+    tagsIdsNotNull() {
+      if(this.selectedTagsIds.indexOf('null') >= 0) {
+        let x = this.selectedTagsIds.slice();
+        x.splice(x.indexOf('null'), 1);
+        return x;
+      }
+      return this.selectedTagsIds;
+    },
+    noTag() {
+      return this.selectedTagsIds.indexOf('null') >= 0;
+    },
     collection() {
-      return new AnnotationCollection({
+      let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds,
         images: this.selectedImagesIds,
@@ -494,6 +536,13 @@ export default {
         afterThan: this.afterThan,
         beforeThan: this.beforeThan
       });
+
+      if(this.selectedTagsIds.length > 0 && this.selectedTagsIds.length < this.availableTags.length) {
+        collection['tags'] = this.selectedTagsIds;
+        collection['noTag'] = this.noTag;
+      }
+
+      return collection;
     },
   },
   methods: {
@@ -518,6 +567,9 @@ export default {
     },
     async fetchTracks() {
       this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+    },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
     downloadURL(format) {
       return this.collection.getDownloadURL(format);
@@ -568,7 +620,8 @@ export default {
         this.fetchImages(),
         this.fetchUsers(),
         this.fetchUserJobs(),
-        this.fetchTracks()
+        this.fetchTracks(),
+        this.fetchTags()
       ]);
     }
     catch(error) {

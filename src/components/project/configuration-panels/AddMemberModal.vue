@@ -1,9 +1,23 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <cytomine-modal :active="active" :title="$t('add-members-to-project')" @close="$emit('update:active', false)">
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
       <b-field>
-        <user-taginput v-model="selectedUsers" :users="notMemberUsers" />
+        <domain-tag-input v-model="selectedMembers" :domains="notMemberUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>
       </b-field>
     </template>
 
@@ -22,7 +36,7 @@
 import {get} from '@/utils/store-helpers';
 
 import {UserCollection} from 'cytomine-client';
-import UserTaginput from '@/components/user/UserTaginput';
+import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
 
@@ -33,22 +47,21 @@ export default {
   },
   components: {
     CytomineModal,
-    UserTaginput
+    DomainTagInput,
   },
   data() {
     return {
       loading: true,
       users: [],
-      filteredUsers: [],
-      selectedUsers: []
+      selectedMembers: []
     };
   },
   computed: {
     project: get('currentProject/project'),
     projectMembersIds() {
       let projectMembers = this.$store.state.currentProject.members;
-      let excluded = projectMembers.concat(this.selectedUsers);
-      return excluded.map(u => u.id);
+      let newProjectMembers = projectMembers.concat(this.selectedMembers);
+      return newProjectMembers.map(u => u.id);
     },
     notMemberUsers() {
       return this.users.filter(user => !this.projectMembersIds.includes(user.id));
@@ -56,16 +69,13 @@ export default {
   },
   watch: {
     active() {
-      this.selectedUsers = [];
+      this.selectedMembers = [];
     }
   },
   methods: {
     async addMembers() {
-      let updatedProject = this.project.clone();
-      updatedProject.users = this.projectMembersIds;
-
       try {
-        await updatedProject.save();
+        await this.project.addUsers(this.selectedMembers.map(member => member.id));
         this.$emit('addMembers');
         this.$notify({type: 'success', text: this.$t('notif-success-add-project-members')});
       }

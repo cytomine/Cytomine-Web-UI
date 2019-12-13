@@ -1,4 +1,21 @@
-import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from 'cytomine-client';
+/*
+* Copyright (c) 2009-2019. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
+
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
@@ -82,11 +99,13 @@ export default {
     },
 
     async fetchProjectMembers({state, commit}) {
-      let managersPromise = state.project.fetchAdministrators();
-      let membersPromise = state.project.fetchUsers();
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: state.project.id,
+      });
 
-      let managers = (await managersPromise).array;
-      let members = (await membersPromise).array;
+      let members =  (await collection.fetchAll()).array;
+      let managers = members.filter(u => u.role == ProjectMemberRole.MANAGER || u.role == ProjectMemberRole.REPRESENTATIVE );
 
       members.forEach(member => member.fullName = fullName(member));
 

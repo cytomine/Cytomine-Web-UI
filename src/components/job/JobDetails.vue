@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="job-details-wrapper">
   <b-loading :is-full-page="false" :active.sync="loading" class="small" />
@@ -75,6 +89,12 @@
             </td>
             <td v-else>
               <em class="has-text-grey">{{$t('not-found')}}</em>
+            </td>
+          </tr>
+          <tr>
+            <td class="prop-label">{{$t('tags')}}</td>
+            <td class="prop-content">
+              <cytomine-tags :object="job" :canEdit="canManageProject" />
             </td>
           </tr>
           <tr v-if="hasAnnotationResult">
@@ -175,6 +195,7 @@ import {Job, JobStatus, JobDataCollection, Task} from 'cytomine-client';
 import filesize from 'filesize';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTask from '@/components/utils/CytomineTask';
+import CytomineTags from '@/components/tag/CytomineTags';
 
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
@@ -187,7 +208,8 @@ export default {
   },
   components: {
     CytomineModal,
-    CytomineTask
+    CytomineTask,
+    CytomineTags
   },
   data() {
     return {
@@ -211,6 +233,9 @@ export default {
     currentUser: get('currentUser/user'),
     canEdit() {
       return this.$store.getters['currentProject/canDeleteJob'](this.job);
+    },
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
     },
     isRunning() {
       return this.job.status === JobStatus.RUNNING;

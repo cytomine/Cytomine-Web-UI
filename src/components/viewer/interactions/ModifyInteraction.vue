@@ -1,9 +1,23 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div>
   <vl-interaction-modify
     v-if="activeEditTool === 'modify'"
+    :source="selectSource"
     ref="olModifyInteraction"
-    :source="`select-target-${index}`"
     :delete-condition="deleteCondition"
     @modifystart="startEdit"
     @modifyend="endEdit"
@@ -11,14 +25,14 @@
 
   <vl-interaction-translate
     v-if="activeEditTool === 'translate'"
-    :source="`select-target-${index}`"
+    :source="selectSource"
     @translatestart="startEdit"
     @translateend="endEdit"
   />
 
   <vl-interaction-rotate
     v-if="activeEditTool === 'rotate'"
-    :source="`select-target-${index}`"
+    :source="selectSource"
     @rotatestart="startEdit"
     @rotateend="endEdit"
   />
@@ -49,6 +63,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    selectSource() {
+      return `select-target-${this.index}`;
     },
     activeEditTool() {
       return this.imageWrapper.draw.activeEditTool;
@@ -90,7 +107,7 @@ export default {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-update')});
           annot.location = oldLocation;
-          feature.setGeometry(this.format.readGeometry(annot.location)); // TODO: use store mutation?
+          feature.setGeometry(this.format.readGeometry(annot.location));
         }
       });
       this.ongoingEdit = false;

@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <form @submit.prevent="createProject()">
   <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
@@ -50,13 +64,14 @@
 </template>
 
 <script>
-import {Project, Ontology, OntologyCollection} from 'cytomine-client';
+import {Project, Ontology} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
   name: 'add-project-modal',
   props: {
-    active: Boolean
+    active: Boolean,
+    ontologies: Array
   },
   components: {CytomineModal},
   $_veeValidate: {validator: 'new'},
@@ -64,7 +79,6 @@ export default {
     return {
       name: '',
       ontology: 'NEW',
-      ontologies: [],
       selectedOntology: null
     };
   },
@@ -103,10 +117,6 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
       }
     }
-  },
-  async created() {
-    this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
-    this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
   }
 };
 </script>

@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="box error" v-if="!configUI['project-jobs-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -74,20 +88,15 @@
         </div>
       </div>
 
-      <b-table
-        :data="filteredJobs"
-        :paginated="true"
-        :current-page.sync="currentPage"
-        :per-page="perPage"
-        pagination-size="is-small"
-        detailed
-        detail-key="id"
-        :opened-detailed.sync="openedDetails"
-        :default-sort="sort.field"
-        :default-sort-direction="sort.order"
-        @sort="updateSort"
+      <cytomine-table
+        :collection="jobCollection"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :openedDetailed.sync="openedDetails"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
+        :revision="revision"
       >
-
         <template #default="{row: job}">
           <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
             <a @click="toggleFavorite(job)" v-if="canEdit(job)">
@@ -95,7 +104,8 @@
             </a>
             <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
           </b-table-column>
-          <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
+
+          <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
             <router-link :to="`/software/${job.software}`">
               {{job.softwareName}}
             </router-link>
@@ -122,7 +132,7 @@
           <job-details
             :key="job.id"
             :job="job"
-            @update="props => job.populate(props)"
+            @update="revision++"
             @delete="deleteJob(job)"
           />
         </template>
@@ -132,16 +142,7 @@
             <p>{{$t('no-analysis-run')}}</p>
           </div>
         </template>
-
-        <template #bottom-left>
-          <b-select v-model="perPage" size="is-small">
-            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
-            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
-            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
-            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
-          </b-select>
-        </template>
-      </b-table>
+      </cytomine-table>
     </div>
   </div>
 
@@ -156,6 +157,8 @@ import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';
+
+import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import jobStatusMapping from '@/utils/job-utils';
@@ -172,6 +175,7 @@ export default {
     JobStatus,
     JobDetails,
     AddJobModal,
+    CytomineTable,
     CytomineMultiselect,
     CytomineDatepicker
   },
@@ -179,8 +183,10 @@ export default {
     return {
       loading: true,
       error: false,
-      jobs: [],
-      launchModal: false
+      launchModal: false,
+      availableSoftwares: [],
+      availableLaunchers: [],
+      revision: 0
     };
   },
   computed: {
@@ -194,12 +200,6 @@ export default {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
     },
 
-    availableSoftwares() {
-      return [...new Set(this.jobs.map(job => job.softwareName))];
-    },
-    availableLaunchers() {
-      return [...new Set(this.jobs.map(job => job.username))].filter(name => name); // TODO: remove filter (HACK to remove empty username)
-    },
     availableStatus() {
       return Object.keys(jobStatusMapping).map(key => {
         return {label: this.$t(jobStatusMapping[key].label), status: key};
@@ -222,42 +222,59 @@ export default {
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
     selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
 
-    filteredJobs() {
-      let selectedStatusValues = this.selectedStatus.map(obj => Number(obj.status));
-      let selectedFavoritesValues = this.selectedFavorites.map(obj => Boolean(obj.value));
-      return this.jobs.filter(job => {
-        let correctDate = this.selectedDate ? moment(Number(job.created)).isSame(this.selectedDate, 'day') : true;
-        return this.selectedSoftwares.includes(job.softwareName) &&
-                    this.selectedLaunchers.includes(job.username) &&
-                    correctDate &&
-                    selectedStatusValues.includes(job.status) &&
-                    selectedFavoritesValues.includes(job.favorite);
+    jobCollection() {
+      let collection = new JobCollection({
+        project: this.project.id
       });
+      if(this.selectedSoftwares.length > 0){
+        collection['softwareName'] = {
+          in: this.selectedSoftwares
+        };
+      }
+      if(this.selectedLaunchers.length > 0){
+        collection['username'] = {
+          in: this.selectedLaunchers
+        };
+      }
+      if(this.selectedStatus.length > 0){
+        collection['status'] = {
+          in: this.selectedStatus.map(option => option.status).join()
+        };
+      }
+      if(this.selectedFavorites.length > 0) {
+        collection['favorite'] = {
+          in: this.selectedFavorites.map(option => option.value).join()
+        }
+      }
+      if(this.selectedDate) {
+        collection.created = {
+          gte: this.selectedDate.getTime(),
+          lte: new Date(this.selectedDate).setHours(15, 15, 59, 999)
+        };
+      }
+      return collection;
     },
 
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
-    sort: sync('sort', storeOptions),
-    openedDetailsStore: get('openedDetails', storeOptions),
-    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
-      get() {
-        return this.openedDetailsStore.slice();
-      },
-      set(value) {
-        this.$store.commit(this.storeModule + '/setOpenedDetails', value);
-      }
-    }
+    sortField: sync('sortField', storeOptions),
+    sortOrder: sync('sortOrder', storeOptions),
+    openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
     canEdit(job) {
       return this.$store.getters['currentProject/canDeleteJob'](job);
     },
-    updateSort(field, order) {
-      this.sort = {field, order};
+    async fetchMultiselectOptions() {
+      let stats = await JobCollection.fetchBounds({project: this.project.id});
+      this.availableSoftwares = stats.software.list.map(option => option.name);
+      this.availableLaunchers = stats.username.list;
     },
-    addJob(job) {
-      this.jobs.unshift(job);
+
+    async addJob(job) {
       this.openedDetails = [job.id, ...this.openedDetails];
+      await this.fetchMultiselectOptions();
+      this.revision++;
     },
     async toggleFavorite(job) {
       job.favorite = !job.favorite;
@@ -267,11 +284,12 @@ export default {
     async deleteJob(jobToDelete) {
       try {
         await jobToDelete.delete();
-        this.jobs = this.jobs.filter(job => job.id !== jobToDelete.id);
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-analysis-deletion')
         });
+        this.fetchMultiselectOptions();
+        this.revision++;
       }
       catch(error) {
         this.$notify({
@@ -279,25 +297,17 @@ export default {
           text: this.$t('notif-error-analysis-deletion')
         });
       }
-    },
-    async refreshJobs() {
-      try {
-        this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-
-        // if a job was deleted, the currentPage value might not be valid => reinitialize it
-        if((this.currentPage - 1)*this.perPage >= this.filteredJobs.length) {
-          this.currentPage = 1;
-        }
-      }
-      catch(error) {
-        console.log(error);
-        this.error = true;
-      }
     }
   },
   async created() {
-    await this.refreshJobs();
-    this.loading = false;
+    try {
+      await this.fetchMultiselectOptions();
+      this.loading = false;
+    }
+    catch(error) {
+      console.log(error);
+      this.error = true;
+    }
   }
 };
 </script>
