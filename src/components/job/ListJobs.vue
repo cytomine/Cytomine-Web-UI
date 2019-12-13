@@ -90,6 +90,7 @@
 
       <cytomine-table
         :collection="jobCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -221,6 +222,10 @@ export default {
     selectedDate: sync('executionDate', storeOptions),
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
     selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
+
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'];
+    },
 
     jobCollection() {
       let collection = new JobCollection({
