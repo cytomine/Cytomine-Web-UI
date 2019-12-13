@@ -162,7 +162,6 @@ import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import jobStatusMapping from '@/utils/job-utils';
-import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -244,7 +243,7 @@ export default {
       if(this.selectedFavorites.length > 0) {
         collection['favorite'] = {
           in: this.selectedFavorites.map(option => option.value).join()
-        }
+        };
       }
       if(this.selectedDate) {
         collection.created = {

@@ -134,13 +134,13 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
-import {Cytomine, UserCollection, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
+import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
 
 export default {
   name: 'projet-members',
@@ -211,7 +211,7 @@ export default {
       if(member.origin === 'BOOTSTRAP') key = 'system';
       else key = 'manual';
 
-      return this.$t(key)
+      return this.$t(key);
     },
     async refreshMembers() {
       try {
@@ -239,7 +239,7 @@ export default {
     },
     async removeSelectedMembers() {
       try {
-        await this.project.deleteUsers(this.selectedMembers.map(member => member.id))
+        await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
       }
