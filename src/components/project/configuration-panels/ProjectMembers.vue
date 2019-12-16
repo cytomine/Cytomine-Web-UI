@@ -69,14 +69,13 @@
         </b-table-column>
 
         <b-table-column field="projectRole" :label="$t('role')" sortable width="50">
-          <span class="icons">
-            <a @click="confirmToggleManager(member)">
-              <i class="fas fa-user-cog" :class="{disabled: member.role === contributorRole.value}"></i>
-            </a>
-            <a v-if="member.role !== contributorRole.value" @click="toggleRepresentative(member)">
-              <i class="fas fa-flag" :class="{disabled: member.role !== representativeRole.value}"></i>
-            </a>
-          </span>
+          <icon-project-member-role
+            :is-manager="member.role !== contributorRole.value"
+            :is-representative="member.role === representativeRole.value"
+            editable
+            @toggleManager="confirmToggleManager(member)"
+            @toggleRepresentative="toggleRepresentative(member)"
+          />
         </b-table-column>
 
         <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
@@ -107,26 +106,9 @@
 
     <div class="legend">
       <h2>{{$t('legend')}}</h2>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog disabled"></i>
-        </span>
-        {{$t('project-contributor')}}
-      </p>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog"></i>
-          <i class="fas fa-flag disabled"></i>
-        </span>
-        {{$t('project-manager')}}
-      </p>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog"></i>
-          <i class="fas fa-flag"></i>
-        </span>
-        {{$t('project-representative')}}
-      </p>
+      <p><icon-project-member-role /> : {{$t('project-contributor')}}</p>
+      <p><icon-project-member-role :is-manager="true" /> : {{$t('project-manager')}}</p>
+      <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('project-representative')}}</p>
     </div>
 
     <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()" />
@@ -142,10 +124,12 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
 import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
   name: 'projet-members',
   components: {
+    IconProjectMemberRole,
     CytomineTable,
     CytomineMultiselect,
     AddMemberModal
