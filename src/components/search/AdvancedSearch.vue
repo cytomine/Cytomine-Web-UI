@@ -62,10 +62,10 @@
     </div>
     <p class="panel-tabs">
       <a :class="{'is-active': activeTab === 'projects'}" @click="activeTab = 'projects'">
-        {{$t('projects')}} ({{this.projects.totalNbItems}})
+        {{$t('projects')}} ({{this.nbProjects}})
       </a>
       <a :class="{'is-active': activeTab === 'images'}" @click="activeTab = 'images'">
-        {{$t('images')}} ({{this.images.totalNbItems}})
+        {{$t('images')}} ({{this.nbImages}})
       </a>
     </p>
     <div class="panel-block">
@@ -84,8 +84,8 @@
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
-          :data.sync="projects"
           :revision="revision"
+          @setCollectionSize="nbProjects = $event"
         >
           <template #default="{row: project}">
             <b-table-column field="currentUserRole" label="" centered width="1" sortable>
@@ -179,8 +179,8 @@
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
-          :data.sync="images"
           :revision="revision"
+          @setCollectionSize="nbImages = $event"
         >
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')" width="100">
@@ -287,8 +287,8 @@ export default {
       loading: true,
       error: false,
 
-      projects:[],
-      images: [],
+      nbProjects: 0,
+      nbImages: 0,
 
       availableTags:[],
       revision: 0,
