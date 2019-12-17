@@ -97,7 +97,6 @@ export default {
   },
   methods: {
     viewAnnot() {
-      this.$router.push(`/project/${this.annot.project}/image/${this.annot.image}/annotation/${this.annot.id}`);
       this.$emit('selectAnnotation');
     },
     close(event) {
