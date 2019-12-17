@@ -293,7 +293,7 @@ export default {
     },
     uploadedFileCollection() {
       return new UploadedFileCollection({
-        detailed: true,
+        onlyRootsWithDetails: true,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
     }
