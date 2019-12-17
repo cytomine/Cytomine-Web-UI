@@ -154,6 +154,7 @@ all-resolutions,All,Toutes
 all-dates,All,Toutes
 my-role,My role,Mon rôle
 legend,Legend,Légende
+contributor-icon-label,You are a contributor of this project,Vous êtes un contributeur du projet
 manager-icon-label,You are a manager of this project,Vous êtes un responsable du projet
 representative-icon-label,You are a representative of this project,Vous êtes une personne de contact du projet
 and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres
