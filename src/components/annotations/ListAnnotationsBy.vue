@@ -149,13 +149,13 @@ export default {
         multipleTerm: this.multipleTerms,
         noTrack: this.noTrack,
         multipleTrack: this.multipleTracks,
-        noTag: (this.tagsIds) ? this.noTag : null,
+        noTag: this.noTag,
 
         terms: (!this.isByTerm) ? this.termsIds.filter(id => id > 0) : null,
         users: (!this.isByUser) ? this.usersIds : null,
         images: (!this.isByImage) ? this.imagesIds : null,
         tracks: (!this.isByTrack) ? this.tracksIds.filter(id => id > 0) : null,
-        tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
+        tags: (!this.isByTag) ? this.tagsIds.filter(id => id > 0) : null,
 
         reviewed: this.reviewed,
         reviewUsers: (!this.isByUser) ? this.reviewUsersIds : null,
@@ -294,7 +294,7 @@ export default {
       this.pendingReload = false;
 
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || (this.tagsIds ? !this.tagsIds.length : 0)) {
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || !this.tagsIds.length) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;
