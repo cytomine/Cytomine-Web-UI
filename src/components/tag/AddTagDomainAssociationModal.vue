@@ -15,24 +15,21 @@
 
 <template>
 <cytomine-modal-card :title="$t('associate-tags')" active>
-    <template>
-      <b-field>
-        <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-tag" allowNew />
-      </b-field>
-    </template>
+  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <template v-if="!loading">
+    <b-field>
+      <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-or-create-tag" allowNew />
+    </b-field>
+  </template>
 
-    <div class="explaination">
-        <p>{{$t('how-to-add-not-yet-existing-tag')}}</p>
-    </div>
-
-    <template #footer>
-      <button class="button" @click="$parent.close()">
-        {{$t('button-cancel')}}
-      </button>
-      <button class="button is-link" @click="addAssociations">
-        {{$t('button-add')}}
-      </button>
-    </template>
+  <template #footer>
+    <button class="button" @click="$parent.close()">
+      {{$t('button-cancel')}}
+    </button>
+    <button class="button is-link" @click="addAssociations">
+      {{$t('button-add')}}
+    </button>
+  </template>
 </cytomine-modal-card>
 </template>
 
@@ -53,6 +50,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       tags: [],
       selectedTags: []
     };
@@ -74,6 +72,7 @@ export default {
   },
   async created() {
     this.fetchTags();
+    this.loading = false;
   }
 };
 </script>
@@ -81,12 +80,6 @@ export default {
 <style scoped>
 >>> .modal-card, >>> .modal-card-body {
   overflow: visible !important;
-  width: 60vw !important;
-}
-
-.explaination {
-  margin-top: 2rem;
-  padding-right: 1.5em;
 }
 
 </style>
