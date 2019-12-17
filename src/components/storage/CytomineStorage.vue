@@ -57,8 +57,14 @@
           <strong>{{$t('link-with-project')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedProjects" :options="projects" label="name" track-by="id"
-                                          :multiple="true" />
+          <cytomine-multiselect
+            v-model="selectedProjects"
+            :options="projects"
+            label="name"
+            track-by="id"
+            :multiple="true"
+            :close-on-select="true"
+          />
         </div>
       </div>
 
