@@ -14,10 +14,10 @@
 
 
 <template>
-<form @submit.prevent="createTag()">
-  <cytomine-modal :active="active" :title="$t('new-tag')" @close="$emit('update:active', false)">
+<form @submit.prevent="save()">
+  <cytomine-modal :active="active" :title="title" @close="$emit('update:active', false)">
     <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-      <b-input v-model="name" name="name" v-validate="'required'" />
+      <b-input v-model="internalTag['name']" name="name" v-validate="'required'" />
     </b-field>
 
     <template #footer>
@@ -33,45 +33,57 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
 import {Tag} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
-  name: 'add-tag-modal',
+  name: 'tag-modal',
   props: {
-    active: Boolean
+    active: Boolean,
+    tag: Object
   },
   components: {CytomineModal},
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-      name: ''
+      internalTag: {},
+      displayErrors: false,
     };
+  },
+  computed: {
+    editionMode() {
+      return Boolean(this.tag);
+    },
+    title() {
+      return this.$t(this.editionMode ? 'update-tag' : 'create-tag');
+    },
   },
   watch: {
     active(val) {
       if(val) {
-        this.name = '';
+        this.internalTag = (this.tag) ? this.tag.clone() : new Tag();
+        this.displayErrors = false;
       }
     }
   },
   methods: {
-    async createTag() {
+    async save() {
       let result = await this.$validator.validateAll();
       if(!result) {
         return;
       }
 
+      let labelTranslation = this.editionMode ? 'update' : 'creation';
+
       try {
-        await new Tag({name: this.name, user : get('currentUser/user')}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-tag-creation')});
+        await this.internalTag.save();
+        this.$notify({type: 'success', text: this.$t('notif-success-tag-' + labelTranslation)});
         this.$emit('update:active', false);
-        this.$emit('addTag');
+        this.$emit(this.editionMode ? 'updateTag' : 'addTag', this.internalTag);
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-tag-creation')});
+        this.$notify({type: 'error', text: this.$t('notif-error-tag-' + labelTranslation)});
       }
     }
   }

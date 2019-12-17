@@ -175,21 +175,22 @@ properties,Properties,Propriétés
 no-properties,No property,Aucune propriété
 tags,Tags,Tags
 no-tag,No tag,Aucun tag
-new-tag,New tag,Nouveau tag
+button-new-tag,New tag,Nouveau tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
 associate-tags,Associate tags,Associer des tags
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés
 notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
-search-tag,Search tag...,Rechercher un tag...
-how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
+search-or-create-tag,Search tag (or create a new one by typing its name and pressing Enter)...,Rechercher un tag (ou créer un nouveau en entrant son nom suivi de la touche Enter)...
 delete-tag,Delete tag,Supprimer le tag
 delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues
-notif-success-tag-rename,Tag {tagName} was successfully renamed,Le tag {tagName} a bien été renommé
-notif-error-tag-rename,Failed to rename tag {tagName},Une erreur a empêché de renommer le tag {tagName}
+notif-success-tag-update,Tag was successfully updated,Le tag a bien été modifié
+notif-error-tag-update,Failed to update tag,Une erreur a empêché de modifier le tag
 notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé
 notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName}
+create-tag,Create tag,Créer un tag
+update-tag,Update tag,Modifier un tag
 area,Area,Aire
 perimeter,Perimeter,Périmètre
 button-view-in-image,View in image,Voir dans l'image
