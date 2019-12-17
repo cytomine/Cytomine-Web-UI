@@ -40,7 +40,7 @@
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple track-by="id" label="fullName"/>
             </div>
           </div>
 
@@ -191,13 +191,11 @@ export default {
 
     jobCollection() {
       let collection = new JobCollection({
-        project: this.project.id
+        project: this.project.id,
+        software: (this.selectedSoftwares.length > 0 && this.selectedSoftwares.length < this.availableSoftwares.length) ?
+          this.selectedSoftwares.map(option => option.id).join(',') : null
       });
-      if(this.selectedSoftwares.length > 0){
-        collection['softwareName'] = {
-          in: this.selectedSoftwares
-        };
-      }
+
       if(this.selectedLaunchers.length > 0){
         collection['username'] = {
           in: this.selectedLaunchers
@@ -226,7 +224,7 @@ export default {
   methods: {
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
-      this.availableSoftwares = stats.software.list.map(option => option.name);
+      this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
     },
 
@@ -235,6 +233,7 @@ export default {
       await this.fetchMultiselectOptions();
       this.revision++;
     },
+
     async deleteJob(jobToDelete) {
       try {
         await jobToDelete.delete();
