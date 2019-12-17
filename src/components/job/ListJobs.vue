@@ -229,6 +229,12 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+<<<<<<< HEAD
+=======
+    canManageJob(job) {
+      return this.$store.getters['currentProject/canManageJob'](job);
+    },
+>>>>>>> 99f8605... Clarify job management rights
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
       this.availableSoftwares = stats.software.list;
