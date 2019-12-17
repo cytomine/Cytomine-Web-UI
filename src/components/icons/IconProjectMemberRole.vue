@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-  <span>
+  <div>
     <i
       class="fas fa-user-cog"
       :class="{disabled: !isManager, clickable: editable}"
@@ -27,7 +27,7 @@
        :class="{disabled: !isRepresentative}"
        @click="$emit('toggleRepresentative')"
     ></i>
-  </span>
+  </div>
 </template>
 
 <script>
@@ -77,5 +77,11 @@ export default {
   .editable:hover {
     color: #2778ad !important;
     cursor: pointer;
+  }
+
+  div {
+    width: 30px;
+    text-align: left;
+    display: inline-block;
   }
 </style>
