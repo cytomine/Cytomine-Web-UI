@@ -127,7 +127,7 @@
         </td>
       </tr>
 
-      <tr>
+      <tr v-if="isPropDisplayed('tags')">
         <td colspan="2">
           <h5>{{$t('tags')}}</h5>
           <cytomine-tags :object="annotation" :canEdit="canEdit" />

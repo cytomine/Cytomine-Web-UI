@@ -106,6 +106,7 @@ export default {
             {key: 'project-explore-annotation-description', label: 'description', icon: 'far fa-file-alt'},
             {key: 'project-explore-annotation-terms', label: 'terms', icon: 'fas fa-hashtag'},
             {key: 'project-explore-annotation-tracks', label: 'tracks', icon: 'fas fa-route'},
+            {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},
