@@ -69,9 +69,11 @@ export default {
     noTerm: Boolean,
     multipleTracks: Boolean,
     noTrack: Boolean,
+    noTag: Boolean,
 
     termsIds: Array,
     tracksIds: Array,
+    tagsIds: Array,
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
@@ -84,6 +86,7 @@ export default {
     allUsers: Array,
     allImages: Array,
     allTracks: Array,
+    allTags: Array,
 
     revision: Number,
     visible: {type: Boolean, default: true},
@@ -113,6 +116,9 @@ export default {
     isByImage() {
       return this.categorization === 'IMAGE';
     },
+    isByTag() {
+      return this.categorization === 'TAG';
+    },
 
     collection() {
       this.revision; // to ensure that collection is reloaded if revision changes
@@ -121,6 +127,7 @@ export default {
 
         term: (this.isByTerm && !this.multipleTerms && !this.noTerm) ? this.prop.id : null,
         track: (this.isByTrack && !this.multipleTracks && !this.noTrack) ? this.prop.id : null,
+        tag: (this.isByTag && !this.noTag) ? this.prop.id : null,
         user: (this.isByUser) ? this.prop.id : null,
         image: (this.isByImage) ? this.prop.id : null,
 
@@ -128,11 +135,13 @@ export default {
         multipleTerm: this.multipleTerms,
         noTrack: this.noTrack,
         multipleTrack: this.multipleTracks,
+        noTag: this.noTag,
 
         terms: (!this.isByTerm) ? this.termsIds.filter(id => id > 0) : null,
         users: (!this.isByUser) ? this.usersIds : null,
         images: (!this.isByImage) ? this.imagesIds : null,
         tracks: (!this.isByTrack) ? this.tracksIds.filter(id => id > 0) : null,
+        tags: (!this.isByTag) ? this.tagsIds.filter(id => id > 0) : null,
 
         reviewed: this.reviewed,
         reviewUsers: (!this.isByUser) ? this.reviewUsersIds : null,
@@ -164,6 +173,9 @@ export default {
       }
       else if (this.isByTrack && this.noTrack) {
         return this.$t('no-track');
+      }
+      else if (this.isByTag && this.noTag) {
+        return this.$t('no-tag');
       }
       else {
         return this.prop.name;
@@ -268,7 +280,7 @@ export default {
       this.pendingReload = false;
 
       if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length) {
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || !this.tagsIds.length) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;
