@@ -92,7 +92,7 @@
       <h2> {{ $t('filters') }} </h2>
       <div class="filters">
         <div class="columns">
-          <div class="column filter is-one-quarter">
+          <div class="column filter">
             <div class="filter-label">
               {{$t('annotation-type')}}
             </div>
@@ -106,7 +106,46 @@
             </div>
           </div>
 
-          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-quarter">
+          <div v-if="ontology" class="column filter">
+            <div class="filter-label">
+              {{$t('terms')}}
+            </div>
+            <div class="filter-body">
+              <ontology-tree-multiselect
+                :ontology="ontology"
+                :additionalNodes="additionalTermNodes"
+                v-model="selectedTermsIds"
+              />
+            </div>
+          </div>
+
+          <div v-if="tracks" class="column filter">
+            <div class="filter-label">
+              {{$t('tracks')}}
+            </div>
+            <div class="filter-body">
+              <track-tree-multiselect
+                :tracks="filteredTracks"
+                :additional-nodes="additionalTrackNodes"
+                v-model="selectedTracksIds"
+              />
+            </div>
+          </div>
+
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('tags')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedTags" :options="tagsOptions"
+                                    label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+            </div>
+          </div>
+        </div>
+
+        <div class="columns">
+
+          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-third">
             <div class="filter-label">
               {{$t('analyses')}}
             </div>
@@ -122,7 +161,7 @@
             </div>
           </div>
 
-          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-quarter">
+          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-third">
             <div class="filter-label">
               {{$t('members')}}
             </div>
@@ -137,7 +176,7 @@
             </div>
           </div>
 
-          <div v-else class="column filter is-one-quarter">
+          <div v-else class="column filter is-one-third">
             <div class="filter-label">
               {{$t('reviewers')}}
             </div>
@@ -165,45 +204,6 @@
                 multiple
                 :allPlaceholder="$t('all-images')"
               />
-            </div>
-          </div>
-        </div>
-
-        <div class="columns">
-
-          <div v-if="ontology" class="column filter is-one-third">
-              <div class="filter-label">
-                {{$t('terms')}}
-              </div>
-              <div class="filter-body">
-                <ontology-tree-multiselect
-                  :ontology="ontology"
-                  :additionalNodes="additionalTermNodes"
-                  v-model="selectedTermsIds"
-                />
-              </div>
-          </div>
-
-          <div v-if="tracks" class="column filter is-one-third">
-            <div class="filter-label">
-              {{$t('tracks')}}
-            </div>
-            <div class="filter-body">
-              <track-tree-multiselect
-                :tracks="filteredTracks"
-                :additional-nodes="additionalTrackNodes"
-                v-model="selectedTracksIds"
-              />
-            </div>
-          </div>
-
-          <div class="column filter is-one-quarter">
-            <div class="filter-label">
-              {{$t('tags')}}
-            </div>
-            <div class="filter-body">
-              <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                    label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
             </div>
           </div>
 
