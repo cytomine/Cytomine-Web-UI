@@ -239,6 +239,7 @@
       :allUsers="allUsers"
       :allImages="images"
       :allTracks="tracks"
+      :allTags="tags"
 
       :prop="prop"
       :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
@@ -247,10 +248,10 @@
       :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
       :terms-ids="selectedTermsIds"
       :tracks-ids="selectedTracksIds"
+      :tags-ids="selectedTagsIds"
+      :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
       :imagesIds="selectedImagesIds"
       :usersIds="selectedUsersIds"
-      :tagsIds="tagsIdsNotNull"
-      :noTag="noTag"
       :reviewed="reviewed"
       :reviewUsersIds="reviewUsersIds"
       :afterThan="afterThan"
@@ -340,13 +341,15 @@ export default {
       annotationTypes: [],
 
       images: [],
-      availableTags:[],
+      tags:[],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
       multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
 
       noTrackOption: {id: 0, name: this.$t('no-track')},
-      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')}
+      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')},
+
+      noTagOption: {id: 0, name: this.$t('no-tag')}
     };
   },
   computed: {
@@ -444,12 +447,16 @@ export default {
       return this.tracksOptions.map(option => option.id);
     },
 
+    tagsOptions() {
+      return [...this.tags, this.noTagOption];
+    },
+
     selectedAnnotationType: sync('annotationType', storeOptions),
     selectedMembers: localSyncMultiselectFilter('members', 'filteredMembers'),
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
-    selectedTags: localSyncMultiselectFilter('tags', 'availableTags'),
+    selectedTags: localSyncMultiselectFilter('tags', 'tagsOptions'),
     selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
@@ -502,26 +509,21 @@ export default {
     isByTrack() {
       return this.selectedCategorization.categorization === 'TRACK';
     },
+    isByTag() {
+      return this.selectedCategorization.categorization === 'TAG';
+    },
     noTerm() {
       return this.selectedTermsIds.includes(this.noTermOption.id);
     },
     noTrack() {
       return this.selectedTracksIds.includes(this.noTrackOption.id);
     },
+    noTag() {
+      return this.selectedTagsIds.includes(this.noTagOption.id);
+    },
 
     selectedTagsIds() {
       return this.selectedTags.map(t => t.id);
-    },
-    tagsIdsNotNull() {
-      if(this.selectedTagsIds.indexOf('null') >= 0) {
-        let x = this.selectedTagsIds.slice();
-        x.splice(x.indexOf('null'), 1);
-        return x;
-      }
-      return this.selectedTagsIds;
-    },
-    noTag() {
-      return this.selectedTagsIds.indexOf('null') >= 0;
     },
     collection() {
       let collection = new AnnotationCollection({
@@ -537,7 +539,7 @@ export default {
         beforeThan: this.beforeThan
       });
 
-      if(this.selectedTagsIds.length > 0 && this.selectedTagsIds.length < this.availableTags.length) {
+      if(this.selectedTagsIds.length > 0 && this.selectedTagsIds.length < this.tags.length) {
         collection['tags'] = this.selectedTagsIds;
         collection['noTag'] = this.noTag;
       }
@@ -569,7 +571,7 @@ export default {
       this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.tags = (await TagCollection.fetchAll()).array;
     },
     downloadURL(format) {
       return this.collection.getDownloadURL(format);
