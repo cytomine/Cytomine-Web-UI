@@ -146,7 +146,7 @@ export default {
         (!currentUser.guestByNow && !project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
     },
 
-    canDeleteJob: (state, getters, rootState) => job => {
+    canManageJob: (state, getters, rootState) => job => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
       return getters.canManageProject ||

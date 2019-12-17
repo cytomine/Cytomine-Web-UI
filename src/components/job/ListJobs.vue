@@ -100,7 +100,7 @@
       >
         <template #default="{row: job}">
           <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
-            <a @click="toggleFavorite(job)" v-if="canEdit(job)">
+            <a @click="toggleFavorite(job)" v-if="canManageJob(job)">
               <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
             </a>
             <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
@@ -264,8 +264,8 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    canEdit(job) {
-      return this.$store.getters['currentProject/canDeleteJob'](job);
+    canManageJob(job) {
+      return this.$store.getters['currentProject/canManageJob'](job);
     },
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
