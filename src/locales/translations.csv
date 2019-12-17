@@ -101,7 +101,7 @@ ontology,Ontology,Ontologie
 number-user-annotations,Number of user annotations,Nombre d'annotations manuelles
 number-analysis-annotations,Number of analysis annotations,Nombre d'annotations d'analyse
 number-reviewed-annotations,Number of reviewed annotations,Nombre d'annotations validées
-no-description,No description.,Pas de description.
+no-description,No description,Pas de description
 search-placeholder,Search,Recherche
 creator,Creator,Créateur
 managers,Managers,Responsables
@@ -391,7 +391,7 @@ use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
 select-ontology,Select ontology,Choisir l'ontologie
 type,Type,Type
 attached-files,Attached files,Fichiers joints
-no-attached-file,No attached file.,Aucun fichier joint.
+no-attached-file,No attached file,Aucun fichier joint
 add-attached-file,Add an attached file,Ajouter un fichier joint
 choose-file-or-drop,Click and choose a file or drop it here,Cliquez ici ou glissez-déposez le fichier de votre choix
 click-or-drop-new-file,Click or drop new file to replace current one,Cliquez ici our glissez-déposez un nouveau fichier pour remplacer le fichier actuel
@@ -924,5 +924,5 @@ notif-error-source-refresh,Error during the refresh of the trusted source,Erreur
 version,Version,Version
 fav,Fav.,Fav.
 favorite,Favorite,Favori
-no-selected-layers,No selected layers.,
+no-selected-layers,No selected layers,
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
