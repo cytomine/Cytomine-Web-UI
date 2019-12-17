@@ -100,7 +100,7 @@ ontology,Ontology,Ontologie
 number-user-annotations,Number of user annotations,Nombre d'annotations manuelles
 number-analysis-annotations,Number of analysis annotations,Nombre d'annotations d'analyse
 number-reviewed-annotations,Number of reviewed annotations,Nombre d'annotations validées
-no-description,No description.,Pas de description.
+no-description,No description,Pas de description
 search-placeholder,Search,Recherche
 creator,Creator,Créateur
 managers,Managers,Responsables
@@ -175,9 +175,9 @@ annotation-type,Annotation type,Type d'annotation
 multiple-terms,Multiple terms,Plusieurs termes
 created-by,Created by,Créé par
 properties,Properties,Propriétés
-no-properties,No properties.,Aucune propriété.
+no-properties,No property,Aucune propriété
 tags,Tags,Tags
-no-tag,No tag,Aucun tag.
+no-tag,No tag,Aucun tag
 button-new-tag,New tag,Nouveau tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
@@ -391,7 +391,7 @@ use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
 select-ontology,Select ontology,Choisir l'ontologie
 type,Type,Type
 attached-files,Attached files,Fichiers joints
-no-attached-file,No attached file.,Aucun fichier joint.
+no-attached-file,No attached file,Aucun fichier joint
 add-attached-file,Add an attached file,Ajouter un fichier joint
 choose-file-or-drop,Click and choose a file or drop it here,Cliquez ici ou glissez-déposez le fichier de votre choix
 click-or-drop-new-file,Click or drop new file to replace current one,Cliquez ici our glissez-déposez un nouveau fichier pour remplacer le fichier actuel
@@ -961,7 +961,7 @@ notif-error-source-refresh,Error during the refresh of the trusted source,Erreur
 version,Version,Version
 fav,Fav.,Fav.
 favorite,Favorite,Favori
-no-selected-layers,No selected layers.,
+no-selected-layers,No selected layers,
 button-best-fit-zoom,Fit zoom to viewport,
 button-reset-zoom,Reset zoom,
 copy,Copy,Copy
@@ -981,7 +981,7 @@ inspect-button,Inspect,Inspecter
 failed-fetch-profile,
 companion-files,Companion files,
 not-available,Not available.,Indisponible.
-no-profile,No profile.,Pas de profil.
+no-profile,No profile,Pas de profil
 developer-mode,Developer mode,Mode développeur
 id,ID,ID
 job-id,Analysis ID,ID de l'analyse
