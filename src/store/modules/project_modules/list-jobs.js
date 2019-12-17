@@ -29,8 +29,8 @@ export default {
 
       currentPage: 1,
       perPage: 10,
-      sortField: null,
-      sortOrder: 'asc',
+      sortField: 'created',
+      sortOrder: 'desc',
       openedDetails: []
     };
   },
