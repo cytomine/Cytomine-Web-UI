@@ -267,6 +267,7 @@
       @updateTermsOrTracks="revision++"
       @delete="revision++"
       @update="revision++"
+      @select="viewAnnot($event)"
     />
 
     <div class="box">
@@ -548,6 +549,9 @@ export default {
     },
   },
   methods: {
+    viewAnnot(annot) {
+      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+    },
     async fetchImages() {
       this.images = (await ImageInstanceCollection.fetchAll({
         filterKey: 'project',
