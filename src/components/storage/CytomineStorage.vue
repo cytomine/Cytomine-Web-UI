@@ -163,6 +163,7 @@
         sort="created" order="desc"
         :revision="revision"
         :refreshInterval="tableRefreshInterval"
+        :openedDetailed.sync="openedDetails"
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80">
@@ -243,6 +244,7 @@ export default {
       selectedProjects: [],
 
       searchString: '',
+      openedDetails: [],
 
       dropFiles: [],
 
