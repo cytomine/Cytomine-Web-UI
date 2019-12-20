@@ -122,13 +122,13 @@ export default {
       return this.selectedSoftware ? this.selectedSoftware.parameters.array : [];
     },
     optionalParams() {
-      return this.params.filter(param => !param.required && !param.defaultParamValue);
+      return this.params.filter(param => !param.required && param.defaultParamValue === null);
     },
     prefilledParams() {
       return this.params.filter(param => param.defaultParamValue);
     },
     paramsMandatoryNoDefault() {
-      return this.params.filter(param => param.required && !param.defaultParamValue);
+      return this.params.filter(param => param.required && param.defaultParamValue === null);
     },
     jobParameters() {
       return this.params.map(param => {
