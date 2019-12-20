@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <tr class="job-param-row-wrapper">
   <td>{{param.name}}</td>

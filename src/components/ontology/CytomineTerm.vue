@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <span v-if="term">
   <div class="color-preview" v-if="term.color" :style="{background: term.color}"></div>

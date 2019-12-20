@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
   <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">

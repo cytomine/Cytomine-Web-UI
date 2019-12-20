@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
   <div class="box" v-if="!loading">
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">

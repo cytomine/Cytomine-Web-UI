@@ -205,7 +205,6 @@ export default {
     async refreshTags(){
       this.tags = (await TagCollection.fetchAll()).array;
     }
-
   },
   async created() {
     try {
@@ -228,7 +227,9 @@ export default {
 .button {
   margin-top: 1em;
 }
+
 .addButton {
   float: right;
 }
 </style>
+

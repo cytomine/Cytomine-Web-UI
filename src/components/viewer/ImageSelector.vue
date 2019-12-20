@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <div class="image-selector-wrapper" v-show="imageSelectorEnabled">

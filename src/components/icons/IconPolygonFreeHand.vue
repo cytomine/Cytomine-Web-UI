@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <svg
   xmlns:dc="http://purl.org/dc/elements/1.1/"

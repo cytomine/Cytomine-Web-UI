@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!configUI['project-jobs-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -139,6 +138,7 @@ import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';
+
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';

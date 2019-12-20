@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="save()">
   <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">

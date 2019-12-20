@@ -13,7 +13,6 @@
  limitations under the License.-->
 
 
-
 <template>
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>

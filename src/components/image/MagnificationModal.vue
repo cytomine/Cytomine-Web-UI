@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="setMagnification()">
   <cytomine-modal :active="active" :title="$t('set-magnification')" @close="$emit('update:active', false)">

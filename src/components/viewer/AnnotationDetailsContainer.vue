@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="annotation-details-playground" ref="playground">
   <vue-draggable-resizable

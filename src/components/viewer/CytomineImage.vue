@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">

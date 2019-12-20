@@ -114,10 +114,10 @@ export default {
         }
       ]
     };
-        
+
     await this.fetchData();
 
-    this.renderChart(this.chartData, { 
+    this.renderChart(this.chartData, {
       maintainAspectRatio: false,
       scales: {
         yAxes: [{

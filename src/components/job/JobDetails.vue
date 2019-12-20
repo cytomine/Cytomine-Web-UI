@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="job-details-wrapper">
   <b-loading :is-full-page="false" :active.sync="loading" class="small" />
