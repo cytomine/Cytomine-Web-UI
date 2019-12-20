@@ -128,7 +128,7 @@ export default {
       return this.params.filter(param => !param.required && param.defaultParamValue === null);
     },
     prefilledParams() {
-      return this.params.filter(param => param.defaultParamValue);
+      return this.params.filter(param => param.defaultParamValue !== null);
     },
     paramsMandatoryNoDefault() {
       return this.params.filter(param => param.required && param.defaultParamValue === null);
