@@ -95,7 +95,7 @@
                     <td>{{filesize(data.size)}}</td>
                     <td>
                       <div class="buttons">
-                        <a class="button is-small" :href="data.viewURL">{{$t('button-view')}}</a>
+                        <a class="button is-small" :href="data.viewURL" target='_blank'>{{$t('button-view')}}</a>
                         <a class="button is-small" :href="data.downloadURL">{{$t('button-download')}}</a>
                       </div>
                     </td>
