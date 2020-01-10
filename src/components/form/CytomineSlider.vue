@@ -17,11 +17,11 @@
   :value="value" @change="$emit('input', $event)"
   :min="min"
   :max="max"
-  :tooltip="'always'"
+  :tooltip="(tooltip) ? 'always' : 'none'"
   :tooltip-placement="tooltipPlacement"
   :lazy="lazy"
 >
-  <template #tooltip="{value, index}">
+  <template #tooltip="{value, index}" v-if="tooltip">
     <div
       :class="['vue-slider-dot-tooltip-inner', `vue-slider-dot-tooltip-inner-${tooltipPlacement[index]}`]"
       @mousedown.stop
@@ -57,7 +57,8 @@ export default {
     min: {type: Number, default: 0},
     max: {type: Number, default: 100},
     integerOnly: {type: Boolean, default: true},
-    lazy: {type: Boolean, default: true}
+    lazy: {type: Boolean, default: true},
+    tooltip: {type: Boolean, default: true}
   },
   data() {
     return {

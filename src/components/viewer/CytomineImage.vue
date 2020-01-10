@@ -370,6 +370,10 @@ export default {
     baseLayerURLs() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
       let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
+
+      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('|');
+      if (minmax) params += `&minmax=${minmax}`;
+
       return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
     },
 

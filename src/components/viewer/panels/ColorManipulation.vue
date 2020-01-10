@@ -16,6 +16,16 @@
 <template>
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>
+  <b-tabs type="is-boxed" v-if="loaded">
+    <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
+      <template #header>
+        <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
+        {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
+      </template>
+      <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
+    </b-tab-item>
+  </b-tabs>
+
   <table>
     <tr v-if="filters && filters.length > 0" class="has-border-bottom">
       <td>{{ $t('filter') }}</td>
@@ -28,33 +38,14 @@
         </b-select>
       </td>
     </tr>
-    <tr>
-      <td>{{ $t('brightness') }}</td>
-      <td>
-        <cytomine-slider v-model="brightness" :min="-255" :max="255" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('contrast') }}</td>
-      <td>
-        <cytomine-slider v-model="contrast" :min="-255" :max="255" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('saturation') }}</td>
-      <td>
-        <cytomine-slider v-model="saturation" :min="-100" :max="100" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('hue') }}</td>
-      <td>
-        <cytomine-slider v-model="hue" :min="-180" :max="180" />
-      </td>
-    </tr>
   </table>
+
   <div class="actions">
-    <button class="button is-small" @click="reset()">{{$t('button-reset')}}</button>
+    <div class="level">
+      <button class="level-item button is-small" @click="auto()">{{$t('button-auto')}}</button>
+      <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
+      <button class="level-item button is-small" @click="switchHistogramScale()">{{switchHistogramScaleLabel}}</button>
+    </div>
   </div>
 </div>
 </template>
@@ -62,17 +53,21 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import {ImageFilterProjectCollection} from 'cytomine-client';
+import {ImageFilterProjectCollection, SampleHistogramCollection} from 'cytomine-client';
+import SampleHistogram from '@/components/viewer/panels/SampleHistogram';
 
 export default {
   name: 'color-manipulation',
-  components: {CytomineSlider},
+  components: {SampleHistogram, CytomineSlider},
   props: {
     index: String
   },
   data() {
     return {
-      filters: null
+      filters: null,
+      sampleHistograms: null,
+      loaded: false,
+      revisionBrightnessContrast: 0,
     };
   },
   computed: {
@@ -82,6 +77,18 @@ export default {
     },
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
+    },
+    image() {
+      return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
+    activePanel() {
+      return this.imageWrapper.activePanel;
+    },
+    maxValue() {
+      return Math.pow(2, this.image.bitPerSample);
     },
 
     selectedFilter: {
@@ -93,42 +100,69 @@ export default {
       }
     },
 
-    brightness: {
+    histogramScale: {
       get() {
-        return this.imageWrapper.colors.brightness;
+        return this.imageWrapper.colors.histogramScale;
       },
       set(value) {
-        this.$store.commit(this.imageModule + 'setBrightness', value);
+        this.$store.commit(this.imageModule + 'setHistogramScale', value);
       }
     },
-    contrast: {
-      get() {
-        return this.imageWrapper.colors.contrast;
-      },
-      set(value) {
-        this.$store.commit(this.imageModule + 'setContrast', value);
+    switchHistogramScaleLabel() {
+      return this.$t((this.histogramScale === 'log') ? 'button-switch-histogram-scale-to-linear' : 'button-switch-histogram-scale-to-log');
+    }
+
+  },
+  watch: {
+    activePanel(panel) {
+      if (panel === 'colors' && !this.sampleHistograms) {
+        this.fetchSampleHistograms();
       }
     },
-    hue: {
-      get() {
-        return this.imageWrapper.colors.hue;
-      },
-      set(value) {
-        this.$store.commit(this.imageModule + 'setHue', value);
-      }
-    },
-    saturation: {
-      get() {
-        return this.imageWrapper.colors.saturation;
-      },
-      set(value) {
-        this.$store.commit(this.imageModule + 'setSaturation', value);
-      }
+    slice() {
+      this.fetchSampleHistograms();
     }
   },
   methods: {
     reset() {
       this.$store.commit(this.imageModule + 'resetColorManipulation');
+      this.revisionBrightnessContrast++;
+    },
+    auto() {
+      this.$store.dispatch(this.imageModule + 'automaticColorManipulation');
+      this.revisionBrightnessContrast++;
+    },
+    switchHistogramScale() {
+      if (this.histogramScale === 'linear') {
+        this.histogramScale = 'log';
+      }
+      else {
+        this.histogramScale = 'linear';
+      }
+    },
+    sampleColor(sample) {
+      if (this.image.samplePerPixel === 3) {
+        switch (sample) {
+          case 0:
+            return 'red';
+          case 1:
+            return 'green';
+          case 2:
+            return 'blue';
+        }
+      }
+
+      return 'grey';
+    },
+    async fetchSampleHistograms() {
+      this.loaded = false;
+      try {
+        this.sampleHistograms = (await SampleHistogramCollection.fetchAll({filterKey: 'sliceinstance', filterValue: this.slice.id})).array;
+      }
+      catch(error) {
+        console.log(error);
+      }
+      this.loaded = true;
     }
   },
   async created() {
@@ -164,8 +198,12 @@ td:last-child {
 }
 
 .actions {
-  margin-top: 1em;
-  text-align: right;
+  margin-bottom: 0.5em;
+}
+
+.actions .button {
+  margin: 3px;
+  box-sizing: border-box;
 }
 
 >>> .vue-slider {
@@ -180,5 +218,16 @@ td:last-child {
 
 .has-border-bottom + tr td {
   padding-top: 1em;
+}
+
+.color-preview {
+  margin-right: 0.25em;
+}
+
+>>> .tab-content {
+  background-color: white;
+  border: 1px solid #DBDBDB;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
 }
 </style>
