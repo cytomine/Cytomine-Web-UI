@@ -20,9 +20,12 @@ export default {
   state() {
     return {
       idImage: 0,
-      
+
+      contrast: 1,
+      gamma: 1,
+      inverse: false,
+
       brightness: 0,
-      contrast: 0,
       hue: 0,
       saturation: 0,
 
@@ -49,6 +52,14 @@ export default {
       state.contrast = value;
     },
 
+    setGamma(state, value) {
+      state.gamma = value;
+    },
+
+    setInverse(state, value) {
+      state.inverse = value;
+    },
+
     setHue(state, value) {
       state.hue = value;
     },
@@ -59,7 +70,9 @@ export default {
 
     resetColorManipulation(state) {
       state.brightness = 0;
-      state.contrast = 0;
+      state.contrast = 1;
+      state.gamma = 1;
+      state.inverse = false;
       state.hue = 0;
       state.saturation = 0;
       state.minMax = state.defaultMinMax.map(obj => {
@@ -123,6 +136,9 @@ export default {
       await dispatch('refreshDefaultMinMax', {image: new ImageInstance({id: state.idImage})});
     },
     automaticColorManipulation({commit, state}) {
+      commit('setContrast', 1);
+      commit('setGamma', 1);
+      commit('setInverse', false);
       commit('setMinMax', deepCopy(state.defaultMinMax));
     }
   }

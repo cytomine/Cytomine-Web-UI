@@ -27,17 +27,6 @@
   </b-tabs>
 
   <table>
-    <tr v-if="filters && filters.length > 0" class="has-border-bottom">
-      <td>{{ $t('filter') }}</td>
-      <td>
-        <b-select v-model="selectedFilter" size="is-small">
-          <option :value="null">{{$t('original-no-filter')}}</option>
-          <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
-            {{filter.name}}
-          </option>
-        </b-select>
-      </td>
-    </tr>
     <tr>
       <td>{{ $t('contrast') }}</td>
       <td>
@@ -50,13 +39,24 @@
         <cytomine-slider v-model="gamma" :min="0.1" :max="4" :interval="0.1" :integer-only="false"/>
       </td>
     </tr>
-    <tr>
+    <tr class="has-border-bottom">
       <td>{{$t('inverse')}}</td>
       <td>
         <b-switch v-model="inverse" class="switch">
           <template v-if="inverse">{{$t('yes')}}</template>
           <template v-else>{{$t('no')}}</template>
         </b-switch>
+      </td>
+    </tr>
+    <tr v-if="filters && filters.length > 0" class="has-border-bottom">
+      <td>{{ $t('filter') }}</td>
+      <td>
+        <b-select v-model="selectedFilter" size="is-small">
+          <option :value="null">{{$t('original-no-filter')}}</option>
+          <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
+            {{filter.name}}
+          </option>
+        </b-select>
       </td>
     </tr>
   </table>
@@ -246,6 +246,7 @@ td:last-child {
 }
 
 .actions {
+  padding-top: 1em;
   margin-bottom: 0.5em;
 }
 

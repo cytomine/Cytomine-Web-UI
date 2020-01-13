@@ -18,6 +18,7 @@
   :min="min"
   :max="max"
   :tooltip="(tooltip) ? 'always' : 'none'"
+  :interval="interval"
   :tooltip-placement="tooltipPlacement"
   :lazy="lazy"
 >
@@ -56,6 +57,7 @@ export default {
     value: {type: null},
     min: {type: Number, default: 0},
     max: {type: Number, default: 100},
+    interval: {type: Number},
     integerOnly: {type: Boolean, default: true},
     lazy: {type: Boolean, default: true},
     tooltip: {type: Boolean, default: true}

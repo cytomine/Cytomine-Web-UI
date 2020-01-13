@@ -1006,3 +1006,5 @@ sample-histogram-abbr,ch.,can.
 button-auto,Auto,Auto
 button-switch-histogram-scale-to-log,Switch to log histogram,Utiliser un histogramme log
 button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un histogramme linéaire
+gamma,Gamma,
+inverse,Inverse,
