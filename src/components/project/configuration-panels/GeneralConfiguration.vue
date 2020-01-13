@@ -136,6 +136,22 @@
   <h2>{{$t('default-property')}}</h2>
   <default-property />
 
+  <h2>{{$t('download-permission')}}</h2>
+
+  <div class="columns">
+    <div class="column is-one-quarter">
+      <b-checkbox v-model="imagesDownloadable">
+        {{$t('images_downloadable_by_contributor')}}
+      </b-checkbox>
+    </div>
+    <div class="column">
+      <b-message type="is-info" has-icon size="is-small">
+        {{$t('images_downloadable_by_contributor-explanation')}}
+      </b-message>
+    </div>
+  </div>
+
+
   <h2>Actions</h2>
   <project-actions :project="project" size="is-normal" @update="externalProjectUpdate" @delete="deleteProject()" />
 </div>
@@ -161,6 +177,7 @@ export default {
       blindMode: null,
       hideManagersLayers: null,
       hideContributorsLayers: null,
+      imagesDownloadable: null,
 
       layerToAdd: null,
       defaultLayers: []
@@ -212,6 +229,13 @@ export default {
         return;
       }
       this.updateProject({hideUsersLayers: this.hideContributorsLayers});
+    },
+
+    imagesDownloadable(){
+      if(this.imagesDownloadable === this.project.areImagesDownloadable){
+        return;
+      }
+      this.updateProject({areImagesDownloadable: this.imagesDownloadable});
     }
   },
   methods: {
@@ -224,6 +248,7 @@ export default {
       this.blindMode = this.project.blindMode;
       this.hideManagersLayers = this.project.hideAdminsLayers;
       this.hideContributorsLayers = this.project.hideUsersLayers;
+      this.imagesDownloadable = this.project.areImagesDownloadable;
     },
 
     async fetchDefaultLayers() {
