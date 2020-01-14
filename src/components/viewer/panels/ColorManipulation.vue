@@ -16,23 +16,31 @@
 <template>
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>
-  <b-tabs type="is-boxed" v-if="loaded">
-    <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
-      <template #header>
-        <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
-        {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
-      </template>
-      <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
-    </b-tab-item>
-  </b-tabs>
-
+  <template v-if="canComputeHistogram">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+      <p> {{ $t('unexpected-error-info-message') }} </p>
+    </b-message>
+    <div class="histogram-actions" v-else-if="!loading && !hasHistograms">
+      <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
+    </div>
+    <b-tabs type="is-boxed" class="histogram" v-else-if="loading || hasHistograms">
+      <b-loading :is-full-page="false" class="small" :active="loading"  />
+      <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
+        <template #header>
+          <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
+          {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
+        </template>
+        <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
+      </b-tab-item>
+    </b-tabs>
+  </template>
   <table>
-    <tr>
+<!--    <tr>
       <td>{{ $t('contrast') }}</td>
       <td>
         <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
       </td>
-    </tr>
+    </tr>-->
     <tr>
       <td>{{ $t('gamma') }}</td>
       <td>
@@ -63,10 +71,15 @@
 
   <div class="actions">
     <div class="level">
-      <button class="level-item button is-small" @click="auto()">{{$t('button-auto')}}</button>
+      <template v-if="maxRank > 1 && hasHistograms">
+        <button class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust-image')}}</button>
+        <button class="level-item button is-small" @click="adjustToSlice()">{{$t('button-adjust-slice')}}</button>
+      </template>
+      <button v-else-if="hasHistograms" class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
+
       <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
-      <button class="level-item button is-small" @click="switchHistogramScale()">{{switchHistogramScaleLabel}}</button>
     </div>
+      <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasHistograms">{{switchHistogramScaleLabel}}</a>
   </div>
 </div>
 </template>
@@ -87,7 +100,8 @@ export default {
     return {
       filters: null,
       sampleHistograms: null,
-      loaded: false,
+      loading: false,
+      error: false,
       revisionBrightnessContrast: 0,
     };
   },
@@ -105,11 +119,20 @@ export default {
     slice() {
       return this.imageWrapper.activeSlice;
     },
+    maxRank() {
+      return this.$store.getters[this.imageModule + 'maxRank'];
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
     maxValue() {
       return Math.pow(2, this.image.bitPerSample);
+    },
+    hasHistograms() {
+      return this.sampleHistograms && this.sampleHistograms.length > 0;
+    },
+    canComputeHistogram() {
+      return this.image.bitPerSample && this.image.samplePerPixel;
     },
 
     selectedFilter: {
@@ -160,22 +183,24 @@ export default {
 
   },
   watch: {
-    activePanel(panel) {
-      if (panel === 'colors' && !this.sampleHistograms) {
-        this.fetchSampleHistograms();
-      }
-    },
     slice() {
       this.fetchSampleHistograms();
     }
   },
   methods: {
     reset() {
-      this.$store.commit(this.imageModule + 'resetColorManipulation');
+      this.$store.dispatch(this.imageModule + 'resetColorManipulation');
       this.revisionBrightnessContrast++;
     },
-    auto() {
-      this.$store.dispatch(this.imageModule + 'automaticColorManipulation');
+    adjustToImage() {
+      this.$store.dispatch(this.imageModule + 'adjustToImage');
+      this.revisionBrightnessContrast++;
+    },
+    adjustToSlice() {
+      let minmax = this.sampleHistograms.map(sh => {
+        return {sample: sh.sample, min: sh.min, max: sh.max};
+      });
+      this.$store.dispatch(this.imageModule + 'adjustToSlice', minmax);
       this.revisionBrightnessContrast++;
     },
     switchHistogramScale() {
@@ -201,14 +226,26 @@ export default {
       return 'grey';
     },
     async fetchSampleHistograms() {
-      this.loaded = false;
       try {
         this.sampleHistograms = (await SampleHistogramCollection.fetchAll({filterKey: 'sliceinstance', filterValue: this.slice.id})).array;
       }
       catch(error) {
         console.log(error);
+        this.error = true;
       }
-      this.loaded = true;
+    },
+    async computeHistograms() {
+      this.loading = true;
+      try {
+        await this.image.extractHistogram();
+        await this.$store.dispatch(this.imageModule + 'refreshDefaultMinMax', {image: this.image});
+        await this.fetchSampleHistograms();
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+      this.loading = false;
     }
   },
   async created() {
@@ -222,6 +259,8 @@ export default {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
       }
       this.filters = filters;
+
+      this.fetchSampleHistograms();
     }
     catch(error) {
       console.log(error);
@@ -250,9 +289,17 @@ td:last-child {
   margin-bottom: 0.5em;
 }
 
-.actions .button {
+.actions .button, .histogram-actions .button {
   margin: 3px;
   box-sizing: border-box;
+}
+
+.actions .level {
+  margin-bottom: 0;
+}
+
+a.is-fullwidth {
+  width: auto;
 }
 
 >>> .vue-slider {
@@ -260,9 +307,13 @@ td:last-child {
   margin-right: 4em;
 }
 
-.has-border-bottom td {
+.has-border-bottom td, .histogram-actions {
   padding-bottom: 1em;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.histogram-actions {
+  margin-bottom: 1em;
 }
 
 .has-border-bottom + tr td {
@@ -278,5 +329,14 @@ td:last-child {
   border: 1px solid #DBDBDB;
   border-top: none;
   border-radius: 0 0 4px 4px;
+  min-height: 5em;
+}
+
+>>> .b-tabs:not(:last-child) {
+  margin-bottom: 1em;
+}
+
+.histogram {
+  min-height: 3em;
 }
 </style>

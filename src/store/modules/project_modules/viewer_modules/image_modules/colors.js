@@ -33,7 +33,7 @@ export default {
       minMax: [],
       maxValue: 0,
 
-      histogramScale: 'linear',
+      histogramScale: 'log',
 
       filter: null
     };
@@ -68,13 +68,16 @@ export default {
       state.saturation = value;
     },
 
-    resetColorManipulation(state) {
+    resetImageColorManipulation(state) {
       state.brightness = 0;
       state.contrast = 1;
       state.gamma = 1;
       state.inverse = false;
       state.hue = 0;
       state.saturation = 0;
+    },
+
+    resetSampleColorManipulation(state) {
       state.minMax = state.defaultMinMax.map(obj => {
         let o = Object.assign({}, obj);
         o.min = 0;
@@ -130,17 +133,31 @@ export default {
     async refreshDefaultMinMax({commit}, {image}) {
       let minmax = await image.fetchHistogramStats();
       commit('setDefaultMinMax', minmax);
-      commit('setMinMax', deepCopy(minmax));
+      if (image.bitPerSample > 8) {
+        commit('setMinMax', deepCopy(minmax));
+      }
+      else {
+        commit('resetSampleColorManipulation');
+      }
     },
     async refreshData({dispatch, state}) {
       await dispatch('refreshDefaultMinMax', {image: new ImageInstance({id: state.idImage})});
     },
-    automaticColorManipulation({commit, state}) {
-      commit('setContrast', 1);
-      commit('setGamma', 1);
-      commit('setInverse', false);
+
+    resetColorManipulation({commit}) {
+      commit('resetImageColorManipulation');
+      commit('resetSampleColorManipulation');
+    },
+
+    adjustToImage({commit, state}) {
+      commit('resetImageColorManipulation');
       commit('setMinMax', deepCopy(state.defaultMinMax));
-    }
+    },
+    adjustToSlice({commit}, minMax) {
+      commit('resetImageColorManipulation');
+      commit('setMinMax', deepCopy(minMax));
+    },
+
   }
 };
 

@@ -1003,8 +1003,11 @@ hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
 minimum,Minimum,Minimum
 maximum,Maximum,Maximum
 sample-histogram-abbr,ch.,can.
-button-auto,Auto,Auto
+button-adjust,Adjust,Ajuster
+button-adjust-image,Adjust to image,Ajuster à l'image
+button-adjust-slice,Adjust to slice,Ajuster au plan
 button-switch-histogram-scale-to-log,Switch to log histogram,Utiliser un histogramme log
 button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un histogramme linéaire
-gamma,Gamma,
-inverse,Inverse,
+gamma,Gamma,Gamma
+inverse,Inverse,Inverse
+button-compute-histogram,Compute histogram,Calculer l'histogramme

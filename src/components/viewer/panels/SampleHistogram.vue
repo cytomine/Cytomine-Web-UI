@@ -1,32 +1,41 @@
 <template>
   <div>
     <div class="chart-container sample-histogram">
-      <sample-histogram-chart :histogram="sampleHistogram.histogram256" :x-min="xMin" :x-max="xMax" :scale="histogramScale" css-classes="chart"/>
+      <sample-histogram-chart
+          :histogram="sampleHistogram.histogram"
+          :min="minimum"
+          :max="maximum"
+          :scale="histogramScale"
+          :theoretical-max="theoreticalMax"
+          :default-max="defaultMax"
+          :default-min="defaultMin"
+          css-classes="chart"
+      />
     </div>
 
     <table>
       <tr>
         <td>{{ $t('minimum') }}</td>
         <td>
-          <cytomine-slider :value="minimum" @input="setMinimum" :min="0" :max="defaultMax" />
+          <cytomine-slider :value="minimum" @input="setMinimum" :min="0" :max="theoreticalMax" />
         </td>
       </tr>
       <tr>
         <td>{{ $t('maximum') }}</td>
         <td>
-          <cytomine-slider :value="maximum" @input="setMaximum" :min="0" :max="defaultMax" />
+          <cytomine-slider :value="maximum" @input="setMaximum" :min="0" :max="theoreticalMax" />
         </td>
       </tr>
       <tr>
         <td>{{ $t('brightness') }}</td>
         <td>
-          <cytomine-slider :value="brightness" @input="setBrightness" :min="0" :max="defaultMax" :tooltip="false"/>
+          <cytomine-slider :value="brightness" @input="setBrightness" :min="0" :max="theoreticalMax" :tooltip="false"/>
         </td>
       </tr>
       <tr>
         <td>{{ $t('contrast') }}</td>
         <td>
-          <cytomine-slider :value="contrast" @input="setContrast" :min="0" :max="defaultMax" :tooltip="false"/>
+          <cytomine-slider :value="contrast" @input="setContrast" :min="0" :max="theoreticalMax" :tooltip="false"/>
         </td>
       </tr>
 
@@ -80,17 +89,24 @@ export default {
       return this.sampleHistogram.sample;
     },
 
-    defaultMax() {
+    theoreticalMax() {
       return Math.pow(2, this.image.bitPerSample) - 1;
     },
-    defaultMin() {
+    theoreticalMin() {
       return 0;
     },
-    defaultRange() {
-      return this.defaultMax - this.defaultMin;
+    theoreticalRange() {
+      return this.theoreticalMax - this.theoreticalMin;
     },
-    defaultCenter() {
-      return this.defaultRange / 2.0;
+    theoreticalCenter() {
+      return this.theoreticalRange / 2.0;
+    },
+
+    defaultMin() {
+      return this.imageWrapper.colors.defaultMinMax[this.sample].min;
+    },
+    defaultMax() {
+      return this.imageWrapper.colors.defaultMinMax[this.sample].max;
     },
 
     minimum: {
@@ -98,7 +114,7 @@ export default {
         return this.imageWrapper.colors.minMax[this.sample].min;
       },
       set(value) {
-        value = Math.max(this.defaultMin, Math.min(value, this.defaultMax));
+        value = Math.max(this.theoreticalMin, Math.min(value, this.theoreticalMax));
         this.$store.commit(this.imageModule + 'setMinimum', {sample: this.sample, value});
         if (value > this.maximum) {
           this.maximum = value;
@@ -110,7 +126,7 @@ export default {
         return this.imageWrapper.colors.minMax[this.sample].max;
       },
       set(value) {
-        value = Math.min(this.defaultMax, Math.max(value, this.defaultMin));
+        value = Math.min(this.theoreticalMax, Math.max(value, this.theoreticalMin));
         this.$store.commit(this.imageModule + 'setMaximum', {sample: this.sample, value});
         if (value < this.minimum) {
           this.minimum = value;
@@ -127,12 +143,6 @@ export default {
     nBins() {
       return 256;
     },
-    xMin() {
-      return Math.round((this.nBins - 1) * this.minimum / this.defaultMax);
-    },
-    xMax() {
-      return Math.round((this.nBins - 1) * this.maximum / this.defaultMax);
-    }
   },
   watch: {
     revision() {
@@ -153,7 +163,7 @@ export default {
     },
     setBrightness(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      let b = this.defaultMin + this.defaultRange * ((this.defaultRange - value) / this.defaultRange);
+      let b = this.theoreticalMin + this.theoreticalRange * ((this.theoreticalRange - value) / this.theoreticalRange);
       let range = this.range;
       this.minimum = Math.round(b - range / 2.0);
       this.maximum = Math.round(b + range / 2.0);
@@ -162,23 +172,23 @@ export default {
     },
     setContrast(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      let slope = (value <= this.defaultCenter) ? value / this.defaultCenter : this.defaultCenter / (this.defaultRange - value);
+      let slope = (value <= this.theoreticalCenter) ? value / this.theoreticalCenter : this.theoreticalCenter / (this.theoreticalRange - value);
       if (slope > 0) {
         let center = this.center;
-        this.minimum = Math.round(center - (this.defaultRange / 2) / slope);
-        this.maximum = Math.round(center + (this.defaultRange / 2) / slope);
+        this.minimum = Math.round(center - (this.theoreticalRange / 2) / slope);
+        this.maximum = Math.round(center + (this.theoreticalRange / 2) / slope);
 
         this.contrast =  value;
       }
     },
     computeBrightness() {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      this.brightness = Math.round(this.defaultRange * (1.0 - (this.center - this.defaultMin) / this.defaultRange));
+      this.brightness = Math.round(this.theoreticalRange * (1.0 - (this.center - this.theoreticalMin) / this.theoreticalRange));
     },
     computeContrast() {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      let c = this.defaultRange / this.range;
-      this.contrast =  Math.round((c > 0) ? this.defaultRange - (this.defaultCenter / c) : this.defaultCenter * c);
+      let c = this.theoreticalRange / this.range;
+      this.contrast =  Math.round((c > 0) ? this.theoreticalRange - (this.theoreticalCenter / c) : this.theoreticalCenter * c);
     }
   },
   created() {
