@@ -725,7 +725,7 @@ $colorOpenedPanelLink: #6c95c8;
   top: 0.7em;
   left: 3.5rem;
   right: $widthPanelBar;
-  z-index: 10;
+  z-index: 30;
 }
 
 .broadcast {
@@ -831,6 +831,7 @@ $colorOpenedPanelLink: #6c95c8;
 
 .ol-zoom, .ol-rotate {
   background: none !important;
+  z-index: 20;
 }
 
 .ol-rotate:not(.custom) {
@@ -858,6 +859,7 @@ $colorOpenedPanelLink: #6c95c8;
   position: absolute;
   left: .5em;
   top: 5rem;
+  z-index: 20;
 }
 
 .custom-overview {
@@ -905,7 +907,7 @@ $colorOpenedPanelLink: #6c95c8;
   bottom: 0;
   left: 0;
   right: $widthPanelBar;
-  z-index: 20;
+  z-index: 40;
   pointer-events: none;
 }
 </style>
