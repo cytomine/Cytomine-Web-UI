@@ -129,6 +129,10 @@ export default {
   margin-right: 1em;
   margin-top: 0.5em;
 }
+
+.top .delete {
+  z-index: 20 !important;
+}
 </style>
 
 <style>
