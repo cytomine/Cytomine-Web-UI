@@ -24,10 +24,10 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown 
-      icon="fa-folder-open" 
-      v-if="this.nbActiveProjects > 0" 
-      :title="$t('workspace')" 
+      <navbar-dropdown
+      icon="fa-folder-open"
+      v-if="this.nbActiveProjects > 0"
+      :title="$t('workspace')"
       :listPathes="['/project/']">
         <navigation-tree />
       </navbar-dropdown>
@@ -43,7 +43,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item">
+      <router-link to="/algorithm" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
