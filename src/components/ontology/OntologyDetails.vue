@@ -110,6 +110,7 @@ export default {
 
       fullOntology: {},
       projects: [],
+      managedProjects: [],
       creatorFullname: null,
 
       isRenameModalActive: false
@@ -118,10 +119,20 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     canEdit() {
-      return this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user;
+      return !this.currentUser.guestByNow && (this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user ||
+        (this.hasAccessToAllProjects && (this.allProjectsAreCollaborative || this.manageAllProjects)));
     },
     nbProjects() {
       return this.fullOntology.projects.length;
+    },
+    hasAccessToAllProjects() {
+      return this.nbProjects === this.projects.length;
+    },
+    allProjectsAreCollaborative() {
+      return !this.projects.some(p => p.isRestricted || p.isReadOnly);
+    },
+    manageAllProjects() {
+      return !this.projects.some(p => !this.managedProjects.find(mp => mp.id === p.id));
     }
   },
   watch: {
@@ -146,6 +157,8 @@ export default {
         this.error = true;
       }
 
+      this.fetchManagedProjects();
+
       try {
         let creator = await User.fetch(this.fullOntology.user);
         this.creatorFullname = fullName(creator);
@@ -155,6 +168,14 @@ export default {
       }
 
       this.loading = false;
+    },
+    async fetchManagedProjects() {
+      this.managedProjects = (await ProjectCollection.fetchAll({
+        filterKey: 'user',
+        filterValue: this.currentUser.id,
+        light: true,
+        admin: true
+      })).array;
     },
 
     async rename(newName) {
