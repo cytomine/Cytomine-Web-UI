@@ -1011,3 +1011,4 @@ button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un h
 gamma,Gamma,Gamma
 inverse,Inverse,Inverse
 button-compute-histogram,Compute histogram,Calculer l'histogramme
+too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.
