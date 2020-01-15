@@ -222,13 +222,13 @@ export default {
     currentPage: {
       get() {
         if (this.isInViewer) {
-          return this.imageWrapper.annotationsList.currentPage || 1;
+          return this.imageWrapper.annotationsList.currentPages[this.prop.id] || 1;
         }
         return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.prop.id] || 1;
       },
       set(page) {
         if (this.isInViewer) {
-          this.$store.commit(this.imageModule + 'setCurrentPage', page);
+          this.$store.commit(this.imageModule + 'setCurrentPage', {prop: this.prop.id, page});
         }
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }

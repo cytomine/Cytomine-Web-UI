@@ -1,8 +1,11 @@
+
+import Vue from 'vue';
+
 export default {
   state() {
     return {
       open: false,
-      currentPage: 1,
+      currentPages: {} // mapping of type {idProp: currentPage}
     };
   },
 
@@ -10,8 +13,8 @@ export default {
     setShowAnnotationsList(state, value) {
       state.open = value;
     },
-    setCurrentPage(state, value) {
-      state.currentPage = value;
+    setCurrentPage(state, {prop, page}) {
+      Vue.set(state.currentPages, prop, page);
     }
   }
 };
