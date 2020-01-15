@@ -39,7 +39,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item">
+      <router-link to="/algorithm" class="navbar-item">
         <i class="fas fa-flask"></i>
         {{ $t('algorithms') }}
       </router-link>

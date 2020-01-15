@@ -32,7 +32,7 @@
     >
       <template #default="{row: software}">
         <b-table-column field="name" :label="$t('name')" sortable width="100">
-          <router-link :to="`/software/${software.id}`">
+          <router-link :to="`/algorithm/${software.id}`">
             {{ software.fullName }}
           </router-link>
         </b-table-column>

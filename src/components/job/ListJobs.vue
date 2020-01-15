@@ -107,7 +107,7 @@
           </b-table-column>
 
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
-            <router-link :to="`/software/${job.software}`">
+            <router-link :to="`/algorithm/${job.software}`">
               {{job.softwareName}}
             </router-link>
           </b-table-column>
