@@ -878,6 +878,8 @@ shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation
 shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification
 shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation
+shortcut-viewer-tool-copy,Copy annotation,Copier l'annotation
+shortcut-viewer-tool-paste,Paster annotation,Coller l'annotation
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom
 shortcut-viewer-toggle-link,Toggle image synchronization panel,Afficher/Masquer le panneau de synchronisation des images
@@ -964,7 +966,7 @@ favorite,Favorite,Favori
 no-selected-layers,No selected layers,Pas de couche sélectionnée
 button-best-fit-zoom,Fit zoom to viewport,Ajuster le zoom à la vue
 button-reset-zoom,Reset zoom,Réinitialiser le zoom
-copy,Copy,Copy
+copy,Copy,Copier
 paste,Paste,Coller
 copy-paste,Copy/Paste,Copier/Coller
 notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée
@@ -1012,3 +1014,9 @@ gamma,Gamma,Gamma
 inverse,Inverse,Inverse
 button-compute-histogram,Compute histogram,Calculer l'histogramme
 too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.
+no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche
+no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche
+confirm-profile-computation,Confirm profile computation,Confirmer le calcul du profil
+confirm-profile-computation-message,Are you sure to ask for profile computation for this image (possibly slow)?,Etes-vous certain de demander le calcul du profil pour cette image (potentiellement lent) ?
+notif-error-profile-computation,Error during profile computation,Une erreur a empêché le calcul du profil
+notif-error-profile-deletion,Error during profile deletion,Une erreur a empêché la suppresion du profil
