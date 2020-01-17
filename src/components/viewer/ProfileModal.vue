@@ -36,6 +36,7 @@
         <annotation-profile-chart
           @error="val => error = val"
           :annotation="annotation"
+          :bpc="bpc"
           :css-classes="'profile-chart-container'"
           ref="chart"
         ></annotation-profile-chart>
@@ -78,7 +79,7 @@ export default {
       return `${this.annotation.url}?maxSize=${this.thumbSize}&square=true&complete=true&thickness=2&increaseArea=1.25&draw=true`;
     },
     bpc() {
-      return (this.image && this.image.bitDepth) ? this.image.bitDepth : 8;
+      return (this.image && this.image.bitPerSample) ? this.image.bitPerSample: 8;
     }
   },
   methods: {
