@@ -240,7 +240,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" :href="image.downloadURL">
+            <a class="button" :href="image.downloadURL" v-if="image.path">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
