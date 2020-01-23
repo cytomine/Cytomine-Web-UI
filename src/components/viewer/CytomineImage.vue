@@ -374,7 +374,7 @@ export default {
       let inverse = (this.imageWrapper.colors.inverse) ? '&inverse=true' : '';
       let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}${contrast}${gamma}${inverse}`;
 
-      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('|');
+      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('%7C');
       if (minmax) params += `&minmax=${minmax}`;
 
       return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
