@@ -18,6 +18,7 @@ analyses,Analyses,Analyses
 configuration,Configuration,Configuration
 no-project,No project to display,Aucun projet à afficher
 no-image,No image to display,Aucune image à afficher
+no-image-recently-opened,No image recently opened,Aucune image consultée récemment
 statistics,Statistics,Statistiques
 user-annotations,Manual Annotations,Annotations manuelles
 analysis-annotations,Analysis Annotations,Annotations d'analyse
