@@ -150,6 +150,7 @@ const routes = [
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
   {path: '/software', redirect: '/algorithm'},
+  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
