@@ -22,7 +22,7 @@
   </div>
 </div>
 <div v-else>
-  {{$t('no-image')}}
+  {{$t('no-image-recently-opened')}}
 </div>
 </template>
 
