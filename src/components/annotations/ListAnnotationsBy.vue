@@ -119,6 +119,12 @@ export default {
     isByTag() {
       return this.categorization === 'TAG';
     },
+    filteredTermsIds() {
+      return this.termsIds.filter(id => id > 0);
+    },
+    filteredTracksIds() {
+      return this.tracksIds.filter(id => id > 0);
+    },
 
     collection() {
       this.revision; // to ensure that collection is reloaded if revision changes
@@ -137,10 +143,10 @@ export default {
         multipleTrack: this.multipleTracks,
         noTag: (this.tagsIds) ? this.noTag : null,
 
-        terms: (!this.isByTerm) ? this.termsIds.filter(id => id > 0) : null,
-        users: (!this.isByUser) ? this.usersIds : null,
-        images: (!this.isByImage) ? this.imagesIds : null,
-        tracks: (!this.isByTrack) ? this.tracksIds.filter(id => id > 0) : null,
+        terms: (!this.isByTerm && this.filteredTermsIds.length < this.allTerms.length) ? this.filteredTermsIds.filter(id => id > 0) : null,
+        users: (!this.isByUser && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
+        images: (!this.isByImage && this.imagesIds.length < this.allImages.length) ? this.imagesIds : null,
+        tracks: (!this.isByTrack && this.filteredTracksIds.length < this.allTracks.length) ? this.filteredTracksIds.filter(id => id > 0) : null,
         tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
 
         reviewed: this.reviewed,
@@ -152,7 +158,8 @@ export default {
         showSlice: true,
         afterThan: this.afterThan,
         beforeThan: this.beforeThan,
-        max: this.nbPerPage
+        max: this.nbPerPage,
+        project: this.currentProject.id
       });
     },
     title() {
