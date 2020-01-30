@@ -879,7 +879,7 @@ shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,S
 shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation
 shortcut-viewer-tool-copy,Copy annotation,Copier l'annotation
-shortcut-viewer-tool-paste,Paster annotation,Coller l'annotation
+shortcut-viewer-tool-paste,Paste annotation,Coller l'annotation
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom
 shortcut-viewer-toggle-link,Toggle image synchronization panel,Afficher/Masquer le panneau de synchronisation des images
