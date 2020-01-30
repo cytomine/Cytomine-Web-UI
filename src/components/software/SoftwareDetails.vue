@@ -176,7 +176,7 @@ export default {
       this.projects = (await ProjectCollection.fetchAll({filterKey: 'software', filterValue: this.software.id})).array;
     },
     async fetchSource() {
-      this.source = await TrustedSource.fetch(this.software.softwareUserRepository);
+      this.source = (this.software.softwareUserRepository) ? await TrustedSource.fetch(this.software.softwareUserRepository) : null;
     }
   },
   created() {
