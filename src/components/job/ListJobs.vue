@@ -205,7 +205,7 @@ export default {
 
       if(this.selectedLaunchers.length > 0){
         collection['username'] = {
-          in: this.selectedLaunchers
+          in: this.selectedLaunchers.join()
         };
       }
       if(this.selectedStatus.length > 0){
