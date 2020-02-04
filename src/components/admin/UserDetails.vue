@@ -56,7 +56,7 @@
               </button>
             </template>
             <ul>
-              <li v-for="project in projects" :key="project.id">
+              <li v-for="project in managedProjects" :key="project.id">
                 <router-link :to="`/project/${project.id}`">
                   {{ project.name }}
                 </router-link>
