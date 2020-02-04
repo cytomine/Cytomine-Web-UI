@@ -501,14 +501,23 @@ website,Website,Site web
 source-code,Source code,Code source
 documentation,Documentation,Documentation
 contact,Contact,Contact
-cytomine-sponsors-info,"Cytomine is developed by the {cytomineCompanyLink} in collaboration with the University of Liège and was previously funded by research grants of the Wallonia.","Cytomine est développé par la {cytomineCompanyLink} en collaboration avec l'Université de Liège et a été subventionné par des conventions de recherche de la Région Wallone."
+cytomine-sponsors-info,"Cytomine is an open-source project developed by the {cytomineCompanyLink} in collaboration with the {cytomineULiegeLink} and was previously funded by research grants of the Wallonia.","Cytomine est un projet open-source développé par la {cytomineCompanyLink} en collaboration avec l'{cytomineULiegeLink} et a été subventionné par des conventions de recherche de la Région Wallone."
 cytomine-company,Cytomine company,société Cytomine
-cytomine-website-info,"You can find more information on the website of the Cytomine project located at {websiteLink}.",Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.
-source-code-info,"Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code is available on our {githubLink}.",Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.
+university-of-liege,University of Liège,Université de Liège
+open-source-project,Open-source project,Projet open-source
+services,Services,Services
+R&D,R&D,R&D
+cytomine-org-info,"You can find more information on the website of the Cytomine project ({websiteOrgLink}).","Vous trouverez davantage d'information sur le site web du projet Cytomine ({websiteOrgLink})."
+cytomine-company-info,"For service requests (e.g. installation, hosting, maintenance, trainings, specific software developments, slide scanning), please contact the {websiteCompanyLink}.","Pour des services (e.g. installation, hébergement, maintenance, formations, développements logiciels spécifiques, slide scanning), contactez la {websiteCompanyLink}."
+cytomine-uliege-info,"Research and development of this experimental version is supported by the {websiteULiegeLink}.","La recherche et développement de cette version expérimentale sont fournis par l'{websiteULiegeLink}."
+cytomine-uliege-team,Cytomine team at the University of Liège,équipe Cytomine à l'Université de Liège
+source-code-info,"Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code of this edge version is available on this {githubULiegeLink}, while the source code for official versions is available on this {githubOrgLink}.","Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source de cette version avancée est disponible sur ce {githubULiegeLink}, tandis que le celui des versions officielles est disponible sur ce {githubOrgLink}."
 github-repository,GitHub repository,répertoire GitHub
-documentation-info,"A complete documentation is available {docLink}. More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.","Une documentation complète est disponible {docLink}. Des informations plus détaillées sur l'API de Cytomine sont aussi disponibles {apiDocLink}."
+documentation-info,"A complete documentation for this edge version is available {docULiegeLink} (based on official documention available {docOrgLink}). More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.","Une documentation complète de cette version avancées est disponible {docULiegeLink} (sur base de la documentation officielle disponible {docOrgLink}). Des informations plus détaillées sur l'API de Cytomine sont aussi disponibles {apiDocLink}."
 here,here,ici
 contact-info,You can contact the Cytomine Team at {contactMail},Vous pouvez contacter l'équipe de Cytomine à l'adresse {contactMail}.
+forum-info,We kindly encourage you to ask user-related questions on the {forumLink}.,Nous vous encourageons à poser vos questions sur le {forumLink}.
+image.sc-forum,Image.sc forum,forum Image.sc
 button-previous-image,Previous image,Image précédente
 button-next-image,Next image,Image suivante
 notif-error-first-image,This is the first image of the project,Il s'agit de la première image du projet
