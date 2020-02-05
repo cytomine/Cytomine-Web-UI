@@ -85,7 +85,7 @@
       <dt>{{$t('contact')}}</dt>
       <dd>
         <i18n path="forum-info">
-          <a place="forumLink" href="">{{$t('image.sc-forum')}}</a>
+          <a place="forumLink" href="https://forum.image.sc/tags/cytomine">{{$t('image.sc-forum')}}</a>
         </i18n>
         <br>
         <i18n path="contact-info">
