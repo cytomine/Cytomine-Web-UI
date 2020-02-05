@@ -26,6 +26,7 @@
         :perPage.sync="perPage"
         :sort.sync="sortField"
         :order.sync="sortOrder"
+        :detailed="false"
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
