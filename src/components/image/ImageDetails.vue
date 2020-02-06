@@ -169,7 +169,7 @@
               <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <a class="button" :href="image.downloadURL">
+              <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
                 {{$t('button-download')}}
               </a>
               <button class="button is-danger" @click="confirmDeletion()">
@@ -255,6 +255,9 @@ export default {
     currentUser: get('currentUser/user'),
     blindMode() {
       return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+    },
+    canDownloadImages() {
+      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
