@@ -73,6 +73,7 @@ modify,Modify,Modifier
 move,Move,Déplacer
 rotate,Rotate,Pivoter
 delete,Delete,Supprimer
+rename,Rename,Renommer
 undo,Undo,Annuler
 redo,Redo,Refaire
 confirm-deletion,Confirm deletion,Confirmer la suppression
@@ -170,7 +171,24 @@ annotation-type,Annotation type,Type d'annotation
 multiple-terms,Multiple terms,Plusieurs termes
 created-by,Created by,Créé par
 properties,Properties,Propriétés
-no-properties,No properties,Aucune propriété
+no-properties,No property,Aucune propriété
+tags,Tags,Tags
+no-tag,No tag,Aucun tag
+new-tag,New tag,Nouveau tag
+notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
+notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
+notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
+associate-tags,Associate tags,Associer des tags
+notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés
+notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
+search-tag,Search tag...,Rechercher un tag...
+how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
+delete-tag,Delete tag,Supprimer le tag
+delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues
+notif-success-tag-rename,Tag {tagName} was successfully renamed,Le tag {tagName} a bien été renommé
+notif-error-tag-rename,Failed to rename tag {tagName},Une erreur a empêché de renommer le tag {tagName}
+notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé
+notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName}
 area,Area,Aire
 perimeter,Perimeter,Périmètre
 button-view-in-image,View in image,Voir dans l'image
@@ -310,6 +328,8 @@ default-annotation-layers,Default annotation layers,Calques chargés par défaut
 select-layer-placeholder,Select a layer,Sélectionner un calque
 default-property,Default property,Propriété par défaut
 no-default-property,No default property,Pas de propriété par défaut
+images_downloadable_by_contributor,"Images downloadable by contributor","Images téléchargeables par les contributeurs"
+images_downloadable_by_contributor-explanation,"If this is enabled, contributors will be able to download the images of this project","Avec cette option, les contributeurs pourront télécharger les images de ce projet"
 notif-error-general-config-update,Error during update of configuration,Une erreur a empêché de mettre à jour la configuration
 layer,Layer,Calque
 hide-by-default,Hide layer by default,Caché par défaut
@@ -317,6 +337,7 @@ button-remove,Remove,Supprimer
 notif-error-default-layer-add,Failed to add a default layer,Une erreur a empêché d'ajouter le calque aux calques par défaut
 notif-error-default-layer-update,Error during update of default layer,Une erreur a empêché de mettre à jour le calque par défaut
 notif-error-default-layer-delete,Failed to delete default layer,Une erreur a empêché de supprimer le calque par défaut
+no-selected-layers,No selected layers,Pas de calque sélectionné
 button-add-members,Add members,Ajouter des membres
 button-details,Details,Détails
 button-view-activity,View activity,Voir l'activité
@@ -407,7 +428,7 @@ no-result,No result,Aucun résultat
 upload,Upload,Upload
 important-notes,Important notes,Remarques importantes
 max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI)."
+allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
 vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.","Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés)."
 zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)","Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS)."
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}""."
@@ -585,6 +606,7 @@ annotation-creations,Annotation creations,Créations d'annotations
 no-project-connection,No project connection,Aucune connexion au projet
 no-image-consultation,No image consultation,Aucune consultation d'image
 operating-system,Operating system,Système d'exploitation
+system,System,Système
 browser,Browser,Navigateur
 first-consultation,First consultation,Première consultation
 last-consultation,Last consultation,Dernière consultation

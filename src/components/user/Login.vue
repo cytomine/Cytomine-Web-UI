@@ -1,9 +1,25 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="panel">
   <template v-if="forgotUsername">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-username')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="sendUsername">
@@ -23,6 +39,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-password')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="resetPassword()">
@@ -44,6 +61,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('login')}}
+      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="login()">
@@ -169,5 +187,9 @@ export default {
 
 .forgot-credentials a {
   text-transform: lowercase;
+}
+
+.panel-heading img {
+  float: right;
 }
 </style>

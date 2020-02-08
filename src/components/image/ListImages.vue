@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="box error" v-if="!configUI['project-images-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -58,6 +73,17 @@
                     :multiple="true" label="label" track-by="value"/>
               </div>
             </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
+
           </div>
 
           <div class="columns">
@@ -193,6 +219,7 @@
           <image-details
             :image="image"
             :excludedProperties="excludedProperties"
+            editable
             @delete="refreshData"
             @setResolution="refreshData"
             @setMagnification="refreshData"
@@ -223,7 +250,7 @@ import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import vendorFromMime from '@/utils/vendor';
 
-import {ImageInstanceCollection} from 'cytomine-client';
+import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -259,6 +286,7 @@ export default {
       availableVendors: [],
       availableMagnifications: [],
       availableResolutions: [],
+      availableTags:[],
       maxWidth: 100,
       maxHeight: 100,
       maxNbUserAnnotations: 100,
@@ -293,6 +321,7 @@ export default {
 
     selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
     selectedVendors: localSyncMultiselectFilter('vendors', 'availableVendors'),
+    selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
     selectedMagnifications: localSyncMultiselectFilter('magnifications', 'availableMagnifications'),
     selectedResolutions: localSyncMultiselectFilter('resolutions', 'availableResolutions'),
     boundsWidth: localSyncBoundsFilter('boundsWidth', 'maxWidth'),
@@ -303,10 +332,11 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'extension', selected: this.selectedFormats},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value)},
-        {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value)},
-        {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value)}
+        {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
+        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
+        {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
+        {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
+        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
     },
 
@@ -336,9 +366,9 @@ export default {
           lte: bounds[1]
         };
       }
-      for(let {prop, selected} of this.multiSelectFilters) {
+      for(let {prop, selected, total} of this.multiSelectFilters) {
         if(prop == 'vendor') prop = 'mimeType';
-        if(selected.length > 0) {
+        if(selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
           };
@@ -373,13 +403,13 @@ export default {
         return {
           value: mime || 'null',
           label: vendor ? vendor.name : this.$t('unknown')
-        }
+        };
       });
       this.availableMagnifications = stats.magnification.list.map(m => {
         return {
           value: m || 'null',
           label: m || this.$t('unknown')
-        }
+        };
       });
       this.availableResolutions = stats.resolution.list.map(resolution => {
         return {
@@ -387,6 +417,9 @@ export default {
           label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
         };
       });
+    },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
 
     async refreshData() {
@@ -410,6 +443,7 @@ export default {
     try {
       await Promise.all([
         this.fetchFilters(),
+        this.fetchTags()
       ]);
       this.loading = false;
     }

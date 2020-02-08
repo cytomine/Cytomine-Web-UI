@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="image-details-wrapper">
   <table class="table">
@@ -44,6 +59,12 @@
         <td class="prop-label">{{$t('description')}}</td>
         <td class="prop-content">
           <cytomine-description :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('tags')">
+        <td class="prop-label">{{$t('tags')}}</td>
+        <td class="prop-content">
+          <cytomine-tags :object="image" :canEdit="canEdit" />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('properties')">
@@ -148,7 +169,7 @@
               <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <a class="button" :href="image.downloadURL">
+              <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
                 {{$t('button-download')}}
               </a>
               <button class="button is-danger" @click="confirmDeletion()">
@@ -192,6 +213,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
@@ -207,6 +229,7 @@ export default {
   name: 'image-details',
   components: {
     CytomineDescription,
+    CytomineTags,
     CytomineProperties,
     AttachedFiles,
     MagnificationModal,
@@ -217,7 +240,8 @@ export default {
   },
   props: {
     image: {type: Object},
-    excludedProperties: {type: Array, default: () => []}
+    excludedProperties: {type: Array, default: () => []},
+    editable: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -230,13 +254,16 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     blindMode() {
-      return this.$store.state.currentProject.project.blindMode;
+      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+    },
+    canDownloadImages() {
+      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
     },
     canEdit() {
-      return this.$store.getters['currentProject/canEditImage'](this.image);
+      return this.editable && this.$store.getters['currentProject/canEditImage'](this.image);
     },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
@@ -299,6 +326,10 @@ export default {
           text: this.$t('notif-success-image-deletion', {imageName: this.imageNameNotif})
         });
         this.$emit('delete');
+
+        let updatedProject = this.$store.state.currentProject.project.clone();
+        updatedProject.numberOfImages--;
+        this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
       catch(err) {
         console.log(err);

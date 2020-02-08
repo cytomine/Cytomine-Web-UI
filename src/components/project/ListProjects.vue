@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="list-projects-wrapper content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -55,7 +70,15 @@
               </div>
             </div>
 
-            <div class="column"></div>
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
           </div>
 
           <div class="columns">
@@ -180,6 +203,7 @@
           <project-details
             :project="project"
             :excluded-properties="excludedProperties"
+            editable
             @update="updateProject()"
             @delete="deleteProject(project)"
           />
@@ -215,7 +239,7 @@ import AddProjectModal from './AddProjectModal';
 
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
-import {ProjectCollection, OntologyCollection} from 'cytomine-client';
+import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
 export default {
   name: 'list-projects',
   components: {
@@ -232,6 +256,8 @@ export default {
 
       projects: [],
       ontologies: [],
+      availableTags:[],
+
 
       contributorLabel: this.$t('contributor'),
       managerLabel: this.$t('manager'),
@@ -273,6 +299,7 @@ export default {
 
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
+    selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
     boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
     boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
     boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
@@ -318,6 +345,11 @@ export default {
           ilike: encodeURIComponent(this.searchString)
         };
       }
+      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length){
+        collection['tag'] = {
+          in: this.selectedTags.map(t => t.id).join()
+        };
+      }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
           gte: bounds[0],
@@ -354,6 +386,9 @@ export default {
       this.maxNbJobAnnotations = Math.max(100, stats.numberOfJobAnnotations.max);
       this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
     },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+    },
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     },
@@ -382,7 +417,8 @@ export default {
     try {
       await Promise.all([
         this.fetchOntologies(),
-        this.fetchMaxFilters()
+        this.fetchMaxFilters(),
+        this.fetchTags()
       ]);
     }
     catch(error) {
