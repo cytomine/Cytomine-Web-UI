@@ -104,6 +104,7 @@ export default {
         if(!this.currentUser) {
           let redirect = encodeURIComponent(window.location.href);
           window.location = '/login/Shibboleth?cytomine_redirect='+redirect;
+          //window.location = '/saml/login?cytomine_redirect='+redirect;
         }
         this.communicationError = false;
       }
