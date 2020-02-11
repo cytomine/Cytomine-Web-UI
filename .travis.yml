@@ -30,11 +30,12 @@ deploy:
       echo $VERSION &&
       docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" &&
       docker push cytomineuliege/web-ui:v$VERSION &&
-      echo "Done.
+      echo "Done."
     skip_cleanup: true
     on:
       condition: $DEPLOY = true
   - provider: releases
+    edge: true
     api_key:
       secure: v6iaN/oL+rDe06b7LegdOJtvm/mcNLeh4i7S+UXtBauZWGt4lhR8FqLP3qKqRaHyS31cOi2rHtl60FZFfpyp88rmsDYdAgybL05b6WolBp/T+dW5rauADz2A0Yb3CurEOjWgrvCw2DIzg+SEOaNVAVq7ue6hXomfsEoyNHyTr/cChwgyXUmg2RAFV/w9ftucANofZUku7cxDmxpKdev38Y+9vN5D4cqdwoPRBxnXiU56lXa4xv4AHu/XdHCmcSDYpRlVTypPsI2LshPltmXatvhOhF0aGCWGfcSqZ4g0Wn3jfv2+rHSePn/tgJ23MHSN6uaEYjCK0bZB8q5FLqZ2BnaWwiFssYw4NWyszlyuvzJSo97PV9n8hUk6Q6i5XXYVcAskTP5E+9LdMf0gEpfXSjd0hFKggM9IQIxQYhCcnHTgrpSgezrqLZJDuRoknVKGcdTn58MwIqJ2TxlmfNYINxp1BlAsMqGBV5vHtAG1L1F+o4Sfw6EEQhZT37r+K6ye6kZ6iXNDw+ufPdKPmo9TdpL55klP0MWWJhqcBgy8y8ydkd9iZwfYvZbHyxk5PplgrYEJphJ6uksgwfcKTAb/eFEhATp7vs5NLpPMZhRuNmMUj+ucu+NrtfrLN5yM+XNsuRAXESCBHTf30PLOUvb9pMyZ+kvDPMY/pkxp2AY1qvU=
     file: "*.{tgz}"
