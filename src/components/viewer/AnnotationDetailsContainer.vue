@@ -38,15 +38,20 @@
       <annotation-details
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
+        :images="[image]"
+        :profiles="profiles"
+        :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
         :key="selectedFeature.id"
         :showComments="showComments"
-        @addTerm="addTerm"
-        @updateTerms="updateTerms()"
-        @updateProperties="updateProperties()"
-        @centerView="centerViewOnAnnot()"
-        @deletion="handleDeletion()"
+        @addTerm="$emit('addTerm', $event)"
+        @addTrack="$emit('addTrack', $event)"
+        @updateTerms="$emit('updateTermsOrTracks', annot)"
+        @updateTracks="$emit('updateTermsOrTracks', annot)"
+        @updateProperties="$emit('updateProperties')"
+        @centerView="$emit('centerView', annot)"
+        @deletion="$emit('delete', annot)"
       />
     </div>
   </vue-draggable-resizable>
@@ -59,9 +64,6 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
-import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
-
-import WKT from 'ol/format/WKT';
 
 export default {
   name: 'annotations-details-container',
@@ -77,7 +79,6 @@ export default {
       users: [],
       userJobs: [],
       reload: true,
-      format: new WKT(),
       showComments: false
     };
   },
@@ -93,6 +94,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    profiles() {
+      return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];
     },
     displayAnnotDetails: {
       get() {
@@ -123,6 +127,9 @@ export default {
     },
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
+    },
+    tracks() {
+      return this.imageWrapper.tracks.tracks;
     }
   },
   watch: {
@@ -146,32 +153,6 @@ export default {
         filterKey: 'project',
         filterValue: this.image.project
       })).array;
-    },
-
-    centerViewOnAnnot() {
-      let geometry = this.format.readGeometry(this.annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
-    },
-
-    addTerm(term) {
-      this.$store.dispatch(this.viewerModule + 'addTerm', term);
-    },
-
-    async updateTerms() {
-      let updatedAnnot = await this.annot.clone().fetch();
-      await updateTermProperties(updatedAnnot);
-
-      this.$eventBus.$emit('editAnnotation', updatedAnnot);
-      this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
-    },
-
-    updateProperties() {
-      this.$store.dispatch(this.imageModule + 'refreshProperties', this.index);
-    },
-
-    handleDeletion() {
-      this.$store.commit(this.imageModule + 'addAction', {annot: this.annot, type: Action.DELETE});
-      this.$eventBus.$emit('deleteAnnotation', this.annot);
     },
 
     dragStop(x, y) {

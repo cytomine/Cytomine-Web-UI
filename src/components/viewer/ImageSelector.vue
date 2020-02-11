@@ -110,7 +110,8 @@ export default {
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
-        await this.$store.dispatch(this.viewerModule + 'addImage', image);
+        let slice = await image.fetchReferenceSlice();
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
       }
       catch(error) {
         console.log(error);
@@ -120,6 +121,16 @@ export default {
 
     more() {
       this.nbImagesDisplayed += 20;
+    },
+
+    toggle() {
+      this.imageSelectorEnabled = !this.imageSelectorEnabled;
+    },
+
+    shortkeyHandler(key) {
+      if (key === 'toggle-add-image') {
+        this.toggle();
+      }
     }
   },
   async created() {
@@ -134,6 +145,12 @@ export default {
       this.error = true;
     }
     this.loading = false;
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

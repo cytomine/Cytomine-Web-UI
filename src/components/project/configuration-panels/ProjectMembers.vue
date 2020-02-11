@@ -30,7 +30,7 @@
           {{$t('role')}}
         </div>
         <div class="filter-body">
-          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
             :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
@@ -47,6 +47,7 @@
 
     <cytomine-table
       :collection="MemberCollection"
+      :is-empty="this.selectedRoles.length === 0"
       :currentPage.sync="currentPage"
       :perPage.sync="perPage"
       :sort.sync="sortField"
@@ -68,14 +69,13 @@
         </b-table-column>
 
         <b-table-column field="projectRole" :label="$t('role')" sortable width="50">
-          <span class="icons">
-            <a @click="confirmToggleManager(member)">
-              <i class="fas fa-user-cog" :class="{disabled: member.role === contributorRole.value}"></i>
-            </a>
-            <a v-if="member.role !== contributorRole.value" @click="toggleRepresentative(member)">
-              <i class="fas fa-flag" :class="{disabled: member.role !== representativeRole.value}"></i>
-            </a>
-          </span>
+          <icon-project-member-role
+            :is-manager="member.role !== contributorRole.value"
+            :is-representative="member.role === representativeRole.value"
+            editable
+            @toggleManager="confirmToggleManager(member)"
+            @toggleRepresentative="toggleRepresentative(member)"
+          />
         </b-table-column>
 
         <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
@@ -106,26 +106,9 @@
 
     <div class="legend">
       <h2>{{$t('legend')}}</h2>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog disabled"></i>
-        </span>
-        {{$t('project-contributor')}}
-      </p>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog"></i>
-          <i class="fas fa-flag disabled"></i>
-        </span>
-        {{$t('project-manager')}}
-      </p>
-      <p>
-        <span class="icons">
-          <i class="fas fa-user-cog"></i>
-          <i class="fas fa-flag"></i>
-        </span>
-        {{$t('project-representative')}}
-      </p>
+      <p><icon-project-member-role /> : {{$t('project-contributor')}}</p>
+      <p><icon-project-member-role :is-manager="true" /> : {{$t('project-manager')}}</p>
+      <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('project-representative')}}</p>
     </div>
 
     <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()" />
@@ -134,17 +117,19 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
-import {Cytomine, UserCollection, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
+import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
   name: 'projet-members',
   components: {
+    IconProjectMemberRole,
     CytomineTable,
     CytomineMultiselect,
     AddMemberModal
@@ -197,7 +182,6 @@ export default {
       return collection;
     },
 
-
     exportURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
@@ -211,7 +195,7 @@ export default {
       if(member.origin === 'BOOTSTRAP') key = 'system';
       else key = 'manual';
 
-      return this.$t(key)
+      return this.$t(key);
     },
     async refreshMembers() {
       try {
@@ -239,7 +223,7 @@ export default {
     },
     async removeSelectedMembers() {
       try {
-        await this.project.deleteUsers(this.selectedMembers.map(member => member.id))
+        await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
       }
@@ -306,7 +290,7 @@ export default {
     },
   },
   async created() {
-    this.availableRoles = [this.contributorRole, this.managerRole];
+    this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
     this.selectedRoles = this.availableRoles;
     this.revision++;
     this.loading = false;

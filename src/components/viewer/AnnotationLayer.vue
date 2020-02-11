@@ -62,6 +62,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     annotsIdsToSelect() {
       return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
     },
@@ -84,6 +87,7 @@ export default {
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
         term.visible;
+        term.color;
         term.opacity;
       });
       this.imageWrapper.style.displayNoTerm;
@@ -91,6 +95,9 @@ export default {
       this.imageWrapper.properties.selectedPropertyKey;
       this.imageWrapper.properties.selectedPropertyColor;
       this.imageWrapper.review.reviewMode;
+      this.imageWrapper.style.wrappedTracks.forEach(track => {
+        track.color;
+      });
 
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];
@@ -114,7 +121,7 @@ export default {
     },
 
     annotBelongsToLayer(annot) {
-      return annotBelongsToLayer(annot, this.layer, this.image);
+      return annotBelongsToLayer(annot, this.layer, this.slice);
     },
 
     addAnnotationHandler(annot) {
@@ -133,10 +140,14 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear=false}={}) {
+    reloadAnnotationsHandler({idImage, clear=false, hard=false}={}) {
       if(!idImage || idImage === this.image.id) {
         if(clear) {
           this.clearFeatures();
+        }
+        else if(hard) {
+          this.clearFeatures();
+          this.loader();
         }
         else {
           this.loader();
@@ -211,12 +222,14 @@ export default {
       let annots = await new AnnotationCollection({
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
+        slice: this.slice.id,
         reviewed: this.layer.isReview,
         notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
         showWKT: true,
         showTerm: true,
         showGIS: true,
+        showTrack: true,
         kmeans: true
       }).fetchAll();
 

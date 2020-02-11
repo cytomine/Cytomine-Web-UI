@@ -82,7 +82,7 @@
           </b-table-column>
 
           <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-            <i class="fas fa-user-cog" :title="$t('project-manager')" v-if="member.role === managerRole"></i>
+            <icon-project-member-role :is-manager="member.role === managerRole" />
           </b-table-column>
 
           <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
@@ -138,9 +138,8 @@
 
       <div class="legend">
         <h2>{{$t('legend')}}</h2>
-        <p>
-          <i class="fas fa-user-cog"></i>: {{$t('project-manager')}}
-        </p>
+        <p><icon-project-member-role /> : {{$t('project-contributor')}}</p>
+        <p><icon-project-member-role :is-manager="true" /> : {{$t('project-manager')}}</p>
       </div>
     </template>
   </div>
@@ -154,10 +153,12 @@ import Username from '@/components/user/Username';
 
 import constants from '@/utils/constants.js';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
   name: 'members-activity',
   components: {
+    IconProjectMemberRole,
     CytomineMultiselect,
     Username
   },

@@ -30,7 +30,7 @@
         :zoom.sync="zoom"
         :rotation.sync="rotation"
         :max-zoom="maxZoom"
-        :max-resolution="Math.pow(2, image.depth)"
+        :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"
         :projection="projectionName"
         @mounted="viewMounted()"
@@ -46,6 +46,7 @@
           crossOrigin="Anonymous"
           ref="baseSource"
           @mounted="setBaseSource()"
+          :transition="0"
         />
       </vl-layer-tile>
 
@@ -95,7 +96,9 @@
             <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
               <i class="fas fa-search"></i>
             </a>
-            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index"
+                          @resetZoom="$refs.view.animate({zoom: image.zoom})"
+                          @fitZoom="fitZoom" />
           </li>
 
           <li v-if="isPanelDisplayed('link') && nbImages > 1">
@@ -152,6 +155,8 @@
       </ul>
     </div>
 
+    <image-controls :index="index" class="image-controls-wrapper" />
+
     <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
@@ -160,7 +165,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
+    <annotations-container :index="index" :view="$refs.view" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -180,6 +185,8 @@ import AnnotationLayer from './AnnotationLayer';
 import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
 import DrawTools from './DrawTools';
+import ImageControls from './ImageControls';
+import AnnotationsContainer from './AnnotationsContainer';
 
 import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
@@ -190,8 +197,6 @@ import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
 import ReviewPanel from './panels/ReviewPanel';
-
-import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
@@ -205,7 +210,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition} from 'cytomine-client';
+import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -224,8 +229,8 @@ export default {
     RotationSelector,
     ScaleLine,
     DrawTools,
-
-    AnnotationDetailsContainer,
+    ImageControls,
+    AnnotationsContainer,
 
     InformationPanel,
     DigitalZoom,
@@ -282,6 +287,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -361,12 +369,19 @@ export default {
 
     baseLayerURLs() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
-      return this.image.imageServerURLs.map(url => filterPrefix + url + params);
+      let contrast = (this.imageWrapper.colors.contrast !== 1) ? `&contrast=${this.imageWrapper.colors.contrast}` : '';
+      let gamma = (this.imageWrapper.colors.gamma !== 1) ? `&gamma=${this.imageWrapper.colors.gamma}` : '';
+      let inverse = (this.imageWrapper.colors.inverse) ? '&inverse=true' : '';
+      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}${contrast}${gamma}${inverse}`;
+
+      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('|');
+      if (minmax) params += `&minmax=${minmax}`;
+
+      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
     },
 
     colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0 || this.imageWrapper.colors.contrast !== 0
+      return this.imageWrapper.colors.brightness !== 0
                 || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
     },
     operation() {
@@ -408,6 +423,19 @@ export default {
     },
     activeModifyInteraction() {
       return this.activeSelectInteraction && this.activeEditTool && !this.correction;
+    },
+    idealZoom() {
+      let container = this.$refs.container;
+      let idealZoom = this.maxZoom;
+      let factor = this.maxZoom - this.image.zoom;
+      let mapWidth = this.image.width * Math.pow(2, factor);
+      let mapHeight = this.image.height * Math.pow(2, factor);
+      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
+        mapWidth /= 2;
+        mapHeight /= 2;
+        idealZoom --;
+      }
+      return idealZoom;
     }
   },
   watch: {
@@ -423,17 +451,7 @@ export default {
       if(this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
       }
-
-      let container = this.$refs.container;
-      let mapWidth = this.image.width;
-      let mapHeight = this.image.height;
-      let idealZoom = this.image.depth;
-      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
-        mapWidth /= 2;
-        mapHeight /= 2;
-        idealZoom --;
-      }
-      this.zoom = idealZoom;
+      this.zoom = this.idealZoom;
     },
 
     async updateMapSize() {
@@ -464,7 +482,7 @@ export default {
       if(this.routedAnnotation) { // center view on annotation
         let annot = this.routedAnnotation;
         let geometry = new WKT().readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -498,6 +516,12 @@ export default {
       this.$refs.map.$map.addControl(this.overview);
     },
 
+    toggleOverview() {
+      if (this.overview) {
+        this.overview.setCollapsed(!this.imageWrapper.view.overviewCollapsed);
+      }
+    },
+
     togglePanel(panel) {
       this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
@@ -509,6 +533,7 @@ export default {
         try {
           await UserPosition.create({
             image: this.image.id,
+            slice: this.slice.id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -532,8 +557,73 @@ export default {
       }
     }, 500),
 
+    fitZoom() {
+      this.$refs.view.animate({
+        zoom: this.idealZoom,
+        center: [this.image.width/2, this.image.height/2]
+      });
+    },
+
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
+    },
+    shortkeyHandler(key) {
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
+        return;
+      }
+
+      switch(key) {
+        case 'toggle-information':
+          if (this.isPanelDisplayed('info')){
+            this.togglePanel('info');
+          }
+          return;
+        case 'toggle-zoom':
+          if (this.isPanelDisplayed('digital-zoom')) {
+            this.togglePanel('digital-zoom');
+          }
+          return;
+        case 'toggle-link':
+          if (this.isPanelDisplayed('link') && this.nbImages > 1) {
+            this.togglePanel('link');
+          }
+          return;
+        case 'toggle-filters':
+          if (this.isPanelDisplayed('color-manipulation')) {
+            this.togglePanel('colors');
+          }
+          return;
+        case 'toggle-layers':
+          if (this.isPanelDisplayed('image-layers')) {
+            this.togglePanel('layers');
+          }
+          return;
+        case 'toggle-ontology':
+          if (this.isPanelDisplayed('ontology') && this.terms && this.terms.length > 0) {
+            this.togglePanel('ontology');
+          }
+          return;
+        case 'toggle-properties':
+          if (this.isPanelDisplayed('property')) {
+            this.togglePanel('properties');
+          }
+          return;
+        case 'toggle-broadcast':
+          if (this.isPanelDisplayed('follow')) {
+            this.togglePanel('follow');
+          }
+          return;
+        case 'toggle-review':
+          if (this.isPanelDisplayed('review') && this.canEdit) {
+            this.togglePanel('review');
+          }
+          return;
+        case 'toggle-overview':
+          if (this.isPanelDisplayed('overview')) {
+            this.toggleOverview();
+          }
+          return;
+      }
     }
   },
   async created() {
@@ -568,6 +658,10 @@ export default {
       try {
         let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
+          if(annot.slice !== this.slice.id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+          }
           this.routedAnnotation = annot;
           if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
@@ -593,10 +687,12 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };
@@ -629,7 +725,7 @@ $colorOpenedPanelLink: #6c95c8;
   top: 0.7em;
   left: 3.5rem;
   right: $widthPanelBar;
-  z-index: 10;
+  z-index: 30;
 }
 
 .broadcast {
@@ -735,6 +831,7 @@ $colorOpenedPanelLink: #6c95c8;
 
 .ol-zoom, .ol-rotate {
   background: none !important;
+  z-index: 20;
 }
 
 .ol-rotate:not(.custom) {
@@ -762,6 +859,7 @@ $colorOpenedPanelLink: #6c95c8;
   position: absolute;
   left: .5em;
   top: 5rem;
+  z-index: 20;
 }
 
 .custom-overview {
@@ -792,5 +890,24 @@ $colorOpenedPanelLink: #6c95c8;
       display: none;
     }
   }
+}
+
+/* ----- Image controls ----- */
+.image-controls-wrapper {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 20%;
+  right: calc(#{$widthPanelBar} + 20%);
+  z-index: 5;
+}
+
+/* ----- Annotation list ----- */
+.annotations-table-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: $widthPanelBar;
+  z-index: 40;
+  pointer-events: none;
 }
 </style>

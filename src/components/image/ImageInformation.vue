@@ -30,7 +30,7 @@
       v-if="image"
       :image="image"
       editable
-      @setResolution="resolution => image.resolution = resolution"
+      @setResolution="resolution => setResolution(resolution)"
       @setMagnification="magnification => image.magnification = magnification"
       @delete="deleteImage()"
     />
@@ -43,6 +43,7 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 
 import {ImageInstance} from 'cytomine-client';
+import vendorFromMime from '@/utils/vendor';
 
 export default {
   name: 'image-information',
@@ -74,7 +75,9 @@ export default {
       this.permissionError = false;
       this.notFoundError = false;
       try {
-        this.image = await ImageInstance.fetch(this.idImage);
+        let image = await ImageInstance.fetch(this.idImage);
+        image.vendor = vendorFromMime(image.mime);
+        this.image = image;
       }
       catch(error) {
         console.log(error);
@@ -90,6 +93,12 @@ export default {
     deleteImage() {
       this.$router.push(`/project/${this.image.project}`);
     },
+    setResolution(resolution) {
+      this.image.physicalSizeX = resolution.x;
+      this.image.physicalSizeY = resolution.y;
+      this.image.physicalSizeZ = resolution.z;
+      this.image.fps = resolution.t;
+    }
   },
   created() {
     this.loadImage();

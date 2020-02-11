@@ -39,6 +39,10 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
+      <router-link to="/algorithm" class="navbar-item">
+        <i class="fas fa-flask"></i>
+        {{ $t('algorithms') }}
+      </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
@@ -82,7 +86,7 @@
 
       <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
         <a class="navbar-item" @click="openHotkeysModal()">
-          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('hotkeys')}}
+          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
         </a>
         <a class="navbar-item" @click="openAboutModal()">
           <span class="icon"><i class="fas fa-info-circle fa-xs"></i></span> {{$t('about-cytomine')}}

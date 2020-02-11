@@ -26,7 +26,7 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('analysis')}}
-      <button class="button is-link" @click="launchModal = true">
+      <button v-if="canAddJob" class="button is-link" @click="launchModal = true">
         {{$t('button-launch-new-analysis')}}
       </button>
     </p>
@@ -34,12 +34,12 @@
       <div class="filters">
         <h2>{{$t('filters')}}</h2>
         <div class="columns">
-          <div class="column filter">
+          <div class="column filter is-one-third">
             <div class="filter-label">
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple track-by="id" label="fullName"/>
             </div>
           </div>
 
@@ -75,11 +75,22 @@
                 label="label" track-by="status" multiple />
             </div>
           </div>
+
+          <div class="column">
+            <div class="filter-label">
+              {{$t('favorite')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
+                label="label" track-by="value" multiple />
+            </div>
+          </div>
         </div>
       </div>
 
       <cytomine-table
         :collection="jobCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -88,23 +99,32 @@
         :revision="revision"
       >
         <template #default="{row: job}">
+          <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
+            <a @click="toggleFavorite(job)" v-if="canManageJob(job)">
+              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+            </a>
+            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+          </b-table-column>
+
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
-            {{job.softwareName}}
+            <router-link :to="`/algorithm/${job.software}`">
+              {{job.softwareName}}
+            </router-link>
           </b-table-column>
 
           <b-table-column :label="$t('run-number')" width="500" centered>
             {{job.number}}
           </b-table-column>
 
-          <b-table-column field="username" :label="$t('launched-by')" sortable width="1000">
+          <b-table-column field="username" :label="$t('launched-by')" sortable width="600">
             {{ job.username }}
           </b-table-column>
 
-          <b-table-column field="created" :label="$t('execution-date')" sortable width="1000">
+          <b-table-column field="created" :label="$t('execution-date')" sortable width="600">
             {{ Number(job.created) | moment('ll LT') }}
           </b-table-column>
 
-          <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
+          <b-table-column field="status" :label="$t('status')" sortable centered width="600">
             <job-status :status="job.status" />
           </b-table-column>
         </template>
@@ -142,7 +162,7 @@ import AddJobModal from './AddJobModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -173,11 +193,23 @@ export default {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
+    canAddJob() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
 
     availableStatus() {
-      return Object.keys(jobStatusLabelMapping).map(key => {
-        return {label: this.$t(jobStatusLabelMapping[key]), status: key};
+      return Object.keys(jobStatusMapping).map(key => {
+        return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
+    },
+    availableFavorites() {
+      return [
+        {label: this.$t('yes'), value: true},
+        {label: this.$t('no'), value: false}
+      ];
     },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listJobs)
@@ -188,24 +220,32 @@ export default {
     selectedLaunchers: localSyncMultiselectFilter('launchers', 'availableLaunchers'),
     selectedDate: sync('executionDate', storeOptions),
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
+    selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
+
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'];
+    },
 
     jobCollection() {
       let collection = new JobCollection({
-        project: this.project.id
+        project: this.project.id,
+        software: (this.selectedSoftwares.length > 0 && this.selectedSoftwares.length < this.availableSoftwares.length) ?
+          this.selectedSoftwares.map(option => option.id).join(',') : null
       });
-      if(this.selectedSoftwares.length > 0){
-        collection['softwareName'] = {
-          in: this.selectedSoftwares
-        };
-      }
+
       if(this.selectedLaunchers.length > 0){
         collection['username'] = {
-          in: this.selectedLaunchers
+          in: this.selectedLaunchers.join()
         };
       }
       if(this.selectedStatus.length > 0){
         collection['status'] = {
           in: this.selectedStatus.map(option => option.status).join()
+        };
+      }
+      if(this.selectedFavorites.length > 0) {
+        collection['favorite'] = {
+          in: this.selectedFavorites.map(option => option.value).join()
         };
       }
       if(this.selectedDate) {
@@ -224,15 +264,23 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+    canManageJob(job) {
+      return this.$store.getters['currentProject/canManageJob'](job);
+    },
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
-      this.availableSoftwares = stats.software.list.map(option => option.name);
+      this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
     },
 
     async addJob(job) {
       this.openedDetails = [job.id, ...this.openedDetails];
       await this.fetchMultiselectOptions();
+      this.revision++;
+    },
+    async toggleFavorite(job) {
+      job.favorite = !job.favorite;
+      await job.setFavorite();
       this.revision++;
     },
     async deleteJob(jobToDelete) {
@@ -275,5 +323,28 @@ export default {
 
 .filters {
   margin-bottom: 1.5em;
+}
+
+a:hover .fas {
+  color: rgb(35, 102, 216);
+}
+
+a:hover .fas.disabled, a:hover .disabled .fas {
+  color: rgba(35, 102, 216, 0.5);
+}
+
+.fas {
+  color: black;
+  width: 20px;
+  position: relative;
+}
+
+.fas.fa-flag {
+  font-size: 0.8em;
+  bottom: 0.5em;
+}
+
+.fas.disabled, .disabled .fas {
+  color: rgba(0, 0, 0, 0.1);
 }
 </style>

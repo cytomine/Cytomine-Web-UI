@@ -19,9 +19,9 @@
     <p> {{ $t('unexpected-error-info-message') }} </p>
   </b-message>
   <template v-else>
-    <template v-if="abstractImage && abstractImage.macroURL">
+    <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -60,13 +60,12 @@ export default {
   name: 'image-metadata-modal',
   props: {
     active: Boolean,
-    idAbstractImage: Number
+    image: Object
   },
   components: {CytomineModal},
   data() {
     return {
       error: false,
-      abstractImage: null,
       properties: [],
       searchString: '',
       rotationAngle: 0
@@ -102,8 +101,8 @@ export default {
   },
   async created() {
     try {
-      this.abstractImage = await AbstractImage.fetch(this.idAbstractImage);
-      this.properties = (await PropertyCollection.fetchAll({object: this.abstractImage})).array;
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }
     catch(error) {

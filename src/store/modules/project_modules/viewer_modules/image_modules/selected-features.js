@@ -43,7 +43,9 @@ export default {
     },
 
     changeAnnotSelectedFeature(state, {indexFeature, annot}) {
-      state.selectedFeatures[indexFeature].properties.annot = annot;
+      if (state.selectedFeatures[indexFeature]) {
+        state.selectedFeatures[indexFeature].properties.annot = annot;
+      }
     },
 
     removeLayerFromSelectedFeatures(state, {layer, cache=false}) {
@@ -106,6 +108,10 @@ export default {
     },
 
     setImageInstance({commit}) {
+      commit('clearSelectedFeatures');
+    },
+
+    setActiveSlice({commit}) {
       commit('clearSelectedFeatures');
     }
   },

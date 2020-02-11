@@ -24,13 +24,30 @@
     </p>
     <div class="panel-block">
       <div class="search-block">
-        <b-input class="search-projects" :value="searchString" @input="debounceSearchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
+        <b-input
+          class="search-projects"
+          v-model="searchString"
+          :placeholder="$t('search-placeholder')"
+          type="search"
+          icon="search"
+        />
+        <button class="button" @click="toggleFilterDisplay()">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+          <span v-if="nbActiveFilters" class="nb-active-filters">
+            {{nbActiveFilters}}
+          </span>
+        </button>
       </div>
 
-      <b-collapse open>
+      <b-collapse :open="filtersOpened">
         <div class="filters">
           <div class="columns">
-            <div class="column filter">
+            <div class="column filter is-one-third">
               <div class="filter-label">
                 {{$t('tags')}}
               </div>
@@ -39,22 +56,16 @@
                   label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
               </div>
             </div>
-            <div class="column filter">
-            </div>
-            <div class="column filter">
-            </div>
           </div>
         </div>
       </b-collapse>
-
-
     </div>
     <p class="panel-tabs">
       <a :class="{'is-active': activeTab === 'projects'}" @click="activeTab = 'projects'">
-        {{$t('projects')}} ({{this.projects.totalNbItems}})
+        {{$t('projects')}} ({{this.nbProjects}})
       </a>
       <a :class="{'is-active': activeTab === 'images'}" @click="activeTab = 'images'">
-        {{$t('images')}} ({{this.images.totalNbItems}})
+        {{$t('images')}} ({{this.nbImages}})
       </a>
     </p>
     <div class="panel-block">
@@ -66,24 +77,26 @@
       >
         <cytomine-table
           :collection="projectCollection"
+          :is-empty="nbEmptyFilters > 0"
           class="table-projects"
           :currentPage.sync="currentPage"
           :perPage.sync="perPage"
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
-          :data.sync="projects"
           :revision="revision"
+          @setCollectionSize="nbProjects = $event"
         >
           <template #default="{row: project}">
             <b-table-column field="currentUserRole" label="" centered width="1" sortable>
-              <i
-                v-if="project.currentUserRoles.admin"
-                class="fas fa-user-cog"
-                :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')"
-              >
-                <i v-if="project.currentUserRoles.representative" class="superscript fas fa-flag"></i>
-              </i>
+              <icon-project-member-role
+                :is-manager="project.currentUserRoles.admin"
+                :is-representative="project.currentUserRoles.representative"
+              />
+            </b-table-column>
+
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper" field="id" sortable>
+              {{project.id}}
             </b-table-column>
 
             <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -100,23 +113,23 @@
               <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/annotations?type=user`">
-                {{ project.numberOfAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">-->
+<!--              <router-link :to="`/project/${project.id}/annotations?type=user`">-->
+<!--                {{ project.numberOfAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/annotations?type=algo`">
-                {{ project.numberOfJobAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">-->
+<!--              <router-link :to="`/project/${project.id}/annotations?type=algo`">-->
+<!--                {{ project.numberOfJobAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
-            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
-                {{ project.numberOfReviewedAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">-->
+<!--              <router-link :to="`/project/${project.id}/annotations?type=reviewed`">-->
+<!--                {{ project.numberOfReviewedAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
               {{ Number(project.lastActivity) | moment('ll') }}
@@ -147,10 +160,9 @@
 
         <div class="legend">
             <h2>{{$t('legend')}}</h2>
-            <p><i class="fas fa-user-cog"></i> : {{$t('manager-icon-label')}}</p>
-            <p><i class="fas fa-user-cog">
-              <i class="superscript fas fa-flag"></i>
-            </i> : {{$t('representative-icon-label')}}</p>
+          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
         </div>
       </div>
 
@@ -161,19 +173,24 @@
       >
         <cytomine-table
           :collection="imageCollection"
+          :is-empty="nbEmptyFilters > 0"
           :currentPage.sync="currentPage"
           :perPage.sync="perPage"
           :openedDetailed.sync="openedDetails"
           :sort.sync="sortField"
           :order.sync="sortOrder"
-          :data.sync="images"
           :revision="revision"
+          @setCollectionSize="nbImages = $event"
         >
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
                 <img :src="image.thumb" class="image-overview">
               </router-link>
+            </b-table-column>
+
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper" sortable field="id">
+              {{image.id}}
             </b-table-column>
 
             <b-table-column
@@ -188,7 +205,7 @@
             </b-table-column>
 
             <b-table-column
-              :field="'projectName'"
+              field="projectId"
               :label="$t('project')"
               width="200"
             >
@@ -197,27 +214,27 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
-              {{ image.magnification || $t('unknown') }}
-            </b-table-column>
+<!--            <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">-->
+<!--              {{ image.magnification || $t('unknown') }}-->
+<!--            </b-table-column>-->
 
-            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
-                {{ image.numberOfAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">-->
+<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">-->
+<!--                {{ image.numberOfAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
-              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
-                {{ image.numberOfJobAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">-->
+<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">-->
+<!--                {{ image.numberOfJobAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
-            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
-                {{ image.numberOfReviewedAnnotations }}
-              </router-link>
-            </b-table-column>
+<!--            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">-->
+<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">-->
+<!--                {{ image.numberOfReviewedAnnotations }}-->
+<!--              </router-link>-->
+<!--            </b-table-column>-->
 
             <b-table-column label=" " centered width="150">
               <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
@@ -246,37 +263,34 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import {get} from '@/utils/store-helpers';
+import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ProjectDetails from '@/components/project/ProjectDetails';
 import ImageDetails from '@/components/image/ImageDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
   name: 'advanced-search',
-  components: {ImageName,CytomineTable,ProjectDetails, ImageDetails, CytomineMultiselect},
+  components: {
+    IconProjectMemberRole,
+    ImageName,
+    CytomineTable,
+    ProjectDetails,
+    ImageDetails,
+    CytomineMultiselect
+  },
   data() {
     return {
       loading: true,
       error: false,
 
-      searchString: '',
-      projects:[],
-      images: [],
-      activeTab: 'projects',
-      perPage: 10,
+      nbProjects: 0,
+      nbImages: 0,
 
-      selectedTags: [],
       availableTags:[],
-
-      currentPage: 1,
-      sortField: 'created',
-      sortOrder: 'desc',
-      openedDetails: [],
       revision: 0,
 
       excludedProperties: [
@@ -284,23 +298,36 @@ export default {
         'imagesPreview',
         'lastActivity',
       ],
-
-
     };
   },
   methods: {
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500)
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    }
   },
   computed: {
     currentUser: get('currentUser/user'),
 
+    activeTab: sync('advancedSearch/activeTab'),
+    currentPage: sync('advancedSearch/currentPage'),
+    perPage: sync('advancedSearch/perPage'),
+    sortField: sync('advancedSearch/sortField'),
+    sortOrder: sync('advancedSearch/sortOrder'),
+    openedDetails: sync('advancedSearch/openedDetails'),
+
+    filtersOpened: sync('advancedSearch/filtersOpened'),
+    searchString: sync('advancedSearch/searchString', {debounce: 500}),
+    selectedTags: syncMultiselectFilter('advancedSearch', 'selectedTags', 'availableTags'),
+
+    nbActiveFilters() {
+      return this.$store.getters['advancedSearch/nbActiveFilters'];
+    },
+    nbEmptyFilters() {
+      return this.$store.getters['advancedSearch/nbEmptyFilters'];
+    },
+
     pathSearchString() {
       return this.$route.params.searchString;
-    },
-    regexp() {
-      return getWildcardRegexp(this.searchString);
     },
     projectCollection() {
       let collection = new ProjectCollection({
@@ -339,9 +366,6 @@ export default {
       }
       return collection;
     },
-
-
-
   },
   watch: {
     pathSearchString(val) {
@@ -382,6 +406,11 @@ export default {
 
 .legend p:not(:last-child) {
   margin-bottom: 0.4em;
+}
+
+.image-overview {
+  max-height: 4rem;
+  max-width: 10rem;
 }
 
 </style>

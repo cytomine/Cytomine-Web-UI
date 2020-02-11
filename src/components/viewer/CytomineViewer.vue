@@ -26,7 +26,7 @@
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="cell && cell.image"
+        v-if="cell && cell.image && cell.slice"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -50,8 +50,9 @@ import ImageSelector from './ImageSelector';
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
 import constants from '@/utils/constants.js';
+import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -74,6 +75,9 @@ export default {
     },
     idImages() {
       return this.$route.params.idImages.split('-');
+    },
+    idSlices() {
+      return (this.$route.params.idSlices) ? this.$route.params.idSlices.split('-') : [];
     },
     paramIdViewer() {
       return this.$route.query.viewer;
@@ -101,7 +105,8 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        cells[i] = {index, image};
+        let slice = this.viewer.images[index].activeSlice;
+        cells[i] = {index, image, slice};
       }
       return cells;
     },
@@ -112,14 +117,20 @@ export default {
       return 100/this.nbHorizontalCells;
     },
     shortkeysMapping() {
-      // for shortkeys composed of a single key, return the key as srcKey
-      let mapping = ['s', 'o', 'f', 'd', 'p', 'n', 'a', 'r', 't'].reduce((object, key) => {
-        object[key] = [key];
+      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t', 'nav-previous-t', 'nav-next-c',
+        'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t', 'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c',
+        'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
+        'tool-freehand-polygon', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
+        'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
+        'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
+        'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
+        'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
+
+      return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
+        object[key.replace('viewer-', '')] = shortcuts[key];
         return object;
       }, {});
-      mapping.ctrlZ = ['ctrl', 'z']; // special handling because combination of keys should trigger the function
-      mapping.ctrlY = ['ctrl', 'y']; // idem
-      return mapping;
     }
   },
   watch: {
@@ -176,18 +187,13 @@ export default {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-
-          let images = {};
-          //don't fetch multiple times the same image.
-          let idImages = [...new Set(this.idImages)];
-          await Promise.all(idImages.map(async id => {
+          await Promise.all(this.idImages.map(async (id, idx) => {
             let image = await ImageInstance.fetch(id);
-            images[id] = image;
-          }));
 
-          this.idImages.forEach(async id => {
-            await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
-          });
+            let idSlice = this.idSlices[idx];
+            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+          }));
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');

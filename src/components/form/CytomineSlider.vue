@@ -17,18 +17,21 @@
   :value="value" @change="$emit('input', $event)"
   :min="min"
   :max="max"
-  :tooltip="'always'"
+  :tooltip="(tooltip) ? 'always' : 'none'"
+  :interval="interval"
   :tooltip-placement="tooltipPlacement"
   :lazy="lazy"
 >
-  <template #tooltip="{value, index}">
+  <template #tooltip="{value, index}" v-if="tooltip">
     <div
       :class="['vue-slider-dot-tooltip-inner', `vue-slider-dot-tooltip-inner-${tooltipPlacement[index]}`]"
       @mousedown.stop
       @click.stop="startEdition(index)"
     >
         <template v-if="indexEdited !== index">
-          {{Math.round(value * 1000)/1000}}
+          <slot name="default" :value="value" >
+            {{Math.round(value * 1000)/1000}}
+          </slot>
         </template>
         <b-input
           v-else
@@ -54,8 +57,10 @@ export default {
     value: {type: null},
     min: {type: Number, default: 0},
     max: {type: Number, default: 100},
+    interval: {type: Number},
     integerOnly: {type: Boolean, default: true},
-    lazy: {type: Boolean, default: true}
+    lazy: {type: Boolean, default: true},
+    tooltip: {type: Boolean, default: true}
   },
   data() {
     return {
@@ -67,8 +72,17 @@ export default {
     isArray() {
       return Array.isArray(this.value);
     },
+    middle() {
+      return (this.max - this.min) /2;
+    },
     tooltipPlacement() {
-      return this.isArray ? ['left', 'right'] : ['right'];
+      if (this.isArray)
+        return ['left', 'right'];
+
+      if (this.value >= this.middle)
+        return ['left'];
+
+      return ['right'];
     }
   },
   methods: {

@@ -16,7 +16,46 @@
 <template>
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>
+  <template v-if="canComputeHistogram">
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+      <p> {{ $t('unexpected-error-info-message') }} </p>
+    </b-message>
+    <div class="histogram-actions" v-else-if="!loading && !hasHistograms">
+      <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
+    </div>
+    <b-tabs type="is-boxed" class="histogram" v-else-if="loading || hasHistograms">
+      <b-loading :is-full-page="false" class="small" :active="loading"  />
+      <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
+        <template #header>
+          <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
+          {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
+        </template>
+        <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
+      </b-tab-item>
+    </b-tabs>
+  </template>
   <table>
+<!--    <tr>
+      <td>{{ $t('contrast') }}</td>
+      <td>
+        <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
+      </td>
+    </tr>-->
+    <tr>
+      <td>{{ $t('gamma') }}</td>
+      <td>
+        <cytomine-slider v-model="gamma" :min="0.1" :max="4" :interval="0.1" :integer-only="false"/>
+      </td>
+    </tr>
+    <tr class="has-border-bottom">
+      <td>{{$t('inverse')}}</td>
+      <td>
+        <b-switch v-model="inverse" class="switch">
+          <template v-if="inverse">{{$t('yes')}}</template>
+          <template v-else>{{$t('no')}}</template>
+        </b-switch>
+      </td>
+    </tr>
     <tr v-if="filters && filters.length > 0" class="has-border-bottom">
       <td>{{ $t('filter') }}</td>
       <td>
@@ -28,33 +67,19 @@
         </b-select>
       </td>
     </tr>
-    <tr>
-      <td>{{ $t('brightness') }}</td>
-      <td>
-        <cytomine-slider v-model="brightness" :min="-255" :max="255" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('contrast') }}</td>
-      <td>
-        <cytomine-slider v-model="contrast" :min="-255" :max="255" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('saturation') }}</td>
-      <td>
-        <cytomine-slider v-model="saturation" :min="-100" :max="100" />
-      </td>
-    </tr>
-    <tr>
-      <td>{{ $t('hue') }}</td>
-      <td>
-        <cytomine-slider v-model="hue" :min="-180" :max="180" />
-      </td>
-    </tr>
   </table>
+
   <div class="actions">
-    <button class="button is-small" @click="reset()">{{$t('button-reset')}}</button>
+    <div class="level">
+      <template v-if="maxRank > 1 && hasHistograms">
+        <button class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust-image')}}</button>
+        <button class="level-item button is-small" @click="adjustToSlice()">{{$t('button-adjust-slice')}}</button>
+      </template>
+      <button v-else-if="hasHistograms" class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
+
+      <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
+    </div>
+      <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasHistograms">{{switchHistogramScaleLabel}}</a>
   </div>
 </div>
 </template>
@@ -62,17 +87,22 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import {ImageFilterProjectCollection} from 'cytomine-client';
+import {ImageFilterProjectCollection, SampleHistogramCollection} from 'cytomine-client';
+import SampleHistogram from '@/components/viewer/panels/SampleHistogram';
 
 export default {
   name: 'color-manipulation',
-  components: {CytomineSlider},
+  components: {SampleHistogram, CytomineSlider},
   props: {
     index: String
   },
   data() {
     return {
-      filters: null
+      filters: null,
+      sampleHistograms: null,
+      loading: false,
+      error: false,
+      revisionBrightnessContrast: 0,
     };
   },
   computed: {
@@ -82,6 +112,27 @@ export default {
     },
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
+    },
+    image() {
+      return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
+    maxRank() {
+      return this.$store.getters[this.imageModule + 'maxRank'];
+    },
+    activePanel() {
+      return this.imageWrapper.activePanel;
+    },
+    maxValue() {
+      return Math.pow(2, this.image.bitPerSample);
+    },
+    hasHistograms() {
+      return this.sampleHistograms && this.sampleHistograms.length > 0;
+    },
+    canComputeHistogram() {
+      return this.image.bitPerSample && this.image.samplePerPixel;
     },
 
     selectedFilter: {
@@ -93,14 +144,6 @@ export default {
       }
     },
 
-    brightness: {
-      get() {
-        return this.imageWrapper.colors.brightness;
-      },
-      set(value) {
-        this.$store.commit(this.imageModule + 'setBrightness', value);
-      }
-    },
     contrast: {
       get() {
         return this.imageWrapper.colors.contrast;
@@ -109,37 +152,115 @@ export default {
         this.$store.commit(this.imageModule + 'setContrast', value);
       }
     },
-    hue: {
+    gamma: {
       get() {
-        return this.imageWrapper.colors.hue;
+        return this.imageWrapper.colors.gamma;
       },
       set(value) {
-        this.$store.commit(this.imageModule + 'setHue', value);
+        this.$store.commit(this.imageModule + 'setGamma', value);
       }
     },
-    saturation: {
+    inverse: {
       get() {
-        return this.imageWrapper.colors.saturation;
+        return this.imageWrapper.colors.inverse;
       },
       set(value) {
-        this.$store.commit(this.imageModule + 'setSaturation', value);
+        this.$store.commit(this.imageModule + 'setInverse', value);
       }
+    },
+
+    histogramScale: {
+      get() {
+        return this.imageWrapper.colors.histogramScale;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setHistogramScale', value);
+      }
+    },
+    switchHistogramScaleLabel() {
+      return this.$t((this.histogramScale === 'log') ? 'button-switch-histogram-scale-to-linear' : 'button-switch-histogram-scale-to-log');
+    }
+
+  },
+  watch: {
+    slice() {
+      this.fetchSampleHistograms();
     }
   },
   methods: {
     reset() {
-      this.$store.commit(this.imageModule + 'resetColorManipulation');
+      this.$store.dispatch(this.imageModule + 'resetColorManipulation');
+      this.revisionBrightnessContrast++;
+    },
+    adjustToImage() {
+      this.$store.dispatch(this.imageModule + 'adjustToImage');
+      this.revisionBrightnessContrast++;
+    },
+    adjustToSlice() {
+      let minmax = this.sampleHistograms.map(sh => {
+        return {sample: sh.sample, min: sh.min, max: sh.max};
+      });
+      this.$store.dispatch(this.imageModule + 'adjustToSlice', minmax);
+      this.revisionBrightnessContrast++;
+    },
+    switchHistogramScale() {
+      if (this.histogramScale === 'linear') {
+        this.histogramScale = 'log';
+      }
+      else {
+        this.histogramScale = 'linear';
+      }
+    },
+    sampleColor(sample) {
+      if (this.image.samplePerPixel === 3) {
+        switch (sample) {
+          case 0:
+            return 'red';
+          case 1:
+            return 'green';
+          case 2:
+            return 'blue';
+        }
+      }
+
+      return 'grey';
+    },
+    async fetchSampleHistograms() {
+      try {
+        this.sampleHistograms = (await SampleHistogramCollection.fetchAll({filterKey: 'sliceinstance', filterValue: this.slice.id})).array;
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+    },
+    async computeHistograms() {
+      this.loading = true;
+      try {
+        await this.image.extractHistogram();
+        await this.$store.dispatch(this.imageModule + 'refreshDefaultMinMax', {image: this.image});
+        await this.fetchSampleHistograms();
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+      this.loading = false;
     }
   },
   async created() {
     try {
       let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      filters.forEach(filter => filter.prefix = filter.processingServer + filter.baseUrl);
+      filters.forEach(filter => {
+        filter.prefix = filter.imagingServer + ((filter.baseUrl[0] !== '/') ? '/' : '') + filter.baseUrl;
+      });
       let prefixes = filters.map(filter => filter.prefix);
       if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
       }
       this.filters = filters;
+
+      this.fetchSampleHistograms();
     }
     catch(error) {
       console.log(error);
@@ -164,8 +285,21 @@ td:last-child {
 }
 
 .actions {
-  margin-top: 1em;
-  text-align: right;
+  padding-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.actions .button, .histogram-actions .button {
+  margin: 3px;
+  box-sizing: border-box;
+}
+
+.actions .level {
+  margin-bottom: 0;
+}
+
+a.is-fullwidth {
+  width: auto;
 }
 
 >>> .vue-slider {
@@ -173,12 +307,36 @@ td:last-child {
   margin-right: 4em;
 }
 
-.has-border-bottom td {
+.has-border-bottom td, .histogram-actions {
   padding-bottom: 1em;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.histogram-actions {
+  margin-bottom: 1em;
+}
+
 .has-border-bottom + tr td {
   padding-top: 1em;
+}
+
+.color-preview {
+  margin-right: 0.25em;
+}
+
+>>> .tab-content {
+  background-color: white;
+  border: 1px solid #DBDBDB;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  min-height: 5em;
+}
+
+>>> .b-tabs:not(:last-child) {
+  margin-bottom: 1em;
+}
+
+.histogram {
+  min-height: 3em;
 }
 </style>

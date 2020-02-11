@@ -107,6 +107,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slice() {
+      return this.imageWrapper.activeSlice;
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
@@ -214,12 +217,14 @@ export default {
 
       let name = fullName(layer);
 
+      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${name} (${indexLayer.countAnnotation || 0})`;
+      return `${name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {
-      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
+      return !layer.isReview && !layer.algo && this.$store.getters['currentProject/canEditLayer'](layer.id);
     },
 
     addLayerById(id, visible) {
@@ -269,7 +274,7 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.image.fetchAnnotationsIndex();
+      this.indexLayers = await this.slice.fetchAnnotationsIndex();
     },
 
     shortkeyHandler(key) {
@@ -277,7 +282,7 @@ export default {
         return;
       }
 
-      if(key === 't') { // toggle review layer
+      if(key === 'tool-review-toggle') { // toggle review layer
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if(index !== -1) {
           this.toggleLayerVisibility(index);

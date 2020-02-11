@@ -1,6 +1,6 @@
 {
-  "name": "cytomine-front-end",
-  "version": "1.0.0",
+  "name": "cytomine-web-ui",
+  "version": "1.0.0-rc.1",
   "scripts": {
     "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
@@ -16,8 +16,10 @@
     "bulma-slider": "^2.0.0",
     "chart.js": "^2.8.0",
     "chartjs-plugin-datalabels": "^0.6.0",
+    "chartjs-plugin-zoom": "^0.7.4",
     "copy-to-clipboard": "^3.0.8",
-    "cytomine-client": "^1.2.0",
+    "cytomine-client": "npm:cytomine-uliege-js-client@^1.0.0-rc.1",
+    "detect-browser": "^4.7.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
     "lodash": "^4.17.13",
@@ -50,7 +52,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^5.16.0",
     "i18n-csv2json-cli": "^1.0.2",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.0",
     "onchange": "^5.2.0",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.10"

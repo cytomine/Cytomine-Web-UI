@@ -20,6 +20,7 @@ import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
+import ListSoftware from './components/software/ListSoftware.vue';
 import ListImages from './components/image/ListImages.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
@@ -36,6 +37,7 @@ import MemberActivityDetails from './components/project/activity/MemberActivityD
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
+import SoftwareInformation from './components/software/SoftwareInformation.vue';
 
 // Define routes
 const routes = [
@@ -54,6 +56,14 @@ const routes = [
   {
     path: '/ontology/:idOntology?',
     component: ListOntologies
+  },
+  {
+    path: '/algorithm',
+    component: ListSoftware
+  },
+  {
+    path: '/algorithm/:idSoftware',
+    component: SoftwareInformation
   },
   {
     path: '/advanced-search/:searchString?',
@@ -80,11 +90,19 @@ const routes = [
         component: CytomineViewer
       },
       {
+        path: 'image/:idImages/slice/:idSlices',
+        component: CytomineViewer
+      },
+      {
         path: 'image/:idImage/information',
         component: ImageInformation
       },
       {
         path: 'image/:idImages/annotation/:idAnnotation',
+        component: CytomineViewer
+      },
+      {
+        path: 'image/:idImages/slice/:idSlices/annotation/:idAnnotation',
         component: CytomineViewer
       },
       {
@@ -131,6 +149,8 @@ const routes = [
   {path: '/project', redirect: '/projects'},
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
+  {path: '/software', redirect: '/algorithm'},
+  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
@@ -155,6 +175,7 @@ const routes = [
   {path: '/tabs-usersconfig-:idProject', redirect: '/project/:idProject/configuration?tab=members'},
   {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
   {path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage'},
+  {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
   {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation'},
   // -----
 

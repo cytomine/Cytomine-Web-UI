@@ -17,6 +17,10 @@
   <b-loading :active="loading" :is-full-page="false" class="small" />
   <table v-if="!loading" class="table">
     <tbody>
+      <tr v-if="currentUser.isDeveloper">
+        <td>{{$t('id')}}</td>
+        <td colspan="2">{{user.id}}</td>
+      </tr>
       <tr>
         <td>{{$t('projects')}}</td>
         <td>
@@ -52,7 +56,7 @@
               </button>
             </template>
             <ul>
-              <li v-for="project in projects" :key="project.id">
+              <li v-for="project in managedProjects" :key="project.id">
                 <router-link :to="`/project/${project.id}`">
                   {{ project.name }}
                 </router-link>

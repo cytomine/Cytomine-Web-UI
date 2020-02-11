@@ -179,6 +179,7 @@ export default {
     let chartOptions = [
       {interval: 'day', period: 'hour'},
       {interval: 'week', period: 'day'},
+      {interval: 'month', period: 'week'},
       {interval: 'year', period: 'week'}
     ];
     this.chartOptions = chartOptions.map(option => {

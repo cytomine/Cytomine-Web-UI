@@ -21,6 +21,10 @@
     </p>
     <div class="panel-block">
       <form @submit.prevent="editDetails()" data-vv-scope="profile">
+        <b-field :label="$t('id')" horizontal v-if="currentUser.isDeveloper">
+          {{currentUser.id}}
+        </b-field>
+
         <b-field :label="$t('username')" horizontal>
           <b-input :value="currentUser.username" disabled />
         </b-field>
@@ -62,6 +66,13 @@
               {{name}}
             </option>
           </b-select>
+        </b-field>
+
+        <b-field :label="$t('developer-mode')" horizontal>
+          <b-switch v-model="updatedUser.isDeveloper" class="switch">
+            <template v-if="updatedUser.isDeveloper">{{$t('yes')}}</template>
+            <template v-else>{{$t('no')}}</template>
+          </b-switch>
         </b-field>
 
         <b-field grouped position="is-right">

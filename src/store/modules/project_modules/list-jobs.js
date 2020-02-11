@@ -20,16 +20,17 @@ export default {
   state() {
     return {
       filters: {
-        softwares: [],
-        launchers: [],
-        statuses: []
+        softwares: null,
+        launchers: null,
+        statuses: null,
+        favorites: null
       },
       executionDate: null,
 
       currentPage: 1,
       perPage: 10,
-      sortField: null,
-      sortOrder: 'asc',
+      sortField: 'created',
+      sortOrder: 'desc',
       openedDetails: []
     };
   },
@@ -61,6 +62,16 @@ export default {
 
     setOpenedDetails(state, value) {
       state.openedDetails = value;
+    }
+  },
+
+  getters: {
+    nbActiveFilters: state => {
+      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+    },
+
+    nbEmptyFilters: state => {
+      return Object.values(state.filters).filter(val => val && val.length === 0).length;
     }
   }
 };

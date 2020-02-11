@@ -1,0 +1,43 @@
+sudo: required
+services:
+- docker
+language: node_js
+node_js:
+- 12
+env:
+  global:
+  - DOCKER_USERNAME=cytomineulg
+  - secure: KpOQ+/at1LU6816ygoju7ENt5o2Z5jMKYDORCjrk5oAuFgxmprMm/n++NtmX6ovSJzF8h8DtlvKR+cQxWq686NhVtgWvjmXNsq+T1nZ8nQR0+FuouQ4BFhQpS0fWnOik1o8ByZEvdwWMJNlf+CdfgTBktb6XGqtnGs/qi61xGAGeSQPCut1Ia5iwk+NOcFEyDpqRl+kIlgHI7Co7LKX8nZ1hbi3Fs5yLdqn9og2Dx5T7EcTaKMmXlpgO8+PrNvxmlY90HuLfK6/FA3kWEchy5oGVkwitCvc5RVY6UhkjXeFCkbr7WnhqjewJfGXfjgKygk+9EH5J0FY0QcVusLZrSVzG1mZozm5hsZ3rPuN1zTC1M2v3akybuZWSwPcOvkVUf78nwz8H8IDCnLcMCOYgLTTiVs38OuZR+XneYVDW3VmuHkdNoVCz47AxuYHSBEXlXYHABALb+NWQdHl5EQbWCseK3AZ98oL3pCLNn3mCK42/Ye+an+kMEXJY65G3eeg1VDZeohDLpCQaSJWhKlfSVMAaGtoa179L7jQVajgcTCkOgOWDAxoMcIc8gTnEi26vUAMAfEzyjrjfsk4rTzJCjjzvryV/4T45JitQELmJ081qLL06AkTk056kMY1M4yrJ9Rbu5eFyeZVq6ZwkIQwZDWEYHZD0DB5sDbXLIyO0yv0=
+script:
+- echo "Skip tests"
+after_success:
+- npm pack
+- git fetch --tags
+- |
+  export VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json);
+  export DEPLOY=false;
+  if [[ ! $(git tag -l v$VERSION) ]]; then
+    git config --local user.name "$(git log -1 --pretty=format:'%an')";
+    git config --local user.email "$(git log -1 --pretty=format:'%ae')";
+    git tag "v$VERSION";
+    export DEPLOY=true;
+    echo "Deploy with version $VERSION";
+    docker build -f docker/Dockerfile -t cytomineuliege/web-ui:v$VERSION .;
+  fi;
+deploy:
+  - provider: script
+    script: >
+      echo $VERSION &&
+      docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" &&
+      docker push cytomineuliege/web-ui:v$VERSION &&
+      echo "Done.
+    skip_cleanup: true
+    on:
+      condition: $DEPLOY = true
+  - provider: releases
+    api_key:
+      secure: v6iaN/oL+rDe06b7LegdOJtvm/mcNLeh4i7S+UXtBauZWGt4lhR8FqLP3qKqRaHyS31cOi2rHtl60FZFfpyp88rmsDYdAgybL05b6WolBp/T+dW5rauADz2A0Yb3CurEOjWgrvCw2DIzg+SEOaNVAVq7ue6hXomfsEoyNHyTr/cChwgyXUmg2RAFV/w9ftucANofZUku7cxDmxpKdev38Y+9vN5D4cqdwoPRBxnXiU56lXa4xv4AHu/XdHCmcSDYpRlVTypPsI2LshPltmXatvhOhF0aGCWGfcSqZ4g0Wn3jfv2+rHSePn/tgJ23MHSN6uaEYjCK0bZB8q5FLqZ2BnaWwiFssYw4NWyszlyuvzJSo97PV9n8hUk6Q6i5XXYVcAskTP5E+9LdMf0gEpfXSjd0hFKggM9IQIxQYhCcnHTgrpSgezrqLZJDuRoknVKGcdTn58MwIqJ2TxlmfNYINxp1BlAsMqGBV5vHtAG1L1F+o4Sfw6EEQhZT37r+K6ye6kZ6iXNDw+ufPdKPmo9TdpL55klP0MWWJhqcBgy8y8ydkd9iZwfYvZbHyxk5PplgrYEJphJ6uksgwfcKTAb/eFEhATp7vs5NLpPMZhRuNmMUj+ucu+NrtfrLN5yM+XNsuRAXESCBHTf30PLOUvb9pMyZ+kvDPMY/pkxp2AY1qvU=
+    file: "*.{tgz}"
+    skip_cleanup: true
+    on:
+      condition: $DEPLOY = true

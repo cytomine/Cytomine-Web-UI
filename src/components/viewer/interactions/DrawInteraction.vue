@@ -64,8 +64,14 @@ export default {
     termsToAssociate() {
       return this.imageWrapper.draw.termsNewAnnots;
     },
+    tracksToAssociate() {
+      return this.imageWrapper.draw.tracksNewAnnots;
+    },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
     },
     activeTool() {
       return this.imageWrapper.draw.activeTool;
@@ -170,8 +176,10 @@ export default {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
           image: this.image.id,
+          slice: this.slice.id,
           user: layer.id,
-          term: this.termsToAssociate
+          term: this.termsToAssociate,
+          track: this.tracksToAssociate
         });
 
         try {
@@ -206,6 +214,8 @@ export default {
         });
         if(correctedAnnot) {
           correctedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
+          correctedAnnot.track = annot.track;
+          correctedAnnot.annotationTrack = annot.annotationTrack;
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
         }

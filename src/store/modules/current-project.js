@@ -123,14 +123,18 @@ export default {
     canEditLayer: (state, getters, rootState) => idLayer => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
+      if (annot.type === AnnotationType.ALGO) {
+        return false;
+      }
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {
-        return currentUser.adminByNow || annot.reviewUser === currentUser.id;
+        return currentUser.adminByNow || (!currentUser.guestByNow && annot.reviewUser === currentUser.id);
       }
       return getters.canEditLayer(idLayer);
     },
@@ -138,12 +142,20 @@ export default {
     canEditImage: (state, getters, rootState) => image => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+    },
+
+    canManageJob: (state, getters, rootState) => job => {
+      let currentUser = rootState.currentUser.user;
+      let project = state.project;
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (job.username === currentUser.username || !project.isRestricted));
     },
 
     canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
       let currentUser = rootState.currentUser.user || {};
-      return currentUser.adminByNow || state.managers.some(user => user.id === currentUser.id);
+      return currentUser.adminByNow || (!currentUser.guestByNow && state.managers.some(user => user.id === currentUser.id));
     },
 
     contributors: (state) => {

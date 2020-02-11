@@ -22,11 +22,9 @@
       <div class="control" v-else-if="associatedTags.length > 0" v-for="(association, idx) in associatedTags" :key="association.id">
         <b-taglist attached>
           <b-tag type="is-info">{{association.tagName.toUpperCase()}}</b-tag>
-          <b-tag>
-            <template v-if="canEdit">
-              <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
-              </button>
-            </template>
+          <b-tag v-if="canEdit">
+            <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
+            </button>
           </b-tag>
         </b-taglist>
       </div>
@@ -41,7 +39,6 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
 
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
@@ -80,9 +77,11 @@ export default {
         events: {'addObjects': this.addAssociations}
       });
     },
+    sortAssociatedTags() {
+      this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
+    },
     async addAssociations(tags){
-
-      if(tags.length == 0) {
+      if(tags.length === 0) {
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
         return;
       }
@@ -98,7 +97,7 @@ export default {
       try{
         let tagPromises = [];
         for(let i = 0; i < newTags.length; i++) {
-          tagPromises.push(new Tag({name : newTags[i], user : get('currentUser/user')}, this.object).save());
+          tagPromises.push(new Tag({name : newTags[i]}, this.object).save());
         }
         newTags = await Promise.all(tagPromises).then(function(values) {
           return values;
@@ -119,7 +118,7 @@ export default {
           return values;
         });
         this.associatedTags = this.associatedTags.concat(newAssocations);
-        this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
+        this.sortAssociatedTags();
         this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
       }
       catch(error){
@@ -142,7 +141,7 @@ export default {
   async created() {
     try {
       this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
-      this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
+      this.sortAssociatedTags();
     }
     catch(error) {
       console.log(error);
