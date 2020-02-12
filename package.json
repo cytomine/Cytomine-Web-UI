@@ -1,6 +1,6 @@
 {
   "name": "cytomine-web-ui",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "scripts": {
     "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
