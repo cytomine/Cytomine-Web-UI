@@ -161,7 +161,7 @@ html, body {
 body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, sans-serif;
   color: #333;
-  background: red;
+  background: gray;
 }
 
 .wrapper {
