@@ -6,4 +6,4 @@ COPY ./ .
 RUN npm run build
 
 FROM cytomine/nginx:v1.2.0 as production-stage
-COPY --from=build-stage /tmp/dist /tmp/dist
+COPY --from=build-stage /app/dist /tmp/dist
