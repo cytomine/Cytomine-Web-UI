@@ -23,7 +23,7 @@
     "ifvisible": "^1.1.0",
     "lodash": "^4.17.15",
     "npm-font-open-sans": "^1.1.0",
-    "ol": "^6.2.1",
+    "ol": "^5.3.3",
     "ol-rotate-feature": "^2.2.1",
     "sl-vue-tree": "1.8.4",
     "v-click-outside-x": "^4.1.0",
