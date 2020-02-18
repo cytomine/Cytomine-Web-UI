@@ -6,7 +6,8 @@
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
     "serve": "npm run watch-translations & vue-cli-service serve",
     "build": "npm run translations-csv2json && vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "echo 1"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
