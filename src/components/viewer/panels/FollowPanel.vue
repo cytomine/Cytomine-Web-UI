@@ -149,6 +149,7 @@ export default {
     onlineContributors() {
       return this.projectContributors.filter(({id}) => this.onlineUsers.includes(id));
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     trackedUserFullName() {
       let trackedUser = this.projectMembers.find(user => user.id === this.trackedUser);
       if(trackedUser) {
