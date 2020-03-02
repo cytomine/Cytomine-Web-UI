@@ -17,25 +17,21 @@
 <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <template v-if="!loading">
-    <b-message v-if="!images" type="is-danger" has-icon icon-size="is-small">
-      <h2> {{ $t('error') }} </h2>
-      <p> {{ $t('unexpected-error-info-message') }} </p>
-    </b-message>
-    <template v-else>
+    <template>
       <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
       type="search" icon="search" />
 
-      <b-table
-        :data="filteredImages"
-        class="table-images"
-        :paginated="true"
-        :per-page="perPage"
-        pagination-size="is-small"
+      <cytomine-table
+        :collection="imageCollection"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
+        :detailed="false"
       >
-
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
-            <img :src="image.preview" class="image-overview">
+            <img :src="image.previewURL(256)" class="image-overview">
           </b-table-column>
 
           <b-table-column field="originalFilename" :label="$t('name')" sortable>
@@ -64,59 +60,52 @@
             <p>{{$t('no-image')}}</p>
           </div>
         </template>
-
-        <template #bottom-left>
-          <b-select v-model="perPage" size="is-small">
-            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
-            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
-            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
-            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
-          </b-select>
-        </template>
-
-      </b-table>
+      </cytomine-table>
     </template>
   </template>
 </cytomine-modal>
 </template>
 
 <script>
-// TODO: add endpoints in backend to allow backend pagination
 import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import CytomineTable from '@/components/utils/CytomineTable';
 
 export default {
   name: 'add-image-modal',
   props: {
     active: Boolean,
-    idsImages: Array
   },
-  components: {CytomineModal},
+  components: {
+    CytomineTable,
+    CytomineModal
+  },
   data() {
     return {
       loading: true,
-      images: null,
       perPage: 10,
       searchString: '',
-      idsAddedImages: []
+      idsAddedImages: [],
+      currentPage: 1,
+      sortField: 'created',
+      sortOrder: 'desc',
     };
   },
   computed: {
     project: get('currentProject/project'),
-    regexp() {
-      return getWildcardRegexp(this.searchString);
-    },
-    filteredImages() {
-      let filtered = this.images;
-
+    imageCollection() {
+      let collection = new AbstractImageCollection({
+        project: this.project.id,
+      });
       if(this.searchString) {
-        filtered = filtered.filter(image => this.regexp.test(image.originalFilename));
+        collection['originalFilename'] = {
+          ilike: encodeURIComponent(this.searchString)
+        };
       }
 
-      return filtered;
-    }
+      return collection;
+    },
   },
   watch: {
     active(val) {
@@ -150,19 +139,13 @@ export default {
       }
     },
     isInProject(image) {
-      return this.idsImages.includes(image.id);
+      return image.inProject;
     },
     wasAdded(image) {
       return this.idsAddedImages.includes(image.id);
     }
   },
   async created() {
-    try {
-      this.images = (await AbstractImageCollection.fetchAll()).array;
-    }
-    catch(error) {
-      console.log(error);
-    }
     this.loading = false;
   }
 };

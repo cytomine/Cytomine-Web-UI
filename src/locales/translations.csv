@@ -333,6 +333,7 @@ default-property,Default property,Propriété par défaut
 no-default-property,No default property,Pas de propriété par défaut
 images_downloadable_by_contributor,"Images downloadable by contributor","Images téléchargeables par les contributeurs"
 images_downloadable_by_contributor-explanation,"If this is enabled, contributors will be able to download the images of this project","Avec cette option, les contributeurs pourront télécharger les images de ce projet"
+download-permission,"Download permission","Permission de téléchargement"
 notif-error-general-config-update,Error during update of configuration,Une erreur a empêché de mettre à jour la configuration
 layer,Layer,Calque
 hide-by-default,Hide layer by default,Caché par défaut

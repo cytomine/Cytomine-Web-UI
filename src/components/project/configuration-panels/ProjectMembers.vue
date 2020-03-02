@@ -196,7 +196,7 @@ export default {
       if(member.origin === 'BOOTSTRAP') key = 'system';
       else key = 'manual';
 
-      return this.$t(key)
+      return this.$t(key);
     },
     async refreshMembers() {
       try {
@@ -225,7 +225,7 @@ export default {
 
     async removeSelectedMembers() {
       try {
-        await this.project.deleteUsers(this.selectedMembers.map(member => member.id))
+        await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
       }
