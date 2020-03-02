@@ -171,7 +171,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumb" class="image-overview">
+              <img :src="image.thumbURL(256)" class="image-overview">
             </router-link>
           </b-table-column>
 
