@@ -14,4 +14,5 @@ ADD configuration.json.sample /tmp/configuration.json.sample
 RUN apt-get update && apt-get install -y curl
 
 ADD run.sh /tmp/run.sh
+RUN chmod 755 /tmp/run.sh
 ENTRYPOINT ["/tmp/run.sh"]
