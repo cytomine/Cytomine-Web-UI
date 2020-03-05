@@ -16,7 +16,7 @@
   <div>
     <i
       class="fas fa-user-cog"
-      :class="{disabled: !isManager, clickable: editable}"
+      :class="{disabled: !isManager, editable: editable}"
       :title="$t(label)"
       @click="$emit('toggleManager')"
     >
