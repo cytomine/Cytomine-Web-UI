@@ -811,18 +811,18 @@ $colorOpenedPanelLink: #6c95c8;
   }
 }
 
-.panels li:nth-child(-n+7) .panel-options {
+.panels li:nth-child(-n+8) .panel-options {
   bottom: -7.5em;
   min-height: 13em;
 }
 
-.panels li:nth-child(-n+3) .panel-options {
+.panels li:nth-child(-n+4) .panel-options {
   top: -1.75em;
   bottom: auto;
   min-height: 7.5em;
 }
 
-.panels li:nth-child(4) .panel-options {
+.panels li:nth-child(5) .panel-options {
   top: -5.5em;
   bottom: auto;
 }

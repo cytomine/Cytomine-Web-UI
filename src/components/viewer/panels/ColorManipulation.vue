@@ -14,61 +14,64 @@
 
 
 <template>
-<div class="color-manipulation">
+<div>
   <h1>{{$t('colors')}}</h1>
-  <template v-if="canComputeHistogram">
-    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
-      <p> {{ $t('unexpected-error-info-message') }} </p>
-    </b-message>
-    <div class="histogram-actions" v-else-if="!loading && !hasHistograms">
-      <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
-    </div>
-    <b-tabs type="is-boxed" class="histogram" v-else-if="loading || hasHistograms">
-      <b-loading :is-full-page="false" class="small" :active="loading"  />
-      <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
-        <template #header>
-          <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
-          {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
-        </template>
-        <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
-      </b-tab-item>
-    </b-tabs>
-  </template>
-  <table>
-<!--    <tr>
-      <td>{{ $t('contrast') }}</td>
-      <td>
-        <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
-      </td>
-    </tr>-->
-    <tr>
-      <td>{{ $t('gamma') }}</td>
-      <td>
-        <cytomine-slider v-model="gamma" :min="0.1" :max="4" :interval="0.1" :integer-only="false"/>
-      </td>
-    </tr>
-    <tr class="has-border-bottom">
-      <td>{{$t('inverse')}}</td>
-      <td>
-        <b-switch v-model="inverse" class="switch">
-          <template v-if="inverse">{{$t('yes')}}</template>
-          <template v-else>{{$t('no')}}</template>
-        </b-switch>
-      </td>
-    </tr>
-    <tr v-if="filters && filters.length > 0" class="has-border-bottom">
-      <td>{{ $t('filter') }}</td>
-      <td>
-        <b-select v-model="selectedFilter" size="is-small">
-          <option :value="null">{{$t('original-no-filter')}}</option>
-          <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
-            {{filter.name}}
-          </option>
-        </b-select>
-      </td>
-    </tr>
-  </table>
+  <div class="color-manipulation-wrapper" :class="{'limited-wrapper': nbImages > 2}">
+    <template v-if="canComputeHistogram">
+      <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+        <p> {{ $t('unexpected-error-info-message') }} </p>
+      </b-message>
+      <div class="histogram-actions" v-else-if="!loading && !hasHistograms">
+        <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
+      </div>
+      <b-tabs type="is-boxed" class="histogram" v-else-if="loading || hasHistograms">
+        <b-loading :is-full-page="false" class="small" :active="loading"  />
+        <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
+          <template #header>
+            <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
+            {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
+          </template>
+          <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
+        </b-tab-item>
+      </b-tabs>
+    </template>
+    <table>
+      <!--    <tr>
+            <td>{{ $t('contrast') }}</td>
+            <td>
+              <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
+            </td>
+          </tr>-->
+      <tr>
+        <td>{{ $t('gamma') }}</td>
+        <td>
+          <cytomine-slider v-model="gamma" :min="0.1" :max="4" :interval="0.1" :integer-only="false"/>
+        </td>
+      </tr>
+      <tr class="has-border-bottom">
+        <td>{{$t('inverse')}}</td>
+        <td>
+          <b-switch v-model="inverse" class="switch">
+            <template v-if="inverse">{{$t('yes')}}</template>
+            <template v-else>{{$t('no')}}</template>
+          </b-switch>
+        </td>
+      </tr>
+      <tr v-if="filters && filters.length > 0" class="has-border-bottom">
+        <td>{{ $t('filter') }}</td>
+        <td>
+          <b-select v-model="selectedFilter" size="is-small">
+            <option :value="null">{{$t('original-no-filter')}}</option>
+            <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
+              {{filter.name}}
+            </option>
+          </b-select>
+        </td>
+      </tr>
+    </table>
 
+
+  </div>
   <div class="actions">
     <div class="level">
       <template v-if="maxRank > 1 && hasHistograms">
@@ -79,7 +82,7 @@
 
       <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
     </div>
-      <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasHistograms">{{switchHistogramScaleLabel}}</a>
+    <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasHistograms">{{switchHistogramScaleLabel}}</a>
   </div>
 </div>
 </template>
@@ -107,6 +110,12 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
+    nbImages() {
+      return Object.keys(this.viewerWrapper.images).length;
+    },
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
@@ -270,6 +279,16 @@ export default {
 </script>
 
 <style scoped>
+.color-manipulation-wrapper {
+
+  overflow: auto;
+  margin-bottom: 0.4em !important;
+}
+
+.limited-wrapper {
+  max-height: 13em;
+}
+
 td, tr {
   vertical-align: middle !important;
 }
@@ -282,11 +301,6 @@ td:first-child {
 
 td:last-child {
   width: 100%;
-}
-
-.actions {
-  padding-top: 1em;
-  margin-bottom: 0.5em;
 }
 
 .actions .button, .histogram-actions .button {
