@@ -1,4 +1,6 @@
 name: Deploy on push to master
+env:
+  SERVICE_NAME: digipat-frontend
 
 on:
   push:
@@ -9,9 +11,6 @@ on:
       - v*
 
   pull_request:
-
-env:
-  IMAGE_NAME: digipat-frontend
 
 
 jobs:
@@ -41,7 +40,7 @@ jobs:
 
       - name: Push image to registry
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$SERVICE_NAME
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
@@ -62,7 +61,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          script: docker service update --image $IMAGE_ID prod_digipat-frontend
-
-
-
+          script: docker pull $IMAGE_ID && docker service update --force prod_${SERVICE_NAME}
