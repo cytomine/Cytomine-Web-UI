@@ -61,4 +61,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          script: docker pull ${{steps.docker-push.outputs.image_url}} && docker service update --force prod_${SERVICE_NAME}
+          script: docker pull ${{steps.docker-push.outputs.image_url}} && docker service update --force prod_${{env.SERVICE_NAME}}
