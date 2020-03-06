@@ -62,7 +62,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          script: ../cytomine/bootstrap/redeploy.sh digipat-frontend
+          script: docker service update --image $IMAGE_ID prod_digipat-frontend
 
 
 
