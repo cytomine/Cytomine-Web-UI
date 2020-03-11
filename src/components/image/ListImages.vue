@@ -25,12 +25,18 @@
 <div v-else class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
   <div v-if="!loading" class="panel">
-    <p class="panel-heading">
-      {{$t('images')}}
+    <div class="panel-heading">
+      <p>{{$t('images')}}</p>
+      <div>
+      <router-link :to="`/project/${project.id}/analyze`">
+        <button class="button is-link"  style="margin-right: 5px">
+          Analyze
+        </button>
+      </router-link>
       <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
         {{$t('button-add-image')}}
-      </button>
-    </p>
+      </button></div>
+    </div>
     <div class="panel-block">
       <div class="search-block">
         <b-input
