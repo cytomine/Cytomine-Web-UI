@@ -168,7 +168,6 @@ import SoftwareStatus from '@/components/software/SoftwareStatus';
 import BooleanItem from '@/components/utils/BooleanItem';
 import SoftwareDetails from '@/components/software/SoftwareDetails';
 
-import {isBetweenBounds} from '@/utils/bounds';
 import {get, sync, syncFilter, syncBoundsFilter} from '@/utils/store-helpers';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
@@ -235,8 +234,8 @@ export default {
       }
 
       filtered = filtered.filter(software => {
-        return isBetweenBounds(software.numberOfJob, this.boundsJobs) &&
-          isBetweenBounds(software.numberOfSuccess, this.boundsSuccessJobs) &&
+        return (software.numberOfJob >= this.boundsJobs[0] && software.numberOfJob <= this.boundsJobs[1]) &&
+          (software.numberOfSuccess >= this.boundsSuccessJobs[0] && software.numberOfSuccess <= this.boundsSuccessJobs[1]) &&
           ((this.onlyLastReleases && software.softwareVersion && !software.deprecated) || !this.onlyLastReleases) &&
           ((this.onlyExecutables && software.executable) || !this.onlyExecutables);
       });

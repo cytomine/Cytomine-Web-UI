@@ -17,7 +17,6 @@
 import {ImageInstance, AbstractImage, AnnotationType} from 'cytomine-client';
 
 import constants from '@/utils/constants';
-import {slicePositionToRank} from '@/utils/slice-utils';
 
 import colors from './image_modules/colors';
 import draw from './image_modules/draw';

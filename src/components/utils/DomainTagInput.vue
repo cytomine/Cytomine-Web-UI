@@ -55,7 +55,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: "search-placeholder"
+      default: 'search-placeholder'
     }
   },
   data() {
