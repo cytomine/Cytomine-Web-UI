@@ -132,23 +132,27 @@ export default {
       return this.params.filter(param => param.required && !param.defaultParamValue);
     },
     jobParameters() {
-      return this.params.map(param => {
-        let value = param.value;
-        if(value.id) {
-          value = value.id;
-        }
-        if(Array.isArray(value)) {
-          if(value.length) {
-            if(value[0].id) {
-              value = value.map(model => model.id).join();
+      return this.params
+        .filter(param => {
+          return param.value || param.value === 0;
+        })
+        .map(param => {
+          let value = param.value;
+          if(value.id) {
+            value = value.id;
+          }
+          if(Array.isArray(value)) {
+            if(value.length) {
+              if(value[0].id) {
+                value = value.map(model => model.id).join();
+              }
+            }
+            else {
+              value = null;
             }
           }
-          else {
-            value = null;
-          }
-        }
-        return new JobParameter({softwareParameter: param.id, value});
-      });
+          return new JobParameter({softwareParameter: param.id, value});
+        });
     },
     executableSoftwares() {
       return this.softwares.filter(s => s.executable);
