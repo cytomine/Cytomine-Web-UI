@@ -136,13 +136,13 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
-import {Cytomine, UserCollection, ProjectRepresentative, ProjectRepresentativeCollection} from 'cytomine-client';
+import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
 
 export default {
   name: 'projet-members',

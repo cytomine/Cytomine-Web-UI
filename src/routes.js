@@ -37,7 +37,7 @@ import MemberActivityDetails from './components/project/activity/MemberActivityD
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
-import ProjectAnalyze from './components/project/ProjectAnalyze';
+import ProjectAnalyze from './components/project/ProjectAnalyze.vue';
 
 // Define routes
 const routes = [

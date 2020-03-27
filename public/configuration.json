@@ -1,5 +1,5 @@
 {
-  "CYTOMINE_CORE_HOST": "http://core.digipat.no",
+  "CYTOMINE_CORE_HOST": "http://core.jepat.jenslien.net",
   "CYTOMINE_UPLOAD_HOST": "http://ims.digipat.no",
   "DIGITAL_ZOOM_INCREMENT": 4,
   "VIEWER_ANNOTATIONS_REFRESH_INTERVAL": 10000,

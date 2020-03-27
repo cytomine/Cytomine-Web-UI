@@ -12,21 +12,11 @@
     <div v-if="!loading" class="panel">
       <div class="panel-heading">
         <p>ROI Groups</p>
-        <button class="button is-link">
+        <button class="button is-link" @click="startNewAnalysis">
           Start new analysis
         </button>
       </div>
       <div class="panel-block">
-        <div class="search-block">
-          <b-input
-            class="search-roi-groups"
-            v-model="searchString"
-            :placeholder="$t('search-placeholder')"
-            type="search" icon="search"
-          />
-        </div>
-
-
         <div>
           <p>ROI Groups content</p>
         </div>
@@ -36,15 +26,13 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
+import {get, sync} from '@/utils/store-helpers';
 
 import {ImageInstanceCollection} from 'cytomine-client';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
-const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
-const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
 
 export default {
   name: 'analyze',
@@ -53,28 +41,32 @@ export default {
       loading: true,
       error: false,
       revision: 0,
+      images: [],
     };
+  },
+  methods: {
+    startNewAnalysis() {
+      // First add all the images to the globalState as a queue
+      this.$store.commit(`${this.storeModule}/setQueuedImages`, this.images);
+      this.$router.push({ path: `/project/${this.project.id}/image/${this.images[0].id}` });
+    },
+    async getAllImages() {
+      const collection = await new ImageInstanceCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+        max: 10,
+      });
+      const resp = await collection.fetchAll();
+      this.images = resp._data;
+    },
   },
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
-    groupCollection() {
-      let collection = new ImageInstanceCollection({
-        filterKey: 'project',
-        filterValue: this.project.id,
-      });
-      if(this.searchString) {
-        collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
-        };
-      }
-      return collection;
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/analysis)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
     },
-    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
-      return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
-    },
-    searchString: sync('searchString', {...storeOptions, debounce: 500}),
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
     sortField: sync('sortField', storeOptions),
@@ -83,6 +75,7 @@ export default {
   async created() {
     try {
       this.loading = false;
+      this.getAllImages();
     }
     catch(error) {
       console.error(error);
@@ -97,18 +90,5 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .search-block {
-    display: flex;
-  }
-
-  >>> .search-images {
-    max-width: 30rem;
-    margin-right: 1rem;
-  }
-
-  >>> td, >>> th {
-    vertical-align: middle !important;
   }
 </style>

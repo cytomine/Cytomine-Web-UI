@@ -27,14 +27,22 @@
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="cell && cell.image"
+        v-if="cell && cell.image && !isAnalyzing"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
+        :projectId="String(project.id)"
+      />
+      <wizard-image
+        v-else-if="cell && cell.image && isAnalyzing"
+        :index="cell.index"
+        :key="`${cell.index}-${cell.image.id}`"
+        @close="closeMap(cell.index)"
+        :projectId="String(project.id)"
       />
     </div>
 
-    <image-selector />
+    <image-selector v-if="!isAnalyzing"/>
 
     <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
     <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
@@ -46,6 +54,7 @@
 import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
+import WizardImage from './WizardImage';
 import ImageSelector from './ImageSelector';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
@@ -57,6 +66,7 @@ import {ImageInstance} from 'cytomine-client';
 export default {
   name: 'cytomine-viewer',
   components: {
+    WizardImage,
     CytomineImage,
     ImageSelector
   },
@@ -70,6 +80,9 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    isAnalyzing() {
+      return this.$store.state.projects[this.project.id].analysis.queuedForAnalysis.length > 0;
+    },
     viewers() {
       return this.$store.state.projects[this.project.id].viewers;
     },

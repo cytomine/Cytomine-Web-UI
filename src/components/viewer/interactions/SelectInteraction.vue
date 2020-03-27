@@ -91,7 +91,7 @@ export default {
     }
   },
   methods: {
-    select({feature}) {
+    select({ feature }) {
       let annot = feature.get('annot');
       annot.recordAction();
     }

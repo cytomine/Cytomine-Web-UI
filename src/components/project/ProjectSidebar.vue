@@ -32,6 +32,12 @@
           {{ $t('annotations') }}
         </a>
       </router-link>
+      <router-link tag="li" :to="`/project/${project.id}/analyze`">
+      <a>
+        <i class="fas fa fa-flask"></i>
+        Analyze
+      </a>
+    </router-link>
       <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`">
         <a>
           <i class="fas fa-tasks"></i>
