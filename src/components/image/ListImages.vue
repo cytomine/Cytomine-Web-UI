@@ -177,7 +177,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumb" class="image-overview">
+              <img :src="image.thumbURL(256)" class="image-overview">
             </router-link>
           </b-table-column>
 
@@ -240,7 +240,7 @@
       </cytomine-table>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" :idsImages="idsAbstractImages" @addImage="refreshData" />
+    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
   </div>
 </div>
 </template>
@@ -313,9 +313,6 @@ export default {
     },
     canAddImage() {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
-    },
-    idsAbstractImages() {
-      return this.images.map(i => i.baseImage);
     },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
