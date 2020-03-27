@@ -16,7 +16,7 @@
 <template>
 <div class="annotation-details">
   <table class="table">
-    <tbody>
+    <tbody v-if="!isAnalyzing">
       <tr v-if="showImageInfo">
         <td><strong>{{$t('image')}}</strong></td>
         <td>
@@ -133,7 +133,7 @@
     </tbody>
   </table>
 
-  <div class="actions">
+  <div class="actions" v-if="!isAnalyzing">
     <router-link
       v-if="showImageInfo"
       :to="annotationURL"
@@ -163,6 +163,16 @@
 
       <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
         {{ $t('button-delete') }}
+      </button>
+    </div>
+  </div>
+  <div class="actions" v-else>
+    <div class="level">
+      <button class="level-item button is-small" @click="cancelAnalysisAnnotation()">
+        Cancel
+      </button>
+      <button class="level-item button is-small is-success" @click="confirmAnalysisAnnotation()">
+        Confirm
       </button>
     </div>
   </div>
@@ -213,7 +223,12 @@ export default {
   },
   computed: {
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     ontology: get('currentProject/ontology'),
+
+    isAnalyzing() {
+      return this.$store.state.projects[this.project.id].analysis.queuedForAnalysis.length > 0;
+    },
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
@@ -257,6 +272,14 @@ export default {
     }
   },
   methods: {
+    confirmAnalysisAnnotation() {
+      console.log('confirm annotation');
+    },
+
+    cancelAnalysisAnnotation() {
+      console.log('cancel annotation');
+    },
+
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },

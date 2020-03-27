@@ -73,7 +73,88 @@
     </vl-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" :projectId="projectId" />
+      <draw-tools :index="index" :projectId="projectId"/>
+    </div>
+
+    <div class="panels">
+      <ul>
+        <li>
+          <a @click="$emit('close')" class="close">
+            <i class="fas fa-times-circle"></i>
+          </a>
+        </li>
+
+        <template v-if="isPanelDisplayed('hide-tools')">
+          <li v-if="isPanelDisplayed('info')">
+            <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
+              <i class="fas fa-info"></i>
+            </a>
+            <information-panel class="panel-options" v-show="activePanel === 'info'" :index="index" />
+          </li>
+
+          <li v-if="isPanelDisplayed('digital-zoom')">
+            <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
+              <i class="fas fa-search"></i>
+            </a>
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
+          </li>
+
+          <li v-if="isPanelDisplayed('link') && nbImages > 1">
+            <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
+              <i class="fas fa-link"></i>
+            </a>
+            <link-panel class="panel-options" v-show="activePanel === 'link'" :index="index" />
+          </li>
+
+          <li v-if="isPanelDisplayed('color-manipulation')">
+            <a @click="togglePanel('colors')" :class="{active: activePanel === 'colors'}">
+              <i class="fas fa-adjust"></i>
+            </a>
+            <color-manipulation class="panel-options" v-show="activePanel === 'colors'" :index="index" />
+          </li>
+
+          <li v-if="isPanelDisplayed('image-layers')">
+            <a @click="togglePanel('layers')" :class="{active: activePanel === 'layers'}">
+              <i class="fas fa-copy"></i>
+            </a>
+            <layers-panel class="panel-options" v-show="activePanel === 'layers'"
+              :index="index" :layers-to-preload="layersToPreload"
+            />
+          </li>
+
+          <li v-if="isPanelDisplayed('ontology') && terms && terms.length > 0">
+            <a @click="togglePanel('ontology')" :class="{active: activePanel === 'ontology'}">
+              <i class="fas fa-hashtag"></i>
+            </a>
+            <ontology-panel class="panel-options" v-show="activePanel === 'ontology'" :index="index" />
+          </li>
+
+          <li  v-if="isPanelDisplayed('property')">
+            <a @click="togglePanel('properties')" :class="{active: activePanel === 'properties'}">
+              <i class="fas fa-tag"></i>
+            </a>
+            <properties-panel class="panel-options" v-show="activePanel === 'properties'" :index="index" />
+          </li>
+
+          <li v-if="isPanelDisplayed('follow')">
+            <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
+              <i class="fas fa-street-view"></i>
+            </a>
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
+          </li>
+
+          <li v-if="isPanelDisplayed('review') && canEdit">
+            <a @click="togglePanel('review')" :class="{active: activePanel === 'review'}">
+              <i class="fas fa-check-circle"></i>
+            </a>
+            <review-panel class="panel-options" v-show="activePanel === 'review'" :index="index" />
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
+      <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
 
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
