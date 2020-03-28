@@ -226,6 +226,9 @@ export default {
     project: get('currentProject/project'),
     ontology: get('currentProject/ontology'),
 
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/analysis)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+    },
     isAnalyzing() {
       return this.$store.state.projects[this.project.id].analysis.queuedForAnalysis.length > 0;
     },
@@ -272,12 +275,27 @@ export default {
     }
   },
   methods: {
-    confirmAnalysisAnnotation() {
+    async confirmAnalysisAnnotation() {
       console.log('confirm annotation');
+      // Add annotation to global state for POST-request to middleware later on
+      await this.$store.commit(`${this.storeModule}/addAnnotationForAnalysis`, this.annotation.id);
+      // Remove the first image from the analysis queue since we just did that one
+      await this.$store.commit(`${this.storeModule}/removeFirstFromAnalysisQueue`);
+      // Go to the first image in the new, mutated queue
+      if (this.isAnalyzing) {
+        // Still more images left to select annotations for, continue
+        const queue = this.$store.state.projects[this.project.id].analysis.queuedForAnalysis;
+        await this.$router.push({ path: `/project/${this.project.id}/image/${queue[0].id}` });
+      }
+      else {
+        // No images left in the queue, go back to project analyze
+        await this.$router.push({ path: `/project/${this.project.id}/analyze` });
+      }
     },
 
     cancelAnalysisAnnotation() {
       console.log('cancel annotation');
+      console.log(this.annotation);
     },
 
     isPropDisplayed(prop) {

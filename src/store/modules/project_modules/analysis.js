@@ -25,6 +25,7 @@ export default {
       sortOrder: 'asc',
       openedDetails: [],
       queuedForAnalysis: [],
+      annotationsAddedForAnalysis: [],
     };
   },
 
@@ -63,6 +64,14 @@ export default {
 
     setQueuedImages(state, value) {
       state.queuedForAnalysis = value;
+    },
+
+    removeFirstFromAnalysisQueue(state) {
+      state.queuedForAnalysis.shift();
+    },
+
+    addAnnotationForAnalysis(state, value) {
+      state.annotationsAddedForAnalysis.push(value);
     }
   },
 
