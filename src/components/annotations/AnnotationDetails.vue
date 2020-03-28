@@ -276,7 +276,6 @@ export default {
   },
   methods: {
     async confirmAnalysisAnnotation() {
-      console.log('confirm annotation');
       // Add annotation to global state for POST-request to middleware later on
       await this.$store.commit(`${this.storeModule}/addAnnotationForAnalysis`, this.annotation.id);
       // Remove the first image from the analysis queue since we just did that one
@@ -289,7 +288,7 @@ export default {
       }
       else {
         // No images left in the queue, go back to project analyze
-        await this.$router.push({ path: `/project/${this.project.id}/analyze` });
+        await this.$router.push({ path: `/project/${this.project.id}/choose-analysis` });
       }
     },
 

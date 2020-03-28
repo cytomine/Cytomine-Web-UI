@@ -72,9 +72,18 @@ export default {
 
     addAnnotationForAnalysis(state, value) {
       state.annotationsAddedForAnalysis.push(value);
-    }
-  },
+    },
 
+    resetAnnotations(state) {
+      state.annotationsAddedForAnalysis = [];
+    },
+  },
+  actions: {
+    startNewAnalysis ({ commit }, newQueue) {
+      commit('setQueuedImages', newQueue);
+      commit('resetAnnotations');
+    },
+  },
   getters: {
     nbActiveFilters: state => {
       return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values

@@ -47,7 +47,7 @@ export default {
   methods: {
     startNewAnalysis() {
       // First add all the images to the globalState as a queue
-      this.$store.commit(`${this.storeModule}/setQueuedImages`, this.images);
+      this.$store.dispatch(`${this.storeModule}/startNewAnalysis`, this.images);
       this.$router.push({ path: `/project/${this.project.id}/image/${this.images[0].id}` });
     },
     async getAllImages() {

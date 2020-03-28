@@ -448,6 +448,9 @@ export default {
         this.fetchFilters(),
         this.fetchTags()
       ]);
+      const analysisModule = this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+      // Reset queued images for analysis
+      this.$store.commit(`${analysisModule}/setQueuedImages`, []);
       this.loading = false;
     }
     catch(error) {
