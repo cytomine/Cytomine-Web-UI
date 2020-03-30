@@ -17,11 +17,48 @@
         </button>
       </div>
       <div class="panel-block">
-        <div>
-          <p>ROI Groups content</p>
-        </div>
+        <b-table
+          v-if="groups"
+          :data="groups"
+          :fields="fields"
+          paginated
+          hover
+          pagination-size="is-small"
+          :per-page="perPage"
+          :current-page.sync="currentPage"
+          :loading="loading"
+        >
+          <template #default="{row: group}">
+            <b-table-column label="Name" width="200" centered>
+              <h3>{{ group.name }}</h3>
+            </b-table-column>
+
+            <b-table-column label="ID" width="100" centered>
+              <p>{{ group.id }}</p>
+            </b-table-column>
+
+            <b-table-column width="150" centered>
+              <button @click="openModal(group)" class="button is-link">Results</button>
+            </b-table-column>
+          </template>
+
+          <template #empty>
+            <div class="content has-text-grey has-text-centered">
+              <p>No groups found</p>
+            </div>
+          </template>
+
+          <template #bottom-left>
+            <b-select v-model="perPage" size="is-small">
+              <option v-for="option in perPageOptions" :key="option" :value="option">
+                {{$t('count-per-page', {count: option})}}
+              </option>
+            </b-select>
+          </template>
+        </b-table>
       </div>
     </div>
+    <AnnotationGroupModal :isActive="isModalActive" :group="modalGroup" v-on:closeModal="closeModal"/>
   </div>
 </template>
 
@@ -30,18 +67,38 @@ import {get, sync} from '@/utils/store-helpers';
 
 import {ImageInstanceCollection} from 'cytomine-client';
 
+import CytomineTable from '../utils/CytomineTable';
+
+import AnnotationGroupModal from './AnnotationGroupModal';
+
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 
 export default {
   name: 'analyze',
+  components: {
+    AnnotationGroupModal,
+    CytomineTable,
+  },
   data() {
     return {
       loading: true,
+      isModalActive: false,
+      modalGroup: {},
       error: false,
       revision: 0,
       images: [],
+      groups: [],
+      perPageOptions: [10, 25, 50, 100],
+      fields: [
+        {
+          key: 'name',
+        },
+        {
+          key: 'id',
+        },
+      ],
     };
   },
   methods: {
@@ -59,6 +116,13 @@ export default {
       const resp = await collection.fetchAll();
       this.images = resp._data;
     },
+    openModal(group) {
+      this.modalGroup = group;
+      this.isModalActive = true;
+    },
+    closeModal() {
+      this.isModalActive = false;
+    },
   },
   computed: {
     currentUser: get('currentUser/user'),
@@ -69,13 +133,14 @@ export default {
     },
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
-    sortField: sync('sortField', storeOptions),
-    sortOrder: sync('sortOrder', storeOptions),
   },
   async created() {
     try {
-      this.loading = false;
       this.getAllImages();
+      const fetchedGroups = await fetch(`http://localhost:9292/annotationGroup?projectId=${this.project.id}`);
+      const response = await fetchedGroups.json();
+      this.groups = response.groups;
+      this.loading = false;
     }
     catch(error) {
       console.error(error);
@@ -90,5 +155,13 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  .tr {
+    height: 50px;
   }
 </style>

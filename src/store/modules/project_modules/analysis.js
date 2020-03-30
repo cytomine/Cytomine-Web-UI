@@ -3,26 +3,8 @@ export default {
 
   state() {
     return {
-      searchString: '',
-
-      filtersOpened: false,
-      filters: {
-        formats: [],
-        vendors: [],
-        selectedTags: [],
-        magnifications: [],
-        resolutions: [],
-        boundsWidth: null,
-        boundsHeight: null,
-        boundsUserAnnotations: null,
-        boundsJobAnnotations: null,
-        boundsReviewedAnnotations: null
-      },
-
       currentPage: 1,
       perPage: 10,
-      sortField: null,
-      sortOrder: 'asc',
       openedDetails: [],
       queuedForAnalysis: [],
       annotationsAddedForAnalysis: [],
