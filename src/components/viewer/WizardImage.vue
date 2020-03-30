@@ -163,6 +163,8 @@
 
     <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
 
+    <template-annotation v-if="hasFirstAnnotation" :projectId="projectId" />
+
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
         <image-name :image="image" />
@@ -197,6 +199,8 @@ import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
+
+import TemplateAnnotation from './TemplateAnnotation';
 
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
@@ -241,25 +245,25 @@ export default {
 
     SelectInteraction,
     DrawInteraction,
-    ModifyInteraction
+    ModifyInteraction,
+
+    TemplateAnnotation,
   },
   data() {
     return {
       minZoom: 0,
-
       projectedMousePosition: [0, 0],
-
       baseSource: null,
       routedAnnotation: null,
-
       timeoutSavePosition: null,
-
       loading: true,
-
       overview: null
     };
   },
   computed: {
+    hasFirstAnnotation() {
+      return this.$store.state.projects[this.projectId].analysis.annotationsAddedForAnalysis.length > 0;
+    },
     document() {
       return document;
     },

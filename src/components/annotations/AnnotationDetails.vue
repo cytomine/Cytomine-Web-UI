@@ -167,7 +167,7 @@
     </div>
   </div>
   <div class="actions" v-else>
-    <div class="level">
+    <div class="analysis-level">
       <button class="level-item button is-small" @click="cancelAnalysisAnnotation()">
         Cancel
       </button>
@@ -408,6 +408,11 @@ export default {
 </script>
 
 <style scoped>
+.analysis-level {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .annotation-details {
   position: relative;
   font-size: 0.85rem;
