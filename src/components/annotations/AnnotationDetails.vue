@@ -16,7 +16,7 @@
 <template>
 <div class="annotation-details">
   <table class="table">
-    <tbody>
+    <tbody v-if="!isAnalyzing">
       <tr v-if="showImageInfo">
         <td><strong>{{$t('image')}}</strong></td>
         <td>
@@ -133,7 +133,7 @@
     </tbody>
   </table>
 
-  <div class="actions">
+  <div class="actions" v-if="!isAnalyzing">
     <router-link
       v-if="showImageInfo"
       :to="annotationURL"
@@ -163,6 +163,16 @@
 
       <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
         {{ $t('button-delete') }}
+      </button>
+    </div>
+  </div>
+  <div class="actions" v-else>
+    <div class="analysis-level">
+      <button class="level-item button is-small" @click="cancelAnalysisAnnotation()">
+        Cancel
+      </button>
+      <button class="level-item button is-small is-success" @click="confirmAnalysisAnnotation()">
+        Confirm
       </button>
     </div>
   </div>
@@ -213,7 +223,15 @@ export default {
   },
   computed: {
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     ontology: get('currentProject/ontology'),
+
+    storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/analysis)
+      return this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+    },
+    isAnalyzing() {
+      return this.$store.state.projects[this.project.id].analysis.queuedForAnalysis.length > 0;
+    },
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
@@ -257,6 +275,28 @@ export default {
     }
   },
   methods: {
+    async confirmAnalysisAnnotation() {
+      // Add annotation to global state for POST-request to middleware later on
+      await this.$store.commit(`${this.storeModule}/addAnnotationForAnalysis`, this.annotation.id);
+      // Remove the first image from the analysis queue since we just did that one
+      await this.$store.commit(`${this.storeModule}/removeFirstFromAnalysisQueue`);
+      // Go to the first image in the new, mutated queue
+      if (this.isAnalyzing) {
+        // Still more images left to select annotations for, continue
+        const queue = this.$store.state.projects[this.project.id].analysis.queuedForAnalysis;
+        await this.$router.push({ path: `/project/${this.project.id}/image/${queue[0].id}` });
+      }
+      else {
+        // No images left in the queue, go back to project analyze
+        await this.$router.push({ path: `/project/${this.project.id}/choose-analysis` });
+      }
+    },
+
+    cancelAnalysisAnnotation() {
+      console.log('cancel annotation');
+      console.log(this.annotation);
+    },
+
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
@@ -368,6 +408,11 @@ export default {
 </script>
 
 <style scoped>
+.analysis-level {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .annotation-details {
   position: relative;
   font-size: 0.85rem;

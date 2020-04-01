@@ -14,10 +14,9 @@ module.exports = {
     'array-bracket-spacing': ['error', 'never'],
     'camelcase': ['error', {allow: ['$_veeValidate']}],
     'semi': ['error', 'always'],
-    'no-console': ['off'],
-    "vue/return-in-computed-property": "off",
-    "vue/no-unused-components": "off",
-    "no-prototype-builtins": "off",
-    "no-unused-vars": "off"
+    'no-console': ['off']
   },
+  'parserOptions': {
+    'parser': 'babel-eslint'
+  }
 };

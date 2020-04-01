@@ -26,7 +26,7 @@
     :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
   >
     <div class="actions">
-      <h1>{{$t('current-selection')}}</h1>
+      <h1>{{ isAnalyzing ? 'Confirm Selection' : $t('current-selection') }}</h1>
       <button class="drag button is-small close">
         <i class="fas fa-arrows-alt"></i>
       </button>
@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
@@ -74,7 +76,6 @@ export default {
   data() {
     return {
       width: 320,
-      height: 500,
       users: [],
       userJobs: [],
       reload: true,
@@ -83,6 +84,16 @@ export default {
     };
   },
   computed: {
+    project: get('currentProject/project'),
+    isAnalyzing() {
+      return this.$store.state.projects[this.project.id].analysis.queuedForAnalysis.length > 0;
+    },
+    height() {
+      if (this.isAnalyzing) {
+        return 100;
+      }
+      return 500;
+    },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },

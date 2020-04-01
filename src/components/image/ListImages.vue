@@ -25,12 +25,18 @@
 <div v-else class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
   <div v-if="!loading" class="panel">
-    <p class="panel-heading">
-      {{$t('images')}}
+    <div class="panel-heading">
+      <p>{{$t('images')}}</p>
+      <div>
+      <router-link :to="`/project/${project.id}/analyze`">
+        <button class="button is-link"  style="margin-right: 5px">
+          Analyze
+        </button>
+      </router-link>
       <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
         {{$t('button-add-image')}}
-      </button>
-    </p>
+      </button></div>
+    </div>
     <div class="panel-block">
       <div class="search-block">
         <b-input
@@ -171,7 +177,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumb" class="image-overview">
+              <img :src="image.thumbURL(256)" class="image-overview">
             </router-link>
           </b-table-column>
 
@@ -234,7 +240,7 @@
       </cytomine-table>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" :idsImages="idsAbstractImages" @addImage="refreshData" />
+    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
   </div>
 </div>
 </template>
@@ -307,9 +313,6 @@ export default {
     },
     canAddImage() {
       return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
-    },
-    idsAbstractImages() {
-      return this.images.map(i => i.baseImage);
     },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
@@ -445,6 +448,9 @@ export default {
         this.fetchFilters(),
         this.fetchTags()
       ]);
+      const analysisModule = this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+      // Reset queued images for analysis
+      this.$store.commit(`${analysisModule}/setQueuedImages`, []);
       this.loading = false;
     }
     catch(error) {

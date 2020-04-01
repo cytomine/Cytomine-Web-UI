@@ -59,7 +59,7 @@
 
     <div class="buttons has-addons are-small">
       <button
-        v-if="isToolDisplayed('point')"
+        v-if="isToolDisplayed('point') && !isAnalyzing"
         :disabled="disabledDraw"
         v-tooltip="$t('point')"
         class="button"
@@ -70,7 +70,7 @@
       </button>
 
       <button
-        v-if="isToolDisplayed('line')"
+        v-if="isToolDisplayed('line') && !isAnalyzing"
         :disabled="disabledDraw"
         v-tooltip="$t('line')"
         class="button"
@@ -81,7 +81,7 @@
       </button>
 
       <button
-        v-if="isToolDisplayed('freehand-line')"
+        v-if="isToolDisplayed('freehand-line') && !isAnalyzing"
         :disabled="disabledDraw"
         v-tooltip="$t('freehand-line')"
         class="button"
@@ -183,7 +183,7 @@
 
   <div class="buttons has-addons are-small">
     <button
-      v-if="isToolDisplayed('fill')"
+      v-if="isToolDisplayed('fill') && !isAnalyzing"
       :disabled="isToolDisabled('fill')"
       v-tooltip="$t('fill')"
       class="button"
@@ -300,7 +300,8 @@ export default {
     IconLineFreeHand
   },
   props: {
-    index: String
+    index: String,
+    projectId: String,
   },
   data() {
     return {
@@ -313,6 +314,10 @@ export default {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
 
+
+    isAnalyzing() {
+      return this.$store.state.projects[this.projectId].analysis.queuedForAnalysis.length > 0;
+    },
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },

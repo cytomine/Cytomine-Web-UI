@@ -73,7 +73,7 @@
     </vl-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" :projectId="projectId"/>
     </div>
 
     <div class="panels">
@@ -215,7 +215,8 @@ import constants from '@/utils/constants.js';
 export default {
   name: 'cytomine-image',
   props: {
-    index: String
+    index: String,
+    projectId: String,
   },
   components: {
     ImageName,
@@ -604,194 +605,194 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vuelayers/lib/style.css';
+  @import '~vuelayers/lib/style.css';
 
-$backgroundPanelBar: #555;
-$widthPanelBar: 2.8rem;
-$backgroundPanel: #f2f2f2;
-$colorPanelLink: #eee;
-$colorHoverPanelLink: white;
-$colorBorderPanelLink: #222;
-$colorOpenedPanelLink: #6c95c8;
+  $backgroundPanelBar: #555;
+  $widthPanelBar: 2.8rem;
+  $backgroundPanel: #f2f2f2;
+  $colorPanelLink: #eee;
+  $colorHoverPanelLink: white;
+  $colorBorderPanelLink: #222;
+  $colorOpenedPanelLink: #6c95c8;
 
-.map-container {
-  display:flex;
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.map {
-  flex-grow: 1;
-}
-
-.draw-tools {
-  position: absolute;
-  top: 0.7em;
-  left: 3.5rem;
-  right: $widthPanelBar;
-  z-index: 10;
-}
-
-.broadcast {
-  position: absolute;
-  right: 4.5rem;
-  top: 0.7em;
-  text-transform: uppercase;
-  font-weight: 600;
-  background-color: #EE4242;
-  color: white;
-  padding: 0.25em 0.75em 0.25em 0.55em;
-  border-radius: 5px;
-  border: 2px solid white;
-
-  i.fas {
-    margin-right: 0.3em;
+  .map-container {
+    display:flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
-}
 
-.panels {
-  background: $backgroundPanelBar;
-  display: flex;
-  font-size: 0.9em;
+  .map {
+    flex-grow: 1;
+  }
 
-  > ul {
-    padding: 0;
-    margin: 0;
+  .draw-tools {
+    position: absolute;
+    top: 0.7em;
+    left: 3.5rem;
+    right: $widthPanelBar;
+    z-index: 10;
+  }
 
-    > li {
-      position: relative;
+  .broadcast {
+    position: absolute;
+    right: 4.5rem;
+    top: 0.7em;
+    text-transform: uppercase;
+    font-weight: 600;
+    background-color: #EE4242;
+    color: white;
+    padding: 0.25em 0.75em 0.25em 0.55em;
+    border-radius: 5px;
+    border: 2px solid white;
 
-      > a {
+    i.fas {
+      margin-right: 0.3em;
+    }
+  }
+
+  .panels {
+    background: $backgroundPanelBar;
+    display: flex;
+    font-size: 0.9em;
+
+    > ul {
+      padding: 0;
+      margin: 0;
+
+      > li {
         position: relative;
-        display: block;
-        width: $widthPanelBar;
-        padding: 0.35rem 0.8rem;
-        font-size: 1.25rem;
-        color: $colorPanelLink;
-        border-bottom: 1px solid $colorBorderPanelLink;
-        text-decoration: none;
-        text-align:center;
 
-        &:hover {
-          color: $colorHoverPanelLink;
-        }
+        > a {
+          position: relative;
+          display: block;
+          width: $widthPanelBar;
+          padding: 0.35rem 0.8rem;
+          font-size: 1.25rem;
+          color: $colorPanelLink;
+          border-bottom: 1px solid $colorBorderPanelLink;
+          text-decoration: none;
+          text-align:center;
 
-        &.active {
-          background: $backgroundPanel;
-          color: $colorOpenedPanelLink;
-        }
+          &:hover {
+            color: $colorHoverPanelLink;
+          }
 
-        &.close {
-          color: #ffc4c4;
-          :hover {
-            color: #ff7070;
+          &.active {
+            background: $backgroundPanel;
+            color: $colorOpenedPanelLink;
+          }
+
+          &.close {
+            color: #ffc4c4;
+            :hover {
+              color: #ff7070;
+            }
           }
         }
       }
     }
   }
-}
 
-.panel-options {
-  position: absolute;
-  bottom: -1.75em;
-  right: $widthPanelBar;
-  width: 24em;
-  min-height: 10em;
-  background: $backgroundPanel;
-  padding: 0.75em;
-  border-radius: 5px 0 0 5px;
-  z-index: 100;
+  .panel-options {
+    position: absolute;
+    bottom: -1.75em;
+    right: $widthPanelBar;
+    width: 24em;
+    min-height: 10em;
+    background: $backgroundPanel;
+    padding: 0.75em;
+    border-radius: 5px 0 0 5px;
+    z-index: 100;
 
-  h1 {
-    font-size: 1.1rem;
-    padding-top: 0.3rem !important;
-    padding-bottom: 1rem !important;
-  }
+    h1 {
+      font-size: 1.1rem;
+      padding-top: 0.3rem !important;
+      padding-bottom: 1rem !important;
+    }
 
-  table {
-    background: none;
-    width: 100%;
-  }
-}
-
-.panels li:nth-child(-n+7) .panel-options {
-  bottom: -7.5em;
-  min-height: 13em;
-}
-
-.panels li:nth-child(-n+3) .panel-options {
-  top: -1.75em;
-  bottom: auto;
-  min-height: 7.5em;
-}
-
-.panels li:nth-child(4) .panel-options {
-  top: -5.5em;
-  bottom: auto;
-}
-
-/* ----- CUSTOM STYLE FOR OL CONTROLS ----- */
-
-.ol-zoom, .ol-rotate {
-  background: none !important;
-}
-
-.ol-rotate:not(.custom) {
-  display: none;
-}
-
-.ol-control button {
-  background: white !important;
-  color: black !important;
-  border-radius: 2px !important;
-  box-shadow: 0 0 1px #777;
-
-  &:hover {
-    box-shadow: 0 0 1px black;
-    cursor: pointer;
-  }
-}
-
-.ol-zoom-in {
-  margin-bottom: 5px !important;
-}
-
-/* ----- Rotation selector ----- */
-.rotation-selector-wrapper {
-  position: absolute;
-  left: .5em;
-  top: 5rem;
-}
-
-.custom-overview {
-  position: absolute;
-  bottom: 0.5em;
-  left: 0.5em;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  flex-direction: column;
-  border-radius: 4px;
-
-  .ol-overviewmap {
-    position: static;
-    background: none;
-  }
-
-  .ol-overviewmap:not(.ol-collapsed) button {
-    bottom: 2px !important;
-  }
-
-  .image-name {
-    font-size: 0.8em;
-    padding: 2px 5px;
-    width: 158px;
-    word-wrap: break-word;
-
-    &.hidden {
-      display: none;
+    table {
+      background: none;
+      width: 100%;
     }
   }
-}
+
+  .panels li:nth-child(-n+7) .panel-options {
+    bottom: -7.5em;
+    min-height: 13em;
+  }
+
+  .panels li:nth-child(-n+3) .panel-options {
+    top: -1.75em;
+    bottom: auto;
+    min-height: 7.5em;
+  }
+
+  .panels li:nth-child(4) .panel-options {
+    top: -5.5em;
+    bottom: auto;
+  }
+
+  /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */
+
+  .ol-zoom, .ol-rotate {
+    background: none !important;
+  }
+
+  .ol-rotate:not(.custom) {
+    display: none;
+  }
+
+  .ol-control button {
+    background: white !important;
+    color: black !important;
+    border-radius: 2px !important;
+    box-shadow: 0 0 1px #777;
+
+    &:hover {
+      box-shadow: 0 0 1px black;
+      cursor: pointer;
+    }
+  }
+
+  .ol-zoom-in {
+    margin-bottom: 5px !important;
+  }
+
+  /* ----- Rotation selector ----- */
+  .rotation-selector-wrapper {
+    position: absolute;
+    left: .5em;
+    top: 5rem;
+  }
+
+  .custom-overview {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0.5em;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+
+    .ol-overviewmap {
+      position: static;
+      background: none;
+    }
+
+    .ol-overviewmap:not(.ol-collapsed) button {
+      bottom: 2px !important;
+    }
+
+    .image-name {
+      font-size: 0.8em;
+      padding: 2px 5px;
+      width: 158px;
+      word-wrap: break-word;
+
+      &.hidden {
+        display: none;
+      }
+    }
+  }
 </style>

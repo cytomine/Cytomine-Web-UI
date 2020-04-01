@@ -479,6 +479,10 @@ export default {
   async created() {
     this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
 
+    const analysisModule = this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+    // Reset queued images for analysis
+    this.$store.commit(`${analysisModule}/setQueuedImages`, []);
+
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {
       this.selectedSize = this.allowedSizes[0];
