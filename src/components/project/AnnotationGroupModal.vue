@@ -5,7 +5,7 @@
         <p class="modal-card-title">Results from {{ group.name }}</p>
       </header>
       <section class="modal-card-body">
-        <p>Gutta</p>
+        <p>Results</p>
       </section>
       <footer class="modal-card-foot">
         <button class="button is-link" @click="$emit('closeModal')">Close</button>
@@ -20,7 +20,7 @@ export default {
     isActive: Boolean,
     group: Object,
   },
-  name: 'AnnotationGroupModal.vue',
+  name: 'AnnotationGroupModal',
 };
 </script>
 
