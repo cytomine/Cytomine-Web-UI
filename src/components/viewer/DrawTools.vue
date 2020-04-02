@@ -145,6 +145,17 @@
         </span>
       </button>
     </div>
+
+    <div class="buttons has-addons are-small">
+      <button
+        class="button"
+        @click="skipImage"
+      >
+       <span class="is-small">
+         Skip image<i style="margin-left: 2px" class="fas fa-fast-forward" />
+       </span>
+      </button>
+    </div>
   </template>
 
   <template v-else>
@@ -313,7 +324,7 @@ export default {
   computed: {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
-
+    project: get('currentProject/project'),
 
     isAnalyzing() {
       return this.$store.state.projects[this.projectId].analysis.queuedForAnalysis.length > 0;
@@ -417,6 +428,26 @@ export default {
     }
   },
   methods: {
+    async skipImage() {
+      const analysisModule = this.$store.getters['currentProject/currentProjectModule'] + 'analysis';
+      await this.$store.commit(`${analysisModule}/removeFirstFromAnalysisQueue`);
+      if (this.isAnalyzing) {
+        // Still more images left to select annotations for, continue
+        const queue = this.$store.state.projects[this.project.id].analysis.queuedForAnalysis;
+        await this.$router.push({ path: `/project/${this.project.id}/image/${queue[0].id}` });
+      }
+      else {
+        // No images left in the queue, go back to project analyze
+        const added = this.$store.state.projects[this.project.id].analysis.annotationsAddedForAnalysis;
+        if (added.length > 0) {
+          await this.$router.push({ path: `/project/${this.project.id}/choose-analysis` });
+        }
+        else {
+          await this.$router.push({ path: `/project/${this.project.id}/analyze` });
+        }
+      }
+    },
+
     isToolDisplayed(tool) {
       return this.configUI[`project-tools-${tool}`];
     },

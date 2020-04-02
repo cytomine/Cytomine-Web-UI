@@ -540,7 +540,7 @@ export default {
 
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
-    }
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time
