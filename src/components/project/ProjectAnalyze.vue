@@ -20,24 +20,22 @@
         <b-table
           v-if="groups"
           :data="groups"
-          :fields="fields"
           paginated
-          hover
           pagination-size="is-small"
           :per-page="perPage"
           :current-page.sync="currentPage"
           :loading="loading"
         >
           <template #default="{row: group}">
-            <b-table-column label="Name" width="200" centered>
+            <b-table-column label="Name" width="90" centered>
               <h3>{{ group.name }}</h3>
             </b-table-column>
 
-            <b-table-column label="ID" width="100" centered>
-              <p>{{ group.id }}</p>
+            <b-table-column label="Status" width="90" centered>
+              <p v-if="group.status" :class="`status ${group.status}`">{{ group.status }}</p>
             </b-table-column>
 
-            <b-table-column width="150" centered>
+            <b-table-column centered width="90">
               <button @click="openModal(group)" class="button is-link">Results</button>
             </b-table-column>
           </template>
@@ -91,14 +89,6 @@ export default {
       images: [],
       groups: [],
       perPageOptions: [10, 25, 50, 100],
-      fields: [
-        {
-          key: 'name',
-        },
-        {
-          key: 'id',
-        },
-      ],
     };
   },
   methods: {
@@ -123,6 +113,21 @@ export default {
     closeModal() {
       this.isModalActive = false;
     },
+    async fetchStatus(group) {
+      const fetchedStatus = await fetch(`http://localhost:9292//analysisInformation?annotationGroupId=${group.id}`);
+      const response = await fetchedStatus.json();
+      group.status = response.analyses[0].status;
+
+      response.analyses.forEach((analysis) => {
+        if (group.status === 'failure') return;
+        if ((group.status === 'pending' && analysis.status === 'failure') ||
+            (group.status === 'success' && analysis.status === 'pending')) {
+          group.status = analysis.status;
+        }
+      });
+
+      return group;
+    }
   },
   computed: {
     currentUser: get('currentUser/user'),
@@ -139,7 +144,13 @@ export default {
       this.getAllImages();
       const fetchedGroups = await fetch(`http://localhost:9292/annotationGroup?projectId=${this.project.id}`);
       const response = await fetchedGroups.json();
-      this.groups = response.groups;
+      const responseGroups = response.groups;
+      let groups = [];
+      for (let group of responseGroups) {
+        group = await this.fetchStatus(group);
+        groups.push(group);
+      }
+      this.groups = groups;
       this.loading = false;
     }
     catch(error) {
@@ -163,5 +174,23 @@ export default {
 
   .tr {
     height: 50px;
+  }
+
+  .status {
+    text-transform: capitalize;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    width: fit-content;
+    margin: auto;
+  }
+  .pending {
+    background: #ffa500;
+  }
+  .success {
+    background: #42ce77;
+  }
+  .failure {
+    background: #ff3860;
   }
 </style>
