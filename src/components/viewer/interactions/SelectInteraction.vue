@@ -20,6 +20,7 @@
   :features.sync="selectedFeatures"
   :toggle-condition="never"
   :remove-condition="shiftKeyOnly"
+  :multi=true
   @select="select"
   ref="interactionSelect"
 >
@@ -48,6 +49,23 @@ export default {
         return this.imageWrapper.selectedFeatures.selectedFeatures;
       },
       set(value) {
+        value.sort(
+          function( a, b ) {
+            if( a.properties.annot.area > b.properties.annot.area ) return 1;
+            else return -1;
+          }
+        );
+
+        if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
+          if(value.length>=1) value = [value[0]]
+        } else {
+          if(value.length > 1){
+            var index = value.findIndex(x => x.id === this.imageWrapper.selectedFeatures.selectedFeatures[0].id);
+            if (index == value.length -1) index = -1
+            value = [value[index+1]]
+          }
+        }
+
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
@@ -93,7 +111,7 @@ export default {
   methods: {
     select({feature}) {
       let annot = feature.get('annot');
-      annot.recordAction();
+      //annot.recordAction();
     }
   }
 };
