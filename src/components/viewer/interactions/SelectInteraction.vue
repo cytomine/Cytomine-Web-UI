@@ -21,7 +21,6 @@
   :toggle-condition="never"
   :remove-condition="shiftKeyOnly"
   :multi=true
-  @select="select"
   ref="interactionSelect"
 >
   <vl-style-func :factory="styleFunctionFactory" />
@@ -56,16 +55,36 @@ export default {
           }
         );
 
+        let previousTarget = this.imageWrapper.selectedFeatures.selectionTargetedFeatures;
+        let previousSelectedFeature = this.imageWrapper.selectedFeatures.selectedFeatures[0];
+
+        this.$store.commit(this.imageModule + 'setSelectionTargetedFeatures', value);
+
+        //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
         if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
           if(value.length>=1) value = [value[0]]
         } else {
           if(value.length > 1){
-            var index = value.findIndex(x => x.id === this.imageWrapper.selectedFeatures.selectedFeatures[0].id);
-            if (index == value.length -1) index = -1
-            value = [value[index+1]]
+            //if previous selection is in the new target, we will take the first element not yet visited
+            if(value.map(x => x.id).includes(previousSelectedFeature.id)) {
+              var index = previousTarget.findIndex(x => x.id === previousSelectedFeature.id);
+              let visitedFeatures = previousTarget.slice(0, index + 1);
+              index = 0
+              for(var i = 0; i < value.length; i++){
+                if(!visitedFeatures.map(x => x.id).includes(value[i].id)) {
+                  index = i;
+                  break;
+                }
+              }
+              value = [value[index]];
+            } else {
+              value = [value[0]]
+            }
           }
         }
 
+        let annot = value[0].properties.annot;
+        annot.recordAction();
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
@@ -106,12 +125,6 @@ export default {
       if(this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
-    }
-  },
-  methods: {
-    select({feature}) {
-      let annot = feature.get('annot');
-      //annot.recordAction();
     }
   }
 };
