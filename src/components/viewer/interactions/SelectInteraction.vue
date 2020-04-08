@@ -62,14 +62,15 @@ export default {
 
         //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
         if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
-          if(value.length>=1) value = [value[0]]
-        } else {
+          if(value.length>=1) value = [value[0]];
+        }
+        else {
           if(value.length > 1){
             //if previous selection is in the new target, we will take the first element not yet visited
             if(value.map(x => x.id).includes(previousSelectedFeature.id)) {
               var index = previousTarget.findIndex(x => x.id === previousSelectedFeature.id);
               let visitedFeatures = previousTarget.slice(0, index + 1);
-              index = 0
+              index = 0;
               for(var i = 0; i < value.length; i++){
                 if(!visitedFeatures.map(x => x.id).includes(value[i].id)) {
                   index = i;
@@ -77,8 +78,9 @@ export default {
                 }
               }
               value = [value[index]];
-            } else {
-              value = [value[0]]
+            }
+            else {
+              value = [value[0]];
             }
           }
         }
