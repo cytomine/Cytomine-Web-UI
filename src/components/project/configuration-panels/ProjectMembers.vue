@@ -308,7 +308,7 @@ export default {
     },
   },
   async created() {
-    this.availableRoles = [this.contributorRole, this.managerRole];
+    this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
     this.selectedRoles = this.availableRoles;
     this.revision++;
     this.loading = false;
