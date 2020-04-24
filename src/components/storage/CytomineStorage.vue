@@ -122,6 +122,9 @@
             <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
               {{$t('cancel-upload')}}
             </button>
+            <button class="button" @click="hideFinished()" v-if="filesFinishedUpload">
+              {{$t('hide-successful-upload')}}
+            </button>
           </div>
         </div>
       </div>
@@ -242,11 +245,21 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    finishedStatus() {
+      return [
+        UploadedFileStatus.CONVERTED,
+        UploadedFileStatus.DEPLOYED
+      ];
+    },
     ongoingUpload() {
       return this.dropFiles.some(wrapper => wrapper.uploading);
     },
     filesPendingUpload() {
       return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile === null);
+    },
+    filesFinishedUpload() {
+      return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile !== null
+        && this.finishedStatus.includes(wrapper.uploadedFile.status));
     },
     overallProgress() {
       let nbUploads = 0;
@@ -435,6 +448,20 @@ export default {
         }
         else {
           this.cancelUpload(idx);
+        }
+      }
+    },
+
+    hideFinished() {
+      let nbFiles = this.dropFiles.length;
+      let idx = 0;
+      for(let i = 0; i < nbFiles; i++) {
+        let uploadedFile = this.dropFiles[idx].uploadedFile;
+        if (uploadedFile !== null && this.finishedStatus.includes(uploadedFile.status)) {
+          this.cancelUpload(idx);
+        }
+        else {
+          idx++;
         }
       }
     },
