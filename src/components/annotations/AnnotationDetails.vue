@@ -36,8 +36,11 @@
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
 
-        <tr v-if="profile && isPoint">
-          <td><strong>{{$t('profile')}}</strong></td>
+        <tr v-if="profile">
+          <td>
+            <strong v-if="isPoint">{{$t('profile')}}</strong>
+            <strong v-else>{{$t('profile-projection')}}</strong>
+          </td>
           <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
       </template>

@@ -1,6 +1,6 @@
 <template>
   <cytomine-modal-card
-    :title="$t('profile')"
+    :title="title"
     class="profile-modal"
     :class="{expanded: expanded}"
     @close="$parent.close()"
@@ -23,24 +23,28 @@
             <img :src="thumbUrl" />
           </p>
         </div>
-        <div class="media-content">
+        <div class="media-content" v-if="isPoint">
           <p><strong>X: </strong> {{x}}</p>
           <p><strong>Y: </strong> {{y}}</p>
         </div>
-        <div class="media-right">
+        <div class="media-right" v-if="isPoint || isLine">
           <button class="button is-small" @click="resetZoom()">{{$t('button-reset-zoom')}}</button>
         </div>
       </div>
 
-      <div class="profile-box" v-if="!loading">
-        <annotation-profile-chart
-          @error="val => error = val"
-          :annotation="annotation"
-          :bpc="bpc"
-          :css-classes="'profile-chart-container'"
-          ref="chart"
-        ></annotation-profile-chart>
-      </div>
+      <template v-if="!loading">
+        <div class="profile-box" v-if="isPoint">
+          <annotation-profile-chart
+              @error="val => error = val"
+              :annotation="annotation"
+              :bpc="bpc"
+              :css-classes="'profile-chart-container'"
+              ref="chart"
+          />
+        </div>
+        <annotation-profile-projection-table v-else :annotation="annotation" />
+      </template>
+
 
     </template>
   </cytomine-modal-card>
@@ -49,10 +53,12 @@
 <script>
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart';
+import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable';
 
 export default {
   name: 'profile-modal',
   components: {
+    AnnotationProfileProjectionTable,
     AnnotationProfileChart,
     CytomineModalCard
   },
@@ -80,6 +86,15 @@ export default {
     },
     bpc() {
       return (this.image && this.image.bitPerSample) ? this.image.bitPerSample: 8;
+    },
+    isPoint() {
+      return this.annotation.location && this.annotation.location.includes('POINT');
+    },
+    isLine() {
+      return this.annotation.location && this.annotation.location.includes('LINESTRING');
+    },
+    title() {
+      return (this.isPoint) ? this.$t('profile') : this.$t('profile-projection');
     }
   },
   methods: {

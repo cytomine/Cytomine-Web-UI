@@ -1031,3 +1031,5 @@ confirm-profile-computation-message,Are you sure to ask for profile computation 
 notif-error-profile-computation,Error during profile computation,Une erreur a empêché le calcul du profil
 notif-error-profile-deletion,Error during profile deletion,Une erreur a empêché la suppresion du profil
 no-trusted-source,No trusted source,Pas de source de confiance
+average,Average,Moyenne
+profile-projection,Profile projection,Projection du profil
