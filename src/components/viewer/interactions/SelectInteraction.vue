@@ -48,6 +48,14 @@ export default {
         return this.imageWrapper.selectedFeatures.selectedFeatures;
       },
       set(value) {
+        //used when selecting a vertex of a feature
+        let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
+        if(notAnnotations.length == 1){
+          value = notAnnotations;
+          this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
+          return;
+        }
+
         value.sort(
           function( a, b ) {
             if( a.properties.annot.area > b.properties.annot.area ) return 1;
@@ -85,8 +93,10 @@ export default {
           }
         }
 
-        let annot = value[0].properties.annot;
-        annot.recordAction();
+        if(value.length>=1 && value[0].properties !== null) {
+          let annot = value[0].properties.annot;
+          annot.recordAction();
+        }
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
