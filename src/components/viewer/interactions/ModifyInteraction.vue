@@ -42,7 +42,7 @@
 <script>
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
-import {altKeyOnly, singleClick} from 'ol/events/condition';
+import {singleClick} from 'ol/events/condition';
 
 export default {
   name: 'modify-interaction',
@@ -80,7 +80,7 @@ export default {
     },
     deleteCondition() {
       return function(mapBrowserEvent) {
-        return altKeyOnly(mapBrowserEvent) && singleClick(mapBrowserEvent);
+        return mapBrowserEvent.originalEvent.ctrlKey && singleClick(mapBrowserEvent);
       };
     }
   },
