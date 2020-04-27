@@ -1,4 +1,5 @@
 import {Bar} from 'vue-chartjs';
+import _ from 'lodash';
 
 export default {
   name: 'sample-histogram-chart',
@@ -12,6 +13,8 @@ export default {
     defaultMax: Number,
     min: Number,
     max: Number,
+    gamma: Number,
+    inverse: Boolean,
   },
   data() {
     return {
@@ -65,16 +68,16 @@ export default {
       return [...this.binnedHistogram.map((_, idx) => Math.round(idx * this.ratio)), this.theoreticalMax];
     },
     defaultMinLabel() {
-      return Math.round(this.findBin(this.defaultMin) * this.ratio);
+      return this.findLabel(this.defaultMin);
     },
     defaultMaxLabel() {
-      return Math.round(this.findBin(this.defaultMax) * this.ratio);
+      return this.findLabel(this.defaultMax);
     },
     currentMinLabel() {
-      return Math.round(this.findBin(this.min) * this.ratio);
+      return this.findLabel(this.min);
     },
     currentMaxLabel() {
-      return Math.min(this.theoreticalMax, Math.round(this.findBin(this.max) * this.ratio));
+      return Math.min(this.theoreticalMax, this.findLabel(this.max));
     },
     minLabel() {
       return Math.min(this.defaultMinLabel, this.currentMinLabel);
@@ -82,12 +85,37 @@ export default {
     maxLabel() {
       return Math.max(this.defaultMaxLabel, this.currentMaxLabel);
     },
+    currentLabels() {
+      return this.labels.filter(label => label >= this.currentMinLabel && label <= this.currentMaxLabel);
+    },
 
     highestValue() {
       let minIdx = this.labels.indexOf(this.minLabel);
       let maxIdx = this.labels.indexOf(this.maxLabel) + 1;
       if (maxIdx === 0) maxIdx = this.labels.length;
       return Math.max(...this.scaledHistogram.slice(minIdx, maxIdx));
+    },
+    systemResponse() {
+      if (this.currentLabels.length === 1) {
+        return [
+          {x: this.currentLabels[0], y: 0},
+          {x: this.currentLabels[0], y: this.highestValue}
+        ];
+      }
+
+      let nbPoints = 100;
+      let step = (this.currentLabels.length - 1) / nbPoints;
+      let range = _.range(0, this.currentLabels.length - 1 + step, step);
+
+      let ymin = (this.inverse) ? 1 : 0;
+      let ymax = (this.inverse) ? 0 : 1;
+      let m = (ymin - ymax) / (this.currentMinLabel - this.currentMaxLabel);
+      let p = ymin - m * this.currentMinLabel;
+      let gamma = (this.inverse) ? 1/this.gamma : this.gamma;
+      return range.map(idx => {
+        let label = this.currentLabels[Math.round(idx)];
+        return { x: label, y: Math.pow((m * label + p), gamma) * this.highestValue };
+      });
     }
   },
   watch: {
@@ -102,11 +130,20 @@ export default {
     },
     highestValue() {
       this.doRenderChart();
+    },
+    gamma() {
+      this.doRenderChart();
+    },
+    inverse() {
+      this.doRenderChart();
     }
   },
   methods: {
     findBin(value) {
       return Math.floor(value / this.ratio);
+    },
+    findLabel(value) {
+      return Math.floor(this.findBin(value) * this.ratio);
     },
     doRenderChart() {
       try {
@@ -116,12 +153,10 @@ export default {
           labels: this.labels,
           datasets: [
             {
-              data: [
-                {x: this.currentMinLabel, y: 0},
-                {x: this.currentMaxLabel, y: this.highestValue}
-              ],
+              data: this.systemResponse,
               fill: false,
               pointRadius: 0,
+              pointHoverRadius: 0,
               borderColor: 'grey',
               borderWidth: 1,
               type: 'line',

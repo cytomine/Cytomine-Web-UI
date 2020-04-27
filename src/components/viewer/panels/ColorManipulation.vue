@@ -31,7 +31,7 @@
             <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
             {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
           </template>
-          <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" />
+          <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" :gamma="gamma" :inverse="inverse"/>
         </b-tab-item>
       </b-tabs>
     </template>

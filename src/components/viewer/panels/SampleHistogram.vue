@@ -9,6 +9,8 @@
           :theoretical-max="theoreticalMax"
           :default-max="defaultMax"
           :default-min="defaultMin"
+          :gamma="gamma"
+          :inverse="inverse"
           css-classes="chart"
       />
     </div>
@@ -57,7 +59,9 @@ export default {
     index: String,
     sampleHistogram: Object,
     histogramScale: String,
-    revision: Number
+    revision: Number,
+    gamma: Number,
+    inverse: Boolean,
   },
   data() {
     return {
