@@ -41,7 +41,7 @@
         {{ $t('ontologies') }}
       </router-link>
       <router-link to="/software" class="navbar-item">
-        <i class="fas fa-flask"></i>
+        <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
