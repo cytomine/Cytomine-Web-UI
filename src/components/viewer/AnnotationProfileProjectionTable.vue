@@ -2,11 +2,14 @@
   <div>
     <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
-      <p class="has-text-centered">
-        <a class="button is-link" :href="downloadURL" target="_self">
-          {{$t('button-export-as-csv')}}
-        </a>
-      </p>
+      <annotation-profile-projection-chart
+          v-if="isLine"
+          @error="val => error = val"
+          :annotation="annotation"
+          :css-classes="'profile-chart-container'"
+          ref="chart"
+      />
+
       <b-table
           :data="projections"
           :paginated="true"
@@ -31,6 +34,14 @@
           </b-table-column>
         </template>
 
+        <template #footer>
+          <p class="has-text-centered">
+            <a class="button is-link" :href="downloadURL" target="_self">
+              {{$t('button-export-as-csv')}}
+            </a>
+          </p>
+        </template>
+
         <template #bottom-left>
           <b-select v-model="perPage" size="is-small">
             <option value="10">{{$t('count-per-page', {count: 10})}}</option>
@@ -47,9 +58,11 @@
 
 <script>
 import constants from '@/utils/constants';
+import AnnotationProfileProjectionChart from '@/components/charts/AnnotationProfileProjectionChart';
 
 export default {
   name: 'AnnotationProfileProjectionTable',
+  components: {AnnotationProfileProjectionChart},
   props: {
     annotation: Object
   },
@@ -64,7 +77,10 @@ export default {
   computed: {
     downloadURL() {
       return `${constants.CYTOMINE_CORE_HOST}/api/annotation/${this.annotation.id}/profile/projections.csv`;
-    }
+    },
+    isLine() {
+      return this.annotation.location && this.annotation.location.includes('LINESTRING');
+    },
   },
   methods: {
     async fetchProfileProjection() {

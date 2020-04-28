@@ -17,17 +17,17 @@
     </b-message>
     <template v-else>
 
-      <div class="media">
+      <div class="media" v-if="isPoint">
         <div class="media-left">
           <p class="image is-64x64">
             <img :src="thumbUrl" />
           </p>
         </div>
-        <div class="media-content" v-if="isPoint">
+        <div class="media-content" >
           <p><strong>X: </strong> {{x}}</p>
           <p><strong>Y: </strong> {{y}}</p>
         </div>
-        <div class="media-right" v-if="isPoint || isLine">
+        <div class="media-right">
           <button class="button is-small" @click="resetZoom()">{{$t('button-reset-zoom')}}</button>
         </div>
       </div>
@@ -44,8 +44,6 @@
         </div>
         <annotation-profile-projection-table v-else :annotation="annotation" />
       </template>
-
-
     </template>
   </cytomine-modal-card>
 </template>
@@ -89,9 +87,6 @@ export default {
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
-    },
-    isLine() {
-      return this.annotation.location && this.annotation.location.includes('LINESTRING');
     },
     title() {
       return (this.isPoint) ? this.$t('profile') : this.$t('profile-projection');
