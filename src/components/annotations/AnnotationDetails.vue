@@ -304,7 +304,7 @@ export default {
       return this.image.depth * this.image.duration * this.image.channels;
     },
     profile() {
-      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
+      return this.profiles.find(profile => profile.image === this.image.baseImage);
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
