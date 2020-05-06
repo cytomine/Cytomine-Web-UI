@@ -106,7 +106,7 @@ export default {
       clone = slice.clone();
       commit('setActiveSlice', clone);
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5' && cf.status > 100);
       commit('setProfile', profile);
 
       await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
