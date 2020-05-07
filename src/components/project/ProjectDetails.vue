@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
   <h2> {{ $t('error') }} </h2>
@@ -52,6 +67,12 @@
       <td class="prop-label">{{$t('description')}}</td>
       <td class="prop-content">
         <cytomine-description :object="project" :canEdit="canManageProject" />
+      </td>
+    </tr>
+    <tr v-if="isPropDisplayed('tags')">
+      <td class="prop-label">{{$t('tags')}}</td>
+      <td class="prop-content">
+        <cytomine-tags :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('properties')">
@@ -129,6 +150,7 @@ import ListUsernames from '@/components/user/ListUsernames';
 import ProjectActions from './ProjectActions';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 
 export default {
@@ -139,11 +161,13 @@ export default {
     ProjectActions,
     CytomineDescription,
     CytomineProperties,
+    CytomineTags,
     AttachedFiles
   },
   props: {
     project: {type: Object},
-    excludedProperties: {type: Array, default: () => []}
+    excludedProperties: {type: Array, default: () => []},
+    editable: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -160,7 +184,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     canManageProject() {
-      return this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id);
+      return this.editable && (this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id));
     },
     managersIds() {
       return this.managers.map(manager => manager.id);

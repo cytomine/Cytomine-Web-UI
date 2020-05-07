@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="draw-tools-wrapper">
   <div class="buttons has-addons are-small" v-if="isToolDisplayed('select')">
@@ -608,7 +623,7 @@ export default {
         annot.userByTerm = reviewedAnnot.userByTerm; // copy terms from reviewed annot
         await annot.cancelReview();
         this.$eventBus.$emit('deleteAnnotation', reviewedAnnot);
-        this.$eventBus.$emit('addAnnotation', annot);
+        this.$eventBus.$emit('addAnnotation', annot, false);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
       }
       catch(error) {
@@ -623,29 +638,105 @@ export default {
       }
 
       switch(key) {
-        case 's':
-          this.activateTool('select');
+        case 'tool-select':
+          if (this.isToolDisplayed('select')){
+            this.activateTool('select');
+          }
           return;
-        case 'o':
-          this.activateTool('point');
+        case 'tool-point':
+          if (this.isToolDisplayed('point') && !this.disabledDraw) {
+            this.activateTool('point');
+          }
           return;
-        case 'f':
-          this.activateTool('freehand-polygon');
+        case 'tool-line':
+          if (this.isToolDisplayed('line') && !this.disabledDraw) {
+            this.activateTool('line');
+          }
           return;
-        case 'd':
-          this.confirmDeletion();
+        case 'tool-freehand-line':
+          if (this.isToolDisplayed('freehand-line') && !this.disabledDraw) {
+            this.activateTool('freehand-line');
+          }
           return;
-        case 'ctrlZ':
-          this.undo();
+        case 'tool-rectangle':
+          if (this.isToolDisplayed('rectangle') && !this.disabledDraw) {
+            this.activateTool('rectangle');
+          }
           return;
-        case 'ctrlY':
-          this.redo();
+        case 'tool-circle':
+          if (this.isToolDisplayed('circle') && !this.disabledDraw) {
+            this.activateTool('circle');
+          }
           return;
-        case 'a':
-          this.accept();
+        case 'tool-polygon':
+          if (this.isToolDisplayed('polygon') && !this.disabledDraw) {
+            this.activateTool('polygon');
+          }
           return;
-        case 'r':
-          this.reject();
+        case 'tool-freehand-polygon':
+          if (this.isToolDisplayed('polygon') && !this.disabledDraw) {
+            this.activateTool('freehand-polygon');
+          }
+          return;
+        case 'tool-delete':
+          if (this.isToolDisplayed('delete') && !this.isToolDisplayed('delete')) {
+            this.confirmDeletion();
+          }
+          return;
+        case 'tool-undo':
+          if (this.isToolDisplayed('undo')) {
+            this.undo();
+          }
+          return;
+        case 'tool-redo':
+          if (this.isToolDisplayed('redo')) {
+            this.redo();
+          }
+          return;
+        case 'tool-review-accept':
+          if (this.reviewMode && this.isToolDisplayed('accept')) {
+            this.accept();
+          }
+          return;
+        case 'tool-review-reject':
+          if (this.reviewMode && this.isToolDisplayed('reject')) {
+            this.reject();
+          }
+          return;
+        case 'tool-fill':
+          if (this.isToolDisplayed('fill') && !this.isToolDisabled('fill')) {
+            this.fill();
+          }
+          return;
+        case 'tool-correct-add':
+          if (this.isToolDisplayed('union') && !this.isToolDisabled('correct-add')) {
+            this.activateEditTool('correct-add');
+          }
+          return;
+        case 'tool-correct-remove':
+          if (this.isToolDisplayed('diff') && !this.isToolDisabled('correct-remove')) {
+            this.activateEditTool('correct-remove');
+          }
+          return;
+        case 'tool-modify':
+          if (this.isToolDisplayed('edit') && !this.isToolDisabled('edit')) {
+            this.activateEditTool('modify');
+          }
+          return;
+        case 'tool-move':
+          if (this.isToolDisplayed('move') && !this.isToolDisabled('move')) {
+            this.activateEditTool('translate');
+          }
+          return;
+        case 'tool-rotate':
+          if (this.isToolDisplayed('rotate') && !this.isToolDisabled('rotate')) {
+            this.activateEditTool('rotate');
+          }
+          return;
+        case 'toggle-current':
+          if (this.configUI['project-explore-annotation-main'] && this.selectedFeature) {
+            this.displayAnnotDetails = !this.displayAnnotDetails;
+          }
           return;
       }
     }

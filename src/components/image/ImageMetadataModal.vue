@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <cytomine-modal :active="active" :title="$t('image-metadata')" @close="$emit('update:active', false)">
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
@@ -5,9 +20,9 @@
     <p> {{ $t('unexpected-error-info-message') }} </p>
   </b-message>
   <template v-else>
-    <template v-if="abstractImage && abstractImage.macroURL">
+    <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="abstractImage.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -46,13 +61,12 @@ export default {
   name: 'image-metadata-modal',
   props: {
     active: Boolean,
-    idAbstractImage: Number
+    image: Object
   },
   components: {CytomineModal},
   data() {
     return {
       error: false,
-      abstractImage: null,
       properties: [],
       searchString: '',
       rotationAngle: 0
@@ -88,8 +102,8 @@ export default {
   },
   async created() {
     try {
-      this.abstractImage = await AbstractImage.fetch(this.idAbstractImage);
-      this.properties = (await PropertyCollection.fetchAll({object: this.abstractImage})).array;
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }
     catch(error) {

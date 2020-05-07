@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="box error" v-if="!configUI['project-jobs-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -12,7 +27,7 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('analysis')}}
-      <button class="button is-link" @click="launchModal = true">
+      <button v-if="canAddJob" class="button is-link" @click="launchModal = true">
         {{$t('button-launch-new-analysis')}}
       </button>
     </p>
@@ -25,7 +40,7 @@
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple track-by="id" label="fullName"/>
             </div>
           </div>
 
@@ -64,22 +79,17 @@
         </div>
       </div>
 
-      <b-table
-        :data="filteredJobs"
-        :paginated="true"
-        :current-page.sync="currentPage"
-        :per-page="perPage"
-        pagination-size="is-small"
-        detailed
-        detail-key="id"
-        :opened-detailed.sync="openedDetails"
-        :default-sort="sort.field"
-        :default-sort-direction="sort.order"
-        @sort="updateSort"
+      <cytomine-table
+        :collection="jobCollection"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :openedDetailed.sync="openedDetails"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
+        :revision="revision"
       >
-
         <template #default="{row: job}">
-          <b-table-column field="software" :label="$t('algorithm')" sortable width="1000">
+          <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
             {{job.softwareName}}
           </b-table-column>
 
@@ -104,7 +114,7 @@
           <job-details
             :key="job.id"
             :job="job"
-            @update="props => job.populate(props)"
+            @update="revision++"
             @delete="deleteJob(job)"
           />
         </template>
@@ -114,16 +124,7 @@
             <p>{{$t('no-analysis-run')}}</p>
           </div>
         </template>
-
-        <template #bottom-left>
-          <b-select v-model="perPage" size="is-small">
-            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
-            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
-            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
-            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
-          </b-select>
-        </template>
-      </b-table>
+      </cytomine-table>
     </div>
   </div>
 
@@ -138,9 +139,10 @@ import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';
+import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
@@ -154,6 +156,7 @@ export default {
     JobStatus,
     JobDetails,
     AddJobModal,
+    CytomineTable,
     CytomineMultiselect,
     CytomineDatepicker
   },
@@ -161,24 +164,26 @@ export default {
     return {
       loading: true,
       error: false,
-      jobs: [],
-      launchModal: false
+      launchModal: false,
+      availableSoftwares: [],
+      availableLaunchers: [],
+      revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
+    canAddJob() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
 
-    availableSoftwares() {
-      return [...new Set(this.jobs.map(job => job.softwareName))];
-    },
-    availableLaunchers() {
-      return [...new Set(this.jobs.map(job => job.username))].filter(name => name); // TODO: remove filter (HACK to remove empty username)
-    },
     availableStatus() {
-      return Object.keys(jobStatusLabelMapping).map(key => {
-        return {label: this.$t(jobStatusLabelMapping[key]), status: key};
+      return Object.keys(jobStatusMapping).map(key => {
+        return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
 
@@ -191,46 +196,60 @@ export default {
     selectedDate: sync('executionDate', storeOptions),
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
 
-    filteredJobs() {
-      let selectedStatusValues = this.selectedStatus.map(obj => Number(obj.status));
-      return this.jobs.filter(job => {
-        let correctDate = this.selectedDate ? moment(Number(job.created)).isSame(this.selectedDate, 'day') : true;
-        return this.selectedSoftwares.includes(job.softwareName) &&
-                    this.selectedLaunchers.includes(job.username) &&
-                    correctDate &&
-                    selectedStatusValues.includes(job.status);
+    jobCollection() {
+      let collection = new JobCollection({
+        project: this.project.id,
+        software: (this.selectedSoftwares.length > 0 && this.selectedSoftwares.length < this.availableSoftwares.length) ?
+          this.selectedSoftwares.map(option => option.id).join(',') : null
       });
+
+      if(this.selectedLaunchers.length > 0){
+        collection['username'] = {
+          in: this.selectedLaunchers.join()
+        };
+      }
+      if(this.selectedStatus.length > 0){
+        collection['status'] = {
+          in: this.selectedStatus.map(option => option.status).join()
+        };
+      }
+      if(this.selectedDate) {
+        collection.created = {
+          gte: this.selectedDate.getTime(),
+          lte: new Date(this.selectedDate).setHours(15, 15, 59, 999)
+        };
+      }
+      return collection;
     },
 
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
-    sort: sync('sort', storeOptions),
-    openedDetailsStore: get('openedDetails', storeOptions),
-    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
-      get() {
-        return this.openedDetailsStore.slice();
-      },
-      set(value) {
-        this.$store.commit(this.storeModule + '/setOpenedDetails', value);
-      }
-    }
+    sortField: sync('sortField', storeOptions),
+    sortOrder: sync('sortOrder', storeOptions),
+    openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    updateSort(field, order) {
-      this.sort = {field, order};
+    async fetchMultiselectOptions() {
+      let stats = await JobCollection.fetchBounds({project: this.project.id});
+      this.availableSoftwares = stats.software.list;
+      this.availableLaunchers = stats.username.list;
     },
-    addJob(job) {
-      this.jobs.unshift(job);
+
+    async addJob(job) {
       this.openedDetails = [job.id, ...this.openedDetails];
+      await this.fetchMultiselectOptions();
+      this.revision++;
     },
+
     async deleteJob(jobToDelete) {
       try {
         await jobToDelete.delete();
-        this.jobs = this.jobs.filter(job => job.id !== jobToDelete.id);
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-analysis-deletion')
         });
+        this.fetchMultiselectOptions();
+        this.revision++;
       }
       catch(error) {
         this.$notify({
@@ -242,13 +261,7 @@ export default {
   },
   async created() {
     try {
-      this.jobs = (await JobCollection.fetchAll({project: this.project.id})).array;
-
-      // if a job was deleted, the currentPage value might not be valid => reinitialize it
-      if((this.currentPage - 1)*this.perPage >= this.filteredJobs.length) {
-        this.currentPage = 1;
-      }
-
+      await this.fetchMultiselectOptions();
       this.loading = false;
     }
     catch(error) {

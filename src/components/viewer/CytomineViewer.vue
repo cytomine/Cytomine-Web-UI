@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div v-if="error" class="box error">
   <h2> {{ $t('error') }} </h2>
@@ -36,6 +51,7 @@ import ImageSelector from './ImageSelector';
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
 import constants from '@/utils/constants.js';
+import shortcuts from '@/utils/shortcuts.js';
 
 import {ImageInstance} from 'cytomine-client';
 
@@ -98,14 +114,20 @@ export default {
       return 100/this.nbHorizontalCells;
     },
     shortkeysMapping() {
-      // for shortkeys composed of a single key, return the key as srcKey
-      let mapping = ['s', 'o', 'f', 'd', 'p', 'n', 'a', 'r', 't'].reduce((object, key) => {
-        object[key] = [key];
+      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t', 'nav-previous-t', 'nav-next-c',
+        'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t', 'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c',
+        'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
+        'tool-freehand-polygon', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
+        'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
+        'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
+        'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
+        'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
+        'nav-next-z', 'nav-previous-z'];
+
+      return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
+        object[key.replace('viewer-', '')] = shortcuts[key];
         return object;
       }, {});
-      mapping.ctrlZ = ['ctrl', 'z']; // special handling because combination of keys should trigger the function
-      mapping.ctrlY = ['ctrl', 'y']; // idem
-      return mapping;
     }
   },
   watch: {
@@ -162,10 +184,18 @@ export default {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          await Promise.all(this.idImages.map(async id => {
+
+          let images = {};
+          //don't fetch multiple times the same image.
+          let idImages = [...new Set(this.idImages)];
+          await Promise.all(idImages.map(async id => {
             let image = await ImageInstance.fetch(id);
-            await this.$store.dispatch(this.viewerModule + 'addImage', image);
+            images[id] = image;
           }));
+
+          this.idImages.forEach(async id => {
+            await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
+          });
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');

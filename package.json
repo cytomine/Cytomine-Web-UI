@@ -1,6 +1,6 @@
 {
-  "name": "cytomine-front-end",
-  "version": "1.0.0",
+  "name": "cytomine-web-ui",
+  "version": "1.2.0",
   "scripts": {
     "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
@@ -10,17 +10,18 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.7.2",
-    "axios": "^0.18.0",
+    "axios": "^0.19.1",
     "buefy": "^0.7.3",
     "bulma": "^0.7.4",
     "bulma-slider": "^2.0.0",
     "chart.js": "^2.8.0",
     "chartjs-plugin-datalabels": "^0.6.0",
     "copy-to-clipboard": "^3.0.8",
-    "cytomine-client": "^1.1.0",
+    "cytomine-client": "^1.4.1",
+    "detect-browser": "^4.7.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "npm-font-open-sans": "^1.1.0",
     "ol": "^5.3.1",
     "ol-rotate-feature": "^2.0.1",
@@ -40,7 +41,7 @@
     "vue-router": "^3.0.2",
     "vue-shortkey": "^3.1.6",
     "vue-slider-component": "^3.0.31",
-    "vuelayers": "^0.11.4",
+    "vuelayers": "0.11.4",
     "vuex": "^3.1.0"
   },
   "devDependencies": {
@@ -50,7 +51,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^5.16.0",
     "i18n-csv2json-cli": "^1.0.2",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.0",
     "onchange": "^5.2.0",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.10"

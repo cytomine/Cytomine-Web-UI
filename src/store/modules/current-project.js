@@ -1,4 +1,20 @@
-import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType} from 'cytomine-client';
+/*
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
@@ -82,11 +98,13 @@ export default {
     },
 
     async fetchProjectMembers({state, commit}) {
-      let managersPromise = state.project.fetchAdministrators();
-      let membersPromise = state.project.fetchUsers();
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: state.project.id,
+      });
 
-      let managers = (await managersPromise).array;
-      let members = (await membersPromise).array;
+      let members =  (await collection.fetchAll()).array;
+      let managers = members.filter(u => u.role == ProjectMemberRole.MANAGER || u.role == ProjectMemberRole.REPRESENTATIVE );
 
       members.forEach(member => member.fullName = fullName(member));
 
@@ -104,14 +122,15 @@ export default {
     canEditLayer: (state, getters, rootState) => idLayer => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {
-        return currentUser.adminByNow || annot.reviewUser === currentUser.id;
+        return currentUser.adminByNow || (!currentUser.guestByNow && annot.reviewUser === currentUser.id);
       }
       return getters.canEditLayer(idLayer);
     },
@@ -119,12 +138,20 @@ export default {
     canEditImage: (state, getters, rootState) => image => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+    },
+
+    canManageJob: (state, getters, rootState) => job => {
+      let currentUser = rootState.currentUser.user;
+      let project = state.project;
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (job.username === currentUser.username || !project.isRestricted));
     },
 
     canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
       let currentUser = rootState.currentUser.user || {};
-      return currentUser.adminByNow || state.managers.some(user => user.id === currentUser.id);
+      return currentUser.adminByNow || (!currentUser.guestByNow && state.managers.some(user => user.id === currentUser.id));
     },
 
     contributors: (state) => {

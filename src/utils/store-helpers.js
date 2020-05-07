@@ -1,11 +1,28 @@
+/*
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 // Helpers for vuex (inspired by https://github.com/davestewart/vuex-pathify)
 
-import {isBoundsFilterActive} from './bounds';
+import _ from 'lodash';
 
 /**
  * @typedef {Object} Options
  * @property {String|Array} rootModuleProp  The name of the component property containing the path to the root module to
  *                                          use; this root path will be prefixed to the provided path
+ * @property {Number} debounced The debounce delay
  */
 
 /**
@@ -53,8 +70,51 @@ export function sync(path, options={}) {
   path = arrayPath(path);
   return {
     ...get(path, options),
-    set(value) {
+    set: debounce(function(value) {
       this.$store.commit(getMutationName(fullPath(path, this, options)), value);
+    }, options)
+  };
+}
+
+/**
+ * Provides getter and setter for a computed property that should be synchronized with a simple filter
+ * stored in Vuex
+ * This function must be called from a Vue.js component and the targetted module should be constructed as shown
+ * in the example
+ * @example
+ * // Vue.js component
+ * computed: {
+ *   myFilter: sync('myModule', 'myFilter'),
+ * }
+ * // myModule structure
+ * namespaced: true,
+ * state: {
+ *   filters: {
+ *     myFilter: null // null value for inactive filter
+ *   }
+ * },
+ * mutations: {
+ *   setFilter(state, {filterName, propValue}) {
+ *     state.filters[filterName] = propValue;
+ *   },
+ * }
+ *
+ *
+ * @param {String|Array<String>} modulePath Path to the store module containing the filters
+ * @param {String} filterName The name of the filter property
+ * @param {Options} [options] Options refining the way to sync the filter
+ * @returns Computed getter and setter for the targetted filter
+ */
+export function syncFilter(modulePath, filterName, options={}) {
+  modulePath = arrayPath(modulePath);
+
+  return {
+    get() {
+      return getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
+    },
+    set(propValue) {
+      let path = fullPath(modulePath, this, options);
+      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
     }
   };
 }
@@ -84,7 +144,7 @@ export function sync(path, options={}) {
  * }
  *
  *
- * @param {String|Array<String>} path Path to the store module containing the filters
+ * @param {String|Array<String>} modulePath Path to the store module containing the filters
  * @param {String} filterName The name of the filter property
  * @param {String} maxProp The name of the component property containing the max allowed value
  * @param {Options} [options] Options refining the way to sync the filter
@@ -98,11 +158,11 @@ export function syncBoundsFilter(modulePath, filterName, maxProp, options={}) {
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : [0, this[maxProp]];
     },
-    set(bounds) {
+    set: debounce(function(bounds) {
       let path = fullPath(modulePath, this, options);
-      let propValue = isBoundsFilterActive(bounds, this[maxProp]) ? bounds : null;
+      let propValue = bounds[0] !== 0 || bounds[1] !== this[maxProp] ? bounds : null;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
-    }
+    }, options)
   };
 }
 
@@ -144,12 +204,22 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : this[optionsProp].slice();
     },
-    set(selectedOptions) {
+    set: debounce(function(selectedOptions) {
       let path = fullPath(modulePath, this, options);
       let propValue = (selectedOptions.length === this[optionsProp].length) ? null : selectedOptions;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
-    }
+    }, options)
   };
+}
+
+// wrapper for lodash debounce that debounces the function iff the debounce delay specified in options is > 0
+function debounce(fct, options) {
+  if(options.debounce) {
+    return _.debounce(fct, options.debounce);
+  }
+  else {
+    return fct;
+  }
 }
 
 function arrayPath(path) {

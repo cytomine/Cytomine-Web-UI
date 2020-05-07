@@ -1,3 +1,19 @@
+/*
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 import VueRouter from 'vue-router';
 
 // Import Components
@@ -5,6 +21,7 @@ import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
+import ListSoftware from './components/software/ListSoftware.vue';
 import ListImages from './components/image/ListImages.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
@@ -21,6 +38,7 @@ import MemberActivityDetails from './components/project/activity/MemberActivityD
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
+import SoftwareInformation from './components/software/SoftwareInformation.vue';
 
 // Define routes
 const routes = [
@@ -39,6 +57,14 @@ const routes = [
   {
     path: '/ontology/:idOntology?',
     component: ListOntologies
+  },
+  {
+    path: '/software',
+    component: ListSoftware
+  },
+  {
+    path: '/software/:idSoftware',
+    component: SoftwareInformation
   },
   {
     path: '/advanced-search/:searchString?',
@@ -141,6 +167,7 @@ const routes = [
   {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
   {path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage'},
   {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation'},
+  {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
   // -----
 
   {

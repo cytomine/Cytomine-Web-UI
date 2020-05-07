@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">
@@ -489,6 +504,12 @@ export default {
       this.$refs.map.$map.addControl(this.overview);
     },
 
+    toggleOverview() {
+      if (this.overview) {
+        this.overview.setCollapsed(!this.imageWrapper.view.overviewCollapsed);
+      }
+    },
+
     togglePanel(panel) {
       this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
@@ -529,6 +550,64 @@ export default {
 
     cancelCalibration() {
       this.$store.dispatch(this.imageModule + 'endCalibration');
+    },
+    shortkeyHandler(key) {
+      if(!this.isActiveImage) { // shortkey should only be applied to active map
+        return;
+      }
+
+      switch(key) {
+        case 'toggle-information':
+          if (this.isPanelDisplayed('info')){
+            this.togglePanel('info');
+          }
+          return;
+        case 'toggle-zoom':
+          if (this.isPanelDisplayed('digital-zoom')) {
+            this.togglePanel('digital-zoom');
+          }
+          return;
+        case 'toggle-link':
+          if (this.isPanelDisplayed('link') && this.nbImages > 1) {
+            this.togglePanel('link');
+          }
+          return;
+        case 'toggle-filters':
+          if (this.isPanelDisplayed('color-manipulation')) {
+            this.togglePanel('colors');
+          }
+          return;
+        case 'toggle-layers':
+          if (this.isPanelDisplayed('image-layers')) {
+            this.togglePanel('layers');
+          }
+          return;
+        case 'toggle-ontology':
+          if (this.isPanelDisplayed('ontology') && this.terms && this.terms.length > 0) {
+            this.togglePanel('ontology');
+          }
+          return;
+        case 'toggle-properties':
+          if (this.isPanelDisplayed('property')) {
+            this.togglePanel('properties');
+          }
+          return;
+        case 'toggle-broadcast':
+          if (this.isPanelDisplayed('follow')) {
+            this.togglePanel('follow');
+          }
+          return;
+        case 'toggle-review':
+          if (this.isPanelDisplayed('review') && this.canEdit) {
+            this.togglePanel('review');
+          }
+          return;
+        case 'toggle-overview':
+          if (this.isPanelDisplayed('overview')) {
+            this.toggleOverview();
+          }
+          return;
+      }
     }
   },
   async created() {
@@ -592,10 +671,12 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };

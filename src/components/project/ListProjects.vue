@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <div class="list-projects-wrapper content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -41,8 +56,8 @@
                 {{$t('ontology')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedOntologies" :options="ontologies"
-                  label="name" track-by="id" multiple :allPlaceholder="$t('all-ontologies')" />
+                <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
               </div>
             </div>
 
@@ -55,7 +70,15 @@
               </div>
             </div>
 
-            <div class="column"></div>
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
           </div>
 
           <div class="columns">
@@ -112,29 +135,22 @@
       </b-collapse>
 
 
-      <b-table
-        :data="filteredProjects"
+      <cytomine-table
+        :collection="projectCollection"
         class="table-projects"
-        :paginated="true"
-        :current-page.sync="currentPage"
-        :per-page="perPage"
-        pagination-size="is-small"
-        detailed
-        detail-key="id"
-        :opened-detailed.sync="openedDetails"
-        :default-sort="sort.field"
-        :default-sort-direction="sort.order"
-        @sort="updateSort"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :openedDetailed.sync="openedDetails"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
+        :revision="revision"
       >
         <template #default="{row: project}">
-          <b-table-column :visible="showRole" field="roleIndex" label="" centered width="1" sortable>
-            <i
-              v-if="project.currentUserRoles.admin"
-              class="fas fa-user-cog"
-              :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')"
-            >
-              <i v-if="project.currentUserRoles.representative" class="superscript fas fa-flag"></i>
-            </i>
+          <b-table-column field="currentUserRole" label="" centered width="1" sortable>
+            <icon-project-member-role
+              :is-manager="project.currentUserRoles.admin"
+              :is-representative="project.currentUserRoles.representative"
+            />
           </b-table-column>
 
           <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -184,7 +200,8 @@
           <project-details
             :project="project"
             :excluded-properties="excludedProperties"
-            @update="updateProject"
+            editable
+            @update="updateProject()"
             @delete="deleteProject(project)"
           />
         </template>
@@ -194,46 +211,37 @@
             <p>{{$t('no-project')}}</p>
           </div>
         </template>
+      </cytomine-table>
 
-        <template #bottom-left>
-          <b-select v-model="perPage" size="is-small">
-            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
-            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
-            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
-            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
-          </b-select>
-        </template>
-      </b-table>
-
-      <div class="legend" v-if="showRole">
+      <div class="legend">
           <h2>{{$t('legend')}}</h2>
-          <p><i class="fas fa-user-cog"></i> : {{$t('manager-icon-label')}}</p>
-          <p><i class="fas fa-user-cog">
-            <i class="superscript fas fa-flag"></i>
-          </i> : {{$t('representative-icon-label')}}</p>
+          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
       </div>
     </div>
   </div>
 
-  <add-project-modal :active.sync="creationModal" />
+  <add-project-modal :active.sync="creationModal" :ontologies="ontologies" />
 </div>
 </template>
 
 <script>
+import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 
-import {isBetweenBounds} from '@/utils/bounds';
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
-import {getWildcardRegexp} from '@/utils/string-utils';
 
-import {ProjectCollection} from 'cytomine-client';
-
+import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 export default {
   name: 'list-projects',
   components: {
+    IconProjectMemberRole,
+    CytomineTable,
     ProjectDetails,
     AddProjectModal,
     CytomineMultiselect,
@@ -245,6 +253,9 @@ export default {
       error: false,
 
       projects: [],
+      ontologies: [],
+      availableTags:[],
+
 
       contributorLabel: this.$t('contributor'),
       managerLabel: this.$t('manager'),
@@ -259,47 +270,34 @@ export default {
         'numberOfJobAnnotations',
         'numberOfReviewedAnnotations',
         'lastActivity'
-      ]
+      ],
+
+      maxNbMembers: 10,
+      maxNbImages: 10,
+      maxNbUserAnnotations: 100,
+      maxNbJobAnnotations: 100,
+      maxNbReviewedAnnotations: 100,
+
+      revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
 
-    searchString: sync('listProjects/searchString'),
+    searchString: sync('listProjects/searchString', {debounce: 500}),
     filtersOpened: sync('listProjects/filtersOpened'),
 
     availableRoles() {
       return [this.contributorLabel, this.managerLabel];
     },
-    maxNbMembers() {
-      return Math.max(10, ...this.projects.map(project => project.membersCount));
-    },
-    maxNbImages() {
-      return Math.max(10, ...this.projects.map(project => project.numberOfImages));
-    },
-    maxNbUserAnnotations() {
-      return Math.max(100, ...this.projects.map(project => project.numberOfAnnotations));
-    },
-    maxNbJobAnnotations() {
-      return Math.max(100, ...this.projects.map(project => project.numberOfJobAnnotations));
-    },
-    maxNbReviewedAnnotations() {
-      return Math.max(100, ...this.projects.map(project => project.numberOfReviewedAnnotations));
-    },
-    ontologies() {
-      let seenIds = [];
-      let ontologies = [];
-      this.projects.forEach(project => {
-        if(!seenIds.includes(project.ontology)) {
-          ontologies.push({id: project.ontology, name: project.ontologyName || this.$t('no-ontology')});
-          seenIds.push(project.ontology);
-        }
-      });
-      return ontologies;
+
+    availableOntologies() {
+      return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },
 
-    selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'ontologies'),
+    selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
+    selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
     boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
     boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
     boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
@@ -313,67 +311,92 @@ export default {
     selectedOntologiesIds() {
       return this.selectedOntologies.map(ontology => ontology.id);
     },
-    regexp() {
-      return getWildcardRegexp(this.searchString);
+
+    boundsFilters() {
+      return [
+        {prop: 'numberOfImages', bounds: this.boundsImages},
+        {prop: 'membersCount', bounds: this.boundsMembers},
+        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations},
+        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations},
+        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations},
+      ];
     },
-    filteredProjects() {
-      let filtered = this.projects;
 
-      if(this.searchString) {
-        filtered = filtered.filter(project => this.regexp.test(project.name));
-      }
-
-      let includeContributor = this.selectedRoles.includes(this.contributorLabel);
-      let includeManager = this.selectedRoles.includes(this.managerLabel);
-
-      filtered = filtered.filter(project => {
-        let managedProject = project.currentUserRoles.admin;
-        let roleIncluded = (includeContributor && !managedProject) || (includeManager && managedProject);
-        return this.selectedOntologiesIds.includes(project.ontology) &&
-          roleIncluded &&
-          isBetweenBounds(project.numberOfImages, this.boundsImages) &&
-          isBetweenBounds(project.membersCount, this.boundsMembers) &&
-          isBetweenBounds(project.numberOfAnnotations, this.boundsUserAnnotations) &&
-          isBetweenBounds(project.numberOfJobAnnotations, this.boundsJobAnnotations) &&
-          isBetweenBounds(project.numberOfReviewedAnnotations, this.boundsReviewedAnnotations);
+    projectCollection() {
+      let collection = new ProjectCollection({
+        withMembersCount: true,
+        withLastActivity: true,
+        withCurrentUserRoles: true
       });
-
-      return filtered;
-    },
-
-    showRole() { // show role iff the current user is manager or representative of at least one project
-      return this.projects.some(project => project.currentUserRoles.admin || project.currentUserRoles.representative);
+      if(this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length){
+        collection['ontology'] = {
+          in: this.selectedOntologiesIds.join()
+        };
+      }
+      if(this.selectedRoles.length > 0){
+        collection['currentUserRole'] = {
+          in: this.selectedRoles.join().toLowerCase()
+        };
+      }
+      if(this.searchString) {
+        collection['name'] = {
+          ilike: encodeURIComponent(this.searchString)
+        };
+      }
+      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length){
+        collection['tag'] = {
+          in: this.selectedTags.map(t => t.id).join()
+        };
+      }
+      for(let {prop, bounds} of this.boundsFilters) {
+        collection[prop] = {
+          gte: bounds[0],
+          lte: bounds[1]
+        };
+      }
+      return collection;
     },
 
     currentPage: sync('listProjects/currentPage'),
     perPage: sync('listProjects/perPage'),
-    sort: sync('listProjects/sort'),
-    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
-      get() {
-        return this.$store.state.listProjects.openedDetails.slice();
-      },
-      set(value) {
-        this.$store.commit('listProjects/setOpenedDetails', value);
-      }
+    sortField: sync('listProjects/sortField'),
+    sortOrder: sync('listProjects/sortOrder'),
+    openedDetails: sync('listProjects/openedDetails')
+  },
+  watch: {
+    revision() {
+      this.fetchOntologies();
+      this.fetchMaxFilters();
     }
   },
   methods: {
+    async fetchOntologies() {
+      let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+      ontologies.sort((a, b) => a.name.localeCompare(b.name));
+      this.ontologies = ontologies;
+    },
+    async fetchMaxFilters() {
+      let stats = await new ProjectCollection.fetchBounds({withMembersCount:true});
+
+      this.maxNbMembers = Math.max(10, stats.members.max);
+      this.maxNbImages = Math.max(10, stats.numberOfImages.max);
+      this.maxNbUserAnnotations = Math.max(100, stats.numberOfAnnotations.max);
+      this.maxNbJobAnnotations = Math.max(100, stats.numberOfJobAnnotations.max);
+      this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
+    },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+    },
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     },
-    updateSort(field, order) {
-      this.sort = {field, order};
-    },
-    updateProject(updatedProject) {
-      let project = this.projects.find(project => project.id === updatedProject.id);
-      if(project) {
-        project.populate({...updatedProject});
-      }
+    updateProject() {
+      this.revision++;
     },
     async deleteProject(projectToDelete) {
       try {
         await projectToDelete.delete();
-        this.projects = this.projects.filter(project => project.id !== projectToDelete.id);
+        this.revision++;
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-project-deletion', {projectName: projectToDelete.name})
@@ -384,27 +407,17 @@ export default {
           type: 'error',
           text: this.$t('notif-error-project-deletion', {projectName: projectToDelete.name})
         });
+        return;
       }
     }
   },
   async created() {
     try {
-      let projects = await ProjectCollection.fetchAll({
-        withMembersCount: true,
-        withLastActivity: true,
-        withCurrentUserRoles: true
-      });
-
-      this.projects = projects.array.map(project => {
-        let roles = project.currentUserRoles;
-        project.roleIndex = Number(roles.admin) + Number(roles.representative); // to allow sorting
-        return project;
-      });
-
-      // if a project was deleted, the currentPage value might not be valid => reinitialize it
-      if((this.currentPage - 1)*this.perPage >= this.filteredProjects.length) {
-        this.currentPage = 1;
-      }
+      await Promise.all([
+        this.fetchOntologies(),
+        this.fetchMaxFilters(),
+        this.fetchTags()
+      ]);
     }
     catch(error) {
       console.log(error);
@@ -441,19 +454,6 @@ export default {
 
 .legend p:not(:last-child) {
   margin-bottom: 0.4em;
-}
-
-.fas.fa-user-cog {
-  width: 20px;
-  position: relative;
-  text-align: center;
-}
-
-.superscript {
-  font-size: 8px;
-  position: absolute;
-  top: -4px;
-  right: 0;
 }
 </style>
 

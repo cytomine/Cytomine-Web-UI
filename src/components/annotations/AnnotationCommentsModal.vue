@@ -1,3 +1,18 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
 <template>
 <cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
   <div v-if="!comments || !comments.length">
@@ -29,7 +44,7 @@
       {{$t('comment-will-be-sent-by-email')}}
     </b-message>
     <b-field>
-      <b-radio v-model="sendToAllMembers" :native-value="true">
+      <b-radio v-model="sendToAllMembers" :native-value="true" :disabled="members.length == 0">
         {{$t('send-to-all-project-members')}}
       </b-radio>
     </b-field>
@@ -39,7 +54,7 @@
       </b-radio>
     </b-field>
     <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
-      <user-taginput v-model="selectedMembers" :users="members" name="members" v-validate="'required'" />
+      <domain-tag-input v-model="selectedMembers" :domains="members" placeholder="search-user" name="members" v-validate="'required'" searchedProperty="fullName" displayedProperty="fullName" />
     </b-field>
     <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
       <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
@@ -49,7 +64,7 @@
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :class="{'is-loading': loading}"
-        :disabled="loading || errors.any()" @click="share()">
+        :disabled="loading || members.length == 0 || errors.any()" @click="share()">
         {{$t('button-share')}}
       </button>
     </p>
@@ -61,14 +76,14 @@
 import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
-import UserTaginput from '@/components/user/UserTaginput';
+import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'annotation-comments-modal',
   components: {
-    UserTaginput,
+    DomainTagInput,
     CytomineModalCard
   },
   $_veeValidate: {validator: 'new'},
