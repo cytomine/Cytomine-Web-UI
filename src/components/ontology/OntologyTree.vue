@@ -199,7 +199,9 @@ export default {
             }
           }
           else {
-            this.internalSelectedNodes = [node.data.id];
+            if(this.internalSelectedNodes.includes(node.data.id)) this.internalSelectedNodes = [];
+            else this.internalSelectedNodes = [node.data.id];
+
             this.$emit('select', node.data.id);
           }
         });
