@@ -26,7 +26,12 @@
         v-model="currentChannel"
         :max="image.channels - 1"
         :integer-only="true"
-        class="image-dimension-slider" />
+        class="image-dimension-slider"
+      >
+        <template v-if="hasChannelName" #default="{ value }">
+          {{channelValue(value) || "?"}}
+        </template>
+      </cytomine-slider>
 
       <div class="buttons has-addons">
         <button
@@ -161,6 +166,7 @@
 import CytomineSlider from '@/components/form/CytomineSlider';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import {slicePositionToRank} from '@/utils/slice-utils';
 
 export default {
   name: 'image-controls',
@@ -233,12 +239,28 @@ export default {
     },
     isImageMultidimensional() {
       return this.hasChannels || this.hasDuration || this.hasDepth;
+    },
+    sliceInstances() {
+      return this.imageWrapper.sliceInstances;
+    },
+    hasChannelName() {
+      return this.currentSlice.channelName !== null;
     }
-
   },
   methods: {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    channelValue(channel) {
+      let slice = null;
+      if (channel === this.currentChannel) {
+        slice = this.currentSlice;
+      }
+      else {
+        let rank = slicePositionToRank({channel, zStack: this.currentZStack, time: this.currentTime}, this.image);
+        slice = this.sliceInstances[rank];
+      }
+      return (slice) ? slice.channelName : null;
     },
 
     async goToRank(rank) {
