@@ -48,6 +48,7 @@ export default {
         if (this.listPathes) {
           this.isActive = this.listPathes.includes(newPath);
         }
+        // required so dropdown doesn't remain open on route change.
         document.activeElement.blur();
       },
       immediate: true
