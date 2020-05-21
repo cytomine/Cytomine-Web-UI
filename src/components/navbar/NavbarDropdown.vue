@@ -14,17 +14,13 @@
 
 
 <template>
-<div class="navbar-item has-dropdown"
-  :class="{'is-active': opened}"
-  @mouseover="opened = true"
-  @mouseout="opened = false"
->
-  <a class="navbar-link" :class="{'is-active': isActive, ...linkClasses}">
+<div class="navbar-item has-dropdown is-hoverable">
+  <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
-  </a>
-  <div class="navbar-dropdown" :class="classes" @click="opened = false;">
+  </span>
+  <div class="navbar-dropdown" :class="classes">
     <slot></slot>
   </div>
 </div>
@@ -44,20 +40,18 @@ export default {
   },
   data() {
     return {
-      opened: false,
       isActive: false
     };
   },
   watch: {
-    '$route.path': function(newPath) {
-      if(this.listPathes) {
-        this.isActive = this.listPathes.includes(newPath);
-      }
-    }
-  },
-  created() {
-    if(this.listPathes) {
-      this.isActive = this.listPathes.includes(this.$route.path);
+    '$route.path': {
+      handler(newPath) {
+        if (this.listPathes) {
+          this.isActive = this.listPathes.includes(newPath);
+        }
+        document.activeElement.blur();
+      },
+      immediate: true
     }
   }
 };
