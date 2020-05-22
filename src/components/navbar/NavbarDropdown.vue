@@ -61,4 +61,9 @@ export default {
 .navbar-item .tag {
   margin-left: 0.5rem;
 }
+@media screen and (min-width: 1024px) {
+  .navbar-item.is-hoverable:hover .navbar-dropdown {
+    display: block;
+  }
+}
 </style>
