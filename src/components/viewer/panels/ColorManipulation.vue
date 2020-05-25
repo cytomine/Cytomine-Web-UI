@@ -21,11 +21,15 @@
       <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
         <p> {{ $t('unexpected-error-info-message') }} </p>
       </b-message>
-      <div class="histogram-actions" v-else-if="!loading && !hasHistograms">
+      <div class="histogram-actions" v-else-if="!loadingHistograms && !hasSomeHistograms">
         <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
       </div>
-      <b-tabs type="is-boxed" class="histogram" v-else-if="loading || hasHistograms">
-        <b-loading :is-full-page="false" class="small" :active="loading"  />
+      <div class="histogram-actions" v-else-if="(loadingHistograms || hasSomeHistograms) && !hasAllHistograms">
+        <progress class="progress is-info" :value="histogramProgress" max="100">
+          {{histogramProgress}}%
+        </progress>
+      </div>
+      <b-tabs type="is-boxed" class="histogram" v-else-if="hasAllHistograms">
         <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
           <template #header>
             <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
@@ -74,15 +78,15 @@
   </div>
   <div class="actions">
     <div class="level">
-      <template v-if="maxRank > 1 && hasHistograms">
+      <template v-if="maxRank > 1 && hasAllHistograms">
         <button class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust-image')}}</button>
         <button class="level-item button is-small" @click="adjustToSlice()">{{$t('button-adjust-slice')}}</button>
       </template>
-      <button v-else-if="hasHistograms" class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
+      <button v-else-if="hasAllHistograms" class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
 
       <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
     </div>
-    <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasHistograms">{{switchHistogramScaleLabel}}</a>
+    <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasAllHistograms">{{switchHistogramScaleLabel}}</a>
   </div>
 </div>
 </template>
@@ -92,6 +96,7 @@ import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import {ImageFilterProjectCollection, SampleHistogramCollection} from 'cytomine-client';
 import SampleHistogram from '@/components/viewer/panels/SampleHistogram';
+import constants from '@/utils/constants';
 
 export default {
   name: 'color-manipulation',
@@ -103,7 +108,10 @@ export default {
     return {
       filters: null,
       sampleHistograms: null,
-      loading: false,
+      loadingHistograms: false,
+      nbHistograms: 0,
+      refreshInterval: constants.HISTOGRAM_REFRESH_INTERVAL,
+      timeout: null,
       error: false,
       revisionBrightnessContrast: 0,
     };
@@ -137,11 +145,20 @@ export default {
     maxValue() {
       return Math.pow(2, this.image.bitPerSample);
     },
-    hasHistograms() {
-      return this.sampleHistograms && this.sampleHistograms.length > 0;
+    expectedNbHistograms() {
+      return this.image.depth * this.image.duration * this.image.channels * this.image.samplePerPixel;
+    },
+    hasAllHistograms() {
+      return this.nbHistograms === this.expectedNbHistograms;
+    },
+    hasSomeHistograms() {
+      return this.nbHistograms > 0;
     },
     canComputeHistogram() {
       return this.image.bitPerSample && this.image.samplePerPixel;
+    },
+    histogramProgress() {
+      return this.nbHistograms / this.expectedNbHistograms * 100;
     },
 
     selectedFilter: {
@@ -193,7 +210,7 @@ export default {
   },
   watch: {
     slice() {
-      this.fetchSampleHistograms();
+      this.refresh();
     }
   },
   methods: {
@@ -234,6 +251,29 @@ export default {
 
       return 'grey';
     },
+    async refresh() {
+      await this.fetchImageHistogramsCount();
+      clearTimeout(this.timeout);
+      if (this.nbHistograms < this.expectedNbHistograms && (this.nbHistograms > 0 || this.loadingHistograms)) {
+        this.timeout = setTimeout(this.refresh, this.refreshInterval);
+      }
+      else if (this.nbHistograms === this.expectedNbHistograms) {
+        if (!this.sampleHistograms) {
+          await this.$store.dispatch(this.imageModule + 'refreshDefaultMinMax', {image: this.image});
+        }
+        await this.fetchSampleHistograms();
+        this.loadingHistograms = false;
+      }
+    },
+    async fetchImageHistogramsCount() {
+      try {
+        this.nbHistograms = await this.image.fetchNbSampleHistograms();
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+    },
     async fetchSampleHistograms() {
       try {
         this.sampleHistograms = (await SampleHistogramCollection.fetchAll({filterKey: 'sliceinstance', filterValue: this.slice.id})).array;
@@ -243,18 +283,16 @@ export default {
         this.error = true;
       }
     },
-    async computeHistograms() {
-      this.loading = true;
+    computeHistograms() {
+      this.loadingHistograms = true;
       try {
-        await this.image.extractHistogram();
-        await this.$store.dispatch(this.imageModule + 'refreshDefaultMinMax', {image: this.image});
-        await this.fetchSampleHistograms();
+        this.image.extractHistogram();
+        this.refresh();
       }
       catch(error) {
         console.log(error);
         this.error = true;
       }
-      this.loading = false;
     }
   },
   async created() {
@@ -269,11 +307,14 @@ export default {
       }
       this.filters = filters;
 
-      this.fetchSampleHistograms();
+      this.refresh();
     }
     catch(error) {
       console.log(error);
     }
+  },
+  beforeDestroy() {
+    clearTimeout(this.timeout);
   }
 };
 </script>
