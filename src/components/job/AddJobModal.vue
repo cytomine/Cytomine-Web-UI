@@ -131,7 +131,9 @@ export default {
       return this.params.filter(param => param.required && param.defaultParamValue === null);
     },
     jobParameters() {
-      return this.params.map(param => {
+      return this.params.filter(param => {
+        return param.value !== null;
+      }).map(param => {
         let value = param.value;
         if(value.id) {
           value = value.id;
