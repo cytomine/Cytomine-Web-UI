@@ -144,10 +144,10 @@
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
-                <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">
-                  {{$t('delete-data')}}
-                </button>
-                <button v-if="isFinished" class="button is-danger" @click="confirmJobDeletion()">
+<!--                <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">-->
+<!--                  {{$t('delete-data')}}-->
+<!--                </button>-->
+                <button v-if="isFinished" class="button is-danger" @click="deletionModal = true">
                   {{$t('button-delete')}}
                 </button>
                 <button v-else class="button is-danger" @click="confirmJobKilling()">
@@ -297,7 +297,7 @@ export default {
       try {
         this.deletionTask = await new Task({project: this.project.id}).save();
         await job.deleteAllData(this.deletionTask.id);
-        this.refresh(true);
+        this.$emit('delete');
         this.deletionTask = null;
         this.deletionModal = false;
         this.$notify({type: 'success', text: this.$t('notif-success-analysis-data-deletion')});

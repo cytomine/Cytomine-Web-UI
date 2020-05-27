@@ -285,7 +285,7 @@ export default {
     },
     async deleteJob(jobToDelete) {
       try {
-        await jobToDelete.delete();
+        // await jobToDelete.delete();
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-analysis-deletion')
