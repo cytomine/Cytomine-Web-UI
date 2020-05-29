@@ -32,7 +32,7 @@
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
     "vue-color": "^2.7.0",
-    "vue-draggable-resizable": "^1.7.5",
+    "vue-draggable-resizable": "^2.2.0",
     "vue-i18n": "^8.9.0",
     "vue-moment": "^4.0.0",
     "vue-multiselect": "^2.1.4",
