@@ -186,16 +186,6 @@ export default {
     },
     deleteAnnotationEventHandler(annot) {
       this.annotationEventHandler(annot);
-
-      let updatedProject = this.$store.state.currentProject.project.clone();
-      if(annot.type === 'UserAnnotation') {
-        updatedProject.numberOfAnnotations--;
-      }
-      else {
-        updatedProject.numberOfReviewedAnnotations--;
-      }
-
-      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {

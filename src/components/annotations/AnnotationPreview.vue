@@ -36,7 +36,7 @@
       :images="images"
       @addTerm="$emit('addTerm', $event)"
       @updateTerms="$emit('update')"
-      @deletion="$emit('update')"
+      @deletion="handleDeletion"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
@@ -97,6 +97,10 @@ export default {
 
       this.opened = false;
     },
+    handleDeletion() {
+      this.$eventBus.$emit('deleteAnnotation', this.annot);
+      this.$emit('update');
+    }
   }
 };
 </script>

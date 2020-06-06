@@ -83,10 +83,27 @@ export default {
           this.notFoundError = true;
         }
       }
+    },
+    deleteAnnotationEventHandler(annot) {
+      let updatedProject = this.$store.state.currentProject.project.clone();
+      if(annot.type === 'UserAnnotation') {
+        updatedProject.numberOfAnnotations--;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations--;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
     }
   },
   async created() {
     await this.loadProject();
+  },
+  mounted() {
+    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
   }
 };
 </script>
