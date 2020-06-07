@@ -82,6 +82,10 @@ export default {
       }
       await Promise.all(promises);
     },
+    async reloadProject({state, commit}) {
+      let project = await Project.fetch(state.project.id);
+      commit('setProject', project);
+    },
 
     async updateProject({state, dispatch, commit}, updatedProject) {
       let reloadOntology = state.project.ontology !== updatedProject.ontology;
