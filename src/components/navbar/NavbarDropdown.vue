@@ -66,5 +66,8 @@ export default {
   .navbar-item.is-hoverable:hover .navbar-dropdown {
     display: block;
   }
+  .navbar-item.is-hoverable:focus-within:not(:hover) .navbar-dropdown {
+    display: none;
+  }
 }
 </style>
