@@ -24,6 +24,7 @@ export default new VueI18n({
   fallbackLocale: 'en',
   messages: {
     'en': require('./locales/json/en.i18n.json'),
+    'es': require('./locales/json/es.i18n.json'),
     'fr': require('./locales/json/fr.i18n.json')
   }
 });
