@@ -149,6 +149,7 @@
         :collection="uploadedFileCollection"
         sort="created" order="desc"
         :revision="revision"
+        :openedDetailed.sync="openedDetails"
         :refreshInterval="tableRefreshInterval"
       >
         <template #default="{row: uFile}">
@@ -240,6 +241,7 @@ export default {
       signature: '',
       signatureDate: '',
 
+      openedDetails: [],
       revision: 0
     };
   },
