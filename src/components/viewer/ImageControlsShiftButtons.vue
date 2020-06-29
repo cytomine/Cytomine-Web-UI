@@ -54,6 +54,7 @@ export default {
     forward: Boolean,
     current: Number,
     size: Number,
+    dimension: String,
   },
   data() {
     return {
@@ -73,12 +74,11 @@ export default {
     },
     step: {
       get() {
-        return this.imageWrapper.controls.step;
+        return this.imageWrapper.controls.step[this.dimension];
       },
       set(value) {
-        if (!isNaN(value)) {
-          this.$store.commit(this.imageModule + 'setStep', Number(value));
-        }
+        this.$store.commit(this.imageModule + 'setStep',
+          {dimension: this.dimension, value: Number(value)});
       }
     },
     canShift() {
