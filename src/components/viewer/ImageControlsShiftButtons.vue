@@ -1,65 +1,48 @@
 <template>
-  <div class="buttons has-addons">
-    <template v-if="forward">
+  <div class="buttons has-addons" :class="{'backward-buttons': !forward}">
+    <button
+        class="button is-small item"
+        :disabled="!canShift"
+        @click="shiftOne()"
+    >
+      <i class="fas" :class="{'fa-step-forward': forward, 'fa-step-backward': !forward}"></i>
+    </button>
+    <v-popover
+        :placement="selectorPlacement"
+        trigger="manual"
+        :open="opened"
+        :auto-hide="false"
+        :popover-inner-class="'tooltip-inner popover-inner step-selector'"
+    >
       <button
           class="button is-small item"
           :disabled="!canShift"
-          @click="shift(1)"
+          @click="shift()"
+          @click.right.prevent="startEdition()"
       >
-        <i class="fas fa-step-forward"></i>
+        <i class="fas" :class="{'fa-fast-forward': forward, 'fa-fast-backward': !forward}"></i>
+        <div class="step-counter">
+          <template v-if="forward">+</template>
+          <template v-else>-</template>{{step}}
+        </div>
       </button>
-      <v-popover
-          placement="left"
-          trigger="manual"
-          :open="opened"
-          :auto-hide="false"
-          :popover-inner-class="'tooltip-inner popover-inner step-selector'"
-      >
-        <button
-            class="button is-small item"
-            :disabled="!canShift"
-            @click="shift(Math.min(step, size - current - 1))"
-            @click.right.prevent="startEdition()"
+
+      <template #popover>
+        <div
+          v-click-outside="() => stopEdition()"
+          v-click-outside:contextmenu.capture="() => stopEdition()"
+          class="step-selector"
         >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-
-        <template #popover>
-          <div
-            v-click-outside="() => stopEdition()"
-            v-click-outside:contextmenu.capture="() => { stopEdition() }"
-            class="step-selector"
-          >
-            <b-input :placeholder="$t('step')" size="is-small"
-               v-model="editedValue"
-               ref="inputStepSelector"
-               @hook:mounted="focus()"
-               @blur="stopEdition()"
-               @keyup.enter.native="stopEdition()"
-            />
-          </div>
-        </template>
-      </v-popover>
-    </template>
-    <template v-else>
-      <button
-          class="button is-small item"
-          :disabled="!canShift"
-          @click="shift(-Math.min(step, current))"
-      >
-        <i class="fas fa-fast-backward"></i>
-        <div class="step-counter">-{{step}}</div>
-      </button>
-      <button
-          class="button is-small item"
-          :disabled="!canShift"
-          @click="shift(-1)"
-      >
-        <i class="fas fa-step-backward"></i>
-      </button>
-    </template>
-
+          <b-input :placeholder="$t('step')" size="is-small"
+             v-model="editedValue"
+             ref="inputStepSelector"
+             @hook:mounted="focus()"
+             @blur="stopEdition()"
+             @keyup.enter.native="stopEdition()"
+          />
+        </div>
+      </template>
+    </v-popover>
   </div>
 </template>
 
@@ -100,10 +83,21 @@ export default {
     },
     canShift() {
       return (this.forward) ? (this.current < this.size - 1) : (this.current >= 1);
+    },
+    shiftDirection() {
+      return (this.forward) ? 1 : -1;
+    },
+    selectorPlacement() {
+      return (this.forward) ? 'left' : 'right';
     }
   },
   methods: {
-    shift(value) {
+    shiftOne() {
+      this.$emit('shift', this.shiftDirection);
+    },
+    shift() {
+      let value = this.shiftDirection;
+      value *= (this.forward) ? Math.min(this.step, this.size - this.current - 1) : Math.min(this.step, this.current);
       this.$emit('shift', value);
     },
     startEdition() {
@@ -146,7 +140,9 @@ export default {
     line-height: 0.9em;
   }
 
-
+  .backward-buttons {
+    flex-direction: row-reverse;
+  }
 </style>
 
 <style>
