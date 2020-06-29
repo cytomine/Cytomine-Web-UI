@@ -9,6 +9,7 @@
         :forward="false"
         :current="currentSlice.channel"
         :size="image.channels"
+        dimension="channel"
         @shift="shift('channel', $event)"
       />
 
@@ -23,6 +24,7 @@
           :forward="true"
           :current="currentSlice.channel"
           :size="image.channels"
+          dimension="channel"
           @shift="shift('channel', $event)"
       />
     </div>
@@ -36,6 +38,7 @@
           :forward="false"
           :current="currentSlice.zStack"
           :size="image.depth"
+          dimension="zStack"
           @shift="shift('zStack', $event)"
       />
 
@@ -50,6 +53,7 @@
           :forward="true"
           :current="currentSlice.zStack"
           :size="image.depth"
+          dimension="zStack"
           @shift="shift('zStack', $event)"
       />
     </div>
@@ -64,6 +68,7 @@
           :forward="false"
           :current="currentSlice.time"
           :size="image.duration"
+          dimension="time"
           @shift="shift('time', $event)"
       />
 
@@ -89,6 +94,7 @@
           :forward="true"
           :current="currentSlice.time"
           :size="image.duration"
+          dimension="time"
           @shift="shift('time', $event)"
       />
     </div>
@@ -104,11 +110,6 @@ import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 export default {
   name: 'image-controls',
   components: {ImageControlsShiftButtons, CytomineSlider},
-  data() {
-    return {
-      step: 2, // TODO: add into configuration
-    };
-  },
   props: {
     index: String
   },
