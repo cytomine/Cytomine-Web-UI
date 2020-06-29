@@ -8,14 +8,39 @@
       >
         <i class="fas fa-step-forward"></i>
       </button>
-      <button
-          class="button is-small item"
-          :disabled="!canShift"
-          @click="shift(Math.min(step, size - current - 1))"
+      <v-popover
+          placement="left"
+          trigger="manual"
+          :open="opened"
+          :auto-hide="false"
+          :popover-inner-class="'tooltip-inner popover-inner step-selector'"
       >
-        <i class="fas fa-fast-forward"></i>
-        <div class="step-counter">+{{step}}</div>
-      </button>
+        <button
+            class="button is-small item"
+            :disabled="!canShift"
+            @click="shift(Math.min(step, size - current - 1))"
+            @click.right.prevent="startEdition()"
+        >
+          <i class="fas fa-fast-forward"></i>
+          <div class="step-counter">+{{step}}</div>
+        </button>
+
+        <template #popover>
+          <div
+            v-click-outside="() => stopEdition()"
+            v-click-outside:contextmenu.capture="() => { stopEdition() }"
+            class="step-selector"
+          >
+            <b-input :placeholder="$t('step')" size="is-small"
+               v-model="editedValue"
+               ref="inputStepSelector"
+               @hook:mounted="focus()"
+               @blur="stopEdition()"
+               @keyup.enter.native="stopEdition()"
+            />
+          </div>
+        </template>
+      </v-popover>
     </template>
     <template v-else>
       <button
@@ -47,6 +72,12 @@ export default {
     current: Number,
     size: Number,
   },
+  data() {
+    return {
+      opened: false,
+      editedValue: 0,
+    };
+  },
   computed: {
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -62,7 +93,9 @@ export default {
         return this.imageWrapper.controls.step;
       },
       set(value) {
-        this.$store.dispatch(this.imageModule + 'setStep', value);
+        if (!isNaN(value)) {
+          this.$store.commit(this.imageModule + 'setStep', Number(value));
+        }
       }
     },
     canShift() {
@@ -72,6 +105,21 @@ export default {
   methods: {
     shift(value) {
       this.$emit('shift', value);
+    },
+    startEdition() {
+      this.editedValue = this.step;
+      this.opened = true;
+    },
+    stopEdition() {
+      this.opened = false;
+      if (!this.editedValue || isNaN(this.editedValue)) {
+        return;
+      }
+
+      this.step = parseInt(this.editedValue);
+    },
+    focus() {
+      this.$refs.inputStepSelector.focus();
     }
   }
 };
@@ -98,4 +146,15 @@ export default {
     line-height: 0.9em;
   }
 
+
+</style>
+
+<style>
+  .step-selector {
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .step-selector input {
+    width: 4rem;
+  }
 </style>
