@@ -34,6 +34,12 @@
           <image-status :image="image" />
         </td>
       </tr>
+      <tr v-if="isPropDisplayed('created')">
+        <td class="prop-label">{{$t('created-on')}}</td>
+        <td class="prop-content">
+          {{ Number(image.created) | moment('ll') }}
+        </td>
+      </tr>
       <tr v-if="isPropDisplayed('numberOfAnnotations')">
         <td class="prop-label">{{$t('user-annotations')}}</td>
         <td class="prop-content" colspan="3">
