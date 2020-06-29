@@ -36,7 +36,7 @@
       </tr>
       <tr v-if="isPropDisplayed('created')">
         <td class="prop-label">{{$t('created-on')}}</td>
-        <td class="prop-content">
+        <td class="prop-content" colspan="3">
           {{ Number(image.created) | moment('ll') }}
         </td>
       </tr>
