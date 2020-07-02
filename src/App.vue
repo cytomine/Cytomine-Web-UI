@@ -102,7 +102,7 @@ export default {
         if(!this.currentUser && authenticated) {
           await this.fetchUser();
         }
-        if(!this.currentUser) {
+        if(!this.currentUser && this.SSO_ENABLED) {
           let redirect = encodeURIComponent(window.location.href);
           window.location = constants.SSO_LOGIN+'?cytomine_redirect='+redirect;
         }
