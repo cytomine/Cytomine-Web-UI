@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
 
 <template>
 <span class="tag" :class="tagClass">
-  {{$t(labels[status])}}
+  {{$t(labels[status].label)}}
 </span>
 </template>
 
 <script>
 import {JobStatus} from 'cytomine-client';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
 
 export default {
   name: 'job-status',
@@ -30,10 +30,12 @@ export default {
   },
   computed: {
     labels() {
-      return jobStatusLabelMapping;
+      return jobStatusMapping;
     },
     result() {
       switch(this.status) {
+        case JobStatus.KILLED:
+          return 'dark';
         case JobStatus.NOTLAUNCH:
         case JobStatus.INQUEUE:
         case JobStatus.WAIT:

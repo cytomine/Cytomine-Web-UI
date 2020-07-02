@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -39,6 +39,10 @@
       <router-link to="/ontology" class="navbar-item">
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
+      </router-link>
+      <router-link to="/software" class="navbar-item">
+        <i class="fas fa-code"></i>
+        {{ $t('algorithms') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
@@ -83,7 +87,7 @@
 
       <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
         <a class="navbar-item" @click="openHotkeysModal()">
-          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('hotkeys')}}
+          <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
         </a>
         <a class="navbar-item" @click="openAboutModal()">
           <span class="icon"><i class="fas fa-info-circle fa-xs"></i></span> {{$t('about-cytomine')}}

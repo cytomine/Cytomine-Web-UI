@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@
           </b-table-column>
 
           <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-            <i class="fas fa-user-cog" :title="$t('project-manager')" v-if="member.role === managerRole"></i>
+            <icon-project-member-role :is-manager="member.role === managerRole" />
           </b-table-column>
 
           <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
@@ -139,9 +139,8 @@
 
       <div class="legend">
         <h2>{{$t('legend')}}</h2>
-        <p>
-          <i class="fas fa-user-cog"></i>: {{$t('project-manager')}}
-        </p>
+        <p><icon-project-member-role /> : {{$t('project-contributor')}}</p>
+        <p><icon-project-member-role :is-manager="true" /> : {{$t('project-manager')}}</p>
       </div>
     </template>
   </div>
@@ -155,10 +154,12 @@ import Username from '@/components/user/Username';
 
 import constants from '@/utils/constants.js';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
   name: 'members-activity',
   components: {
+    IconProjectMemberRole,
     CytomineMultiselect,
     Username
   },

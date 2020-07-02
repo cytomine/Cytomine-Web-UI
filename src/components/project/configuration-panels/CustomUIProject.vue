@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -106,6 +106,7 @@ export default {
               icon: 'fas fa-ruler-combined'},
             {key: 'project-explore-annotation-description', label: 'description', icon: 'far fa-file-alt'},
             {key: 'project-explore-annotation-terms', label: 'terms', icon: 'fas fa-hashtag'},
+            {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},

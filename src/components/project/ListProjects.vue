@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -147,13 +147,10 @@
       >
         <template #default="{row: project}">
           <b-table-column field="currentUserRole" label="" centered width="1" sortable>
-            <i
-              v-if="project.currentUserRoles.admin"
-              class="fas fa-user-cog"
-              :title="$t(project.currentUserRoles.representative ? 'representative-icon-label' : 'manager-icon-label')"
-            >
-              <i v-if="project.currentUserRoles.representative" class="superscript fas fa-flag"></i>
-            </i>
+            <icon-project-member-role
+              :is-manager="project.currentUserRoles.admin"
+              :is-representative="project.currentUserRoles.representative"
+            />
           </b-table-column>
 
           <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -218,10 +215,9 @@
 
       <div class="legend">
           <h2>{{$t('legend')}}</h2>
-          <p><i class="fas fa-user-cog"></i> : {{$t('manager-icon-label')}}</p>
-          <p><i class="fas fa-user-cog">
-            <i class="superscript fas fa-flag"></i>
-          </i> : {{$t('representative-icon-label')}}</p>
+          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
       </div>
     </div>
   </div>
@@ -240,9 +236,11 @@ import AddProjectModal from './AddProjectModal';
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 export default {
   name: 'list-projects',
   components: {
+    IconProjectMemberRole,
     CytomineTable,
     ProjectDetails,
     AddProjectModal,
@@ -456,19 +454,6 @@ export default {
 
 .legend p:not(:last-child) {
   margin-bottom: 0.4em;
-}
-
-.fas.fa-user-cog {
-  width: 20px;
-  position: relative;
-  text-align: center;
-}
-
-.superscript {
-  font-size: 8px;
-  position: absolute;
-  top: -4px;
-  right: 0;
 }
 </style>
 

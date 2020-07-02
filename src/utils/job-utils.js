@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,15 +16,47 @@
 
 import {JobStatus} from 'cytomine-client';
 
-const jobStatusLabelMapping = Object.freeze({
-  [JobStatus.NOTLAUNCH]: 'not-launch',
-  [JobStatus.INQUEUE]: 'in-queue',
-  [JobStatus.RUNNING]: 'running',
-  [JobStatus.SUCCESS]: 'success',
-  [JobStatus.FAILED]: 'failed',
-  [JobStatus.INDETERMINATE]: 'indeterminate',
-  [JobStatus.WAIT]: 'wait',
-  [JobStatus.PREVIEWED]: 'previewed'
+const jobStatusMapping = Object.freeze({
+  [JobStatus.RUNNING]: {
+    label: 'running',
+    statLabel: 'numberOfRunning',
+    color: '#209CEE'
+  },
+  [JobStatus.SUCCESS]: {
+    label: 'success',
+    statLabel: 'numberOfSuccess',
+    color: '#23D160'
+  },
+  [JobStatus.FAILED]: {
+    label: 'failed',
+    statLabel: 'numberOfFailed',
+    color: '#FF3860'
+  },
+  [JobStatus.NOTLAUNCH]: {
+    label: 'not-launch',
+    statLabel: 'numberOfNotLaunch',
+    color: '#F5F5F5'
+  },
+  [JobStatus.WAIT]: {
+    label: 'wait',
+    statLabel: 'numberOfWait',
+    color: '#F5F5F5'
+  },
+  [JobStatus.INQUEUE]: {
+    label: 'in-queue',
+    statLabel: 'numberOfInQueue',
+    color: '#F5F5F5'
+  },
+  [JobStatus.INDETERMINATE]: {
+    label: 'indeterminate',
+    statLabel: 'numberOfIndeterminate',
+    color: '#F5F5F5'
+  },
+  [JobStatus.KILLED]: {
+    label: 'killed',
+    statLabel: 'numberOfKilled',
+    color: '#363636'
+  }
 });
 
-export default jobStatusLabelMapping;
+export default jobStatusMapping;

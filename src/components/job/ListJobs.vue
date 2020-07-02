@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('analysis')}}
-      <button class="button is-link" @click="launchModal = true">
+      <button v-if="canAddJob" class="button is-link" @click="launchModal = true">
         {{$t('button-launch-new-analysis')}}
       </button>
     </p>
@@ -40,7 +40,7 @@
               {{$t('algorithm')}}
             </div>
             <div class="filter-body">
-              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple />
+              <cytomine-multiselect v-model="selectedSoftwares" :options="availableSoftwares" multiple track-by="id" label="fullName"/>
             </div>
           </div>
 
@@ -142,7 +142,8 @@ import AddJobModal from './AddJobModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import jobStatusLabelMapping from '@/utils/job-utils';
+import jobStatusMapping from '@/utils/job-utils';
+import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -173,10 +174,16 @@ export default {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
+    canAddJob() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
 
     availableStatus() {
-      return Object.keys(jobStatusLabelMapping).map(key => {
-        return {label: this.$t(jobStatusLabelMapping[key]), status: key};
+      return Object.keys(jobStatusMapping).map(key => {
+        return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
 
@@ -191,16 +198,14 @@ export default {
 
     jobCollection() {
       let collection = new JobCollection({
-        project: this.project.id
+        project: this.project.id,
+        software: (this.selectedSoftwares.length > 0 && this.selectedSoftwares.length < this.availableSoftwares.length) ?
+          this.selectedSoftwares.map(option => option.id).join(',') : null
       });
-      if(this.selectedSoftwares.length > 0){
-        collection['softwareName'] = {
-          in: this.selectedSoftwares
-        };
-      }
+
       if(this.selectedLaunchers.length > 0){
         collection['username'] = {
-          in: this.selectedLaunchers
+          in: this.selectedLaunchers.join()
         };
       }
       if(this.selectedStatus.length > 0){
@@ -226,7 +231,7 @@ export default {
   methods: {
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
-      this.availableSoftwares = stats.software.list.map(option => option.name);
+      this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
     },
 
@@ -235,6 +240,7 @@ export default {
       await this.fetchMultiselectOptions();
       this.revision++;
     },
+
     async deleteJob(jobToDelete) {
       try {
         await jobToDelete.delete();

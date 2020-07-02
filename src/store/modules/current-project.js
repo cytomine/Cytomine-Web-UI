@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -82,6 +82,10 @@ export default {
       }
       await Promise.all(promises);
     },
+    async reloadProject({state, commit}) {
+      let project = await Project.fetch(state.project.id);
+      commit('setProject', project);
+    },
 
     async updateProject({state, dispatch, commit}, updatedProject) {
       let reloadOntology = state.project.ontology !== updatedProject.ontology;
@@ -122,14 +126,15 @@ export default {
     canEditLayer: (state, getters, rootState) => idLayer => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {
-        return currentUser.adminByNow || annot.reviewUser === currentUser.id;
+        return currentUser.adminByNow || (!currentUser.guestByNow && annot.reviewUser === currentUser.id);
       }
       return getters.canEditLayer(idLayer);
     },
@@ -137,12 +142,20 @@ export default {
     canEditImage: (state, getters, rootState) => image => {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
-      return getters.canManageProject || (!project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (image.user === currentUser.id || !project.isRestricted));
+    },
+
+    canManageJob: (state, getters, rootState) => job => {
+      let currentUser = rootState.currentUser.user;
+      let project = state.project;
+      return getters.canManageProject ||
+        (!currentUser.guestByNow && !project.isReadOnly && (job.username === currentUser.username || !project.isRestricted));
     },
 
     canManageProject: (state, _, rootState) => { // true iff current user is admin or project manager
       let currentUser = rootState.currentUser.user || {};
-      return currentUser.adminByNow || state.managers.some(user => user.id === currentUser.id);
+      return currentUser.adminByNow || (!currentUser.guestByNow && state.managers.some(user => user.id === currentUser.id));
     },
 
     contributors: (state) => {

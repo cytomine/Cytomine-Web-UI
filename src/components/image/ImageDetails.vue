@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -169,9 +169,11 @@
               <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
-                {{$t('button-download')}}
-              </a>
+            </template>
+            <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
+              {{$t('button-download')}}
+            </a>
+            <template v-if="canEdit">
               <button class="button is-danger" @click="confirmDeletion()">
                 {{$t('button-delete')}}
               </button>
@@ -203,7 +205,7 @@
 
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
-    :idAbstractImage="image.baseImage"
+    :image="image"
   />
 </div>
 </template>
@@ -220,7 +222,6 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
-
 import {ImageInstance} from 'cytomine-client';
 
 import vendorFromMime from '@/utils/vendor';

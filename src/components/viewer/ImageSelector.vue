@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -121,6 +121,16 @@ export default {
 
     more() {
       this.nbImagesDisplayed += 20;
+    },
+
+    toggle() {
+      this.imageSelectorEnabled = !this.imageSelectorEnabled;
+    },
+
+    shortkeyHandler(key) {
+      if (key === 'toggle-add-image') {
+        this.toggle();
+      }
     }
   },
   async created() {
@@ -135,6 +145,12 @@ export default {
       this.error = true;
     }
     this.loading = false;
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

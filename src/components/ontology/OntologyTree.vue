@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -199,7 +199,9 @@ export default {
             }
           }
           else {
-            this.internalSelectedNodes = [node.data.id];
+            if(this.internalSelectedNodes.includes(node.data.id)) this.internalSelectedNodes = [];
+            else this.internalSelectedNodes = [node.data.id];
+
             this.$emit('select', node.data.id);
           }
         });

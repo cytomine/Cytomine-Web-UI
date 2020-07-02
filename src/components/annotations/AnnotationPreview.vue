@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
       :images="images"
       @addTerm="$emit('addTerm', $event)"
       @updateTerms="$emit('update')"
-      @deletion="$emit('update')"
+      @deletion="handleDeletion"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
@@ -66,10 +66,11 @@ export default {
   computed: {
     styleAnnotDetails() {
       let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
+      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`;
 
       return {
         backgroundImage: `url(${url})`,
+        backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
       };
@@ -96,6 +97,10 @@ export default {
 
       this.opened = false;
     },
+    handleDeletion() {
+      this.$eventBus.$emit('deleteAnnotation', this.annot);
+      this.$emit('update');
+    }
   }
 };
 </script>

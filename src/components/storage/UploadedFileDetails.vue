@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -227,10 +227,6 @@ h2 .button {
   bottom: 3px;
   margin-left: 0.8em;
   text-transform: none;
-}
-
->>> .sl-vue-tree {
-  max-width: 80em;
 }
 
 >>> .sl-vue-tree-sidebar {

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
 
 
 <template>
-<div class="navbar-item has-dropdown"
-  :class="{'is-active': opened}"
-  @mouseover="opened = true"
-  @mouseout="opened = false"
->
-  <a class="navbar-link" :class="{'is-active': isActive, ...linkClasses}">
+<div class="navbar-item has-dropdown is-hoverable">
+  <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
-  </a>
-  <div class="navbar-dropdown" :class="classes" @click="opened = false;">
+  </span>
+  <div class="navbar-dropdown" :class="classes">
     <slot></slot>
   </div>
 </div>
@@ -44,20 +40,19 @@ export default {
   },
   data() {
     return {
-      opened: false,
       isActive: false
     };
   },
   watch: {
-    '$route.path': function(newPath) {
-      if(this.listPathes) {
-        this.isActive = this.listPathes.includes(newPath);
-      }
-    }
-  },
-  created() {
-    if(this.listPathes) {
-      this.isActive = this.listPathes.includes(this.$route.path);
+    '$route.path': {
+      handler(newPath) {
+        if (this.listPathes) {
+          this.isActive = this.listPathes.includes(newPath);
+        }
+        // required so dropdown doesn't remain open on route change.
+        document.activeElement.blur();
+      },
+      immediate: true
     }
   }
 };
@@ -66,5 +61,13 @@ export default {
 <style>
 .navbar-item .tag {
   margin-left: 0.5rem;
+}
+@media screen and (min-width: 1024px) {
+  .navbar-item.is-hoverable:hover .navbar-dropdown {
+    display: block;
+  }
+  .navbar-item.is-hoverable:focus-within:not(:hover) .navbar-dropdown {
+    display: none;
+  }
 }
 </style>

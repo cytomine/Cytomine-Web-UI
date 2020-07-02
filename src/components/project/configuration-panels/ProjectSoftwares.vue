@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -33,12 +33,17 @@
     >
       <template #default="{row: software}">
         <b-table-column field="name" :label="$t('name')" sortable width="100">
-          {{software.name}}
+          <router-link :to="`/software/${software.id}`">
+            {{ software.fullName }}
+          </router-link>
         </b-table-column>
 
-        <b-table-column :label="$t('description')" width="400">
-          <template v-if="software.description">{{software.description}}</template>
-          <em v-else>{{$t('no-description')}}</em>
+        <b-table-column field="softwareStatus" :label="$t('version')" centered sortable width="100" :custom-sort="sortBySoftwareStatus">
+          <software-status :software="software" />
+        </b-table-column>
+
+        <b-table-column field="executable" :label="$t('ui-runnable')" centered sortable width="100">
+          <boolean-item :value="software.executable" />
         </b-table-column>
 
         <b-table-column field="selected" :label="$t('status')" sortable width="100">
@@ -71,9 +76,15 @@
 import {get} from '@/utils/store-helpers';
 import {SoftwareCollection, SoftwareProject, SoftwareProjectCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import SoftwareStatus from '@/components/software/SoftwareStatus';
+import BooleanItem from '@/components/utils/BooleanItem';
 
 export default {
   name: 'project-softwares',
+  components: {
+    BooleanItem,
+    SoftwareStatus
+  },
   data() {
     return {
       loading: true,
@@ -116,6 +127,14 @@ export default {
           text: this.$t('notif-error-change-status-algorithm-project', {softwareName: software.name})
         });
       }
+    },
+    sortBySoftwareStatus(a, b, asc) {
+      return ((asc) ? 1 : -1) * (this.getSoftwareStatusValue(a) - this.getSoftwareStatusValue(b));
+    },
+    getSoftwareStatusValue(software) {
+      if (!software.softwareVersion) return 0;
+      if (software.deprecated) return 1;
+      return 2;
     }
   },
   async created() {

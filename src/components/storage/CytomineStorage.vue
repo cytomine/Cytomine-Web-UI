@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -122,6 +122,9 @@
             <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
               {{$t('cancel-upload')}}
             </button>
+            <button class="button" @click="hideFinished()" v-if="filesFinishedUpload">
+              {{$t('hide-successful-upload')}}
+            </button>
           </div>
         </div>
       </div>
@@ -146,6 +149,7 @@
         :collection="uploadedFileCollection"
         sort="created" order="desc"
         :revision="revision"
+        :openedDetailed.sync="openedDetails"
         :refreshInterval="tableRefreshInterval"
       >
         <template #default="{row: uFile}">
@@ -237,16 +241,27 @@ export default {
       signature: '',
       signatureDate: '',
 
+      openedDetails: [],
       revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    finishedStatus() {
+      return [
+        UploadedFileStatus.CONVERTED,
+        UploadedFileStatus.DEPLOYED
+      ];
+    },
     ongoingUpload() {
       return this.dropFiles.some(wrapper => wrapper.uploading);
     },
     filesPendingUpload() {
       return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile === null);
+    },
+    filesFinishedUpload() {
+      return this.dropFiles.some(wrapper => !wrapper.uploading && wrapper.uploadedFile !== null
+        && this.finishedStatus.includes(wrapper.uploadedFile.status));
     },
     overallProgress() {
       let nbUploads = 0;
@@ -438,14 +453,25 @@ export default {
         }
       }
     },
-
     updatedTree() {
       this.revision++; // updating the table will result in new files objects => the uf details will also be updated
     },
-
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
-    }, 500)
+    }, 500),
+    hideFinished() {
+      let nbFiles = this.dropFiles.length;
+      let idx = 0;
+      for(let i = 0; i < nbFiles; i++) {
+        let uploadedFile = this.dropFiles[idx].uploadedFile;
+        if (uploadedFile !== null && this.finishedStatus.includes(uploadedFile.status)) {
+          this.cancelUpload(idx);
+        }
+        else {
+          idx++;
+        }
+      }
+    }
   },
   activated() {
     this.fetchStorages();

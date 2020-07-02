@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@
     :resizable="false"
     drag-handle=".drag"
     @dragstop="dragStop"
-    :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    ref="detailsPanel"
   >
     <div class="actions">
       <h1>{{$t('current-selection')}}</h1>
@@ -74,7 +75,6 @@ export default {
   data() {
     return {
       width: 320,
-      height: 500,
       users: [],
       userJobs: [],
       reload: true,
@@ -184,7 +184,7 @@ export default {
 
       if(this.$refs.playground) {
         let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
-        let maxY = Math.max(this.$refs.playground.clientHeight - this.height, 0);
+        let maxY = Math.max(this.$refs.playground.clientHeight - this.$refs.detailsPanel.height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
         this.positionAnnotDetails = {x, y};

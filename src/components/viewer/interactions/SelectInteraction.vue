@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
   :features.sync="selectedFeatures"
   :toggle-condition="never"
   :remove-condition="shiftKeyOnly"
-  @select="select"
+  :multi=true
   ref="interactionSelect"
 >
   <vl-style-func :factory="styleFunctionFactory" />
@@ -48,6 +48,55 @@ export default {
         return this.imageWrapper.selectedFeatures.selectedFeatures;
       },
       set(value) {
+        //used when selecting a vertex of a feature
+        let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
+        if(notAnnotations.length == 1){
+          value = notAnnotations;
+          this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
+          return;
+        }
+
+        value.sort(
+          function( a, b ) {
+            if( a.properties.annot.area > b.properties.annot.area ) return 1;
+            else return -1;
+          }
+        );
+
+        let previousTarget = this.imageWrapper.selectedFeatures.selectionTargetedFeatures;
+        let previousSelectedFeature = this.imageWrapper.selectedFeatures.selectedFeatures[0];
+
+        this.$store.commit(this.imageModule + 'setSelectionTargetedFeatures', value);
+
+        //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
+        if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
+          if(value.length>=1) value = [value[0]];
+        }
+        else {
+          if(value.length > 1){
+            //if previous selection is in the new target, we will take the first element not yet visited
+            if(value.map(x => x.id).includes(previousSelectedFeature.id)) {
+              var index = previousTarget.findIndex(x => x.id === previousSelectedFeature.id);
+              let visitedFeatures = previousTarget.slice(0, index + 1);
+              index = 0;
+              for(var i = 0; i < value.length; i++){
+                if(!visitedFeatures.map(x => x.id).includes(value[i].id)) {
+                  index = i;
+                  break;
+                }
+              }
+              value = [value[index]];
+            }
+            else {
+              value = [value[0]];
+            }
+          }
+        }
+
+        if(value.length>=1 && value[0].properties !== null) {
+          let annot = value[0].properties.annot;
+          annot.recordAction();
+        }
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
@@ -88,12 +137,6 @@ export default {
       if(this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
-    }
-  },
-  methods: {
-    select({feature}) {
-      let annot = feature.get('annot');
-      annot.recordAction();
     }
   }
 };

@@ -3,7 +3,7 @@ project,Project,Projet
 projects,Projects,Projets
 storage,Storage,Stockage
 help,Help,Aide
-hotkeys,Hotkeys,Raccourcis
+shortcuts,Shortcuts,Raccourcis
 about-cytomine,About Cytomine,À propos de Cytomine
 account,Account,Compte
 logout,Logout,Se déconnecter
@@ -18,6 +18,7 @@ analyses,Analyses,Analyses
 configuration,Configuration,Configuration
 no-project,No project to display,Aucun projet à afficher
 no-image,No image to display,Aucune image à afficher
+no-image-recently-opened,No image recently opened,Aucune image consultée récemment
 statistics,Statistics,Statistiques
 user-annotations,Manual Annotations,Annotations manuelles
 analysis-annotations,Analysis Annotations,Annotations d'analyse
@@ -101,13 +102,14 @@ ontology,Ontology,Ontologie
 number-user-annotations,Number of user annotations,Nombre d'annotations manuelles
 number-analysis-annotations,Number of analysis annotations,Nombre d'annotations d'analyse
 number-reviewed-annotations,Number of reviewed annotations,Nombre d'annotations validées
-no-description,No description.,Pas de description.
+no-description,No description,Pas de description
 search-placeholder,Search,Recherche
 creator,Creator,Créateur
 managers,Managers,Responsables
 contributors,Contributors,Contributeurs
 online,Online,En ligne
 representatives,Representatives,Personnes de contact
+representative,Representative,Personne de contact
 manager,Manager,Responsable
 role,Role,Rôle
 contributor,Contributor,Contributeur
@@ -151,6 +153,7 @@ all-resolutions,All,Toutes
 all-dates,All,Toutes
 my-role,My role,Mon rôle
 legend,Legend,Légende
+contributor-icon-label,You are a contributor of this project,Vous êtes un contributeur du projet
 manager-icon-label,You are a manager of this project,Vous êtes un responsable du projet
 representative-icon-label,You are a representative of this project,Vous êtes une personne de contact du projet
 and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres
@@ -174,21 +177,22 @@ properties,Properties,Propriétés
 no-properties,No property,Aucune propriété
 tags,Tags,Tags
 no-tag,No tag,Aucun tag
-new-tag,New tag,Nouveau tag
+button-new-tag,New tag,Nouveau tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
 associate-tags,Associate tags,Associer des tags
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés
 notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés
-search-tag,Search tag...,Rechercher un tag...
-how-to-add-not-yet-existing-tag,"To add a not existing tag, type the name and press Enter","Pour ajouter un tag non existant, entrer son nom et appuyer sur la touche Enter"
+search-or-create-tag,Search tag (or create a new one by typing its name and pressing Enter)...,Rechercher un tag (ou créer un nouveau en entrant son nom suivi de la touche Enter)...
 delete-tag,Delete tag,Supprimer le tag
 delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues
-notif-success-tag-rename,Tag {tagName} was successfully renamed,Le tag {tagName} a bien été renommé
-notif-error-tag-rename,Failed to rename tag {tagName},Une erreur a empêché de renommer le tag {tagName}
+notif-success-tag-update,Tag was successfully updated,Le tag a bien été modifié
+notif-error-tag-update,Failed to update tag,Une erreur a empêché de modifier le tag
 notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé
 notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName}
+create-tag,Create tag,Créer un tag
+update-tag,Update tag,Modifier un tag
 area,Area,Aire
 perimeter,Perimeter,Périmètre
 button-view-in-image,View in image,Voir dans l'image
@@ -330,6 +334,7 @@ default-property,Default property,Propriété par défaut
 no-default-property,No default property,Pas de propriété par défaut
 images_downloadable_by_contributor,"Images downloadable by contributor","Images téléchargeables par les contributeurs"
 images_downloadable_by_contributor-explanation,"If this is enabled, contributors will be able to download the images of this project","Avec cette option, les contributeurs pourront télécharger les images de ce projet"
+download-permission,"Download permission","Permission de téléchargement"
 notif-error-general-config-update,Error during update of configuration,Une erreur a empêché de mettre à jour la configuration
 layer,Layer,Calque
 hide-by-default,Hide layer by default,Caché par défaut
@@ -389,7 +394,7 @@ use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
 select-ontology,Select ontology,Choisir l'ontologie
 type,Type,Type
 attached-files,Attached files,Fichiers joints
-no-attached-file,No attached file.,Aucun fichier joint.
+no-attached-file,No attached file,Aucun fichier joint
 add-attached-file,Add an attached file,Ajouter un fichier joint
 choose-file-or-drop,Click and choose a file or drop it here,Cliquez ici ou glissez-déposez le fichier de votre choix
 click-or-drop-new-file,Click or drop new file to replace current one,Cliquez ici our glissez-déposez un nouveau fichier pour remplacer le fichier actuel
@@ -468,25 +473,25 @@ slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename}
 file-tree,File tree,Arborescence de fichiers
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?
 view,View,Visualisation d'images
-hotkey-move-up,Move up,Déplacer vers le haut
-hotkey-move-down,Move down,Déplacer vers le bas
-hotkey-move-left,Move left,Déplacer vers la gauche
-hotkey-move-right,Move right,Déplacer vers la droite
-hotkey-zoom-in,Zoom in,Zoomer
-hotkey-zoom-out,Zoom out,Dézoomer
-hotkey-next-image,Next image,Image suivante
-hotkey-previous-image,Previous image,Image précédente
+shortcut-viewer-nav-move-up,Move up,Déplacer vers le haut
+shortcut-viewer-nav-move-down,Move down,Déplacer vers le bas
+shortcut-viewer-nav-move-left,Move left,Déplacer vers la gauche
+shortcut-viewer-nav-move-right,Move right,Déplacer vers la droite
+shortcut-viewer-nav-zoom-in,Zoom in,Zoomer
+shortcut-viewer-nav-zoom-out,Zoom out,Dézoomer
+shortcut-viewer-nav-next-image,Go to next image,Aller à l'image suivante
+shortcut-viewer-nav-previous-image,Go to previous image,Aller à l'image précédente
 draw,Draw,Outils d'annotations
-hotkey-select,Select,Sélectionner
-hotkey-point,Point,Point
-hotkey-freehand,Freehand polygon,Polygone à main levée
-hotkey-delete,Delete,Supprimer
-hotkey-undo,Undo,Annuler
-hotkey-redo,Redo,Refaire
+shortcut-viewer-tool-select,Select annotation,Sélectionner une annotation
+shortcut-viewer-tool-point,Draw a point,Dessiner un point
+shortcut-viewer-tool-freehand-polygon,Draw a freehand polygon,Dessiner un polygone à main levée
+shortcut-viewer-tool-delete,Delete selected annotation,Supprimer l'annotation sélectionnée
+shortcut-viewer-tool-undo,Undo annotation action,Annuler une action sur les annotations
+shortcut-viewer-tool-redo,Redo annotation action,Refaire une action sur les annotations
 review,Review,Validation
-hotkey-accept-annotation,Accept annotation,Valider l'annotation
-hotkey-reject-annotation,Reject annotation,Rejeter l'annotation
-hotkey-toggle-review,Toggle review layer,Afficher/masquer le calque de validation
+shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Valider l'annotation sélectionnée en mode validation
+shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation
+shortcut-viewer-tool-review-toggle,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation
 version,Version,Version
 sponsors,Sponsors,Sponsors
 website,Website,Site web
@@ -565,6 +570,7 @@ failed,Failed,Échoué
 indeterminate,Indeterminate,Inconnu
 wait,Wait,En attente
 previewed,Previewed,Prévisualisé
+killed,Killed,Arrêté
 no-analysis-run,No analysis run,Aucune analyse lancée
 launcher,Launcher,Créateur
 status-comment,Status comment,Commentaire
@@ -656,6 +662,7 @@ ongoing,Ongoing,En cours
 last-connections,Last connections,Dernières connexions
 last-day,Last day,Dernier jour
 last-week,Last week,Dernière semaine
+last-month,Last month,Dernier mois
 last-year,Last year,Dernière année
 period,Period,Période
 by,By,Par
@@ -805,3 +812,123 @@ successful-registration,Your account was successfully created. Check your inbox 
 back-to-login,Back to login form,Retour au formulaire d'authentification
 filter,Filter,Filtre
 original-no-filter,Original (no filter),Pas de filtre
+by-term,By term,Par terme
+annotations-list,Annotation list, Liste des annotations
+shortcut-viewer-nav-next-t,Go to next frame,Aller à la frame suivante
+shortcut-viewer-nav-previous-t,Go to previous frame,Aller à la frame précédente
+shortcut-viewer-nav-first-t,Go to first frame,Aller à la première frame
+shortcut-viewer-nav-last-t,Go to last frame,Aller à la dernière frame
+shortcut-viewer-nav-next-c,Go to next channel,Aller au canal suivant
+shortcut-viewer-nav-previous-c,Go to previous channel,Aller au canal précédent
+shortcut-viewer-nav-first-c,Go to first channel,Aller au premier canal
+shortcut-viewer-nav-last-c,Go to last channel,Aller au dernier canal
+shortcut-viewer-nav-next-z,Go to next slice,Aller à la tranche suivante
+shortcut-viewer-nav-previous-z,Go to previous slice,Aller à la tranche précédente
+shortcut-viewer-nav-first-z,Go to first slice,Aller à la première tranche
+shortcut-viewer-nav-last-z,Go to last slice,Aller à la dernière tranche
+shortcut-viewer-nav-next-slice,Go to next plane,Aller au plan suivant
+shortcut-viewer-nav-previous-slice,Go to previous plane,Aller au plan précédent
+shortcut-viewer-nav-first-slice,Go to first plane,Aller au premier plan
+shortcut-viewer-nav-last-slice,Go to last plane,Aller au dernier plan
+shortcut-viewer-nav-drag-rotate,Rotate image,Faire tourner l'image
+shortcut-viewer-nav-drag-zoom,Zoom in area,Zoomer dans une région
+shortcut-viewer-tool-line,Draw a line,Dessiner une ligne
+shortcut-viewer-tool-freehand-line,Draw a freehand line,Dessiner une ligne à main levée
+shortcut-viewer-tool-rectangle,Draw a rectangle,Dessiner un rectangle
+shortcut-viewer-tool-circle,Draw a circle,Dessiner un cercle
+shortcut-viewer-tool-polygon,Draw a polygon,Dessiner un polygone
+shortcut-viewer-tool-fill,Fill annotation,Remplir l'annotation
+shortcut-viewer-tool-correct-add,Correct annotation by adding a freehand area,Corriger l'annotation en lui ajoutant un polygone à main levée
+shortcut-viewer-tool-correct-remove,Correct annotation by removing a freehand area,Corriger l'annotation en lui soustrayant un polygone à main levée
+shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation
+shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification
+shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
+shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation
+shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information
+shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom
+shortcut-viewer-toggle-link,Toggle image synchronization panel,Afficher/Masquer le panneau de synchronisation des images
+shortcut-viewer-toggle-filters,Toggle image color panel,Afficher/Masquer le panneau de colorisation de l'image
+shortcut-viewer-toggle-layers,Toggle layers panel,Afficher/Masquer le panneau des calques
+shortcut-viewer-toggle-ontology,Toggle terms panel,Afficher/Masquer le panneau des termes
+shortcut-viewer-toggle-properties,Toggle properties panel,Afficher/Masquer le panneau des propriétés
+shortcut-viewer-toggle-broadcast,Toggle broadcast panel,Afficher/Masquer le panneau de diffusion et suivi
+shortcut-viewer-toggle-review,Toggle review panel,Afficher/Masquer le panneau de validation
+shortcut-viewer-toggle-overview,Toggle overview,Afficher/Masquer l'aperçu
+shortcut-viewer-toggle-annotations,Toggle annotations panel,Afficher/Masquer le panneau des annotations
+shortcut-viewer-toggle-current,Toggle currently selected annotation panel,Afficher/Masquer les détails de l'annotation sélectionnée
+shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images
+shortcut-general-close-modal,Close a modal,Fermer une fenêtre
+shortcut-text-editor-bold,Format text in bold,Mettre le texte en gras
+shortcut-text-editor-italic,Format text in italic,Mettre le texte en italique
+shortcut-text-editor-underline,Format text underlined,Souligner le texte
+shortcut-text-editor,Text editor,Editeur de texte
+shortcut-viewer-toggle,Viewer: Display,Visualisateur : Affichage
+shortcut-viewer-tool,Viewer: Tools, Visualisateur : Outils
+shortcut-viewer-nav,Viewer: Navigation,Visualisateur : Naviguation
+shortcut-general,General,Général
+shortcut,Keyboard shortcut,Raccourci clavier
+new-algorithm,New algorithm,Nouvel algorithme
+nb-jobs,Number of jobs,Nombre d'exécutions
+nb-success-jobs,Number of successful jobs,Nombre d'exécutions réussies
+only-last-release,Only last releases,Seulement les dernières versions
+only-UI-runnable,Only runnable algorithms,Seulement les algorithmes exécutables
+yes,Yes,Oui
+no,No,Non
+creation-date,Creation date,Date de création
+no-software,No algorithm,Pas d'algorithme
+notif-success-algorithm-deletion,Algorithm correctly deleted,L'algorithme a été supprimé
+notif-error-algortihm-deletion,Error during algorithm deletion,Erreur durant la suppression de l'algoritme
+github,Github,Github
+dockerhub,DockerHub,DockerHub
+no-info,No information,Pas d'information
+deprecated,Deprecated,Déprécié
+last-release,Last release,Dernière version
+ui-runnable,Runnable,Exécutable
+number-jobs,Jobs,Exécutions
+number-success,Successful jobs,Exécutions réussies
+software-parameters,Algorithm parameters,Paramètres de l'algorithme
+default-value,Default value,Valeur par défaut
+mandatory,Mandatory,Obligatoire
+domain,Cytomine domain,Domaine Cytomine
+listdomain,List of Cytomine domains,Liste de domaines Cytomine
+list,List,Liste
+number,Number,Nombre
+string,String,Chaîne de caractères
+boolean,Boolean,Booléen
+value-key,Value key,Valeur de la clé
+command-line-flag,Command line flag,Argument de la ligne de commande
+other-information,Other information,Autres informations
+execute-command,Execute command,Commande d'exécution
+pulling-command,Pulling command,Commande de récupération
+trusted-source,Trusted source,Source de confiance
+see-source-code-on,See source code on,Voir le code source sur
+see-environment-on,See environment on,Voir l'environnement sur
+button-kill,Kill,Arrêter
+notif-success-analysis-kill,Analysis was successfully killed,L'analyse a bien été arrêtée
+notif-error-analysis-kill,Failed to kill analysis,Une erreur a empêché l'arrêt de l'analyse
+execution-log,Execution log,Log d'exécution
+log-being-collected,Execution log is being collected,Le log d'exécution est en train d'être collecté
+trusted-sources,Trusted sources,Sources de confiance
+button-refresh,Refresh,Rafraîchir
+button-new-trusted-source,New trusted source,Nouvelle source de confiance
+source-provider,Source code provider,Fournisseur du code source
+source-provider-name,Source code provider username,Nom d'utilisateur du fournisseur de code source
+environment-provider,Environment provider,Fournisseur de l'environnement d'exécution
+environment-provider-name,Environment provider username,Nom d'utilisateur du fournisseur de l'environnement d'exécution
+prefix,Prefix,Préfixe
+create-source,Create trusted source,Créer une source de confiance
+update-source,Update trusted source,Modifier une source de confiance
+notif-success-source-creation,Trusted source successfully created,La source de confiance a bien été créée
+notif-error-source-creation,Failed to create the trusted source,Une erreur a empêché la création de la source de confiance
+notif-success-source-update,Trusted source successfully updated,La source de confiance a bien été modifiée
+notif-error-source-update,Failed to update the trusted source,Une erreur a empêché la modification de la source de confiance
+notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée
+notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance
+version,Version,Version
+fav,Fav.,Fav.
+favorite,Favorite,Favori
+no-selected-layers,No selected layers,Pas de couche sélectionnée
+hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
+no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche
+no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche
+no-trusted-source,No trusted source,Pas de source de confiance

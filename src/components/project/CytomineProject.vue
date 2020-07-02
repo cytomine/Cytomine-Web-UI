@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -83,10 +83,27 @@ export default {
           this.notFoundError = true;
         }
       }
+    },
+    deleteAnnotationEventHandler(annot) {
+      let updatedProject = this.$store.state.currentProject.project.clone();
+      if(annot.type === 'UserAnnotation') {
+        updatedProject.numberOfAnnotations--;
+      }
+      else {
+        updatedProject.numberOfReviewedAnnotations--;
+      }
+
+      this.$store.dispatch('currentProject/updateProject', updatedProject);
     }
   },
   async created() {
     await this.loadProject();
+  },
+  mounted() {
+    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
   }
 };
 </script>

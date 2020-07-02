@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2020. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import {annotBelongsToLayer} from '@/utils/annotation-utils';
 export default {
   state() {
     return {
+      selectionTargetedFeatures: [], // when we select a feature by clicking on a location, we can have multiple feature at this location.
       selectedFeatures: [],
       annotsToSelect: [],
       showComments: null, // set to the identifier of an annotation to automatically open comments modal if this annotation if the first to be selected
@@ -29,6 +30,10 @@ export default {
   },
 
   mutations: {
+    setSelectionTargetedFeatures(state, targetedFeatures) {
+      state.selectionTargetedFeatures = targetedFeatures;
+    },
+
     setSelectedFeatures(state, selectedFeatures) {
       state.selectedFeatures = selectedFeatures;
     },

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@
               </button>
             </template>
             <ul>
-              <li v-for="project in projects" :key="project.id">
+              <li v-for="project in managedProjects" :key="project.id">
                 <router-link :to="`/project/${project.id}`">
                   {{ project.name }}
                 </router-link>
