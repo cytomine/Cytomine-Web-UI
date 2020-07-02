@@ -72,7 +72,7 @@ export default {
       communicationError: false,
       loading: true,
       timeout: null,
-      SSOEnabled: constants.SSO_ENABLED
+      SSOEnabled: null
     };
   },
   computed: {
@@ -102,7 +102,7 @@ export default {
         if(!this.currentUser && authenticated) {
           await this.fetchUser();
         }
-        if(!this.currentUser && this.SSO_ENABLED) {
+        if(!this.currentUser && this.SSOEnabled) {
           let redirect = encodeURIComponent(window.location.href);
           window.location = constants.SSO_LOGIN+'?cytomine_redirect='+redirect;
         }
@@ -135,6 +135,7 @@ export default {
       }
     }
     Object.freeze(constants);
+    this.SSOEnabled = constants.SSO_ENABLED;
 
     new Cytomine(constants.CYTOMINE_CORE_HOST);
 
