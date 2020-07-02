@@ -15,6 +15,7 @@
 */
 
 export default {
+  SSO_ENABLED: false,
   SSO_LOGIN: '/login/Shibboleth', // or '/saml/login'
   CYTOMINE_CORE_HOST: 'http://localhost-core',
   CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',

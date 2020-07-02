@@ -35,7 +35,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <!--<login v-else-if="!currentUser" />-->
+    <login v-else-if="(!currentUser) && (!SSOEnabled)" />
 
     <template v-else>
       <cytomine-navbar />
@@ -71,7 +71,8 @@ export default {
     return {
       communicationError: false,
       loading: true,
-      timeout: null
+      timeout: null,
+      SSOEnabled: constants.SSO_ENABLED
     };
   },
   computed: {
