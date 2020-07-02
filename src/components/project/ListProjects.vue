@@ -113,7 +113,7 @@
               </div>
             </div>
 
-            <div class="column filter">
+            <div v-show="algoEnabled" class="column filter">
               <div class="filter-label">
                 {{$t('analysis-annotations')}}
               </div>
@@ -130,6 +130,7 @@
                 <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
               </div>
             </div>
+            <div v-show="!algoEnabled" class="column"></div>
           </div>
         </div>
       </b-collapse>
@@ -173,7 +174,7 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+          <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/annotations?type=algo`">
               {{ project.numberOfJobAnnotations }}
             </router-link>
@@ -230,6 +231,7 @@
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
+import constants from '@/utils/constants.js';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 
@@ -271,6 +273,8 @@ export default {
         'numberOfReviewedAnnotations',
         'lastActivity'
       ],
+
+      algoEnabled: constants.ALGORITHMS_ENABLED,
 
       maxNbMembers: 10,
       maxNbImages: 10,

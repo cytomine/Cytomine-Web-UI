@@ -40,7 +40,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item">
+      <router-link v-show="algoEnabled" to="/software" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
@@ -109,6 +109,7 @@ import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
 import {Cytomine} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
@@ -123,6 +124,7 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: false,
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       aboutModal: false
     };
   },

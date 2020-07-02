@@ -244,6 +244,7 @@
 </template>
 
 <script>
+import constants from '@/utils/constants.js';
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -272,6 +273,8 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
+
       loading: true,
       error: false,
       revision: 0,
@@ -477,7 +480,8 @@ export default {
     }
   },
   async created() {
-    this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
+    this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
+    if(this.algoEnabled) this.annotationTypes.splice(1, 0, this.jobAnnotationOption);
 
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {

@@ -19,6 +19,8 @@ export default {
   CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
+  // features switches
+  ALGORITHMS_ENABLED: true,
   // Refresh intervals (expressed in milliseconds)
   VIEWER_ANNOTATIONS_REFRESH_INTERVAL: 10000,
   MEMBERS_ACTIVITY_REFRESH_INTERVAL: 30000,

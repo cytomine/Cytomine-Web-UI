@@ -107,7 +107,7 @@
               </div>
             </div>
 
-            <div class="column">
+            <div v-if="algoEnabled" class="column">
               <div class="filter-label">
                 {{$t('width')}}
               </div>
@@ -116,7 +116,7 @@
               </div>
             </div>
 
-            <div class="column">
+            <div v-if="algoEnabled" class="column">
               <div class="filter-label">
                 {{$t('height')}}
               </div>
@@ -127,6 +127,24 @@
           </div>
 
           <div class="columns">
+            <div v-if="!algoEnabled" class="column">
+              <div class="filter-label">
+                {{$t('width')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
+              </div>
+            </div>
+
+            <div v-if="!algoEnabled" class="column">
+              <div class="filter-label">
+                {{$t('height')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
+              </div>
+            </div>
+
             <div class="column filter">
               <div class="filter-label">
                 {{$t('user-annotations')}}
@@ -136,7 +154,7 @@
               </div>
             </div>
 
-            <div class="column filter">
+            <div v-if="algoEnabled" class="column filter">
               <div class="filter-label">
                 {{$t('analysis-annotations')}}
               </div>
@@ -154,7 +172,7 @@
               </div>
             </div>
 
-            <div class="column filter"></div>
+            <div v-if="algoEnabled" class="column filter"></div>
           </div>
         </div>
       </b-collapse>
@@ -196,7 +214,7 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+          <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
             <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
               {{ image.numberOfJobAnnotations }}
             </router-link>
@@ -248,6 +266,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
+import constants from '@/utils/constants.js';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
@@ -270,6 +289,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
       images: [],

@@ -104,7 +104,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=algo`">
                 {{ project.numberOfJobAnnotations }}
               </router-link>
@@ -204,7 +204,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
               <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                 {{ image.numberOfJobAnnotations }}
               </router-link>
@@ -246,6 +246,7 @@
 
 <script>
 import _ from 'lodash';
+import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineTable from '@/components/utils/CytomineTable';
@@ -286,6 +287,7 @@ export default {
       openedDetails: [],
       revision: 0,
 
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       excludedProperties: [
         'name',
         'imagesPreview',
@@ -366,6 +368,7 @@ export default {
       console.log(error);
       this.error = true;
     }
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
 
     this.loading = false;
   }
