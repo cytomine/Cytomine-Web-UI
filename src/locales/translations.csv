@@ -1035,3 +1035,7 @@ average,Average,Moyenne
 profile-projection,Profile projection,Projection du profil
 button-retry,Retry,Réessayer
 step,Step,Saut
+fluorescence-spectra,Fluorescence spectra,Spectre de fluorescence
+depth-spectra,Depth spectra,Spectre de profondeur
+temporal-spectra,Temporal spectra,Spectre temporel
+spatial-projection,Spatial projection,Projection spatiale

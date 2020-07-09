@@ -6,6 +6,10 @@ export default {
   extends: Line,
   props: {
     annotation: Object,
+    data: Array,
+    spatialAxis: Boolean,
+    dimension: String,
+    slices: Array
   },
   data() {
     return {
@@ -16,6 +20,29 @@ export default {
     queryParams() {
       return {};
     },
+    sortedData() {
+      if (this.spatialAxis) {
+        return this.data;
+      }
+      return this.data.sort((a, b) => {
+        if (a.x === b.x) return a.y - b.y;
+        return a.x - b.x;
+      });
+    },
+    labels() {
+      if (this.spatialAxis && this.dimension === 'channels') {
+        return this.sortedData.map(item => this.channelName(item.channel));
+      }
+      else if (this.spatialAxis && this.dimension === 'depth') {
+        return this.sortedData.map(item => item.zStack);
+      }
+      else if (this.spatialAxis && this.dimension === 'duration') {
+        return this.sortedData.map(item => item.time);
+      }
+      else {
+        return this.sortedData.map(item => `(${item.x}, ${item.y})`);
+      }
+    }
   },
   watch: {
     async queryParams() {
@@ -28,13 +55,10 @@ export default {
     },
     async doRenderChart() {
       try {
-        let data = (await this.annotation.fetchProfileProjections())['collection'].sort((a, b) => {
-          if (a.point[0] === b.point[0]) return a.point[1] - b.point[1];
-          return a.point[0] - b.point[0];
-        });
+        let data = this.sortedData;
 
         this.renderChart({
-          labels: data.map(item => `(${item.point[0]}, ${item.point[1]})`),
+          labels: this.labels,
           datasets: [
             {
               data: data.map(item => item.average),
@@ -81,7 +105,19 @@ export default {
         console.log(error);
         this.$emit('error', true);
       }
-    }
+    },
+    channelName(value) {
+      if (!this.slices || this.slices.length === 0) {
+        return value;
+      }
+
+      let slice = this.slices.find(slice => slice.channel === value);
+      if (!slice) {
+        return value;
+      }
+
+      return slice.channelName;
+    },
   },
   async mounted () {
     this.addPlugin(ChartZoom);

@@ -41,7 +41,14 @@
             <strong v-if="isPoint">{{$t('profile')}}</strong>
             <strong v-else>{{$t('profile-projection')}}</strong>
           </td>
-          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
+          <td><button class="button is-small" @click="openRegularProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
+
+        <tr v-if="profile && !isPoint">
+          <td>
+            <strong>{{spatialProjection}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openSpatialProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
       </template>
 
@@ -345,6 +352,18 @@ export default {
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
+    },
+    spatialProjection() {
+      if (this.image.channels > 1) {
+        return this.$t('fluorescence-spectra');
+      }
+      else if (this.image.depth > 1) {
+        return this.$t('depth-spectra');
+      }
+      else if (this.image.duration > 1) {
+        return this.$t('temporal-spectra');
+      }
+      return  this.$t('spatial-projection');
     }
   },
   methods: {
@@ -456,11 +475,19 @@ export default {
       this.comments.unshift(comment);
     },
 
-    openProfileModal() {
+    openSpatialProfileModal() {
+      this.openProfileModal(true);
+    },
+
+    openRegularProfileModal() {
+      this.openProfileModal(false);
+    },
+
+    openProfileModal(spatialAxis) {
       this.$modal.open({
         parent: this,
         component: ProfileModal,
-        props: {annotation: this.annotation, image: this.image},
+        props: {annotation: this.annotation, image: this.image, spatialAxis},
         hasModalCard: true
       });
     },

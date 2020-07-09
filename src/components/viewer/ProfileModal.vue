@@ -42,7 +42,7 @@
               ref="chart"
           />
         </div>
-        <annotation-profile-projection-table v-else :annotation="annotation" />
+        <annotation-profile-projection-table v-else :annotation="annotation" :spatial-axis="spatialAxis" :image="image" />
       </template>
     </template>
   </cytomine-modal-card>
@@ -62,7 +62,8 @@ export default {
   },
   props: {
     annotation: Object,
-    image: {type: Object, default: null}
+    image: {type: Object, default: null},
+    spatialAxis: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -89,7 +90,19 @@ export default {
       return this.annotation.location && this.annotation.location.includes('POINT');
     },
     title() {
-      return (this.isPoint) ? this.$t('profile') : this.$t('profile-projection');
+      if (this.isPoint) {
+        return this.$t('profile');
+      }
+      else if (this.spatialAxis && this.image.channels > 1) {
+        return this.$t('fluorescence-spectra');
+      }
+      else if (this.spatialAxis && this.image.depth > 1) {
+        return this.$t('depth-spectra');
+      }
+      else if (this.spatialAxis && this.image.duration > 1) {
+        return this.$t('temporal-spectra');
+      }
+      return this.$t('profile-projection');
     }
   },
   methods: {
