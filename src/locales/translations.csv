@@ -348,6 +348,8 @@ button-details,Details,Détails
 button-view-activity,View activity,Voir l'activité
 source,Source,Source
 ldap,LDAP,LDAP
+LTI,LTI,LTI
+Shibboleth,Shibboleth,Shibboleth
 manual,Manual,Manuelle
 last-image,Last image,Dernière image
 last-connection,Last connection,Dernière connexion
