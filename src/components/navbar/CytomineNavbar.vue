@@ -125,6 +125,8 @@ export default {
       openedTopMenu: false,
       hotkeysModal: false,
       algoEnabled: constants.ALGORITHMS_ENABLED,
+      postLogoutURL: constants.LOGOUT_REDIRECTION,
+      SSOEnabled: constants.SSO_ENABLED,
       aboutModal: false
     };
   },
@@ -196,7 +198,8 @@ export default {
         await Cytomine.instance.logout();
         this.$store.dispatch('logout');
         this.changeLanguage();
-        this.$router.push('/');
+        if(this.SSOEnabled) window.location = this.postLogoutURL;
+        else this.$router.push(this.postLogoutURL);
       }
       catch(error) {
         console.log(error);
