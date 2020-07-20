@@ -130,6 +130,7 @@ button-add-image,Add image,Ajouter une image
 actions,Actions,Actions
 button-rename,Rename,Renommer
 button-properties,Properties,Propriétés
+button-clone,Clone,Dupliquer
 button-download,Download,Télécharger
 button-delete,Delete,Supprimer
 recently-opened,Recently opened,Consultés récemment
@@ -291,6 +292,12 @@ rename-image,Rename the image,Renommer l'image
 enter-new-name-of-image,Enter the new name to use for this image,Nouveau nom de l'image
 notif-success-image-rename,Image {imageName} was successfully renamed,L'image {imageName} a été renommée avec succès
 notif-error-image-rename,Failed to rename image {imageName},Une erreur a empêché de renommer l'image {imageName}
+clone-image,Clone the image,Dupliquer l'image
+clone-metadata,Clone the associated data,Dupliquer les données associées
+clone-annotations,Clone the annotations,Dupliquer les annotations
+clone-annotations-metadata,Clone the annotations associated data,Dupliquer les données associées aux annotations
+notif-success-image-clone,Image {imageName} was successfully cloned,L'image {imageName} a été dupliquée avec succès
+notif-error-image-clone,Failed to clone image {imageName},Une erreur a empêché de dupliquer l'image {imageName}
 colors,Colors,Couleurs
 button-lock,Lock,Verrouiller
 button-set-calibration,Set calibration,Calibrer
@@ -391,6 +398,7 @@ create-project,Create project,Créer un projet
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé
 notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet
+select-project,Select project,Choisir le projet
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
 select-ontology,Select ontology,Choisir l'ontologie
 type,Type,Type
