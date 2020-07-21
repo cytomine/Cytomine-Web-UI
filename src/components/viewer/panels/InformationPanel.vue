@@ -49,7 +49,7 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
-            <button class="button is-small" @click="screenshot()">
+            <button class="button is-small" @click="overview()">
               {{$t('button-get-overview')}}
             </button>
           </div>
@@ -135,7 +135,7 @@ export default {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
     },
-    async screenshot() {
+    async overview() {
       window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/camera.json?maxSize=1000', '_blank');
     },
     async previousImage() {
