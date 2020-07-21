@@ -49,6 +49,9 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
+            <button class="button is-small" @click="screenshot()">
+              {{$t('button-get-overview')}}
+            </button>
           </div>
         </td>
       </tr>
@@ -78,6 +81,7 @@
 <script>
 import ImageName from '@/components/image/ImageName';
 import CalibrationModal from '@/components/image/CalibrationModal';
+import {Cytomine} from 'cytomine-client';
 
 export default {
   name: 'information-panel',
@@ -130,6 +134,9 @@ export default {
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+    },
+    async screenshot() {
+      window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/camera.json?maxSize=1000', '_blank');
     },
     async previousImage() {
       try {
