@@ -48,7 +48,7 @@
         </b-checkbox>
       </div>
       <div class="column is-half">
-        <b-checkbox v-model="cloneAnnotMetadata">
+        <b-checkbox v-model="cloneAnnotMetadata" :disabled="!cloneAnnot">
           {{$t('clone-annotations-metadata')}}
         </b-checkbox>
       </div>
