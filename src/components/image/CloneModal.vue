@@ -81,8 +81,8 @@ export default {
   data() {
     return {
       cloneMetadata:true,
-      cloneAnnot:true,
-      cloneAnnotMetadata:true,
+      cloneAnnot:false,
+      cloneAnnotMetadata:false,
       selectedProject : null,
       projects: null
     };
