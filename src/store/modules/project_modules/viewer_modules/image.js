@@ -159,15 +159,15 @@ export default {
       let propValue = state.properties.selectedPropertyValues[annot.id];
       if (propValue) {
         let color = state.properties.selectedPropertyColor;
-        let fontSize = '34px';
+        let fontSize = constants.PROPERTY_FONTSIZE+22+'px';
         if(state.view.zoom <= 3) {
-          fontSize = '12px';
+          fontSize = constants.PROPERTY_FONTSIZE+'px';
         }
         else if(state.view.zoom <= 6) {
-          fontSize = '19px';
+          fontSize = constants.PROPERTY_FONTSIZE+7+'px';
         }
         else if(state.view.zoom <= 8) {
-          fontSize = '26px';
+          fontSize = constants.PROPERTY_FONTSIZE+14+'px';
         }
         styles.push(createTextStyle(propValue, fontSize, color.fill, null));
       }
