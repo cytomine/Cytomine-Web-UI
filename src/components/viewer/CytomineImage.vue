@@ -169,7 +169,7 @@
       </button>
     </div>
 
-    <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+    <scale-line :magnification.sync="currentMagnification" :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
     <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
 
@@ -257,6 +257,7 @@ export default {
       minZoom: 0,
 
       projectedMousePosition: [0, 0],
+      currentMagnification : 0,
 
       baseSource: null,
       routedAnnotation: null,
@@ -438,7 +439,7 @@ export default {
       let w = Math.min(extent[2],this.image.width)-x;
       let h = this.image.height - Math.min(extent[1],this.image.height)-y;
       let drawScaleBar = (this.image.magnification || this.image.resolution) ? true : false;
-      window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/window-'+x+'-'+y+'-'+w+'-'+h+'.json?maxSize=1000&drawScaleBar='+drawScaleBar, '_blank');
+      window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/window-'+x+'-'+y+'-'+w+'-'+h+'.json?maxSize=1000&magnification='+this.currentMagnification+'&rotation='+this.rotation+'&drawScaleBar='+drawScaleBar, '_blank');
     },
     setInitialZoom() {
       if(this.zoom !== null) {
