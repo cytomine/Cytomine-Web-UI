@@ -183,9 +183,9 @@
             {{ filesize(uFile.size) }}
           </b-table-column>
 
-          <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">
-            {{ filesize(uFile.globalSize) }}
-          </b-table-column>
+<!--          <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">-->
+<!--            {{ filesize(uFile.globalSize) }}-->
+<!--          </b-table-column>-->
 
           <b-table-column field="status" :label="$t('status')" sortable width="80">
             <uploaded-file-status :file="uFile" />
@@ -403,7 +403,7 @@ export default {
       });
     },
     filesize(size) {
-      return filesize(size, {base: 10});
+      return (size) ? filesize(size, {base: 10}) : null;
     },
 
     startUpload(fileWrapper) {
