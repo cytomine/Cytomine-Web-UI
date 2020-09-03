@@ -5,5 +5,53 @@
   "VIEWER_ANNOTATIONS_REFRESH_INTERVAL": 10000,
   "MEMBERS_ACTIVITY_REFRESH_INTERVAL": 30000,
   "STORAGE_REFRESH_INTERVAL": 10000,
-  "ONGOING_UPLOAD_REFRESH_INTERVAL": 500
+  "ONGOING_UPLOAD_REFRESH_INTERVAL": 500,
+  "PRELOADED_SLICES": 50,
+  "ANNOTATIONS_MAX_ITEMS_PER_CATEGORY": 50,
+
+  "CYTOMINE_FLAVOR": "ULiege",
+  "CYTOMINE_VERSION": "?",
+
+  "CORE_NAMESPACE": "cytomineuliege",
+  "CORE_VERSION": "?",
+  "IMS_NAMESPACE": "cytomineuliege",
+  "IMS_VERSION": "?",
+  "WEB_UI_NAMESPACE": "cytomineuliege",
+  "WEB_UI_VERSION": "?",
+  "NGINX_NAMESPACE": "cytomineuliege",
+  "NGINX_VERSION": "?",
+  "MEMCACHED_NAMESPACE": "cytomineuliege",
+  "MEMCACHED_VERSION": "?",
+  "POSTGRES_NAMESPACE": "cytomineuliege",
+  "POSTGRES_VERSION": "?",
+  "MONGODB_NAMESPACE": "cytomineuliege",
+  "MONGODB_VERSION": "?",
+  "BACKUP_NAMESPACE": "cytomineuliege",
+  "BACKUP_VERSION": "?",
+  "IIPCYTO_NAMESPACE": "cytomineuliege",
+  "IIPCYTO_VERSION": "?",
+
+  "IIPJP2_ENABLED": true,
+  "IIPJP2_NAMESPACE": "cytomineuliege",
+  "IIPJP2_VERSION": "?",
+
+  "BIOFORMAT_ENABLED": true,
+  "BIOFORMAT_NAMESPACE": "cytomineuliege",
+  "BIOFORMAT_VERSION": "?",
+
+  "SOFTWARE_ENABLED": true,
+  "SOFTWARE_ROUTER_NAMESPACE": "cytomineuliege",
+  "SOFTWARE_ROUTER_VERSION": "?",
+  "RABBITMQ_NAMESPACE": "cytomineuliege",
+  "RABBITMQ_VERSION": "?",
+  "SLURM_NAMESPACE": "cytomineuliege",
+  "SLURM_VERSION": "?",
+
+  "RETRIEVAL_ENABLED": false,
+  "RETRIEVAL_NAMESPACE": "cytomineuliege",
+  "RETRIEVAL_VERSION": "?",
+
+  "IRIS_ENABLED": false,
+  "IRIS_NAMESPACE": "cytomineuliege",
+  "IRIS_VERSION": "?"
 }
