@@ -47,6 +47,7 @@
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
+          :tile-size="tileSize"
         />
       </vl-layer-tile>
 
@@ -365,6 +366,9 @@ export default {
     },
     imageSize() {
       return [this.image.width, this.image.height];
+    },
+    tileSize() {
+      return this.image.tileSize;
     },
 
     baseLayerURLs() {
