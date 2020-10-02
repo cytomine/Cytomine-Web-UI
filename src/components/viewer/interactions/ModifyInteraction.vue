@@ -30,6 +30,13 @@
     @translateend="endEdit"
   />
 
+  <vl-interaction-rescale
+    v-if="activeEditTool === 'rescale'"
+    :source="selectSource"
+    @rescalestart="startEdit"
+    @rescaleend="endEdit"
+  />
+
   <vl-interaction-rotate
     v-if="activeEditTool === 'rotate'"
     :source="selectSource"

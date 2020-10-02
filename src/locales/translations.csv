@@ -72,6 +72,7 @@ display-annot-details,Display details of currently selected annotation,Afficher 
 fill,Fill,Remplir
 modify,Modify,Modifier
 move,Move,Déplacer
+resize,Resize,Redimensionner
 rotate,Rotate,Pivoter
 delete,Delete,Supprimer
 undo,Undo,Annuler
@@ -887,6 +888,7 @@ shortcut-viewer-tool-correct-remove,Correct annotation by removing a freehand ar
 shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation
 shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification
 shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
+shortcut-viewer-tool-rescale,Rescale annotation,Redimensionner l'annotation
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation
 shortcut-viewer-tool-copy,Copy annotation,Copier l'annotation
 shortcut-viewer-tool-paste,Paste annotation,Coller l'annotation

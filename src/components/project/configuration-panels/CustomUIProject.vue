@@ -137,6 +137,7 @@ export default {
             {key: 'project-tools-fill', label: 'fill', icon: 'fas fa-fill',},
             {key: 'project-tools-edit', label: 'modify', icon: 'fas fa-edit'},
             {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt'},
+            {key: 'project-tools-resize', label: 'rescale', icon: 'fas fa-expand'},
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt'},
 
