@@ -66,12 +66,14 @@ import RasterSource from './vuelayers-suppl/raster-source';
 import TranslateInteraction from './vuelayers-suppl/translate-interaction';
 import RotateInteraction from './vuelayers-suppl/rotate-interaction';
 import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
+import ModifyInteraction from './vuelayers-suppl/modify-interaction';
 Vue.use(VueLayers);
 Vue.use(ZoomifySource);
 Vue.use(RasterSource);
 Vue.use(TranslateInteraction);
 Vue.use(RotateInteraction);
 Vue.use(RescaleInteraction);
+Vue.use(ModifyInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
