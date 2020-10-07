@@ -87,8 +87,6 @@ const methods = {
       }
     }
 
-    console.log('coucou');
-
     return new ModifyInteraction({
       source: isVectorSource(source) ? source : undefined,
       features: isCollection(source) ? source : undefined,
