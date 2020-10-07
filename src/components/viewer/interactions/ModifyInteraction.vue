@@ -19,6 +19,7 @@
     :source="selectSource"
     ref="olModifyInteraction"
     :delete-condition="deleteCondition"
+    :insert-vertex-condition="insertVertexCondition"
     @modifystart="startEdit"
     @modifyend="endEdit"
   />
@@ -50,6 +51,7 @@
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
 import {altKeyOnly, singleClick} from 'ol/events/condition';
+import {isRectangle} from '@/utils/geometry-utils';
 
 export default {
   name: 'modify-interaction',
@@ -88,6 +90,13 @@ export default {
     deleteCondition() {
       return function(mapBrowserEvent) {
         return altKeyOnly(mapBrowserEvent) && singleClick(mapBrowserEvent);
+      };
+    },
+    insertVertexCondition() {
+      return function() {
+        return !this.features_.getArray().every(function(feature) {
+          return isRectangle(feature.getGeometry());
+        });
       };
     }
   },

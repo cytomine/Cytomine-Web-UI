@@ -3,6 +3,17 @@ import GeometryType from 'ol/geom/GeometryType';
 import {equals as coordinatesEqual, distance as coordinateDistance, closestOnSegment} from 'ol/coordinate';
 import {getUid} from 'ol/util';
 import {boundingExtent} from 'ol/extent';
+import {isRectangle} from '@/utils/geometry-utils';
+
+function getSegmentDataUid(segmentData) {
+  let uid = getUid(segmentData.feature);
+  const depth = segmentData.depth;
+  if (depth) {
+    uid += '-' + depth.join('-'); // separate feature components
+  }
+
+  return uid;
+}
 
 /**
  * @param {SegmentData} a The first segment data.
@@ -44,7 +55,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
       const segmentData = dragSegment[0];
       const depth = segmentData.depth;
       const geometry = segmentData.geometry;
-      let coordinates;
+      let coordinates, newVertex;
       const segment = segmentData.segment;
       const index = dragSegment[1];
 
@@ -74,8 +85,17 @@ export default class ModifyInteraction extends ModifyInteractionBase {
           break;
         case GeometryType.POLYGON:
           coordinates = geometry.getCoordinates();
-          coordinates[depth[0]][segmentData.index + index] = vertex;
-          segment[index] = vertex;
+          newVertex = vertex;
+          if (i === 2 || i === 3) {
+            newVertex = coordinates[depth[0]][segmentData.index + index];
+            newVertex[0] = vertex[0];
+          }
+          else if (i === 4 || i === 5) {
+            newVertex = coordinates[depth[0]][segmentData.index + index];
+            newVertex[1] = vertex[1];
+          }
+          coordinates[depth[0]][segmentData.index + index] = newVertex;
+          segment[index] = newVertex;
           break;
         case GeometryType.MULTI_POLYGON:
           coordinates = geometry.getCoordinates();
@@ -129,11 +149,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
       for (let i = 0, ii = segmentDataMatches.length; i < ii; ++i) {
         const segmentDataMatch = segmentDataMatches[i];
         const segment = segmentDataMatch.segment;
-        let uid = getUid(segmentDataMatch.feature);
-        const depth = segmentDataMatch.depth;
-        if (depth) {
-          uid += '-' + depth.join('-'); // separate feature components
-        }
+        let uid = getSegmentDataUid(segmentDataMatch);
         if (!componentSegments[uid]) {
           componentSegments[uid] = new Array(2);
         }
@@ -145,6 +161,45 @@ export default class ModifyInteraction extends ModifyInteractionBase {
             this.dragSegments_.push([segmentDataMatch, 0]);
             componentSegments[uid][0] = segmentDataMatch;
           }
+        }
+        else if (segmentDataMatch.geometry.getType() === GeometryType.POLYGON
+          && isRectangle(segmentDataMatch.geometry)) {
+          let cid = segmentDataMatch.feature.get('annot').id;
+          const segmentDataBbox = this.rBush_.getInExtent(segmentDataMatch.geometry.getExtent()).filter( sd => {
+            return sd.feature.get('annot').id === cid;
+          });
+
+          const otherVertices = segmentDataMatch.geometry.getCoordinates()[0]
+            .filter(coord => !coordinatesEqual(coord, vertex));
+
+          const predicates = [
+            (sd) => coordinatesEqual(sd.segment[0], vertex)
+              && !componentSegments[getSegmentDataUid(sd)][0],
+            (sd) => coordinatesEqual(sd.segment[1], vertex)
+              && !componentSegments[getSegmentDataUid(sd)][1],
+            (sd) => sd.segment[0][0] === vertex[0] && sd.segment[0][1] !== vertex[1]
+              && otherVertices.find(c => coordinatesEqual(c, sd.segment[0])),
+            (sd) => sd.segment[1][0] === vertex[0] && sd.segment[1][1] !== vertex[1]
+              && otherVertices.find(c => coordinatesEqual(c, sd.segment[1])),
+            (sd) => sd.segment[0][1] === vertex[1] && sd.segment[0][0] !== vertex[0]
+              && otherVertices.find(c => coordinatesEqual(c, sd.segment[0])),
+            (sd) => sd.segment[1][1] === vertex[1] && sd.segment[1][0] !== vertex[0]
+              && otherVertices.find(c => coordinatesEqual(c, sd.segment[1]))
+          ];
+
+          for (let j = 0, jj = predicates.length; j < jj; ++j) {
+            const sd = segmentDataBbox.find(predicates[j]);
+            if (!sd) {
+              break;
+            }
+            this.dragSegments_.push([sd, j % 2]);
+            let uid = getSegmentDataUid(sd);
+            if (!componentSegments[uid]) {
+              componentSegments[uid] = new Array(2);
+            }
+            componentSegments[uid][j % 2] = sd;
+          }
+          break;
         }
         else if (coordinatesEqual(segment[0], vertex) &&
           !componentSegments[uid][0]) {
