@@ -196,6 +196,11 @@
               {{$t('images')}}
             </div>
             <div class="filter-body">
+              <b-input
+                v-if="tooManyImages && selectedImages.length === 0"
+                :placeholder="$t('all-images')"
+                disabled
+              />
               <cytomine-multiselect
                 v-model="selectedImages"
                 :options="images"
@@ -203,6 +208,7 @@
                 track-by="id"
                 multiple
                 :allPlaceholder="$t('all-images')"
+                v-else
               />
             </div>
           </div>
@@ -291,7 +297,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -329,13 +335,6 @@ export default {
         {label: this.$t('huge'), size: 400},
       ],
 
-      allowedCategorizations: [
-        {label: this.$t('per-term'), categorization: 'TERM'},
-        {label: this.$t('per-track'), categorization: 'TRACK'},
-        {label: this.$t('per-user'), categorization: 'USER'},
-        {label: this.$t('per-image'), categorization: 'IMAGE'}
-      ],
-
       userAnnotationOption: this.$t('user-annotations'),
       jobAnnotationOption: this.$t('analysis-annotations'),
       reviewedAnnotationOption: this.$t('reviewed-annotations'),
@@ -354,6 +353,19 @@ export default {
     };
   },
   computed: {
+    allowedCategorizations() {
+      let categorizations = [
+        {label: this.$t('per-term'), categorization: 'TERM'},
+        {label: this.$t('per-track'), categorization: 'TRACK'},
+        {label: this.$t('per-user'), categorization: 'USER'},
+      ];
+
+      if (!this.tooManyImages) {
+        categorizations.push({label: this.$t('per-image'), categorization: 'IMAGE'});
+      }
+
+      return categorizations;
+    },
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     blindMode() {
@@ -536,7 +548,7 @@ export default {
       let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds,
-        images: this.selectedImagesIds,
+        images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
         users: this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
@@ -553,17 +565,22 @@ export default {
 
       return collection;
     },
+    tooManyImages() {
+      return this.project.numberOfImages > constants.MAX_IMAGES_FOR_FILTER;
+    }
   },
   methods: {
     viewAnnot(annot) {
       this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
     },
     async fetchImages() {
-      this.images = (await ImageInstanceCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id,
-        light: true
-      })).array;
+      if (!this.tooManyImages) {
+        this.images = (await ImageInstanceCollection.fetchAll({
+          filterKey: 'project',
+          filterValue: this.project.id,
+          light: true
+        })).array;
+      }
     },
     async fetchUsers() {
 
@@ -677,6 +694,9 @@ export default {
 
     if(this.$route.query.image) {
       let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
+      if(this.tooManyImages) {
+        queriedImage = await ImageInstance.fetch(Number(this.$route.query.image));
+      }
       if(queriedImage) {
         this.resetPagesAndFilters(); // we want all annotations of the image => reset state
         this.selectedImages = [queriedImage];

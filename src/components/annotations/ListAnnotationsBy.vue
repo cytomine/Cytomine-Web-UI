@@ -68,6 +68,7 @@ import {fullName} from '@/utils/user-utils.js';
 import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
+import constants from '@/utils/constants';
 
 export default {
   name: 'list-annotations-by',
@@ -118,6 +119,8 @@ export default {
     };
   },
   computed: {
+    project: get('currentProject/project'),
+
     isByTerm() {
       return this.categorization === 'TERM';
     },
@@ -140,6 +143,10 @@ export default {
       return this.tracksIds.filter(id => id > 0);
     },
 
+    tooManyImages() {
+      return this.project.numberOfImages > constants.MAX_IMAGES_FOR_FILTER;
+    },
+
     collection() {
       this.revision; // to ensure that collection is reloaded if revision changes
       return new AnnotationCollection({
@@ -159,7 +166,7 @@ export default {
 
         terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
         users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
-        images: (!this.isByImage && this.imagesIds.length < this.allImages.length) ? this.imagesIds : null,
+        images: (!this.isByImage && ((this.tooManyImages && this.imagesIds.length > 0) || (!this.tooManyImages && this.imagesIds.length < this.allImages.length))) ? this.imagesIds : null,
         tracks: (!this.isByTrack && (this.noTrack || this.multipleTrack || this.filteredTracksIds.length < this.allTracks.length)) ? this.filteredTracksIds.filter(id => id > 0) : null,
         tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
 
@@ -169,6 +176,7 @@ export default {
         showGIS: true,
         showTrack: true,
         showWKT: this.isInViewer,
+        showImage: this.tooManyImages,
         showSlice: true,
         afterThan: this.afterThan,
         beforeThan: this.beforeThan,
@@ -300,8 +308,8 @@ export default {
 
       this.pendingReload = false;
 
-      if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || !this.tagsIds.length) {
+      if((!this.tooManyImages && !this.imagesIds.length) || (!this.reviewed && !this.usersIds.length)
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || (this.tagsIds ? !this.tagsIds.length : 0)) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;
