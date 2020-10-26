@@ -127,7 +127,7 @@ export default {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
       return getters.canManageProject ||
-        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+        (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
