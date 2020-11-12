@@ -75,7 +75,7 @@ export default {
   data() {
     return {
       width: 320,
-      users: [],
+      projectUsers: [],
       userJobs: [],
       reload: true,
       format: new WKT(),
@@ -115,7 +115,7 @@ export default {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     allUsers() {
-      let allUsers = this.users.concat(this.userJobs);
+      let allUsers = this.projectUsers.concat(this.userJobs);
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
@@ -140,7 +140,12 @@ export default {
   },
   methods: {
     async fetchUsers() {
-      this.users = (await UserCollection.fetchAll()).array;
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+
+      this.projectUsers = (await collection.fetchAll()).array;
     },
     async fetchUserJobs() {
       this.userJobs = (await UserJobCollection.fetchAll({
