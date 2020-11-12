@@ -279,7 +279,7 @@ export default {
       error: false,
       revision: 0,
 
-      users: [],
+      projectUsers: [],
       userJobs: [],
 
       allowedSizes: [
@@ -339,7 +339,7 @@ export default {
     },
 
     allUsers() {
-      return this.users.concat(this.userJobs);
+      return this.projectUsers.concat(this.userJobs);
     },
     members: get('currentProject/members'),
     managers: get('currentProject/managers'),
@@ -454,8 +454,14 @@ export default {
       })).array;
     },
     async fetchUsers() {
-      this.users = (await UserCollection.fetchAll()).array;
-      this.users.forEach(user => {
+
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+
+      this.projectUsers = (await collection.fetchAll()).array;
+      this.projectUsers.forEach(user => {
         user.fullName = fullName(user);
       });
     },
