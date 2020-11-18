@@ -132,7 +132,7 @@ export default {
     },
     jobParameters() {
       return this.params.filter(param => {
-        return param.value !== null;
+        return (Array.isArray(param.value)) ? param.value.length : param.value !== null;
       }).map(param => {
         let value = param.value;
         if(value.id) {
@@ -145,7 +145,7 @@ export default {
             }
           }
           else {
-            value = null;
+            value = '';
           }
         }
         return new JobParameter({softwareParameter: param.id, value});
