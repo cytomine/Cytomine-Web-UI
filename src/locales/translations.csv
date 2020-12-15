@@ -1032,7 +1032,7 @@ use-existing-image-group,Use existing image group,Utiliser un groupe d'images ex
 select-image-group,Select image group,Choisir le groupe d'images
 button-remove-from-image-group,Remove from image group,Retirer d'un groupe d'images
 delete-image-group,Delete image group,Supprimer le groupe d'images
-delete-image-confirmation-message,Do you really want to delete image group {groupName}? <br> All annotation links will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le groupe d'images {groupName} ? <br> Cette action ne pourra être annulée
+delete-image-group-confirmation-message,Do you really want to delete image group {groupName}? <br> All annotation links will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le groupe d'images {groupName} ? <br> Cette action ne pourra être annulée
 notif-success-image-group-deletion,Image group {groupName} was successfully deleted,Le groupe d'images {groupName} a été supprimé
 notif-error-image-group-deletion,Failed to delete image group {groupName},Une erreur a empêché la suppression du groupe d'images {groupName}
 delete-image-group-link,Remove image from its image group,Retirer l'image de son groupe d'images

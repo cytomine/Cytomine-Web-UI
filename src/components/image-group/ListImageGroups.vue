@@ -250,7 +250,7 @@ export default {
     },
 
     async refreshData() {
-
+      this.revision++;
     },
 
     toggleFilterDisplay() {
