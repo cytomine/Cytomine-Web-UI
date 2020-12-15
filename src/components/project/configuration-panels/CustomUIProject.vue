@@ -73,7 +73,8 @@ export default {
         {
           label: 'project-side-bar',
           props: [
-            {key: 'project-images-tab', label: 'images', icon: 'far fa-images'},
+            {key: 'project-images-tab', label: 'images', icon: 'far fa-image'},
+            {key: 'project-image-groups-tab', label: 'image-groups', icon: 'far fa-images'},
             {key: 'project-annotations-tab', label: 'annotations', icon: 'far fa-edit'},
             {key: 'project-jobs-tab', label: 'analysis', icon: 'fas fa-tasks'},
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
