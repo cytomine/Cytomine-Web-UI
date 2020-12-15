@@ -417,7 +417,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-image'),
         message: this.$t('delete-image-confirmation-message', {imageName: this.imageNameNotif}),
         type: 'is-danger',
@@ -448,7 +448,7 @@ export default {
       }
     },
     confirmImageGroupLinkDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group-link'),
         message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif}),
         type: 'is-danger',

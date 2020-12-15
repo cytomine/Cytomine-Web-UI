@@ -237,7 +237,7 @@ export default {
     },
 
     openModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: TrackModal,
         props: {
@@ -276,7 +276,7 @@ export default {
     },
 
     confirmTrackDeletion(node) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-track', {name: node.data.name}),
         type: 'is-danger',

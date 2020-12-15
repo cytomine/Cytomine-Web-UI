@@ -463,7 +463,7 @@ export default {
     },
 
     openCommentsModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: AnnotationCommentsModal,
         props: {annotation: this.annotation, comments: this.comments},
@@ -485,7 +485,7 @@ export default {
     },
 
     openProfileModal(spatialAxis) {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: ProfileModal,
         props: {annotation: this.annotation, image: this.image, spatialAxis},
@@ -494,7 +494,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-annotation'),
         type: 'is-danger',

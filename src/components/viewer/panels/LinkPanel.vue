@@ -157,7 +157,7 @@ export default {
   methods: {
     handleCheckboxChange(event, indexGroup, indexImage) {
       if(this.trackedUser) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-untrack-to-link-view'),
           confirmText: this.$t('button-confirm'),

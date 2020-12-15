@@ -226,7 +226,7 @@ export default {
       return filesize(size, {base: 10});
     },
     confirmDeletion(file) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-file'),
         type: 'is-danger',

@@ -321,7 +321,7 @@ export default {
       }
     },
     confirmJobDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-analysis'),
         message: this.$t('delete-analysis-confirmation-message'),
         type: 'is-danger',
@@ -331,7 +331,7 @@ export default {
       });
     },
     confirmJobKilling() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('kill-analysis'),
         message: this.$t('kill-analysis-confirmation-message'),
         type: 'is-danger',

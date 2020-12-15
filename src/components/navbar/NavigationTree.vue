@@ -77,7 +77,7 @@ export default {
     closeProject(project) {
       let nbViewers = Object.keys(project.viewers).length;
       if(nbViewers) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('confirm-close-project'),
           message: this.$t(
             'confirm-close-project-message',

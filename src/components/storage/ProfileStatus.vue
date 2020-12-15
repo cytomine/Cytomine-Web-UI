@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     confirmProfileComputation() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-profile-computation'),
         message: this.$t('confirm-profile-computation-message'),
         confirmText: this.$t('button-confirm'),
@@ -88,7 +88,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-file'),
         type: 'is-danger',
