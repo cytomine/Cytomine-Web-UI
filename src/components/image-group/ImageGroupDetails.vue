@@ -19,8 +19,11 @@ limitations under the License.-->
     <tr v-if="isPropDisplayed('overview')">
       <td class="prop-label">{{$t('overview')}}</td>
       <td class="prop-content" colspan="3">
-        <router-link :to="`/project/${imageGroup.project}/image/${imageGroup.id}`" v-if="!isEmpty">
-          <img :src="imageGroup.thumb" class="image-overview">
+        <router-link
+            v-if="imageGroup.imageInstances.length > 0"
+            :to="viewerURL(imageGroup)"
+        >
+          <image-group-preview :image-group="imageGroup" />
         </router-link>
       </td>
     </tr>
@@ -107,6 +110,7 @@ import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import RenameModal from '@/components/utils/RenameModal';
 import ImagePreview from '../image/ImagePreview';
+import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
 
 import {ImageGroup} from 'cytomine-client';
 
@@ -119,7 +123,8 @@ export default {
     CytomineProperties,
     AttachedFiles,
     RenameModal,
-    ImagePreview
+    ImagePreview,
+    ImageGroupPreview
   },
   props: {
     imageGroup: {type: Object},
@@ -150,6 +155,11 @@ export default {
   methods: {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop);
+    },
+
+    viewerURL(imageGroup) {
+      let ids = imageGroup.imageInstances.map(img => img.id);
+      return `/project/${imageGroup.project}/image/${ids.join('-')}`;
     },
 
     async rename(newName) {
