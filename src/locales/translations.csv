@@ -1041,3 +1041,24 @@ fluorescence-spectra,Fluorescence spectra,Spectre de fluorescence
 depth-spectra,Depth spectra,Spectre de profondeur
 temporal-spectra,Temporal spectra,Spectre temporel
 spatial-projection,Spatial projection,Projection spatiale
+image-groups,Image groups,Groupes d'images
+rename-image-group,Rename the image group,Renommer le groupe d'images
+notif-success-image-group-rename,Image group {imageName} was successfully renamed,Le groupe d'images {imageName} a été renommé avec succès
+notif-error-image-group-rename,Failed to rename image group {imageName},Une erreur a empêché de renommer le groupe d'images {imageName}
+image-group,Image group,Groupe d'images
+button-add-to-image-group,Add to image group,Ajouter à un groupe d'images
+add-to-image-group,Add image to image group,Ajouter l'image à un groupe d'images
+create-image-group,Create new image group,Créer un nouveau groupe d'images
+use-existing-image-group,Use existing image group,Utiliser un groupe d'images existant
+select-image-group,Select image group,Choisir le groupe d'images
+button-remove-from-image-group,Remove from image group,Retirer d'un groupe d'images
+delete-image-group,Delete image group,Supprimer le groupe d'images
+delete-image-confirmation-message,Do you really want to delete image group {groupName}? <br> All annotation links will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le groupe d'images {groupName} ? <br> Cette action ne pourra être annulée
+notif-success-image-group-deletion,Image group {groupName} was successfully deleted,Le groupe d'images {groupName} a été supprimé
+notif-error-image-group-deletion,Failed to delete image group {groupName},Une erreur a empêché la suppression du groupe d'images {groupName}
+delete-image-group-link,Remove image from its image group,Retirer l'image de son groupe d'images
+delete-image-group-link-confirmation-message,Do you really want to remove image {imageName} from its image group? <br> All related annotation links be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir retirer l'image {imageName} de son groupe d'images ? <br> Cette action ne pourra être annulée
+notif-success-image-group-link-deletion,Image {imageName} was successfully removed from its image group,L'image {imageName} a été retirée de son groupe d'images
+notif-error-image-group-link-deletion,Failed to remove image {imageName} from its image group,Une erreur a empêché le retrait de l'image {imageName} de son groupe d'images
+notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images
+notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images

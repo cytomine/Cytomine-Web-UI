@@ -20,11 +20,17 @@
       <template v-if="isTabDisplayed('images')">
         <router-link tag="li" :to="`/project/${project.id}/images`">
           <a>
-            <i class="far fa-images"></i>
+            <i class="far fa-image"></i>
             {{ $t('images') }}
           </a>
         </router-link>
       </template>
+      <router-link v-if="isTabDisplayed('image-groups')" tag="li" :to="`/project/${project.id}/image-groups`">
+        <a>
+          <i class="far fa-images"></i>
+          {{ $t('image-groups') }}
+        </a>
+      </router-link>
       <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`">
         <a>
           <i class="far fa-edit"></i>
