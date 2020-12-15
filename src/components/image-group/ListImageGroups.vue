@@ -84,7 +84,7 @@ limitations under the License.-->
                 v-if="imageGroup.imageInstances.length > 0"
                 :to="viewerURL(imageGroup)"
             >
-<!--              <img :src="imageGroup.thumb" class="image-overview">-->
+              <image-group-preview :image-group="imageGroup" />
             </router-link>
           </b-table-column>
 
@@ -148,6 +148,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 
 import AddImageModal from '../image/AddImageModal';
 import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
+import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
 
 import {ImageGroupCollection, TagCollection} from 'cytomine-client';
 
@@ -161,6 +162,7 @@ const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilte
 export default {
   name: 'list-image-groups',
   components: {
+    ImageGroupPreview,
     ImageGroupDetails,
     CytomineTable,
     CytomineMultiselect,
@@ -172,7 +174,7 @@ export default {
       loading: true,
       error: false,
       addImageModal: false,
-      excludedProperties: [],
+      excludedProperties: ['overview'],
       availableTags:[],
       revision: 0
     };

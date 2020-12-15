@@ -13,77 +13,51 @@ See the License for the specific language governing permissions and
 limitations under the License.-->
 
 <template>
-<div class="card" :class="{'full-height-card': fullHeightCard}">
-  <router-link class="card-image recent-image" :to="`/project/${idProject}/image/${idImage}`">
-    <figure class="image is-5by3" :style="figureStyle">
-    </figure>
-  </router-link>
-  <div class="card-content">
-    <div class="content">
-      <p>
-        <router-link :to="`/project/${idProject}/image/${idImage}`">
-          <span v-if="isBlindMode" class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
-          {{ image.blindedName || image.instanceFilename || image.imageName }}
-          <span v-if="showProject" class="in-project">({{$t('in-project', {projectName: image.projectName})}})</span>
-        </router-link>
-      </p>
-      <slot></slot>
-    </div>
-  </div>
-</div>
+  <b-carousel
+      autoplay repeat
+      :arrow-hover="false" :pause-hover="false" :pause-info="false" :indicator="false"
+      :interval="7500"
+      animated="fade"
+      icon-size="small"
+      icon-next="angle-right"
+      icon-prev="angle-left"
+      class="has-background-light">
+    <b-carousel-item v-for="image in imageGroup.imageInstances" :key="`${imageGroup.id}-${image.id}`">
+      <div class="has-text-centered">
+        <img :src="image.thumb" class="image-overview">
+      </div>
+    </b-carousel-item>
+  </b-carousel>
 </template>
 
 <script>
 export default {
-  name: 'image-preview',
+  name: 'image-group-preview',
   props: {
-    image: {type: Object},
-    project: {type: Object, default: null},
-    fullHeightCard: {type: Boolean, default: true},
-    showProject: {type: Boolean, default: false},
-    blindMode: {type: Boolean, default: false},
-  },
-  computed: {
-    idImage() {
-      return this.image.image || this.image.id; // if provided object is image consultation, image.image
-    },
-    idProject() {
-      return (this.project) ? this.project.id : this.image.project;
-    },
-    isBlindMode() {
-      return (this.project) ? this.project.blindMode : this.blindMode;
-    },
-    figureStyle() {
-      return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)}")`};
-    }
+    imageGroup: {type: Object},
   }
 };
 </script>
 
 <style scoped>
-.image {
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  position: relative;
-  border-bottom: 1px solid #ddd;
+.image-overview {
+  max-height: 4rem;
+  max-width: 10rem;
 }
 
-.card.full-height-card {
-  height: 100%;
+.carousel {
+  min-height: auto;
+  height: 4rem;
+  width: 10rem;
 }
 
-.card-content {
-  padding: 1.5rem;
-  overflow-wrap: break-word;
+>>> .carousel-arrow .icon.has-icons-right {
+  color: #3273dc;
+  right: 0.5rem;
 }
 
-.card-content a {
-  font-weight: 600;
-}
-
-.blind-indication {
-  font-size: 0.9em;
-  text-transform: uppercase;
+>>> .carousel-arrow .icon.has-icons-left {
+  color: #3273dc;
+  left: 0.5rem;
 }
 </style>
