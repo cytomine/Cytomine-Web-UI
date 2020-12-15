@@ -146,7 +146,7 @@ export default {
       return this.$store.getters['currentProject/canManageProject'];
     },
     canEdit() {
-      return this.editable && this.$store.getters['currentProject/canEditImage'](this.imageGroup); //TODO
+      return this.editable && !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
     },
     isEmpty() {
       return this.imageGroup.imageInstances.length > 0;
