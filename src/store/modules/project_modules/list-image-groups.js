@@ -23,13 +23,16 @@ export default {
 
       filtersOpened: false,
       filters: {
-        selectedTags: null,
+        boundsImages: null,
+        boundsAnnotationLinks: null
       },
 
       currentPage: 1,
       perPage: 10,
-      sortField: null,
-      sortOrder: 'asc',
+      sort: {
+        field: 'name',
+        order: 'asc'
+      },
       openedDetails: []
     };
   },
@@ -55,12 +58,8 @@ export default {
       state.perPage = perPage;
     },
 
-    setSortField(state, field) {
-      state.sortField = field;
-    },
-
-    setSortOrder(state, order) {
-      state.sortOrder = order;
+    setSort(state, sort) {
+      state.sort = sort;
     },
 
     setOpenedDetails(state, value) {
