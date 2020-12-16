@@ -26,9 +26,6 @@ limitations under the License.-->
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('image-groups')}}
-<!--      <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">-->
-<!--        {{$t('button-add-image')}}-->
-<!--      </button>-->
     </p>
     <div class="panel-block">
       <div class="search-block">
@@ -54,13 +51,21 @@ limitations under the License.-->
       <b-collapse :open="filtersOpened">
         <div class="filters">
           <div class="columns">
-            <div class="column filter is-one-quarter">
+            <div class="column filter">
               <div class="filter-label">
-                {{$t('tags')}}
+                {{$t('images')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                                      label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                <cytomine-slider v-model="boundsImages" :max="maxNbImages" />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('annotation-links')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsAnnotationLinks" :max="maxNbAnnotationLinks" />
               </div>
             </div>
           </div>
@@ -68,15 +73,18 @@ limitations under the License.-->
         </div>
       </b-collapse>
 
-      <cytomine-table
-          :collection="groupCollection"
-          :is-empty="nbEmptyFilters > 0"
-          :currentPage.sync="currentPage"
-          :perPage.sync="perPage"
-          :openedDetailed.sync="openedDetails"
-          :sort.sync="sortField"
-          :order.sync="sortOrder"
-          :revision="revision"
+      <b-table
+          :data="filteredImageGroups"
+          :paginated="true"
+          :current-page.sync="currentPage"
+          :per-page="perPage"
+          pagination-size="is-small"
+          detailed
+          detail-key="id"
+          :opened-detailed.sync="openedDetails"
+          :default-sort="sort.field"
+          :default-sort-direction="sort.order"
+          @sort="updateSort"
       >
         <template #default="{row: imageGroup}">
           <b-table-column :label="$t('overview')" width="100">
@@ -84,12 +92,12 @@ limitations under the License.-->
                 v-if="imageGroup.imageInstances.length > 0"
                 :to="viewerURL(imageGroup)"
             >
-              <image-group-preview :image-group="imageGroup" />
+              <image-group-preview :image-group="imageGroup" :key="`preview-${imageGroup.id}`"/>
             </router-link>
           </b-table-column>
 
           <b-table-column
-              :field="blindMode ? 'blindedName' : 'instanceFilename'"
+              field="name"
               :label="$t('name')"
               sortable
               width="400"
@@ -100,10 +108,17 @@ limitations under the License.-->
           </b-table-column>
 
           <b-table-column
-            :field="'imageInstances.length'"
+            field="numberOfImages"
             :label="$t('images')" centered sortable width="150"
           >
-            {{ imageGroup.imageInstances.length }}
+            {{ imageGroup.numberOfImages }}
+          </b-table-column>
+
+          <b-table-column
+            field="numberOfAnnotationLinks"
+            :label="$t('annotation-links')" centered sortable width="150"
+          >
+            {{ imageGroup.numberOfAnnotationLinks }}
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -131,32 +146,41 @@ limitations under the License.-->
             <p>{{$t('no-image-group')}}</p>
           </div>
         </template>
-      </cytomine-table>
+
+        <template #bottom-left>
+          <b-select v-model="perPage" size="is-small">
+            <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+            <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+            <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+            <option value="100">{{$t('count-per-page', {count: 100})}}</option>
+          </b-select>
+        </template>
+      </b-table>
     </div>
 
-<!--    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />-->
   </div>
 </div>
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get, sync, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 
-import AddImageModal from '../image/AddImageModal';
 import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
 
-import {ImageGroupCollection, TagCollection} from 'cytomine-client';
+import {ImageGroupCollection} from 'cytomine-client';
+import {getWildcardRegexp} from '@/utils/string-utils';
+import {isBetweenBounds} from '@/utils/bounds';
 
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
-const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
 
 
 export default {
@@ -166,17 +190,14 @@ export default {
     ImageGroupDetails,
     CytomineTable,
     CytomineMultiselect,
-    CytomineSlider,
-    AddImageModal
+    CytomineSlider
   },
   data() {
     return {
       loading: true,
       error: false,
-      addImageModal: false,
       excludedProperties: ['overview'],
-      availableTags:[],
-      revision: 0
+      imageGroups:[],
     };
   },
   computed: {
@@ -200,33 +221,34 @@ export default {
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
-    selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
-
-    multiSelectFilters() {
-      return [
-        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
-      ];
+    maxNbImages() {
+      return Math.max(10, ...this.imageGroups.map(ig => ig.numberOfImages));
+    },
+    maxNbAnnotationLinks() {
+      return Math.max(100, ...this.imageGroups.map(ig => ig.numberOfAnnotationLinks));
     },
 
-    groupCollection() {
-      let collection = new ImageGroupCollection({
-        filterKey: 'project',
-        filterValue: this.project.id,
-      });
+    boundsImages: localSyncBoundsFilter('boundsImages', 'maxNbImages'),
+    boundsAnnotationLinks: localSyncBoundsFilter('boundsAnnotationLinks', 'maxNbAnnotationLinks'),
+
+    regexp() {
+      return getWildcardRegexp(this.searchString);
+    },
+    filteredImageGroups() {
+      let filtered = this.imageGroups;
+
       if(this.searchString) {
-        collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
-        };
+        filtered = filtered.filter(group => this.regexp.test(group.name));
       }
-      for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(selected.length > 0 && selected.length < total) {
-          collection[prop] = {
-            in: selected.join()
-          };
-        }
-      }
-      return collection;
+
+      filtered = filtered.filter(group => {
+        return isBetweenBounds(group.numberOfImages, this.boundsImages) &&
+          isBetweenBounds(group.numberOfAnnotationLinks, this.boundsAnnotationLinks);
+      });
+
+      return filtered;
     },
+
 
     nbActiveFilters() {
       return this.$store.getters[this.storeModule + '/nbActiveFilters'];
@@ -237,24 +259,46 @@ export default {
 
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
-    sortField: sync('sortField', storeOptions),
-    sortOrder: sync('sortOrder', storeOptions),
-    openedDetails: sync('openedDetails', storeOptions)
+    sort: sync('sort', storeOptions),
+    openedDetailsStore: get('openedDetails', storeOptions),
+    openedDetails: { // HACK cannot use sync because buefy modifies the property => vuex warning because modif outside store
+      get() {
+        return this.openedDetailsStore.slice();
+      },
+      set(value) {
+        this.$store.commit(this.storeModule + '/setOpenedDetails', value);
+      }
+    }
   },
   methods: {
-    async fetchFilters() {
-
-    },
-    async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+    async fetchImageGroups() {
+      this.imageGroups = (await ImageGroupCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      })).array;
     },
 
     async refreshData() {
-      this.revision++;
+      try {
+        await this.fetchImageGroups();
+
+        // if an item has been deleted, the currentPage value might not be valid => reinitialize it
+        if((this.currentPage - 1)*this.perPage >= this.filteredImageGroups.length) {
+          this.currentPage = 1;
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
     },
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+
+    updateSort(field, order) {
+      this.sort = {field, order};
     },
 
     viewerURL(imageGroup) {
@@ -265,7 +309,7 @@ export default {
   async created() {
     try {
       await Promise.all([
-        this.fetchTags()
+        this.fetchImageGroups()
       ]);
       this.loading = false;
     }
@@ -282,11 +326,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.image-overview {
-  max-height: 4rem;
-  max-width: 10rem;
 }
 
 .search-block {

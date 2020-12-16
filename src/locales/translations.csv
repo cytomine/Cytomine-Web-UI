@@ -1041,3 +1041,4 @@ notif-success-image-group-link-deletion,Image {imageName} was successfully remov
 notif-error-image-group-link-deletion,Failed to remove image {imageName} from its image group,Une erreur a empêché le retrait de l'image {imageName} de son groupe d'images
 notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images
+no-image-group,No image group to display,Aucun groupe d'images à afficher
