@@ -166,7 +166,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotations-container :index="index" :view="$refs.view" />
+    <annotations-container :index="index" :view="$refs.view" @centerViewOnAnnot="centerViewOnAnnot" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -260,7 +260,9 @@ export default {
 
       loading: true,
 
-      overview: null
+      overview: null,
+
+      format: new WKT(),
     };
   },
   computed: {
@@ -566,6 +568,21 @@ export default {
         zoom: this.idealZoom,
         center: [this.image.width/2, this.image.height/2]
       });
+    },
+
+    async centerViewOnAnnot(annot) {
+      if (annot.image !== this.image.id) {
+        this.$emit('centerViewOnAnnot', annot);
+        return;
+      }
+
+      if (!annot.location) {
+        //in case annotation location has not been loaded
+        annot = await Annotation.fetch(annot.id);
+      }
+
+      let geometry = this.format.readGeometry(annot.location);
+      this.$refs.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
     },
 
     isPanelDisplayed(panel) {

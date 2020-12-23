@@ -4,7 +4,7 @@
       v-if="isPanelDisplayed('annotation-main')"
       :index="index"
       :view="view"
-      @centerView="centerViewOnAnnot"
+      @centerView="$emit('centerViewOnAnnot', $event)"
       @addTerm="addTerm"
       @addTrack="addTrack"
       @updateTermsOrTracks="updateTermsOrTracks"
@@ -15,7 +15,7 @@
       class="annotations-table-wrapper"
       :index="index"
       :view="view"
-      @centerView="centerViewOnAnnot"
+      @centerView="$emit('centerViewOnAnnot', $event)"
       @addTerm="addTerm"
       @addTrack="addTrack"
       @updateTermsOrTracks="updateTermsOrTracks"
@@ -67,11 +67,6 @@ export default {
   methods: {
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
-    },
-
-    centerViewOnAnnot(annot) {
-      let geometry = this.format.readGeometry(annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
     },
 
     addTerm(term) {

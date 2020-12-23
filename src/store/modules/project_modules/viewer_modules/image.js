@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 
-import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance, CompanionFileCollection} from 'cytomine-client';
+import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance,
+  CompanionFileCollection, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
 import constants from '@/utils/constants';
 import {slicePositionToRank} from '@/utils/slice-utils';
@@ -54,6 +55,7 @@ export default {
     return {
       imageInstance: null,
       profile: null,
+      imageGroupLink: null,
       sliceInstances: {},
       loadedSlicePages: [],
       activeSlice: null,
@@ -96,6 +98,10 @@ export default {
 
     setProfile(state, profile) {
       state.profile = profile;
+    },
+
+    setImageGroupLink(state, imageGroupLink) {
+      state.imageGroupLink = imageGroupLink;
     }
   },
 
@@ -109,6 +115,9 @@ export default {
 
       let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5' && cf.status > 100);
       commit('setProfile', profile);
+
+      let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({filterKey: 'imageinstance', filterValue: image.id})).array;
+      commit('setImageGroupLink', (groupLinks.length > 0) ? groupLinks[0] : null);
 
       await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
     },
@@ -153,6 +162,9 @@ export default {
 
       let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
       commit('setProfile', profile);
+
+      let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({filterKey: 'imageinstance', filterValue: image.id})).array;
+      commit('setImageGroupLink', (groupLinks.length > 0) ? groupLinks[0] : null);
 
       commit('clearSliceInstances');
       await dispatch('fetchSliceInstancesAround', {rank: slice.rank});

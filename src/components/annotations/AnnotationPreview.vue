@@ -22,7 +22,7 @@
 
   <div class="annot-preview">
     <div :style="styleAnnotDetails" @click.self="viewAnnot()">
-      <button class="button is-small" @click="opened = !opened" ref="previewButton">
+      <button class="button is-small" @click="opened = !opened" ref="previewButton" v-if="showDetails">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
       </button>
 
@@ -58,7 +58,6 @@
 </template>
 
 <script>
-import AnnotationDetails from './AnnotationDetails';
 
 export default {
   name: 'annotation-preview',
@@ -70,10 +69,13 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
+    showDetails: {type: Boolean, default: true},
     showImageInfo: {type: Boolean, default: true},
     showSliceInfo: {type: Boolean, default: false}
   },
-  components: {AnnotationDetails},
+  components: {
+    AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
+  },
   data() {
     return {
       opened: false

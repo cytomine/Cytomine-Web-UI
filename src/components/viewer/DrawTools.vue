@@ -329,11 +329,11 @@
       >
       <span class="icon is-small">
         <i class="fas fa-paste"></i>
-        <i class="fas fa-star"></i>
+        <i class="fas fa-star special-paste-icon"></i>
       </span>
       </button>
 
-      <div class="repeat-container" v-show="showRepeatSelector">
+      <div class="special-paste-container" v-show="showRepeatSelector">
         <p>
           <i18n path="paste-repeat-info">
             <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
@@ -345,6 +345,24 @@
         </div>
 
       </div>
+    </div>
+    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false" v-if="isInImageGroup">
+      <button
+        :disabled="disabledPaste"
+        v-tooltip="$t('paste-with-link')"
+        class="button"
+        @click="openPasteWithLinkModal()"
+      >
+        <span class="icon is-small">
+          <i class="fas fa-paste"></i>
+          <i class="fas fa-project-diagram special-paste-icon"></i>
+        </span>
+      </button>
+
+<!--      <div class="special-paste-container" v-show="showAnnotationLinkSelector">-->
+<!--        <paste-annotation-with-link-selector :index="index" />-->
+<!--      </div>-->
+
     </div>
   </div>
 
@@ -382,11 +400,13 @@ import WKT from 'ol/format/WKT';
 import {containsExtent} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
-import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
+import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties} from '@/utils/annotation-utils.js';
+import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal';
 
 export default {
   name: 'draw-tools',
   components: {
+    PasteAnnotationWithLinkModal,
     TrackTree,
     OntologyTree,
     IconPolygonFreeHand,
@@ -403,6 +423,7 @@ export default {
       showTrackSelector: false,
       searchStringTrack: '',
       showRepeatSelector: false,
+      showAnnotationLinkSelector: false,
       nbRepeats: 2,
     };
   },
@@ -461,6 +482,9 @@ export default {
       set(tracks) {
         this.$store.commit(this.imageModule + 'setTracksNewAnnots', tracks);
       }
+    },
+    isInImageGroup() {
+      return this.imageWrapper.imageGroup !== null;
     },
     backgroundTracksNewAnnot() {
       if(this.tracksToAssociate.length === 1) {
@@ -654,6 +678,17 @@ export default {
       });
     },
 
+    openPasteWithLinkModal() {
+      this.$buefy.modal.open({
+        component: PasteAnnotationWithLinkModal,
+        parent: this,
+        hasModalCard: true,
+        props: {
+          index: this.index
+        }
+      });
+    },
+
     copy() {
       let feature = this.selectedFeature;
       if(!feature) {
@@ -799,6 +834,7 @@ export default {
           let annot = new Annotation(jsonAnnot);
           await updateTermProperties(annot);
           await updateTrackProperties(annot);
+          await updateAnnotationLinkProperties(annot);
           return annot;
         }
       }
@@ -1013,7 +1049,7 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection, .track-selection, .repeat-selection {
+.term-selection, .track-selection, .special-paste-selection {
   position: relative;
 }
 
@@ -1024,7 +1060,7 @@ export default {
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .repeat-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .special-paste-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
@@ -1078,7 +1114,7 @@ export default {
 $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
-  .repeat-selection .repeat-container {
+  .special-paste-selection .special-paste-container {
     p {
       margin: 0.75em;
       font-size: 0.9em;
@@ -1114,7 +1150,7 @@ $colorActiveIcon: #fff;
     height: 1.15em !important;
   }
 
-  .icon .fa-star {
+  .icon .special-paste-icon {
     font-size: 0.5em;
     position: absolute;
     right: 0.2rem;

@@ -30,6 +30,7 @@
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
+        @centerViewOnAnnot="findViewerAndCenterViewOnAnnot"
       />
     </div>
 
@@ -52,7 +53,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance, SliceInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance, Annotation} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -203,6 +204,32 @@ export default {
       catch(err) {
         console.log(err);
         this.error = true;
+      }
+    },
+
+    async findViewerAndCenterViewOnAnnot(annot) {
+      let existingImage = true;
+      try {
+        annot = await Annotation.fetch(annot.id);
+        if (!this.idImages.includes(String(annot.image))) {
+          existingImage = false;
+          // TODO: promise all
+          let image = await ImageInstance.fetch(annot.image);
+          let slice = await SliceInstance.fetch(annot.slice);
+          await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        }
+      }
+      catch(err) {
+        console.log(err);
+        this.error = true;
+      }
+
+      let index = this.cells.find(cell => cell.image.id === annot.image).index;
+      if (!existingImage) {
+        this.$store.commit(this.$store.getters['currentProject/imageModule'](index) + 'setAnnotToSelect', annot);
+      }
+      else {
+        this.$eventBus.$emit('selectAnnotation', {index, annot});
       }
     },
 

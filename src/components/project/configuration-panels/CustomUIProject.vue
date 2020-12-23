@@ -110,6 +110,7 @@ export default {
             {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
+            {key: 'project-explore-annotation-linked-annotations', label: 'linked-annotations', icon: 'fas fa-project-diagram'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment'}
           ]

@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -55,6 +55,24 @@ export async function updateTrackProperties(annot) {
   let annotTracks = await AnnotationTrackCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id});
   annot.track = annotTracks.array.map(at => at.track);
   annot.annotationTrack = annotTracks.array;
+}
+
+/**
+ * Fetch the annotation links and annotation group associated to the provided annot, and populate accordingly
+ *
+ * @param {Object} annot The annotation to update
+ */
+export async function updateAnnotationLinkProperties(annot) {
+  let annotLinks = (await AnnotationLinkCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id})).array;
+  annot.group = (annotLinks.length > 0) ? annotLinks[0].group : null;
+  annot.annotationLink = annotLinks.map(link => {
+    return {
+      id: link.id,
+      annotation: link.annotationIdent,
+      image: link.image,
+      group: link.group
+    };
+  });
 }
 
 /**

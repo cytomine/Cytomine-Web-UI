@@ -230,6 +230,7 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showLink: true,
         kmeans: true
       }).fetchAll();
 

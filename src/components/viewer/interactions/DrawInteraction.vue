@@ -39,6 +39,7 @@ import WKT from 'ol/format/WKT';
 
 import {Annotation, AnnotationType} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
+import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
 export default {
   name: 'draw-interaction',
@@ -185,6 +186,7 @@ export default {
         try {
           await annot.save();
           annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
+          updateAnnotationLinkProperties(annot);
           this.$eventBus.$emit('addAnnotation', annot);
           if(idx === this.nbActiveLayers - 1) {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});

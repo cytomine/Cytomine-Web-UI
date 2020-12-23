@@ -1064,3 +1064,14 @@ notif-success-image-group-link-creation,Image {imageName} was successfully added
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images
 no-image-group,No image group to display,Aucun groupe d'images à afficher
 annotation-links,Annotation links,Liens entre annotations
+paste-with-link,Paste with link,Coller avec un lien
+eligible-images-in-this-viewer,Eligible images currently displayed,Images éligibles actuellement affichées
+eligible-images-not-in-this-viewer,Eligible images currently not shown,Images éligibles actuellement non affichées
+paste-with-link-in-images,Paste annotation and create link(s) to the original one in these images...,Coller l'annotation et créer un lien avec l'originale dans ces images...
+viewer-center-position,viewer center position,centre du visualisateur
+image-center-position,image center position,centre de l'image
+annotation-position,original annotation position,position de l'annotation originale
+at,at,au
+linked-annotations,Linked annotations,Annotations liées
+no-linked-annotation,No linked annotation,Aucune annotation liée
+button-show-linked-annots,Show all linked annotations,Montrer toutes les annotations liées

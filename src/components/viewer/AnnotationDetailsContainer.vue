@@ -50,7 +50,7 @@
         @updateTerms="$emit('updateTermsOrTracks', annot)"
         @updateTracks="$emit('updateTermsOrTracks', annot)"
         @updateProperties="$emit('updateProperties')"
-        @centerView="$emit('centerView', annot)"
+        @centerView="$emit('centerView', ($event) ? $event : annot)"
         @deletion="$emit('delete', annot)"
       />
     </div>

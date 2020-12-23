@@ -159,6 +159,32 @@
         </td>
       </tr>
 
+      <template v-if="isPropDisplayed('linked-annotations')">
+        <tr>
+          <td colspan="2">
+            <h5>{{$t('linked-annotations')}}</h5>
+            <template v-if="annotationLinks.length > 0">
+              <div>
+                <annotation-preview
+                    v-for="annotLink in annotationLinks"
+                    :key="`${annotation.id}-${annotLink.id}`"
+                    :annot="annotLink"
+                    :show-details="false"
+                    :show-image-info="false"
+                    :show-slice-info="false"
+                    :size="linkCropSize"
+                    @selectAnnotation="$emit('centerView', annotLink)"
+                />
+              </div>
+              <a v-if="!showImageInfo" class="button is-small is-fullwidth" @click="showLinkedAnnotations()">
+                {{ $t('button-show-linked-annots') }}
+              </a>
+            </template>
+            <em v-else>{{$t('no-linked-annotation')}}</em>
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -245,10 +271,13 @@ import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
+import AnnotationPreview from '@/components/annotations/AnnotationPreview';
+import constants from '@/utils/constants';
 
 export default {
   name: 'annotations-details',
   components: {
+    'annotation-preview': AnnotationPreview,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -279,6 +308,7 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      linkCropSize: 64,
     };
   },
   computed: {
@@ -350,6 +380,19 @@ export default {
     },
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
+    },
+    annotationLinks() {
+      if (!this.annotation.annotationLink || this.annotation.annotationLink.length < 2) {
+        return [];
+      }
+
+      return this.annotation.annotationLink.filter(link => link.annotation !== this.annotation.id).map(link => {
+        return {
+          id: link.annotation,
+          image: link.image,
+          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
+        };
+      });
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
@@ -512,6 +555,12 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
+    },
+
+    showLinkedAnnotations() {
+      this.annotationLinks.forEach( link => {
+        this.$emit('centerView', link);
+      });
     }
   },
   async created() {
