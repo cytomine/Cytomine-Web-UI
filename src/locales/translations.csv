@@ -1075,3 +1075,15 @@ at,at,au
 linked-annotations,Linked annotations,Annotations liées
 no-linked-annotation,No linked annotation,Aucune annotation liée
 button-show-linked-annots,Show all linked annotations,Montrer toutes les annotations liées
+open-view-select-annot-to-link,Open another view and select an annotation to link with,Une nouvelle vue doit être ouverte avec l'annotation à lier sélectionnée
+selection-in-view,Selection in view {number},Sélection dans la vue {number}
+different-image-group,Incompatible image group,Groupe d'image incompatible
+already-linked,Already linked,Déjà lié
+no-selected-annot,No selected annotation,Pas d'annotation sélectionnée
+link,Link,Lier
+unlink,Unlink,Dissocier
+notif-success-annotation-link-creation,Annotation successfully linked,L'annotation a été liée avec succès
+notif-error-annotation-link-creation,Failed to link annotation,Une erreur a empêché de lier l'annoation
+notif-success-annotation-link-deletion,Annotation successfully unlinked,L'annotation a été dissociée avec succès
+notif-error-annotation-link-deletion,Failed to unlink annotation,Une erreur a empêché de dissocier l'annotation
+confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?

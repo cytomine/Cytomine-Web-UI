@@ -320,7 +320,7 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
-    <div class="repeat-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+    <div v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
         :disabled="disabledPaste"
         v-tooltip="$t('paste-repeat')"
@@ -346,24 +346,49 @@
 
       </div>
     </div>
-    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false" v-if="isInImageGroup">
+<!--    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false" v-if="isInImageGroup">-->
+<!--      <button-->
+<!--        :disabled="disabledPaste"-->
+<!--        v-tooltip="$t('paste-with-link')"-->
+<!--        class="button"-->
+<!--        @click="openPasteWithLinkModal()"-->
+<!--      >-->
+<!--        <span class="icon is-small">-->
+<!--          <i class="fas fa-paste"></i>-->
+<!--          <i class="fas fa-link special-paste-icon"></i>-->
+<!--        </span>-->
+<!--      </button>-->
+
+<!--&lt;!&ndash;      <div class="special-paste-container" v-show="showAnnotationLinkSelector">&ndash;&gt;-->
+<!--&lt;!&ndash;        <paste-annotation-with-link-selector :index="index" />&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+
+<!--    </div>-->
+  </div>
+
+  <div class="buttons has-addons are-small" v-if="isToolDisplayed('link') || isToolDisplayed('unlink')">
+    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false">
       <button
-        :disabled="disabledPaste"
-        v-tooltip="$t('paste-with-link')"
-        class="button"
-        @click="openPasteWithLinkModal()"
+          :disabled="isToolDisabled('link')"
+          v-tooltip="$t('link')"
+          class="button"
+          :class="{'is-selected': showAnnotationLinkSelector}"
+          @click="showAnnotationLinkSelector = !showAnnotationLinkSelector"
       >
-        <span class="icon is-small">
-          <i class="fas fa-paste"></i>
-          <i class="fas fa-project-diagram special-paste-icon"></i>
-        </span>
+        <span class="icon is-small"><i class="fas fa-link"></i></span>
       </button>
-
-<!--      <div class="special-paste-container" v-show="showAnnotationLinkSelector">-->
-<!--        <paste-annotation-with-link-selector :index="index" />-->
-<!--      </div>-->
-
+      <div class="special-paste-container" v-if="showAnnotationLinkSelector">
+        <annotation-link-selector :index="index" />
+      </div>
     </div>
+    <button
+        :disabled="isToolDisabled('unlink')"
+        v-tooltip="$t('unlink')"
+        class="button"
+        @click="confirmUnlink()"
+    >
+      <span class="icon is-small"><icon-unlink-annotations /></span>
+    </button>
   </div>
 
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
@@ -395,22 +420,27 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
+import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal';
+import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector';
 
 import WKT from 'ol/format/WKT';
 import {containsExtent} from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
+import {Cytomine, Annotation, AnnotationType, AnnotationLink, AnnotationCollection} from 'cytomine-client';
 import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties} from '@/utils/annotation-utils.js';
-import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal';
+
 
 export default {
   name: 'draw-tools',
   components: {
     PasteAnnotationWithLinkModal,
+    AnnotationLinkSelector,
     TrackTree,
     OntologyTree,
     IconPolygonFreeHand,
-    IconLineFreeHand
+    IconLineFreeHand,
+    IconUnlinkAnnotations
   },
   props: {
     index: String
@@ -592,8 +622,15 @@ export default {
         return false;
       }
 
+      if (tool === 'link') {
+        return !this.isInImageGroup;
+      }
+
       let ftr = this.selectedFeature;
       let annot = ftr.properties.annot;
+      if (tool === 'unlink') {
+        return annot.group == null;
+      }
       if(tool === 'accept') {
         return annot.type === AnnotationType.REVIEWED;
       }
@@ -764,6 +801,57 @@ export default {
       catch(err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
+      }
+    },
+
+    confirmUnlink() {
+      if(!this.selectedFeature) {
+        return;
+      }
+
+      this.$buefy.dialog.confirm({
+        title: this.$t('confirm-deletion'),
+        message: this.$t('confirm-deletion-annotation-link'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => this.unlink()
+      });
+    },
+    async unlink() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.activateEditTool(null);
+
+      try {
+        let annot = feature.properties.annot;
+        if (!annot.group) {
+          return;
+        }
+        await AnnotationLink.delete(annot.id, annot.group);
+        let collection = new AnnotationCollection({
+          project: annot.project,
+          group: annot.group,
+          showWKT: true,
+          showTerm: true,
+          showGIS: true,
+          showTrack: true,
+          showLink: true,
+        });
+        let updatedAnnot = annot.clone();
+        await updateAnnotationLinkProperties(updatedAnnot);
+        let editedAnnots = [updatedAnnot, ...(await collection.fetchAll()).array];
+        editedAnnots.forEach(annot => {
+          this.$eventBus.$emit('editAnnotation', annot);
+        });
+        this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-deletion')});
       }
     },
 
@@ -1065,13 +1153,16 @@ export default {
   top: 100%;
   left: -1.5em;
   margin-top: 5px;
-  background: white;
   min-width: 18em;
   max-width: 20vw;
   max-height: 40vh;
   overflow: auto;
+}
+
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border-radius: 4px;
+  background: white;
 }
 
 .term-selection:not(.has-preview) .color-preview, .track-selection:not(.has-preview) .color-preview {

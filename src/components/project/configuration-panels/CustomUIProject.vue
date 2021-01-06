@@ -59,6 +59,7 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
 
 export default {
   name: 'custom-ui-project',
@@ -110,7 +111,7 @@ export default {
             {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
-            {key: 'project-explore-annotation-linked-annotations', label: 'linked-annotations', icon: 'fas fa-project-diagram'},
+            {key: 'project-explore-annotation-linked-annotations', label: 'linked-annotations', icon: 'fas fa-link'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment'}
           ]
@@ -144,6 +145,9 @@ export default {
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt'},
 
             {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy'},
+
+            {key: 'project-tools-link', label: 'link', icon: 'fas fa-link'},
+            {key: 'project-tools-unlink', label: 'unlink', iconComponent: IconUnlinkAnnotations},
 
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo'},
           ]

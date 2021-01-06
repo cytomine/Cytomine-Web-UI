@@ -163,24 +163,16 @@
         <tr>
           <td colspan="2">
             <h5>{{$t('linked-annotations')}}</h5>
-            <template v-if="annotationLinks.length > 0">
-              <div>
-                <annotation-preview
-                    v-for="annotLink in annotationLinks"
-                    :key="`${annotation.id}-${annotLink.id}`"
-                    :annot="annotLink"
-                    :show-details="false"
-                    :show-image-info="false"
-                    :show-slice-info="false"
-                    :size="linkCropSize"
-                    @selectAnnotation="$emit('centerView', annotLink)"
-                />
-              </div>
-              <a v-if="!showImageInfo" class="button is-small is-fullwidth" @click="showLinkedAnnotations()">
-                {{ $t('button-show-linked-annots') }}
-              </a>
-            </template>
-            <em v-else>{{$t('no-linked-annotation')}}</em>
+              <annotation-links-preview
+                  :size="linkCropSize"
+                  :link-color="linkColor"
+                  :show-main-annotation="false"
+                  :show-select-all-button="true"
+                  :allow-annotation-selection="true"
+                  :annotation="annotation"
+                  :images="images"
+                  @selectAnnotation="$emit('centerView', $event)"
+              />
           </td>
         </tr>
       </template>
@@ -271,13 +263,11 @@ import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
-import constants from '@/utils/constants';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
 export default {
   name: 'annotations-details',
   components: {
-    'annotation-preview': AnnotationPreview,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -287,7 +277,8 @@ export default {
     AttachedFiles,
     AnnotationCommentsModal,
     TrackTree,
-    CytomineTrack
+    CytomineTrack,
+    AnnotationLinksPreview
   },
   props: {
     annotation: {type: Object},
@@ -309,6 +300,7 @@ export default {
       revTerms: 0,
       revTracks: 0,
       linkCropSize: 64,
+      linkColor: '696969'
     };
   },
   computed: {
@@ -380,19 +372,6 @@ export default {
     },
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
-    },
-    annotationLinks() {
-      if (!this.annotation.annotationLink || this.annotation.annotationLink.length < 2) {
-        return [];
-      }
-
-      return this.annotation.annotationLink.filter(link => link.annotation !== this.annotation.id).map(link => {
-        return {
-          id: link.annotation,
-          image: link.image,
-          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
-        };
-      });
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
@@ -556,12 +535,6 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     },
-
-    showLinkedAnnotations() {
-      this.annotationLinks.forEach( link => {
-        this.$emit('centerView', link);
-      });
-    }
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
