@@ -35,7 +35,8 @@ import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
-import {AnnotationGroup, AnnotationCollection, AnnotationLink} from 'cytomine-client';
+import {AnnotationGroup, AnnotationLink} from 'cytomine-client';
+import {listAnnotationsInGroup} from '@/utils/annotation-utils';
 
 export default {
   name: 'annotation-link-selector',
@@ -157,18 +158,8 @@ export default {
           group = annotGroup.id;
         }
 
-        let collection = new AnnotationCollection({
-          project: this.image.project,
-          group,
-          showWKT: true,
-          showTerm: true,
-          showGIS: true,
-          showTrack: true,
-          showLink: true,
-        });
-        let editedAnnots = (await collection.fetchAll()).array;
-        editedAnnots.forEach(annot => {
-          this.$eventBus.$emit('editAnnotation', annot);
+        (await listAnnotationsInGroup(this.image.project, group)).forEach(a => {
+          this.$eventBus.$emit('editAnnotation', a);
         });
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-creation')});
 

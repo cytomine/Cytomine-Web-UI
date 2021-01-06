@@ -218,6 +218,8 @@ export default {
           correctedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
           correctedAnnot.track = annot.track;
           correctedAnnot.annotationTrack = annot.annotationTrack;
+          correctedAnnot.group = annot.group;
+          correctedAnnot.annotationLink = annot.annotationLink;
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
         }

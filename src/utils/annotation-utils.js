@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 
-import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection,
+  AnnotationCollection} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -73,6 +74,19 @@ export async function updateAnnotationLinkProperties(annot) {
       group: link.group
     };
   });
+}
+
+export async function listAnnotationsInGroup(project, group) {
+  let collection = new AnnotationCollection({
+    project: project,
+    group: group,
+    showWKT: true,
+    showTerm: true,
+    showGIS: true,
+    showTrack: true,
+    showLink: true,
+  });
+  return (await collection.fetchAll()).array;
 }
 
 /**

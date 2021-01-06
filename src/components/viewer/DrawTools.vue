@@ -427,8 +427,9 @@ import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationL
 import WKT from 'ol/format/WKT';
 import {containsExtent} from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType, AnnotationLink, AnnotationCollection} from 'cytomine-client';
-import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties} from '@/utils/annotation-utils.js';
+import {Cytomine, Annotation, AnnotationType, AnnotationLink} from 'cytomine-client';
+import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
+  listAnnotationsInGroup} from '@/utils/annotation-utils';
 
 
 export default {
@@ -693,6 +694,11 @@ export default {
       try {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
+        if (annot.group) {
+          (await listAnnotationsInGroup(annot.project, annot.group)).forEach(a => {
+            this.$eventBus.$emit('editAnnotation', a);
+          });
+        }
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }
@@ -832,18 +838,9 @@ export default {
           return;
         }
         await AnnotationLink.delete(annot.id, annot.group);
-        let collection = new AnnotationCollection({
-          project: annot.project,
-          group: annot.group,
-          showWKT: true,
-          showTerm: true,
-          showGIS: true,
-          showTrack: true,
-          showLink: true,
-        });
         let updatedAnnot = annot.clone();
         await updateAnnotationLinkProperties(updatedAnnot);
-        let editedAnnots = [updatedAnnot, ...(await collection.fetchAll()).array];
+        let editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
         editedAnnots.forEach(annot => {
           this.$eventBus.$emit('editAnnotation', annot);
         });

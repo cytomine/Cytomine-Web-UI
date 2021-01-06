@@ -33,6 +33,7 @@ import WKT from 'ol/format/WKT';
 
 import AnnotationsList from './AnnotationsList';
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
+import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
 export default {
   name: 'AnnotationsContainer',
@@ -81,6 +82,7 @@ export default {
       let updatedAnnot = await annot.clone().fetch();
       await updateTermProperties(updatedAnnot);
       await updateTrackProperties(updatedAnnot);
+      await updateAnnotationLinkProperties(updatedAnnot);
 
       this.$eventBus.$emit('editAnnotation', updatedAnnot);
       this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
