@@ -346,24 +346,19 @@
 
       </div>
     </div>
-<!--    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false" v-if="isInImageGroup">-->
-<!--      <button-->
-<!--        :disabled="disabledPaste"-->
-<!--        v-tooltip="$t('paste-with-link')"-->
-<!--        class="button"-->
-<!--        @click="openPasteWithLinkModal()"-->
-<!--      >-->
-<!--        <span class="icon is-small">-->
-<!--          <i class="fas fa-paste"></i>-->
-<!--          <i class="fas fa-link special-paste-icon"></i>-->
-<!--        </span>-->
-<!--      </button>-->
-
-<!--&lt;!&ndash;      <div class="special-paste-container" v-show="showAnnotationLinkSelector">&ndash;&gt;-->
-<!--&lt;!&ndash;        <paste-annotation-with-link-selector :index="index" />&ndash;&gt;-->
-<!--&lt;!&ndash;      </div>&ndash;&gt;-->
-
-<!--    </div>-->
+    <div class="special-paste-selection" v-click-outside="() => showPasteAndLinkModal = false" v-if="isInImageGroup">
+      <button
+        :disabled="disabledPaste"
+        v-tooltip="$t('paste-with-link')"
+        class="button"
+        @click="openPasteWithLinkModal()"
+      >
+        <span class="icon is-small">
+          <i class="fas fa-paste"></i>
+          <i class="fas fa-link special-paste-icon"></i>
+        </span>
+      </button>
+    </div>
   </div>
 
   <div class="buttons has-addons are-small" v-if="isToolDisplayed('link') || isToolDisplayed('unlink')">
@@ -455,6 +450,7 @@ export default {
       searchStringTrack: '',
       showRepeatSelector: false,
       showAnnotationLinkSelector: false,
+      showPasteAndLinkModal: false,
       nbRepeats: 2,
     };
   },
@@ -698,6 +694,12 @@ export default {
         if (annot.group) {
           (await listAnnotationsInGroup(annot.project, annot.group)).forEach(a => {
             this.$eventBus.$emit('editAnnotation', a);
+            if (a.id === this.copiedAnnot.id) {
+              let copiedAnnot = this.copiedAnnot.clone();
+              copiedAnnot.annotationLink = a.annotationLink;
+              copiedAnnot.group = a.group;
+              this.copiedAnnot = copiedAnnot;
+            }
           });
         }
         this.$eventBus.$emit('deleteAnnotation', annot);
@@ -844,6 +846,12 @@ export default {
         let editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
         editedAnnots.forEach(annot => {
           this.$eventBus.$emit('editAnnotation', annot);
+          if (annot.id === this.copiedAnnot.id) {
+            let copiedAnnot = this.copiedAnnot.clone();
+            copiedAnnot.annotationLink = annot.annotationLink;
+            copiedAnnot.group = annot.group;
+            this.copiedAnnot = copiedAnnot;
+          }
         });
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
       }

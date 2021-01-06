@@ -7,7 +7,18 @@
         <p> {{ $t('unexpected-error-info-message') }} </p>
       </b-message>
       <template v-else>
-        <div class="info">{{$t('paste-with-link-in-images')}}</div>
+        <div class="info" v-if="copiedAnnot.group"
+             v-html="$tc('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
+        <annotation-links-preview
+            :size="64"
+            :main-color="mainColor"
+            :link-color="linkColor"
+            :show-main-annotation="true"
+            :annotation="copiedAnnot"
+            :images="[image]"
+        />
+        <div class="info" v-html="$t('paste-with-link-info', {imageGroup: imageGroup.name})"></div>
+
         <div v-if="imagesInGroupInViewer.length > 0">
           <div class="field header">
             <b-checkbox :value="allCheckedInViewer" @change.native="checkAllInViewer()">
@@ -50,6 +61,10 @@
             </b-checkbox>
           </div>
         </div>
+        <div v-if="imagesInGroupInViewer.length === 0 && imagesInGroupNotInViewer.length === 0"
+             class="has-text-grey has-text-centered">
+          <em>{{$t('all-images-have-linked-annot')}}</em>
+        </div>
       </template>
     </template>
 
@@ -70,14 +85,15 @@ import WKT from 'ol/format/WKT';
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
 import {ImageGroup, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from 'cytomine-client';
 import {getCenter, containsExtent, getIntersection} from 'ol/extent';
-import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
+import {listAnnotationsInGroup} from '@/utils/annotation-utils';
 
 export default {
   name: 'paste-annotation-with-link-modal',
-  components: {CytomineModalCard, ImageName},
+  components: {CytomineModalCard, ImageName, AnnotationLinksPreview},
   props: {
     index: String
   },
@@ -87,6 +103,9 @@ export default {
       imageGroup: null,
       loading: true,
       error: false,
+
+      mainColor: '0099ff',
+      linkColor: '696969',
 
       viewerCenterPosition: {label: this.$t('viewer-center-position'), value: 'viewer'},
       imageCenterPosition: {label: this.$t('image-center-position'), value: 'image'},
@@ -119,6 +138,24 @@ export default {
     imagesInGroup() {
       return (!this.imageGroup) ? [] : this.imageGroup.imageInstances;
     },
+    copiedAnnot: {
+      get() {
+        return this.viewerWrapper.copiedAnnot;
+      },
+      set(annot) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
+    alreadyLinkedAnnotations() {
+      return this.copiedAnnot.annotationLink;
+    },
+    nbAlreadyLinkedAnnotations() {
+      return Math.max(0, this.alreadyLinkedAnnotations.length - 1);
+    },
+    ineligibleImageIds() {
+      return [this.copiedAnnot.image, ...this.alreadyLinkedAnnotations.map(link => link.image)];
+    },
+
     eligibleImages() {
       return this.imagesInGroup.filter(image => !this.ineligibleImageIds.includes(image.id));
     },
@@ -129,8 +166,7 @@ export default {
     imageWrappersInGroupInViewer() {
       return this.imageWrappers.filter(wrapper =>
         wrapper.imageGroupLink &&
-        wrapper.imageGroupLink.group === this.imageGroupId &&
-        wrapper !== this.imageWrapper);
+        wrapper.imageGroupLink.group === this.imageGroupId);
     },
     imagesIdsInGroupInViewer() {
       return this.imageWrappersInGroupInViewer.map(wrapper => wrapper.imageInstance.id);
@@ -154,22 +190,6 @@ export default {
           return {'image': image.id, 'position': image.notInViewerPosition};
         });
       return selected1.concat(selected2);
-    },
-
-
-    copiedAnnot: {
-      get() {
-        return this.viewerWrapper.copiedAnnot;
-      },
-      set(annot) {
-        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
-      }
-    },
-    alreadyLinkedAnnotations() {
-      return this.copiedAnnot.annotationLink;
-    },
-    ineligibleImageIds() {
-      return this.alreadyLinkedAnnotations.map(link => link.image);
     },
 
     inViewerPositions() {
@@ -202,6 +222,7 @@ export default {
       try {
         let annotGroup = null;
         let existingAnnotGroup = this.copiedAnnot.group;
+        let existingAnnots = [this.copiedAnnot.id, ...this.alreadyLinkedAnnotations.map(al => al.annotation)];
         if (existingAnnotGroup === null) {
           annotGroup = await new AnnotationGroup({
             imageGroup: this.imageGroupId,
@@ -237,20 +258,28 @@ export default {
           }).save();
         }
 
-        this.selectedImagesAndOptions.forEach(selected => {
-          this.$eventBus.$emit('reloadAnnotations', {idImage: selected.image});
-        });
+        (await listAnnotationsInGroup(this.image.project, annotGroup.id)).forEach(a => {
+          if (existingAnnots.includes(a.id)) {
+            this.$eventBus.$emit('editAnnotation', a);
 
-        let copiedAnnot = this.copiedAnnot.clone();
-        await updateAnnotationLinkProperties(copiedAnnot);
-        this.copiedAnnot = copiedAnnot;
-        this.$eventBus.$emit('editAnnotation', copiedAnnot);
+            if (a.id === this.copiedAnnot.id) {
+              let copiedAnnot = this.copiedAnnot.clone();
+              copiedAnnot.annotationLink = a.annotationLink;
+              copiedAnnot.group = a.group;
+              this.copiedAnnot = copiedAnnot;
+            }
+          }
+          else {
+            this.$eventBus.$emit('addAnnotation', a);
+          }
+          //TODO: select annotation
+        });
 
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-paste')});
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-paste')});
       }
       this.$parent.close();
     },
