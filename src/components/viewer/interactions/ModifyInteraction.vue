@@ -117,6 +117,7 @@ export default {
           annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
           await annot.save();
           this.$eventBus.$emit('editAnnotation', annot);
+          this.$eventBus.$emit('reloadAnnotationCrop', annot);
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
         }
         catch(err) {

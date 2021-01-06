@@ -222,6 +222,7 @@ export default {
           correctedAnnot.annotationLink = annot.annotationLink;
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
+          this.$eventBus.$emit('reloadAnnotationCrop', annot);
         }
       }
       catch(err) {

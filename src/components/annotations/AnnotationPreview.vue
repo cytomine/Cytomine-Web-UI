@@ -78,13 +78,14 @@ export default {
   },
   data() {
     return {
-      opened: false
+      opened: false,
+      revisionCrop: 0
     };
   },
   computed: {
     styleAnnotDetails() {
       let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=true&thickness=2&increaseArea=1.25${outlineParams}`;
+      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=true&rev=${this.revisionCrop}&thickness=2&increaseArea=1.25${outlineParams}`;
 
       return {
         backgroundImage: `url(${url})`,
@@ -118,6 +119,18 @@ export default {
 
       this.opened = false;
     },
+    reloadAnnotationCropHandler(annot) {
+      if (annot.id === this.annot.id) {
+        this.revisionCrop++;
+      }
+    }
+  },
+  mounted() {
+    this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
+  },
+  beforeDestroy() {
+    // unsubscribe from all events
+    this.$eventBus.$off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }
 };
 </script>

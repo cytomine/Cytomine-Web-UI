@@ -676,6 +676,7 @@ export default {
       try {
         await annot.fill();
         this.$eventBus.$emit('editAnnotation', annot);
+        this.$eventBus.$emit('reloadAnnotationCrop', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
       }
       catch(err) {
