@@ -1,6 +1,6 @@
 <template>
 <div class="panel">
-  <div class="panel-block has-text-grey" v-if="views.length < 2">
+  <div class="panel-block has-text-grey" v-if="filteredViews.length === 0">
     <em>{{$t('open-view-select-annot-to-link')}}</em>
   </div>
   <template v-else>
@@ -109,7 +109,7 @@ export default {
       });
     },
     filteredViews() {
-      return this.views.filter(view => view.index !== Number(this.index));
+      return this.views.filter(view => view.index !== Number(this.index) && view.sameImageGroup);
     }
   },
   methods: {

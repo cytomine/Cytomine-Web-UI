@@ -1078,7 +1078,7 @@ at,at,au
 linked-annotations,Linked annotations,Annotations liées
 no-linked-annotation,No linked annotation,Aucune annotation liée
 button-show-linked-annots,Show all linked annotations,Montrer toutes les annotations liées
-open-view-select-annot-to-link,Open another view and select an annotation to link with,Une nouvelle vue doit être ouverte avec l'annotation à lier sélectionnée
+open-view-select-annot-to-link,Open another view with an image from the same image group and select annotation to link with.,Une nouvelle vue avec une image du même groupe d'images doit être ouverte avec l'annotation à lier sélectionnée.
 selection-in-view,Selection in view {number},Sélection dans la vue {number}
 different-image-group,Incompatible image group,Groupe d'image incompatible
 already-linked,Already linked,Déjà lié
