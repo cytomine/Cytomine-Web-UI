@@ -327,6 +327,14 @@ export default {
       }
 
       return state.imageInstance.depth * state.imageInstance.duration * state.imageInstance.channels;
+    },
+
+    imageGroupId: state => {
+      if (!state.imageGroupLink) {
+        return null;
+      }
+
+      return state.imageGroupLink.group;
     }
   },
 

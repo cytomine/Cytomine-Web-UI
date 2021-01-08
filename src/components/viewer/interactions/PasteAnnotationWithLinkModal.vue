@@ -130,7 +130,7 @@ export default {
       return this.$store.getters['currentProject/currentViewer'];
     },
     imageGroupId() {
-      return this.imageWrapper.imageGroupLink.group;
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     image() {
       return this.imageWrapper.imageInstance;

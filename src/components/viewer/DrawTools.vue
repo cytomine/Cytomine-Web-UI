@@ -348,7 +348,7 @@
     </div>
     <div class="special-paste-selection" v-click-outside="() => showPasteAndLinkModal = false" v-if="isInImageGroup">
       <button
-        :disabled="disabledPaste"
+        :disabled="disabledPaste || !linkableCopiedAnnot"
         v-tooltip="$t('paste-with-link')"
         class="button"
         @click="openPasteWithLinkModal()"
@@ -361,7 +361,8 @@
     </div>
   </div>
 
-  <div class="buttons has-addons are-small" v-if="isToolDisplayed('link') || isToolDisplayed('unlink')">
+  <div class="buttons has-addons are-small"
+       v-if="isInImageGroup && (isToolDisplayed('link') || isToolDisplayed('unlink'))">
     <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false">
       <button
           :disabled="isToolDisabled('link')"
@@ -474,6 +475,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    imageGroupId() {
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
+    },
     slice() {
       return this.imageWrapper.activeSlice;
     },
@@ -511,7 +515,7 @@ export default {
       }
     },
     isInImageGroup() {
-      return this.imageWrapper.imageGroup !== null;
+      return this.imageGroupId !== null;
     },
     backgroundTracksNewAnnot() {
       if(this.tracksToAssociate.length === 1) {
@@ -576,6 +580,9 @@ export default {
       set(annot) {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
+    },
+    linkableCopiedAnnot() {
+      return this.isInImageGroup && this.copiedAnnot && this.copiedAnnot.imageGroup === this.imageGroupId;
     },
     disabledPaste() {
       return this.disabledDraw || !this.copiedAnnot;
@@ -786,6 +793,7 @@ export default {
         annot.userByTerm = this.copiedAnnot.term.map(term => {
           return {term, user: [this.currentUser.id]};
         });
+        annot.imageGroup = this.imageGroupId;
         // ----
 
         this.$eventBus.$emit('addAnnotation', annot);
@@ -926,6 +934,7 @@ export default {
         let jsonAnnot = model.annotation || model.reviewedannotation;
         if(jsonAnnot) {
           let annot = new Annotation(jsonAnnot);
+          annot.imageGroup = this.imageGroupId;
           await updateTermProperties(annot);
           await updateTrackProperties(annot);
           await updateAnnotationLinkProperties(annot);

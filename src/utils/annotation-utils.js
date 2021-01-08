@@ -85,6 +85,7 @@ export async function listAnnotationsInGroup(project, group) {
     showGIS: true,
     showTrack: true,
     showLink: true,
+    showImageGroup: true
   });
   return (await collection.fetchAll()).array;
 }

@@ -63,6 +63,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    imageGroupId() {
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
+    },
   },
   methods: {
     isPanelDisplayed(panel) {
@@ -79,6 +82,7 @@ export default {
 
     async updateTermsOrTracks(annot) {
       let updatedAnnot = await annot.clone().fetch();
+      updatedAnnot.imageGroup = this.imageGroupId;
       await updateTermProperties(updatedAnnot);
       await updateTrackProperties(updatedAnnot);
       await updateAnnotationLinkProperties(updatedAnnot);
