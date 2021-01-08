@@ -63,9 +63,9 @@
 
           @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
           @updateProperties="$emit('updateProperties')"
-          @centerView="$emit('centerView', $event)"
+          @centerView="$emit('centerView', {annot: $event, sameView: displayType === 'TERM'})"
           @delete="$emit('delete', $event)"
-          @select="select($event)"
+          @select="$emit('select', {annot: $event, sameView: displayType === 'TERM'})"
         />
       </div>
     </div>
@@ -103,7 +103,6 @@ export default {
   },
   props: [
     'index',
-    'view'
   ],
   data() {
     return {
@@ -258,19 +257,19 @@ export default {
         this.revision++;
       }
     },
-    async select(annot) {
-      if (annot.slice !== this.slice.id) {
-        await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
-          {time: annot.time, channel: annot.channel, zStack: annot.zStack});
-        this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
-      }
-      else {
-        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
-      }
-
-      this.$emit('centerView', annot);
-    },
+    // async select(annot) {
+    //   if (annot.slice !== this.slice.id) {
+    //     //TODO
+    //     await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
+    //       {time: annot.time, channel: annot.channel, zStack: annot.zStack});
+    //     this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+    //     this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+    //     this.$emit('centerView', annot);
+    //   }
+    //   else {
+    //     this.$eventBus.$emit('selectAnnotation', {index: this.index, annot, center: true});
+    //   }
+    // },
 
     shortkeyHandler(key) {
       if (!this.isActiveImage) {

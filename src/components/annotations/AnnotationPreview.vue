@@ -48,6 +48,7 @@
       @updateTerms="$emit('updateTermsOrTracks')"
       @updateTracks="$emit('updateTermsOrTracks')"
       @updateProperties="$emit('updateProperties')"
+      @select="$emit('select', $event)"
       @centerView="$emit('centerView')"
       @deletion="handleDeletion"
       v-if="opened"
@@ -97,7 +98,7 @@ export default {
   },
   methods: {
     viewAnnot() {
-      this.$emit('selectAnnotation');
+      this.$emit('select', this.annot);
     },
     close(event) {
       if(!this.opened) {
