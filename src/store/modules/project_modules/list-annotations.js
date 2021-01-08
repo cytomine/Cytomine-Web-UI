@@ -34,7 +34,8 @@ export default {
         images: null,
         termsIds: null,
         tracksIds: null,
-        tags: null
+        tags: null,
+        imageGroups: null,
       },
       fromDate: null,
       toDate: null,

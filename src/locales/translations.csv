@@ -150,6 +150,7 @@ button-show-filters,Show filters,Montrer les filtres
 button-hide-filters,Hide filters,Cacher les filtres
 all,All,Tous
 all-images,All,Toutes
+all-image-groups,All,Tous
 all-analyses,All,Toutes
 all-ontologies,All,Toutes
 all-resolutions,All,Toutes
@@ -1004,6 +1005,7 @@ per-term,Per term,Par terme
 per-track,Per track,Par trace
 per-user,Per user,Par utilisateur
 per-image,Per image,Par image
+per-image-group,Per image group,Par groupe d'images
 categorization,Categorization,Catégorisation
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace
