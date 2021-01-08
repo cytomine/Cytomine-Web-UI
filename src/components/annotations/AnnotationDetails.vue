@@ -167,7 +167,7 @@
                   :size="linkCropSize"
                   :link-color="linkColor"
                   :show-main-annotation="false"
-                  :show-select-all-button="true"
+                  :show-select-all-button="!showImageInfo"
                   :allow-annotation-selection="true"
                   :annotation="annotation"
                   :images="images"

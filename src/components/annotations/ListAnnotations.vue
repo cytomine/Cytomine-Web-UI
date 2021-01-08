@@ -578,7 +578,7 @@ export default {
   },
   methods: {
     viewAnnot(annot) {
-      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+      this.$router.push(`/project/${this.project.id}/image/${annot.image}/annotation/${annot.id}`);
     },
     async fetchImages() {
       if (!this.tooManyImages) {
