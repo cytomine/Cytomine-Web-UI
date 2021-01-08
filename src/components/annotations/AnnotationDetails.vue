@@ -171,7 +171,7 @@
                   :allow-annotation-selection="true"
                   :annotation="annotation"
                   :images="images"
-                  @selectAnnotation="$emit('centerView', $event)"
+                  @select="$emit('select', $event)"
               />
           </td>
         </tr>

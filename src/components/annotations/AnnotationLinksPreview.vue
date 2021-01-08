@@ -25,7 +25,7 @@ limitations under the License.-->
           :show-slice-info="false"
           :size="size"
           :color="(annotLink.id === annotation.id) ? mainColor : linkColor"
-          @selectAnnotation="selectAnnotation(annotLink)"
+          @select="selectAnnotation($event)"
       />
     </div>
     <a v-if="showSelectAllButton" class="button is-small is-fullwidth" @click="showLinkedAnnotations()">
@@ -99,12 +99,12 @@ export default {
   methods: {
     showLinkedAnnotations() {
       this.annotationLinks.forEach( link => {
-        this.$emit('selectAnnotation', link);
+        this.$emit('select', link);
       });
     },
     selectAnnotation(annot) {
       if (this.allowAnnotationSelection) {
-        this.$emit('selectAnnotation', annot);
+        this.$emit('select', annot);
       }
     }
   },

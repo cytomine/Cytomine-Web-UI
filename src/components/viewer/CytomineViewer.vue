@@ -30,7 +30,6 @@
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
-        @centerViewOnAnnot="findViewerAndCenterViewOnAnnot"
       />
     </div>
 
@@ -207,29 +206,25 @@ export default {
       }
     },
 
-    async findViewerAndCenterViewOnAnnot(annot) {
-      let existingImage = true;
-      try {
-        annot = await Annotation.fetch(annot.id);
-        if (!this.idImages.includes(String(annot.image))) {
-          existingImage = false;
-          // TODO: promise all
-          let image = await ImageInstance.fetch(annot.image);
-          let slice = await SliceInstance.fetch(annot.slice);
-          await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
-        }
-      }
-      catch(err) {
-        console.log(err);
-        this.error = true;
-      }
+    async selectAnnotationHandler({index, annot, center=false}) {
+      if (index === null) {
+        try {
+          let newImage = false;
+          annot = await Annotation.fetch(annot.id);
+          if (!this.idImages.includes(String(annot.image))) {
+            let image = await ImageInstance.fetch(annot.image);
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+            newImage = true;
+          }
 
-      let index = this.cells.find(cell => cell.image.id === annot.image).index;
-      if (!existingImage) {
-        this.$store.commit(this.$store.getters['currentProject/imageModule'](index) + 'setAnnotToSelect', annot);
-      }
-      else {
-        this.$eventBus.$emit('selectAnnotation', {index, annot});
+          let index = this.cells.find(cell => cell.image.id === annot.image).index;
+          this.$eventBus.$emit('selectAnnotation', {index, annot, center, newImage});
+        }
+        catch(err) {
+          console.log(err);
+          this.error = true;
+        }
       }
     },
 
@@ -245,7 +240,11 @@ export default {
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
   },
+  mounted() {
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+  },
   beforeDestroy() {
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }
 };

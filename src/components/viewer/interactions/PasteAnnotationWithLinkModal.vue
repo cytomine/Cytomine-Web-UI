@@ -161,7 +161,15 @@ export default {
     },
 
     imageWrappers() {
-      return Object.values(this.viewerWrapper.images);
+      return Object.keys(this.viewerWrapper.images).reduce((obj, index) => {
+        obj[index] = {
+          index,
+          imageInstance: this.viewerWrapper.images[index].imageInstance,
+          imageGroupLink: this.viewerWrapper.images[index].imageGroupLink,
+          view: this.viewerWrapper.images[index].view,
+        };
+        return obj;
+      }, []);
     },
     imageWrappersInGroupInViewer() {
       return this.imageWrappers.filter(wrapper =>
@@ -272,7 +280,10 @@ export default {
           else {
             this.$eventBus.$emit('addAnnotation', a);
           }
-          //TODO: select annotation
+          if (this.imagesIdsInGroupInViewer.includes(a.image)) {
+            let index = this.findWrapper(a.image).index;
+            this.$eventBus.$emit('selectAnnotation', {index, annot: a, center: false});
+          }
         });
 
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-paste')});
