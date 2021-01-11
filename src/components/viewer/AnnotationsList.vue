@@ -62,9 +62,9 @@
 
           @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
           @updateProperties="$emit('updateProperties')"
-          @centerView="$emit('centerView', {annot: $event, sameView: displayType === 'TERM'})"
+          @centerView="$emit('centerView', {annot: $event, sameView: isSameView($event)})"
           @delete="$emit('delete', $event)"
-          @select="$emit('select', {annot: $event, sameView: displayType === 'TERM'})"
+          @select="$emit('select', {annot: $event, sameView: isSameView($event)})"
         />
       </div>
     </div>
@@ -254,6 +254,9 @@ export default {
       if(deletedAnnot.image === this.image.id) {
         this.revision++;
       }
+    },
+    isSameView(annot) {
+      return this.displayType === 'TERM' && annot.slice === this.slice.id;
     },
     // async select(annot) {
     //   if (annot.slice !== this.slice.id) {
