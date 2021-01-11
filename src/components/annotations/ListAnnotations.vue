@@ -86,6 +86,17 @@
               />
             </div>
           </div>
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('group-linked-annotations')}}
+            </div>
+            <div class="filter-body">
+              <b-switch v-model="regroup" class="switch">
+                <template v-if="regroup">{{$t('yes')}}</template>
+                <template v-else>{{$t('no')}}</template>
+              </b-switch>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -259,6 +270,7 @@
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
       :nbPerPage="nbPerPage"
+      :regroup="regroup"
 
       :allTerms="terms"
       :allUsers="allUsers"
@@ -500,6 +512,7 @@ export default {
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
     toDate: sync('toDate', storeOptions),
+    regroup: sync('regroup', storeOptions),
 
     afterThan() {
       return this.fromDate ? this.fromDate.getTime() : null;

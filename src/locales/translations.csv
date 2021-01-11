@@ -1093,3 +1093,4 @@ notif-success-annotation-link-deletion,Annotation successfully unlinked,L'annota
 notif-error-annotation-link-deletion,Failed to unlink annotation,Une erreur a empêché de dissocier l'annotation
 confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?
 count-copied-annot-links,Copied annotation has no other link.|Copied annotation already has <strong>one</strong> link.|Copied annotation already has <strong>{count}</strong> links.,L'annotation copiée n'a pas de lien.|L'annotation copiée a déjà <strong>un</strong> lien.|L'annotation copiée a déjà <strong>{count}</strong> liens.
+group-linked-annotations,Group linked annotations,Grouper les annotations liées

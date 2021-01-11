@@ -16,8 +16,9 @@
     </template>
     <template v-else>
       <annotation-preview
-        v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
-        :class="{active: isInViewer && annot.slice === imageWrapper.activeSlice.id}"
+        v-for="(annot, index) in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
+        :class="annotStyles(annot, index)"
+        class="annot-preview-block"
         :annot="annot"
         :size="size"
         :color="color"
@@ -63,6 +64,7 @@ export default {
     nbPerPage: Number,
     size: Number,
     color: String,
+    regroup: {type: Boolean, default: false},
 
     prop: Object,
 
@@ -252,6 +254,24 @@ export default {
     },
     activeSlice() {
       return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
+    },
+
+    annotationIds() {
+      return this.annotations.map(annot => annot.id);
+    },
+
+    annotationInGroupDetails() {
+      return this.annotations.map((annotation, index) => {
+        let previousGroup = (index > 0) ? this.annotations[index - 1].group : null;
+        let nextGroup = (index < this.annotations.length - 1) ? this.annotations[index + 1].group : null;
+        let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
+        return {
+          first: annotation.group !== null && annotation.group !== previousGroup,
+          last: annotation.group !== null && annotation.group !== nextGroup,
+          in: annotation.group !== null,
+          complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
+        };
+      });
     }
   },
   watch: {
@@ -276,6 +296,16 @@ export default {
     }
   },
   methods: {
+    annotStyles(annot, index) {
+      let groupDetails = this.annotationInGroupDetails[index];
+      return {
+        'active': this.isInViewer && annot.slice === this.imageWrapper.activeSlice.id,
+        'group-first': this.regroup && groupDetails.first,
+        'group-last': this.regroup && groupDetails.last,
+        'group-in': this.regroup && groupDetails.in && !groupDetails.first && !groupDetails.last,
+        'group-complete': this.regroup && groupDetails.in && groupDetails.complete
+      };
+    },
     async initialize() {
       await this.findPage();
       await this.fetchPage(true);
@@ -349,5 +379,65 @@ export default {
 >>> .active .annot-preview {
   box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
   font-weight: 600;
+}
+
+.annot-preview-block {
+  margin: 4px;
+  padding: 6px;
+}
+
+>>> .annot-preview {
+  margin: 0;
+  padding: 0;
+}
+
+>>> .group-first, .group-in, .group-last {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  border-top: 2px dashed rgb(100,100,100);
+  border-bottom: 2px dashed rgb(100,100,100);
+}
+
+>>> .group-first.group-complete, .group-in.group-complete, .group-last.group-complete {
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+>>> .group-first {
+  padding-left: 4px !important;
+  border-left: 2px dashed rgb(100,100,100);
+  margin-right: 0 !important;
+  padding-right: 10px !important;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+>>> .group-first.group-complete {
+  border-left-style: solid;
+}
+
+>>> .group-last {
+  padding-right: 4px !important;
+  border-right: 2px dashed rgb(100,100,100);
+  margin-left: 0 !important;
+  padding-left: 10px !important;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+>>> .group-last.group-complete {
+  border-right-style: solid;
+}
+
+>>> .group-first.group-last {
+  margin: 4px !important;
+  padding: 4px !important;
+}
+
+>>> .group-in {
+  margin-left: 0 !important;
+  padding-left: 10px !important;
+  margin-right: 0 !important;
+  padding-right: 10px !important;
 }
 </style>

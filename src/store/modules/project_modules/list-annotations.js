@@ -39,6 +39,7 @@ export default {
       },
       fromDate: null,
       toDate: null,
+      regroup: false,
 
       currentPages: {} // mapping of type {idProp: currentPage}
     };
@@ -77,12 +78,17 @@ export default {
       state.toDate = date;
     },
 
+    setRegroup(state, regroup) {
+      state.regroup = regroup;
+    },
+
     resetPagesAndFilters(state) {
       for(let key in state.filters) {
         state.filters[key] = null;
       }
       state.fromDate = null;
       state.toDate = null;
+      state.regroup = false;
       state.currentPages = {};
     },
 
