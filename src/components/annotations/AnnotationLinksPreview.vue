@@ -25,6 +25,7 @@ limitations under the License.-->
           :show-slice-info="false"
           :size="size"
           :color="(annotLink.id === annotation.id) ? mainColor : linkColor"
+          :clickable="allowAnnotationSelection"
           @select="selectAnnotation($event)"
       />
     </div>
