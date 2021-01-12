@@ -1,154 +1,174 @@
 <!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
 
 <template>
-<form @submit.prevent="addToImageGroup()">
-  <cytomine-modal :active="active" :title="$t('add-to-image-group')" @close="$emit('update:active', false)">
-    <b-loading :is-full-page="false" :active="loading" />
+  <cytomine-modal :active="active" :title="$t('add-images-to-image-group')" @close="$emit('update:active', false)">
+    <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
-      <b-field :label="$t('image-group')">
-        <b-radio v-model="imageGroup" native-value="NEW">
-          {{$t('create-image-group')}}
-        </b-radio>
-      </b-field>
-      <template v-if="imageGroup === 'NEW'">
-        <b-field :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-          <b-input v-model="name" name="name" v-validate="'required'" />
-        </b-field>
+      <template>
+        <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
+                 type="search" icon="search" />
+
+        <cytomine-table
+            :collection="imageCollection"
+            :currentPage.sync="currentPage"
+            :perPage.sync="perPage"
+            :sort.sync="sortField"
+            :order.sync="sortOrder"
+            :detailed="false"
+        >
+          <template #default="{row: image}">
+            <b-table-column :label="$t('overview')">
+              <img :src="image.preview" class="image-overview">
+            </b-table-column>
+
+            <b-table-column field="originalFilename" :label="$t('name')" sortable>
+              {{ image.originalFilename }}
+            </b-table-column>
+
+            <b-table-column field="created" :label="$t('created-on')" sortable>
+              {{ Number(image.created) | moment('ll LT') }}
+            </b-table-column>
+
+            <b-table-column label=" " centered>
+              <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
+                {{$t('button-added')}}
+              </button>
+              <span v-else-if="isInImageGroup(image)">
+                {{$t('already-in-this-image-group')}}
+              </span>
+              <span v-else-if="image.imageGroup">
+                {{$t('already-in-other-image-group')}}
+              </span>
+              <button v-else class="button is-small is-link" @click="addImage(image)">
+                {{$t('button-add')}}
+              </button>
+            </b-table-column>
+          </template>
+
+          <template #empty>
+            <div class="content has-text-grey has-text-centered">
+              <p>{{$t('no-image')}}</p>
+            </div>
+          </template>
+        </cytomine-table>
       </template>
-      <b-field>
-        <b-radio v-model="imageGroup" native-value="EXISTING">
-          {{$t('use-existing-image-group')}}
-        </b-radio>
-      </b-field>
-
-      <template v-if="imageGroup === 'EXISTING'">
-        <b-field :type="{'is-danger': errors.has('imageGroup')}" :message="errors.first('imageGroup')">
-          <b-select
-              v-model="selectedImageGroup"
-              :placeholder="$t('select-image-group')"
-              name="imageGroup"
-              v-validate="'required'"
-              expanded
-          >
-            <option v-for="imageGroup in imageGroups" :value="imageGroup.id" :key="imageGroup.id">
-              {{imageGroup.name}}
-            </option>
-          </b-select>
-        </b-field>
-      </template>
-
-    </template>
-
-
-
-    <template #footer>
-      <button class="button" type="button" @click="$emit('update:active', false)">
-        {{$t('button-cancel')}}
-      </button>
-      <button class="button is-link" :disabled="errors.any()">
-        {{$t('button-save')}}
-      </button>
     </template>
   </cytomine-modal>
-</form>
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+import {ImageInstanceCollection, ImageGroupImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
-
-import {ImageGroupCollection, ImageGroup, ImageGroupImageInstance} from 'cytomine-client';
+import CytomineTable from '@/components/utils/CytomineTable';
 
 export default {
   name: 'add-to-image-group-modal',
   props: {
-    active: {type: Boolean},
-    image: {type: Object}
+    active: Boolean,
+    imageGroup: Object,
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: {
+    CytomineTable,
+    CytomineModal
+  },
   data() {
     return {
-      name: '',
-      imageGroup: 'NEW',
-      selectedImageGroup: null,
-      imageGroups: [],
-      loading: true
+      loading: true,
+      perPage: 10,
+      searchString: '',
+      idsAddedImages: [],
+      currentPage: 1,
+      sortField: 'created',
+      sortOrder: 'desc',
     };
   },
   computed: {
+    project: get('currentProject/project'),
+    imageCollection() {
+      let collection = new ImageInstanceCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+        withImageGroup: true,
+      });
+      if(this.searchString) {
+        collection['originalFilename'] = {
+          ilike: encodeURIComponent(this.searchString)
+        };
+      }
+      return collection;
+    },
     blindMode() {
       return this.$store.state.currentProject.project.blindMode;
-    },
-    imageNameNotif() {
-      return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
   },
   watch: {
     active(val) {
       if(val) {
-        this.name = '';
-        this.imageGroup = 'NEW';
-        this.selectedImageGroup = null;
-        this.fetchImageGroups(); // TODO: improve
+        this.idsAddedImages = [];
       }
     }
   },
   methods: {
-    async addToImageGroup() {
-      let result = await this.$validator.validateAll();
-      if(!result) {
-        return;
-      }
-
-      try {
-        let idImageGroup;
-        if(this.imageGroup === 'NEW') {
-          let imageGroup = await new ImageGroup({name: this.name, project: this.image.project}).save();
-          idImageGroup = imageGroup.id;
-        }
-        else if(this.imageGroup === 'EXISTING') {
-          idImageGroup = this.selectedImageGroup;
-        }
-
-        let link = await new ImageGroupImageInstance({image: this.image.id, group: idImageGroup}).save();
-        this.$emit('addToImageGroup', link);
-        this.$notify({type: 'success', text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif})});
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif})});
-      }
-      this.$emit('update:active', false);
+    imageNameNotif(image) {
+      return this.blindMode ? image.blindedName : image.instanceFilename;
     },
-    async fetchImageGroups() {
+    async addImage(imageInstance) {
       try {
-        this.imageGroups = (await ImageGroupCollection.fetchAll({
-          filterKey: 'project',
-          filterValue: this.image.project,
-        })).array;
+        let link = await new ImageGroupImageInstance({image: imageInstance.id, group: this.imageGroup.id}).save();
+        this.idsAddedImages.push(imageInstance.id);
+        this.$emit('addToImageGroup', link);
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
+        });
       }
       catch(error) {
         console.log(error);
-        this.error = true;
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
+        });
       }
+    },
+    isInImageGroup(image) {
+      return image.imageGroup === this.imageGroup.id;
+    },
+    wasAdded(image) {
+      return this.idsAddedImages.includes(image.id);
     }
   },
   async created() {
-    await this.fetchImageGroups();
     this.loading = false;
   }
 };
 </script>
 
+<style scoped>
+>>> .animation-content {
+  max-width: 60% !important;
+  width: 60%;
+}
+
+>>> .modal-card {
+  width: 100%;
+  height: 80vh;
+}
+
+.image-overview {
+  max-height: 4rem;
+  max-width: 10rem;
+}
+</style>

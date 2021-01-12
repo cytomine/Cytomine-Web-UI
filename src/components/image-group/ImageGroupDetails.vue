@@ -67,7 +67,14 @@ limitations under the License.-->
       <td class="prop-content image-thumbs" colspan="3">
         <div class="columns" v-if="imageGroup.imageInstances.length">
           <div class="column" v-for="image in imageGroup.imageInstances" :key="image.id">
-            <image-preview :image="image" :project="project" />
+            <image-preview :image="image" :project="project">
+              <div class="buttons are-small">
+                <button class="button is-small is-fullwidth" @click="confirmImageGroupLinkDeletion(image)">
+                  {{$t('button-remove')}}
+                </button>
+              </div>
+
+            </image-preview>
           </div>
         </div>
         <em v-else>{{$t('no-image')}}</em>
@@ -81,6 +88,9 @@ limitations under the License.-->
           <template v-if="canEdit">
             <button v-if="!blindMode || canManageProject" class="button" @click="isRenameModalActive = true">
               {{$t('button-rename')}}
+            </button>
+            <button class="button" @click="isAddToModalActive = true">
+              {{$t('button-add-images-to-image-group')}}
             </button>
             <button class="button is-danger" @click="confirmDeletion()">
               {{$t('button-delete')}}
@@ -98,6 +108,12 @@ limitations under the License.-->
       :active.sync="isRenameModalActive"
       @rename="rename"
   />
+
+  <add-to-image-group-modal
+    :active.sync="isAddToModalActive"
+    :image-group="imageGroup"
+    @addToImageGroup="$emit('addToImageGroup', $event)"
+  />
 </div>
 </template>
 
@@ -111,8 +127,9 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import RenameModal from '@/components/utils/RenameModal';
 import ImagePreview from '../image/ImagePreview';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
+import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
 
-import {ImageGroup} from 'cytomine-client';
+import {ImageGroup, ImageGroupImageInstance} from 'cytomine-client';
 
 
 export default {
@@ -124,7 +141,8 @@ export default {
     AttachedFiles,
     RenameModal,
     ImagePreview,
-    ImageGroupPreview
+    ImageGroupPreview,
+    AddToImageGroupModal
   },
   props: {
     imageGroup: {type: Object},
@@ -134,6 +152,7 @@ export default {
   data() {
     return {
       isRenameModalActive: false,
+      isAddToModalActive: false,
     };
   },
   computed: {
@@ -207,6 +226,38 @@ export default {
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-image-group-deletion', {imageName: this.imageGroup.name})
+        });
+      }
+    },
+
+    imageNameNotif(image) {
+      return this.blindMode ? image.blindedName : image.instanceFilename;
+    },
+    confirmImageGroupLinkDeletion(image) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-image-group-link'),
+        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif(image)}),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => this.deleteImageGroupLink(image)
+      });
+    },
+    async deleteImageGroupLink(image) {
+      try {
+        // currently, we limit an image instance to be associated to 1 group.
+        await ImageGroupImageInstance.delete(this.imageGroup.id, image.id);
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
+        });
+        this.$emit('deleteImage', image);
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
         });
       }
     },
