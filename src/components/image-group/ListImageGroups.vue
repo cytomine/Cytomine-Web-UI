@@ -26,6 +26,9 @@ limitations under the License.-->
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('image-groups')}}
+      <button v-if="canAddImage" class="button is-link" @click="addImageGroupModal = true">
+        {{$t('button-add-image-group')}}
+      </button>
     </p>
     <div class="panel-block">
       <div class="search-block">
@@ -160,6 +163,7 @@ limitations under the License.-->
       </b-table>
     </div>
 
+    <add-image-group-modal :active.sync="addImageGroupModal" @newImageGroup="newImageGroup" />
   </div>
 </div>
 </template>
@@ -173,6 +177,8 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 
 import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
+import AddImageGroupModal from '@/components/image-group/AddImageGroupModal';
+import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
 
 import {ImageGroupCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
@@ -192,7 +198,8 @@ export default {
     ImageGroupDetails,
     CytomineTable,
     CytomineMultiselect,
-    CytomineSlider
+    CytomineSlider,
+    AddImageGroupModal
   },
   data() {
     return {
@@ -200,6 +207,7 @@ export default {
       error: false,
       excludedProperties: ['overview'],
       imageGroups:[],
+      addImageGroupModal: false
     };
   },
   computed: {
@@ -306,6 +314,21 @@ export default {
     viewerURL(imageGroup) {
       let ids = imageGroup.imageInstances.map(img => img.id);
       return `/project/${imageGroup.project}/image/${ids.join('-')}`;
+    },
+
+    newImageGroup(imageGroup) {
+      this.refreshData();
+      this.addImageGroupModal = false;
+      this.$buefy.modal.open({
+        parent: this,
+        component: AddToImageGroupModal,
+        hasModalCard: true,
+        props: {imageGroup, programmatic: true, active: true},
+        events: {
+          'addToImageGroup': this.refreshData,
+        }
+      });
+
     }
   },
   async created() {

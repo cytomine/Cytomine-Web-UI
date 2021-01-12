@@ -1046,3 +1046,6 @@ add-images-to-image-group,Add images to image group,Ajouter des images au groupe
 already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'images
 already-in-other-image-group,Already in another image group,Déjà dans un autre groupe d'images
 button-add-images-to-image-group,Add images,Ajouter des images
+notif-success-image-group-creation,Image group successfully created,Le groupe d'images a été créé avec succès
+notif-error-image-group-creation,Failed to create image group,Une erreur a empêché la création du groupe d'images
+button-add-image-group,Add image group,Ajouter un groupe d'imges
