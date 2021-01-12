@@ -291,7 +291,7 @@
     :image="image"
   />
 
-  <add-to-image-group-modal
+  <simple-add-to-image-group-modal
     :active.sync="isAddToImageGroupModalActive"
     :image="image"
     @addToImageGroup="(event) => imageGroupLinks.push(event)"
@@ -311,7 +311,7 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
-import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
+import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
@@ -322,7 +322,7 @@ import vendorFromMime from '@/utils/vendor';
 export default {
   name: 'image-details',
   components: {
-    AddToImageGroupModal,
+    SimpleAddToImageGroupModal,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,

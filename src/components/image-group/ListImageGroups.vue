@@ -138,6 +138,8 @@ limitations under the License.-->
               :excludedProperties="excludedProperties"
               editable
               @delete="refreshData"
+              @deleteImage="refreshData"
+              @addToImageGroup="refreshData"
           />
         </template>
 

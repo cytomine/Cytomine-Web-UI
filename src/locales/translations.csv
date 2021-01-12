@@ -1042,3 +1042,7 @@ notif-error-image-group-link-deletion,Failed to remove image {imageName} from it
 notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images
 no-image-group,No image group to display,Aucun groupe d'images à afficher
+add-images-to-image-group,Add images to image group,Ajouter des images au groupe d'images
+already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'images
+already-in-other-image-group,Already in another image group,Déjà dans un autre groupe d'images
+button-add-images-to-image-group,Add images,Ajouter des images
