@@ -1067,10 +1067,10 @@ notif-error-image-group-link-creation,Failed to add image {imageName} to an imag
 no-image-group,No image group to display,Aucun groupe d'images à afficher
 annotation-links,Annotation links,Liens entre annotations
 paste-with-link,Paste with link,Coller avec un lien
-eligible-images-in-this-viewer,Images from same image group currently displayed,Images du même groupe d'images actuellement affichées
-eligible-images-not-in-this-viewer,Images from same image group currently not shown,Images du même groupe d'images actuellement non affichées
-paste-with-link-info,Paste copied annotation in images from <strong>{imageGroup}</strong> image group and link pasted annotations to the copied one.,Coller l'annotation copiée dans des images du groupe d'images {imageGroup} en liant ces annotations à l'annotation copiée.
-all-images-have-linked-annot,All images in the image group already have an annotation linked to the copied one.,Toutes les images du groupe d'images ont déjà une annotation liée à l'annotation copiée.
+eligible-images-in-this-viewer,Images from {imageGroup} image group currently displayed,Images du groupe d'images {imageGroup} actuellement affichées
+eligible-images-not-in-this-viewer,Images from {imageGroup} image group currently not shown,Images du groupe d'images {imageGroup} actuellement non affichées
+paste-with-link-info,Select image(s) where to paste and link the copied annotation:,Sélectionner la ou les image(s) où coller et lier l'annotation copiée:
+all-images-have-linked-annot,All images in the image group already have annotations linked to the copied annotation.,Toutes les images du groupe d'images ont déjà une annotation liée à l'annotation copiée.
 notif-success-annotation-link-paste,Annotation successfully pasted and linked,L'annotation a été collée en créant des liens avec succès
 notif-error-annotation-link-paste,Failed to paste and link annotation,Une erreur a empêché de coller et lier l'annotation
 viewer-center-position,viewer center position,centre du visualisateur

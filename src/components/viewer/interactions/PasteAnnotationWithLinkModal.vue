@@ -17,12 +17,12 @@
             :annotation="copiedAnnot"
             :images="[image]"
         />
-        <div class="info" v-html="$t('paste-with-link-info', {imageGroup: imageGroup.name})"></div>
+        <div class="info" v-html="$t('paste-with-link-info')"></div>
 
         <div v-if="imagesInGroupInViewer.length > 0">
           <div class="field header">
             <b-checkbox :value="allCheckedInViewer" @change.native="checkAllInViewer()">
-              {{$t('eligible-images-in-this-viewer')}}
+              {{$t('eligible-images-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>
           <div class="field" v-for="image in imagesInGroupInViewer" :key="`in-viewer-${index}-${image.id}`">
@@ -43,7 +43,7 @@
         <div v-if="imagesInGroupNotInViewer.length > 0">
           <div class="field header">
             <b-checkbox :value="allCheckedNotInViewer" @change.native="checkAllNotInViewer()">
-              {{$t('eligible-images-not-in-this-viewer')}}
+              {{$t('eligible-images-not-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>
           <div class="field" v-for="image in imagesInGroupNotInViewer" :key="`not-in-viewer-${index}-${image.id}`">
