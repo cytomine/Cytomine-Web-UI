@@ -54,7 +54,7 @@ limitations under the License.-->
       <b-collapse :open="filtersOpened">
         <div class="filters">
           <div class="columns">
-            <div class="column filter">
+            <div class="column filter is-half">
               <div class="filter-label">
                 {{$t('images')}}
               </div>
@@ -63,14 +63,14 @@ limitations under the License.-->
               </div>
             </div>
 
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('annotation-links')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsAnnotationLinks" :max="maxNbAnnotationLinks" />
-              </div>
-            </div>
+<!--            <div class="column filter">-->
+<!--              <div class="filter-label">-->
+<!--                {{$t('annotation-links')}}-->
+<!--              </div>-->
+<!--              <div class="filter-body">-->
+<!--                <cytomine-slider v-model="boundsAnnotationLinks" :max="maxNbAnnotationLinks" />-->
+<!--              </div>-->
+<!--            </div>-->
           </div>
 
         </div>
@@ -117,12 +117,12 @@ limitations under the License.-->
             {{ imageGroup.numberOfImages }}
           </b-table-column>
 
-          <b-table-column
-            field="numberOfAnnotationLinks"
-            :label="$t('annotation-links')" centered sortable width="150"
-          >
-            {{ imageGroup.numberOfAnnotationLinks }}
-          </b-table-column>
+<!--          <b-table-column-->
+<!--            field="numberOfAnnotationLinks"-->
+<!--            :label="$t('annotation-links')" centered sortable width="150"-->
+<!--          >-->
+<!--            {{ imageGroup.numberOfAnnotationLinks }}-->
+<!--          </b-table-column>-->
 
           <b-table-column label=" " centered width="150">
             <router-link
@@ -235,7 +235,7 @@ export default {
       return Math.max(10, ...this.imageGroups.map(ig => ig.numberOfImages));
     },
     maxNbAnnotationLinks() {
-      return Math.max(100, ...this.imageGroups.map(ig => ig.numberOfAnnotationLinks));
+      return 100; //Math.max(100, ...this.imageGroups.map(ig => ig.numberOfAnnotationLinks));
     },
 
     boundsImages: localSyncBoundsFilter('boundsImages', 'maxNbImages'),
@@ -252,8 +252,8 @@ export default {
       }
 
       filtered = filtered.filter(group => {
-        return isBetweenBounds(group.numberOfImages, this.boundsImages) &&
-          isBetweenBounds(group.numberOfAnnotationLinks, this.boundsAnnotationLinks);
+        return isBetweenBounds(group.numberOfImages, this.boundsImages) /*&&
+          isBetweenBounds(group.numberOfAnnotationLinks, this.boundsAnnotationLinks)*/;
       });
 
       return filtered;
