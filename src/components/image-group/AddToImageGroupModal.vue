@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-  <cytomine-modal :active="active" :title="$t('add-images-to-image-group')" @close="$emit('update:active', false)">
+  <cytomine-modal :active="active" :title="$t('add-images-to-image-group')" @close="close()">
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
       <template>
@@ -79,6 +79,7 @@ export default {
   props: {
     active: Boolean,
     imageGroup: Object,
+    programmatic: {type: Boolean, default: false}
   },
   components: {
     CytomineTable,
@@ -122,6 +123,14 @@ export default {
     }
   },
   methods: {
+    close() {
+      if (!this.programmatic) {
+        this.$emit('update:active', false);
+      }
+      else {
+        this.$emit('close');
+      }
+    },
     imageNameNotif(image) {
       return this.blindMode ? image.blindedName : image.instanceFilename;
     },
