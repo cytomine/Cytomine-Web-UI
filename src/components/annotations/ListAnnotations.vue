@@ -91,10 +91,14 @@
               {{$t('group-linked-annotations')}}
             </div>
             <div class="filter-body">
-              <b-switch v-model="regroup" class="switch">
-                <template v-if="regroup">{{$t('yes')}}</template>
-                <template v-else>{{$t('no')}}</template>
-              </b-switch>
+              <cytomine-multiselect
+                  v-model="regroup"
+                  :options="groupBundling"
+                  label="label"
+                  track-by="bundling"
+                  :allow-empty="false"
+                  :searchable="false"
+              />
             </div>
           </div>
         </div>
@@ -266,7 +270,7 @@
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
       :nbPerPage="nbPerPage"
-      :regroup="regroup"
+      :bundling="regroup.bundling"
 
       :allTerms="terms"
       :allUsers="allUsers"
@@ -362,6 +366,12 @@ export default {
         {label: this.$t('medium'), size: 125},
         {label: this.$t('large'), size: 200},
         {label: this.$t('huge'), size: 400},
+      ],
+
+      groupBundling: [
+        {label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE'},
+        {label: this.$t('yes'), bundling: 'YES'},
+        {label: this.$t('no'), bundling: 'NO'}
       ],
 
       userAnnotationOption: this.$t('user-annotations'),
@@ -727,6 +737,9 @@ export default {
     }
     if(!this.selectedAnnotationType) {
       this.selectedAnnotationType = this.userAnnotationOption;
+    }
+    if(!this.regroup) {
+      this.regroup = this.groupBundling[this.groupBundling.length - 1];
     }
     // ---
 

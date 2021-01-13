@@ -25,6 +25,7 @@ export default {
       categorization: null,
       perPage: 25,
       outlineColor: null,
+      regroup: null,
 
       annotationType: null,
       filters: {
@@ -39,7 +40,7 @@ export default {
       },
       fromDate: null,
       toDate: null,
-      regroup: false,
+
 
       currentPages: {} // mapping of type {idProp: currentPage}
     };
