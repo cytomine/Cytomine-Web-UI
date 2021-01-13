@@ -699,9 +699,24 @@ export default {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
         if (annot.group) {
-          (await listAnnotationsInGroup(annot.project, annot.group)).forEach(a => {
+          let editedAnnots = [];
+          if (annot.annotationLink.length === 2) {
+            // If there were 2 links, the group has been deleted by backend
+            let otherId = annot.annotationLink.filter(al => al.annotation !== annot.id)[0].annotation;
+            let other = await Annotation.fetch(otherId);
+            other.imageGroup = annot.imageGroup;
+            await updateTermProperties(other);
+            await updateTrackProperties(other);
+            await updateAnnotationLinkProperties(other);
+
+            editedAnnots = [other];
+          }
+          else {
+            editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
+          }
+          editedAnnots.forEach(a => {
             this.$eventBus.$emit('editAnnotation', a);
-            if (a.id === this.copiedAnnot.id) {
+            if (this.copiedAnnot && a.id === this.copiedAnnot.id) {
               let copiedAnnot = this.copiedAnnot.clone();
               copiedAnnot.annotationLink = a.annotationLink;
               copiedAnnot.group = a.group;
@@ -851,10 +866,26 @@ export default {
         await AnnotationLink.delete(annot.id, annot.group);
         let updatedAnnot = annot.clone();
         await updateAnnotationLinkProperties(updatedAnnot);
-        let editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
+
+        let editedAnnots = [];
+        if (annot.annotationLink.length === 2) {
+          // If there were 2 links, the group has been deleted by backend
+          let otherId = annot.annotationLink.filter(al => al.annotation !== annot.id)[0].annotation;
+          let other = await Annotation.fetch(otherId);
+          other.imageGroup = annot.imageGroup;
+          await updateTermProperties(other);
+          await updateTrackProperties(other);
+          await updateAnnotationLinkProperties(other);
+
+          editedAnnots = [updatedAnnot, other];
+        }
+        else {
+          editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
+        }
+
         editedAnnots.forEach(annot => {
           this.$eventBus.$emit('editAnnotation', annot);
-          if (annot.id === this.copiedAnnot.id) {
+          if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
             let copiedAnnot = this.copiedAnnot.clone();
             copiedAnnot.annotationLink = annot.annotationLink;
             copiedAnnot.group = annot.group;
