@@ -395,8 +395,9 @@ export default {
 
     layersToPreload() {
       let layers = [];
-      if(this.selectedAnnotation) {
-        layers.push(this.selectedAnnotation.type === AnnotationType.REVIEWED ? -1 : this.selectedAnnotation.user);
+      let annot = this.selectedAnnotation || this.routedAnnotation;
+      if(annot) {
+        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : annot.user);
       }
       if(this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);
@@ -568,7 +569,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center=false, newImage=false, showComments=false}) {
+    async selectAnnotationHandler({index, annot, center=false, showComments=false}) {
       if (this.index === index && annot.image === this.image.id) {
         try {
           if (!annot.slice) {
@@ -586,19 +587,8 @@ export default {
           }
 
           this.selectedAnnotation = annot; // used to pre-load annot layer
-
-          if (newImage) {
-            // remove all selected features in order to reselect them when they will be added to the map (otherwise,
-            // issue with the select interaction)
-            this.selectedLayers.forEach(layer => {
-              this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
-            });
-            this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-          }
-          else {
-            this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-            this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
-          }
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+          this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
 
           if (center) {
             await this.viewMounted();
@@ -701,20 +691,35 @@ export default {
       this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
     });
 
-    let idRoutedAnnot = this.$route.params.idAnnotation;
-    if(idRoutedAnnot) {
-      try {
-        let annot = await Annotation.fetch(idRoutedAnnot);
-        if(annot.image === this.image.id) {
-          await this.selectAnnotationHandler({
-            index: this.index,
-            annot,
-            center: false, // require special treatment as $refs.view is not available yet in the lifecycle: see viewMounted()
-            newImage: true,
-            showComments:(this.routedAction === 'comments')
-          });
-          this.routedAnnotation = annot;
+    let annot = this.imageWrapper.routedAnnotation;
+    if (!annot) {
+      let idRoutedAnnot = this.$route.params.idAnnotation;
+      if (idRoutedAnnot) {
+        try {
+          annot = await Annotation.fetch(idRoutedAnnot);
         }
+        catch (error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        }
+      }
+    }
+
+    if (annot) {
+      try {
+        if (annot.image === this.image.id) {
+          if (annot.slice !== this.slice.id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+          }
+          this.routedAnnotation = annot;
+          if (this.routedAction === 'comments') {
+            this.$store.commit(this.imageModule + 'setShowComments', annot);
+          }
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+        }
+
+        this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       }
       catch(error) {
         console.log(error);

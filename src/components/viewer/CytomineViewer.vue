@@ -235,17 +235,16 @@ export default {
     async selectAnnotationHandler({index, annot, center=false}) {
       if (index === null) {
         try {
-          let newImage = false;
           annot = await Annotation.fetch(annot.id);
-          if (!this.idImages.includes(String(annot.image))) {
+          if (this.idImages.includes(String(annot.image))) {
+            let index = this.cells.find(cell => cell.image.id === annot.image).index;
+            this.$eventBus.$emit('selectAnnotation', {index, annot, center});
+          }
+          else {
             let image = await ImageInstance.fetch(annot.image);
             let slice = await SliceInstance.fetch(annot.slice);
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
-            newImage = true;
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
           }
-
-          let index = this.cells.find(cell => cell.image.id === annot.image).index;
-          this.$eventBus.$emit('selectAnnotation', {index, annot, center, newImage});
         }
         catch(err) {
           console.log(err);
