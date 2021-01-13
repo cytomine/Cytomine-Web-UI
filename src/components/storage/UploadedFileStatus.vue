@@ -12,15 +12,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div v-if="!iconOnly">
-  <span v-if="!isConverted || !file.nbChildren" class="tag" :class="tagClass">
+  <span v-if="!isSuccessful || file.nbChildren === undefined" class="tag" :class="tagClass">
     {{$t(labels[file.status])}}
   </span>
   <div v-else class="tags has-addons">
-    <span class="tag is-success">{{$t('converted')}}</span>
-    <span class="tag is-light">{{$tc("count-files", file.nbChildren, {count: file.nbChildren})}}</span>
+    <span class="tag" :class="tagClass">{{$t(labels[file.status])}}</span>
+    <span class="tag is-light">{{$tc("count-files", file.nbChildren + 1, {count: file.nbChildren + 1})}}</span>
   </div>
 </div>
 <span v-else :class="['icon', textClass]">
@@ -38,8 +37,8 @@ export default {
     iconOnly: {type: Boolean, default: false}
   },
   computed: {
-    isConverted() {
-      return this.file.status === UploadedFileStatus.CONVERTED;
+    isSuccessful() {
+      return this.file.status === UploadedFileStatus.CONVERTED || this.file.status === UploadedFileStatus.DEPLOYED;
     },
     labels() {
       return {
@@ -47,26 +46,32 @@ export default {
         [UploadedFileStatus.CONVERTED]: 'converted',
         [UploadedFileStatus.DEPLOYED]: 'deployed',
         [UploadedFileStatus.ERROR_FORMAT]: 'error-format',
-        [UploadedFileStatus.ERROR_CONVERT]: 'error-convert',
-        [UploadedFileStatus.UNCOMPRESSED]: 'uncompressed',
-        [UploadedFileStatus.TO_DEPLOY]: 'to-deploy',
-        [UploadedFileStatus.TO_CONVERT]: 'to-convert',
+        [UploadedFileStatus.ERROR_CONVERSION]: 'error-convert',
+        [UploadedFileStatus.EXTRACTED]: 'uncompressed',
         [UploadedFileStatus.ERROR_DEPLOYMENT]: 'error-deployment',
+        [UploadedFileStatus.DETECTING_FORMAT]: 'detecting-format',
+        [UploadedFileStatus.EXTRACTING_DATA]: 'extracting-data',
+        [UploadedFileStatus.ERROR_EXTRACTION]: 'error-extraction',
+        [UploadedFileStatus.CONVERTING]: 'converting',
+        [UploadedFileStatus.DEPLOYING]: 'deploying',
       };
     },
     result() {
       switch(this.file.status) {
         case UploadedFileStatus.UPLOADED:
-        case UploadedFileStatus.TO_DEPLOY:
-        case UploadedFileStatus.TO_CONVERT:
-        case UploadedFileStatus.UNCOMPRESSED:
+        case UploadedFileStatus.DETECTING_FORMAT:
+        case UploadedFileStatus.EXTRACTING_DATA:
+        case UploadedFileStatus.CONVERTING:
+        case UploadedFileStatus.DEPLOYING:
+        case UploadedFileStatus.EXTRACTED:
           return 'info';
         case UploadedFileStatus.CONVERTED:
         case UploadedFileStatus.DEPLOYED:
           return 'success';
         case UploadedFileStatus.ERROR_FORMAT:
-        case UploadedFileStatus.ERROR_CONVERT:
+        case UploadedFileStatus.ERROR_CONVERSION:
         case UploadedFileStatus.ERROR_DEPLOYMENT:
+        case UploadedFileStatus.ERROR_EXTRACTION:
           return 'danger';
       }
     },

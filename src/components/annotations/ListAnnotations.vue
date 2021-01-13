@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!configUI['project-annotations-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -29,6 +28,21 @@
       <h2> {{ $t('display') }} </h2>
       <div class="filters">
         <div class="columns">
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('categorization')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                v-model="selectedCategorization"
+                :options="allowedCategorizations"
+                label="label"
+                track-by="categorization"
+                :allow-empty="false"
+                :searchable="false"
+              />
+            </div>
+          </div>
           <div class="column filter">
             <div class="filter-label">
               {{$t('preview-size')}}
@@ -92,7 +106,53 @@
             </div>
           </div>
 
-          <div class="column filter is-one-quarter">
+          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-quarter">
+            <div class="filter-label">
+              {{$t('analyses')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                v-model="selectedUserJobs"
+                :options="userJobs"
+                label="fullName"
+                track-by="id"
+                multiple
+                :allPlaceholder="$t('all-analyses')"
+              />
+            </div>
+          </div>
+
+          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-quarter">
+            <div class="filter-label">
+              {{$t('members')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                v-model="selectedMembers"
+                :options="filteredMembers"
+                label="fullName"
+                track-by="id"
+                multiple
+              />
+            </div>
+          </div>
+
+          <div v-else class="column filter is-one-quarter">
+            <div class="filter-label">
+              {{$t('reviewers')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                v-model="selectedReviewers"
+                :options="members"
+                label="fullName"
+                track-by="id"
+                multiple
+              />
+            </div>
+          </div>
+
+          <div class="column filter is-one-third">
             <div class="filter-label">
               {{$t('images')}}
             </div>
@@ -107,80 +167,47 @@
               />
             </div>
           </div>
+        </div>
 
-          <div v-if="ontology" class="column filter is-one-quarter">
+        <div class="columns">
+
+          <div v-if="ontology" class="column filter is-one-third">
               <div class="filter-label">
                 {{$t('terms')}}
               </div>
               <div class="filter-body">
                 <ontology-tree-multiselect
                   :ontology="ontology"
-                  :additionalNodes="additionalNodes"
+                  :additionalNodes="additionalTermNodes"
                   v-model="selectedTermsIds"
                 />
               </div>
           </div>
 
-          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-quarter">
-           <div class="filter-label">
-             {{$t('analyses')}}
-           </div>
-           <div class="filter-body">
-             <cytomine-multiselect
-               v-model="selectedUserJobs"
-               :options="userJobs"
-               label="fullName"
-               track-by="id"
-               multiple
-               :allPlaceholder="$t('all-analyses')"
-             />
-           </div>
+          <div v-if="tracks" class="column filter is-one-third">
+            <div class="filter-label">
+              {{$t('tracks')}}
+            </div>
+            <div class="filter-body">
+              <track-tree-multiselect
+                :tracks="filteredTracks"
+                :additional-nodes="additionalTrackNodes"
+                v-model="selectedTracksIds"
+              />
+            </div>
           </div>
 
-          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-quarter">
-           <div class="filter-label">
-             {{$t('members')}}
-           </div>
-           <div class="filter-body">
-             <cytomine-multiselect
-               v-model="selectedMembers"
-               :options="filteredMembers"
-               label="fullName"
-               track-by="id"
-               multiple
-             />
-           </div>
-          </div>
-
-          <div v-else class="column filter is-one-quarter">
-           <div class="filter-label">
-             {{$t('reviewers')}}
-           </div>
-           <div class="filter-body">
-             <cytomine-multiselect
-               v-model="selectedReviewers"
-               :options="members"
-               label="fullName"
-               track-by="id"
-               multiple
-             />
-           </div>
-          </div>
-        </div>
-
-        <div class="columns">
           <div class="column filter is-one-quarter">
             <div class="filter-label">
               {{$t('tags')}}
             </div>
             <div class="filter-body">
               <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                                    label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
             </div>
           </div>
-          <div class="column filter is-one-quarter"></div>
 
-          <div class="column filter is-one-quarter">
+          <div class="column filter">
             <div class="filter-label">
               {{$t('from')}}
             </div>
@@ -189,12 +216,12 @@
             </div>
           </div>
 
-          <div class="column filter is-one-quarter">
+          <div class="column filter">
             <div class="filter-label">
               {{$t('to')}}
             </div>
             <div class="filter-body">
-              <cytomine-datepicker v-model="toDate" :styles="['multiselect']" :minDate="fromDate" />
+              <cytomine-datepicker v-model="toDate" :styles="['multiselect']" :minDate="fromDate" position="is-bottom-left" />
             </div>
           </div>
 
@@ -202,7 +229,8 @@
       </div>
     </div>
 
-    <list-annotations-by-term v-for="term in termsOptions" :key="term.id"
+    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
+      :categorization="selectedCategorization.categorization"
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
       :nbPerPage="nbPerPage"
@@ -210,10 +238,15 @@
       :allTerms="terms"
       :allUsers="allUsers"
       :allImages="images"
+      :allTracks="tracks"
 
-      :term="term"
-      :multipleTerms="term.id === multipleTermsOption.id"
-      :noTerm="term.id === noTermOption.id"
+      :prop="prop"
+      :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
+      :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
+      :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
+      :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
+      :terms-ids="selectedTermsIds"
+      :tracks-ids="selectedTracksIds"
       :imagesIds="selectedImagesIds"
       :usersIds="selectedUsersIds"
       :tagsIds="tagsIdsNotNull"
@@ -225,9 +258,13 @@
 
       :revision="revision"
 
-      v-show="selectedTermsIds.includes(term.id)"
+      v-show="showList(prop)"
+      :visible="showList(prop)"
 
       @addTerm="addTerm"
+      @addTrack="addTrack"
+      @updateTermsOrTracks="revision++"
+      @delete="revision++"
       @update="revision++"
     />
 
@@ -250,12 +287,13 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
-import ListAnnotationsByTerm from './ListAnnotationsByTerm';
+import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
+import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -265,10 +303,11 @@ const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilte
 export default {
   name: 'list-annotations',
   components: {
+    TrackTreeMultiselect,
     CytomineMultiselect,
     CytomineDatepicker,
     OntologyTreeMultiselect,
-    ListAnnotationsByTerm
+    ListAnnotationsBy
   },
   data() {
     return {
@@ -279,11 +318,20 @@ export default {
       projectUsers: [],
       userJobs: [],
 
+      tracks: [],
+
       allowedSizes: [
         {label: this.$t('small'), size: 85},
         {label: this.$t('medium'), size: 125},
         {label: this.$t('large'), size: 200},
         {label: this.$t('huge'), size: 400},
+      ],
+
+      allowedCategorizations: [
+        {label: this.$t('per-term'), categorization: 'TERM'},
+        {label: this.$t('per-track'), categorization: 'TRACK'},
+        {label: this.$t('per-user'), categorization: 'USER'},
+        {label: this.$t('per-image'), categorization: 'IMAGE'}
       ],
 
       userAnnotationOption: this.$t('user-annotations'),
@@ -295,7 +343,10 @@ export default {
       availableTags:[],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
-      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')}
+      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
+
+      noTrackOption: {id: 0, name: this.$t('no-track')},
+      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')}
     };
   },
   computed: {
@@ -321,6 +372,7 @@ export default {
     },
 
     selectedSize: sync('previewSize', storeOptions),
+    selectedCategorization: sync('categorization', storeOptions),
     nbPerPage: sync('perPage', storeOptions),
     selectedColor: sync('outlineColor', storeOptions),
 
@@ -358,18 +410,38 @@ export default {
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
     },
-    additionalNodes() {
+    additionalTermNodes() {
       let additionalNodes = [this.noTermOption];
-      if(this.terms.length > 1) {
+      if(this.terms.length > 1 && this.isByTerm) {
         additionalNodes.push(this.multipleTermsOption);
       }
       return additionalNodes;
     },
     termsOptions() {
-      return this.terms.concat(this.additionalNodes);
+      return this.terms.concat(this.additionalTermNodes);
     },
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
+    },
+
+    filteredTracks() {
+      return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
+    },
+    filteredTracksIds() {
+      return this.filteredTracks.map(track => track.id);
+    },
+    additionalTrackNodes() {
+      let additionalNodes = [this.noTrackOption];
+      if (this.tracks.length > 1 && this.isByTrack) {
+        additionalNodes.push(this.multipleTracksOption);
+      }
+      return additionalNodes;
+    },
+    tracksOptions() {
+      return this.filteredTracks.concat(this.additionalTrackNodes);
+    },
+    trackOptionsIds() {
+      return this.tracksOptions.map(option => option.id);
     },
 
     selectedAnnotationType: sync('annotationType', storeOptions),
@@ -378,6 +450,7 @@ export default {
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
     selectedTags: localSyncMultiselectFilter('tags', 'availableTags'),
+    selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
     toDate: sync('toDate', storeOptions),
@@ -406,6 +479,36 @@ export default {
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
+
+    categoryOptions() {
+      switch (this.selectedCategorization.categorization) {
+        case 'TERM':
+          return this.termsOptions;
+        case 'IMAGE':
+          return this.images;
+        case 'USER':
+          if (this.selectedAnnotationType === this.jobAnnotationOption)
+            return this.selectedUserJobs;
+          if (this.reviewed)
+            return this.selectedReviewers;
+          return this.selectedMembers;
+        case 'TRACK':
+          return this.tracksOptions;
+      }
+    },
+    isByTerm() {
+      return this.selectedCategorization.categorization === 'TERM';
+    },
+    isByTrack() {
+      return this.selectedCategorization.categorization === 'TRACK';
+    },
+    noTerm() {
+      return this.selectedTermsIds.includes(this.noTermOption.id);
+    },
+    noTrack() {
+      return this.selectedTracksIds.includes(this.noTrackOption.id);
+    },
+
     selectedTagsIds() {
       return this.selectedTags.map(t => t.id);
     },
@@ -428,7 +531,7 @@ export default {
         users: this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
-        noTerm: this.selectedTermsIds.includes(this.noTermOption.id),
+        noTerm: this.noTerm,
         multipleTerms: this.selectedTermsIds.includes(this.multipleTermsOption.id),
         afterThan: this.afterThan,
         beforeThan: this.beforeThan
@@ -468,6 +571,9 @@ export default {
         userJob.fullName = fullName(userJob);
       });
     },
+    async fetchTracks() {
+      this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+    },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
@@ -478,8 +584,23 @@ export default {
       this.terms.push(term);
       this.selectedTermsIds.push(term.id);
     },
+    addTrack(track) {
+      this.tracks.push(track);
+    },
     resetPagesAndFilters() {
       this.$store.commit(this.storeModule + '/resetPagesAndFilters');
+    },
+    showList(prop) {
+      switch (this.selectedCategorization.categorization) {
+        case 'TERM':
+          return this.selectedTermsIds.includes(prop.id);
+        case 'IMAGE':
+          return this.selectedImagesIds.includes(prop.id);
+        case 'USER':
+          return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
+        case 'TRACK':
+          return this.selectedTracksIds.includes(prop.id);
+      }
     }
   },
   async created() {
@@ -488,6 +609,9 @@ export default {
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {
       this.selectedSize = this.allowedSizes[0];
+    }
+    if(!this.selectedCategorization) {
+      this.selectedCategorization = this.allowedCategorizations[0];
     }
     if(!this.selectedColor) {
       this.selectedColor = this.colors[0];
@@ -502,6 +626,7 @@ export default {
         this.fetchImages(),
         this.fetchUsers(),
         this.fetchUserJobs(),
+        this.fetchTracks(),
         this.fetchTags()
       ]);
     }

@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="columns" v-if="images && images.length">
   <div class="column" v-for="image in images" :key="image.image">

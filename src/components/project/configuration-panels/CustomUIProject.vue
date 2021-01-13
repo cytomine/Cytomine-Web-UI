@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
   <h2> {{ $t('error') }} </h2>
@@ -107,11 +106,11 @@ export default {
             {key: 'project-explore-annotation-description', label: 'description', icon: 'far fa-file-alt'},
             {key: 'project-explore-annotation-terms', label: 'terms', icon: 'fas fa-hashtag'},
             {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-annotation-tracks', label: 'tracks', icon: 'fas fa-route'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment'}
-
           ]
         },
         {
@@ -121,7 +120,7 @@ export default {
 
             {key: 'project-tools-select', label: 'select', icon: 'fas fa-mouse-pointer'},
 
-            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-marker-alt'},
+            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-pin'},
             {key: 'project-tools-line', label: 'line', icon: 'fas fa-minus'},
             {key: 'project-tools-freehand-line', label: 'freehand-line',
               iconComponent: IconLineFreeHand},
@@ -140,6 +139,8 @@ export default {
             {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt'},
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt'},
+
+            {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy'},
 
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo'},
           ]

@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
   <div v-if="!comments || !comments.length">
@@ -77,6 +76,7 @@ import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
+
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 

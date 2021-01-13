@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="tile is-child box last-actions">
   <h2>{{$t('activity-logs')}}</h2>

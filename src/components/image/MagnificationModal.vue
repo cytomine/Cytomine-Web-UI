@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="setMagnification()">
   <cytomine-modal :active="active" :title="$t('set-magnification')" @close="$emit('update:active', false)">
@@ -21,7 +20,7 @@
     </b-message>
 
     <b-field :label="$t('magnification')" :type="fieldType" :message="errors.first('magnification')">
-      <b-input v-model="newMagnification" name="magnification" v-validate="'required|decimal|positive'" />
+      <b-input v-model="newMagnification" name="magnification" v-validate="'decimal|positive'" />
     </b-field>
 
     <template #footer>

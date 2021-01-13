@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="storage-wrapper content-wrapper">
   <div class="panel">
@@ -25,24 +24,31 @@
       </b-message>
     </div>
     <div class="panel-block" v-else>
-      <b-message type="is-info" has-icon icon-size="is-small">
-        <h2>{{$t('important-notes')}}</h2>
-        <ul class="small-text">
-          <li>{{$t('max-size-upload-info')}}</li>
-          <li>{{$t('allowed-formats-upload-info')}}</li>
-          <li>{{$t('vms-mrxs-upload-info')}}</li>
-          <li>{{$t('zip-upload-info')}}</li>
-          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
-          <li>{{$t('link-to-project-upload-info')}}</li>
-        </ul>
-      </b-message>
+<!--      <b-message type="is-info" has-icon icon-size="is-small">-->
+<!--        <h2>{{$t('important-notes')}}</h2>-->
+<!--        <ul class="small-text">-->
+<!--          <li>{{$t('max-size-upload-info')}}</li>-->
+<!--          <li>{{$t('allowed-formats-upload-info')}}</li>-->
+<!--          <li>{{$t('vms-mrxs-upload-info')}}</li>-->
+<!--          <li>{{$t('zip-upload-info')}}</li>-->
+<!--          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>-->
+<!--          <li>{{$t('link-to-project-upload-info')}}</li>-->
+<!--        </ul>-->
+<!--      </b-message>-->
 
       <div class="columns">
         <div class="column is-one-quarter has-text-right">
           <strong>{{$t('storage')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false" />
+          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false">
+            <template #option="{option}">
+              {{option.name}}
+              <template v-if="currentUser.isDeveloper">
+                 ({{$t('id')}}: {{option.id}})
+              </template>
+            </template>
+          </cytomine-multiselect>
         </div>
       </div>
 
@@ -51,7 +57,8 @@
           <strong>{{$t('link-with-project')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedProject" :options="projects" label="name" track-by="id" />
+          <cytomine-multiselect v-model="selectedProjects" :options="projects" label="name" track-by="id"
+                                          :multiple="true" />
         </div>
       </div>
 
@@ -170,10 +177,6 @@
             {{ filesize(uFile.size) }}
           </b-table-column>
 
-          <b-table-column field="contentType" :label="$t('content-type')" sortable width="100">
-            {{ uFile.contentType }}
-          </b-table-column>
-
           <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">
             {{ filesize(uFile.globalSize) }}
           </b-table-column>
@@ -182,9 +185,9 @@
             <uploaded-file-status :file="uFile" />
           </b-table-column>
 
-          <b-table-column field="parentFilename" :label="$t('from')" sortable width="150">
-            {{ uFile.parentFilename ? uFile.parentFilename : "-" }}
-          </b-table-column>
+          <!--<b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">-->
+            <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
+          <!--</b-table-column>-->
         </template>
 
         <template #detail="{row: uFile}">
@@ -232,7 +235,7 @@ export default {
       storages: [],
       selectedStorage: null,
       projects: [],
-      selectedProject: null,
+      selectedProjects: [],
 
       searchString: '',
 
@@ -282,8 +285,8 @@ export default {
       if(this.selectedStorage) {
         str += `&idStorage=${this.selectedStorage.id}`;
       }
-      if(this.selectedProject) {
-        str += `&idProject=${this.selectedProject.id}`;
+      if(this.selectedProjects) {
+        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
       }
       return str;
     },
@@ -336,9 +339,10 @@ export default {
     async refreshStatusSessionUploads() {
       let pendingStatus = [
         UploadedFileStatus.UPLOADED,
-        UploadedFileStatus.TO_DEPLOY,
-        UploadedFileStatus.UNCOMPRESSED,
-        UploadedFileStatus.TO_CONVERT
+        UploadedFileStatus.DETECTING_FORMAT,
+        UploadedFileStatus.EXTRACTING_DATA,
+        UploadedFileStatus.CONVERTING,
+        UploadedFileStatus.DEPLOYING,
       ];
 
       let unfinishedConversions = false;
@@ -420,7 +424,7 @@ export default {
           cancelToken: fileWrapper.cancelToken.token
         }
       ).then(response => {
-        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadFile.attr);
+        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
         this.refreshStatusSessionUploads();
         this.revision++;
       }).catch(error => {

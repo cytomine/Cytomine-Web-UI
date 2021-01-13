@@ -48,7 +48,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit}, image) {
+    async initialize({commit}, {image}) {
       commit('setCenter', [image.width/2, image.height/2]);
     },
   }

@@ -12,10 +12,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <h1>{{$t('link-images')}}</h1>
+
+  <b-field horizontal :label="$t('link-mode')">
+    <b-select v-model="linkMode" size="is-small" expanded>
+      <option v-for="option in modeOptions" :key="option.label" :value="option.key">
+        {{option.label}}
+      </option>
+    </b-select>
+  </b-field>
 
   <div class="current-group" v-if="linkedIndexes">
     <p>{{$t('view-linked-with')}}</p>
@@ -68,6 +75,12 @@ export default {
     };
   },
   computed: {
+    modeOptions: function () {
+      return [
+        {key: 'ABSOLUTE', label: this.$t('absolute-link-mode')},
+        {key: 'RELATIVE', label: this.$t('relative-link-mode')}
+      ];
+    },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -76,6 +89,14 @@ export default {
     },
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
+    },
+    linkMode: {
+      get() {
+        return this.viewerWrapper.linkMode;
+      },
+      set(mode) {
+        this.$store.commit(this.viewerModule + 'setLinkMode', mode);
+      }
     },
     images() {
       return this.viewerWrapper.images;

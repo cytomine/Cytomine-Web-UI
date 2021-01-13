@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="card" :class="{'full-height-card': fullHeightCard}">
   <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${idImage}`">

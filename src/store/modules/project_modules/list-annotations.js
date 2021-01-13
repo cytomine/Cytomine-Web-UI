@@ -22,6 +22,7 @@ export default {
   state() {
     return {
       previewSize: null,
+      categorization: null,
       perPage: 25,
       outlineColor: null,
 
@@ -32,18 +33,23 @@ export default {
         userJobs: null,
         images: null,
         termsIds: null,
+        tracksIds: null,
         tags: null
       },
       fromDate: null,
       toDate: null,
 
-      currentPages: {} // mapping of type {idTerm: currentPage}
+      currentPages: {} // mapping of type {idProp: currentPage}
     };
   },
 
   mutations: {
     setPreviewSize(state, size) {
       state.previewSize = size;
+    },
+
+    setCategorization(state, categorization) {
+      state.categorization = categorization;
     },
 
     setPerPage(state, perPage) {
@@ -79,8 +85,8 @@ export default {
       state.currentPages = {};
     },
 
-    setCurrentPage(state, {term, page}) {
-      Vue.set(state.currentPages, term, page);
+    setCurrentPage(state, {prop, page}) {
+      Vue.set(state.currentPages, prop, page);
     }
   }
 };

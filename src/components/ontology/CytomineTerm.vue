@@ -12,19 +12,24 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <span v-if="term">
   <div class="color-preview" v-if="term.color" :style="{background: term.color}"></div>
   {{term.name}}
+  <span v-if="currentUser.isDeveloper && term.id > 0"> ({{$t('id')}}: {{term.id}})</span>
 </span>
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 export default {
   name: 'cytomine-term',
   props: {
     term: Object
+  },
+  computed: {
+    currentUser: get('currentUser/user'),
   }
 };
 </script>

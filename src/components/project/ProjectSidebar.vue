@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="sidebar-wrapper" :class="{expanded: expanded}" ref="sidebar">
   <nav class="sidebar" @click="clickHandler">

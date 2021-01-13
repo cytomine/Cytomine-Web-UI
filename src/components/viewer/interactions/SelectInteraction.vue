@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <vl-interaction-select
   :ident="`select-target-${index}`"
@@ -108,6 +107,7 @@ export default {
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
         term.visible;
+        term.color;
         term.opacity;
       });
       this.imageWrapper.style.displayNoTerm;
@@ -116,6 +116,9 @@ export default {
       this.imageWrapper.properties.selectedPropertyValues;
       this.imageWrapper.properties.selectedPropertyColor;
       this.imageWrapper.review.reviewMode;
+      this.imageWrapper.style.wrappedTracks.forEach(track => {
+        track.color;
+      });
 
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];

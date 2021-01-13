@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <b-loading :is-full-page="false" :active="loading" />
@@ -109,12 +108,12 @@
 </template>
 
 <script>
+
 import CytomineTable from '@/components/utils/CytomineTable';
 import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
-import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'admin-users',

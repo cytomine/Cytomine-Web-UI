@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
@@ -111,7 +110,8 @@ export default {
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
-        await this.$store.dispatch(this.viewerModule + 'addImage', image);
+        let slice = await image.fetchReferenceSlice();
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
       }
       catch(error) {
         console.log(error);

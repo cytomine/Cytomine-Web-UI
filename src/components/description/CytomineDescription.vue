@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div :class="['description-wrapper', loading ? 'loading' : '']">
   <b-loading :is-full-page="false" :active="loading" class="small" />

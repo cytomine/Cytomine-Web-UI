@@ -71,7 +71,7 @@ export default {
             hoverBorderColor: borderColors,
           }
         ]
-      }, { 
+      }, {
         maintainAspectRatio: false,
         legend: {display: false},
         scales: {

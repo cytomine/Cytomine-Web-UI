@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <span v-if="filteredUsers.length">
   <span v-for="(user, index) in usersToDisplay" :key="user.id">

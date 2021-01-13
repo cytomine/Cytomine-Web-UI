@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="list-projects-wrapper content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -133,7 +132,6 @@
           </div>
         </div>
       </b-collapse>
-
 
       <cytomine-table
         :collection="projectCollection"
@@ -256,7 +254,6 @@ export default {
       ontologies: [],
       availableTags:[],
 
-
       contributorLabel: this.$t('contributor'),
       managerLabel: this.$t('manager'),
 
@@ -290,7 +287,6 @@ export default {
     availableRoles() {
       return [this.contributorLabel, this.managerLabel];
     },
-
     availableOntologies() {
       return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },

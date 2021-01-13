@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <h2>
@@ -60,6 +59,25 @@
     </template>
   </sl-vue-tree>
 
+  <template v-if="nbUploadedFiles > 10">
+    <div class="level">
+      <b-select v-model="nbPerPage" size="is-small" class="level-left">
+        <option value="10">{{$t('count-per-page', {count: 10})}}</option>
+        <option value="25">{{$t('count-per-page', {count: 25})}}</option>
+        <option value="50">{{$t('count-per-page', {count: 50})}}</option>
+        <option value="100">{{$t('count-per-page', {count: 100})}}</option>
+      </b-select>
+
+      <b-pagination
+        class="level-right"
+        :total="nbUploadedFiles"
+        :current.sync="currentPage"
+        size="is-small"
+        :per-page="nbPerPage"
+      />
+    </div>
+  </template>
+
   <template v-if="samplePreview">
     <h2>
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
@@ -74,18 +92,34 @@
     </h2>
     <img :src="slidePreview.macroURL">
   </template>
+
+  <template v-if="image">
+    <h2>{{$t('companion-files')}}</h2>
+    <table class="table">
+      <tbody>
+      <tr>
+        <td class="prop-label">{{$t('profile')}}</td>
+        <td class="prop-content">
+          <profile-status :image="image" @update="$emit('update')"></profile-status>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </template>
 </div>
 </template>
 
 <script>
 import SlVueTree from 'sl-vue-tree';
-import {UploadedFile, UploadedFileCollection} from 'cytomine-client';
+import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
+import ProfileStatus from './ProfileStatus';
 
 export default {
   name: 'uploaded-file-details',
   components: {
+    ProfileStatus,
     SlVueTree,
     UploadedFileStatus
   },
@@ -97,15 +131,35 @@ export default {
       rootId: null,
       uploadedFiles: [],
       nodes: [],
+      image: null,
       slidePreview: null,
       samplePreview: null,
-      error: false
+      error: false,
+
+      nbUploadedFiles: 0,
+      currentPage: 1,
+      nbPerPage: 10,
     };
   },
+  computed: {
+    collection() {
+      return new UploadedFileCollection({
+        root: this.rootId,
+        max: this.nbPerPage
+      });
+    },
+  },
   watch: {
-    file() {
+    async file() {
       this.findRoot();
-      this.makeTree();
+      await Promise.all([this.fetchAbstractImage(), this.makeTree()]);
+    },
+    async currentPage() {
+      this.findRoot();
+      await this.makeTree();
+    },
+    async collection() {
+      await this.makeTree();
     },
     slidePreview(val) {
       if(val) {
@@ -120,22 +174,44 @@ export default {
   },
   methods: {
     findRoot() {
-      this.rootId = this.file.parentId || this.file.id;
+      this.rootId = this.file.root || this.file.id;
+    },
+    async fetchAbstractImage() {
+      if (this.file.image && (this.file.status === UFStatus.CONVERTED || this.file.status === UFStatus.DEPLOYED)) {
+        try {
+          this.image = await AbstractImage.fetch(this.file.image);
+        }
+        catch(error) {
+          console.log(error);
+          this.error = true;
+        }
+      }
     },
     async makeTree() {
       try {
-        this.uploadedFiles = (await UploadedFileCollection.fetchAll({root: this.rootId})).array;
-        this.nodes = this.createNodes(null);
+        let data = (await this.collection.fetchPage(this.currentPage - 1));
+        this.uploadedFiles = data.array;
+        this.nbUploadedFiles = data.totalNbItems;
+        this.nodes = (await this.createNodes(null));
       }
       catch(error) {
         console.log(error);
         this.error = true;
       }
     },
-    createNodes(idParent) {
-      let directChildren = this.uploadedFiles.filter(file => file.parentId === idParent);
-      return directChildren.map(file => {
-        let children = this.createNodes(file.id);
+    async createNodes(idParent) {
+      let directChildren = this.uploadedFiles.filter(file => file.parent === idParent);
+
+      if (directChildren.length === 0 && idParent === null) {
+        let missingIds = this.uploadedFiles[0].lTree.split('.');
+        await Promise.all(missingIds.slice(0, missingIds.length - 1).map(async id => {
+          this.uploadedFiles.unshift((await UploadedFile.fetch(id)));
+        }));
+        return this.createNodes(null);
+      }
+
+      return await Promise.all(directChildren.map(async file => {
+        let children = await this.createNodes(file.id);
         return {
           title: file.originalFilename,
           isLeaf: children.length === 0,
@@ -144,7 +220,7 @@ export default {
           data: {downloadURL: file.downloadURL, ...file}, // data converted to object by sl-vue-tree => need to define downloadURL as property
           children
         };
-      });
+      }));
     },
     filesize(size) {
       return filesize(size, {base: 10});
@@ -183,7 +259,7 @@ export default {
   },
   created() {
     this.findRoot();
-    this.makeTree();
+    this.fetchAbstractImage();
   }
 };
 </script>
@@ -219,7 +295,7 @@ export default {
 
 h2:not(:first-child) {
   margin-top: 1em;
-  border-bottom: 2px solid #ddd;
+  /*border-bottom: 2px solid #ddd;*/
 }
 
 h2 .button {
@@ -250,5 +326,28 @@ h2 .button {
 
 >>> .sl-vue-tree-gap:nth-last-child(3) {
   border-width: 0 0 1px 1px !important;
+}
+
+>>> ul.pagination-list {
+  justify-content: flex-end;
+}
+
+.level {
+  padding-bottom: 0.5rem !important;
+}
+
+.table {
+  /*background: none;*/
+  position: relative;
+  height: 3em;
+}
+
+td.prop-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+td.prop-content {
+  width: 100%;
 }
 </style>

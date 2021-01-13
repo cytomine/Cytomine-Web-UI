@@ -52,7 +52,6 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-welcome-message-update')});
       }
     }
-
   },
   async created() {
     try {

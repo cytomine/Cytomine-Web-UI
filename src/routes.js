@@ -13,7 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 import VueRouter from 'vue-router';
 
 // Import Components
@@ -91,11 +90,19 @@ const routes = [
         component: CytomineViewer
       },
       {
+        path: 'image/:idImages/slice/:idSlices',
+        component: CytomineViewer
+      },
+      {
         path: 'image/:idImage/information',
         component: ImageInformation
       },
       {
         path: 'image/:idImages/annotation/:idAnnotation',
+        component: CytomineViewer
+      },
+      {
+        path: 'image/:idImages/slice/:idSlices/annotation/:idAnnotation',
         component: CytomineViewer
       },
       {

@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <script>
 /**
  * @module zoomify-source/source
@@ -158,9 +157,9 @@ const methods = {
 
 const watch = {
   urls() {
+    //source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/UrlTile.js#L194
     const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
-    this.$source.setTileUrlFunction(tileUrlFunction);
-    this.$source.refresh();
+    this.$source.setTileUrlFunction(tileUrlFunction, this.urls.join('\n'));
   },
 };
 

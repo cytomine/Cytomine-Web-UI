@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="error">
   <h2> {{ $t('error') }} </h2>
@@ -82,6 +81,10 @@
                 :is-manager="project.currentUserRoles.admin"
                 :is-representative="project.currentUserRoles.representative"
               />
+            </b-table-column>
+
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{project.id}}
             </b-table-column>
 
             <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -167,6 +170,10 @@
           :revision="revision"
         >
           <template #default="{row: image}">
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{image.id}}
+            </b-table-column>
+
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
                 <img :src="image.thumb" class="image-overview">
@@ -237,8 +244,6 @@
           </template>
         </cytomine-table>
       </div>
-
-
     </div>
   </div>
 </div>
@@ -253,7 +258,6 @@ import ProjectDetails from '@/components/project/ProjectDetails';
 import ImageDetails from '@/components/image/ImageDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
-import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 
 export default {
@@ -306,8 +310,8 @@ export default {
     pathSearchString() {
       return this.$route.params.searchString;
     },
-    regexp() {
-      return getWildcardRegexp(this.searchString);
+    lowCaseSearchString() {
+      return this.searchString.toLowerCase();
     },
     projectCollection() {
       let collection = new ProjectCollection({

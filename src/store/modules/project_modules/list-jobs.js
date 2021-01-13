@@ -22,7 +22,8 @@ export default {
       filters: {
         softwares: [],
         launchers: [],
-        statuses: []
+        statuses: [],
+        favorites: []
       },
       executionDate: null,
 

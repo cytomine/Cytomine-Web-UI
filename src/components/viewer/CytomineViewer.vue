@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div v-if="error" class="box error">
   <h2> {{ $t('error') }} </h2>
@@ -27,7 +26,7 @@
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="cell && cell.image"
+        v-if="cell && cell.image && cell.slice"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -53,7 +52,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -76,6 +75,9 @@ export default {
     },
     idImages() {
       return this.$route.params.idImages.split('-');
+    },
+    idSlices() {
+      return (this.$route.params.idSlices) ? this.$route.params.idSlices.split('-') : [];
     },
     paramIdViewer() {
       return this.$route.query.viewer;
@@ -103,7 +105,8 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        cells[i] = {index, image};
+        let slice = this.viewer.images[index].activeSlice;
+        cells[i] = {index, image, slice};
       }
       return cells;
     },
@@ -122,7 +125,7 @@ export default {
         'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
         'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
         'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z'];
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
 
       return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
         object[key.replace('viewer-', '')] = shortcuts[key];
@@ -185,12 +188,16 @@ export default {
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
 
-          let images = {};
+          let imgAndSlices = this.idImages.map(function(e,i) { return {image : e, slice: this.idSlices[i]}})
           //don't fetch multiple times the same image.
-          let idImages = [...new Set(this.idImages)];
-          await Promise.all(idImages.map(async id => {
-            let image = await ImageInstance.fetch(id);
-            images[id] = image;
+          let uniqueArray = imgAndSlices.filter(function(item, pos) {
+            return imgAndSlices.map(function(e) { return e.image+"."+e.slice; }).indexOf(item.image+'.'+item.slice) == pos;
+          })
+          await Promise.all(uniqueArray.map(async (e, idx) => {
+            let image = await ImageInstance.fetch(e.image);
+            let idSlice = this.idSlices[e.slice];
+            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
           }));
 
           this.idImages.forEach(async id => {

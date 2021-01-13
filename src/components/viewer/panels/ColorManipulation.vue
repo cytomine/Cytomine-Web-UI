@@ -13,7 +13,6 @@
  limitations under the License.-->
 
 
-
 <template>
 <div class="color-manipulation">
   <h1>{{$t('colors')}}</h1>
@@ -135,7 +134,7 @@ export default {
   async created() {
     try {
       let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      filters.forEach(filter => filter.prefix = filter.processingServer + filter.baseUrl);
+      filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
       let prefixes = filters.map(filter => filter.prefix);
       if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it

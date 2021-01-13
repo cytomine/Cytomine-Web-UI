@@ -46,7 +46,16 @@ const moment = require('moment');
 Vue.use(VueMoment, {moment});
 
 import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, { prevent: ['input', 'textarea', '.ql-editor'] });
+Vue.use(VueShortKey, {
+  prevent: [
+    'input[type=text]',
+    'input[type=password]',
+    'input[type=search]',
+    'input[type=email]',
+    'textarea',
+    '.ql-editor'
+  ]
+});
 
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
@@ -64,6 +73,8 @@ Vue.use(RotateInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartZoom from 'chartjs-plugin-zoom';
+Chart.plugins.unregister(ChartZoom);
 Chart.plugins.unregister(ChartDataLabels);
 Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
   anchor: 'end',
