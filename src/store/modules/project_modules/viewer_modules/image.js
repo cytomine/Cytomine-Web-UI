@@ -59,7 +59,9 @@ export default {
       sliceInstances: {},
       loadedSlicePages: [],
       activeSlice: null,
-      activePanel: null
+      activePanel: null,
+
+      routedAnnotation: null
     };
   },
 
@@ -102,6 +104,13 @@ export default {
 
     setImageGroupLink(state, imageGroupLink) {
       state.imageGroupLink = imageGroupLink;
+    },
+
+    setRoutedAnnotation(state, annotation) {
+      state.routedAnnotation = annotation;
+    },
+    clearRoutedAnnotation(state) {
+      state.routedAnnotation = null;
     }
   },
 
