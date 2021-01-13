@@ -15,27 +15,38 @@
       <em class="no-result">{{ $t('no-annotation') }}</em>
     </template>
     <template v-else>
-      <annotation-preview
-        v-for="(annot, index) in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
-        :class="annotStyles(annot, index)"
-        class="annot-preview-block"
-        :annot="annot"
-        :size="size"
-        :color="color"
-        :terms="allTerms"
-        :users="allUsers"
-        :images="allImages"
-        :tracks="allTracks"
-        :show-image-info="!isInViewer"
-        :show-slice-info="isByTrack && !noTrack"
-        @addTerm="$emit('addTerm', $event)"
-        @addTrack="$emit('addTrack', $event)"
-        @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
-        @updateProperties="$emit('updateProperties')"
-        @centerView="$emit('centerView', annot)"
-        @deletion="$emit('delete', annot)"
-        @select="$emit('select', $event)"
-      />
+      <template v-for="(annot, index) in annotations">
+        <div class="break"
+             v-if="regroupPerLine && annotationInGroupDetails[index].first"
+             :key="((isInViewer) ? index : '') + title + annot.id + 'break-in'"
+        ></div>
+        <annotation-preview
+            :key="((isInViewer) ? index : '') + title + annot.id"
+            :class="annotStyles(annot, index)"
+            class="annot-preview-block"
+            :annot="annot"
+            :size="size"
+            :color="color"
+            :terms="allTerms"
+            :users="allUsers"
+            :images="allImages"
+            :tracks="allTracks"
+            :show-image-info="!isInViewer"
+            :show-slice-info="isByTrack && !noTrack"
+            @addTerm="$emit('addTerm', $event)"
+            @addTrack="$emit('addTrack', $event)"
+            @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
+            @updateProperties="$emit('updateProperties')"
+            @centerView="$emit('centerView', annot)"
+            @deletion="$emit('delete', annot)"
+            @select="$emit('select', $event)"
+        />
+        <div class="break"
+             v-if="regroupPerLine && annotationInGroupDetails[index].last"
+             :key="((isInViewer) ? index : '') + title + annot.id + 'break-out'"
+        ></div>
+      </template>
+
 
       <b-pagination
         :total="nbAnnotations"
@@ -64,7 +75,7 @@ export default {
     nbPerPage: Number,
     size: Number,
     color: String,
-    regroup: {type: Boolean, default: false},
+    bundling: {type: String, default: 'NO'},
 
     prop: Object,
 
@@ -260,6 +271,13 @@ export default {
       return this.annotations.map(annot => annot.id);
     },
 
+    regroup() {
+      return this.bundling !== 'NO';
+    },
+    regroupPerLine() {
+      return this.bundling === 'ONE_PER_LINE';
+    },
+
     annotationInGroupDetails() {
       return this.annotations.map((annotation, index) => {
         let previousGroup = (index > 0) ? this.annotations[index - 1].group : null;
@@ -439,5 +457,10 @@ export default {
   padding-left: 10px !important;
   margin-right: 0 !important;
   padding-right: 10px !important;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 </style>
