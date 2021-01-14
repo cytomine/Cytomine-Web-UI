@@ -617,10 +617,11 @@ export default {
       return this.configUI[`project-explore-${panel}`];
     },
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
+      key = key.replace('toggle-all-', 'toggle-');
       switch(key) {
         case 'toggle-information':
           if (this.isPanelDisplayed('info')){

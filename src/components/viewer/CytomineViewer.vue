@@ -125,7 +125,11 @@ export default {
         'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
         'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
         'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste', 'tool-review-reject', 'tool-review-toggle',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-all-information', 'toggle-all-zoom',
+        'toggle-all-filters', 'toggle-all-layers', 'toggle-all-ontology', 'toggle-all-properties',
+        'toggle-all-broadcast', 'toggle-all-review', 'toggle-all-overview', 'toggle-all-annotations',
+        'toggle-all-current', 'toggle-all-link'];
 
       return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
         object[key.replace('viewer-', '')] = shortcuts[key];

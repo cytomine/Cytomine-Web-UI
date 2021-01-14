@@ -1029,7 +1029,7 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
@@ -1135,6 +1135,7 @@ export default {
           }
           return;
         case 'toggle-current':
+        case 'toggle-all-current':
           if (this.configUI['project-explore-annotation-main'] && this.selectedFeature) {
             this.displayAnnotDetails = !this.displayAnnotDetails;
           }
