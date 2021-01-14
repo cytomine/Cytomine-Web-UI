@@ -496,7 +496,6 @@ shortcut-viewer-tool-redo,Redo annotation action,Refaire une action sur les anno
 review,Review,Validation
 shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Valider l'annotation sélectionnée en mode validation
 shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation
-shortcut-viewer-tool-review-toggle,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation
 version,Version,Version
 sponsors,Sponsors,Sponsors
 website,Website,Site web
@@ -906,6 +905,10 @@ shortcut-viewer-toggle-overview,Toggle overview,Afficher/Masquer l'aperçu
 shortcut-viewer-toggle-annotations,Toggle annotations panel,Afficher/Masquer le panneau des annotations
 shortcut-viewer-toggle-current,Toggle currently selected annotation panel,Afficher/Masquer les détails de l'annotation sélectionnée
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images
+shortcut-viewer-toggle-review-layer,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation
+shortcut-viewer-toggle-all-review-layer,Toggle review layer in review mode in all views,Afficher/masquer le calque de validation en mode validation dans toutes les vues
+shortcut-viewer-toggle-selected-layers,Toggle visibility of selected layers,Afficher/masquer les calques d'annotations sélectionnés
+shortcut-viewer-toggle-all-selected-layers,Toggle visibility of selected layers in all views,Afficher/masquer les calques d'annotations sélectionnés dans toutes les vues
 shortcut-viewer-toggle-all-information,Toggle information panel in all views,Afficher/Masquer le panneau d'information dans toutes les vues
 shortcut-viewer-toggle-all-zoom,Toggle zoom panel in all views,Afficher/Masquer le panneau de zoom dans toutes les vues
 shortcut-viewer-toggle-all-link,Toggle image synchronization panel in all views,Afficher/Masquer le panneau de synchronisation des images dans toutes les vues
