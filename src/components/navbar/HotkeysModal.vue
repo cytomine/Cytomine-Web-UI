@@ -14,7 +14,14 @@
 
 <template>
 <cytomine-modal-card :title="$t('shortcuts')" @close="$parent.close()" :footer="false">
-  <div v-for="category in categories" :key="category">
+  <b-input
+      v-model="searchString"
+      :placeholder="$t('search-placeholder')"
+      type="search"
+      icon="search"
+      size="is-small"
+  />
+  <div v-for="category in categories" :key="category" v-if="filteredShortcuts(category).length > 0">
     <h2>{{$t(`shortcut-${category}`)}}</h2>
     <b-table :data="filteredShortcuts(category)" class="shortcut-list">
       <template #default="{row: shortcut}">
@@ -47,19 +54,24 @@
       </template>
     </b-table>
   </div>
+  <div class="content has-text-grey has-text-centered" v-if="noResult">
+    {{$t('no-result')}}
+  </div>
 </cytomine-modal-card>
 </template>
 
 <script>
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import shortcuts from '@/utils/shortcuts.js';
+import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'hotkeys-modal',
   components: {CytomineModalCard},
   data() {
     return {
-      categories: ['general', 'viewer-nav', 'viewer-tool', 'viewer-toggle', 'text-editor']
+      categories: ['general', 'viewer-nav', 'viewer-tool', 'viewer-toggle', 'text-editor'],
+      searchString: ''
     };
   },
   computed: {
@@ -67,13 +79,21 @@ export default {
       return Object.entries(shortcuts).map(([name, key]) => {
         return {name, key};
       });
+    },
+    noResult() {
+      return this.categories.every(category => this.isEmpty(category));
     }
   },
   methods: {
     filteredShortcuts(category) {
+      let regexp = getWildcardRegexp(this.searchString);
       return this.shortcuts.filter(shortcut => {
-        return shortcut.name.startsWith(`${category}-`);
+        return shortcut.name.startsWith(`${category}-`) &&
+          (!this.searchString || regexp.test(this.$t(`shortcut-${shortcut.name}`)));
       });
+    },
+    isEmpty(category) {
+      return this.filteredShortcuts(category).length === 0;
     }
   }
 };
@@ -109,6 +129,11 @@ export default {
 >>> td, >>> th {
   vertical-align: middle !important;
   width: 50%;
+}
+
+>>> input {
+  max-width: 30em;
+  margin-bottom: 1em;
 }
 </style>
 
