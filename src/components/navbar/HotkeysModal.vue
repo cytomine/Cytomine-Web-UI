@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<cytomine-modal-card :title="$t('shortcuts')" @close="$parent.close()">
+<cytomine-modal-card :title="$t('shortcuts')" @close="$parent.close()" :footer="false">
   <div v-for="category in categories" :key="category">
     <h2>{{$t(`shortcut-${category}`)}}</h2>
     <b-table :data="filteredShortcuts(category)" class="shortcut-list">

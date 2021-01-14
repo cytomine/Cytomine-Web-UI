@@ -901,6 +901,7 @@ shortcut-viewer-toggle-annotations,Toggle annotations panel,Afficher/Masquer le 
 shortcut-viewer-toggle-current,Toggle currently selected annotation panel,Afficher/Masquer les détails de l'annotation sélectionnée,Alternar el panel de anotaciones seleccionado actualmente
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images,Alternar selector de imagen
 shortcut-general-close-modal,Close a modal,Fermer une fenêtre,Cerrar una ventana de diálogo
+shortcut-general-shortcuts-modal,Bring up this keyboard shortcut list,Afficher cette liste de raccourcis clavier
 shortcut-text-editor-bold,Format text in bold,Mettre le texte en gras,Negrita
 shortcut-text-editor-italic,Format text in italic,Mettre le texte en italique,Cursiva
 shortcut-text-editor-underline,Format text underlined,Souligner le texte,Subrayado
