@@ -919,6 +919,7 @@ shortcut-viewer-toggle-all-overview,Toggle overview in all views,Afficher/Masque
 shortcut-viewer-toggle-all-annotations,Toggle annotations panel in all views,Afficher/Masquer le panneau des annotations dans toutes les vues
 shortcut-viewer-toggle-all-current,Toggle currently selected annotation panel in all views,Afficher/Masquer les détails de l'annotation sélectionnée dans toutes les vues
 shortcut-general-close-modal,Close a modal,Fermer une fenêtre
+shortcut-general-shortcuts-modal,Bring up this keyboard shortcut list,Afficher cette liste de raccourcis clavier
 shortcut-text-editor-bold,Format text in bold,Mettre le texte en gras
 shortcut-text-editor-italic,Format text in italic,Mettre le texte en italique
 shortcut-text-editor-underline,Format text underlined,Souligner le texte

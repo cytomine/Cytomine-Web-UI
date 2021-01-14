@@ -21,7 +21,7 @@
   <section class="modal-card-body">
     <slot></slot>
   </section>
-  <footer class="modal-card-foot">
+  <footer class="modal-card-foot" v-if="footer">
     <slot name="footer">
       <button class="button" type="button" @click="$emit('close')">
         {{$t('button-close')}}
@@ -35,7 +35,8 @@
 export default {
   name: 'cytomine-modal-card',
   props: {
-    title: String
+    title: String,
+    footer: {type: Boolean, default: true}
   }
 };
 </script>

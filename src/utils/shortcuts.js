@@ -5,6 +5,7 @@ const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
 // Key list reference: https://github.com/iFgR/vue-shortkey#key-list
 export default Object.freeze({
   'general-close-modal': ['esc'], // Handled by Bulma
+  'general-shortcuts-modal': ['shift', '?'],
   // 'navbar-dashboard': ['g', 'd'],
   // 'navbar-projects': ['g', 'p'],
   // 'navbar-ontologies': ['g', 'o'],
