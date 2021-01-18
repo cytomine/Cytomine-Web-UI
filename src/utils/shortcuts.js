@@ -28,6 +28,8 @@ export default Object.freeze({
   'viewer-nav-move-right': ['arrowright'], // Handled by Openlayers KeyboardPan
   'viewer-nav-next-image': ['shift', 'arrowright'],
   'viewer-nav-previous-image': ['shift', 'arrowleft'],
+  'viewer-nav-next-image-in-group': ['alt', 'shift', 'arrowright'],
+  'viewer-nav-previous-image-in-group': ['alt', 'shift', 'arrowleft'],
   'viewer-nav-next-t': ['pageup'],
   'viewer-nav-previous-t': ['pagedown'],
   'viewer-nav-first-t': ['home'],
