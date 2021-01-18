@@ -491,6 +491,8 @@ shortcut-viewer-nav-zoom-in,Zoom in,Zoomer,Aumentar escala
 shortcut-viewer-nav-zoom-out,Zoom out,Dézoomer,Disminuir escala
 shortcut-viewer-nav-next-image,Go to next image,Aller à l'image suivante,Ir a la siguiente imagen
 shortcut-viewer-nav-previous-image,Go to previous image,Aller à l'image précédente,Ir a la imagen anterior
+shortcut-viewer-nav-next-image-in-group,Go to next image in group,Aller à l'image suivante dans le groupe
+shortcut-viewer-nav-previous-image-in-group,Go to previous image in group,Aller à l'image précédente dans le groupe
 draw,Draw,Outils d'annotations,Herramientas de anotación
 shortcut-viewer-tool-select,Select annotation,Sélectionner une annotation,Seleccionar anotación
 shortcut-viewer-tool-point,Draw a point,Dessiner un point,Dibujar un punto
@@ -1049,3 +1051,5 @@ button-add-images-to-image-group,Add images,Ajouter des images
 notif-success-image-group-creation,Image group successfully created,Le groupe d'images a été créé avec succès
 notif-error-image-group-creation,Failed to create image group,Une erreur a empêché la création du groupe d'images
 button-add-image-group,Add image group,Ajouter un groupe d'imges
+button-previous-image-in-group,Previous image in group,Image précédente dans le groupe
+button-next-image-in-group,Next image in group,Image suivante dans le groupe
