@@ -4,7 +4,7 @@ export default {
   state() {
     return {
       idImage: 0,
-      tracks: null,
+      tracks: [],
     };
   },
 
