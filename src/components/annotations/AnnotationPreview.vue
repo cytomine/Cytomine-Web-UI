@@ -21,7 +21,7 @@
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
   <div class="annot-preview">
-    <div :style="styleAnnotDetails" @click.self="viewAnnot()">
+    <div :style="styleAnnotDetails" @click.self="viewAnnot(sameViewOnClick)">
       <button class="button is-small" @click="opened = !opened" ref="previewButton">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
       </button>
@@ -72,7 +72,8 @@ export default {
     images: Array,
     tracks: Array,
     showImageInfo: {type: Boolean, default: true},
-    showSliceInfo: {type: Boolean, default: false}
+    showSliceInfo: {type: Boolean, default: false},
+    sameViewOnClick: {type: Boolean, default: false}
   },
   components: {AnnotationDetails},
   data() {
@@ -97,8 +98,8 @@ export default {
     }
   },
   methods: {
-    viewAnnot() {
-      this.$emit('select', this.annot);
+    viewAnnot(trySameView=false) {
+      this.$emit('select', {annot: this.annot, options:{trySameView}});
     },
     close(event) {
       if(!this.opened) {
