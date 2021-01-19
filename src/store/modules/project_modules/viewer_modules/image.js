@@ -15,7 +15,7 @@
 */
 
 import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance,
-  CompanionFileCollection, ImageGroupImageInstanceCollection} from 'cytomine-client';
+  CompanionFileCollection, ImageGroupImageInstanceCollection, ImageGroup} from 'cytomine-client';
 
 import constants from '@/utils/constants';
 import {slicePositionToRank} from '@/utils/slice-utils';
@@ -56,6 +56,7 @@ export default {
       imageInstance: null,
       profile: null,
       imageGroupLink: null,
+      imageGroup: null,
       sliceInstances: {},
       loadedSlicePages: [],
       activeSlice: null,
@@ -106,6 +107,10 @@ export default {
       state.imageGroupLink = imageGroupLink;
     },
 
+    setImageGroup(state, imageGroup) {
+      state.imageGroup = imageGroup;
+    },
+
     setRoutedAnnotation(state, annotation) {
       state.routedAnnotation = annotation;
     },
@@ -122,13 +127,11 @@ export default {
       clone = slice.clone();
       commit('setActiveSlice', clone);
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5' && cf.status > 100);
-      commit('setProfile', profile);
-
-      let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({filterKey: 'imageinstance', filterValue: image.id})).array;
-      commit('setImageGroupLink', (groupLinks.length > 0) ? groupLinks[0] : null);
-
-      await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
+      await Promise.all([
+        dispatch('fetchProfile'),
+        dispatch('fetchImageGroup'),
+        dispatch('fetchSliceInstancesAround', {rank: clone.rank})
+      ]);
     },
     async setImageInstance({dispatch, rootState}, {image, slice}) {
       await dispatch('initialize', {image, slice});
@@ -163,20 +166,42 @@ export default {
     },
 
     async refreshData({state, commit, dispatch}) {
-      let image = await ImageInstance.fetch(state.imageInstance.id);
-      commit('setImageInstance', image);
-
-      let slice = await SliceInstance.fetch(state.activeSlice.id);
-      commit('setActiveSlice', slice);
-
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
-
-      let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({filterKey: 'imageinstance', filterValue: image.id})).array;
-      commit('setImageGroupLink', (groupLinks.length > 0) ? groupLinks[0] : null);
+      await Promise.all([
+        ImageInstance.fetch(state.imageInstance.id).then(image => commit('setImageInstance', image)),
+        SliceInstance.fetch(state.activeSlice.id).then(slice => commit('setActiveSlice', slice))
+      ]);
 
       commit('clearSliceInstances');
-      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+
+      await Promise.all([
+        dispatch('fetchProfile'),
+        dispatch('fetchImageGroup'),
+        dispatch('fetchSliceInstancesAround', {rank: state.activeSlice.rank})
+      ]);
+    },
+
+    async fetchProfile({state, commit}) {
+      let image = state.imageInstance;
+      let profile = (await CompanionFileCollection.fetchAll({
+        filterKey: 'abstractimage',
+        filterValue: image.baseImage
+      })).array.find(cf => cf.type === 'HDF5' && cf.status > 100);
+      commit('setProfile', profile);
+    },
+
+    async fetchImageGroup({state, commit}) {
+      let image = state.imageInstance;
+      let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({
+        filterKey: 'imageinstance',
+        filterValue: image.id
+      })).array;
+      let groupLink = (groupLinks.length > 0) ? groupLinks[0] : null;
+      commit('setImageGroupLink', groupLink);
+
+      if (groupLink) {
+        let imageGroup = await ImageGroup.fetch(groupLink.group);
+        commit('setImageGroup', imageGroup);
+      }
     },
 
     async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {

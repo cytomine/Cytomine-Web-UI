@@ -28,7 +28,6 @@ export default {
       imageSelector: false,
       activeImage: 0,
       indexNextImage: 0,
-      imageGroupMapping: [],
 
       copiedAnnot: null
     };
