@@ -1122,3 +1122,5 @@ button-add-image-group,Add image group,Ajouter un groupe d'images
 yes-one-group-per-line,"Yes, one per line","Oui, un par ligne"
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe
 button-next-image-in-group,Next image in group,Image suivante dans le groupe
+button-previous-annot-link,Previous link,Lien précédent
+button-next-annot-link,Next link,Lien suivant

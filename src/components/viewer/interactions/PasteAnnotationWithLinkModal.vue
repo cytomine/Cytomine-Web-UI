@@ -15,7 +15,7 @@
             :link-color="linkColor"
             :show-main-annotation="true"
             :annotation="copiedAnnot"
-            :images="[image]"
+            :images="imagesInGroup"
         />
         <div class="info" v-html="$t('paste-with-link-info')"></div>
 

@@ -38,7 +38,7 @@
       <annotation-details
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
-        :images="[image]"
+        :images="images"
         :profiles="profiles"
         :tracks="tracks"
         :users="allUsers"
@@ -94,6 +94,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
     },
     profiles() {
       return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];

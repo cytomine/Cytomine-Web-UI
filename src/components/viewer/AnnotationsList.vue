@@ -41,7 +41,7 @@
 
           :all-terms="terms"
           :all-users="allUsers"
-          :all-images="[image]"
+          :all-images="images"
           :all-tracks="tracks"
 
           :multiple-terms="false"
@@ -130,6 +130,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
     },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;

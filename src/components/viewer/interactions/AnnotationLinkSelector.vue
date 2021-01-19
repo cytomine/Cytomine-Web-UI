@@ -22,7 +22,7 @@
         :link-color="linkColor"
         :show-main-annotation="true"
         :annotation="view.annot"
-        :images="[view.imageInstance]"
+        :images="images"
       />
     </a>
   </template>
@@ -72,6 +72,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
     },
     selectedFeature() {
       return this.$store.getters[this.imageModule + 'selectedFeature'];

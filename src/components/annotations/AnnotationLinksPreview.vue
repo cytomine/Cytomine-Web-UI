@@ -28,7 +28,16 @@ limitations under the License.-->
           :clickable="allowAnnotationSelection"
           :same-view-on-click="allowAnnotationSelection && showSelectAllButton"
           @select="selectAnnotation($event)"
+          v-tooltip="annotLink.instanceFilename"
       />
+    </div>
+    <div class="level navigation" v-if="allowAnnotationSelection && showSelectAllButton">
+      <button class="level-item button is-small" @click="selectPrevious">
+        <i class="fas fa-angle-left fa-lg"></i> {{$t('button-previous-annot-link')}}
+      </button>
+      <button class="level-item button is-small" @click="selectNext">
+        {{$t('button-next-annot-link')}} <i class="fas fa-angle-right fa-lg"></i>
+      </button>
     </div>
     <a v-if="showSelectAllButton" class="button is-small is-fullwidth" @click="showLinkedAnnotations()">
       {{ $t('button-show-linked-annots') }}
@@ -47,7 +56,7 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import constants from '@/utils/constants';
 
 export default {
-  name: 'annotations-details',
+  name: 'annotations-links-preview',
   components: {
     'annotation-preview': AnnotationPreview,
     ImageName,
@@ -83,24 +92,33 @@ export default {
         return [];
       }
 
-      return this.annotation.annotationLink.filter(link => link.annotation !== this.annotation.id).map(link => {
+      let annots = this.annotation.annotationLink.map(link => {
         return {
           id: link.annotation,
           image: link.image,
+          instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
           url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
         };
       });
+      annots.sort((a, b) => a.instanceFilename.localeCompare(b.instanceFilename));
+      return annots;
+    },
+    orderedLinks() {
+      let mainIndex = this.annotationLinks.findIndex(annot => annot.id === this.annotation.id);
+      let next = this.annotationLinks.slice(mainIndex);
+      let previous = this.annotationLinks.slice(0, mainIndex);
+      return next.concat(previous);
     },
     filteredLinks() {
       if (this.showMainAnnotation) {
-        return [this.annotation, ...this.annotationLinks];
+        return (this.orderedLinks.length > 0) ? this.orderedLinks : [this.annotation];
       }
-      return this.annotationLinks;
+      return this.orderedLinks.slice(1);
     }
   },
   methods: {
     showLinkedAnnotations() {
-      this.annotationLinks.forEach( link => {
+      this.filteredLinks.forEach( link => {
         this.$emit('select', {annot: link, options:{}});
       });
     },
@@ -108,6 +126,14 @@ export default {
       if (this.allowAnnotationSelection) {
         this.$emit('select', {annot, options});
       }
+    },
+    selectNext() {
+      let annot = this.orderedLinks[1];
+      this.selectAnnotation({annot, options:{trySameView: true}});
+    },
+    selectPrevious() {
+      let annot = this.orderedLinks[this.orderedLinks.length - 1];
+      this.selectAnnotation({annot, options:{trySameView: true}});
     }
   },
 };
@@ -116,5 +142,26 @@ export default {
 <style scoped>
 >>> .annot-preview {
   margin: 3px;
+}
+
+.level.navigation {
+  justify-content: center;
+  margin: 3px 0;
+}
+
+.level.navigation .level-item:first-child {
+  margin-right: 3px;
+}
+
+.level.navigation .level-item:last-child {
+  margin-left: 3px;
+}
+
+.fa-angle-left {
+  margin-right: 0.4em;
+}
+
+.fa-angle-right {
+  margin-left: 0.4em;
 }
 </style>
