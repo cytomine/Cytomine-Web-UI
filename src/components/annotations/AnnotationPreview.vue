@@ -21,9 +21,12 @@
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
   <div class="annot-preview" :class="{clickable}">
-    <div :style="styleAnnotDetails" @click.self="viewAnnot()">
+    <div :style="styleAnnotDetails" @click.self="viewAnnot(sameViewOnClick)">
       <button class="button is-small" @click="opened = !opened" ref="previewButton" v-if="showDetails">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
+      </button>
+      <button class="button is-small" @click="viewAnnot()" v-else-if="clickable && sameViewOnClick">
+        <i class="fas fa-external-link-alt"></i>
       </button>
 
     </div>
@@ -73,7 +76,8 @@ export default {
     showDetails: {type: Boolean, default: true},
     showImageInfo: {type: Boolean, default: true},
     showSliceInfo: {type: Boolean, default: false},
-    clickable: {type: Boolean, default: true}
+    clickable: {type: Boolean, default: true},
+    sameViewOnClick: {type: Boolean, default: false}
   },
   components: {
     AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
@@ -101,9 +105,9 @@ export default {
     }
   },
   methods: {
-    viewAnnot() {
+    viewAnnot(trySameView=false) {
       if (this.clickable) {
-        this.$emit('select', this.annot);
+        this.$emit('select', {annot: this.annot, options:{trySameView}});
       }
     },
     close(event) {

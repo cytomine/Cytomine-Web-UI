@@ -213,23 +213,34 @@ export default {
     },
 
     async selectAnnotationHandler({index, annot, center=false}) {
-      if (index === null) {
-        try {
+      try {
+        if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
+          annot = await Annotation.fetch(annot.id);
+          let [image, slice] = await Promise.all([
+            ImageInstance.fetch(annot.image),
+            SliceInstance.fetch(annot.slice)
+          ]);
+          this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+        }
+        else if (index === null) {
           annot = await Annotation.fetch(annot.id);
           if (this.idImages.includes(String(annot.image))) {
             let index = this.cells.find(cell => cell.image.id === annot.image).index;
             this.$eventBus.$emit('selectAnnotation', {index, annot, center});
           }
           else {
-            let image = await ImageInstance.fetch(annot.image);
-            let slice = await SliceInstance.fetch(annot.slice);
+            let [image, slice] = await Promise.all([
+              ImageInstance.fetch(annot.image),
+              SliceInstance.fetch(annot.slice)
+            ]);
             await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
           }
         }
-        catch(err) {
-          console.log(err);
-          this.error = true;
-        }
+      }
+      catch(err) {
+        console.log(err);
+        this.error = true;
       }
     },
 

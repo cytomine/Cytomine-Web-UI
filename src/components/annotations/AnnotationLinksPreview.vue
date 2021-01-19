@@ -26,6 +26,7 @@ limitations under the License.-->
           :size="size"
           :color="(annotLink.id === annotation.id) ? mainColor : linkColor"
           :clickable="allowAnnotationSelection"
+          :same-view-on-click="allowAnnotationSelection && showSelectAllButton"
           @select="selectAnnotation($event)"
       />
     </div>
@@ -100,12 +101,12 @@ export default {
   methods: {
     showLinkedAnnotations() {
       this.annotationLinks.forEach( link => {
-        this.$emit('select', link);
+        this.$emit('select', {annot: link, options:{}});
       });
     },
-    selectAnnotation(annot) {
+    selectAnnotation({annot, options}) {
       if (this.allowAnnotationSelection) {
-        this.$emit('select', annot);
+        this.$emit('select', {annot, options});
       }
     }
   },

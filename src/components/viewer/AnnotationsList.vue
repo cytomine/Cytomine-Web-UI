@@ -64,7 +64,7 @@
           @updateProperties="$emit('updateProperties')"
           @centerView="$emit('centerView', {annot: $event, sameView: isSameView($event)})"
           @delete="$emit('delete', $event)"
-          @select="$emit('select', {annot: $event, sameView: isSameView($event)})"
+          @select="select"
         />
       </div>
     </div>
@@ -257,6 +257,9 @@ export default {
     },
     isSameView(annot) {
       return this.displayType === 'TERM' && annot.slice === this.slice.id;
+    },
+    select({annot, options}) {
+      this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});
     },
     // async select(annot) {
     //   if (annot.slice !== this.slice.id) {

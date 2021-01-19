@@ -632,7 +632,7 @@ export default {
     }
   },
   methods: {
-    viewAnnot(annot) {
+    viewAnnot({annot}) {
       this.$router.push(`/project/${this.project.id}/image/${annot.image}/annotation/${annot.id}`);
     },
     async fetchImages() {

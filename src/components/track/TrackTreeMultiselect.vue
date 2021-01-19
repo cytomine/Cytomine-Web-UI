@@ -91,7 +91,7 @@ export default {
   },
   computed: {
     allTracks() {
-      if(!this.tracks || this.tracks.length === 0) {
+      if(!this.tracks) {
         return [];
       }
       let tracks = this.additionalNodes.map(node => node);
