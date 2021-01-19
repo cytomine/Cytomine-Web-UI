@@ -56,12 +56,13 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import constants from '@/utils/constants';
 
 export default {
-  name: 'annotations-links-preview',
+  name: 'annotation-links-preview',
   components: {
     'annotation-preview': AnnotationPreview,
     ImageName,
   },
   props: {
+    index: {type: String, default: null},
     annotation: {type: Object},
     images: {type: Array},
     allowAnnotationSelection: {type: Boolean, default: false},
@@ -114,7 +115,13 @@ export default {
         return (this.orderedLinks.length > 0) ? this.orderedLinks : [this.annotation];
       }
       return this.orderedLinks.slice(1);
-    }
+    },
+    viewerWrapper() {
+      return (this.index) ? this.$store.getters['currentProject/currentViewer'] : {};
+    },
+    isActiveImage() {
+      return this.viewerWrapper.activeImage === this.index;
+    },
   },
   methods: {
     showLinkedAnnotations() {
@@ -134,8 +141,30 @@ export default {
     selectPrevious() {
       let annot = this.orderedLinks[this.orderedLinks.length - 1];
       this.selectAnnotation({annot, options:{trySameView: true}});
+    },
+    shortkeyHandler(key) {
+      if (!this.isActiveImage) {
+        return;
+      }
+
+      if(key === 'nav-next-annot-link') {
+        this.selectNext();
+      }
+      else if(key === 'nav-previous-annot-link') {
+        this.selectPrevious();
+      }
     }
   },
+  mounted() {
+    if (this.index !== null) {
+      this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    }
+  },
+  beforeDestroy() {
+    if (this.index !== null) {
+      this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    }
+  }
 };
 </script>
 
