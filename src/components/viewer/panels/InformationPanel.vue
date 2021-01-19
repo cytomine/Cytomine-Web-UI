@@ -72,7 +72,7 @@
         <td v-else>{{$t('unknown')}}</td>
       </tr>
       <tr>
-        <td colspan="2" class="buttons-wrapper">
+        <td colspan="2" class="actions">
           <div class="buttons">
             <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
               {{$t('button-set-calibration')}}
@@ -293,6 +293,10 @@ td:first-child {
 }
 
 .buttons-wrapper {
+  padding: 0;
+}
+
+.actions {
   padding-left: 0;
   padding-right: 0;
 }
