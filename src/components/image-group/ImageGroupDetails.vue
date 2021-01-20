@@ -202,7 +202,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group'),
         message: this.$t('delete-image-group-confirmation-message', {imageName: this.imageGroup.name}),
         type: 'is-danger',

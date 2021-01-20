@@ -1053,3 +1053,6 @@ notif-error-image-group-creation,Failed to create image group,Une erreur a empê
 button-add-image-group,Add image group,Ajouter un groupe d'imges
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe
 button-next-image-in-group,Next image in group,Image suivante dans le groupe
+open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de
+open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to}
+open-image-index,Open image {index},Ouvrir l'image {index}
