@@ -148,7 +148,7 @@ export default {
     async fetchUsers() {
       let collection = new UserCollection({
         filterKey: 'project',
-        filterValue: this.project.id,
+        filterValue: this.image.project.id,
       });
 
       this.projectUsers = (await collection.fetchAll()).array;

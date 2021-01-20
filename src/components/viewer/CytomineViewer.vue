@@ -188,21 +188,21 @@ export default {
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
 
-          let imgAndSlices = this.idImages.map(function(e,i) { return {image : e, slice: this.idSlices[i]}})
+          let imgAndSlices = this.idImages.map(function(e,i) {
+            return {image : e, slice: this.idSlices[i]};
+          }, this);
           //don't fetch multiple times the same image.
           let uniqueArray = imgAndSlices.filter(function(item, pos) {
-            return imgAndSlices.map(function(e) { return e.image+"."+e.slice; }).indexOf(item.image+'.'+item.slice) == pos;
-          })
-          await Promise.all(uniqueArray.map(async (e, idx) => {
+            return imgAndSlices.map(function(e) {
+              return e.image+'.'+e.slice;
+            }).indexOf(item.image+'.'+item.slice) == pos;
+          });
+          await Promise.all(uniqueArray.map(async (e) => {
             let image = await ImageInstance.fetch(e.image);
-            let idSlice = this.idSlices[e.slice];
+            let idSlice = e.slice;
             let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
             await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
           }));
-
-          this.idImages.forEach(async id => {
-            await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
-          });
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
@@ -210,7 +210,7 @@ export default {
         this.loading = false;
       }
       catch(err) {
-        console.log(err);
+        window.console.log(err);
         this.error = true;
       }
     },
