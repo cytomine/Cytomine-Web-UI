@@ -125,13 +125,7 @@ limitations under the License.-->
 <!--          </b-table-column>-->
 
           <b-table-column label=" " centered width="150">
-            <router-link
-                :to="viewerURL(imageGroup)"
-                class="button is-small is-link"
-                :disabled="imageGroup.imageInstances.length === 0"
-            >
-              {{$t('button-open')}}
-            </router-link>
+            <open-image-group-button :image-group="imageGroup" :key="`open-ig-${imageGroup.id}`"/>
           </b-table-column>
         </template>
 
@@ -179,6 +173,7 @@ import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
 import AddImageGroupModal from '@/components/image-group/AddImageGroupModal';
 import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
+import OpenImageGroupButton from '@/components/image-group/OpenImageGroupButton';
 
 import {ImageGroupCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
@@ -194,6 +189,7 @@ const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, fi
 export default {
   name: 'list-image-groups',
   components: {
+    OpenImageGroupButton,
     ImageGroupPreview,
     ImageGroupDetails,
     CytomineTable,

@@ -1126,3 +1126,6 @@ button-previous-image-in-group,Previous image in group,Image précédente dans l
 button-next-image-in-group,Next image in group,Image suivante dans le groupe
 button-previous-annot-link,Previous link,Lien précédent
 button-next-annot-link,Next link,Lien suivant
+open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de
+open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to}
+open-image-index,Open image {index},Ouvrir l'image {index}
