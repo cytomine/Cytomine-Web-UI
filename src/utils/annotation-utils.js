@@ -69,6 +69,7 @@ export async function updateAnnotationLinkProperties(annot) {
   annot.annotationLink = annotLinks.map(link => {
     return {
       id: link.id,
+      updated: link.updated,
       annotation: link.annotationIdent,
       image: link.image,
       group: link.group

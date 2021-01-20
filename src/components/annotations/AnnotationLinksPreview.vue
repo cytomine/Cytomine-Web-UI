@@ -96,6 +96,7 @@ export default {
       let annots = this.annotation.annotationLink.map(link => {
         return {
           id: link.annotation,
+          updated: link.updated,
           image: link.image,
           instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
           url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
