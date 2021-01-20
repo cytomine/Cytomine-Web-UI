@@ -167,7 +167,7 @@
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80">
-            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
+            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview" :key="uFile.thumbURL">
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 

@@ -182,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <img :src="consultation.imageThumb" class="image-overview">
+                <img :src="consultation.imageThumb" class="image-overview" :key="consultation.imageThumb">
               </router-link>
             </b-table-column>
 

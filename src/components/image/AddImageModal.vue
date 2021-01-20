@@ -30,7 +30,7 @@
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
-            <img :src="image.preview" class="image-overview">
+            <img :src="image.preview" class="image-overview" :key="image.preview">
           </b-table-column>
 
           <b-table-column field="originalFilename" :label="$t('name')" sortable>
