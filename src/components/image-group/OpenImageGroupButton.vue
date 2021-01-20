@@ -10,7 +10,7 @@
       </router-link>
     </p>
     <p class="control" v-if="images.length > 1">
-      <b-dropdown position="is-bottom-left" :disabled="disabled">
+      <b-dropdown position="is-bottom-left" :disabled="disabled" scrollable :max-height="350">
         <template #trigger>
           <button class="button is-small is-link">
             <i class="fas fa-caret-down"></i>
@@ -32,6 +32,11 @@
             <template v-else>
               {{$t('open-image-index', {index: batch.start+1})}}
             </template>
+            <ol :start="batch.start+1">
+              <li v-for="image in batch.images" :key="`${batch.start}-${image.id}`">
+                <image-name :image="image"/>
+              </li>
+            </ol>
           </router-link>
         </b-dropdown-item>
       </b-dropdown>
@@ -40,8 +45,10 @@
 </template>
 
 <script>
+import ImageName from '@/components/image/ImageName';
 export default {
   name: 'open-image-group-button',
+  components: {ImageName},
   data() {
     return {
       batchSize: 4
@@ -91,5 +98,9 @@ export default {
 input {
   width: 50px;
   margin-left: 2px;
+}
+
+ol {
+  padding-left: 1rem;
 }
 </style>
