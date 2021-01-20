@@ -116,7 +116,15 @@ export default {
     },
     filteredViews() {
       return this.views.filter(view => view.index !== Number(this.index) && view.sameImageGroup);
-    }
+    },
+    copiedAnnot: {
+      get() {
+        return this.viewerWrapper.copiedAnnot;
+      },
+      set(annot) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
   },
   methods: {
     isViewDisabled(view) {
@@ -164,8 +172,14 @@ export default {
           group = annotGroup.id;
         }
 
-        (await listAnnotationsInGroup(this.image.project, group)).forEach(a => {
-          this.$eventBus.$emit('editAnnotation', a);
+        (await listAnnotationsInGroup(this.image.project, group)).forEach(annot => {
+          this.$eventBus.$emit('editAnnotation', annot);
+          if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
+            let copiedAnnot = this.copiedAnnot.clone();
+            copiedAnnot.annotationLink = annot.annotationLink;
+            copiedAnnot.group = annot.group;
+            this.copiedAnnot = copiedAnnot;
+          }
         });
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-creation')});
 
