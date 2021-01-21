@@ -113,9 +113,9 @@ export default {
     }
   },
   methods: {
-    clearFeatures() {
+    clearFeatures(cache=true) {
       if(this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache: true});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
         this.$refs.olSource.clearFeatures();
       }
     },
@@ -146,7 +146,7 @@ export default {
           this.clearFeatures();
         }
         else if(hard) {
-          this.clearFeatures();
+          this.clearFeatures(false);
           this.loader();
         }
         else {
