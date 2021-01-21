@@ -476,7 +476,7 @@ export default {
     async viewMounted() {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
       if(this.routedAnnotation) {
-        this.centerViewOnAnnot(this.routedAnnotation);
+        this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
       this.savePosition();
     },
@@ -552,7 +552,7 @@ export default {
       });
     },
 
-    async centerViewOnAnnot(annot) {
+    async centerViewOnAnnot(annot, duration) {
       if (annot.image === this.image.id) {
         if (!annot.location) {
           //in case annotation location has not been loaded
@@ -560,7 +560,7 @@ export default {
         }
 
         let geometry = this.format.readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -572,6 +572,7 @@ export default {
     async selectAnnotationHandler({index, annot, center=false, showComments=false}) {
       if (this.index === index && annot.image === this.image.id) {
         try {
+          let sliceChange = false;
           if (!annot.slice) {
             //in case annotation slice has not been loaded
             annot = await Annotation.fetch(annot.id);
@@ -580,6 +581,8 @@ export default {
           if(annot.slice !== this.slice.id) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+            this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            sliceChange = true;
           }
 
           if (showComments) {
@@ -592,7 +595,8 @@ export default {
 
           if (center) {
             await this.viewMounted();
-            this.centerViewOnAnnot(annot);
+            let duration = (sliceChange) ? undefined : 500;
+            this.centerViewOnAnnot(annot, duration);
           }
         }
         catch(error) {
