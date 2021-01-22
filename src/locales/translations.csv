@@ -1129,3 +1129,4 @@ button-next-annot-link,Next link,Lien suivant
 open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de
 open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to}
 open-image-index,Open image {index},Ouvrir l'image {index}
+warning-more-links-than-images,There will be more linked annotations (<strong>{nbLinks}</strong>) than images in this group (<strong>{nbImages}</strong>),Il va y avoir plus d'annotations liées (<strong>{nbLinks}</strong>) que d'images dans ce groupe (<strong>{nbImages}</strong>)

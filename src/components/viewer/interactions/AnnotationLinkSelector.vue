@@ -11,6 +11,10 @@
       :key="`annot-link-${index}-${view.index}`"
       @click="link(view)"
     >
+      <i class="fas fa-exclamation-triangle"
+         v-if="!view.sameAnnotationGroup && view.nbAnnotationLinks + nbAnnotationLinks > nbImagesInGroup"
+         v-tooltip="$t('warning-more-links-than-images', {nbLinks: view.nbAnnotationLinks + nbAnnotationLinks, nbImages: nbImagesInGroup})"
+      ></i>
       {{$t('selection-in-view', {number: view.index+1})}} (<image-name :image="view.imageInstance" />) <br>
       <em class="has-text-grey is-size-7" v-if="!view.sameImageGroup">{{$t('different-image-group')}}</em>
       <em class="has-text-grey is-size-7" v-else-if="view.sameAnnotationGroup">{{$t('already-linked')}}</em>
@@ -79,6 +83,9 @@ export default {
       }
       return [this.image];
     },
+    nbImagesInGroup() {
+      return this.imageWrapper.imageGroup.numberOfImages;
+    },
     selectedFeature() {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
@@ -87,6 +94,9 @@ export default {
     },
     annotationGroupId() {
       return this.annotation.group;
+    },
+    nbAnnotationLinks() {
+      return (this.annotation.annotationLink) ? this.annotation.annotationLink.length : 1;
     },
     views() {
       return Object.values(this.viewerWrapper.images).map((wrapper, index) => {
@@ -102,6 +112,7 @@ export default {
           sameImageGroup: groupId === this.imageGroupId,
           annot: annot,
           annotationGroupId: (annot) ? annot.group : null,
+          nbAnnotationLinks: (annot && annot.annotationLink) ? annot.annotationLink.length : 1,
           sameAnnotationGroup: (annot && annot.group) ? annot.group === this.annotationGroupId : false,
         };
       }).sort((a, b) => {
