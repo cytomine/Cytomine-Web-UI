@@ -15,7 +15,7 @@
          v-if="!view.sameAnnotationGroup && view.nbAnnotationLinks + nbAnnotationLinks > nbImagesInGroup"
          v-tooltip="$t('warning-more-links-than-images', {nbLinks: view.nbAnnotationLinks + nbAnnotationLinks, nbImages: nbImagesInGroup})"
       ></i>
-      {{$t('selection-in-view', {number: view.index+1})}} (<image-name :image="view.imageInstance" />) <br>
+      {{$t('selection-in-view', {number: view.number})}} (<image-name :image="view.imageInstance" />) <br>
       <em class="has-text-grey is-size-7" v-if="!view.sameImageGroup">{{$t('different-image-group')}}</em>
       <em class="has-text-grey is-size-7" v-else-if="view.sameAnnotationGroup">{{$t('already-linked')}}</em>
       <em class="has-text-grey is-size-7" v-else-if="!view.annot">{{$t('no-selected-annot')}}</em>
@@ -98,14 +98,20 @@ export default {
     nbAnnotationLinks() {
       return (this.annotation.annotationLink) ? this.annotation.annotationLink.length : 1;
     },
+    imageWrappers() {
+      return this.viewerWrapper.images;
+    },
     views() {
-      return Object.values(this.viewerWrapper.images).map((wrapper, index) => {
+      let number = 1;
+      return Object.keys(this.imageWrappers).reduce((obj, index) => {
+        let wrapper = this.imageWrappers[index];
         let groupId = (wrapper.imageGroupLink) ? wrapper.imageGroupLink.group : null;
         let selectedFeatures = wrapper.selectedFeatures.selectedFeatures;
         let feature = ((selectedFeatures.length === 1)) ? selectedFeatures[0] : null;
         let annot = (feature) ? feature.properties.annot : null;
-        return {
-          index: index,
+        obj[index] = {
+          number,
+          index,
           imageInstance: wrapper.imageInstance,
           imageId: wrapper.imageInstance.id,
           imageGroupId: groupId,
@@ -115,7 +121,9 @@ export default {
           nbAnnotationLinks: (annot && annot.annotationLink) ? annot.annotationLink.length : 1,
           sameAnnotationGroup: (annot && annot.group) ? annot.group === this.annotationGroupId : false,
         };
-      }).sort((a, b) => {
+        number++;
+        return obj;
+      }, []).sort((a, b) => {
         if (!this.isViewDisabled(a) && this.isViewDisabled(b)) {
           return -1;
         }
@@ -126,7 +134,7 @@ export default {
       });
     },
     filteredViews() {
-      return this.views.filter(view => view.index !== Number(this.index) && view.sameImageGroup);
+      return this.views.filter(view => view.index !== this.index && view.sameImageGroup);
     },
     copiedAnnot: {
       get() {
