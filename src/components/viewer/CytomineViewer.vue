@@ -24,6 +24,7 @@
       v-for="(cell, i) in cells"
       :key="i"
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+      :class="{highlighted: cell.highlighted}"
     >
       <cytomine-image
         v-if="cell && cell.image && cell.slice"
@@ -106,7 +107,8 @@ export default {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
         let slice = this.viewer.images[index].activeSlice;
-        cells[i] = {index, image, slice};
+        let highlighted = this.viewer.images[index].view.highlighted;
+        cells[i] = {index, image, slice, highlighted};
       }
       return cells;
     },
@@ -287,5 +289,9 @@ export default {
 
 .hidden {
   display: none;
+}
+
+.highlighted {
+  border: 6px solid #0099ff;
 }
 </style>

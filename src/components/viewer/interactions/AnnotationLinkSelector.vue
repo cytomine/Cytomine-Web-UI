@@ -10,9 +10,11 @@
       v-for="view in filteredViews"
       :key="`annot-link-${index}-${view.index}`"
       @click="link(view)"
+      @mouseover="highlightView(view.index, true)"
+      @mouseleave="highlightView(view.index, false)"
     >
       <i class="fas fa-exclamation-triangle"
-         v-if="!view.sameAnnotationGroup && view.nbAnnotationLinks + nbAnnotationLinks > nbImagesInGroup"
+         v-if="view.annot && !view.sameAnnotationGroup && view.nbAnnotationLinks + nbAnnotationLinks > nbImagesInGroup"
          v-tooltip="$t('warning-more-links-than-images', {nbLinks: view.nbAnnotationLinks + nbAnnotationLinks, nbImages: nbImagesInGroup})"
       ></i>
       {{$t('selection-in-view', {number: view.number})}} (<image-name :image="view.imageInstance" />) <br>
@@ -148,6 +150,10 @@ export default {
   methods: {
     isViewDisabled(view) {
       return !view.sameImageGroup || view.sameAnnotationGroup || !view.annot;
+    },
+
+    highlightView(index, highlight) {
+      this.$store.commit(`${this.viewerModule}images/${index}/setHighlighted`, highlight);
     },
 
     async link(view) {
