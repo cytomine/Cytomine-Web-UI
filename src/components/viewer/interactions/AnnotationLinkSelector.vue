@@ -9,7 +9,7 @@
       :class="{'is-disabled': isViewDisabled(view)}"
       v-for="view in filteredViews"
       :key="`annot-link-${index}-${view.index}`"
-      @click="link(view)"
+      @click="confirmLink(view)"
       @mouseover="highlightView(view.index, true)"
       @mouseleave="highlightView(view.index, false)"
     >
@@ -156,7 +156,31 @@ export default {
       this.$store.commit(`${this.viewerModule}images/${index}/setHighlighted`, highlight);
     },
 
+    confirmLink(view) {
+      if (this.isViewDisabled(view)) {
+        return;
+      }
+
+      if (this.annotationGroupId && view.annotationGroupId) {
+        this.$buefy.dialog.confirm({
+          title: this.$t('confirm-annotation-link'),
+          message: this.$t('confirm-annotation-group-merge'),
+          type: 'is-warning',
+          confirmText: this.$t('button-confirm'),
+          cancelText: this.$t('button-cancel'),
+          onConfirm: async () => await this.link(view)
+        });
+      }
+      else {
+        this.link(view);
+      }
+    },
+
     async link(view) {
+      let successMessage =  this.$t('notif-success-annotation-link-creation');
+      let errorMessage = this.$t('notif-error-annotation-link-creation');
+
+      this.highlightView(view.index, false);
       if (this.isViewDisabled(view)) {
         return;
       }
@@ -206,12 +230,11 @@ export default {
             this.copiedAnnot = copiedAnnot;
           }
         });
-        this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-creation')});
-
+        this.$notify({type: 'success', text: successMessage});
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-creation')});
+        this.$notify({type: 'error', text: errorMessage});
       }
     },
   },
