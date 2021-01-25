@@ -156,7 +156,7 @@ export default {
   watch: {
     selectedFeature() {
       if(this.selectedFeature) {
-        this.displayAnnotDetails = true;
+        // this.displayAnnotDetails = true;
         let targetAnnot = this.imageWrapper.selectedFeatures.showComments;
         this.showComments = (targetAnnot === this.annot.id);
         if(targetAnnot !== null) {
