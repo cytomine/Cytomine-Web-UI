@@ -93,7 +93,7 @@
     <img :src="slidePreview.macroURL">
   </template>
 
-  <template v-if="image">
+  <template v-if="image && profileEnabled">
     <h2>{{$t('companion-files')}}</h2>
     <table class="table">
       <tbody>
@@ -139,6 +139,8 @@ export default {
       nbUploadedFiles: 0,
       currentPage: 1,
       nbPerPage: 10,
+
+      profileEnabled: false
     };
   },
   computed: {
