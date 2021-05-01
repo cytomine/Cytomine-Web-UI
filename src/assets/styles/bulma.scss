@@ -115,6 +115,10 @@ html {
   font-weight: normal !important;
 }
 
+.modal+.autocomplete.control .dropdown-menu {
+  z-index: 3000 !important;
+}
+
 /* Loading */
 
 .loading-overlay .loading-icon::after {
