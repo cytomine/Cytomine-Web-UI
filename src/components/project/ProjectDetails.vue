@@ -215,7 +215,7 @@ export default {
     },
 
     deleteProject() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
         message: this.$t('delete-project-confirmation-message', {projectName: this.project.name}),
         type: 'is-danger',

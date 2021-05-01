@@ -58,7 +58,7 @@ export default {
       // CSS transform (e.g. popover) that conflict with the fixed position of the modal
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: AttachedFileModal,
         props: {object: this.object},
@@ -70,7 +70,7 @@ export default {
       this.attachedFiles.push(attachedFile);
     },
     confirmDeletion(attachedFile, idx) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-attached-file', {filename: attachedFile.filename}),
         type: 'is-danger',

@@ -143,14 +143,14 @@ export default {
   methods: {
     // required to use programmatic modal for correct display in IE11
     openHotkeysModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: HotkeysModal,
         hasModalCard: true
       });
     },
     openAboutModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: AboutCytomineModal,
         hasModalCard: true

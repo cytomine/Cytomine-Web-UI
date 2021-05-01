@@ -189,7 +189,7 @@ export default {
     trackedUserModel(value) {
       // if map is linked to another map on which tracking is already enabled, possible conflict
       if(value && this.linkedIndexTracking) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-unlink-view-to-track'),
           confirmText: this.$t('button-confirm'),

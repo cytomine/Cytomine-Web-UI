@@ -98,7 +98,7 @@ export default {
       }
 
       // if user entered value that is not yet used as key for an annotation property, ask confirmation
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-default-property'),
         message: this.$t('confirm-default-property-not-used-in-project', {key: this.searchString}),
         type: 'is-info',

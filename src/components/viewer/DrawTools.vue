@@ -497,7 +497,7 @@ export default {
         return;
       }
 
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-annotation'),
         type: 'is-danger',

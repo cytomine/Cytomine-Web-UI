@@ -252,7 +252,7 @@ export default {
     },
 
     openModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: TermModal,
         props: {
@@ -291,7 +291,7 @@ export default {
     },
 
     confirmTermDeletion(node) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-term', {name: node.data.name}),
         type: 'is-danger',
