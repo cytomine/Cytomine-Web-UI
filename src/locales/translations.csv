@@ -305,6 +305,7 @@ image-filters,Image filters,Filtres d'images
 project-side-bar,Project side bar,Barre latérale du projet
 viewer-panels,Viewer panels,Visualisateur d'images
 all-panels,All panels,Tous les outils
+image-details,Image details,Détails de l'image
 annotation-details,Annotation details,Détails de l'annotation
 annotation-details-box,Annotation details box,Boîte de détails
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)"

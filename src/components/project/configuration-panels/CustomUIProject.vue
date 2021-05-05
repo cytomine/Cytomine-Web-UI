@@ -82,6 +82,24 @@ export default {
           ]
         },
         {
+          label: 'image-details',
+          props: [
+            {key: 'project-explore-image-overview', label: 'overview', icon: 'fas fa-image'},
+            //{key: 'project-explore-image-status', label: 'status'},
+            {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt'},
+            {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag'},
+            {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
+            {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
+            {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info'},
+            /*{key: 'project-explore-image-format', label: 'format'},
+            {key: 'project-explore-image-vendor', label: 'vendor'},
+            {key: 'project-explore-image-size', label: 'size'},
+            {key: 'project-explore-image-resolution', label: 'resolution'},
+            {key: 'project-explore-image-magnification', label: 'magnification'},*/
+          ]
+        },
+        {
           label: 'viewer-panels',
           props: [
             {key: 'project-explore-hide-tools', label: 'all-panels'}, // hide all panels

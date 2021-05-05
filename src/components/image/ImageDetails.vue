@@ -73,13 +73,13 @@
           <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('attachedFiles')">
+      <tr v-if="isPropDisplayed('attached-files')">
         <td class="prop-label">{{$t('attached-files')}}</td>
         <td class="prop-content">
           <attached-files :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('slidePreview')">
+      <tr v-if="isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
@@ -90,7 +90,7 @@
           </em>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
+      <tr v-if="isPropDisplayed('original-filename') && (!blindMode || canManageProject)">
         <td class="prop-label">{{$t('originalFilename')}}</td>
         <td class="prop-content">
           {{image.originalFilename}}
@@ -254,6 +254,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    configUI: get('currentProject/configUI'),
     blindMode() {
       return ((this.$store.state.currentProject.project || {}).blindMode) || false;
     },
@@ -275,7 +276,7 @@ export default {
   },
   methods: {
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop);
+      return !this.excludedProperties.includes(prop) && this.configUI[`project-explore-image-${prop}`];
     },
 
     async cancelReview() {
