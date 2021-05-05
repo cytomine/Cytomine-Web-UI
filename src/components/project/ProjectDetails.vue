@@ -126,7 +126,7 @@
         <list-usernames :users="contributors" :onlines="onlines" />
       </td>
     </tr>
-    <tr v-if="!excludedProperties.includes('imagesPreview')">
+    <tr v-if="isPropDisplayed('imagesPreview')">
       <td class="prop-label">{{$t('images')}}</td>
       <td class="prop-content">
         <list-images-preview :project="project" />
