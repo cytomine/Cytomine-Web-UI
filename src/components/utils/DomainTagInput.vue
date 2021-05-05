@@ -79,3 +79,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.taginput {
+  width: 82% !important;
+}
+</style>
