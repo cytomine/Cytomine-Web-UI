@@ -403,6 +403,12 @@ export default {
       return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
     },
 
+    querySearchImage() {
+      return this.$route.query.image;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
@@ -482,6 +488,28 @@ export default {
       this.$store.commit(this.storeModule + '/resetPagesAndFilters');
     }
   },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.resetPagesAndFilters(); // we want all annotations of the job => reset state
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
+    querySearchImage(val) {
+      if(val) {
+        this.selectedImages = [];
+        let queriedImage = this.images.find(image => image.id === Number(val));
+        if(queriedImage) {
+          this.resetPagesAndFilters(); // we want all annotations of the image => reset state
+          this.selectedImages = [queriedImage];
+        }
+      }
+    }
+  },
   async created() {
     this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
 
@@ -530,6 +558,13 @@ export default {
         this.resetPagesAndFilters(); // we want all annotations of the job => reset state
         this.selectedAnnotationType = this.jobAnnotationOption;
         this.selectedUserJobs = [queriedUserJob];
+      }
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
+        this.selectedTags = queriedTags;
       }
     }
 

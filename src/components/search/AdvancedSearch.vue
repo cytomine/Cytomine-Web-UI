@@ -306,6 +306,12 @@ export default {
     pathSearchString() {
       return this.$route.params.searchString;
     },
+    querySearchString() {
+      return this.$route.query.searchString;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     regexp() {
       return getWildcardRegexp(this.searchString);
     },
@@ -355,16 +361,37 @@ export default {
       if(val) {
         this.searchString = val;
       }
-    }
+    },
+    querySearchString(val) {
+      if(val && !this.pathSearchString) {
+        this.searchString = val;
+      }
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
   },
   async created() {
-    this.searchString = this.pathSearchString || '';
+    this.searchString = this.pathSearchString || this.querySearchString || '';
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;
