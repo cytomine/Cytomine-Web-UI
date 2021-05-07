@@ -389,7 +389,6 @@ export default {
     if(this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
       if(queriedTags) {
-        this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
         this.selectedTags = queriedTags;
       }
     }
