@@ -21,7 +21,7 @@
     "detect-browser": "^4.7.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "npm-font-open-sans": "^1.1.0",
     "ol": "^5.3.1",
     "ol-rotate-feature": "^2.0.1",
