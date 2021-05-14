@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -143,14 +143,14 @@ export default {
   methods: {
     // required to use programmatic modal for correct display in IE11
     openHotkeysModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: HotkeysModal,
         hasModalCard: true
       });
     },
     openAboutModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: AboutCytomineModal,
         hasModalCard: true

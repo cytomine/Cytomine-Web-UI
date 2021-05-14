@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ export default {
   methods: {
     handleCheckboxChange(event, indexGroup, indexImage) {
       if(this.trackedUser) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-untrack-to-link-view'),
           confirmText: this.$t('button-confirm'),

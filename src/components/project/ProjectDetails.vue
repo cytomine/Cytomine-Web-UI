@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@
         <list-usernames :users="contributors" :onlines="onlines" />
       </td>
     </tr>
-    <tr v-if="!excludedProperties.includes('imagesPreview')">
+    <tr v-if="isPropDisplayed('imagesPreview')">
       <td class="prop-label">{{$t('images')}}</td>
       <td class="prop-content">
         <list-images-preview :project="project" />
@@ -215,7 +215,7 @@ export default {
     },
 
     deleteProject() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
         message: this.$t('delete-project-confirmation-message', {projectName: this.project.name}),
         type: 'is-danger',

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -316,7 +316,7 @@ export default {
     },
 
     openCommentsModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: AnnotationCommentsModal,
         props: {annotation: this.annotation, comments: this.comments},
@@ -330,7 +330,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-annotation'),
         type: 'is-danger',

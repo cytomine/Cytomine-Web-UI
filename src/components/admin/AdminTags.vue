@@ -135,7 +135,7 @@ export default {
     },
 
     deleteTagDialog(tag) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete'),
         message: this.$t('delete-tag-confirmation-message', {tagName: tag.name}),
         type: 'is-danger',

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -210,7 +210,7 @@ export default {
     },
 
     confirmMembersRemoval() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('remove-members'),
         message: this.$tc('remove-members-confirmation-message', this.selectedMembers.length, {
           count: this.selectedMembers.length,
@@ -237,7 +237,7 @@ export default {
 
     confirmToggleManager(member) {
       if(member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
           message: this.$tc('remove-yourself-from-manager-confirmation-message'),
           type: 'is-danger',
