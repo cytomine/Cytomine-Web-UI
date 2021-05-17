@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -316,6 +316,9 @@ export default {
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
     selectedVendors: localSyncMultiselectFilter('vendors', 'availableVendors'),
     selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
@@ -359,9 +362,9 @@ export default {
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
-          gte: bounds[0],
           lte: bounds[1]
         };
+        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
         if(prop == 'vendor') prop = 'mimeType';
@@ -436,6 +439,17 @@ export default {
       this.filtersOpened = !this.filtersOpened;
     }
   },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    }
+  },
   async created() {
     try {
       await Promise.all([
@@ -447,6 +461,12 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
   }
 };

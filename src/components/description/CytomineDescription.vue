@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ export default {
       // CSS transform (e.g. popover) that conflict with the fixed position of the modal
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: DescriptionModal,
         props: {

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -79,6 +79,24 @@ export default {
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
             {key: 'project-information-tab', label: 'information', icon: 'fas fa-info-circle'},
             {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'}
+          ]
+        },
+        {
+          label: 'image-details',
+          props: [
+            {key: 'project-explore-image-overview', label: 'overview', icon: 'fas fa-image'},
+            //{key: 'project-explore-image-status', label: 'status'},
+            {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt'},
+            {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag'},
+            {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
+            {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
+            {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info'},
+            /*{key: 'project-explore-image-format', label: 'format'},
+            {key: 'project-explore-image-vendor', label: 'vendor'},
+            {key: 'project-explore-image-size', label: 'size'},
+            {key: 'project-explore-image-resolution', label: 'resolution'},
+            {key: 'project-explore-image-magnification', label: 'magnification'},*/
           ]
         },
         {

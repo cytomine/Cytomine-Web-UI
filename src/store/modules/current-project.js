@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2021. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ export default {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
       return getters.canManageProject ||
-        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+        (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {

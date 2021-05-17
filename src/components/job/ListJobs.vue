@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -143,7 +143,6 @@ import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
 import jobStatusMapping from '@/utils/job-utils';
-import moment from 'moment';
 
 // store options to use with store helpers to target projects/currentProject/listJobs module
 const storeOptions = {rootModuleProp: 'storeModule'};

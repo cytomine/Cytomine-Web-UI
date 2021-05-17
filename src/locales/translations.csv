@@ -305,6 +305,7 @@ image-filters,Image filters,Filtres d'images,Filtros de imagen
 project-side-bar,Project side bar,Barre latérale du projet,Barra lateral del proyecto
 viewer-panels,Viewer panels,Visualisateur d'images,Paneles del visor
 all-panels,All panels,Tous les outils,Todos los paneles
+image-details,Image details,Détails de l'image,Detalles de la imagen
 annotation-details,Annotation details,Détails de l'annotation,Detalles de anotación
 annotation-details-box,Annotation details box,Boîte de détails,Cuadro de detalles de anotación
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)","Información de geometría (área, longitud)"
@@ -432,7 +433,6 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel
 no-result,No result,Aucun résultat,Sin resultados
 upload,Upload,Upload,Subir
 important-notes,Important notes,Remarques importantes,Notas importantes
-max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,El tamaño máximo de archivo es de 100 GB
 allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF).","Solo se permiten archivos de imagen en formato JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI o BIF"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS)

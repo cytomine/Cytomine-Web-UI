@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -114,7 +114,6 @@ import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
-import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'admin-users',

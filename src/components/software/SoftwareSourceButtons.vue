@@ -55,6 +55,7 @@ export default {
   },
   methods: {
     formatProvider(provider) {
+      provider = provider.toLowerCase();
       return this.supportedProviders.includes(provider) ? provider : null;
     }
   }

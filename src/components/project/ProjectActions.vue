@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ export default {
 
           // if the only terms associations are performed by users, ask confirmation and delete them
           if(counts.algoAssociatedTermsCount === 0 && counts.reviewedAssociatedTermsCount === 0) {
-            this.$dialog.confirm({
+            this.$buefy.dialog.confirm({
               title: this.$t('confirm-ontology-change'),
               message: this.$t('confirm-ontology-change-delete-user-terms', {count: counts.userAssociatedTermsCount}),
               type: 'is-danger',
@@ -204,7 +204,7 @@ export default {
     },
 
     deleteProject() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
         message: this.$t('delete-project-confirmation-message', {projectName: this.project.name}),
         type: 'is-danger',
