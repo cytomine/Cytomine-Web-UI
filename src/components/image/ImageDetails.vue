@@ -25,7 +25,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <img :src="image.thumb" class="image-overview">
+            <img :src="imageThumbnailUrl" class="image-overview">
           </router-link>
         </td>
       </tr>
@@ -97,7 +97,7 @@
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <img :src="image.macroURL" class="image-overview">
+            <img :src="imageMacroUrl" class="image-overview" :key="imageMacroUrl">
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
@@ -320,6 +320,7 @@ import RenameModal from '@/components/utils/RenameModal';
 import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
@@ -378,6 +379,15 @@ export default {
     },
     isInImageGroup() {
       return this.imageGroupLinks.length > 0;
+    },
+    imageMacroUrl() {
+      if (!this.image.macroURL) {
+        return null;
+      }
+      return imageThumbnailUrl(this.image.macroURL, 256, 'webp');
+    },
+    imageThumbnailUrl() {
+      return imageThumbnailUrl(this.image.thumb, 256, 'webp');
     }
   },
   methods: {

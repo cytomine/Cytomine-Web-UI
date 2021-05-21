@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumb" class="image-overview" :key="image.thumb">
+              <img :src="imageThumbnailUrl(image)" class="image-overview" :key="imageThumbnailUrl(image)">
             </router-link>
           </b-table-column>
 
@@ -240,6 +240,8 @@
 
 <script>
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
+
+import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -448,6 +450,10 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+
+    imageThumbnailUrl(image) {
+      return imageThumbnailUrl(image.thumb, 128, 'webp');
     }
   },
   async created() {
