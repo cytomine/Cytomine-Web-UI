@@ -114,7 +114,6 @@ import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
-import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {
   name: 'admin-users',
