@@ -28,6 +28,7 @@ username,Username,Nom d'utilisateur
 firstname,First name,Prénom
 lastname,Last name,Nom
 email,Email address,Adresse e-mail
+phone_number,Phone number,Numéro de téléphone
 button-save,Save,Sauvegarder
 notif-success-user-details-saved,User details correctly updated,Profil mis à jour avec succès
 notif-error-user-details-not-saved,Error during update of user details,Une erreur a empêché la mise à jour du profil

@@ -36,7 +36,7 @@
           :type="{'is-danger': errors.has('profile.lastname')}"
           :message="errors.first('profile.lastname')"
         >
-          <b-input v-model="updatedUser.lastname" name="lastname" v-validate="'required'" />
+          <b-input :value="currentUser.lastname" :disabled="isFromSSO" />
         </b-field>
 
         <b-field
@@ -45,7 +45,7 @@
           :type="{'is-danger': errors.has('profile.firstname')}"
           :message="errors.first('profile.firstname')"
         >
-          <b-input v-model="updatedUser.firstname" name="firstname" v-validate="'required'" />
+          <b-input :value="currentUser.firstname" :disabled="isFromSSO" />
         </b-field>
 
         <b-field
@@ -54,7 +54,16 @@
           :type="{'is-danger': errors.has('profile.email')}"
           :message="errors.first('profile.email')"
         >
-          <b-input v-model="updatedUser.email" name="email" v-validate="'required|email'" />
+          <b-input :value="currentUser.email" :disabled="isFromSSO" />
+        </b-field>
+
+        <b-field
+          :label="$t('phone_number')"
+          horizontal
+          :type="{'is-danger': errors.has('profile.phone_number')}"
+          :message="errors.first('profile.phone_number')"
+        >
+          <b-input :value="currentUser.phone_number" :disabled="isFromSSO" />
         </b-field>
 
         <b-field :label="$t('language')" horizontal>
@@ -69,12 +78,14 @@
           <div class="control">
             <button class="button is-link" :disabled="errors.any('profile')"> {{$t('button-save')}}</button>
           </div>
+          <div class="control" v-if="isFromHelseID">
+            <a :href="externalEditLink" class="button is-link">{{$t('button-edit')}}</a>
+          </div>
         </b-field>
       </form>
     </div>
   </div>
-
-  <div class="panel">
+  <div class="panel" v-if="!isFromSSO">
     <p class="panel-heading">
       <i class="fas fa-briefcase" aria-hidden="true"></i>
       {{ $t('password') }}
@@ -183,6 +194,7 @@ import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
 import {User} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
@@ -202,6 +214,7 @@ export default {
         {value: 'EN', name:'English'},
         {value: 'FR', name:'Français'}
       ],
+      externalEditLink: constants.SSO_LOGIN+'/edit',
     };
   },
   computed: {
@@ -209,6 +222,13 @@ export default {
     role() {
       let key = this.currentUser.guestByNow ? 'ROLE_GUEST' : this.currentUser.adminByNow ? 'ROLE_ADMIN' : 'ROLE_USER';
       return rolesMapping[key];
+    },
+    isFromSSO() {
+      let origin = this.currentUser.origin;
+      return origin == 'HELSEID' || origin == 'LTI' || origin == 'SAML' || origin == 'LDAP';
+    },
+    isFromHelseID() {
+      return this.currentUser.origin == 'HELSEID';
     },
     newPasswordDisabled() {
       return !this.correctPassword && !this.currentUser.passwordExpired;
