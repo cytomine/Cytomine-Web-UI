@@ -107,7 +107,7 @@
             type="password"
             v-model="newPassword"
             name="newPassword"
-            v-validate="'required|min:4'"
+            v-validate="'required|min:8'"
             :disabled="newPasswordDisabled"
           />
         </b-field>
