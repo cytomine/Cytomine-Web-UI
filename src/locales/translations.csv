@@ -762,6 +762,7 @@ notif-error-failed-to-switch-back-as-real-user,Failed to switch back to real acc
 notif-error-invalid-key-prefix,The property key cannot start by {prefix}: this prefix is reserved for internal use,La clé ne peut commencer par {prefix} : ce préfixe est réservé par Cytomine pour une utilisation interne.
 button-copy,Copy,Copier
 notif-success-key-copied,Key copied to clipboard,Clé copiée dans le presse-papier
+notif-error-key-copied,Cannot copy to clipboard,Impossible de copier dans le presse-papier
 confirm-close-project,Close project,Fermer le projet
 confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,Êtes-vous sûr de vouloir fermer ce projet ? Les {viewers} qu'il contient seront également fermés.
 count-viewers,no viewer | viewer | {count} viewers,aucun visualisateur | visualisateurs | {count} visualisateurs
