@@ -279,6 +279,7 @@ um,µm,µm
 mm,mm,mm
 error,Error,Erreur
 error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image
+error-loading-image-bad-project,At least one image is not in the project from the link, Au moins une image n'est pas dans le project associé au lien
 live,Live,Live
 broadcast,Broadcast,Diffusion et suivi
 broadcast-my-position,Broadcast my position and allow other users to follow me,Diffuser ma position dans l'image et autoriser d'autres utilisateurs à me suivre
