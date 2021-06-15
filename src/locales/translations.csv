@@ -391,6 +391,7 @@ length,Length,Longueur
 create-project,Create project,Créer un projet
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé
 notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
 select-ontology,Select ontology,Choisir l'ontologie
