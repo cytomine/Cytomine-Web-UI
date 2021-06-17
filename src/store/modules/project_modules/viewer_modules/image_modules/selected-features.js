@@ -35,7 +35,11 @@ export default {
     },
 
     setSelectedFeatures(state, selectedFeatures) {
-      state.selectedFeatures = selectedFeatures;
+      let newSelectedFeatures = JSON.stringify(selectedFeatures);
+      let currentSelectedFeatures = JSON.stringify(state.selectedFeatures);
+      if (newSelectedFeatures !== currentSelectedFeatures) {
+        state.selectedFeatures = selectedFeatures;
+      }
     },
 
     clearSelectedFeatures(state) {
