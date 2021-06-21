@@ -34,7 +34,7 @@
       </td>
       <td>
         <button
-          :class="['button', customUI[prop.key].ADMIN_PROJECT && !isParentDisabled(prop, 'ADMIN_PROJECT') ? 'is-success' : 'is-danger']"
+          :class="['button', customUI[prop.key] && customUI[prop.key].ADMIN_PROJECT && !isParentDisabled(prop, 'ADMIN_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'ADMIN_PROJECT')"
           :disabled="isParentDisabled(prop, 'ADMIN_PROJECT') || prop.key === 'project-configuration-tab'"
         >
@@ -43,7 +43,7 @@
       </td>
       <td>
         <button
-          :class="['button', customUI[prop.key].CONTRIBUTOR_PROJECT && !isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') ? 'is-success' : 'is-danger']"
+          :class="['button', customUI[prop.key] && customUI[prop.key].CONTRIBUTOR_PROJECT && !isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')"
           :disabled="isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') || prop.key === 'project-configuration-tab'"
         >
@@ -85,18 +85,18 @@ export default {
           label: 'image-details',
           props: [
             {key: 'project-explore-image-overview', label: 'overview', icon: 'fas fa-image'},
-            //{key: 'project-explore-image-status', label: 'status', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info', parentConfiguration: 'project-explore-image-overview'},
-            /*{key: 'project-explore-image-format', label: 'format', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-vendor', label: 'vendor', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-size', label: 'size', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-resolution', label: 'resolution', parentConfiguration: 'project-explore-image-overview'},
-            {key: 'project-explore-image-magnification', label: 'magnification', parentConfiguration: 'project-explore-image-overview'},*/
+            //{key: 'project-explore-image-status', label: 'status'},
+            {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt'},
+            {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag'},
+            {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
+            {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
+            {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info'},
+            /*{key: 'project-explore-image-format', label: 'format'},
+            {key: 'project-explore-image-vendor', label: 'vendor'},
+            {key: 'project-explore-image-size', label: 'size'},
+            {key: 'project-explore-image-resolution', label: 'resolution'},
+            {key: 'project-explore-image-magnification', label: 'magnification'},*/
           ]
         },
         {
