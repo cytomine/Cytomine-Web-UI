@@ -297,7 +297,10 @@ export default {
   },
   async created() {
     try {
-      let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      let filters = (await ImageFilterProjectCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id
+      })).array.filter(filter => filter.available);
       let methods = filters.map(filter => filter.method);
       if(this.selectedFilter && !methods.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it

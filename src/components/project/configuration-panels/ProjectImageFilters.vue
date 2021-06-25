@@ -121,7 +121,7 @@ export default {
         filterValue: this.project.id
       });
 
-      let filters = (await promiseFilters).array;
+      let filters = (await promiseFilters).array.filter(filter => filter.available);
       let filtersProject = (await promiseFiltersProjects).array;
 
       filters.forEach(filter => {
