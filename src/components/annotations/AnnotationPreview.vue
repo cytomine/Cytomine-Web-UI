@@ -90,7 +90,14 @@ export default {
   },
   computed: {
     styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
+      let outlineParams = '';
+      if (this.color || this.color === '') {
+        outlineParams += '&draw=true';
+      }
+      if (this.color) {
+        outlineParams += `&color=0x${this.color}`;
+      }
+
       let updatedParams = this.annot.updated ? '&updated=' + this.annot.updated : '';
       let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=true&rev=${this.revisionCrop}&thickness=2&increaseArea=1.25${outlineParams}${updatedParams}`;
 
