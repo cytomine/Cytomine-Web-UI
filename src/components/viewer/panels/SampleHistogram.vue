@@ -3,6 +3,10 @@
     <div class="chart-container sample-histogram">
       <sample-histogram-chart
           :histogram="sampleHistogram.histogram"
+          :n-bins="sampleHistogram.n_bins"
+          :first-bin="sampleHistogram.first_bin"
+          :last-bin="sampleHistogram.last_bin"
+          :color="sampleHistogram.color"
           :min="minimum"
           :max="maximum"
           :scale="histogramScale"
@@ -65,9 +69,6 @@ export default {
   },
   data() {
     return {
-      cacheCenter: 0,
-      cacheRange: 0,
-
       brightness: 0,
       contrast: 0,
     };
@@ -90,7 +91,7 @@ export default {
       return this.imageWrapper.activePanel;
     },
     sample() {
-      return this.sampleHistogram.sample;
+      return this.sampleHistogram.channel;
     },
 
     theoreticalMax() {
@@ -107,15 +108,15 @@ export default {
     },
 
     defaultMin() {
-      return this.imageWrapper.colors.defaultMinMax[this.sample].min;
+      return this.imageWrapper.colors.defaultMinMax[this.sample].minimum;
     },
     defaultMax() {
-      return this.imageWrapper.colors.defaultMinMax[this.sample].max;
+      return this.imageWrapper.colors.defaultMinMax[this.sample].maximum;
     },
 
     minimum: {
       get() {
-        return this.imageWrapper.colors.minMax[this.sample].min;
+        return this.imageWrapper.colors.minMax[this.sample].minimum;
       },
       set(value) {
         value = Math.max(this.theoreticalMin, Math.min(value, this.theoreticalMax));
@@ -127,7 +128,7 @@ export default {
     },
     maximum: {
       get() {
-        return this.imageWrapper.colors.minMax[this.sample].max;
+        return this.imageWrapper.colors.minMax[this.sample].maximum;
       },
       set(value) {
         value = Math.min(this.theoreticalMax, Math.max(value, this.theoreticalMin));
@@ -142,10 +143,6 @@ export default {
     },
     center() {
       return this.minimum + this.range / 2;
-    },
-
-    nBins() {
-      return 256;
     },
   },
   watch: {

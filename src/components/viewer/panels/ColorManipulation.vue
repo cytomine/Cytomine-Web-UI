@@ -17,28 +17,22 @@
 <div>
   <h1>{{$t('colors')}}</h1>
   <div class="color-manipulation-wrapper" :class="{'limited-wrapper': nbImages > 2}">
-    <template v-if="canComputeHistogram">
-      <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
-        <p> {{ $t('unexpected-error-info-message') }} </p>
-      </b-message>
-      <div class="histogram-actions" v-else-if="!loadingHistograms && !hasSomeHistograms">
-        <a  class="button is-small is-fullwidth" @click="computeHistograms()">{{$t('button-compute-histogram')}}</a>
-      </div>
-      <div class="histogram-actions" v-else-if="(loadingHistograms || hasSomeHistograms) && !hasAllHistograms">
-        <progress class="progress is-info" :value="histogramProgress" max="100">
-          {{histogramProgress}}%
-        </progress>
-      </div>
-      <b-tabs type="is-boxed" class="histogram" v-else-if="hasAllHistograms">
-        <b-tab-item v-for="sampleHisto in sampleHistograms" :key="`${sampleHisto.id}`">
-          <template #header>
-            <i class="fa fa-circle color-preview" :style="{color: sampleColor(sampleHisto.sample)}" />
-            {{$t('sample-histogram-abbr')}} {{sampleHisto.sample}}
-          </template>
-          <sample-histogram :index="index" :sampleHistogram="sampleHisto" :histogram-scale="histogramScale" :revision="revisionBrightnessContrast" :gamma="gamma" :inverse="inverse"/>
-        </b-tab-item>
-      </b-tabs>
-    </template>
+    <b-tabs type="is-boxed" class="histogram">
+      <b-tab-item v-for="(sampleHisto, idx) in sampleHistograms" :key="`${image.id}-histogram-${idx}`">
+        <template #header>
+          <i class="fa fa-circle color-preview" :style="{color: sampleHisto.color}" />
+          {{$t('sample-histogram-abbr')}} {{sampleHisto.index}}
+        </template>
+        <sample-histogram
+            :index="index"
+            :sampleHistogram="sampleHisto"
+            :histogram-scale="histogramScale"
+            :revision="revisionBrightnessContrast"
+            :gamma="gamma"
+            :inverse="inverse"
+        />
+      </b-tab-item>
+    </b-tabs>
     <table>
       <!--    <tr>
             <td>{{ $t('contrast') }}</td>
@@ -78,15 +72,15 @@
   </div>
   <div class="actions">
     <div class="level">
-      <template v-if="maxRank > 1 && hasAllHistograms">
+      <template v-if="maxRank > 1">
         <button class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust-image')}}</button>
         <button class="level-item button is-small" @click="adjustToSlice()">{{$t('button-adjust-slice')}}</button>
       </template>
-      <button v-else-if="hasAllHistograms" class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
+      <button v-else class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>
 
       <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>
     </div>
-    <a class="is-fullwidth button is-small" @click="switchHistogramScale()" v-if="hasAllHistograms">{{switchHistogramScaleLabel}}</a>
+    <a class="is-fullwidth button is-small" @click="switchHistogramScale()">{{switchHistogramScaleLabel}}</a>
   </div>
 </div>
 </template>
@@ -94,9 +88,8 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import {ImageFilterProjectCollection, SampleHistogramCollection} from 'cytomine-client';
+import {ImageFilterProjectCollection} from 'cytomine-client';
 import SampleHistogram from '@/components/viewer/panels/SampleHistogram';
-import constants from '@/utils/constants';
 
 export default {
   name: 'color-manipulation',
@@ -109,9 +102,6 @@ export default {
       filters: null,
       sampleHistograms: null,
       loadingHistograms: false,
-      nbHistograms: 0,
-      refreshInterval: constants.HISTOGRAM_REFRESH_INTERVAL,
-      timeout: null,
       error: false,
       revisionBrightnessContrast: 0,
     };
@@ -144,21 +134,6 @@ export default {
     },
     maxValue() {
       return Math.pow(2, this.image.bitPerSample);
-    },
-    expectedNbHistograms() {
-      return this.image.depth * this.image.duration * this.image.channels * this.image.samplePerPixel;
-    },
-    hasAllHistograms() {
-      return this.nbHistograms === this.expectedNbHistograms;
-    },
-    hasSomeHistograms() {
-      return this.nbHistograms > 0;
-    },
-    canComputeHistogram() {
-      return this.image.bitPerSample && this.image.samplePerPixel;
-    },
-    histogramProgress() {
-      return this.nbHistograms / this.expectedNbHistograms * 100;
     },
 
     selectedFilter: {
@@ -204,13 +179,21 @@ export default {
       }
     },
     switchHistogramScaleLabel() {
-      return this.$t((this.histogramScale === 'log') ? 'button-switch-histogram-scale-to-linear' : 'button-switch-histogram-scale-to-log');
+      if (this.histogramScale === 'log') {
+        return this.$t('button-switch-histogram-scale-to-linear');
+      }
+      else {
+        return this.$t('button-switch-histogram-scale-to-log');
+      }
+    },
+    histogramNBins() {
+      return (this.image.bitPerSample > 8) ? 2048 : 256;
     }
 
   },
   watch: {
     slice() {
-      this.refresh();
+      this.fetchSampleHistograms();
     }
   },
   methods: {
@@ -224,7 +207,7 @@ export default {
     },
     adjustToSlice() {
       let minmax = this.sampleHistograms.map(sh => {
-        return {sample: sh.sample, min: sh.min, max: sh.max};
+        return {channel: sh.channel, minimum: sh.minimum, maximum: sh.maximum};
       });
       this.$store.dispatch(this.imageModule + 'adjustToSlice', minmax);
       this.revisionBrightnessContrast++;
@@ -237,63 +220,18 @@ export default {
         this.histogramScale = 'linear';
       }
     },
-    sampleColor(sample) {
-      if (this.image.samplePerPixel === 3) {
-        switch (sample) {
-          case 0:
-            return 'red';
-          case 1:
-            return 'green';
-          case 2:
-            return 'blue';
-        }
-      }
 
-      return 'grey';
-    },
-    async refresh() {
-      await this.fetchImageHistogramsCount();
-      clearTimeout(this.timeout);
-      if (this.nbHistograms < this.expectedNbHistograms && (this.nbHistograms > 0 || this.loadingHistograms)) {
-        this.timeout = setTimeout(this.refresh, this.refreshInterval);
-      }
-      else if (this.nbHistograms === this.expectedNbHistograms) {
-        if (!this.sampleHistograms) {
-          await this.$store.dispatch(this.imageModule + 'refreshDefaultMinMax', {image: this.image});
-        }
-        await this.fetchSampleHistograms();
-        this.loadingHistograms = false;
-      }
-    },
-    async fetchImageHistogramsCount() {
-      try {
-        this.nbHistograms = await this.image.fetchNbSampleHistograms();
-      }
-      catch(error) {
-        console.log(error);
-        this.error = true;
-      }
-    },
+
     async fetchSampleHistograms() {
       try {
-        this.sampleHistograms = (await SampleHistogramCollection.fetchAll({filterKey: 'sliceinstance', filterValue: this.slice.id})).array;
+        console.log(this.histogramNBins);
+        this.sampleHistograms = (await this.slice.fetchChannelHistograms({nBins: this.histogramNBins}));
       }
       catch(error) {
         console.log(error);
         this.error = true;
       }
     },
-    computeHistograms() {
-      this.loadingHistograms = true;
-      try {
-        this.image.extractHistogram();
-        this.refresh();
-      }
-      catch(error) {
-        console.log(error);
-        this.error = true;
-      }
-    }
   },
   async created() {
     try {
@@ -307,7 +245,8 @@ export default {
       }
       this.filters = filters;
 
-      this.refresh();
+      await this.fetchSampleHistograms();
+      this.loadingHistograms = false;
     }
     catch(error) {
       console.log(error);

@@ -1,12 +1,16 @@
-import {Bar} from 'vue-chartjs';
+import {Line} from 'vue-chartjs';
 import _ from 'lodash';
 
 export default {
   name: 'sample-histogram-chart',
-  extends: Bar,
+  extends: Line,
   props: {
     scale: String,
     histogram: Array,
+    nBins: Number,
+    firstBin: Number,
+    lastBin: Number,
+    color: String,
 
     theoreticalMax: Number,
     defaultMin: Number,
@@ -22,33 +26,13 @@ export default {
     };
   },
   computed: {
-    nBins() {
-      return (this.theoreticalMax > 256) ? 2048 : 256;
-    },
-    binSize() {
-      return Math.ceil(this.theoreticalMax / this.nBins);
-    },
     extendedHistogram() {
-      if (this.theoreticalMax > this.histogram.length) {
-        let missing = new Array(this.theoreticalMax - this.histogram.length).fill(0);
-        return this.histogram.concat(missing);
-      }
-
-      return this.histogram;
+      let missingLeft = new Array(this.firstBin).fill(0);
+      let missingRight = new Array(this.nBins - this.lastBin - 1).fill(0);
+      return missingLeft.concat(this.histogram).concat(missingRight);
     },
     binnedHistogram() {
-      if (this.extendedHistogram.length === this.nBins) {
-        return this.extendedHistogram;
-      }
-
-      let bins = [];
-      for (let i = 0; i < this.nBins; i++) {
-        let start = i * this.binSize;
-        let end = start + this.binSize;
-        bins.push(this.extendedHistogram.slice(start, end).reduce((cnt, value) => cnt + value));
-      }
-
-      return bins;
+      return this.extendedHistogram;
     },
 
     logHistogram() {
@@ -61,11 +45,14 @@ export default {
       return (this.scale === 'log');
     },
 
-    ratio() {
+    binSize() {
       return (this.theoreticalMax + 1) / this.nBins;
     },
+    integerBinSize() {
+      return Math.round(this.binSize);
+    },
     labels() {
-      return [...this.binnedHistogram.map((_, idx) => Math.round(idx * this.ratio)), this.theoreticalMax];
+      return this.binnedHistogram.map((_, idx) => Math.round(idx * this.binSize));
     },
     defaultMinLabel() {
       return this.findLabel(this.defaultMin);
@@ -114,8 +101,36 @@ export default {
       let gamma = (this.inverse) ? 1/this.gamma : this.gamma;
       return range.map(idx => {
         let label = this.currentLabels[Math.round(idx)];
-        return { x: label, y: Math.pow((m * label + p), gamma) * this.highestValue };
+        return {
+          x: label,
+          y: Math.pow((m * label + p), gamma) * this.highestValue
+        };
       });
+    },
+
+    histogramColor() {
+      return (this.color) ? this.color : '#C0C0C0';
+    },
+
+    datasets() {
+      return [
+        {
+          data: this.systemResponse,
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          borderColor: '#333',
+          borderWidth: 1,
+          type: 'line',
+          order: 2
+        },
+        {
+          data: this.scaledHistogram,
+          backgroundColor: this.histogramColor,
+          pointRadius: 1,
+          order: 1,
+        },
+      ];
     }
   },
   watch: {
@@ -140,38 +155,44 @@ export default {
   },
   methods: {
     findBin(value) {
-      return Math.floor(value / this.ratio);
+      return Math.floor(value / this.binSize);
     },
     findLabel(value) {
-      return Math.floor(this.findBin(value) * this.ratio);
+      return Math.floor(this.findBin(value) * this.binSize);
     },
     doRenderChart() {
       try {
         this.renderChart({
-          isLogarithmic: this.isLogarithmic,
-          ratio: Math.round(this.ratio),
           labels: this.labels,
-          datasets: [
-            {
-              data: this.systemResponse,
-              fill: false,
-              pointRadius: 0,
-              pointHoverRadius: 0,
-              borderColor: 'grey',
-              borderWidth: 1,
-              type: 'line',
-              order: 2
-            },
-            {
-              data: this.scaledHistogram,
-              backgroundColor: '#2778ad',
-              barPercentage: 1.0,
-              categoryPercentage: 1.0,
-              order: 1
-            },
+          datasets: this.datasets,
 
-          ]
+          // Additional data for tooltips
+          isLogarithmic: this.isLogarithmic,
+          binSize: this.integerBinSize,
         }, {
+          tooltips: {
+            filter: function(tooltipItem) {
+              return tooltipItem.datasetIndex !== 0;
+            },
+            callbacks: {
+              label: function(tooltipItem, data) {
+                if (data.isLogarithmic) {
+                  return Math.round(Math.exp(tooltipItem.value));
+                }
+                return tooltipItem.value;
+              },
+              title: function(tooltipItems, data) {
+                if (tooltipItems.length > 0) {
+                  let left = Number(tooltipItems[0].label);
+                  if (data.binSize === 1) {
+                    return left;
+                  }
+                  let right = left + data.binSize;
+                  return `[${left} - ${right}[`;
+                }
+              }
+            }
+          },
           maintainAspectRatio: false,
           responsive: true,
           title: {
@@ -183,28 +204,9 @@ export default {
           animation: {
             duration: 0,
           },
-          tooltips: {
-            filter: function(tooltipItem) {
-              return tooltipItem.datasetIndex !== 0;
-            },
-            callbacks: {
-              label: function(tooltipItem, data) {
-                return (data.isLogarithmic) ? Math.round(Math.exp(tooltipItem.value)) : tooltipItem.value;
-              },
-              title: function(tooltipItems, data) {
-                if (tooltipItems.length > 0) {
-                  let left = Number(tooltipItems[0].label);
-                  let right = left + data.ratio;
-                  return (left !== right) ? `[${left} - ${right}[` : left;
-                }
-              }
-            }
-          },
           scales: {
             xAxes: [{
               display: true,
-              barPercentage: 1.0,
-              categoryPercentage: 1.0,
               scaleLabel: {
                 display: false
               },
@@ -217,7 +219,7 @@ export default {
             yAxes: [{
               display: false,
               ticks: {
-                max: this.highestValue
+                suggestedMax: this.highestValue
               }
             }]
           },

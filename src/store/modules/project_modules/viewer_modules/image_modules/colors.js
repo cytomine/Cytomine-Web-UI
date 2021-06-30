@@ -80,8 +80,8 @@ export default {
     resetSampleColorManipulation(state) {
       state.minMax = state.defaultMinMax.map(obj => {
         let o = Object.assign({}, obj);
-        o.min = 0;
-        o.max = state.maxValue;
+        o.minimum = 0;
+        o.maximum = state.maxValue;
         return o;
       });
     },
@@ -100,13 +100,13 @@ export default {
 
     setMinimum(state, {sample, value}) {
       let clone = state.minMax;
-      clone[sample].min = value;
+      clone[sample].minimum = value;
       state.minMax = clone;
     },
 
     setMaximum(state, {sample, value}) {
       let clone = state.minMax;
-      clone[sample].max = value;
+      clone[sample].maximum = value;
       state.minMax = clone;
     },
 
@@ -131,7 +131,7 @@ export default {
       await dispatch('refreshDefaultMinMax', {image});
     },
     async refreshDefaultMinMax({commit}, {image}) {
-      let minmax = await image.fetchHistogramStats();
+      let minmax = await image.fetchChannelHistogramBounds();
       commit('setDefaultMinMax', minmax);
       if (image.bitPerSample > 8) {
         commit('setMinMax', deepCopy(minmax));

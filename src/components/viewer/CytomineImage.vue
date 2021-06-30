@@ -381,10 +381,12 @@ export default {
       let inverse = (this.imageWrapper.colors.inverse) ? '&inverse=true' : '';
       let params = `?${filter}${contrast}${gamma}${inverse}`;
 
-      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('%7C');
-      if (minmax) params += `&minmax=${minmax}`;
+      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum).join(',');
+      if (minIntensities) params += `&min_intensities=${minIntensities}`;
+      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum).join(',');
+      if (maxIntensities) params += `&max_intensities=${maxIntensities}`;
 
-      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}${params}`];
+      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${params}`];
     },
 
     colorManipulationOn() {
