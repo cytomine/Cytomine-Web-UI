@@ -298,7 +298,7 @@ import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 import {ImageInstance} from 'cytomine-client';
 
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
@@ -345,7 +345,7 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromMime(this.image.mime);
+      return vendorFromFormat(this.image.contentType);
     },
     imageMacroUrl() {
       if (!this.image.macroURL) {
