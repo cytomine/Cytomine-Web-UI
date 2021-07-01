@@ -14,7 +14,6 @@
 * limitations under the License.
 */
 
-import {ImageInstance} from 'cytomine-client';
 
 export default {
   state() {
@@ -139,9 +138,6 @@ export default {
       else {
         commit('resetSampleColorManipulation');
       }
-    },
-    async refreshData({dispatch, state}) {
-      await dispatch('refreshDefaultMinMax', {image: new ImageInstance({id: state.idImage})});
     },
 
     resetColorManipulation({commit}) {

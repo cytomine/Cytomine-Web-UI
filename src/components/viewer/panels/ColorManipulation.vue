@@ -17,29 +17,23 @@
 <div>
   <h1>{{$t('colors')}}</h1>
   <div class="color-manipulation-wrapper" :class="{'limited-wrapper': nbImages > 2}">
-    <b-tabs type="is-boxed" class="histogram">
-      <b-tab-item v-for="(sampleHisto, idx) in sampleHistograms" :key="`${image.id}-histogram-${idx}`">
-        <template #header>
-          <i class="fa fa-circle color-preview" :style="{color: sampleHisto.color}" />
-          {{$t('sample-histogram-abbr')}} {{sampleHisto.index}}
-        </template>
-        <sample-histogram
-            :index="index"
-            :sampleHistogram="sampleHisto"
-            :histogram-scale="histogramScale"
-            :revision="revisionBrightnessContrast"
-            :gamma="gamma"
-            :inverse="inverse"
-        />
-      </b-tab-item>
-    </b-tabs>
+    <channel-histograms
+      :index="index"
+      :histograms="sampleHistograms"
+      :log-scale="isHistogramScaleLog"
+      :revision="revisionBrightnessContrast"
+      :gamma="gamma"
+      :inverse="inverse"
+    />
     <table>
-      <!--    <tr>
-            <td>{{ $t('contrast') }}</td>
-            <td>
-              <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
-            </td>
-          </tr>-->
+      <!--
+      <tr>
+        <td>{{ $t('contrast') }}</td>
+        <td>
+          <cytomine-slider v-model="contrast" :min="0.25" :max="10" :interval="0.25" :integer-only="false"/>
+        </td>
+      </tr>
+      -->
       <tr>
         <td>{{ $t('gamma') }}</td>
         <td>
@@ -87,13 +81,15 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import CytomineSlider from '@/components/form/CytomineSlider';
+
 import {ImageFilterProjectCollection} from 'cytomine-client';
-import SampleHistogram from '@/components/viewer/panels/SampleHistogram';
+
+import CytomineSlider from '@/components/form/CytomineSlider';
+import ChannelHistograms from '@/components/viewer/panels/histograms/ChannelHistograms';
 
 export default {
   name: 'color-manipulation',
-  components: {SampleHistogram, CytomineSlider},
+  components: {ChannelHistograms, CytomineSlider},
   props: {
     index: String
   },
@@ -186,6 +182,10 @@ export default {
         return this.$t('button-switch-histogram-scale-to-log');
       }
     },
+    isHistogramScaleLog() {
+      return (this.histogramScale === 'log');
+    },
+
     histogramNBins() {
       return (this.image.bitPerSample > 8) ? 2048 : 256;
     }
@@ -224,7 +224,6 @@ export default {
 
     async fetchSampleHistograms() {
       try {
-        console.log(this.histogramNBins);
         this.sampleHistograms = (await this.slice.fetchChannelHistograms({nBins: this.histogramNBins}));
       }
       catch(error) {
@@ -260,12 +259,11 @@ export default {
 
 <style scoped>
 .color-manipulation-wrapper {
-
-  overflow: auto;
   margin-bottom: 0.4em !important;
 }
 
 .limited-wrapper {
+  overflow: auto;
   max-height: 13em;
 }
 
@@ -298,39 +296,15 @@ a.is-fullwidth {
 
 >>> .vue-slider {
   margin-left: 0.4em;
-  margin-right: 4em;
+  margin-right: 1em;
 }
 
-.has-border-bottom td, .histogram-actions {
+.has-border-bottom td {
   padding-bottom: 1em;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.histogram-actions {
-  margin-bottom: 1em;
-}
-
 .has-border-bottom + tr td {
   padding-top: 1em;
-}
-
-.color-preview {
-  margin-right: 0.25em;
-}
-
->>> .tab-content {
-  background-color: white;
-  border: 1px solid #DBDBDB;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  min-height: 5em;
-}
-
->>> .b-tabs:not(:last-child) {
-  margin-bottom: 1em;
-}
-
-.histogram {
-  min-height: 3em;
 }
 </style>

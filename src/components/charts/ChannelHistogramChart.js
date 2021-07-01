@@ -2,10 +2,10 @@ import {Line} from 'vue-chartjs';
 import _ from 'lodash';
 
 export default {
-  name: 'sample-histogram-chart',
+  name: 'channel-histogram-chart',
   extends: Line,
   props: {
-    scale: String,
+    logScale: Boolean,
     histogram: Array,
     nBins: Number,
     firstBin: Number,
@@ -31,18 +31,12 @@ export default {
       let missingRight = new Array(this.nBins - this.lastBin - 1).fill(0);
       return missingLeft.concat(this.histogram).concat(missingRight);
     },
-    binnedHistogram() {
-      return this.extendedHistogram;
-    },
 
     logHistogram() {
-      return this.binnedHistogram.map(v => Math.log(v));
+      return this.extendedHistogram.map(v => Math.log(v));
     },
     scaledHistogram() {
-      return this.isLogarithmic ? this.logHistogram : this.binnedHistogram;
-    },
-    isLogarithmic() {
-      return (this.scale === 'log');
+      return this.logScale ? this.logHistogram : this.extendedHistogram;
     },
 
     binSize() {
@@ -52,7 +46,7 @@ export default {
       return Math.round(this.binSize);
     },
     labels() {
-      return this.binnedHistogram.map((_, idx) => Math.round(idx * this.binSize));
+      return this.extendedHistogram.map((_, idx) => Math.round(idx * this.binSize));
     },
     defaultMinLabel() {
       return this.findLabel(this.defaultMin);
@@ -107,11 +101,6 @@ export default {
         };
       });
     },
-
-    histogramColor() {
-      return (this.color) ? this.color : '#C0C0C0';
-    },
-
     datasets() {
       return [
         {
@@ -126,7 +115,7 @@ export default {
         },
         {
           data: this.scaledHistogram,
-          backgroundColor: this.histogramColor,
+          backgroundColor: this.color,
           pointRadius: 1,
           order: 1,
         },
@@ -140,7 +129,7 @@ export default {
     currentMaxLabel() {
       this.doRenderChart();
     },
-    scale() {
+    logScale() {
       this.doRenderChart();
     },
     highestValue() {
@@ -167,7 +156,7 @@ export default {
           datasets: this.datasets,
 
           // Additional data for tooltips
-          isLogarithmic: this.isLogarithmic,
+          logScale: this.logScale,
           binSize: this.integerBinSize,
         }, {
           tooltips: {
@@ -176,7 +165,7 @@ export default {
             },
             callbacks: {
               label: function(tooltipItem, data) {
-                if (data.isLogarithmic) {
+                if (data.logScale) {
                   return Math.round(Math.exp(tooltipItem.value));
                 }
                 return tooltipItem.value;

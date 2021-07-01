@@ -1,21 +1,21 @@
 <template>
   <div>
-    <div class="chart-container sample-histogram">
-      <sample-histogram-chart
-          :histogram="sampleHistogram.histogram"
-          :n-bins="sampleHistogram.n_bins"
-          :first-bin="sampleHistogram.first_bin"
-          :last-bin="sampleHistogram.last_bin"
-          :color="sampleHistogram.color"
-          :min="minimum"
-          :max="maximum"
-          :scale="histogramScale"
-          :theoretical-max="theoreticalMax"
-          :default-max="defaultMax"
-          :default-min="defaultMin"
-          :gamma="gamma"
-          :inverse="inverse"
-          css-classes="chart"
+    <div class="chart-container channel-histogram">
+      <channel-histogram-chart
+        :histogram="histogram.histogram"
+        :n-bins="histogram.nBins"
+        :first-bin="histogram.firstBin"
+        :last-bin="histogram.lastBin"
+        :color="color"
+        :min="minimum"
+        :max="maximum"
+        :log-scale="logScale"
+        :theoretical-max="theoreticalMax"
+        :default-max="defaultMax"
+        :default-min="defaultMin"
+        :gamma="gamma"
+        :inverse="inverse"
+        css-classes="chart"
       />
     </div>
 
@@ -23,13 +23,13 @@
       <tr>
         <td>{{ $t('minimum') }}</td>
         <td>
-          <cytomine-slider :value="minimum" @input="setMinimum" :min="0" :max="theoreticalMax" />
+          <cytomine-slider :value="minimum" @input="setMinimum" :min="0" :max="theoreticalMax"/>
         </td>
       </tr>
       <tr>
         <td>{{ $t('maximum') }}</td>
         <td>
-          <cytomine-slider :value="maximum" @input="setMaximum" :min="0" :max="theoreticalMax" />
+          <cytomine-slider :value="maximum" @input="setMaximum" :min="0" :max="theoreticalMax"/>
         </td>
       </tr>
       <tr>
@@ -47,22 +47,20 @@
 
     </table>
   </div>
-
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import SampleHistogramChart from '@/components/charts/SampleHistogramChart';
-
+import ChannelHistogramChart from '@/components/charts/ChannelHistogramChart';
 
 export default {
-  name: 'SampleHistogram',
-  components: {SampleHistogramChart, CytomineSlider},
+  name: 'ChannelHistogram',
+  components: {ChannelHistogramChart, CytomineSlider},
   props: {
     index: String,
-    sampleHistogram: Object,
-    histogramScale: String,
+    histogram: Object,
+    logScale: Boolean,
     revision: Number,
     gamma: Number,
     inverse: Boolean,
@@ -90,8 +88,12 @@ export default {
     activePanel() {
       return this.imageWrapper.activePanel;
     },
-    sample() {
-      return this.sampleHistogram.channel;
+    channelIndex() {
+      return this.histogram.channel;
+    },
+
+    color() {
+      return (this.histogram.color) ? this.histogram.color : '#C0C0C0';
     },
 
     theoreticalMax() {
@@ -108,19 +110,19 @@ export default {
     },
 
     defaultMin() {
-      return this.imageWrapper.colors.defaultMinMax[this.sample].minimum;
+      return this.imageWrapper.colors.defaultMinMax[this.channelIndex].minimum;
     },
     defaultMax() {
-      return this.imageWrapper.colors.defaultMinMax[this.sample].maximum;
+      return this.imageWrapper.colors.defaultMinMax[this.channelIndex].maximum;
     },
 
     minimum: {
       get() {
-        return this.imageWrapper.colors.minMax[this.sample].minimum;
+        return this.imageWrapper.colors.minMax[this.channelIndex].minimum;
       },
       set(value) {
         value = Math.max(this.theoreticalMin, Math.min(value, this.theoreticalMax));
-        this.$store.commit(this.imageModule + 'setMinimum', {sample: this.sample, value});
+        this.$store.commit(this.imageModule + 'setMinimum', {sample: this.channelIndex, value});
         if (value > this.maximum) {
           this.maximum = value;
         }
@@ -128,11 +130,11 @@ export default {
     },
     maximum: {
       get() {
-        return this.imageWrapper.colors.minMax[this.sample].maximum;
+        return this.imageWrapper.colors.minMax[this.channelIndex].maximum;
       },
       set(value) {
         value = Math.min(this.theoreticalMax, Math.max(value, this.theoreticalMin));
-        this.$store.commit(this.imageModule + 'setMaximum', {sample: this.sample, value});
+        this.$store.commit(this.imageModule + 'setMaximum', {sample: this.channelIndex, value});
         if (value < this.minimum) {
           this.minimum = value;
         }
@@ -164,7 +166,8 @@ export default {
     },
     setBrightness(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      let b = this.theoreticalMin + this.theoreticalRange * ((this.theoreticalRange - value) / this.theoreticalRange);
+      let b = this.theoreticalMin + this.theoreticalRange *
+        ((this.theoreticalRange - value) / this.theoreticalRange);
       let range = this.range;
       this.minimum = Math.round(b - range / 2.0);
       this.maximum = Math.round(b + range / 2.0);
@@ -173,23 +176,34 @@ export default {
     },
     setContrast(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      let slope = (value <= this.theoreticalCenter) ? value / this.theoreticalCenter : this.theoreticalCenter / (this.theoreticalRange - value);
+      let slope;
+      if (value <= this.theoreticalCenter) {
+        slope = value / this.theoreticalCenter;
+      }
+      else {
+        slope = this.theoreticalCenter / (this.theoreticalRange - value);
+      }
       if (slope > 0) {
         let center = this.center;
         this.minimum = Math.round(center - (this.theoreticalRange / 2) / slope);
         this.maximum = Math.round(center + (this.theoreticalRange / 2) / slope);
 
-        this.contrast =  value;
+        this.contrast = value;
       }
     },
     computeBrightness() {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
-      this.brightness = Math.round(this.theoreticalRange * (1.0 - (this.center - this.theoreticalMin) / this.theoreticalRange));
+      this.brightness = Math.round(
+        this.theoreticalRange *
+        (1.0 - (this.center - this.theoreticalMin) / this.theoreticalRange)
+      );
     },
     computeContrast() {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
       let c = this.theoreticalRange / this.range;
-      this.contrast =  Math.round((c > 0) ? this.theoreticalRange - (this.theoreticalCenter / c) : this.theoreticalCenter * c);
+      this.contrast = Math.round(
+        (c > 0) ? this.theoreticalRange - (this.theoreticalCenter / c) : this.theoreticalCenter * c
+      );
     }
   },
   created() {
@@ -200,43 +214,35 @@ export default {
 </script>
 
 <style scoped>
-  td, tr {
-    vertical-align: middle !important;
-  }
+td, tr {
+  vertical-align: middle !important;
+}
 
-  td:first-child {
-    font-weight: 600;
-    text-align: right;
-    padding: 0.35em 0.5em;
-  }
+td:first-child {
+  font-weight: 600;
+  text-align: right;
+  padding: 0.35em 0.5em;
+}
 
-  td:last-child {
-    width: 100%;
-  }
+td:last-child {
+  width: 100%;
+}
 
-  .actions {
-    margin-top: 1em;
-    text-align: right;
-  }
+>>> .vue-slider {
+  margin-left: 0.4em;
+  margin-right: 1em;
+}
 
-  >>> .vue-slider {
-    margin-left: 0.4em;
-    margin-right: 4em;
-  }
-
-  .chart-container {
-    margin-top: 0.5em;
-    height: 10em;
-    position: relative;
-  }
-
-
+.chart-container {
+  margin-top: 0.5em;
+  height: 10em;
+}
 </style>
 
 <style>
-  .sample-histogram .chart {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
+.channel-histogram .chart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 </style>
