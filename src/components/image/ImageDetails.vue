@@ -324,7 +324,7 @@ import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
@@ -375,7 +375,7 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromMime(this.image.contentType);
+      return vendorFromFormat(this.image.contentType);
     },
     isInImageGroup() {
       return this.imageGroupLinks.length > 0;

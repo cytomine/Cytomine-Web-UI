@@ -249,7 +249,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
 
@@ -406,10 +406,10 @@ export default {
 
       this.availableFormats = stats.format.list;
 
-      stats.format.list.forEach(mime => {
-        let vendor = vendorFromMime(mime);
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
         let vendorFormatted = {
-          value: vendor ? mime : 'null',
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
 
