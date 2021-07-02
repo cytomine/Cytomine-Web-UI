@@ -17,6 +17,7 @@
 <div v-if="error" class="box error">
   <h2> {{ $t('error') }} </h2>
   <p>{{ $t('error-loading-image') }}</p>
+  <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
 </div>
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
@@ -64,6 +65,7 @@ export default {
   data() {
     return {
       error: false,
+      errorBadImageProject: false,
       loading: true,
       reloadInterval: null,
       idViewer: null
@@ -192,6 +194,14 @@ export default {
             let image = await ImageInstance.fetch(id);
             images[id] = image;
           }));
+
+          console.log('images', images);
+          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
+          console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
+          if (imagesNotInCurrentProject.length > 0) {
+            this.errorBadImageProject = true;
+            throw new Error('Some images are not from this project');
+          }
 
           this.idImages.forEach(async id => {
             await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
