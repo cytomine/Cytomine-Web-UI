@@ -19,8 +19,8 @@ WORKDIR /app
 
 ARG CURRENT_BRANCH
 ENV CURRENT_BRANCH=$CURRENT_BRANCH
-
-RUN git clone https://github.com/cytomine/Cytomine-Web-UI.git && cd Cytomine-Web-UI && git checkout "$CURRENT_BRANCH"
+RUN echo "$CURRENT_BRANCH"
+RUN "git clone https://github.com/cytomine/Cytomine-Web-UI.git && cd Cytomine-Web-UI && git checkout $CURRENT_BRANCH"
 WORKDIR /app/Cytomine-Web-UI
 RUN npm install
 RUN npm run build
