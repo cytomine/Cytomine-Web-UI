@@ -162,7 +162,6 @@
         :collection="uploadedFileCollection"
         sort="created" order="desc"
         :revision="revision"
-        :openedDetailed.sync="openedDetails"
         :refreshInterval="tableRefreshInterval"
         :openedDetailed.sync="openedDetails"
       >
@@ -252,7 +251,6 @@ export default {
       signature: '',
       signatureDate: '',
 
-      openedDetails: [],
       revision: 0
     };
   },

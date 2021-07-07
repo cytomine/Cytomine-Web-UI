@@ -87,7 +87,7 @@ export default {
 
     termsIds: Array,
     tracksIds: Array,
-    tagsIds: {type: Array, default: null},
+    tagsIds: {type: Array, default: () => []},
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
