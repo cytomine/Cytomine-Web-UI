@@ -22,6 +22,7 @@ ENV CURRENT_BRANCH=$CURRENT_BRANCH
 RUN echo "$CURRENT_BRANCH"
 RUN git clone https://github.com/cytomine/Cytomine-Web-UI.git
 WORKDIR /app/Cytomine-Web-UI
+RUN git branch
 RUN "git checkout $CURRENT_BRANCH"
 RUN npm install
 RUN npm run build
