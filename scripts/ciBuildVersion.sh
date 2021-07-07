@@ -7,8 +7,7 @@ srcRoot=$(git rev-parse --show-toplevel)
 cd $srcRoot
 
 # get version number from git
-lastGitTag="v1.5.1-0-gf6e2eb6"
-#$(git describe --long --dirty)
+lastGitTag=$(git describe --long --dirty)
 
 if [[ $lastGitTag =~ v[0-9]+.[0-9]+.[0-9]+-0-[0-9a-g]{8,9}$ ]]; then
   # official release x.y.z
