@@ -133,7 +133,7 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content">
           <div class="buttons are-small">
-            <button class="button" @click="isMetadataModalActive = true">
+            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">

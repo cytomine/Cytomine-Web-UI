@@ -280,6 +280,7 @@ um,µm,µm
 mm,mm,mm
 error,Error,Erreur
 error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image
+error-loading-image-bad-project,At least one image is not in the project from the link, Au moins une image n'est pas dans le project associé au lien
 live,Live,Live
 broadcast,Broadcast,Diffusion et suivi
 broadcast-my-position,Broadcast my position and allow other users to follow me,Diffuser ma position dans l'image et autoriser d'autres utilisateurs à me suivre
@@ -397,6 +398,7 @@ length,Length,Longueur
 create-project,Create project,Créer un projet
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé
 notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet
 select-project,Select project,Choisir le projet
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
@@ -940,3 +942,4 @@ hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche
 no-trusted-source,No trusted source,Pas de source de confiance
+hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop

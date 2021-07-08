@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
