@@ -148,10 +148,7 @@
         <b-field>
           <b-input :value="currentUser.publicKey" readonly expanded />
           <p class="control">
-            <button class="button" @click="copy(currentUser.publicKey)">
-              <span class="icon"><i class="far fa-clipboard"></i></span>
-              <span>{{$t('button-copy')}}</span>
-            </button>
+            <copy-to-clipboard-widget :value="currentUser.publicKey" :on-success="notifyCopySuccess" :on-failure="notifyCopyError" />
           </p>
         </b-field>
       </b-field>
@@ -160,10 +157,7 @@
         <b-field>
           <b-input :value="currentUser.privateKey" readonly expanded />
           <p class="control">
-            <button class="button" @click="copy(currentUser.privateKey)">
-              <span class="icon"><i class="far fa-clipboard"></i></span>
-              <span>{{$t('button-copy')}}</span>
-            </button>
+            <copy-to-clipboard-widget :value="currentUser.privateKey" :on-success="notifyCopySuccess" :on-failure="notifyCopyError" />
           </p>
         </b-field>
       </b-field>
@@ -184,10 +178,13 @@ import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
 import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
-import copyToClipboard from 'copy-to-clipboard';
+import CopyToClipboardWidget from '@/components/utils/CopyToClipboardWidget';
 
 export default {
   name: 'Account',
+  components: {
+    CopyToClipboardWidget,
+  },
   $_veeValidate: {validator: 'new'},
   mixins: [changeLanguageMixin],
   data() {
@@ -282,9 +279,12 @@ export default {
       this.isCheckingPassword = false;
     }, 500),
 
-    copy(value) {
-      copyToClipboard(value);
+    notifyCopySuccess() {
       this.$notify({type: 'success', text: this.$t('notif-success-key-copied')});
+    },
+
+    notifyCopyError() {
+      this.$notify({type: 'error', text: this.$t('notif-error-key-copied')});
     },
 
     async regenerateKeys() {
