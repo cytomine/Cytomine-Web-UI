@@ -584,6 +584,7 @@ comment,Comment,Commentaire
 no-result-file,No result file,Aucun fichier de résultat
 button-view,View,Voir
 data,Data,Données
+relaunch,Relaunch,Relancer
 delete-data,Delete data,Supprimer les données
 count-annotations,0 annotation | 1 annotation | {count} annotations,0 annotation | 1 annotation | {count} annotations
 deleted-analysis-data,Analysis data was deleted,Données de l'analyse supprimées

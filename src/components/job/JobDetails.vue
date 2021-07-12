@@ -135,6 +135,9 @@
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
+                <button class="button" @click="relaunchJob()">
+                  {{$t('relaunch')}}
+                </button>
                 <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">
                   {{$t('delete-data')}}
                 </button>
@@ -252,6 +255,7 @@ export default {
       let job = await Job.fetch(this.job.id);
       this.$emit('update', job);
       await this.fetchData();
+      this.job.status = job.status;
       this.fetchLog();
 
       clearTimeout(this.timeoutRefresh);
@@ -329,7 +333,19 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.killJob()
       });
-    }
+    },
+    async relaunchJob() {
+      try {
+        let newJob = await this.job.copy();
+        this.$emit('relaunch', newJob);
+        await newJob.execute();
+        this.$notify({type: 'success', text: this.$t('notif-success-analysis-launch')});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-analysis-launch')});
+      }
+    },
   },
   async created() {
     await this.fetchData();
