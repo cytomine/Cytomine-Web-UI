@@ -325,14 +325,16 @@ export default {
       this.isRenameModalActive = false;
     },
 
-    async clone(selectedProject, cloneMetadata, cloneAnnot, cloneAnnotMetadata) {
+    async clone(selectedProject, cloneMetadata, cloneAnnot, cloneAnnotMetadata, annotationsTranfertMap) {
       let name = this.image.instanceFilename;
       try {
         await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/imageinstance/${this.image.id}/clone.json`, {
           idProject: selectedProject,
           areImageMetadataCopied: cloneMetadata,
           areAnnotationsCopied: cloneAnnot,
-          areAnnotationsMetadataCopied: cloneAnnotMetadata
+          areAnnotationsMetadataCopied: cloneAnnotMetadata,
+          layersArray: annotationsTranfertMap.map(item => item.source).join(','),
+          annotationsTranfertMap: annotationsTranfertMap
         });
         this.$notify({
           type: 'success',

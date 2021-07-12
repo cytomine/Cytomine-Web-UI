@@ -66,7 +66,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="layer in displayedSourceAnnotationLayers" :value="layer.id" :key="layer.id">
+          <tr v-for="layer in annotationLayersTransfert" :value="layer.source" :key="layer.source">
             <td>{{layer.label}}</td>
             <td>
               <b-field>
@@ -127,7 +127,7 @@ export default {
   },
   methods: {
     async clone() {
-      this.$emit('clone', this.selectedProject, this.cloneMetadata, this.cloneAnnot, this.cloneAnnotMetadata);
+      this.$emit('clone', this.selectedProject, this.cloneMetadata, this.cloneAnnot, this.cloneAnnotMetadata, this.annotationLayersTransfert);
     },
     async fetchLayers() {
       this.sourceAnnotationLayers = (await this.project.fetchUserLayers(this.currentImage.id)).array;
@@ -144,11 +144,11 @@ export default {
   },
   computed : {
     project: get('currentProject/project'),
-    displayedSourceAnnotationLayers(){
+    annotationLayersTransfert(){
       this.sourceAnnotationLayers; // to force listening.
 
       let mergedLayers = this.indexLayers.map(t1 => ({...t1, ...this.sourceAnnotationLayers.find(t2 => t2.id === t1.user)}));
-      return mergedLayers.sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 ).map(layer => ({id : layer.id, label :`${fullName(layer)} (${layer.countAnnotation || 0})`, destination:null} ));
+      return mergedLayers.sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 ).map(layer => ({source : layer.id, label :`${fullName(layer)} (${layer.countAnnotation || 0})`, destination:null} ));
     }
   },
   watch :{
@@ -160,7 +160,7 @@ export default {
     }
   },
   async created() {
-    this.projects = await ProjectCollection.fetchAll();
+    this.projects = (await ProjectCollection.fetchAll()).array.sort((a, b) => (a.name < b.name) ? -1 : 1 );
     this.fetchIndexLayers();
     this.fetchLayers();
   }
