@@ -14,9 +14,10 @@
 * limitations under the License.
 */
 
-import {ImageInstance, AbstractImage, AnnotationType} from 'cytomine-client';
+import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance, CompanionFileCollection} from 'cytomine-client';
 
 import constants from '@/utils/constants';
+import {slicePositionToRank} from '@/utils/slice-utils';
 
 import colors from './image_modules/colors';
 import draw from './image_modules/draw';
@@ -28,6 +29,10 @@ import tracking from './image_modules/tracking';
 import undoRedo from './image_modules/undo-redo';
 import view from './image_modules/view';
 import review from './image_modules/review';
+import tracks from './image_modules/tracks';
+import annotationsList from './image_modules/annotations-list';
+
+import Vue from 'vue';
 
 import {
   isCluster,
@@ -37,7 +42,8 @@ import {
   reviewedStyles,
   reviewedSelectStyles,
   rejectedStyles,
-  rejectedSelectStyles
+  rejectedSelectStyles,
+  trackedSelectStyles
 } from '@/utils/style-utils.js';
 
 export default {
@@ -46,6 +52,10 @@ export default {
   state() {
     return {
       imageInstance: null,
+      profile: null,
+      sliceInstances: {},
+      loadedSlicePages: [],
+      activeSlice: null,
       activePanel: null
     };
   },
@@ -56,31 +66,128 @@ export default {
     },
 
     setResolution(state, resolution) {
-      state.imageInstance.resolution = resolution;
+      state.imageInstance.physicalSizeX = resolution.x;
+      state.imageInstance.physicalSizeY = resolution.y;
+      state.imageInstance.physicalSizeZ = resolution.z;
+      state.imageInstance.fps = resolution.t;
     },
 
     togglePanel(state, panel) {
       state.activePanel = state.activePanel === panel ? null : panel;
+    },
+
+    clearSliceInstances(state) {
+      state.sliceInstances = {};
+      state.loadedSlicePages = [];
+    },
+
+    setSliceInstance(state, slice) {
+      Vue.set(state.sliceInstances, slice.rank, slice);
+    },
+
+    setLoadedSlicePage(state, page) {
+      state.loadedSlicePages.push(page);
+    },
+
+    setActiveSlice(state, slice) {
+      state.activeSlice = slice;
+    },
+
+    setProfile(state, profile) {
+      state.profile = profile;
     }
   },
 
   actions: {
-    async initialize({commit}, image) {
+    async initialize({commit, dispatch}, {image, slice}) {
       let clone = image.clone();
-      await fetchImageServers(clone);
       commit('setImageInstance', clone);
-    },
 
-    async setImageInstance({dispatch, rootState}, image) {
-      await dispatch('initialize', image);
+      clone = slice.clone();
+      commit('setActiveSlice', clone);
+
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      commit('setProfile', profile);
+
+      await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
+    },
+    async setImageInstance({dispatch, rootState}, {image, slice}) {
+      await dispatch('initialize', {image, slice});
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
 
-    async refreshData({state, commit}) {
-      let image = await fetchImage(state.imageInstance.id);
+    async setActiveSlice({commit, dispatch, rootState}, slice) {
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      commit('setActiveSlice', slice);
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+    },
+    async setActiveSliceByPosition({state, dispatch}, {channel, zStack, time}) {
+      let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
+      await dispatch('setActiveSliceByRank', rank);
+    },
+    async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
+      let slice = state.sliceInstances[rank];
+      if (!slice) {
+        await dispatch('fetchSliceInstancesAround', {rank, setActive: true});
+      }
+      else {
+        commit('setActiveSlice', slice);
+      }
+
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+    },
+
+    async refreshData({state, commit, dispatch}) {
+      let image = await ImageInstance.fetch(state.imageInstance.id);
       commit('setImageInstance', image);
+
+      let slice = await SliceInstance.fetch(state.activeSlice.id);
+      commit('setActiveSlice', slice);
+
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      commit('setProfile', profile);
+
+      commit('clearSliceInstances');
+      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+    },
+
+    async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {
+      let promises = [];
+      let props = {filterKey: 'imageinstance', filterValue: state.imageInstance.id, max: constants.PRELOADED_SLICES};
+
+      let page = findRankPage(rank);
+      if (!state.loadedSlicePages.includes(page)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(page).then(data => {
+          data.array.forEach(slice => {
+            commit('setSliceInstance', slice);
+            if (setActive && slice.rank === rank) {
+              commit('setActiveSlice', slice);
+            }
+          });
+        }).then(() => commit('setLoadedSlicePage', page)));
+      }
+
+      let previous = page - 1;
+      if (previous >= 0 && !state.loadedSlicePages.includes(previous)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(previous).then(data => {
+          data.array.forEach(slice => commit('setSliceInstance', slice));
+        }).then(() => commit('setLoadedSlicePage', previous)));
+      }
+
+      let next = page + 1;
+      if (next < findSliceInstanceNbPage(state.imageInstance) && !state.loadedSlicePages.includes(previous)) {
+        promises.push(new SliceInstanceCollection(props).fetchPage(next).then(data => {
+          data.array.forEach(slice => commit('setSliceInstance', slice));
+        }).then(() => commit('setLoadedSlicePage', next)));
+      }
+
+      await Promise.all(promises);
     }
   },
 
@@ -136,12 +243,13 @@ export default {
         styles.push(state.style.noTermStyle);
       }
 
+      let nbTracks = annot.track.length;
       let isReviewed = annot.type === AnnotationType.REVIEWED;
       let isRejected = state.review.reviewMode && !isReviewed;
 
       // Styles for selected elements
       if(state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
-        styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : selectStyles));
+        styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : (nbTracks > 0) ? trackedSelectStyles : selectStyles));
 
         // if in modify mode, display vertices
         if(state.draw.activeEditTool === 'modify') {
@@ -153,6 +261,23 @@ export default {
       }
       else if(isRejected) {
         styles.push(...rejectedStyles);
+      }
+
+      let tracks = state.style.wrappedTracks;
+
+      if (tracks && nbTracks === 1) {
+        let wrappedTrack = getters.tracksMapping[annot.track[0]];
+        if(wrappedTrack) {
+          if(feature.getGeometry().getType() === 'LineString') {
+            styles.unshift(wrappedTrack.olLineStyle);
+          }
+          else {
+            styles.push(wrappedTrack.olStyle);
+          }
+        }
+      }
+      else if (tracks && nbTracks > 1) {
+        styles.push(state.style.multipleTracksStyle);
       }
 
       // Properties
@@ -180,7 +305,15 @@ export default {
         return 0;
       }
       let increment = state.view.digitalZoom ? constants.DIGITAL_ZOOM_INCREMENT : 0;
-      return state.imageInstance.depth + increment;
+      return state.imageInstance.zoom + increment;
+    },
+
+    maxRank: state => {
+      if(!state.imageInstance) {
+        return 0;
+      }
+
+      return state.imageInstance.depth * state.imageInstance.duration * state.imageInstance.channels;
     }
   },
 
@@ -194,18 +327,17 @@ export default {
     tracking,
     undoRedo,
     view,
-    review
+    review,
+    tracks,
+    annotationsList,
   }
 };
 
-async function fetchImage(idImage) {
-  let image = await ImageInstance.fetch(idImage);
-  await fetchImageServers(image);
-  return image;
+function findRankPage(rank) {
+  return Math.ceil((rank + 1) / constants.PRELOADED_SLICES) - 1;
 }
 
-async function fetchImageServers(image) {
-  if(!image.imageServerURLs) {
-    image.imageServerURLs = await new AbstractImage({id: image.baseImage}).fetchImageServers();
-  }
+function findSliceInstanceNbPage(image) {
+  return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
+

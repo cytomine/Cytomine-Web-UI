@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
   <template v-if="!loading">

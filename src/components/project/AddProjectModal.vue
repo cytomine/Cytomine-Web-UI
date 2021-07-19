@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="createProject()">
   <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
@@ -21,8 +20,8 @@
     </b-field>
 
     <b-field :label="$t('ontology')">
-      <b-radio v-model="ontology" native-value="NO">
-        {{$t('no-ontology')}}
+      <b-radio v-model="ontology" native-value="NEW">
+        {{$t('create-ontology-for-project')}}
       </b-radio>
     </b-field>
     <b-field>
@@ -31,8 +30,8 @@
       </b-radio>
     </b-field>
     <b-field>
-      <b-radio v-model="ontology" native-value="NEW">
-        {{$t('create-ontology-for-project')}}
+      <b-radio v-model="ontology" native-value="NO">
+        {{$t('no-ontology')}}
       </b-radio>
     </b-field>
 
@@ -79,7 +78,7 @@ export default {
   data() {
     return {
       name: '',
-      ontology: 'NO',
+      ontology: 'NEW',
       selectedOntology: null
     };
   },
@@ -87,7 +86,7 @@ export default {
     active(val) {
       if(val) {
         this.name = '';
-        this.ontology = 'NO';
+        this.ontology = 'NEW';
         this.selectedOntology = null;
       }
     }

@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <v-popover
   placement="right"
@@ -21,10 +20,18 @@
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-  <div class="annot-preview" :style="styleAnnotDetails" @click.self="viewAnnot()">
-    <button class="button is-small" @click="opened = !opened" ref="previewButton">
-      <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
-    </button>
+  <div class="annot-preview">
+    <div :style="styleAnnotDetails" @click.self="viewAnnot()">
+      <button class="button is-small" @click="opened = !opened" ref="previewButton">
+        <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
+      </button>
+
+    </div>
+    <template v-if="showSliceInfo">
+      <div v-if="image.channels > 1 || image.channels == null">C: {{annot.channel}}</div>
+      <div v-if="image.depth > 1 || image.depth == null">Z: {{annot.zStack}}</div>
+      <div v-if="image.duration > 1 || image.duration == null">T: {{annot.time}}</div>
+    </template>
   </div>
 
   <template #popover>
@@ -34,8 +41,14 @@
       :terms="terms"
       :users="users"
       :images="images"
+      :tracks="tracks"
+      :show-image-info="showImageInfo"
       @addTerm="$emit('addTerm', $event)"
-      @updateTerms="$emit('update')"
+      @addTrack="$emit('addTrack', $event)"
+      @updateTerms="$emit('updateTermsOrTracks')"
+      @updateTracks="$emit('updateTermsOrTracks')"
+      @updateProperties="$emit('updateProperties')"
+      @centerView="$emit('centerView')"
       @deletion="handleDeletion"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
@@ -55,7 +68,10 @@ export default {
     color: String,
     terms: Array,
     users: Array,
-    images: Array
+    images: Array,
+    tracks: Array,
+    showImageInfo: {type: Boolean, default: true},
+    showSliceInfo: {type: Boolean, default: false}
   },
   components: {AnnotationDetails},
   data() {
@@ -74,11 +90,14 @@ export default {
         width: this.size + 'px',
         height: this.size + 'px'
       };
+    },
+    image() {
+      return this.images.find(image => image.id === this.annot.image);
     }
   },
   methods: {
     viewAnnot() {
-      this.$router.push(`/project/${this.annot.project}/image/${this.annot.image}/annotation/${this.annot.id}`);
+      this.$emit('selectAnnotation');
     },
     close(event) {
       if(!this.opened) {

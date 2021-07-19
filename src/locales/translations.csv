@@ -92,7 +92,7 @@ filename,Filename,Nom de fichier
 height,Height,Hauteur
 width,Width,Largeur
 magnification,Magnification,Grossissement
-resolution,Resolution,Résolution
+resolution,Resolution X/Y,Résolution X/Y
 unknown,Unknown,Inconnu
 information,Information,Information
 name,Name,Nom
@@ -123,6 +123,9 @@ pixels,pixels,pixels
 nm-per-pixel,nm/pixel,nm/pixel
 um-per-pixel,µm/pixel,µm/pixel
 mm-per-pixel,mm/pixel,mm/pixel
+um-per-slice,µm/slice,µm/plan
+nm-per-slice,nm/slice,nm/plan
+mm-per-slice,mm/slice,mm/plan
 vendor,Vendor,Marque du scanner
 image-size,Image size,Taille de l'image
 status,Status,Statut
@@ -174,10 +177,10 @@ annotation-type,Annotation type,Type d'annotation
 multiple-terms,Multiple terms,Plusieurs termes
 created-by,Created by,Créé par
 properties,Properties,Propriétés
-no-properties,No property,Aucune propriété
+no-properties,No properties.,Aucune propriété.
 tags,Tags,Tags
 no-tag,No tag,Aucun tag
-button-new-tag,New tag,Nouveau tag
+new-tag,New tag,Nouveau tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés
@@ -344,7 +347,6 @@ button-remove,Remove,Supprimer
 notif-error-default-layer-add,Failed to add a default layer,Une erreur a empêché d'ajouter le calque aux calques par défaut
 notif-error-default-layer-update,Error during update of default layer,Une erreur a empêché de mettre à jour le calque par défaut
 notif-error-default-layer-delete,Failed to delete default layer,Une erreur a empêché de supprimer le calque par défaut
-no-selected-layers,No selected layers,Pas de calque sélectionné
 button-add-members,Add members,Ajouter des membres
 button-details,Details,Détails
 button-view-activity,View activity,Voir l'activité
@@ -435,7 +437,8 @@ download-excel,Download Excel,Télécharger l'Excel
 no-result,No result,Aucun résultat
 upload,Upload,Upload
 important-notes,Important notes,Remarques importantes
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
+allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI)."
 vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.","Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés)."
 zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)","Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS)."
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}""."
@@ -466,6 +469,11 @@ uncompressed,Uncompressed,Décompressé
 to-deploy,To deploy,À déployer
 to-convert,To convert,À convertir
 error-deployment,Deployment error,Erreur de déploiement
+detecting-format,Detecting format,Détection de format en cours
+extracting-data,Extracting data,Extraction des données en cours
+error-extraction,Extraction error,Erreur d'extraction
+deploying,Deploying,Déploiement en cours
+converting,Converting,Conversion en cours
 no-uploaded-file,No uploaded file,Aucun fichier
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers
 sample-preview,Sample preview,Aperçu de l'image
@@ -615,7 +623,6 @@ annotation-creations,Annotation creations,Créations d'annotations
 no-project-connection,No project connection,Aucune connexion au projet
 no-image-consultation,No image consultation,Aucune consultation d'image
 operating-system,Operating system,Système d'exploitation
-system,System,Système
 browser,Browser,Navigateur
 first-consultation,First consultation,Première consultation
 last-consultation,Last consultation,Dernière consultation
@@ -642,6 +649,17 @@ button-unlock,Unlock,Déverrouiller
 notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur
 notif-error-user-lock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche
+count-slices,- | 1 slice | {count} slices,- | 1 plan | {count} plans
+count-frames,- | 1 frame | {count} frames,- | 1 frame | {count} frames
+count-bands,- | 1 band | {count} bands,- | 1 bande | {count} bandes
+seconds,second | seconds,seconde | secondes
+image-width,Width,Largeur
+image-height,Height,Hauteur
+image-depth,Depth,Profondeur
+image-time,Duration,Durée
+image-channels,Channels,Canaux
+frame-rate,Frame rate,Débit des frames
+frame-per-second,f/s,f/s
 members-activity,Members activity,Activité des membres
 select-date,Select a date,Choisir une date
 no-record,No record,Aucune entrée
@@ -736,6 +754,7 @@ number-annotations-info-message,The number of annotations that you created,Le no
 number-reviewed-annotations-info-message,The number of annotations that you validated during a review,Le nombre d'annotations que vous avez validées
 blinded-name-indication,Blind,Masqué
 language,Language,Langue
+system,System,Système
 no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut"
@@ -777,6 +796,10 @@ validations.messages.decimal,Must be a number,Doit être un nombre
 validations.messages.positive,Must be positive,Doit être positif
 invalid-password,Invalid password,Mot de passe incorrect
 activity-history,Activity history,Historique de l'activité
+x-resolution,X resolution,Résolution X
+y-resolution,Y resolution,Résolution Y
+z-resolution,Z resolution,Résolution Z
+link-x-y-resolution,Link resolution along X and Y axes,Lier la résolution selon les axes X et Y
 image-not-reviewed,This image has not been reviewed,Cette image n'a pas été validée
 button-start-review,Start review,Commencer la validation
 notif-error-start-review,Failed to start reviewing the image,Une erreur a empêché de commencer la validation de l'image
@@ -815,7 +838,24 @@ successful-registration,Your account was successfully created. Check your inbox 
 back-to-login,Back to login form,Retour au formulaire d'authentification
 filter,Filter,Filtre
 original-no-filter,Original (no filter),Pas de filtre
+add-track,Add a track,Ajouter une trace
+tracks-new-annotation,Track(s) to associate to new annotations,Trace(s) à associer à de nouvelles annotations
+create-track,Create track,Créer une trace
+update-track,Update track,Modifier une trace
+notif-success-track-creation,The track was successfully created,La trace a bien été créée
+notif-error-track-creation,Failed to create the track,Erreur durant la création de la trace
+notif-success-track-update,The track was successfully updated,La trace a bien été modifiée
+notif-error-track-update,Failed to update the track,Erreur durant la modification de la trace
+confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?
+notif-error-track-deletion,Failed to delete the track.,Erreur lors de la suppression de la trace
+tracks,Tracks,Traces
+no-track,No track,Pas de trace
+multiple-tracks,Multiple tracks,Traces multiples
+no-track-to-add,No track to add,Pas de trace à ajouter
+notif-error-add-track,Failed to add the track,Impossible d'ajouter la trace
+notif-error-remove-track,Failed to remove the track,Impossible de retirer la trace
 by-term,By term,Par terme
+by-track,By track,Par trace
 annotations-list,Annotation list, Liste des annotations
 shortcut-viewer-nav-next-t,Go to next frame,Aller à la frame suivante
 shortcut-viewer-nav-previous-t,Go to previous frame,Aller à la frame précédente
@@ -931,6 +971,43 @@ version,Version,Version
 fav,Fav.,Fav.
 favorite,Favorite,Favori
 no-selected-layers,No selected layers,Pas de couche sélectionnée
+button-best-fit-zoom,Fit zoom to viewport,
+button-reset-zoom,Reset zoom,
+copy,Copy,Copy
+paste,Paste,Coller
+copy-paste,Copy/Paste,Copier/Coller
+notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée
+notif-error-annotation-paste,Failed to paste the annotation. It is too large for this image.,L'annotation n'a pu être collée car elle est trop large pour cette image
+paste-repeat,Repeat,Répéter
+paste-repeat-info,Repeat on {input} next slices.,Répéter sur les {input} plans suivants.
+notif-success-annotation-repeat,Annotation has been repeated,L'annotation a été répétée
+notif-error-annotation-repeat,Failed to repeat the annotation,L'annotation n'a pu être répétée
+button-compute-profile,Compute profile,Calculer le profil
+slice,Slice,Plan
+pixel-intensity,Intensity,Intensité
+profile,Profile,Profil
+inspect-button,Inspect,Inspecter
+failed-fetch-profile,
+companion-files,Companion files,
+not-available,Not available.,Indisponible.
+no-profile,No profile.,Pas de profil.
+developer-mode,Developer mode,Mode développeur
+id,ID,ID
+job-id,Analysis ID,ID de l'analyse
+userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse
+per-term,Per term,Par terme
+per-track,Per track,Par trace
+per-user,Per user,Par utilisateur
+per-image,Per image,Par image
+categorization,Categorization,Catégorisation
+currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec
+currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace
+the-term,term,le terme
+in-this-image,in this image,dans cette image
+in-this-slice,in this slice,dans ce plan
+link-mode,Mode,Mode
+absolute-link-mode,Absolute,Absolu
+relative-link-mode,Relative,Relatif
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche

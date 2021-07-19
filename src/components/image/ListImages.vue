@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!configUI['project-images-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -83,7 +82,6 @@
                   label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
               </div>
             </div>
-
           </div>
 
           <div class="columns">
@@ -280,7 +278,8 @@ export default {
         'magnification',
         'numberOfAnnotations',
         'numberOfJobAnnotations',
-        'numberOfReviewedAnnotations'
+        'numberOfReviewedAnnotations',
+        'size'
       ],
       availableFormats: [],
       availableVendors: [],

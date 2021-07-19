@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!currentUser.adminByNow">
   <h2> {{ $t('access-denied') }} </h2>

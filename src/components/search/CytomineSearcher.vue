@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
   <b-field class="no-margin" :type="error ? 'is-danger' : null">

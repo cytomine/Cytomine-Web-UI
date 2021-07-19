@@ -12,33 +12,34 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
-  <div>
-    <b-loading :is-full-page="false" :active="loading" />
-    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
-      {{$t('unexpected-error-info-message')}}
-    </b-message>
-    <div v-else-if="!loading" class="ontology-details-wrapper">
-      <table class="table is-fullwidth">
-        <tbody>
-        <tr>
-          <td colspan="2">
-            <strong>{{$t('terms')}}</strong>
-            <b-message type="is-info" has-icon icon-size="is-small">
-              {{$t('hierarchical-drag-drop-term')}}
-            </b-message>
-            <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
-              <template #no-result>
-                <em class="has-text-grey">{{$t('no-term')}}</em>
-              </template>
-            </ontology-tree>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>{{$t('projects')}}</strong></td>
-          <td>
-            <template v-if="projects.length">
+<b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+  {{$t('unexpected-error-info-message')}}
+</b-message>
+<div v-else-if="!loading" class="ontology-details-wrapper">
+  <table class="table is-fullwidth">
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <strong>{{$t('terms')}}</strong>
+          <b-message type="is-info" has-icon icon-size="is-small">
+            {{$t('hierarchical-drag-drop-term')}}
+          </b-message>
+          <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
+            <template #no-result>
+              <em class="has-text-grey">{{$t('no-term')}}</em>
+            </template>
+          </ontology-tree>
+        </td>
+      </tr>
+      <tr v-if="currentUser.isDeveloper">
+        <td><strong>{{$t('id')}}</strong></td>
+        <td>{{ontology.id}}</td>
+      </tr>
+      <tr>
+        <td><strong>{{$t('projects')}}</strong></td>
+        <td>
+          <template v-if="projects.length">
             <span v-for="(project, index) in projects" :key="project.id">
               <router-link :to="`/project/${project.id}`">{{project.name}}</router-link>
               <span v-if="index < projects.length - 1">, </span>

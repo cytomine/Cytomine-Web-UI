@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="navbar-item has-dropdown is-hoverable">
   <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" tabindex="0">

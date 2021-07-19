@@ -88,6 +88,7 @@ export default {
             //{key: 'project-explore-image-status', label: 'status'},
             {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt'},
             {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-image-tracks', label: 'tracks', icon: 'fas fa-route'},
             {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag'},
             {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
             {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
@@ -139,7 +140,7 @@ export default {
 
             {key: 'project-tools-select', label: 'select', icon: 'fas fa-mouse-pointer', parentConfiguration: 'project-tools-main'},
 
-            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-marker-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-pin', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-line', label: 'line', icon: 'fas fa-minus', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-line', label: 'freehand-line',
               iconComponent: IconLineFreeHand, parentConfiguration: 'project-tools-main'},
@@ -158,7 +159,7 @@ export default {
             {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
-
+            {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo', parentConfiguration: 'project-tools-main'},
           ]
         }

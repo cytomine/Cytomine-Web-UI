@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="cytomine-quill-editor">
   <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
