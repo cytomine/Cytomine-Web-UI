@@ -206,6 +206,13 @@ export default {
             await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
           }));
 
+          let images = {};
+          //don't fetch multiple times the same image.
+          let idImages = [...new Set(this.idImages)];
+          await Promise.all(idImages.map(async id => {
+            let image = await ImageInstance.fetch(id);
+            images[id] = image;
+          }));
           console.log('images', images);
           const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
           console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
@@ -213,10 +220,6 @@ export default {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');
           }
-
-          this.idImages.forEach(async id => {
-            await this.$store.dispatch(this.viewerModule + 'addImage', images[id]);
-          });
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
