@@ -438,7 +438,7 @@ no-result,No result,Aucun résultat
 upload,Upload,Upload
 important-notes,Important notes,Remarques importantes
 max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI)."
+allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
 vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.","Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés)."
 zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)","Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS)."
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}""."
