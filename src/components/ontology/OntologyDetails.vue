@@ -51,44 +51,43 @@
             <em class="has-text-grey" v-else>
               {{$t('not-used-in-any-project')}}
             </em>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>{{$t('creator')}}</strong></td>
-          <td>
-            {{creatorFullname || $t('unknown')}}
-          </td>
-        </tr>
-        <tr v-if="canEdit">
-          <td><strong>{{$t('actions')}}</strong></td>
-          <td>
-            <div class="buttons">
-              <button class="button" @click="isRenameModalActive = true">
-                {{$t('button-rename')}}
-              </button>
-              <button
-                  class="button is-danger"
-                  @click="confirmDeletion()"
-                  :disabled="nbProjects > 0"
-                  :title="nbProjects ? $t('cannot-delete-ontology-with-projects') : ''"
-              >
-                {{$t('button-delete')}}
-              </button>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>{{$t('creator')}}</strong></td>
+        <td>
+          {{creatorFullname || $t('unknown')}}
+        </td>
+      </tr>
+      <tr v-if="canEdit">
+        <td><strong>{{$t('actions')}}</strong></td>
+        <td>
+          <div class="buttons">
+            <button class="button" @click="isRenameModalActive = true">
+              {{$t('button-rename')}}
+            </button>
+            <button
+                class="button is-danger"
+                @click="confirmDeletion()"
+                :disabled="nbProjects > 0"
+                :title="nbProjects ? $t('cannot-delete-ontology-with-projects') : ''"
+            >
+              {{$t('button-delete')}}
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-      <rename-modal
-          :title="$t('rename-ontology')"
-          :currentName="ontology.name"
-          :active.sync="isRenameModalActive"
-          @rename="rename"
-      />
+  <rename-modal
+      :title="$t('rename-ontology')"
+      :currentName="ontology.name"
+      :active.sync="isRenameModalActive"
+      @rename="rename"
+  />
 
-    </div>
-  </div>
+</div>
 </template>
 
 <script>
