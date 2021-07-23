@@ -242,7 +242,7 @@ export default {
       if(this.selectedFavorites.length > 0) {
         collection['favorite'] = {
           in: this.selectedFavorites.map(option => option.value).join()
-        }
+        };
       }
       if(this.selectedDate) {
         collection.created = {
@@ -261,7 +261,7 @@ export default {
   },
   methods: {
     canEdit(job) {
-      return this.$store.getters['currentProject/canDeleteJob'](job);
+      return this.$store.getters['currentProject/canManageJob'](job);
     },
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
