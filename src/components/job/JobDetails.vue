@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -311,7 +311,7 @@ export default {
       }
     },
     confirmJobDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('delete-analysis'),
         message: this.$t('delete-analysis-confirmation-message'),
         type: 'is-danger',
@@ -321,7 +321,7 @@ export default {
       });
     },
     confirmJobKilling() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('kill-analysis'),
         message: this.$t('kill-analysis-confirmation-message'),
         type: 'is-danger',

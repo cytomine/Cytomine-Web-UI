@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -189,7 +189,7 @@ export default {
     trackedUserModel(value) {
       // if map is linked to another map on which tracking is already enabled, possible conflict
       if(value && this.linkedIndexTracking) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-unlink-view-to-track'),
           confirmText: this.$t('button-confirm'),

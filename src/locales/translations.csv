@@ -281,6 +281,7 @@ um,µm,µm
 mm,mm,mm
 error,Error,Erreur
 error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image
+error-loading-image-bad-project,At least one image is not in the project from the link, Au moins une image n'est pas dans le project associé au lien
 live,Live,Live
 broadcast,Broadcast,Diffusion et suivi
 broadcast-my-position,Broadcast my position and allow other users to follow me,Diffuser ma position dans l'image et autoriser d'autres utilisateurs à me suivre
@@ -313,6 +314,7 @@ image-filters,Image filters,Filtres d'images
 project-side-bar,Project side bar,Barre latérale du projet
 viewer-panels,Viewer panels,Visualisateur d'images
 all-panels,All panels,Tous les outils
+image-details,Image details,Détails de l'image
 annotation-details,Annotation details,Détails de l'annotation
 annotation-details-box,Annotation details box,Boîte de détails
 geometry-info,"Geometry information (area, length)","Mesures (aire, périmètre, longueur)"
@@ -399,6 +401,7 @@ length,Length,Longueur
 create-project,Create project,Créer un projet
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé
 notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet
 select-project,Select project,Choisir le projet
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante
@@ -444,7 +447,6 @@ download-excel,Download Excel,Télécharger l'Excel
 no-result,No result,Aucun résultat
 upload,Upload,Upload
 important-notes,Important notes,Remarques importantes
-max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
 allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
 vms-mrxs-upload-info,"VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.","Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés)."
 zip-upload-info,"A ZIP file containing multiple image is allowed (except for VMS and MRXS)","Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS)."
@@ -944,3 +946,4 @@ hide-successful-upload,Hide successful uploads,Cacher les uploads réussis
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche
 no-trusted-source,No trusted source,Pas de source de confiance
+hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,18 +34,18 @@
       </td>
       <td>
         <button
-          :class="['button', customUI[prop.key].ADMIN_PROJECT ? 'is-success' : 'is-danger']"
+          :class="['button', customUI[prop.key] && customUI[prop.key].ADMIN_PROJECT && !isParentDisabled(prop, 'ADMIN_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'ADMIN_PROJECT')"
-          :disabled="prop.key === 'project-configuration-tab'"
+          :disabled="isParentDisabled(prop, 'ADMIN_PROJECT') || prop.key === 'project-configuration-tab'"
         >
           {{$t('manager')}}
         </button>
       </td>
       <td>
         <button
-          :class="['button', customUI[prop.key].CONTRIBUTOR_PROJECT ? 'is-success' : 'is-danger']"
+          :class="['button', customUI[prop.key] && customUI[prop.key].CONTRIBUTOR_PROJECT && !isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')"
-          :disabled="prop.key === 'project-configuration-tab'"
+          :disabled="isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') || prop.key === 'project-configuration-tab'"
         >
             {{$t('contributor')}}
         </button>
@@ -84,19 +84,37 @@ export default {
           ]
         },
         {
+          label: 'image-details',
+          props: [
+            {key: 'project-explore-image-overview', label: 'overview', icon: 'fas fa-image'},
+            //{key: 'project-explore-image-status', label: 'status'},
+            {key: 'project-explore-image-description', label: 'description', icon: 'far fa-file-alt'},
+            {key: 'project-explore-image-tags', label: 'tags', icon: 'fas fa-bookmark'},
+            {key: 'project-explore-image-properties', label: 'properties', icon: 'fas fa-tag'},
+            {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
+            {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
+            {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info'},
+            /*{key: 'project-explore-image-format', label: 'format'},
+            {key: 'project-explore-image-vendor', label: 'vendor'},
+            {key: 'project-explore-image-size', label: 'size'},
+            {key: 'project-explore-image-resolution', label: 'resolution'},
+            {key: 'project-explore-image-magnification', label: 'magnification'},*/
+          ]
+        },
+        {
           label: 'viewer-panels',
           props: [
             {key: 'project-explore-hide-tools', label: 'all-panels'}, // hide all panels
-            {key: 'project-explore-overview', label: 'overview', icon: 'fas fa-image'},
-            {key: 'project-explore-info', label: 'information', icon: 'fas fa-info'},
-            {key: 'project-explore-digital-zoom', label: 'digital-zoom', icon: 'fas fa-search'},
-            {key: 'project-explore-link', label: 'link-images', icon: 'fas fa-link'},
-            {key: 'project-explore-color-manipulation', label: 'colors', icon: 'fas fa-adjust'},
-            {key: 'project-explore-image-layers', label: 'annotation-layers', icon: 'fas fa-copy'},
-            {key: 'project-explore-ontology', label: 'ontology', icon: 'fas fa-hashtag'},
-            {key: 'project-explore-property', label: 'properties', icon: 'fas fa-tag'},
-            {key: 'project-explore-follow', label: 'broadcast', icon: 'fas fa-street-view'},
-            {key: 'project-explore-review', label: 'review', icon: 'fas fa-check-circle'},
+            {key: 'project-explore-overview', label: 'overview', icon: 'fas fa-image', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-info', label: 'information', icon: 'fas fa-info', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-digital-zoom', label: 'digital-zoom', icon: 'fas fa-search', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-link', label: 'link-images', icon: 'fas fa-link', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-color-manipulation', label: 'colors', icon: 'fas fa-adjust', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-image-layers', label: 'annotation-layers', icon: 'fas fa-copy', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-ontology', label: 'ontology', icon: 'fas fa-hashtag', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-property', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-follow', label: 'broadcast', icon: 'fas fa-street-view', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-review', label: 'review', icon: 'fas fa-check-circle', parentConfiguration: 'project-explore-hide-tools'},
           ]
         },
         {
@@ -105,14 +123,14 @@ export default {
             // display annotation details in viewer
             {key: 'project-explore-annotation-main', label: 'annotation-details-box'},
             {key: 'project-explore-annotation-geometry-info', label: 'geometry-info',
-              icon: 'fas fa-ruler-combined'},
-            {key: 'project-explore-annotation-description', label: 'description', icon: 'far fa-file-alt'},
-            {key: 'project-explore-annotation-terms', label: 'terms', icon: 'fas fa-hashtag'},
-            {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark'},
-            {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag'},
-            {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
-            {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info'},
-            {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment'}
+              icon: 'fas fa-ruler-combined', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-description', label: 'description', icon: 'far fa-file-alt', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-terms', label: 'terms', icon: 'fas fa-hashtag', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment', parentConfiguration: 'project-explore-annotation-main'}
 
           ]
         },
@@ -121,29 +139,29 @@ export default {
           props: [
             {key: 'project-tools-main', label: 'all-draw-tools'},
 
-            {key: 'project-tools-select', label: 'select', icon: 'fas fa-mouse-pointer'},
+            {key: 'project-tools-select', label: 'select', icon: 'fas fa-mouse-pointer', parentConfiguration: 'project-tools-main'},
 
-            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-marker-alt'},
-            {key: 'project-tools-line', label: 'line', icon: 'fas fa-minus'},
+            {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-marker-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-line', label: 'line', icon: 'fas fa-minus', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-line', label: 'freehand-line',
-              iconComponent: IconLineFreeHand},
-            {key: 'project-tools-rectangle', label: 'rectangle', icon: 'far fa-square'},
-            {key: 'project-tools-circle', label: 'circle', icon: 'far fa-circle'},
-            {key: 'project-tools-polygon', label: 'polygon', icon: 'fas fa-draw-polygon'},
+              iconComponent: IconLineFreeHand, parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-rectangle', label: 'rectangle', icon: 'far fa-square', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-circle', label: 'circle', icon: 'far fa-circle', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-polygon', label: 'polygon', icon: 'fas fa-draw-polygon', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-polygon', label: 'freehand-polygon',
-              iconComponent: IconPolygonFreeHand},
+              iconComponent: IconPolygonFreeHand, parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-union', label: 'freehand-correct-add', icon: 'fas fa-pencil-alt',
-              superscript: 'fas fa-plus'},
+              superscript: 'fas fa-plus', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-diff', label: 'freehand-correct-remove', icon: 'fas fa-pencil-alt',
-              superscript: 'fas fa-minus'},
+              superscript: 'fas fa-minus', parentConfiguration: 'project-tools-main'},
 
-            {key: 'project-tools-fill', label: 'fill', icon: 'fas fa-fill',},
-            {key: 'project-tools-edit', label: 'modify', icon: 'fas fa-edit'},
-            {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt'},
-            {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt'},
-            {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt'},
+            {key: 'project-tools-fill', label: 'fill', icon: 'fas fa-fill', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-edit', label: 'modify', icon: 'fas fa-edit', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
 
-            {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo'},
+            {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo', parentConfiguration: 'project-tools-main'},
           ]
         }
       ]
@@ -164,6 +182,9 @@ export default {
         this.customUI[prop][userType] = !this.customUI[prop][userType]; // revert change
         this.$notify({type: 'error', text: this.$t('notif-error-custom-ui-change')});
       }
+    },
+    isParentDisabled(child, role) {
+      return (child.parentConfiguration && this.customUI[child.parentConfiguration][role] === false);
     }
   },
   async created() {

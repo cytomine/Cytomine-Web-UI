@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -299,6 +299,9 @@ export default {
       return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
     selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
@@ -371,6 +374,15 @@ export default {
     revision() {
       this.fetchOntologies();
       this.fetchMaxFilters();
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
     }
   },
   methods: {
@@ -426,6 +438,12 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;

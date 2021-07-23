@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -406,6 +406,12 @@ export default {
       return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
     },
 
+    querySearchImage() {
+      return this.$route.query.image;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
@@ -485,6 +491,28 @@ export default {
       this.$store.commit(this.storeModule + '/resetPagesAndFilters');
     }
   },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.resetPagesAndFilters(); // we want all annotations of the job => reset state
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
+    querySearchImage(val) {
+      if(val) {
+        this.selectedImages = [];
+        let queriedImage = this.images.find(image => image.id === Number(val));
+        if(queriedImage) {
+          this.resetPagesAndFilters(); // we want all annotations of the image => reset state
+          this.selectedImages = [queriedImage];
+        }
+      }
+    }
+  },
   async created() {
     this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
     if(this.algoEnabled) this.annotationTypes.splice(1, 0, this.jobAnnotationOption);
@@ -534,6 +562,13 @@ export default {
         this.resetPagesAndFilters(); // we want all annotations of the job => reset state
         this.selectedAnnotationType = this.jobAnnotationOption;
         this.selectedUserJobs = [queriedUserJob];
+      }
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
+        this.selectedTags = queriedTags;
       }
     }
 
