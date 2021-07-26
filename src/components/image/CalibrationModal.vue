@@ -105,7 +105,14 @@ export default {
         return;
       }
 
-      let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
+      let imageName;
+      if(this.image.class.includes('AbstractImage')) {
+        imageName = this.image.originalFilename;
+      }
+      else {
+        imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
+      }
+
       try {
         let updateImage = this.image.clone();
         updateImage.physicalSizeX = Number(this.calibrationFieldX)*this.calibrationFactorX;

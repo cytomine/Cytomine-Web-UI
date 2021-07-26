@@ -2,6 +2,7 @@ key,en,fr,es
 project,Project,Projet,Proyecto
 projects,Projects,Projets,Proyectos
 storage,Storage,Stockage,Almacenamiento
+storages,Storages,Stockages,Almacenamiento
 help,Help,Aide,Ayuda
 shortcuts,Shortcuts,Raccourcis,Atajos
 about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine
@@ -1038,4 +1039,5 @@ remove-yourself-from-administrator,Remove administrator rights,Retrait des droit
 remove-yourself-from-administrator-confirmation-message,Are you sure you want to remove yourself from the storage administrators? You will not be able to undo this action,Êtes-vous sûr de souhaiter vous retirer des administrateurs de l'espace de stockage ? Cette action est irréversible
 no-storage,No storage,Pas d'espace de stockage
 owner, Owner, Propriétaire
-
+renamed,Renamed,Renommé
+image-renamed,This image has been renamed,Cette image a été renommée

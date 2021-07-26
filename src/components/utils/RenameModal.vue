@@ -61,7 +61,7 @@ export default {
         return;
       }
       this.$emit('rename', this.newName);
-      this.$parent.close();
+      //this.$parent.close();
     }
   },
   async created() {

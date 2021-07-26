@@ -15,7 +15,7 @@
 <template>
 <form @submit.prevent="setMagnification()">
   <cytomine-modal :active="active" :title="$t('set-magnification')" @close="$emit('update:active', false)">
-    <b-message type="is-warning" has-icon icon-size="is-small">
+    <b-message v-if="!image.class.includes('AbstractImage')" type="is-warning" has-icon icon-size="is-small">
       {{ $t('warning-change-applies-in-project-only') }}
     </b-message>
 
@@ -73,7 +73,13 @@ export default {
         return;
       }
 
-      let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
+      let imageName;
+      if(this.image.class.includes('AbstractImage')) {
+        imageName = this.image.originalFilename;
+      }
+      else {
+        imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
+      }
       try {
         let updateImage = this.image.clone();
         updateImage.magnification = this.newMagnification;
@@ -98,4 +104,3 @@ export default {
   }
 };
 </script>
-
