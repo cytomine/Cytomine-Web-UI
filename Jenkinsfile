@@ -20,7 +20,7 @@ node {
         ]
         ) {
             docker.withRegistry('https://index.docker.io/v1/', 'DOCKERHUB_CREDENTIAL') {
-                sh 'scripts/ciBuildDockerImage.sh'
+                sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
             }
         }
 }
