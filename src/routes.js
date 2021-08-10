@@ -38,6 +38,10 @@ import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 import SoftwareInformation from './components/software/SoftwareInformation.vue';
+import ListStorages from './components/storage/ListStorages';
+import StorageHome from './components/storage/StorageHome';
+import StorageUpload from './components/storage/StorageUpload';
+import StorageConfiguration from './components/storage/StorageConfiguration';
 
 // Define routes
 const routes = [
@@ -51,7 +55,33 @@ const routes = [
   },
   {
     path: '/storage',
+    component: ListStorages,
+  },
+  {
+    path: '/storage/:idStorage',
     component: CytomineStorage,
+    children: [
+      {
+        path: '',
+        component: StorageHome
+      },
+      {
+        path: 'upload',
+        component: StorageUpload
+      },
+      // {
+      //   path: 'uploaded-files',
+      //   component: ListUploadedFiles
+      // },
+      {
+        path: 'configuration',
+        component: StorageConfiguration
+      },
+      {
+        path: '*',
+        component: PageNotFound
+      }
+    ]
   },
   {
     path: '/ontology/:idOntology?',

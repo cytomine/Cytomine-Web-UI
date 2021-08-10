@@ -1018,3 +1018,21 @@ delete-source,Delete source,Supprimer la source de confiance
 delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?
 notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername}
+read-only-role,Read only,Lecture seule
+read-write-role,Read and write,Lecture et écriture
+administration,Administration,Administration
+uploaded-files-number,Number of uploaded files,Nombre de fichiers uploadés
+total-size,Total size,Taille totale
+add-users-to-storage,Add users to storage,Ajouter des utilisateurs a l'espace de stockage
+remove-users-from-storage,Remove selected users from storage,Retirer les utilisateurs sélectionnés de l'espace de stockage
+notif-success-add-storage-users,The selected users were correctly added to the storage,Les utilisateurs sélectionnés ont été ajoutés à l'espace de stockage
+notif-error-add-storage-users,Failed to add the selected user to the storage,Une erreur a empêché d'ajouter les utilisateurs sélectionnés à l'espace de stockage
+notif-success-remove-storage-users,The selected users were correctly removed from storage,Les utilisateurs sélectionnés ont bien été retirés de l'espace de stockage
+notif-error-remove-storage-users,Failed to remove the selected users from storage,Une erreur a empêché de retirer les utilisateurs sélectionnés de l'espace de stockage
+remove-users,Remove users,Retirer les utilisateurs
+remove-users-confirmation-message,- | Do you really want to remove user {username} from storage? Its uploaded files will be linked to the storage owner | Do you really want to remove the {count} selected users from storage? Their uploaded files will be linked to the storage owner,- | Êtes-vous sûr de vouloir retirer {username} de l'espace de stockage ? Ses fichiers uploadés seront lié au propriétaire de l'espace de stockage | Êtes-vous sûr de vouloir supprimer les {count} utilisateurs sélectionnés de l'espace de stockage ? Leurs fichiers uploadés seront liés au propriétaire de l'espace de stockage
+readonly-icon-label,You have read only access to this storage,Vous avez uniquement des droits de lecture sur l'espace de stockage
+readwrite-icon-label,You have write access on this storage,Vous avez des droits d'écriture sur l'espace de stockage
+administrator-icon-label,You are an administrator of this storage,Vous êtes un administrateur de l'espace de stockage
+remove-yourself-from-administrator,Remove administrator rights,Retrait des droits d'administration
+remove-yourself-from-administrator-confirmation-message,Are you sure you want to remove yourself from the storage administrators? You will not be able to undo this action,Êtes-vous sûr de souhaiter vous retirer des administrateurs de l'espace de stockage ? Cette action est irréversible
