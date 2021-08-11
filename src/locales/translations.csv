@@ -278,7 +278,8 @@ end-tracking-user-no-longer-broadcasting,Stopped following {username} on image {
 um,µm,µm,µm
 mm,mm,mm,mm
 error,Error,Erreur,Error
-error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image,Se produjo un error durante la carga de la imagen.
+error-loading-image,An error occurred during image loading,Une erreur a eu lieu lors du chargement de l'image,Se produjo un error durante la carga de la imagen
+error-loading-image-bad-project,At least one image is not in the project from the link, Au moins une image n'est pas dans le project associé au lien,
 live,Live,Live,En Vivo
 broadcast,Broadcast,Diffusion et suivi,Transmitir
 broadcast-my-position,Broadcast my position and allow other users to follow me,Diffuser ma position dans l'image et autoriser d'autres utilisateurs à me suivre,Transmita mi posición y permita que otros usuarios me sigan
@@ -389,6 +390,7 @@ notif-error-magnification-update,Failed to update the magnification image {image
 length,Length,Longueur,Longitud
 create-project,Create project,Créer un projet,Crear proyecto
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé,El proyecto fue creado exitosamente
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé,
 notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet,Error al crear el proyecto
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente
@@ -932,3 +934,5 @@ hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocult
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
 no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza
+hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,
+
