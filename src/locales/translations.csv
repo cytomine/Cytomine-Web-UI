@@ -390,8 +390,8 @@ notif-error-magnification-update,Failed to update the magnification image {image
 length,Length,Longueur,Longitud
 create-project,Create project,Créer un projet,Crear proyecto
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé,El proyecto fue creado exitosamente
+notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet,
 notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé,
-notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet,Error al crear el proyecto
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente
 select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología
@@ -584,6 +584,7 @@ comment,Comment,Commentaire,Comentario
 no-result-file,No result file,Aucun fichier de résultat,Sin archivo de resultados
 button-view,View,Voir,Ver
 data,Data,Données,Datos
+relaunch,Relaunch,Relancer,
 delete-data,Delete data,Supprimer les données,Borrar datos
 count-annotations,0 annotation | 1 annotation | {count} annotations,0 annotation | 1 annotation | {count} annotations,0 anotación | 1 anotación | {count} anotaciones
 deleted-analysis-data,Analysis data was deleted,Données de l'analyse supprimées,Los datos de análisis fueron eliminados
@@ -935,4 +936,8 @@ no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune sou
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
 no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza
 hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,
-
+notif-deprecated-software,This software is deprecated,
+delete-source,Delete source,Supprimer la source de confiance,
+delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,
+notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée,
+notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
