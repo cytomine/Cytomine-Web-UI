@@ -26,7 +26,7 @@ node {
                 ]
                 ) {
                     docker.withRegistry('http://repository.cytom.in:5004/v2/', 'CYTOMINE_DOCKER_REGISTRY') {
-                        sh 'scriptsCI/ciBuildDockerImagePrivate.sh ${BRANCH_NAME}'
+                        sh 'scripts/ciBuildDockerImagePrivate.sh ${BRANCH_NAME}'
                     }
                 }
         } else {
