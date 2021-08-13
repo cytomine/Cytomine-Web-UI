@@ -17,11 +17,12 @@
 FROM node:13.12.0 as build-stage
 WORKDIR /app
 
-ADD . /app
+ADD . /app/Cytomine-Web-UI
+WORKDIR /app/Cytomine-Web-UI
 RUN npm install
 RUN npm run build
 
 FROM nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/Cytomine-Web-UI/dist /app
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY scripts/docker/web-ui/nginx.conf /etc/nginx/nginx.conf
