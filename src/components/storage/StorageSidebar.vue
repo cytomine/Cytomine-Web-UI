@@ -18,7 +18,7 @@
     <h1 class="storage-name">{{`${$t('storage')}: ${storage.name}`}}</h1>
     <ul>
       <template>
-        <router-link tag="li" :to="`/storage/${storage.id}/upload`">
+        <router-link v-if="this.$store.state.currentStorage.currentUserRole!=='READ'" tag="li" :to="`/storage/${storage.id}/upload`">
           <a>
             <i class="fas fa-upload"></i>
             {{ $t('upload') }}

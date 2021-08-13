@@ -27,7 +27,13 @@ export default {
   },
   created() {
     console.log('storageHome.created');
-    this.$router.replace(`/storage/${this.storage.id}/upload`);
+    if (this.$store.state.currentStorage.currentUserRole==='READ') {
+      this.$router.replace(`/storage/${this.storage.id}/uploaded-files`);
+    }
+    else {
+      this.$router.replace(`/storage/${this.storage.id}/upload`);
+    }
+
   }
 };
 </script>
