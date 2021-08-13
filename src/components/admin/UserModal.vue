@@ -104,7 +104,8 @@ export default {
       displayErrors: false,
       languages: [
         {value: 'EN', name:'English'},
-        {value: 'FR', name:'Français'}
+        {value: 'FR', name:'Français'},
+        {value: 'ES', name:'Español'}
       ]
     };
   },
