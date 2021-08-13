@@ -235,7 +235,13 @@ export default {
   },
   watch: {
     async queryString() {
+      this.generateSignature();
+    }
+  },
+  methods: {
+    async generateSignature() {
       this.signatureDate = new Date().toISOString();
+      console.log('watch.queryString');
       try {
         this.signature = await Cytomine.instance.fetchSignature({
           uri: this.uri,
@@ -247,9 +253,7 @@ export default {
       catch(error) {
         this.newUploadError = true;
       }
-    }
-  },
-  methods: {
+    },
     async fetchProjects() {
       console.log('fetchProjects');
       try {
@@ -405,6 +409,7 @@ export default {
     console.log('created');
     this.fetchProjects();
     this.refreshStatusSessionUploads();
+    this.generateSignature();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   async destroyed() {
