@@ -14,17 +14,26 @@
 
 <template>
   <div class="storage-wrapper content-wrapper">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
+        <li class="is-active"><a href="#" aria-current="page">{{storage.name}}</a></li>
+      </ul>
+    </nav>
     <list-uploaded-files></list-uploaded-files>
   </div>
 </template>
 
 <script>
-
+import {get} from '@/utils/store-helpers';
 import ListUploadedFiles from './ListUploadedFiles';
 export default {
   name: 'storage-files',
   components: {
     ListUploadedFiles,
+  },
+  computed: {
+    storage: get('currentStorage/storage'),
   }
 };
 </script>

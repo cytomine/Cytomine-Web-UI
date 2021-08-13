@@ -4,7 +4,7 @@
     <div class="content-wrapper" v-if="!loading">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-          <li><router-link :to="`/storages`">{{$t('storage')}}</router-link></li>
+          <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
           <li class="is-active"><a href="#" aria-current="page">{{storage.name}}</a></li>
         </ul>
       </nav>

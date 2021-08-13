@@ -61,7 +61,7 @@ const routes = [
   },
   {
     path: '/storage',
-    component: StorageRedirection,
+    component: StorageRedirection, // if only 1 storage, redirect on /storage/:id otherwise, redirect on /storageS
   },
   {
     path: '/storage/:idStorage',

@@ -14,6 +14,12 @@
 
 <template>
   <div class="storage-wrapper content-wrapper">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
+        <li class="is-active"><a href="#" aria-current="page">{{selectedStorage.name}}</a></li>
+      </ul>
+    </nav>
     <div class="panel">
       <p class="panel-heading">
         {{ $t('upload') }}
