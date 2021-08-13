@@ -120,9 +120,7 @@ export default {
     storageCollection() {
       let collection = new StorageCollection({});
       if(this.searchString) {
-        collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
-        };
+        collection['searchString'] = encodeURIComponent(this.searchString);
       }
       return collection;
     },

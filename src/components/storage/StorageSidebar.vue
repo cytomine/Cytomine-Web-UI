@@ -20,14 +20,22 @@
       <template>
         <router-link tag="li" :to="`/storage/${storage.id}/upload`">
           <a>
-            <i class="far fa-upload"></i>
+            <i class="fas fa-upload"></i>
             {{ $t('upload') }}
           </a>
         </router-link>
+        <router-link tag="li" :to="`/storage/${storage.id}/uploaded-files`">
+          <a>
+            <i class="fas fa-file"></i>
+            {{ $t('files') }}
+          </a>
+        </router-link>
       </template>
+
     </ul>
+
     <ul class="bottom-menu">
-      <router-link tag="li" :to="`/storage/${storage.id}/configuration`">
+      <router-link v-if="this.$store.state.currentStorage.currentUserRole==='ADMINISTRATION'" tag="li" :to="`/storage/${storage.id}/configuration`">
         <a>
           <i class="fas fa-cogs"></i>
           {{ $t('configuration') }}

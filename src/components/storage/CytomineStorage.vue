@@ -54,6 +54,8 @@ export default {
   watch: {
     async idStorage() {
       this.loading = true;
+      this.notFoundError = false;
+      this.permissionError = false;
       await this.loadStorage();
     },
     storageModule() {
@@ -66,10 +68,13 @@ export default {
   },
   methods: {
     async loadStorage() {
+      console.log('this.idStorage', this.idStorage);
       try {
         if(!this.$store.state.storages[this.idStorage]) { // module does not exist yet
+          console.log('registerModule');
           this.$store.registerModule(['storages', this.idStorage], storageModuleModel);
         }
+        console.log('loadStorage');
         await this.$store.dispatch('currentStorage/loadStorage', this.idStorage);
         this.loading = false;
       }

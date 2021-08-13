@@ -50,7 +50,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {UserCollection, StorageUserCollection} from 'cytomine-client';
+import {UserCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
@@ -77,7 +77,7 @@ export default {
   computed: {
     project: get('currentProject/project'),
     userInStorageIds() {
-      let userInStorageIds = this.usersIdAlreadyInStorage.concat(this.selectedUsers.map(u => u.id));
+      let userInStorageIds = this.$store.state.currentStorage.users.map(u => u.id).concat(this.selectedUsers.map(u => u.id));
       return userInStorageIds;
     },
     notStorageUsers() {
@@ -94,7 +94,6 @@ export default {
       try {
         console.log('users', this.selectedUsers.map(user => user.id), 'permission', this.permission);
         await this.storage.addUsers(this.selectedUsers.map(user => user.id), this.permission);
-        console.log('emit addUsersInStorage');
         this.$emit('addUsersInStorage');
         this.$notify({type: 'success', text: this.$t('notif-success-add-storage-users')});
       }
@@ -110,10 +109,6 @@ export default {
     let users = (await UserCollection.fetchAll()).array;
     users.forEach(u => u.fullName = fullName(u));
     this.users = users;
-
-    let usersAlreadyInStorage = (await StorageUserCollection.fetchAll({filterKey: 'storage', filterValue: this.storage.id})).array;
-    this.usersIdAlreadyInStorage = usersAlreadyInStorage.map(u => u.id);
-
     this.loading = false;
   }
 };

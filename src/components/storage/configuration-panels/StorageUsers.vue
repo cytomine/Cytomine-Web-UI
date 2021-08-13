@@ -4,7 +4,7 @@
     <div class="content-wrapper" v-if="!loading">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-          <li><router-link :to="`/storage`">{{$t('storage')}}</router-link></li>
+          <li><router-link :to="`/storages`">{{$t('storage')}}</router-link></li>
           <li class="is-active"><a href="#" aria-current="page">{{storage.name}}</a></li>
         </ul>
       </nav>
@@ -37,7 +37,7 @@
             :order.sync="sortOrder"
             :detailed=false
             :checkable=true
-            :isRowCheckable="(row) => row.id !== currentUser.id"
+            :isRowCheckable="(row) => row.id !== currentUser.id && row.id !== storage.user"
             :checkedRows.sync="selectedUsers"
             :revision="revision"
           >
@@ -51,14 +51,19 @@
                 {{userStat.firstname}} {{userStat.lastname}}
               </b-table-column>
 
-              <b-table-column field="role" :label="$t('role')" sortable width="50">
+              <b-table-column field="role" :label="$t('role')" sortable width="50" >
                 <icon-storage-user-role
+                  v-if="userStat.id !== storage.user"
                   :is-read-write="userStat.role !== readOnlyRole.value"
                   :is-administrator="userStat.role === administrationRole.value"
                   editable
                   @toggleReadWrite="toggleReadWrite(userStat)"
                   @toggleAdministrator="confirmToggleAdministrator(userStat)"
                 />
+
+                <span class="tag is-rounded is-info"  v-if="userStat.id === storage.user">
+                    {{$t('owner')}}
+                </span>
               </b-table-column>
 
               <b-table-column field="numberOfFiles" :label="$t('uploaded-files-number')" sortable width="150">
@@ -68,6 +73,7 @@
               <b-table-column field="totalSize" :label="$t('total-size')" sortable width="150">
                 {{filesize(userStat.totalSize)}}
               </b-table-column>
+
 
             </template>
 
@@ -174,8 +180,14 @@ export default {
       this.storage = await Storage.fetch(this.idStorage);
     },
     async refreshUsers() {
-      console.log('refreshUsers()');
-      this.revision++;
+      try {
+        this.revision++;
+        await this.$store.dispatch('currentStorage/fetchStorageUsers');
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
     },
     confirmUsersRemoval() {
       this.$buefy.dialog.confirm({

@@ -12,22 +12,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
-<div></div>
+  <div class="storage-wrapper content-wrapper">
+    <list-uploaded-files></list-uploaded-files>
+  </div>
 </template>
 
-
 <script>
-import {get} from '@/utils/store-helpers';
 
+import ListUploadedFiles from './ListUploadedFiles';
 export default {
-  computed: {
-    storage: get('currentStorage/storage')
-  },
-  created() {
-    console.log('storageHome.created');
-    this.$router.replace(`/storage/${this.storage.id}/upload`);
+  name: 'storage-files',
+  components: {
+    ListUploadedFiles,
   }
 };
 </script>
+
+<style>
+.storage-wrapper {
+  margin-bottom: 0;
+}
+
+.storage-wrapper {
+  margin-right: 0.75em;
+  position: relative;
+  bottom: 4px;
+}
+
+</style>

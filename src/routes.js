@@ -42,6 +42,8 @@ import ListStorages from './components/storage/ListStorages';
 import StorageHome from './components/storage/StorageHome';
 import StorageUpload from './components/storage/StorageUpload';
 import StorageConfiguration from './components/storage/StorageConfiguration';
+import StorageRedirection from './components/storage/StorageRedirection';
+import StorageFiles from './components/storage/StorageFiles';
 
 // Define routes
 const routes = [
@@ -54,8 +56,12 @@ const routes = [
     component: ListProjects,
   },
   {
-    path: '/storage',
+    path: '/storages',
     component: ListStorages,
+  },
+  {
+    path: '/storage',
+    component: StorageRedirection,
   },
   {
     path: '/storage/:idStorage',
@@ -69,10 +75,10 @@ const routes = [
         path: 'upload',
         component: StorageUpload
       },
-      // {
-      //   path: 'uploaded-files',
-      //   component: ListUploadedFiles
-      // },
+      {
+        path: 'uploaded-files',
+        component: StorageFiles
+      },
       {
         path: 'configuration',
         component: StorageConfiguration

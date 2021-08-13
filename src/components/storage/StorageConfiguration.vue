@@ -14,11 +14,11 @@
 
 <template>
 <div class="content-wrapper">
-  <b-field class="radio-buttons-fullwidth">
-    <b-radio-button v-model="activeTab" native-value="users" type="is-link">
-      {{$t('users')}}
-    </b-radio-button>
-  </b-field>
+<!--  <b-field class="radio-buttons-fullwidth">-->
+<!--    <b-radio-button v-model="activeTab" native-value="users" type="is-link">-->
+<!--      {{$t('users')}}-->
+<!--    </b-radio-button>-->
+<!--  </b-field>-->
 
   <div class="box tab-content">
     <keep-alive>

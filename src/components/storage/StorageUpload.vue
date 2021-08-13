@@ -138,30 +138,29 @@
       </div>
     </div>
 
-
+  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval"></list-uploaded-files>
   </div>
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Cytomine, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
+import {Cytomine, ProjectCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
 import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
-import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-
+import ListUploadedFiles from './ListUploadedFiles';
 export default {
-  name: 'cytomine-storage',
+  name: 'storage-upload',
   components: {
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
-    UploadedFileDetails,
+    ListUploadedFiles,
     CytomineTable
   },
   data() {
@@ -172,9 +171,6 @@ export default {
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
       projects: [],
       selectedProjects: [],
-
-      searchString: '',
-      openedDetails: [],
 
       dropFiles: [],
 
@@ -230,13 +226,6 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
-    uploadedFileCollection() {
-      return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: {ilike: encodeURIComponent(this.searchString)},
-        storage: {in: this.selectedStorage.id}
-      });
-    }
   },
   watch: {
     async queryString() {
@@ -256,6 +245,7 @@ export default {
   },
   methods: {
     async fetchProjects() {
+      console.log('fetchProjects');
       try {
         this.projects = (await ProjectCollection.fetchAll()).array;
       }
@@ -405,12 +395,14 @@ export default {
       }
     }
   },
-  activated() {
+  created() {
+    console.log('created');
     this.fetchProjects();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
-  deactivated() {
+  async destroyed() {
+    console.log('deactivated');
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
   }

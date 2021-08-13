@@ -20,14 +20,23 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {StorageAccessCollection} from 'cytomine-client';
 
 export default {
   computed: {
     storage: get('currentStorage/storage')
+
   },
-  created() {
+  async created() {
     console.log('storageHome.created');
-    this.$router.replace(`/storage/${this.storage.id}/upload`);
+    let storageAccessList = (await StorageAccessCollection.fetchAll()).array;
+    if (storageAccessList.length!==1) {
+      this.$router.replace('/storages');
+    }
+    else {
+      this.$router.replace(`/storage/${storageAccessList[0].id}`);
+    }
+
   }
 };
 </script>
