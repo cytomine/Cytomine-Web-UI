@@ -160,7 +160,7 @@ export default {
     }
   },
   async created() {
-    this.projects = (await ProjectCollection.fetchAll()).array.sort((a, b) => (a.name < b.name) ? -1 : 1 );
+    this.projects = (await ProjectCollection.fetchAll()).array.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase()) ? -1 : 1 );
     this.fetchIndexLayers();
     this.fetchLayers();
   }
