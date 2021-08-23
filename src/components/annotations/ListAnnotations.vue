@@ -290,6 +290,7 @@
 
 <script>
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
