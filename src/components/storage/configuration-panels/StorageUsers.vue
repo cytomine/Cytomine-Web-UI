@@ -247,11 +247,11 @@ export default {
     },
     async toggleReadWrite(user) {
       try {
-        if(user.role === this.readWriteRole.value) {
-          await this.storage.changePermission(user.id, this.readOnlyRole.value);
+        if(user.role === this.readOnlyRole.value) {
+          await this.storage.changePermission(user.id, this.readWriteRole.value);
         }
         else {
-          await this.storage.changePermission(user.id, this.readWriteRole.value);
+          await this.storage.changePermission(user.id, this.readOnlyRole.value);
         }
         this.revision++;
       }
