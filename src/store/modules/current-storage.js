@@ -67,12 +67,17 @@ export default {
       let usersAlreadyInStorage = (await StorageUserCollection.fetchAll({filterKey: 'storage', filterValue: state.storage.id})).array;
       console.log('rootState.currentUser.user', rootState.currentUser.user);
 
-      usersAlreadyInStorage.forEach(user => {
-        console.log('user', user.id);
-        if(rootState.currentUser.user.id === user.id) {
-          commit('setCurrentUserRole', user.role);
-        }
-      });
+      if(rootState.currentUser.user.adminByNow) {
+        commit('setCurrentUserRole', 'ADMINISTRATION');
+      }
+      else {
+        usersAlreadyInStorage.forEach(user => {
+          console.log('user', user.id);
+          if(rootState.currentUser.user.id === user.id) {
+            commit('setCurrentUserRole', user.role);
+          }
+        });
+      }
       commit('setUsers', usersAlreadyInStorage);
     },
 
