@@ -12,8 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
-
 <template>
 <div class="list-members-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -32,7 +30,7 @@
           {{$t('role')}}
         </div>
         <div class="filter-body">
-          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
             :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
@@ -163,6 +161,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+
     MemberCollection() {
       let collection = new UserCollection({
         filterKey: 'project',
@@ -222,7 +221,6 @@ export default {
         onConfirm: () => this.removeSelectedMembers()
       });
     },
-
     async removeSelectedMembers() {
       try {
         await this.project.deleteUsers(this.selectedMembers.map(member => member.id));

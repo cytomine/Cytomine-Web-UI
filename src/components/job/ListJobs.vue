@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!configUI['project-jobs-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -35,7 +34,7 @@
       <div class="filters">
         <h2>{{$t('filters')}}</h2>
         <div class="columns">
-          <div class="column filter">
+          <div class="column filter is-one-third">
             <div class="filter-label">
               {{$t('algorithm')}}
             </div>
@@ -76,6 +75,16 @@
                 label="label" track-by="status" multiple />
             </div>
           </div>
+
+          <div class="column">
+            <div class="filter-label">
+              {{$t('favorite')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
+                label="label" track-by="value" multiple />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -89,23 +98,32 @@
         :revision="revision"
       >
         <template #default="{row: job}">
+          <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
+            <a @click="toggleFavorite(job)" v-if="canEdit(job)">
+              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+            </a>
+            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+          </b-table-column>
+
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
-            {{job.softwareName}}
+            <router-link :to="`/software/${job.software}`">
+              {{job.softwareName}}
+            </router-link>
           </b-table-column>
 
           <b-table-column :label="$t('run-number')" width="500" centered>
             {{job.number}}
           </b-table-column>
 
-          <b-table-column field="username" :label="$t('launched-by')" sortable width="1000">
+          <b-table-column field="username" :label="$t('launched-by')" sortable width="600">
             {{ job.username }}
           </b-table-column>
 
-          <b-table-column field="created" :label="$t('execution-date')" sortable width="1000">
+          <b-table-column field="created" :label="$t('execution-date')" sortable width="600">
             {{ Number(job.created) | moment('ll LT') }}
           </b-table-column>
 
-          <b-table-column field="status" :label="$t('status')" sortable centered width="1000">
+          <b-table-column field="status" :label="$t('status')" sortable centered width="600">
             <job-status :status="job.status" />
           </b-table-column>
         </template>
@@ -116,6 +134,7 @@
             :job="job"
             @update="revision++"
             @delete="deleteJob(job)"
+            @relaunch="addJob"
           />
         </template>
 
@@ -139,6 +158,7 @@ import {JobCollection} from 'cytomine-client';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';
+
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
@@ -185,6 +205,12 @@ export default {
         return {label: this.$t(jobStatusMapping[key].label), status: key};
       });
     },
+    availableFavorites() {
+      return [
+        {label: this.$t('yes'), value: true},
+        {label: this.$t('no'), value: false}
+      ];
+    },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listJobs)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listJobs';
@@ -194,6 +220,7 @@ export default {
     selectedLaunchers: localSyncMultiselectFilter('launchers', 'availableLaunchers'),
     selectedDate: sync('executionDate', storeOptions),
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
+    selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
 
     jobCollection() {
       let collection = new JobCollection({
@@ -212,6 +239,11 @@ export default {
           in: this.selectedStatus.map(option => option.status).join()
         };
       }
+      if(this.selectedFavorites.length > 0) {
+        collection['favorite'] = {
+          in: this.selectedFavorites.map(option => option.value).join()
+        };
+      }
       if(this.selectedDate) {
         collection.created = {
           gte: this.selectedDate.getTime(),
@@ -228,7 +260,16 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+    canEdit(job) {
+      return this.$store.getters['currentProject/canManageJob'](job);
+    },
+    async toggleFavorite(job) {
+      job.favorite = !job.favorite;
+      await job.setFavorite();
+      await this.refreshJobs();
+    },
     async fetchMultiselectOptions() {
+      console.log('fetchMultiselectOptions');
       let stats = await JobCollection.fetchBounds({project: this.project.id});
       this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
@@ -256,17 +297,23 @@ export default {
           text: this.$t('notif-error-analysis-deletion')
         });
       }
-    }
+    },
+    async refreshJobs() {
+      console.log('refreshJobs');
+      try {
+        await this.fetchMultiselectOptions();
+        this.loading = false;
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+    },
   },
   async created() {
-    try {
-      await this.fetchMultiselectOptions();
-      this.loading = false;
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    console.log('created');
+    await this.refreshJobs();
+    this.loading = false;
   }
 };
 </script>
@@ -280,5 +327,28 @@ export default {
 
 .filters {
   margin-bottom: 1.5em;
+}
+
+a:hover .fas {
+  color: rgb(35, 102, 216);
+}
+
+a:hover .fas.disabled, a:hover .disabled .fas {
+  color: rgba(35, 102, 216, 0.5);
+}
+
+.fas {
+  color: black;
+  width: 20px;
+  position: relative;
+}
+
+.fas.fa-flag {
+  font-size: 0.8em;
+  bottom: 0.5em;
+}
+
+.fas.disabled, .disabled .fas {
+  color: rgba(0, 0, 0, 0.1);
 }
 </style>

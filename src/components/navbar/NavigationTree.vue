@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="navigation-tree-wrapper">
   <div v-for="(project, _, index) in projects" :key="project.id">

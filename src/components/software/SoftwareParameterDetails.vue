@@ -7,6 +7,11 @@
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <tbody v-if="!loading">
 
+    <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+      <td class="prop-label">{{$t('id')}}</td>
+      <td class="prop-content">{{parameter.id}}</td>
+    </tr>
+
     <tr v-if="isPropDisplayed('description')">
       <td class="prop-label">{{$t('description')}}</td>
       <td class="prop-content">

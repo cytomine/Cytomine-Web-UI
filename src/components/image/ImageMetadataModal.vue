@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <cytomine-modal :active="active" :title="$t('image-metadata')" @close="$emit('update:active', false)">
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">

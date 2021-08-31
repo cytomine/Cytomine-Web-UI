@@ -6,6 +6,10 @@
 <table v-else class="table">
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <tbody v-if="!loading">
+  <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+    <td class="prop-label">{{$t('id')}}</td>
+    <td class="prop-content">{{software.id}}</td>
+  </tr>
   <tr v-if="isPropDisplayed('name')">
     <td class="prop-label">{{$t('name')}}</td>
     <td class="prop-content">

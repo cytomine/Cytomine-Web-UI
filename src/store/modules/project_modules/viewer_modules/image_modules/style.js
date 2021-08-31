@@ -14,9 +14,10 @@
 * limitations under the License.
 */
 
-import {createColorStyle, createLineStyle, changeOpacity} from '@/utils/style-utils.js';
+import {createColorStyle, createColorLineStyle, changeOpacity, createStrokeStyle, createLineStrokeStyle} from '@/utils/style-utils.js';
 
 let initialTermsOpacity = 1;
+let initialTracksOpacity = 1;
 let initialLayersOpacity = 0.5;
 
 export default {
@@ -31,7 +32,10 @@ export default {
       defaultStyle: createColorStyle('#fff', initialLayersOpacity),
       multipleTermsStyle: createColorStyle('#fff', initialLayersOpacity),
 
-      layersOpacity: initialLayersOpacity
+      layersOpacity: initialLayersOpacity,
+
+      wrappedTracks: null,
+      multipleTracksStyle: createStrokeStyle('#fff', initialLayersOpacity)
     };
   },
 
@@ -42,6 +46,10 @@ export default {
 
     setTerms(state, terms) {
       state.terms = terms;
+    },
+
+    setWrappedTracks(state, tracks) {
+      state.wrappedTracks = formatTracks(tracks, state.layersOpacity, state.wrappedTracks || []);
     },
 
     toggleTermVisibility(state, indexTerm) {
@@ -86,13 +94,23 @@ export default {
       changeOpacity(state.noTermStyle, opacity*state.noTermOpacity);
       changeOpacity(state.multipleTermsStyle, opacity);
       changeOpacity(state.defaultStyle, opacity);
+      if(state.wrappedTracks) {
+        state.wrappedTracks.forEach(track => {
+          changeOpacity(track.olStyle, opacity*track.opacity);
+          changeOpacity(track.olLineStyle, opacity*track.opacity);
+        });
+      }
+      changeOpacity(state.multipleTracksStyle, opacity);
     },
   },
 
   actions: {
-    initialize({commit, rootGetters}) {
+    initialize({commit, getters, rootGetters}) {
       let terms = formatTerms(rootGetters['currentProject/terms'], initialLayersOpacity);
       commit('setTerms', terms);
+
+      let tracks = formatTracks(getters.tracks, initialLayersOpacity);
+      commit('setWrappedTracks', tracks);
     },
 
     toggleTermVisibility({state, commit}, indexTerm) {
@@ -110,19 +128,47 @@ export default {
       }
     },
 
-    async refreshData({state, commit, rootGetters}) {
+    async refreshData({state, commit, getters, rootGetters}) {
       let terms = formatTerms(rootGetters['currentProject/terms'], state.layersOpacity, state.terms);
       commit('setTerms', terms);
+
+      let tracks = formatTracks(getters.tracks, state.layersOpacity, state.terms);
+      commit('setWrappedTracks', tracks);
     }
   },
 
   getters: {
     termsMapping: state => {
+      if(!state.terms) {
+        return {};
+      }
+
       return state.terms.reduce((mapping, term) => {
         mapping[term.id] = term;
         return mapping;
       }, {});
-    }
+    },
+    tracksMapping: state => {
+      if(!state.wrappedTracks) {
+        return {};
+      }
+
+      return state.wrappedTracks.reduce((mapping, track) => {
+        mapping[track.id] = track;
+        return mapping;
+      }, {});
+    },
+    wrappedTracks: state => state.wrappedTracks,
+    hiddenTermsIds: state => {
+      if (!state.terms) {
+        return [];
+      }
+
+      let list = state.terms.filter(term => !term.visible).map(term => term.id);
+      if (!state.displayNoTerm)
+        list.push(0);
+      return list || [];
+    },
   }
 };
 
@@ -146,7 +192,32 @@ function formatTerm(term, layersOpacity) {
   let result = {id: term.id};
   result.opacity = initialTermsOpacity;
   result.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
-  result.olLineStyle = createLineStyle(term.color, initialTermsOpacity*layersOpacity);
+  result.olLineStyle = createColorLineStyle(term.color, initialTermsOpacity*layersOpacity);
   result.visible = true;
+  result.color = term.color;
+  return result;
+}
+
+function formatTracks(tracks, layersOpacity, previousTracks=[]) {
+  if(!tracks) {
+    return;
+  }
+
+  let result = [];
+  let nbTracks = tracks.length;
+  for(let i = 0; i < nbTracks; i++) {
+    let track = tracks[i];
+    let prevTrack = previousTracks.find(prevTrack => prevTrack.id === track.id && prevTrack.color === track.color);
+    result.push(prevTrack ? prevTrack : formatTrack(track, layersOpacity));
+  }
+  return result;
+}
+
+function formatTrack(track, layersOpacity) {
+  let result = {id: track.id};
+  result.opacity = initialTracksOpacity;
+  result.olStyle = createStrokeStyle(track.color, initialTracksOpacity*layersOpacity);
+  result.olLineStyle = createLineStrokeStyle(track.color, initialTracksOpacity*layersOpacity);
+  result.color = track.color;
   return result;
 }

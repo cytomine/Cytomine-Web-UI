@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="properties-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -34,12 +33,11 @@
           </b-tag>
         </b-taglist>
       </div>
-      <em v-else-if="properties.length === 0">{{$t('no-properties')}}</em>
+      <em v-else>{{$t('no-properties')}}</em>
 
       <button v-if="canEdit" class="button is-small add-prop" @click="addNewProp()" key="showForm">
         {{$t('button-add')}}
       </button>
-      <em v-else-if="properties.length === 0">{{$t('no-properties')}}</em>
     </b-field>
 
     <form @submit.prevent="saveProp(idx)" class="new-prop-form" v-for="(prop, idx) in editedProperties" :key="prop.id">

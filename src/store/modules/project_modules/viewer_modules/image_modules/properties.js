@@ -56,7 +56,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit, rootState}, image) {
+    async initialize({commit, rootState}, {image}) {
       commit('setIdImage', image.id);
 
       let [propertiesKeys, projectProperties] = await Promise.all([
@@ -98,7 +98,7 @@ export default {
       commit('addSelectedPropertyValues', propValues);
     },
 
-    async setImageInstance({commit, dispatch}, image) {
+    async setImageInstance({commit, dispatch}, {image}) {
       commit('setIdImage', image.id);
       await dispatch('refreshProperties');
     },

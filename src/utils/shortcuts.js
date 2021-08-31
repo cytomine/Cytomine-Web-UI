@@ -1,7 +1,8 @@
+const {detect} = require('detect-browser');
+const browser = detect();
+const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
+
 // Key list reference: https://github.com/iFgR/vue-shortkey#key-list
-
-let shortkey = 'ctrl'; //should be meta on Mac OS
-
 export default Object.freeze({
   'general-close-modal': ['esc'], // Handled by Bulma
   // 'navbar-dashboard': ['g', 'd'],
@@ -26,7 +27,7 @@ export default Object.freeze({
   'viewer-nav-move-right': ['arrowright'], // Handled by Openlayers KeyboardPan
   'viewer-nav-next-image': ['shift', 'arrowright'],
   'viewer-nav-previous-image': ['shift', 'arrowleft'],
-  /*'viewer-nav-next-t': ['pageup'],
+  'viewer-nav-next-t': ['pageup'],
   'viewer-nav-previous-t': ['pagedown'],
   'viewer-nav-first-t': ['home'],
   'viewer-nav-last-t': ['end'],
@@ -41,7 +42,7 @@ export default Object.freeze({
   'viewer-nav-next-slice': ['alt', 'shift', 'pageup'],
   'viewer-nav-previous-slice': ['alt', 'shift', 'pagedown'],
   'viewer-nav-first-slice': ['alt', 'shift', 'home'],
-  'viewer-nav-last-slice': ['alt', 'shift', 'end'],*/
+  'viewer-nav-last-slice': ['alt', 'shift', 'end'],
   'viewer-nav-drag-rotate': ['alt', 'shift', 'drag'], // Handled by Openlayers
   'viewer-nav-drag-zoom': ['shift', 'drag'], // Handled by Openlayers
   'viewer-tool-select': ['s'],
@@ -61,6 +62,8 @@ export default Object.freeze({
   'viewer-tool-move': ['t'],
   'viewer-tool-rotate': ['shift', 't'],
   'viewer-tool-delete': ['del'],
+  'viewer-tool-copy': [shortkey, 'c'],
+  'viewer-tool-paste': [shortkey, 'v'],
   'viewer-tool-undo': [shortkey, 'z'],
   'viewer-tool-redo': [shortkey, 'y'],
   'viewer-tool-review-accept': ['j'],

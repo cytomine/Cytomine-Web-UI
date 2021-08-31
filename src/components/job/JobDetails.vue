@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="job-details-wrapper">
   <b-loading :is-full-page="false" :active.sync="loading" class="small" />
@@ -36,6 +35,14 @@
             <td>{{$t('execution-duration')}}</td>
             <td>{{Number(job.updated) - Number(job.created) | duration('humanize')}}</td>
           </tr>
+          <tr v-if="currentUser.isDeveloper">
+            <td>{{$t('job-id')}}</td>
+            <td>{{job.id}}</td>
+          </tr>
+          <tr v-if="currentUser.isDeveloper">
+            <td>{{$t('userjob-id')}}</td>
+            <td>{{job.userJob}}</td>
+          </tr>
           <tr>
             <td>{{$t('parameters')}}</td>
             <td>
@@ -46,6 +53,7 @@
                 <table class="table is-narrow inline-table is-fullwidth">
                   <thead>
                     <tr>
+                      <th v-if="currentUser.isDeveloper">{{$t('id')}}</th>
                       <th>{{$t('name')}}</th>
                       <th>{{$t('value')}}</th>
                       <th>{{$t('type')}}</th>
@@ -53,6 +61,7 @@
                   </thead>
                   <tbody>
                     <tr v-for="param in job.jobParameters.array" :key="param.id">
+                      <td v-if="currentUser.isDeveloper">{{param.id}}</td>
                       <td>{{param.humanName}}</td>
                       <td>{{param.value}}</td>
                       <td>{{$t(param.type.toLowerCase())}}</td>
@@ -135,6 +144,9 @@
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
+                <button class="button" @click="relaunchJob()">
+                  {{$t('relaunch')}}
+                </button>
                 <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">
                   {{$t('delete-data')}}
                 </button>
@@ -221,6 +233,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    currentUser: get('currentUser/user'),
     canManageJob() {
       return this.$store.getters['currentProject/canManageJob'](this.job);
     },
@@ -252,6 +265,7 @@ export default {
       let job = await Job.fetch(this.job.id);
       this.$emit('update', job);
       await this.fetchData();
+      this.job.status = job.status;
       this.fetchLog();
 
       clearTimeout(this.timeoutRefresh);
@@ -329,7 +343,19 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.killJob()
       });
-    }
+    },
+    async relaunchJob() {
+      try {
+        let newJob = await this.job.copy();
+        this.$emit('relaunch', newJob);
+        await newJob.execute();
+        this.$notify({type: 'success', text: this.$t('notif-success-analysis-launch')});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-analysis-launch')});
+      }
+    },
   },
   async created() {
     await this.fetchData();

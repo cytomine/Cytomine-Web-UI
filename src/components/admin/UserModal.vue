@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="save()">
   <cytomine-modal :active="active" :title="title" @close="$emit('update:active', false)">
@@ -105,7 +104,8 @@ export default {
       displayErrors: false,
       languages: [
         {value: 'EN', name:'English'},
-        {value: 'FR', name:'Français'}
+        {value: 'FR', name:'Français'},
+        {value: 'ES', name:'Español'}
       ]
     };
   },

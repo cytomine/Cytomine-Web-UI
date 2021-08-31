@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="createJob()">
   <cytomine-modal :active="active" :title="$t('launch-new-analysis')" @close="$emit('update:active', false)">
@@ -25,6 +24,9 @@
       </div>
     </div>
     <template v-if="selectedSoftware">
+      <b-message v-if="selectedSoftware.deprecated" type="is-info" has-icon icon-size="is-small">
+        {{$t('notif-deprecated-software')}}
+      </b-message>
       <table class="table is-fullwidth">
         <thead>
           <tr>
