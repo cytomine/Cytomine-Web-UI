@@ -20,7 +20,7 @@
         <domain-tag-input v-model="selectedUsers" :domains="notStorageUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>
       </b-field>
 
-      <b-field>
+      <!--<b-field>
         <b-radio-button v-model="permission" native-value="READ" type="is-success is-light">
           <span>Read</span>
         </b-radio-button>
@@ -32,7 +32,7 @@
         <b-radio-button v-model="permission" native-value="ADMINISTRATION" type="is-danger is-light">
           <span>Administration</span>
         </b-radio-button>
-      </b-field>
+      </b-field>-->
 
     </template>
 

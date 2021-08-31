@@ -118,7 +118,7 @@ export default {
     searchString: sync('listStorages/searchString', {debounce: 500}),
 
     storageCollection() {
-      let collection = new StorageCollection({});
+      let collection = new StorageCollection({all:true});
       if(this.searchString) {
         collection['searchString'] = encodeURIComponent(this.searchString);
       }

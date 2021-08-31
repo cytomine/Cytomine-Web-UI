@@ -1035,4 +1035,5 @@ readwrite-icon-label,You have write access on this storage,Vous avez des droits 
 administrator-icon-label,You are an administrator of this storage,Vous êtes un administrateur de l'espace de stockage
 remove-yourself-from-administrator,Remove administrator rights,Retrait des droits d'administration
 remove-yourself-from-administrator-confirmation-message,Are you sure you want to remove yourself from the storage administrators? You will not be able to undo this action,Êtes-vous sûr de souhaiter vous retirer des administrateurs de l'espace de stockage ? Cette action est irréversible
+no-storage,No storage,Pas d'espace de stockage
 owner, Owner, Propriétaire

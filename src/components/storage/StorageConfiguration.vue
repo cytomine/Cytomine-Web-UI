@@ -20,6 +20,12 @@
 <!--    </b-radio-button>-->
 <!--  </b-field>-->
 
+  <nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+      <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
+      <li class="is-active"><a href="#" aria-current="page">{{storage.name}}</a></li>
+    </ul>
+  </nav>
   <div class="box tab-content">
     <keep-alive>
       <component :is="activeComponent" />
@@ -29,6 +35,7 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
 import StorageUsers from './configuration-panels/StorageUsers';
 
 const defaultTab = 'users';
@@ -41,6 +48,7 @@ export default {
     };
   },
   computed: {
+    storage: get('currentStorage/storage'),
     queriedTab() {
       return this.$route.query.tab;
     },
