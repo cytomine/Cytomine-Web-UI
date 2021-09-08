@@ -132,6 +132,7 @@ vendor,Vendor,Marque du scanner,Vendedor
 image-size,Image size,Taille de l'image,Tamaño de imagen
 status,Status,Statut,Estado
 button-add-image,Add image,Ajouter une image,Añadir imagen
+button-add-image-lab-network,Add image and data to Lab network,Ajouter une image au réseau de laboratoires,
 actions,Actions,Actions,Acciones
 button-rename,Rename,Renommer,Renombrar
 button-properties,Properties,Propriétés,Propiedades
