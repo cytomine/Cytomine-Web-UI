@@ -16,7 +16,7 @@
 <cytomine-modal :active="active" :title="$t('button-add-image-lab-network')" @close="$emit('update:active', false)">
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <template v-if="!loading">
-    <template>
+    <template v-if="!processing">
 
       <div class="columns">
         <div class="column is-half">
@@ -25,7 +25,7 @@
               <strong>{{$t('storage')}}</strong>
             </div>
             <div class="column is-half">
-              storage<!--{{selectedStorage.name}}-->
+              <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false" />
             </div>
           </div>
 
@@ -104,8 +104,6 @@
               <cytomine-multiselect
                 v-model="selectedLab"
                 :options="laboratories"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
             </div>
@@ -118,8 +116,6 @@
               <cytomine-multiselect
                 v-model="selectedStaining"
                 :options="stainings"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
             </div>
@@ -132,8 +128,6 @@
               <cytomine-multiselect
                 v-model="selectedAntibody"
                 :options="antibodies"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
 
@@ -147,8 +141,6 @@
               <cytomine-multiselect
                 v-model="selectedDilution"
                 :options="dilutions"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
 
@@ -162,8 +154,6 @@
               <cytomine-multiselect
                 v-model="selectedDetection"
                 :options="detections"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
 
@@ -177,8 +167,6 @@
               <cytomine-multiselect
                 v-model="selectedInstrument"
                 :options="instruments"
-                label="name"
-                track-by="id"
                 :close-on-select="true"
               />
 
@@ -206,31 +194,45 @@
           <cytomine-quill-editor v-model="descriptionContent" :placeholder="$t('enter-description')" />
         </div>
       </div>
+    </template>
+    <b-loading v-else :is-full-page="false" :active="processing && !success && !failed" class="small" />
 
-
-      <!--<div class="columns">
-        <div class="column is-half flex-column is-offset-one-quarter">
-          <progress v-if="ongoingUpload" class="progress is-success" :value="overallProgress" max="100">
-            {{overallProgress}}%
-          </progress>
-
-          <div class="buttons">
-            <b-upload :value="plainFiles" type="is-link" multiple drag-drop @input="filesChange">
-              <a class="button is-success">{{$t('add-files')}}</a>
-            </b-upload>
-            <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">
-              {{$t('start-upload')}}
-            </button>
-            <button class="button" @click="cancelAll()" :disabled="!filesPendingUpload && !ongoingUpload">
-              {{$t('cancel-upload')}}
-            </button>
-            <button class="button" @click="hideFinished()" v-if="filesFinishedUpload">
-              {{$t('hide-successful-upload')}}
-            </button>
+    <article v-if="success" class="message is-success">
+      <section class="message-body">
+        <div class="media">
+          <div class="media-content">
+            This image {{name}} has been successfully uploaded to the project.
           </div>
         </div>
-      </div>-->
-    </template>
+      </section>
+    </article>
+
+    <article v-if="failed" class="message is-danger">
+      <section class="message-body">
+        <div class="media">
+          <div class="media-content">
+            An error occured.
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <div class="columns" v-if="!success && !failed">
+      <div class="column is-half flex-column is-offset-one-quarter">
+        <progress v-if="ongoingUpload" class="progress is-success" :value="imageToUpload.progress" max="100">
+          {{imageToUpload.progress}}%
+        </progress>
+
+        <div class="buttons">
+          <button class="button is-success" @click="startUpload(imageToUpload)" :disabled="!uploadable">
+            {{$t('start-upload')}}
+          </button>
+          <button class="button" @click="cancelAll()" :disabled="!ongoingUpload">
+            {{$t('cancel-upload')}}
+          </button>
+        </div>
+      </div>
+    </div>
   </template>
 </cytomine-modal>
 </template>
@@ -238,7 +240,8 @@
 <script>
 import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
-import {ImageInstance} from 'cytomine-client';
+import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, Property, StorageAccessCollection, UploadedFile/*, UploadedFileStatus*/} from 'cytomine-client';
+import axios from 'axios';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
 import CytomineModal from '@/components/utils/CytomineModal';
@@ -258,10 +261,14 @@ export default {
   data() {
     return {
       loading: true,
+      storages:[],
+      selectedStorage:null,
       descriptionContent: '',
       selectedProtocol:null,
       selectedImage:null,
+      imageToUpload:null,
       name: null,
+      ongoingUpload:false,
       laboratories: [],
       selectedLab: [],
       stainings: [],
@@ -274,15 +281,62 @@ export default {
       selectedDetection: [],
       instruments: [],
       selectedInstrument: [],
+      signature: '',
+      signatureDate: '',
+      processing: false,
+      success : false,
+      failed : false,
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
     descriptionWithoutKeywords() {
       return this.description.data.replace(new RegExp(constants.STOP_PREVIEW_KEYWORD, 'g'), '');
     },
     stopPreviewKeyword() {
       return constants.STOP_PREVIEW_KEYWORD;
+    },
+    uri() {
+      return '/upload';
+    },
+    queryString() {
+      let str = `cytomine=${constants.CYTOMINE_CORE_HOST}`;
+      if(this.selectedStorage) {
+        str += `&idStorage=${this.selectedStorage.id}`;
+      }
+      str += '&sync=true';
+      return str;
+    },
+    uploadable(){
+      /*console.log('uploadable');
+      console.log('this.selectedStorage');
+      console.log(this.selectedStorage != null);
+      console.log('this.selectedImage');
+      console.log(this.selectedImage != null);
+      console.log('this.selectedProtocol');
+      console.log(this.selectedProtocol != null);
+      console.log('this.selectedLab');
+      console.log(this.selectedLab && this.selectedLab.length > 0);
+      console.log('this.selectedStaining');
+      console.log(this.selectedStaining && this.selectedStaining.length > 0);
+      console.log('this.selectedAntibody');
+      console.log(this.selectedAntibody && this.selectedAntibody.length > 0);
+      console.log('this.selectedDilution');
+      console.log(this.selectedDilution && this.selectedDilution.length > 0);
+      console.log('this.selectedDetection');
+      console.log(this.selectedDetection && this.selectedDetection.length > 0);
+      console.log('this.selectedInstrument');
+      console.log(this.selectedInstrument && this.selectedInstrument.length > 0);
+      console.log('uploadable2');*/
+      return this.selectedStorage != null && this.selectedImage != null && this.selectedProtocol != null &&
+        this.selectedLab && this.selectedLab.length > 0 &&
+        this.selectedStaining && this.selectedStaining.length > 0 &&
+        this.selectedAntibody && this.selectedAntibody.length > 0 &&
+        this.selectedDilution && this.selectedDilution.length > 0 &&
+        this.selectedDetection && this.selectedDetection.length > 0 &&
+        this.selectedInstrument && this.selectedInstrument.length > 0;
+
     }
   },
   watch: {
@@ -291,9 +345,20 @@ export default {
         this.idsAddedImages = [];
       }
     },
+    async queryString() {
+      this.generateSignature();
+    },
     selectedImage(file) {
       if(file) {
         this.name = file.name;
+        this.imageToUpload = {
+          file,
+          uploading: false,
+          progress: 0,
+          uploadedFile: null, // null if upload not finished, false if upload failed, UploadedFile instance if upload successful
+          abstractImage: null, // null if upload not finished, false if upload failed, AbstractImage instance if upload successful
+          cancelToken: null
+        };
       }
     }
   },
@@ -326,10 +391,168 @@ export default {
     },
     wasAdded(image) {
       return this.idsAddedImages.includes(image.id);
-    }
+    },
+    async loadConfigByPrefix(configKey) {
+      let configurationValue;
+      try {
+        configurationValue = (await new Configuration({key: configKey}).fetch()).value;
+        return configurationValue.split(',').filter(s => s.length > 0);
+      }
+      catch(error) {
+        if(error.response.status == 404) {
+          //404 if configuration not set. Ignore.
+          configurationValue = '';
+          return [];
+        }
+        else {
+          console.log(error);
+          this.error = true;
+        }
+      }
+    },
+    async startUpload(fileWrapper) {
+      if(fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
+        return;
+      }
+
+      let formData = new FormData();
+      formData.append('files[]', fileWrapper.file);
+      fileWrapper.cancelToken = axios.CancelToken.source();
+      fileWrapper.uploading = true;
+      this.ongoingUpload = true;
+      this.processing = true;
+      axios.post(
+        constants.CYTOMINE_UPLOAD_HOST + this.uri + '?' + this.queryString,
+        formData,
+        {
+          headers: {
+            'authorization': `CYTOMINE ${this.currentUser.publicKey}:${this.signature}`,
+            'dateFull': this.signatureDate, // will replace actual date value, so that signature is valid
+            'content-type-full': 'null' // will erase actual content-type value, so that signature is valid
+          },
+          onUploadProgress: progress => {
+            fileWrapper.progress = Math.floor((progress.loaded * 100) / progress.total);
+          },
+          cancelToken: fileWrapper.cancelToken.token
+        }
+      ).then(async response => {
+        fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
+        fileWrapper.abstractImage = new AbstractImage(response.data[0].images[0].image);
+
+        await this.associateMetadata();
+        await this.addToProject();
+      }).catch(error => {
+        this.processing = false;
+        if(!axios.isCancel(error)) {
+          console.log(error);
+          fileWrapper.uploadedFile = false;
+        }
+      }).finally(() => fileWrapper.uploading = false);
+    },
+
+    async associateMetadata(){
+      try {
+
+        await Promise.all([
+          //lab_id
+          new Property({key: 'hv-laboratory', value: this.selectedLab}, this.imageToUpload.abstractImage).save(),
+          //staining
+          new Property({key: 'hv-staining', value: this.selectedStaining}, this.imageToUpload.abstractImage).save(),
+          //antibody
+          new Property({key: 'hv-antibody', value: this.selectedAntibody}, this.imageToUpload.abstractImage).save(),
+          //detection
+          new Property({key: 'hv-detection', value: this.selectedDilution}, this.imageToUpload.abstractImage).save(),
+          //dilution
+          new Property({key: 'hv-dilution', value: this.selectedDetection}, this.imageToUpload.abstractImage).save(),
+          //instrument
+          new Property({key: 'hv-instrument', value: this.selectedInstrument}, this.imageToUpload.abstractImage).save()
+        ]);
+
+        //await prop.save();
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-save-prop')});
+      }
+
+
+      //attached file -- protocol
+      try {
+        await new AttachedFile({file: this.selectedProtocol, filename: this.selectedProtocol.name}, this.imageToUpload.abstractImage).save();
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
+      }
+
+      //description
+      try {
+        await new Description({data: this.descriptionContent, object: this.imageToUpload.abstractImage}).save();
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
+      }
+    },
+    async addToProject(){
+      console.log('coucou. Ici ajoute l abstrat image au project');
+      let propsTranslation = {imageName: this.imageToUpload.abstractImage.originalFilename, projectName: this.project.name};
+      try {
+        let image = await new ImageInstance({baseImage: this.imageToUpload.abstractImage.id, project: this.project.id}).save();
+        this.$emit('addImage', image);
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-add-image', propsTranslation)
+        });
+
+        let updatedProject = this.project.clone();
+        updatedProject.numberOfImages++;
+        this.$store.dispatch('currentProject/updateProject', updatedProject);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-add-image', propsTranslation)
+        });
+      }
+
+    },
+    async fetchStorages() {
+      try {
+        this.storages = (await StorageAccessCollection.fetchAll()).array.filter(storage => storage.permission == 'ADMINISTRATION' || storage.permission == 'WRITE');
+        //this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
+      }
+      catch(error) {
+        console.log(error);
+        this.newUploadError = true;
+      }
+    },
+    async generateSignature() {
+      this.signatureDate = new Date().toISOString();
+      try {
+        this.signature = await Cytomine.instance.fetchSignature({
+          uri: this.uri,
+          queryString: this.queryString,
+          method: 'POST',
+          date: this.signatureDate
+        });
+      }
+      catch(error) {
+        this.newUploadError = true;
+      }
+    },
   },
   async created() {
     this.loading = false;
+    this.laboratories = await this.loadConfigByPrefix('hv-laboratory-list');
+    this.fetchStorages();
+    this.stainings = await this.loadConfigByPrefix('hv-staining-list');
+    this.antibodies = await this.loadConfigByPrefix('hv-antibody-list');
+    this.dilutions = await this.loadConfigByPrefix('hv-detection-list');
+    this.detections = await this.loadConfigByPrefix('hv-dilution-list');
+    this.instruments = await this.loadConfigByPrefix('hv-instrument-list');
+    this.generateSignature();
   }
 };
 </script>
