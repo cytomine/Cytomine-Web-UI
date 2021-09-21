@@ -31,7 +31,7 @@
 
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('file')}}</strong>
+              <strong>{{$t('image')}}</strong>
             </div>
             <div class="column is-three-quarters">
               <b-field>
@@ -66,7 +66,7 @@
 
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('protocol')}}</strong>
+              <strong>{{$t('hv-protocol')}}</strong>
             </div>
             <div class="column is-three-quarters">
               <b-field>
@@ -98,7 +98,7 @@
         <div class="column is-half">
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('lab-id')}}</strong>
+              <strong>{{$t('hv-lab-id')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -110,7 +110,7 @@
           </div>
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('staining')}}</strong>
+              <strong>{{$t('hv-staining')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -122,7 +122,7 @@
           </div>
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('antibidy')}}</strong>
+              <strong>{{$t('hv-antibody')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -135,7 +135,7 @@
           </div>
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('dilution')}}</strong>
+              <strong>{{$t('hv-dilution')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -148,7 +148,7 @@
           </div>
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('detection')}}</strong>
+              <strong>{{$t('hv-detection')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -161,7 +161,7 @@
           </div>
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('instrument')}}</strong>
+              <strong>{{$t('hv-instrument')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
@@ -227,9 +227,9 @@
           <button class="button is-success" @click="startUpload(imageToUpload)" :disabled="!uploadable">
             {{$t('start-upload')}}
           </button>
-          <button class="button" @click="cancelAll()" :disabled="!ongoingUpload">
+          <!--<button class="button" @click="cancelAll()" :disabled="!ongoingUpload">
             {{$t('cancel-upload')}}
-          </button>
+          </button>-->
         </div>
       </div>
     </div>
@@ -363,35 +363,6 @@ export default {
     }
   },
   methods: {
-    async addImage(abstractImage) {
-      let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
-      try {
-        let image = await new ImageInstance({baseImage: abstractImage.id, project: this.project.id}).save();
-        this.idsAddedImages.push(abstractImage.id);
-        this.$emit('addImage', image);
-        this.$notify({
-          type: 'success',
-          text: this.$t('notif-success-add-image', propsTranslation)
-        });
-
-        let updatedProject = this.project.clone();
-        updatedProject.numberOfImages++;
-        this.$store.dispatch('currentProject/updateProject', updatedProject);
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({
-          type: 'error',
-          text: this.$t('notif-error-add-image', propsTranslation)
-        });
-      }
-    },
-    isInProject(image) {
-      return image.inProject;
-    },
-    wasAdded(image) {
-      return this.idsAddedImages.includes(image.id);
-    },
     async loadConfigByPrefix(configKey) {
       let configurationValue;
       try {
@@ -446,6 +417,8 @@ export default {
         if(!axios.isCancel(error)) {
           console.log(error);
           fileWrapper.uploadedFile = false;
+          this.failed = true;
+          this.errorMessage = error;
         }
       }).finally(() => fileWrapper.uploading = false);
     },
@@ -473,6 +446,8 @@ export default {
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-save-prop')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-save-prop');
       }
 
 
@@ -483,6 +458,8 @@ export default {
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-attached-file-creation');
       }
 
       //description
@@ -492,10 +469,11 @@ export default {
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-update-description');
       }
     },
     async addToProject(){
-      console.log('coucou. Ici ajoute l abstrat image au project');
       let propsTranslation = {imageName: this.imageToUpload.abstractImage.originalFilename, projectName: this.project.name};
       try {
         let image = await new ImageInstance({baseImage: this.imageToUpload.abstractImage.id, project: this.project.id}).save();
@@ -508,6 +486,7 @@ export default {
         let updatedProject = this.project.clone();
         updatedProject.numberOfImages++;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
+        this.success = true;
       }
       catch(error) {
         console.log(error);
