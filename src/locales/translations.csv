@@ -469,6 +469,11 @@ extracting-data,Extracting data,Extraction des données en cours
 error-extraction,Extraction error,Erreur d'extraction
 deploying,Deploying,Déploiement en cours
 converting,Converting,Conversion en cours
+unpacking,Unpacking,Décompression en cours
+error-unpacking,Unpacking error,Erreur de décompression
+unpacked,Unpacked,Décompressé
+checking-integrity,Checking integrity,Vérification de l'intégrité en cours
+error-integrity,Corrupted file,Fichier corrompu
 no-uploaded-file,No uploaded file,Aucun fichier
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers
 sample-preview,Sample preview,Aperçu de l'image
