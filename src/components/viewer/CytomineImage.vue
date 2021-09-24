@@ -378,7 +378,7 @@ export default {
       let filter = (this.imageWrapper.colors.filter) ? `&filters=${this.imageWrapper.colors.filter}` : '';
       let contrast = (this.imageWrapper.colors.contrast !== 1) ? `&contrast=${this.imageWrapper.colors.contrast}` : '';
       let gamma = (this.imageWrapper.colors.gamma !== 1) ? `&gammas=${this.imageWrapper.colors.gamma}` : '';
-      let inverse = (this.imageWrapper.colors.inverse) ? '&inverse=true' : '';
+      let inverse = (this.imageWrapper.colors.inverse) ? '&colormaps=!DEFAULT' : '';
       let params = `?${filter}${contrast}${gamma}${inverse}`;
 
       let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum).join(',');
