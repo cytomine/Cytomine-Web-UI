@@ -386,6 +386,8 @@ export default {
       let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum).join(',');
       if (maxIntensities) params += `&max_intensities=${maxIntensities}`;
 
+      params += `&z_slices=${this.slice.zStack}&timepoints=${this.slice.time}`;
+
       return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${params}`];
     },
 
@@ -601,7 +603,7 @@ export default {
           if (showComments) {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
-          
+
           this.selectedAnnotation = annot; // used to pre-load annot layer
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
           this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
