@@ -350,6 +350,8 @@ export default {
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
+        50,
+        60
       ];
 
       let unfinishedConversions = false;
