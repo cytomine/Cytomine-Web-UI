@@ -17,8 +17,122 @@
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <template v-if="!loading">
     <template>
-      <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-      type="search" icon="search" />
+      <div class="search-block">
+        <b-input
+          class="search-images"
+          v-model="searchString"
+          :placeholder="$t('search-placeholder')"
+          type="search" icon="search"
+        />
+        <button class="button" @click="toggleFilterDisplay()">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+        </button>
+      </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column filter is-one-third">
+              <div class="filter-label">
+                {{$t('hv-laboratory')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedLab"
+                  :options="laboratories"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-third">
+              <div class="filter-label">
+                {{$t('hv-staining')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedStaining"
+                  :options="stainings"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-third">
+              <div class="filter-label">
+                {{$t('hv-antibody')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedAntibody"
+                  :options="antibodies"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('hv-dilution')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedDilution"
+                  :options="dilutions"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('hv-detection')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedDetection"
+                  :options="detections"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="filter-label">
+                {{$t('hv-instrument')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedInstrument"
+                  :options="instruments"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </b-collapse>
 
       <cytomine-table
         :collection="imageCollection"
@@ -67,9 +181,10 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
+import {AbstractImageCollection, ImageInstance, HVMetadataCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'add-image-modal',
@@ -78,6 +193,7 @@ export default {
   },
   components: {
     CytomineTable,
+    CytomineMultiselect,
     CytomineModal
   },
   data() {
@@ -89,10 +205,33 @@ export default {
       currentPage: 1,
       sortField: 'created',
       sortOrder: 'desc',
+      filtersOpened : false,
+      laboratories: [],
+      selectedLab: [],
+      stainings: [],
+      selectedStaining: [],
+      antibodies: [],
+      selectedAntibody: [],
+      dilutions: [],
+      selectedDilution: [],
+      detections: [],
+      selectedDetection: [],
+      instruments: [],
+      selectedInstrument: [],
     };
   },
   computed: {
     project: get('currentProject/project'),
+    multiSelectFilters() {
+      return [
+        {prop: 'laboratory', selected: this.selectedLab, total: this.laboratories.length},
+        {prop: 'staining', selected: this.selectedStaining, total: this.stainings.length},
+        {prop: 'antibody', selected: this.selectedAntibody, total: this.antibodies.length},
+        {prop: 'dilution', selected: this.selectedDilution, total: this.dilutions.length},
+        {prop: 'detection', selected: this.selectedDetection, total: this.detections.length},
+        {prop: 'instrument', selected: this.selectedInstrument, total: this.instruments.length},
+      ];
+    },
     imageCollection() {
       let collection = new AbstractImageCollection({
         project: this.project.id,
@@ -100,7 +239,15 @@ export default {
       if(this.searchString) {
         collection['originalFilename'] = {
           ilike: encodeURIComponent(this.searchString)
+          //voir comment je fais pour les users mais a priori, ca va chercher sur plusieurs champs. ça va devenir un collection['search']
         };
+      }
+      for(let {prop, selected, total} of this.multiSelectFilters) {
+        if(selected.length > 0 && selected.length < total) {
+          collection[prop] = {
+            in: selected.map(s => s.id).join()
+          };
+        }
       }
 
       return collection;
@@ -114,6 +261,20 @@ export default {
     }
   },
   methods: {
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    },
+    async loadMetadata(type) {
+      let metadatas;
+      if(type == 'staining') metadatas = (await HVMetadataCollection.fetchStaining());
+      else if(type == 'laboratory') metadatas = (await HVMetadataCollection.fetchLaboratory());
+      else if(type == 'antibody') metadatas = (await HVMetadataCollection.fetchAntibody());
+      else if(type == 'detection') metadatas = (await HVMetadataCollection.fetchDetection());
+      else if(type == 'dilution') metadatas = (await HVMetadataCollection.fetchDilution());
+      else if(type == 'instrument') metadatas = (await HVMetadataCollection.fetchInstrument());
+      else metadatas = [];
+      return metadatas;
+    },
     async addImage(abstractImage) {
       let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
       try {
@@ -146,6 +307,13 @@ export default {
   },
   async created() {
     this.loading = false;
+    this.laboratories = await this.loadMetadata('laboratory');
+    //this.fetchStorages();
+    this.stainings = await this.loadMetadata('staining');
+    this.antibodies = await this.loadMetadata('antibody');
+    this.dilutions = await this.loadMetadata('detection');
+    this.detections = await this.loadMetadata('dilution');
+    this.instruments = await this.loadMetadata('instrument');
   }
 };
 </script>

@@ -1044,8 +1044,10 @@ renamed,Renamed,Renommé
 image-renamed,This image has been renamed,Cette image a été renommée
 hv-antibody,Antibody,Anticorps
 hv-protocol,Protocol,Protocole
-hv-lab-id,Laboratories,Laboratoires
+hv-laboratories,Laboratories,Laboratoires
+hv-laboratory,Laboratory,Laboratoire
 hv-staining,Staining,
 hv-dilution,Dilution,Dilution
 hv-detection,Detection,Détection
 hv-instrument,Instrument,Instrument
+set-metadata,Set specific metadata,Changer les méta-données spécifiques

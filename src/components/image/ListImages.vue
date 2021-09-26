@@ -193,22 +193,30 @@
             {{ image.magnification || $t('unknown') }}
           </b-table-column>
 
-          <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
-              {{ image.numberOfAnnotations }}
-            </router-link>
+          <b-table-column field="laboratory" :label="$t('hv-laboratory')" centered sortable width="100">
+            <!--<router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">-->
+              {{ image.laboratoryValue }}
+            <!--</router-link>-->
           </b-table-column>
 
-          <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
-              {{ image.numberOfJobAnnotations }}
-            </router-link>
+          <b-table-column field="staining" :label="$t('hv-staining')" centered sortable width="100">
+            {{ image.stainingValue }}
           </b-table-column>
 
-          <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
-              {{ image.numberOfReviewedAnnotations }}
-            </router-link>
+          <b-table-column field="antibody" :label="$t('hv-antibody')" centered sortable width="100">
+            {{ image.antibodyValue }}
+          </b-table-column>
+
+          <b-table-column field="detection" :label="$t('hv-detection')" centered sortable width="100">
+            {{ image.detectionValue }}
+          </b-table-column>
+
+          <b-table-column field="dilution" :label="$t('hv-dilution')" centered sortable width="100">
+            {{ image.dilutionValue }}
+          </b-table-column>
+
+          <b-table-column field="instrument" :label="$t('hv-instrument')" centered sortable width="100">
+            {{ image.instrumentValue }}
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -226,6 +234,7 @@
             @delete="refreshData"
             @setResolution="refreshData"
             @setMagnification="refreshData"
+            @setMetadata="refreshData"
           />
         </template>
 
