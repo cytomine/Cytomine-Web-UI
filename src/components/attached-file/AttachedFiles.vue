@@ -37,7 +37,8 @@ export default {
   name: 'attached-files',
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
+    atkey: String
   },
   data() {
     return {
@@ -99,6 +100,12 @@ export default {
   async created() {
     try {
       this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+      if(this.atkey) {
+        this.attachedFiles = this.attachedFiles.filter(at => at.key == this.atkey);
+      }
+      else {
+        this.attachedFiles = this.attachedFiles.filter(at => !at.key);
+      }
     }
     catch(error) {
       console.log(error);
