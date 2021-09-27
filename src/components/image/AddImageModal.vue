@@ -234,12 +234,12 @@ export default {
     },
     imageCollection() {
       let collection = new AbstractImageCollection({
+        search: true,
         project: this.project.id,
       });
       if(this.searchString) {
-        collection['originalFilename'] = {
+        collection['search'] = {
           ilike: encodeURIComponent(this.searchString)
-          //voir comment je fais pour les users mais a priori, ca va chercher sur plusieurs champs. ça va devenir un collection['search']
         };
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
