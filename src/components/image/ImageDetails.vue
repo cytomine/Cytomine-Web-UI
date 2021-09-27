@@ -76,6 +76,12 @@
           <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
+      <tr>
+        <td class="prop-label">{{$t('hv-staining-protocol')}}</td>
+        <td class="prop-content" colspan="3">
+          <attached-files :object="image" :atkey="attachedFileHVStainingProtocolKey" :canEdit="canEdit" />
+        </td>
+      </tr>
       <tr v-if="isPropDisplayed('attached-files')">
         <td class="prop-label">{{$t('attached-files')}}</td>
         <td class="prop-content" colspan="3">
@@ -309,6 +315,7 @@ import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 import {ImageInstance} from 'cytomine-client';
 
 import vendorFromMime from '@/utils/vendor';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'image-details',
@@ -336,6 +343,7 @@ export default {
       isMagnificationModalActive: false,
       isHVMetadataModalActive: false,
       isMetadataModalActive: false,
+      attachedFileHVStainingProtocolKey: constants.ATTACHED_FILE_HV_STAINING_PROTOCOL
     };
   },
   computed: {

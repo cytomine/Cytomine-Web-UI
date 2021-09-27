@@ -39,5 +39,7 @@ export default {
   IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
+  ATTACHED_FILE_HV_STAINING_PROTOCOL: 'staining-protocol',
+  ATTACHED_FILE_HV_SCORE_REPORT: 'score-report',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
 };
