@@ -129,7 +129,7 @@
             </div>
           </div>
 
-          <div class="columns">
+          <!--<div class="columns">
             <div class="column filter">
               <div class="filter-label">
                 {{$t('user-annotations')}}
@@ -158,9 +158,104 @@
             </div>
 
             <div class="column filter"></div>
+          </div>-->
+          <div class="columns is-multiline">
+            <div class="column filter is-one-quarter" v-if="currentUser.adminByNow" >
+              <div class="filter-label">
+                {{$t('hv-laboratory')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedLab"
+                  :options="laboratories"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('hv-staining')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedStaining"
+                  :options="stainings"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('hv-antibody')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedAntibody"
+                  :options="antibodies"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('hv-detection')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedDetection"
+                  :options="detections"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('hv-dilution')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedDilution"
+                  :options="dilutions"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
+            <div class="column is-one-quarter">
+              <div class="filter-label">
+                {{$t('hv-instrument')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedInstrument"
+                  :options="instruments"
+                  :close-on-select="true"
+                  label="value" track-by="id"
+                  multiple
+                />
+              </div>
+            </div>
+
           </div>
+
         </div>
       </b-collapse>
+
+
 
       <cytomine-table
         :collection="imageCollection"
@@ -189,30 +284,34 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
+          <!--<b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
             {{ image.magnification || $t('unknown') }}
+          </b-table-column>-->
+
+          <b-table-column field="staining" :label="$t('hv-staining')" centered sortable width="100">
+            {{ image.stainingValue }}
           </b-table-column>
 
-          <b-table-column field="laboratory" :label="$t('hv-laboratory')" centered sortable width="100">
+          <b-table-column field="laboratory" v-if="currentUser.adminByNow" :label="$t('hv-laboratory')" centered sortable width="100">
             <!--<router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">-->
               {{ image.laboratoryValue }}
             <!--</router-link>-->
           </b-table-column>
 
-          <b-table-column field="staining" :label="$t('hv-staining')" centered sortable width="100">
-            {{ image.stainingValue }}
+          <b-table-column field="scores" :label="$t('scores...')" centered sortable width="100">
+            scores
           </b-table-column>
 
           <b-table-column field="antibody" :label="$t('hv-antibody')" centered sortable width="100">
             {{ image.antibodyValue }}
           </b-table-column>
 
-          <b-table-column field="detection" :label="$t('hv-detection')" centered sortable width="100">
-            {{ image.detectionValue }}
-          </b-table-column>
-
           <b-table-column field="dilution" :label="$t('hv-dilution')" centered sortable width="100">
             {{ image.dilutionValue }}
+          </b-table-column>
+
+          <b-table-column field="detection" :label="$t('hv-detection')" centered sortable width="100">
+            {{ image.detectionValue }}
           </b-table-column>
 
           <b-table-column field="instrument" :label="$t('hv-instrument')" centered sortable width="100">
@@ -264,7 +363,7 @@ import AddImageModal from './AddImageModal';
 import AddImageModalLabNetwork from './AddImageModalLabNetwork';
 import vendorFromMime from '@/utils/vendor';
 
-import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, TagCollection, HVMetadataCollection} from 'cytomine-client';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -304,6 +403,18 @@ export default {
       availableMagnifications: [],
       availableResolutions: [],
       availableTags:[],
+      laboratories: [],
+      selectedLab: [],
+      stainings: [],
+      selectedStaining: [],
+      antibodies: [],
+      selectedAntibody: [],
+      dilutions: [],
+      selectedDilution: [],
+      detections: [],
+      selectedDetection: [],
+      instruments: [],
+      selectedInstrument: [],
       maxWidth: 100,
       maxHeight: 100,
       maxNbUserAnnotations: 100,
@@ -353,7 +464,13 @@ export default {
         {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
-        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
+        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length},
+        {prop: 'laboratory', selected: this.selectedLab.map(option => option.id), total: this.laboratories.length},
+        {prop: 'staining', selected: this.selectedStaining.map(option => option.id), total: this.stainings.length},
+        {prop: 'antibody', selected: this.selectedAntibody.map(option => option.id), total: this.antibodies.length},
+        {prop: 'dilution', selected: this.selectedDilution.map(option => option.id), total: this.dilutions.length},
+        {prop: 'detection', selected: this.selectedDetection.map(option => option.id), total: this.detections.length},
+        {prop: 'instrument', selected: this.selectedInstrument.map(option => option.id), total: this.instruments.length},
       ];
     },
 
@@ -435,6 +552,17 @@ export default {
         };
       });
     },
+    async loadMetadata(type) {
+      let metadatas;
+      if(type == 'staining') metadatas = (await HVMetadataCollection.fetchStaining());
+      else if(type == 'laboratory') metadatas = (await HVMetadataCollection.fetchLaboratory());
+      else if(type == 'antibody') metadatas = (await HVMetadataCollection.fetchAntibody());
+      else if(type == 'detection') metadatas = (await HVMetadataCollection.fetchDetection());
+      else if(type == 'dilution') metadatas = (await HVMetadataCollection.fetchDilution());
+      else if(type == 'instrument') metadatas = (await HVMetadataCollection.fetchInstrument());
+      else metadatas = [];
+      return metadatas;
+    },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
@@ -473,6 +601,12 @@ export default {
         this.fetchFilters(),
         this.fetchTags()
       ]);
+      this.laboratories = await this.loadMetadata('laboratory');
+      this.stainings = await this.loadMetadata('staining');
+      this.antibodies = await this.loadMetadata('antibody');
+      this.dilutions = await this.loadMetadata('detection');
+      this.detections = await this.loadMetadata('dilution');
+      this.instruments = await this.loadMetadata('instrument');
       this.loading = false;
     }
     catch(error) {
