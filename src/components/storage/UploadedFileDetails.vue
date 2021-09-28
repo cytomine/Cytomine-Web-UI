@@ -112,6 +112,48 @@
     <table class="table">
       <tbody>
         <tr>
+          <td class="prop-label">{{$t('hv-staining')}}</td>
+          <td class="prop-content">
+            <template v-if="image.stainingValue">{{image.stainingValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr v-if="currentUser.adminByNow">
+          <td class="prop-label" >{{$t('hv-laboratory')}}</td>
+          <td class="prop-content">
+            <template v-if="image.laboratoryValue">{{image.laboratoryValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('hv-antibody')}}</td>
+          <td class="prop-content">
+            <template v-if="image.antibodyValue">{{image.antibodyValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('hv-dilution')}}</td>
+          <td class="prop-content">
+            <template v-if="image.dilutionValue">{{image.dilutionValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('hv-detection')}}</td>
+          <td class="prop-content">
+            <template v-if="image.detectionValue">{{image.detectionValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('hv-instrument')}}</td>
+          <td class="prop-content">
+            <template v-if="image.instrumentValue">{{image.instrumentValue}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
           <td class="prop-label">{{$t('description')}}</td>
           <td class="prop-content">
             <cytomine-description :object="image" :canEdit="canEdit" />
@@ -131,6 +173,12 @@
           </td>
         </tr>
         -->
+        <tr>
+          <td class="prop-label">{{$t('hv-staining-protocol')}}</td>
+          <td class="prop-content" colspan="3">
+            <attached-files :object="image" :atkey="attachedFileHVStainingProtocolKey" :canEdit="canEdit" />
+          </td>
+        </tr>
         <tr>
           <td class="prop-label">{{$t('attached-files')}}</td>
           <td class="prop-content">
@@ -179,6 +227,9 @@
                   {{$t('button-set-magnification')}}
                 </button>
                 -->
+                <button class="button" @click="isHVMetadataModalActive = true">
+                  {{$t('set-metadata')}}
+                </button>
               </template>
             </div>
           </td>
@@ -206,6 +257,11 @@
       @setResolution="(resolution) => image.resolution=resolution"
     />
     -->
+    <h-v-metadata-modal
+      :image="image"
+      :active.sync="isHVMetadataModalActive"
+      @setMetadata="(laboratory, staining, antibody, dilution, detection, instrument) => setMetadata(laboratory, staining, antibody, dilution, detection, instrument)"
+    />
   </div>
 
 </div>
@@ -221,9 +277,13 @@ import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from '@/components/image/MagnificationModal';
 import CalibrationModal from '@/components/image/CalibrationModal';
+import HVMetadataModal from '@/components/image/HVMetadataModal';
 import RenameModal from '@/components/utils/RenameModal';
 import filesize from 'filesize';
 import ProfileStatus from './ProfileStatus';
+
+import {get} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'uploaded-file-details',
@@ -237,6 +297,7 @@ export default {
     MagnificationModal,
     CalibrationModal,
     RenameModal,
+    HVMetadataModal,
     UploadedFileStatus
   },
   props: {
@@ -261,9 +322,12 @@ export default {
       isRenameModalActive: false,
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
+      isHVMetadataModalActive: false,
+      attachedFileHVStainingProtocolKey: constants.ATTACHED_FILE_HV_STAINING_PROTOCOL
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     collection() {
       return new UploadedFileCollection({
         root: this.rootId,
@@ -398,6 +462,14 @@ export default {
       }
       this.isRenameModalActive = false;
     },
+    async setMetadata(laboratory, staining, antibody, dilution, detection, instrument) {
+      [laboratory,staining,antibody,dilution,detection,instrument].forEach( metadata => {
+        if(metadata) {
+          this.image[metadata]=metadata;
+          this.image[metadata+'Value']=metadata.value;
+        }
+      });
+    }
 
   },
   async created() {
