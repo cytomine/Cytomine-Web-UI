@@ -149,18 +149,15 @@ export default {
 
         let updateImage = this.image.clone();
 
-        if(this.selectedLab) updateImage.laboratory = this.selectedLab.id;
-        if(this.selectedStaining) updateImage.staining = this.selectedStaining.id;
-        if(this.selectedAntibody) this.selectedAntibody.id;
-        if(this.selectedDilution) this.selectedDilution.id;
-        if(this.selectedDetection) this.selectedDetection.id;
-        if(this.selectedInstrument) this.selectedInstrument.id;
+        updateImage.laboratory = this.selectedLab ? this.selectedLab.id : null;
+        updateImage.staining = this.selectedStaining ? this.selectedStaining.id : null;
+        updateImage.antibody = this.selectedAntibody ? this.selectedAntibody.id : null;
+        updateImage.dilution = this.selectedDilution ? this.selectedDilution.id : null;
+        updateImage.detection = this.selectedDetection ? this.selectedDetection.id : null;
+        updateImage.instrument = this.selectedInstrument ? this.selectedInstrument.id : null;
 
-        if(this.selectedLab || this.selectedStaining || this.selectedAntibody ||
-          this.selectedDilution || this.selectedDetection || this.selectedInstrument) await updateImage.save();
+        await updateImage.save();
 
-        /*this.$emit('setMetadata',{laboratory: this.selectedLab, staining : this.selectedStaining, antibody: this.selectedAntibody,
-          dilution : this.selectedDilution, detection : this.selectedDetection, instrument : this.selectedInstrument});*/
         this.$emit('setMetadata', this.selectedLab, this.selectedStaining, this.selectedAntibody,
           this.selectedDilution, this.selectedDetection, this.selectedInstrument);
 

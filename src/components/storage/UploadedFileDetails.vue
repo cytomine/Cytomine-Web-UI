@@ -219,14 +219,12 @@
                 <button class="button" @click="isRenameModalActive = true">
                   {{$t('button-rename')}}
                 </button>
-                <!--
                 <button class="button" @click="isCalibrationModalActive = true">
                   {{$t('button-set-calibration')}}
                 </button>
                 <button class="button" @click="isMagnificationModalActive = true">
                   {{$t('button-set-magnification')}}
                 </button>
-                -->
                 <button class="button" @click="isHVMetadataModalActive = true">
                   {{$t('set-metadata')}}
                 </button>
@@ -244,7 +242,6 @@
       @rename="rename"
     />
 
-    <!--
     <magnification-modal
       :image="image"
       :active.sync="isMagnificationModalActive"
@@ -256,7 +253,7 @@
       :active.sync="isCalibrationModalActive"
       @setResolution="(resolution) => image.resolution=resolution"
     />
-    -->
+
     <h-v-metadata-modal
       :image="image"
       :active.sync="isHVMetadataModalActive"
@@ -464,10 +461,8 @@ export default {
     },
     async setMetadata(laboratory, staining, antibody, dilution, detection, instrument) {
       [laboratory,staining,antibody,dilution,detection,instrument].forEach( metadata => {
-        if(metadata) {
-          this.image[metadata]=metadata;
-          this.image[metadata+'Value']=metadata.value;
-        }
+        this.image[metadata]=metadata;
+        this.image[metadata+'Value']= metadata ? metadata.value : null;
       });
     }
 
