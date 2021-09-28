@@ -35,6 +35,10 @@
       {{$t('tags')}}
     </b-radio-button>
 
+    <b-radio-button v-model="activeTab" native-value="scores" type="is-link">
+      {{$t('scores')}}
+    </b-radio-button>
+
     <b-radio-button v-model="activeTab" native-value="configuration" type="is-link">
       {{$t('configuration')}}
     </b-radio-button>
@@ -56,6 +60,7 @@ import AdminUsers from './AdminUsers';
 import AdminSoftware from './AdminSoftware';
 import AdminConfiguration from './AdminConfiguration';
 import AdminTags from './AdminTags';
+import AdminScores from './AdminScores';
 
 const defaultTab = 'dashboard';
 
@@ -69,6 +74,7 @@ export default {
         'users',
         'trusted-sources',
         'tags',
+        'scores',
         'configuration'
       ]
     };
@@ -90,6 +96,8 @@ export default {
           return AdminSoftware;
         case 'tags':
           return AdminTags;
+        case 'scores':
+          return AdminScores;
       }
     }
   },
