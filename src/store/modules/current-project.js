@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
+import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole, ScoreCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
@@ -24,6 +24,7 @@ function getDefaultState() {
     project: null,
     configUI: {},
     ontology: null,
+    scores: [],
     managers: [],
     members: [],
     currentViewer: null
@@ -52,6 +53,10 @@ export default {
       state.configUI = config;
     },
 
+    setScores(state, scores) {
+      state.scores = scores;
+    },
+
     setManagers(state, managers) {
       state.managers = managers;
     },
@@ -75,7 +80,8 @@ export default {
       let promises = [
         dispatch('fetchUIConfig'),
         dispatch('fetchOntology'),
-        dispatch('fetchProjectMembers')
+        dispatch('fetchProjectMembers'),
+        dispatch('fetchScores')
       ];
 
       if(projectChange) {
@@ -100,6 +106,11 @@ export default {
     async fetchUIConfig({state, commit}) {
       let config = await Cytomine.instance.fetchUIConfigCurrentUser(state.project.id);
       commit('setConfigUI', config);
+    },
+
+    async fetchScores({state, commit}) {
+      let scores = await ScoreCollection.fetchAll({filterKey: 'project', filterValue: state.project.id});
+      commit('setScores', scores);
     },
 
     async fetchProjectMembers({state, commit}) {

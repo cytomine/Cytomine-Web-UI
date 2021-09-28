@@ -38,6 +38,10 @@
     <b-radio-button v-model="activeTab" native-value="imageFilters" type="is-link">
       {{$t('image-filters')}}
     </b-radio-button>
+
+    <b-radio-button v-model="activeTab" native-value="scores" type="is-link">
+      {{$t('scores')}}
+    </b-radio-button>
   </b-field>
 
   <div class="box tab-content">
@@ -56,7 +60,7 @@ import ProjectMembers from './configuration-panels/ProjectMembers';
 import CustomUIProject from './configuration-panels/CustomUIProject';
 import ProjectSoftwares from './configuration-panels/ProjectSoftwares';
 import ProjectImageFilters from './configuration-panels/ProjectImageFilters';
-
+import ProjectScores from './configuration-panels/ProjectScores';
 const defaultTab = 'general';
 
 export default {
@@ -83,6 +87,8 @@ export default {
           return ProjectSoftwares;
         case 'imageFilters':
           return ProjectImageFilters;
+        case 'scores':
+          return ProjectScores;
       }
     }
   },
