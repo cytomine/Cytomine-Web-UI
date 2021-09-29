@@ -184,6 +184,10 @@
             </router-link>
           </b-table-column>
 
+          <b-table-column :field="'score'+score.id" :label="score.name" centered sortable width="100" v-for="score in scores" :key="score.id">
+            {{retrieveScoreValue(image, score)}}
+          </b-table-column>
+
           <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
             {{ image.magnification || $t('unknown') }}
           </b-table-column>
@@ -291,13 +295,15 @@ export default {
       maxNbUserAnnotations: 100,
       maxNbJobAnnotations: 100,
       maxNbReviewedAnnotations: 100,
-      revision: 0
+      revision: 0,
+      imageScoresByImages: {}
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
+    scores: get('currentProject/scores'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -348,7 +354,6 @@ export default {
         {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations},
       ];
     },
-
     imageCollection() {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',
@@ -387,6 +392,18 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+    retrieveScoreValue(image, score) {
+      let columnName = 'score' + score.id;
+      console.log('image', image);
+      console.log('score', score);
+      if (image[columnName]!=null) {
+        console.log('image[columnName]', image[columnName]);
+        let value = score.values.find(value => value.value == image[columnName]);
+        console.log('value', value);
+        return (value!=null? value.value : '');
+      }
+      return null;
+    },
     async fetchFilters() {
       let stats = await new ImageInstanceCollection.fetchBounds({project: this.project.id});
       this.maxWidth = Math.max(100, stats.width.max);
