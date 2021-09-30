@@ -13,14 +13,14 @@
  limitations under the License.-->
 
 <template>
-  <div class="box error" v-if="false && !configUI['project-scores-tab']">
+  <div class="box error" v-if="!configUI['project-scores-tab']">
     <h2> {{ $t('access-denied') }} </h2>
     <p>{{ $t('insufficient-permission') }}</p>
   </div>
   <div v-else class="project-scores-wrapper content-wrapper">
     <div class="columns">
       <div class="column">
-        <b-field v-if="canManageProject" class="radio-buttons-fullwidth is-hovered">
+        <b-field class="radio-buttons-fullwidth is-hovered">
           <b-radio-button v-model="activeTab" native-value="images" type="is-link">
             {{$t('scores-by-images')}}
           </b-radio-button>
@@ -28,10 +28,13 @@
           <b-radio-button v-model="activeTab" native-value="members" type="is-link">
             {{$t('scores-by-members')}}
           </b-radio-button>
+
+          <b-radio-button v-model="activeTab" native-value="report" type="is-link">
+            {{$t('scores-report')}}
+          </b-radio-button>
         </b-field>
       </div>
     </div>
-
     <div class="component-wrapper">
       <keep-alive>
         <component
@@ -49,7 +52,7 @@ import {get} from '@/utils/store-helpers';
 import moment from 'moment';
 import ProjectScoresGroupByImage from './ProjectScoresGroupByImage';
 import ProjectScoresGroupByUser from './ProjectScoresGroupByUser';
-
+import ProjectScoresReport from './ProjectScoresReport';
 const defaultTab = 'images';
 
 export default {
@@ -79,6 +82,8 @@ export default {
           return ProjectScoresGroupByImage;
         case 'members':
           return ProjectScoresGroupByUser;
+        case 'report':
+          return ProjectScoresReport;
       }
     }
   },

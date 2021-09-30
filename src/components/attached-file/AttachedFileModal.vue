@@ -53,7 +53,8 @@ import CytomineModalCard from '@/components/utils/CytomineModalCard';
 export default {
   name: 'attached-file-modal',
   props: {
-    object: Object
+    object: Object,
+    atkey: String
   },
   components: {CytomineModalCard},
   $_veeValidate: {validator: 'new'},
@@ -78,7 +79,7 @@ export default {
       }
 
       try {
-        let attached = await new AttachedFile({file: this.selectedFile, filename: this.name}, this.object).save();
+        let attached = await new AttachedFile({file: this.selectedFile, filename: this.name, key: this.atkey}, this.object).save();
         this.$emit('addAttachedFile', attached);
         this.$notify({type: 'success', text: this.$t('notif-success-attached-file-creation')});
         this.$parent.close();

@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<div class="box error" v-if="false && !configUI['project-scores-tab']">
+<div class="box error" v-if="!configUI['project-scores-tab']">
   <h2> {{ $t('access-denied') }} </h2>
   <p>{{ $t('insufficient-permission') }}</p>
 </div>
@@ -99,16 +99,8 @@
       </cytomine-table>
     </div>
 
-
-
   </div>
 
-  <div class="box">
-    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-    <div class="buttons is-centered">
-      <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
-    </div>
-  </div>
 </div>
 </template>
 
@@ -121,7 +113,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from '../image/ImageName';
 import ImageDetails from '../image/ImageDetails';
 
-import {GenericCollection, Cytomine} from 'cytomine-client';
+import {GenericCollection} from 'cytomine-client';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -193,13 +185,6 @@ export default {
       }
       return collection;
     },
-    downloadCSV() {
-      let filter = '';
-      if(this.searchImageString) {
-        filter = '?name[ilike]=' + this.searchImageString;
-      }
-      return Cytomine.instance.host + `/api/project/${this.project.id}/image-score/stats-group-by-image.csv${filter}`;
-    },
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
     sortField: sync('sortField', storeOptions),
@@ -226,15 +211,7 @@ export default {
     }
   },
   async created() {
-    try {
-      await Promise.all([
-      ]);
-      this.loading = false;
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    this.loading = false;
   }
 };
 </script>

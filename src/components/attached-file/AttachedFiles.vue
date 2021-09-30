@@ -37,7 +37,8 @@ export default {
   name: 'attached-files',
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
+    atkey: String
   },
   data() {
     return {
@@ -60,7 +61,7 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: AttachedFileModal,
-        props: {object: this.object},
+        props: {object: this.object, atkey: this.atkey},
         hasModalCard: true,
         events: {'addAttachedFile': this.addAttachedFile}
       });
@@ -99,6 +100,12 @@ export default {
   async created() {
     try {
       this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+      if(this.atkey) {
+        this.attachedFiles = this.attachedFiles.filter(at => at.key == this.atkey);
+      }
+      else {
+        this.attachedFiles = this.attachedFiles.filter(at => !at.key);
+      }
     }
     catch(error) {
       console.log(error);

@@ -38,6 +38,7 @@ import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 import SoftwareInformation from './components/software/SoftwareInformation.vue';
+import ProjectScores from './components/project/ProjectScores';
 
 // Define routes
 const routes = [
@@ -124,6 +125,10 @@ const routes = [
       {
         path: 'information',
         component: ProjectInformation
+      },
+      {
+        path: 'scores',
+        component: ProjectScores
       },
       {
         path: 'configuration',

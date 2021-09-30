@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<div class="box error" v-if="false && !configUI['project-scores-tab']">
+<div class="box error" v-if="!configUI['project-scores-tab']">
   <h2> {{ $t('access-denied') }} </h2>
   <p>{{ $t('insufficient-permission') }}</p>
 </div>
@@ -59,9 +59,9 @@
             {{ retrieveFullName(user) }}
           </b-table-column>
 
-          <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-            <icon-project-member-role :is-manager="user.role === managerRole" />
-          </b-table-column>
+<!--          <b-table-column field="role" :label="$t('role')" centered sortable width="20">-->
+<!--            <icon-project-member-role :is-manager="user.role === managerRole" />-->
+<!--          </b-table-column>-->
 
           <b-table-column :field="score.name" :label="score.name" centered sortable width="100" v-for="score in scores" :key="score.id">
             {{user[score.id]}}
@@ -79,12 +79,6 @@
     </div>
   </div>
 
-  <div class="box">
-    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-    <div class="buttons is-centered">
-      <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
-    </div>
-  </div>
 </div>
 </template>
 
@@ -95,7 +89,7 @@ import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 
-import { GenericCollection, Cytomine} from 'cytomine-client';
+import { GenericCollection} from 'cytomine-client';
 import Username from '../user/Username';
 import constants from '../../utils/constants';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
@@ -148,13 +142,6 @@ export default {
         };
       }
       return collection;
-    },
-    downloadCSV() {
-      let filter = '';
-      if(this.searchUserString) {
-        filter = '?name[ilike]=' + this.searchUserString;
-      }
-      return Cytomine.instance.host + `/api/project/${this.project.id}/image-score/stats-group-by-user.csv${filter}`;
     },
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
