@@ -151,6 +151,13 @@
             </a>
             <review-panel class="panel-options" v-show="activePanel === 'review'" :index="index" />
           </li>
+
+          <li>
+            <a @click="togglePanel('scores')" :class="{active: activePanel === 'scores'}">
+              <i class="fas fa-star"></i>
+            </a>
+            <scores-panel class="panel-options" v-show="activePanel === 'scores'" :index="index" />
+          </li>
         </template>
       </ul>
     </div>
@@ -197,6 +204,7 @@ import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
 import ReviewPanel from './panels/ReviewPanel';
+import ScoresPanel from './panels/ScoresPanel';
 
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
@@ -241,6 +249,7 @@ export default {
     PropertiesPanel,
     FollowPanel,
     ReviewPanel,
+    ScoresPanel,
 
     SelectInteraction,
     DrawInteraction,

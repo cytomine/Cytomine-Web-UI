@@ -18,17 +18,68 @@
     <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
       <div class="header">
-        <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-          type="search" icon="search"
-        />
+
+        <div class="columns" style="width:100%;">
+          <div class="column is-2">
+            <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
+                     type="search" icon="search"
+            />
+          </div>
+          <div class="column is-2">
+            <button class="button" @click="toggleFilterDisplay()">
+              <span class="icon">
+                <i class="fas fa-filter"></i>
+              </span>
+                  <span>
+                {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+              </span>
+            </button>
+          </div>
+          <div class="column is-8">
+
+            <b-collapse :open="filtersOpened">
+              <div class="filters">
+                <div class="columns">
+
+                  <b-field horizontal :label="score.name" v-for="score in scores" :key="score.id">
+                    <b-select size="is-small" v-model="selectedScoreValue[score.id]" @input="event => changeValue()">
+                      <option :value="null">
+
+                      </option>
+                      <option :value="-1">
+                        No value
+                      </option>
+                      <option v-for="scoreValue in score.values" :value="scoreValue.value" :key="scoreValue.id">
+                        {{ scoreValue.value }}
+                      </option>
+                    </b-select>
+                  </b-field>
+                </div>
+              </div>
+            </b-collapse>
+
+          </div>
+        </div>
+
+
+
+
+
+
+
         <button class="delete" @click="imageSelectorEnabled = false"></button>
       </div>
+
       <div class="content-wrapper" v-if="error">
         <b-message type="is-danger" has-icon icon-size="is-small">
           <h2> {{ $t('error') }} </h2>
           <p> {{ $t('unexpected-error-info-message') }} </p>
         </b-message>
       </div>
+
+
+
+
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
           <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
@@ -76,11 +127,14 @@ export default {
       searchString: '',
       nbImagesDisplayed: 20,
       loading: true,
-      error: false
+      error: false,
+      filtersOpened: false,
+      selectedScoreValue: {}
     };
   },
   computed: {
     project: get('currentProject/project'),
+    scores: get('currentProject/scores'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -100,6 +154,16 @@ export default {
         filtered =  filtered.filter(image => regexp.test(image.instanceFilename));
       }
 
+      for (const [key, value] of Object.entries(this.selectedScoreValue)) {
+        console.log(`${key}: ${value}`);
+        console.log(filtered);
+        if (value!=null && value!==-1) {
+          filtered =  filtered.filter(image => image['score' + key]!=null && image['score' + key]==value );
+        }
+        else if(value===-1) {
+          filtered =  filtered.filter(image => image['score' + key]==null );
+        }
+      }
       return filtered;
     },
     displayedImages() {
@@ -107,6 +171,9 @@ export default {
     }
   },
   methods: {
+    changeValue() {
+
+    },
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
@@ -118,7 +185,9 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
     },
-
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    },
     more() {
       this.nbImagesDisplayed += 20;
     },
@@ -231,5 +300,16 @@ export default {
   box-sizing: border-box;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   z-index: 100;
+}
+
+.filters {
+  margin-top: 0px;
+}
+.field {
+  margin-right: 10px;
+}
+.field-label .is-normal {
+  padding-top: 0px;
+  margin-right: 0.5rem;
 }
 </style>
