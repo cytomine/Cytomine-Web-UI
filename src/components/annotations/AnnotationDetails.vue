@@ -295,7 +295,8 @@ export default {
       return this.canEdit && this.annotation.type === AnnotationType.USER;
     },
     image() {
-      return this.images.find(image => image.id === this.annotation.image) || {};
+      return this.images.find(image => image.id === this.annotation.image) ||
+        {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
