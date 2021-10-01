@@ -31,6 +31,7 @@
     </b-upload>
   </b-field>
 
+
   <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
     <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
   </b-field>
