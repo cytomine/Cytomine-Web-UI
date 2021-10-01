@@ -44,6 +44,7 @@ import StorageUpload from './components/storage/StorageUpload';
 import StorageConfiguration from './components/storage/StorageConfiguration';
 import StorageRedirection from './components/storage/StorageRedirection';
 import StorageFiles from './components/storage/StorageFiles';
+import ProjectScores from './components/project/ProjectScores';
 
 // Define routes
 const routes = [
@@ -160,6 +161,10 @@ const routes = [
       {
         path: 'information',
         component: ProjectInformation
+      },
+      {
+        path: 'scores',
+        component: ProjectScores
       },
       {
         path: 'configuration',

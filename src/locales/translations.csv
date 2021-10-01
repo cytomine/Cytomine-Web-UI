@@ -1051,3 +1051,19 @@ hv-dilution,Dilution,Dilution
 hv-detection,Detection,Détection
 hv-instrument,Instrument,Instrument
 set-metadata,Set specific metadata,Changer les méta-données spécifiques
+scores,Scores,Scores
+button-new-score,New score,Nouveau score
+management,Management,Gestion
+scores-by-images,Score by images,Scores par images
+scores-by-members,Score by members,Scores par membres
+scores-report,Score report,Rapport des scores
+create-score,Create score,Créer un score
+delete-score,Delete score,Supprimer le score,
+delete-score-confirmation-message,Do you really want to delete score {name}?,Êtes-vous sûr de vouloir supprimer le score {name}?,
+notif-success-score-delete,Score {name} was successfully deleted,Le score {name} a bien été supprimé,
+notif-error-score-delete,Failed to delete score {name},Une erreur a empêché de supprimer le score {username},
+update-score,Update score,Modification du score
+notif-success-score-creation,Score successfully created,La score a bien été créé
+notif-error-score-creation,Failed to create the score,Une erreur a empêché la création du score
+no-score,No score,Pas de score
+

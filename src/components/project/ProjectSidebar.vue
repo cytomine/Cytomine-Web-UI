@@ -49,6 +49,12 @@
           {{ $t('information') }}
         </a>
         </router-link>
+      <router-link v-if="isTabDisplayed('scores')" tag="li" :to="`/project/${project.id}/scores`">
+        <a>
+          <i class="fas fa-star"></i>
+          {{ $t('scores') }}
+        </a>
+      </router-link>
     </ul>
     <ul class="bottom-menu">
       <router-link v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`">

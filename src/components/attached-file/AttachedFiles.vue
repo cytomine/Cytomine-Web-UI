@@ -61,7 +61,7 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: AttachedFileModal,
-        props: {object: this.object},
+        props: {object: this.object, atkey: this.atkey},
         hasModalCard: true,
         events: {'addAttachedFile': this.addAttachedFile}
       });
