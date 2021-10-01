@@ -1,5 +1,6 @@
 <template>
   <div class="annotations-list-wrapper">
+  <!--
     <div v-show="opened" class="annotations-list-opened">
       <button class="delete" @click="opened = false"></button>
 
@@ -70,6 +71,7 @@
     </div>
 
     <div v-show="!opened" class="opener" @click="opened = true">{{$t("annotations-list")}} <i class="fas fa-caret-up"></i></div>
+    -->
   </div>
 </template>
 
