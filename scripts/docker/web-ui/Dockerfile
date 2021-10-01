@@ -17,18 +17,12 @@
 FROM node:13.12.0 as build-stage
 WORKDIR /app
 
-ARG CURRENT_BRANCH
-ENV CURRENT_BRANCH_ENV=$CURRENT_BRANCH
-RUN echo "$CURRENT_BRANCH"
-RUN git clone https://github.com/cytomine/Cytomine-Web-UI.git
+ADD . /app/Cytomine-Web-UI
 WORKDIR /app/Cytomine-Web-UI
-RUN git fetch
-RUN git branch
-RUN git checkout $CURRENT_BRANCH
 RUN npm install
 RUN npm run build
 
 FROM nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/Cytomine-Web-UI/dist /app
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY scripts/docker/web-ui/nginx.conf /etc/nginx/nginx.conf
