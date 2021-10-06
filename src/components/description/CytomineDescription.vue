@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {Description} from 'cytomine-client';
+import {Description, ScoringDescription} from 'cytomine-client';
 import DescriptionModal from './CytomineDescriptionModal';
 
 import constants from '@/utils/constants.js';
@@ -50,7 +50,8 @@ export default {
   props: {
     object: {type: Object},
     canEdit: {type: Boolean, default: true},
-    maxPreviewLength: {type: Number, default: 0} // if set to 0, the description preview is not limited unless stop preview keyword is present
+    maxPreviewLength: {type: Number, default: 0}, // if set to 0, the description preview is not limited unless stop preview keyword is present
+    descriptionType: {type: String, default: 'description'},
   },
   data() {
     return {
@@ -82,11 +83,21 @@ export default {
       // CSS transform (e.g. popover) that conflict with the fixed position of the modal
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
+      let description = this.description;
+      if (description == null) {
+        if(this.descriptionType==='description') {
+          description = new Description({data: '', object: this.object});
+        }
+        else if(this.descriptionType==='scoring-description') {
+          description = new ScoringDescription({data: '', object: this.object});
+        }
+      }
+
       this.$buefy.modal.open({
         parent: this,
         component: DescriptionModal,
         props: {
-          description: this.description || new Description({data: '', object: this.object}),
+          description: description,
           edit
         },
         hasModalCard: true,
@@ -98,7 +109,12 @@ export default {
   },
   async created() {
     try {
-      this.description = await Description.fetch(this.object);
+      if(this.descriptionType==='description') {
+        this.description = await Description.fetch(this.object);
+      }
+      else if(this.descriptionType==='scoring-description') {
+        this.description = await ScoringDescription.fetch(this.object);
+      }
     }
     catch(err) {
       // the error may make sense if the object has no description

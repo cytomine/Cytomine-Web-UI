@@ -26,6 +26,9 @@
     </b-select>
   </b-field>
   <div>
+    <cytomine-description :object="image" :description-type="'scoring-description'" />
+  </div>
+  <div>
     <td colspan="2" class="buttons-wrapper">
       <div class="buttons navigation has-addons">
         <button class="button is-small" @click="previousImage()" :disabled="isFirstImage">
@@ -43,9 +46,13 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {ImageScoreCollection, ImageScore} from 'cytomine-client';
+import CytomineDescription from '@/components/description/CytomineDescription';
 
 export default {
   name: 'scores-panel',
+  components: {
+    CytomineDescription
+  },
   props: {
     index: String
   },
