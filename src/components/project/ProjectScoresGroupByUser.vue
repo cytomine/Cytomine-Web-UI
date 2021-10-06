@@ -25,7 +25,7 @@
   <b-loading :is-full-page="false" :active="loading" />
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
-      {{$t('images')}}
+      {{$t('members')}}
     </p>
     <div class="panel-block">
       <div class="search-block">
