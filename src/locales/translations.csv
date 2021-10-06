@@ -650,7 +650,7 @@ updated,Updated,Mis à jour,Actualizado
 button-new-user,New user,Nouvel utilisateur,Nuevo usuario
 button-unlock,Unlock,Déverrouiller,Desbloquear
 notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur,Error al bloquear el usuario
-notif-error-user-lock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
+notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario
 count-slices,- | 1 slice | {count} slices,- | 1 plan | {count} plans,
 count-frames,- | 1 frame | {count} frames,- | 1 frame | {count} frames,
@@ -1067,3 +1067,7 @@ notif-success-score-creation,Score successfully created,La score a bien été cr
 notif-error-score-creation,Failed to create the score,Une erreur a empêché la création du score
 no-score,No score,Pas de score
 no-score-fitting-criteria,No score fitting criteria,Aucun score ne remplissant les critères de recherche
+upload-report,Upload report,Upload du rapport
+project-locking,Project locking,Verrouillage du projet
+notif-error-project-lock,Failed to lock the project,Une erreur a empêché de verrouiler le projet,Error al bloquear el proyecto
+notif-error-project-unlock,Failed to unlock the project,Une erreur a empêché de déverrouiler le projet,Error al desbloquear el proyecto

@@ -29,16 +29,29 @@
     </p>
     <div class="panel-block">
 
-      <div class="box">
+      <div class="sub-panel">
         <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
         <div class="buttons is-centered">
           <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
         </div>
       </div>
-      <div class="box">
-        <h2 class="has-text-centered"> {{ $t('upload report') }} </h2>
+      <hr/>
+      <div class="sub-panel">
+        <h2 class="has-text-centered"> {{ $t('upload-report') }} </h2>
         <div class="buttons is-centered">
           <attached-files :object="project" :atkey="'globalReport'" :canEdit="canManageProject" />
+        </div>
+      </div>
+      <hr/>
+      <div class="sub-panel">
+        <h2 class="has-text-centered"> {{ $t('project-locking') }} </h2>
+        <div class="buttons is-centered">
+          <button v-if="project.isLocked" class="button is-success" @click="unlock(project)">
+            {{$t('button-unlock')}}
+          </button>
+          <button v-else class="button is-danger" @click="lock(project)">
+            {{$t('button-lock')}}
+          </button>
         </div>
       </div>
     </div>
@@ -109,6 +122,26 @@ export default {
         this.error = true;
       }
     },
+    async lock(project) {
+      try {
+        let {data} = await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${project.id}/lock.json`);
+        this.$store.commit('currentProject/setProject', data.data.project);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-project-lock')});
+      }
+    },
+    async unlock(project) {
+      try {
+        let {data} = await Cytomine.instance.api.delete(`${Cytomine.instance.host}/api/project/${project.id}/lock.json`);
+        this.$store.commit('currentProject/setProject', data.data.project);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-project-unlock')});
+      }
+    },
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
@@ -147,6 +180,11 @@ export default {
 >>> .search-images {
   max-width: 30rem;
   margin-right: 1rem;
+}
+
+.sub-panel {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 >>> td, >>> th {
