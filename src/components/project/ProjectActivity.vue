@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<div class="box error" v-if="!configUI['project-activities-tab']">
+<div class="box error" v-if="!currentUser.adminByNow">
   <h2> {{ $t('access-denied') }} </h2>
   <p>{{ $t('insufficient-permission') }}</p>
 </div>
@@ -87,6 +87,7 @@ export default {
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
