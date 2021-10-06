@@ -229,16 +229,16 @@
           {{imageToUpload.progress}}%
         </progress>
 
-        <div class="buttons">
-          <button class="button is-success" @click="startUpload(imageToUpload)" :disabled="!uploadable">
-            {{$t('start-upload')}}
-          </button>
-          <!--<button class="button" @click="cancelAll()" :disabled="!ongoingUpload">
-            {{$t('cancel-upload')}}
-          </button>-->
-        </div>
       </div>
     </div>
+  </template>
+  <template #footer>
+    <button class="button" type="button" @click="$emit('update:active', false)">
+      {{$t('button-cancel')}}
+    </button>
+    <button class="button is-success" @click="startUpload(imageToUpload)" :disabled="!uploadable || success">
+      {{$t('start-upload')}}
+    </button>
   </template>
 </cytomine-modal>
 </template>
@@ -468,7 +468,7 @@ export default {
 
         if(this.selectedLab || this.selectedStaining || this.selectedAntibody ||
           this.selectedDilution || this.selectedDetection || this.selectedInstrument) await this.imageToUpload.abstractImage.save();
-          
+
       }
       catch(error) {
         console.log(error);
