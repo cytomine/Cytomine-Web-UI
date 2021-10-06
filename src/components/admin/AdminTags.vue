@@ -14,7 +14,7 @@
 
           <div class="column is-one-half has-text-right-desktop">
             <button class="button is-link" @click="startTagCreation()">
-              {{$t('button-new-tag')}}
+              {{$t('new-tag')}}
             </button>
           </div>
         </div>
