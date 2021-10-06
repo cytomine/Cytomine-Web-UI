@@ -284,10 +284,6 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column :field="'score'+score.id" :label="score.name" centered sortable width="100" v-for="score in scores" :key="score.id">
-            {{retrieveScoreValue(image, score)}}
-          </b-table-column>
-
           <!--<b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
             {{ image.magnification || $t('unknown') }}
           </b-table-column>-->
@@ -302,8 +298,8 @@
             <!--</router-link>-->
           </b-table-column>
 
-          <b-table-column field="scores" :label="$t('scores...')" centered sortable width="100">
-            scores
+          <b-table-column :field="'score'+score.id" :label="score.name" centered sortable width="100" v-for="score in scores" :key="score.id">
+            {{retrieveScoreValue(image, score)}}
           </b-table-column>
 
           <b-table-column field="antibody" :label="$t('hv-antibody')" centered sortable width="100">
