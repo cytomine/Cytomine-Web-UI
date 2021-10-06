@@ -36,7 +36,7 @@
         <button
           :class="['button', customUI[prop.key] && customUI[prop.key].ADMIN_PROJECT && !isParentDisabled(prop, 'ADMIN_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'ADMIN_PROJECT')"
-          :disabled="isParentDisabled(prop, 'ADMIN_PROJECT') || prop.key === 'project-configuration-tab'"
+          :disabled="isParentDisabled(prop, 'ADMIN_PROJECT') || prop.key === 'project-configuration-tab' || prop.key === 'project-activities-tab'"
         >
           {{$t('manager')}}
         </button>
@@ -45,7 +45,7 @@
         <button
           :class="['button', customUI[prop.key] && customUI[prop.key].CONTRIBUTOR_PROJECT && !isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') ? 'is-success' : 'is-danger']"
           @click="toggleProp(prop.key, 'CONTRIBUTOR_PROJECT')"
-          :disabled="isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') || prop.key === 'project-configuration-tab'"
+          :disabled="isParentDisabled(prop, 'CONTRIBUTOR_PROJECT') || prop.key === 'project-configuration-tab' || prop.key === 'project-activities-tab'"
         >
             {{$t('contributor')}}
         </button>
