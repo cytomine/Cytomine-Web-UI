@@ -640,7 +640,7 @@ updated,Updated,Mis à jour,Actualizado
 button-new-user,New user,Nouvel utilisateur,Nuevo usuario
 button-unlock,Unlock,Déverrouiller,Desbloquear
 notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur,Error al bloquear el usuario
-notif-error-user-lock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
+notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario
 members-activity,Members activity,Activité des membres,Actividad de miembros
 select-date,Select a date,Choisir une date,Seleccione una fecha
