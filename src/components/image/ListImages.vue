@@ -334,7 +334,7 @@ export default {
         {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
         {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
-        {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
+        {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
     },
