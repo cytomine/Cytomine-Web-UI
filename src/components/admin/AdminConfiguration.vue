@@ -47,6 +47,29 @@
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('hv-laboratory')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <h-v-metadata type="laboratory"/>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('hv-laboratory-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
       <h3>{{$t('hv-antibody')}}</h3>
     </div>
     <div class="column is-one-quarter">

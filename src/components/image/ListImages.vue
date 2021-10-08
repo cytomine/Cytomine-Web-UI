@@ -160,7 +160,7 @@
             <div class="column filter"></div>
           </div>-->
           <div class="columns is-multiline">
-            <div class="column filter is-one-quarter" v-if="currentUser.adminByNow" >
+            <div class="column filter is-one-quarter" v-if="canManageProject" >
               <div class="filter-label">
                 {{$t('hv-laboratory')}}
               </div>
@@ -292,7 +292,7 @@
             {{ image.stainingValue }}
           </b-table-column>
 
-          <b-table-column field="laboratory" v-if="currentUser.adminByNow" :label="$t('hv-laboratory')" centered sortable width="100">
+          <b-table-column field="laboratory" v-if="canManageProject" :label="$t('hv-laboratory')" centered sortable width="100">
             <!--<router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">-->
               {{ image.laboratoryValue }}
             <!--</router-link>-->

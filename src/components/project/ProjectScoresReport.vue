@@ -125,7 +125,7 @@ export default {
     async lock(project) {
       try {
         let {data} = await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${project.id}/lock.json`);
-        this.$store.commit('currentProject/setProject', data.data.project);
+        await this.$store.dispatch('currentProject/loadProject', data.data.project.id);
       }
       catch(error) {
         console.log(error);
@@ -135,7 +135,7 @@ export default {
     async unlock(project) {
       try {
         let {data} = await Cytomine.instance.api.delete(`${Cytomine.instance.host}/api/project/${project.id}/lock.json`);
-        this.$store.commit('currentProject/setProject', data.data.project);
+        await this.$store.dispatch('currentProject/loadProject', data.data.project.id);
       }
       catch(error) {
         console.log(error);
