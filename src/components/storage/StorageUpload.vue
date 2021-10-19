@@ -225,7 +225,7 @@ export default {
         str += `&idStorage=${this.selectedStorage.id}`;
       }
       if(this.selectedProjects) {
-        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
+        str += `${this.selectedProjects.map(project => '&idProject=' + project.id).join('')}`;
       }
       return str;
     },
