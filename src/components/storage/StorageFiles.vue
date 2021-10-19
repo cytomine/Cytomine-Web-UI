@@ -13,7 +13,11 @@
  limitations under the License.-->
 
 <template>
-  <div class="storage-wrapper content-wrapper">
+  <div class="box error" v-if="currentUser.guestByNow">
+    <h2> {{ $t('access-denied') }} </h2>
+    <p>{{ $t('insufficient-permission') }}</p>
+  </div>
+  <div class="storage-wrapper content-wrapper" v-else>
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
@@ -33,6 +37,7 @@ export default {
     ListUploadedFiles,
   },
   computed: {
+    currentUser: get('currentUser/user'),
     storage: get('currentStorage/storage'),
   }
 };

@@ -1,5 +1,9 @@
 <template>
-  <div class="storage-wrapper">
+  <div class="box error" v-if="currentUser.guestByNow">
+    <h2> {{ $t('access-denied') }} </h2>
+    <p>{{ $t('insufficient-permission') }}</p>
+  </div>
+  <div class="storage-wrapper" v-else>
     <b-loading :is-full-page="false" :active="loading" />
     <div class="content-wrapper" v-if="!loading">
       <nav class="breadcrumb" aria-label="breadcrumbs">
