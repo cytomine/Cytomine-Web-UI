@@ -13,8 +13,12 @@
  limitations under the License.-->
 
 <template>
-<div class="storage-members-wrapper" v-if="!loading">
-  <b-loading :is-full-page="false" :active="loading" />
+<div class="storage-members-wrapper">
+  <div class="box error" v-if="currentUser.guestByNow">
+    <h2> {{ $t('access-denied') }} </h2>
+    <p>{{ $t('insufficient-permission') }}</p>
+  </div>
+  <b-loading :is-full-page="false" :active="loading" v-if="loading"/>
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
     <p> {{ $t('unexpected-error-info-message') }} </p>

@@ -13,7 +13,11 @@
  limitations under the License.-->
 
 <template>
-  <div class="storage-wrapper content-wrapper">
+  <div class="box error" v-if="currentUser.guestByNow || currentStorageUserPermission==='READ'">
+    <h2> {{ $t('access-denied') }} </h2>
+    <p>{{ $t('insufficient-permission') }}</p>
+  </div>
+  <div class="storage-wrapper content-wrapper" v-else>
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><router-link :to="`/storages`">{{$t('storages')}}</router-link></li>
@@ -144,7 +148,7 @@
       </div>
     </div>
 
-  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval"></list-uploaded-files>
+    <list-uploaded-files :tableRefreshInterval="tableRefreshInterval"></list-uploaded-files>
   </div>
 </template>
 
@@ -182,13 +186,14 @@ export default {
 
       signature: '',
       signatureDate: '',
-
+      permissionError: false,
       revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     selectedStorage: get('currentStorage/storage'),
+    currentStorageUserPermission: get('currentStorage/currentUserRole'),
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -225,7 +230,7 @@ export default {
         str += `&idStorage=${this.selectedStorage.id}`;
       }
       if(this.selectedProjects) {
-        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
+        str += `${this.selectedProjects.map(project => '&idProject=' + project.id).join('')}`;
       }
       return str;
     },

@@ -246,7 +246,10 @@ export default {
         console.log(error);
         let errorValues = error.response.data.errorValues;
         let text;
-        if(errorValues && errorValues.projectNames && errorValues.imageNames) {
+        if(error.response.status===403) {
+          text = this.$t('notif-error-delete-uploaded-file-forbidden');
+        }
+        else if(errorValues && errorValues.projectNames && errorValues.imageNames) {
           text = this.$t('notif-error-delete-used-uploaded-file', {
             projects: errorValues.projectNames.join(', '),
             names: errorValues.imageNames.join(', ')
