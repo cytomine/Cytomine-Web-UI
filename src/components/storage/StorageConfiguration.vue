@@ -26,7 +26,7 @@
       <li class="is-active"><a href="#" aria-current="page">{{storage.name}}</a></li>
     </ul>
   </nav>
-  <div class="box tab-content">
+  <div class="tab-content">
     <keep-alive>
       <component :is="activeComponent" />
     </keep-alive>

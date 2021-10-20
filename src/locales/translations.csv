@@ -763,6 +763,7 @@ confirm-default-property-not-used-in-project,'{key}' is currently not used as an
 notif-success-default-property-update,Default property successfully updated,La propriété par défaut a bien été mise à jour,Propiedad predeterminada actualizada correctamente
 notif-error-default-property-update,Failed to update the default property,Une erreur a empêché la modification de la propriété par défaut,Error al actualizar la propiedad predeterminada
 notif-error-delete-uploaded-file,Failed to delete the uploaded file (unexpected error),Une erreur a empêché de supprimer le fichier,Error al eliminar el archivo cargado (error inesperado)
+notif-error-delete-uploaded-file-forbidden,Failed to delete the uploaded file:  insufficient permissions,Une erreur a empêché de supprimer le fichier (droits insufisants)
 notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},Cette image est utilisée dans des projets ({projects}) sous les noms suivants : {names},Esta imagen tiene instancias en proyectos activos ({proyectos}) con los siguientes nombres: {names}
 no-ontology,No ontology,Pas d'ontologie,Sin ontología
 button-change-ontology,Change ontology,Changer l'ontologie,Cambiar ontología
