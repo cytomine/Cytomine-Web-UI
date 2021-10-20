@@ -13,11 +13,11 @@
  limitations under the License.-->
 
 <template>
-<div class="storage-members-wrapper">
-  <div class="box error" v-if="currentUser.guestByNow">
-    <h2> {{ $t('access-denied') }} </h2>
-    <p>{{ $t('insufficient-permission') }}</p>
-  </div>
+<div class="box error" v-if="currentUser.guestByNow">
+  <h2> {{ $t('access-denied') }} </h2>
+  <p>{{ $t('insufficient-permission') }}</p>
+</div>
+<div class="storage-members-wrapper" v-else>
   <b-loading :is-full-page="false" :active="loading" v-if="loading"/>
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
@@ -25,81 +25,83 @@
   </b-message>
 
   <template v-else-if="!loading">
-    <div class="columns">
-      <div class="column is-one-half has-text-right-desktop buttons">
-        <button class="button is-link add-member" @click="addUserToStorageModal = true">
-          {{$t('add-users-to-storage')}}
-        </button>
+    <div class="box">
+      <div class="columns">
+        <div class="column is-one-half has-text-right-desktop buttons">
+          <button class="button is-link add-member" @click="addUserToStorageModal = true">
+            {{$t('add-users-to-storage')}}
+          </button>
 
-        <button class="button is-danger" @click="confirmUsersRemoval()" :disabled="selectedUsers.length === 0">
-          {{$t('remove-users-from-storage')}}
-        </button>
-      </div>
-    </div>
-
-    <cytomine-table
-      :collection="UserStatCollection"
-      :currentPage.sync="currentPage"
-      :perPage.sync="perPage"
-      :sort.sync="sortField"
-      :order.sync="sortOrder"
-      :detailed=false
-      :checkable=true
-      :isRowCheckable="(row) => row.id !== currentUser.id && row.id !== storage.user"
-      :checkedRows.sync="selectedUsers"
-      :revision="revision"
-    >
-
-      <template #default="{row: userStat}">
-        <b-table-column field="username" :label="$t('username')" sortable width="100">
-          {{userStat.username}}
-        </b-table-column>
-
-        <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-          {{userStat.firstname}} {{userStat.lastname}}
-        </b-table-column>
-
-        <b-table-column field="role" :label="$t('role')" sortable width="50" >
-          <icon-storage-user-role
-            v-if="userStat.id !== storage.user"
-            :is-read-write="userStat.role !== readOnlyRole.value"
-            :is-administrator="userStat.role === administrationRole.value"
-            editable
-            @toggleReadWrite="toggleReadWrite(userStat)"
-            @toggleAdministrator="confirmToggleAdministrator(userStat)"
-          />
-
-          <span class="tag is-rounded is-info"  v-if="userStat.id === storage.user">
-              {{$t('owner')}}
-          </span>
-        </b-table-column>
-
-        <b-table-column field="numberOfFiles" :label="$t('uploaded-files-number')" sortable width="150">
-          {{userStat.numberOfFiles}}
-        </b-table-column>
-
-        <b-table-column field="totalSize" :label="$t('total-size')" sortable width="150">
-          {{filesize(userStat.totalSize)}}
-        </b-table-column>
-
-
-      </template>
-
-      <template #empty>
-        <div class="content has-text-grey has-text-centered">
-          <p>{{$t('no-member-fitting-criteria')}}</p>
+          <button class="button is-danger" @click="confirmUsersRemoval()" :disabled="selectedUsers.length === 0">
+            {{$t('remove-users-from-storage')}}
+          </button>
         </div>
-      </template>
-    </cytomine-table>
+      </div>
 
-    <div class="legend">
-      <h2>{{$t('legend')}}</h2>
-      <p><icon-storage-user-role /> : {{$t('read-only-role')}}</p>
-      <p><icon-storage-user-role :is-read-write="true" /> : {{$t('read-write-role')}}</p>
-      <p><icon-storage-user-role :is-read-write="true" :is-administrator="true" /> : {{$t('administration')}}</p>
-    </div>
+      <cytomine-table
+        :collection="UserStatCollection"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
+        :detailed=false
+        :checkable=true
+        :isRowCheckable="(row) => row.id !== currentUser.id && row.id !== storage.user"
+        :checkedRows.sync="selectedUsers"
+        :revision="revision"
+      >
 
-   <add-user-to-storage-modal :active.sync="addUserToStorageModal" :storage="storage" @addUsersInStorage="refreshUsers()" />
+        <template #default="{row: userStat}">
+          <b-table-column field="username" :label="$t('username')" sortable width="100">
+            {{userStat.username}}
+          </b-table-column>
+
+          <b-table-column field="fullName" :label="$t('name')" sortable width="150">
+            {{userStat.firstname}} {{userStat.lastname}}
+          </b-table-column>
+
+          <b-table-column field="role" :label="$t('role')" sortable width="50" >
+            <icon-storage-user-role
+              v-if="userStat.id !== storage.user"
+              :is-read-write="userStat.role !== readOnlyRole.value"
+              :is-administrator="userStat.role === administrationRole.value"
+              editable
+              @toggleReadWrite="toggleReadWrite(userStat)"
+              @toggleAdministrator="confirmToggleAdministrator(userStat)"
+            />
+
+            <span class="tag is-rounded is-info"  v-if="userStat.id === storage.user">
+                {{$t('owner')}}
+            </span>
+          </b-table-column>
+
+          <b-table-column field="numberOfFiles" :label="$t('uploaded-files-number')" sortable width="150">
+            {{userStat.numberOfFiles}}
+          </b-table-column>
+
+          <b-table-column field="totalSize" :label="$t('total-size')" sortable width="150">
+            {{filesize(userStat.totalSize)}}
+          </b-table-column>
+
+
+        </template>
+
+        <template #empty>
+          <div class="content has-text-grey has-text-centered">
+            <p>{{$t('no-member-fitting-criteria')}}</p>
+          </div>
+        </template>
+      </cytomine-table>
+
+      <div class="legend">
+        <h2>{{$t('legend')}}</h2>
+        <p><icon-storage-user-role /> : {{$t('read-only-role')}}</p>
+        <p><icon-storage-user-role :is-read-write="true" /> : {{$t('read-write-role')}}</p>
+        <p><icon-storage-user-role :is-read-write="true" :is-administrator="true" /> : {{$t('administration')}}</p>
+      </div>
+
+     <add-user-to-storage-modal :active.sync="addUserToStorageModal" :storage="storage" @addUsersInStorage="refreshUsers()" />
+  </div>
   </template>
 </div>
 </template>
