@@ -100,6 +100,8 @@ export default {
         case 'freehand-polygon':
         case 'select': // correct mode
           return 'Polygon';
+        default:
+          return ''; // Should not happen
       }
     },
     drawCorrection() {

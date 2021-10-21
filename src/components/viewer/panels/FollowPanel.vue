@@ -153,6 +153,7 @@ export default {
       if(trackedUser) {
         return trackedUser.fullName;
       }
+      return null;
     }
   },
   watch: {
