@@ -443,6 +443,7 @@ export default {
         fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
         fileWrapper.abstractImage = new AbstractImage(response.data[0].images[0].image);
 
+        await this.rename();
         await this.associateMetadata();
         await this.addToProject();
       }).catch(error => {
@@ -456,6 +457,22 @@ export default {
       }).finally(() => fileWrapper.uploading = false);
     },
 
+    async rename(){
+      try {
+
+        if(this.name && this.imageToUpload.abstractImage.originalFilename){
+          this.imageToUpload.abstractImage.originalFilename = this.name;
+          this.imageToUpload.abstractImage = await this.imageToUpload.abstractImage.save();
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-image-rename')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-image-rename');
+      }
+    },
+
     async associateMetadata(){
       try {
 
@@ -467,7 +484,7 @@ export default {
         if(this.selectedInstrument) this.imageToUpload.abstractImage.instrument = this.selectedInstrument.id;
 
         if(this.selectedLab || this.selectedStaining || this.selectedAntibody ||
-          this.selectedDilution || this.selectedDetection || this.selectedInstrument) await this.imageToUpload.abstractImage.save();
+          this.selectedDilution || this.selectedDetection || this.selectedInstrument) this.imageToUpload.abstractImage = await this.imageToUpload.abstractImage.save();
 
       }
       catch(error) {
