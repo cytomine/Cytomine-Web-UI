@@ -50,8 +50,6 @@ limitations under the License.-->
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ImageName from '@/components/image/ImageName';
-
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import constants from '@/utils/constants';
 
@@ -59,7 +57,6 @@ export default {
   name: 'annotation-links-preview',
   components: {
     'annotation-preview': AnnotationPreview,
-    ImageName,
   },
   props: {
     index: {type: String, default: null},

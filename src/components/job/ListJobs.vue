@@ -283,6 +283,7 @@ export default {
       await job.setFavorite();
       this.revision++;
     },
+    // eslint-disable-next-line no-unused-vars
     async deleteJob(jobToDelete) {
       try {
         // await jobToDelete.delete();

@@ -31,6 +31,7 @@ export default {
     labels() {
       return jobStatusMapping;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     result() {
       switch(this.status) {
         case JobStatus.KILLED:

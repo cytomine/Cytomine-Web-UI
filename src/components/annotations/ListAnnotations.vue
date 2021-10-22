@@ -439,6 +439,7 @@ export default {
     nbPerPage: sync('perPage', storeOptions),
     selectedColor: sync('outlineColor', storeOptions),
 
+    // eslint-disable-next-line vue/return-in-computed-property
     targetAnnotationType() {
       switch(this.$route.query.type) {
         case 'user':
@@ -559,6 +560,7 @@ export default {
       return this.selectedImageGroups.map(group => group.id);
     },
 
+    // eslint-disable-next-line vue/return-in-computed-property
     fullCategoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -577,6 +579,7 @@ export default {
           return this.imageGroups;
       }
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     selectedCategoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':

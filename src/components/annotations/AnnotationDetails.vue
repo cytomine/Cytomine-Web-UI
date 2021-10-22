@@ -317,6 +317,7 @@ export default {
       if(this.isReview) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
+      return null;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);

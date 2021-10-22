@@ -61,6 +61,7 @@ export default {
         106: 'unpacked'
       };
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     result() {
       switch(this.file.status) {
         case UploadedFileStatus.UPLOADED:
@@ -91,6 +92,7 @@ export default {
     textClass() {
       return 'has-text-' + this.result;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     iconClass() {
       switch(this.result) {
         case 'info':
