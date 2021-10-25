@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="imageThumbnailUrl(image)" class="image-overview" :key="imageThumbnailUrl(image)">
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
             </router-link>
           </b-table-column>
 
@@ -241,8 +241,6 @@
 <script>
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
-import {imageThumbnailUrl} from '@/utils/thumb-utils';
-
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
@@ -252,6 +250,7 @@ import AddImageModal from './AddImageModal';
 import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -262,6 +261,7 @@ const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, fi
 export default {
   name: 'list-images',
   components: {
+    ImageThumbnail,
     ImageName,
     ImageDetails,
     CytomineTable,
@@ -451,10 +451,6 @@ export default {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     },
-
-    imageThumbnailUrl(image) {
-      return imageThumbnailUrl(image.thumb, 128, 'webp');
-    }
   },
   async created() {
     try {
@@ -479,7 +475,7 @@ export default {
   align-items: center;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

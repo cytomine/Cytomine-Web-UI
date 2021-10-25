@@ -185,7 +185,7 @@
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <img :src="image.thumb" class="image-overview" :key="image.thumb">
+                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
               </router-link>
             </b-table-column>
 
@@ -271,10 +271,12 @@ import ImageDetails from '@/components/image/ImageDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'advanced-search',
   components: {
+    ImageThumbnail,
     IconProjectMemberRole,
     ImageName,
     CytomineTable,
@@ -408,7 +410,7 @@ export default {
   margin-bottom: 0.4em;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }
