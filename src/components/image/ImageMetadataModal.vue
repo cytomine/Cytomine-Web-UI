@@ -21,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="imageMacroUrl" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="image.associatedImageURL('macro', 256, 'jpg')" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -55,7 +55,6 @@
 import {AbstractImage, PropertyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
-import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 export default {
   name: 'image-metadata-modal',
@@ -93,12 +92,6 @@ export default {
         width: reverse ? height : width,
         height: reverse ? width : height
       };
-    },
-    imageMacroUrl() {
-      if (!this.image.macroURL) {
-        return null;
-      }
-      return imageThumbnailUrl(this.image.macroURL, 256, 'webp');
     },
   },
   methods: {

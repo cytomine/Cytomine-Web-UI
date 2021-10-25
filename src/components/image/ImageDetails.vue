@@ -20,7 +20,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <img :src="imageThumbnailUrl" class="image-overview">
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`"/>
           </router-link>
         </td>
       </tr>
@@ -86,7 +86,7 @@
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <img :src="imageMacroUrl" class="image-overview" :key="imageMacroUrl">
+            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`"/>
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
@@ -292,9 +292,9 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
-import {imageThumbnailUrl} from '@/utils/thumb-utils';
 
 import {ImageInstance} from 'cytomine-client';
 
@@ -303,6 +303,7 @@ import vendorFromFormat from '@/utils/vendor';
 export default {
   name: 'image-details',
   components: {
+    ImageThumbnail,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -347,15 +348,6 @@ export default {
     vendor() {
       return vendorFromFormat(this.image.contentType);
     },
-    imageMacroUrl() {
-      if (!this.image.macroURL) {
-        return null;
-      }
-      return imageThumbnailUrl(this.image.macroURL, 256, 'webp');
-    },
-    imageThumbnailUrl() {
-      return imageThumbnailUrl(this.image.thumb, 256, 'webp');
-    }
   },
   methods: {
     isPropDisplayed(prop) {
@@ -460,7 +452,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }
