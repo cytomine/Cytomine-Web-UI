@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import {changeImageUrlFormat, SUPPORT_WEBP} from '@/utils/image-utils';
+
 export default {
   name: 'image-preview',
   props: {
@@ -53,8 +55,17 @@ export default {
     isBlindMode() {
       return (this.project) ? this.project.blindMode : this.blindMode;
     },
+    rawPreviewUrl() {
+      return this.image.thumb || this.image.imageThumb;
+    },
+    imageFormat() {
+      return (SUPPORT_WEBP) ? 'webp' : 'jpg';
+    },
+    previewUrl() {
+      return changeImageUrlFormat(this.rawPreviewUrl, this.imageFormat);
+    },
     figureStyle() {
-      return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)}")`};
+      return {backgroundImage: `url("${this.previewUrl}")`};
     }
   }
 };

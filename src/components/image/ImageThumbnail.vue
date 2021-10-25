@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import {combineImageUrl, splitImageUrl} from '@/utils/image-utils';
+
 export default {
   name: 'ImageThumbnail',
   props: {
@@ -27,21 +29,14 @@ export default {
         return [];
       }
 
-      let url = new URL(this.url);
-      let pathname = url.pathname.split('.')[0];
-      let params = url.searchParams;
-      params.set('maxSize', this.size.toString());
-
-      return {
-        host: `${url.protocol}//${url.host}`,
-        pathname: pathname,
-        params: params
-      };
+      let urlParts = splitImageUrl(this.url);
+      urlParts.params.set('maxSize', this.size.toString());
+      return urlParts;
     }
   },
   methods: {
     combineURL({host, pathname, format, params}) {
-      return `${host}${pathname}.${format}?${params.toString()}`;
+      return combineImageUrl({host, pathname, format, params});
     },
     formatSrc(format) {
       if (this.url !== null) {
