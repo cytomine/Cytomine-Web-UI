@@ -39,6 +39,9 @@ export function splitImageUrl(rawUrl) {
 }
 
 export function combineImageUrl({host, pathname, format, params}) {
+  if (!(params instanceof URLSearchParams)) {
+    params = new URLSearchParams(params);
+  }
   let formattedParams = params.toString();
   let sep = (formattedParams.length > 0) ? '?' : '';
   return `${host}${pathname}.${format}${sep}${formattedParams}`;
