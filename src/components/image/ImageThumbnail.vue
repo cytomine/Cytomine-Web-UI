@@ -46,8 +46,10 @@ export default {
 
       let urlParts = splitImageUrl(this.url);
       urlParts.params.set('maxSize', this.size.toString());
-      for (const [key, value] in Object.entries(this.extraParameters)) {
-        urlParts.params.set(key, value.toString());
+      if (this.extraParameters) {
+        for (const [key, value] in Object.entries(this.extraParameters)) {
+          urlParts.params.set(key, value.toString());
+        }
       }
       return urlParts;
     }
