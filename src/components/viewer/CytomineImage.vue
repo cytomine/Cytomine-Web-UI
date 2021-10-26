@@ -373,22 +373,50 @@ export default {
     tileSize() {
       return this.image.tileSize;
     },
+    baseLayerProcessingParams() {
+      let params = {};
+      if (this.imageWrapper.colors.filter) {
+        params.filters = this.imageWrapper.colors.filter;
+      }
+      if (this.imageWrapper.colors.contrast !== 1) {
+        params.contrast = this.imageWrapper.colors.contrast;
+      }
+      if (this.imageWrapper.colors.gamma !== 1) {
+        params.gammas = this.imageWrapper.colors.gamma;
+      }
+      if (this.imageWrapper.colors.inverse) {
+        params.colormaps = '!DEFAULT';
+      }
+      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      if (minIntensities.length > 0) {
+        // eslint-disable-next-line camelcase
+        params.min_intensities = minIntensities.join(',');
+      }
+      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
+      if (maxIntensities.length > 0) {
+        // eslint-disable-next-line camelcase
+        params.max_intensities = maxIntensities.join(',');
+      }
 
+      return params;
+    },
+    baseLayerSliceParams() {
+      // TODO: channels !
+      return {
+        // eslint-disable-next-line camelcase
+        z_slices: this.slice.zStack,
+        timepoints: this.slice.time
+      };
+    },
+    baseLayerURLQuery() {
+      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      if (query.length > 0) {
+        return `?${query}`;
+      }
+      return query;
+    },
     baseLayerURLs() {
-      let filter = (this.imageWrapper.colors.filter) ? `&filters=${this.imageWrapper.colors.filter}` : '';
-      let contrast = (this.imageWrapper.colors.contrast !== 1) ? `&contrast=${this.imageWrapper.colors.contrast}` : '';
-      let gamma = (this.imageWrapper.colors.gamma !== 1) ? `&gammas=${this.imageWrapper.colors.gamma}` : '';
-      let inverse = (this.imageWrapper.colors.inverse) ? '&colormaps=!DEFAULT' : '';
-      let params = `?${filter}${contrast}${gamma}${inverse}`;
-
-      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum).join(',');
-      if (minIntensities) params += `&min_intensities=${minIntensities}`;
-      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum).join(',');
-      if (maxIntensities) params += `&max_intensities=${maxIntensities}`;
-
-      params += `&z_slices=${this.slice.zStack}&timepoints=${this.slice.time}`;
-
-      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${params}`];
+      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
     colorManipulationOn() {
