@@ -53,6 +53,8 @@ import {get} from '@/utils/store-helpers';
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import constants from '@/utils/constants';
 
+import {Annotation} from 'cytomine-client';
+
 export default {
   name: 'annotation-links-preview',
   components: {
@@ -91,13 +93,13 @@ export default {
       }
 
       let annots = this.annotation.annotationLink.map(link => {
-        return {
+        return new Annotation({
           id: link.annotation,
           updated: link.updated,
           image: link.image,
           instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
           url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
-        };
+        });
       });
       annots.sort((a, b) => a.instanceFilename.localeCompare(b.instanceFilename));
       return annots;

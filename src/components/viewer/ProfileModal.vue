@@ -80,8 +80,17 @@ export default {
     y() {
       return Math.round(this.annotation.centroid.y);
     },
+    thumbParams() {
+      return {
+        square: true,
+        complete: true,
+        thickness: 2,
+        increaseArea: 1.25,
+        draw: true
+      };
+    },
     thumbUrl() {
-      return `${this.annotation.url}?maxSize=${this.thumbSize}&square=true&complete=true&thickness=2&increaseArea=1.25&draw=true`;
+      return this.annotation.annotationCropURL(this.thumbSize, 'jpg', this.thumbParams);
     },
     bpc() {
       return (this.image && this.image.bitPerSample) ? this.image.bitPerSample: 8;
