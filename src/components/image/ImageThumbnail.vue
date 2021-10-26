@@ -30,6 +30,7 @@ export default {
     macro: {type: Boolean, default: false}, // Ignored if URL is used
     url: {type: String, default: null}, // Cannot be null if image is null or empty
     size: {type: Number},
+    extraParameters: {type: Object, default: () => {}}
   },
   computed: {
     jpegSrc() {
@@ -45,6 +46,9 @@ export default {
 
       let urlParts = splitImageUrl(this.url);
       urlParts.params.set('maxSize', this.size.toString());
+      for (const [key, value] in Object.entries(this.extraParameters)) {
+        urlParts.params.set(key, value.toString());
+      }
       return urlParts;
     }
   },
@@ -57,9 +61,9 @@ export default {
         return this.combineURL({format, ...this.splitURL});
       }
       if (this.macro) {
-        return this.image.associatedImageURL('macro', this.size, format);
+        return this.image.associatedImageURL('macro', this.size, format, this.extraParameters);
       }
-      return this.image.thumbURL(this.size, format);
+      return this.image.thumbURL(this.size, format, this.extraParameters);
     }
   }
 };
