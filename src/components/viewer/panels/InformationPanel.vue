@@ -49,7 +49,7 @@
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
-        <td>{{$tc("count-bands", image.channels, {count: image.channels})}}</td>
+        <td>{{$tc("count-bands", image.extrinsicChannels, {count: image.extrinsicChannels})}}</td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
