@@ -4,34 +4,44 @@
     <!-- ----- CHANNELS ----- -->
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
-      <image-controls-shift-buttons
-        :index="index"
-        :forward="false"
-        :current="currentSlice.channel"
-        :size="image.channels"
-        dimension="channel"
-        @shift="shift('channel', $event)"
-      />
+      <template v-if="areChannelsMergeable">
+        <b-select v-model="currentChannel" size="is-small" class="channel-selector" expanded>
+          <option v-for="channel in channels" :key="channel.name" :value="channel.index">
+            {{channel.name}}
+          </option>
+        </b-select>
 
-      <cytomine-slider
-        v-model="currentChannel"
-        :max="image.channels - 1"
-        :integer-only="true"
-        class="image-dimension-slider"
-      >
-        <template v-if="hasChannelName" #default="{ value }">
-          {{channelValue(value) || "?"}}
-        </template>
-      </cytomine-slider>
+      </template>
+      <template v-else>
+        <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.channel"
+          :size="image.channels"
+          dimension="channel"
+          @shift="shift('channel', $event)"
+        />
 
-      <image-controls-shift-buttons
+        <cytomine-slider
+          v-model="currentChannel"
+          :max="image.channels - 1"
+          :integer-only="true"
+          class="image-dimension-slider"
+        >
+          <template v-if="hasChannelName" #default="{ value }">
+            {{channelValue(value) || "?"}}
+          </template>
+        </cytomine-slider>
+
+        <image-controls-shift-buttons
           :index="index"
           :forward="true"
           :current="currentSlice.channel"
           :size="image.channels"
           dimension="channel"
           @shift="shift('channel', $event)"
-      />
+        />
+      </template>
     </div>
 
 
@@ -112,6 +122,7 @@ import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftBut
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 import {slicePositionToRank} from '@/utils/slice-utils';
+import constants from '@/utils/constants';
 
 export default {
   name: 'image-controls',
@@ -185,6 +196,14 @@ export default {
     },
     hasChannelName() {
       return this.currentSlice.channelName !== null;
+    },
+    areChannelsMergeable() {
+      return this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS;
+    },
+    channels() {
+      return [...Array(this.image.extrinsicChannels).keys()].map(index => (
+        {index, name: this.channelValue(index)}
+      ));
     }
   },
   methods: {
@@ -346,6 +365,10 @@ export default {
 
 .image-dimension-slider {
   flex-grow: 3;
+}
+
+.channel-selector {
+  width: 100%;
 }
 
 </style>
