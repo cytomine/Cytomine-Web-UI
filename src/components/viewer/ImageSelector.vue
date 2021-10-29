@@ -116,7 +116,7 @@ export default {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
       catch(error) {
         console.log(error);

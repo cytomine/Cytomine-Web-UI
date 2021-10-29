@@ -51,7 +51,7 @@
           :no-track="noTrack"
 
           :images-ids="[image.id]"
-          :slices-ids="[slice.id]"
+          :slices-ids="sliceIds"
           :users-ids="layersIds"
           :terms-ids="termsOptionsIds"
           :tracks-ids="tracksIds"
@@ -137,8 +137,11 @@ export default {
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
 
     isDisplayedByTerm() {

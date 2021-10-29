@@ -4,71 +4,58 @@
     <!-- ----- CHANNELS ----- -->
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
-      <div class="buttons has-addons">
-        <button
-          class="button is-small item"
-          :disabled="!canShiftBackward('channel')"
-          @click="shift('channel', -Math.min(step, currentSlice.channel))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-        <button
-          class="button is-small item"
-          :disabled="!canShiftBackward('channel')"
-          @click="shift('channel', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <template v-if="areChannelsMergeable">
+        <b-select v-model="currentChannels" size="is-small" class="channel-selector" expanded>
+          <option v-for="channel in channelOptions" :key="channel.name" :value="channel.value">
+            <channel-name :channel="channel" />
+          </option>
+        </b-select>
 
-      <cytomine-slider
-        v-model="currentChannel"
-        :max="image.channels - 1"
-        :integer-only="true"
-        class="image-dimension-slider" />
+      </template>
+      <template v-else>
+        <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.channel"
+          :size="image.channels"
+          dimension="channel"
+          @shift="shift('channel', $event)"
+        />
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small item"
-          :disabled="!canShiftForward('channel')"
-          @click="shift('channel', 1)"
+        <cytomine-slider
+          v-model="currentChannel"
+          :max="image.channels - 1"
+          :integer-only="true"
+          class="image-dimension-slider"
         >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small item"
-          :disabled="!canShiftForward('channel')"
-          @click="shift('channel', Math.min(step, image.channels - currentSlice.channel - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+          <template v-if="hasChannelName" #default="{ value }">
+            {{channelValue(value) || "?"}}
+          </template>
+        </cytomine-slider>
+
+        <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.channel"
+          :size="image.channels"
+          dimension="channel"
+          @shift="shift('channel', $event)"
+        />
+      </template>
     </div>
 
 
     <!-- ----- DEPTH ----- -->
     <div class="image-dimension" v-if="hasDepth">
       <strong class="image-dimension-name">Z</strong>
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('zStack')"
-          @click="shift('zStack', -Math.min(step, currentSlice.zStack))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('zStack')"
-          @click="shift('zStack', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.zStack"
+          :size="image.depth"
+          dimension="zStack"
+          @shift="shift('zStack', $event)"
+      />
 
       <cytomine-slider
         v-model="currentZStack"
@@ -76,23 +63,14 @@
         :integer-only="true"
         class="image-dimension-slider" />
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('zStack')"
-          @click="shift('zStack', 1)"
-        >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('zStack')"
-          @click="shift('zStack', Math.min(step, image.depth - currentSlice.zStack - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.zStack"
+          :size="image.depth"
+          dimension="zStack"
+          @shift="shift('zStack', $event)"
+      />
     </div>
 
 
@@ -100,24 +78,14 @@
     <!-- ----- DURATION ----- -->
     <div class="image-dimension" v-if="hasDuration">
       <strong class="image-dimension-name">T</strong>
-
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('time')"
-          @click="shift('time', -Math.min(step, currentSlice.time))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('time')"
-          @click="shift('time', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.time"
+          :size="image.duration"
+          dimension="time"
+          @shift="shift('time', $event)"
+      />
 
 <!--      <div class="buttons has-addons">-->
 <!--        <button class="button is-small">-->
@@ -136,40 +104,30 @@
         </template>
       </cytomine-slider>
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('time')"
-          @click="shift('time', 1)"
-        >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('time')"
-          @click="shift('time', Math.min(step, image.duration - currentSlice.time - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.time"
+          :size="image.duration"
+          dimension="time"
+          @shift="shift('time', $event)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import CytomineSlider from '@/components/form/CytomineSlider';
+import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import constants from '@/utils/constants';
+import _ from 'lodash';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'image-controls',
-  components: {CytomineSlider},
-  data() {
-    return {
-      step: 2, // TODO: add into configuration
-    };
-  },
+  components: {ChannelName, ImageControlsShiftButtons, CytomineSlider},
   props: {
     index: String
   },
@@ -192,15 +150,32 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    channels() {
+      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
+    },
+    currentSlices() {
+      return this.imageWrapper.activeSlices;
+    },
     currentSlice() {
-      return this.imageWrapper.activeSlice;
+      return this.currentSlices[0];
     },
     nbSlices() {
       return this.image.depth * this.image.duration * this.image.channels;
     },
+    showMultiChannels() {
+      return this.currentChannels.length > 1;
+    },
     currentChannel: {
       get() {
         return this.currentSlice.channel;
+      },
+      async set(value) {
+        await this.seek([value], this.currentSlice.zStack, this.currentSlice.time);
+      }
+    },
+    currentChannels: {
+      get() {
+        return this.currentSlices.map(slice => slice.channel);
       },
       async set(value) {
         await this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
@@ -211,7 +186,7 @@ export default {
         return this.currentSlice.zStack;
       },
       async set(value) {
-        await this.seek(this.currentSlice.channel, value, this.currentSlice.time);
+        await this.seek(this.currentChannels, value, this.currentSlice.time);
       }
     },
     currentTime: {
@@ -219,7 +194,7 @@ export default {
         return this.currentSlice.time;
       },
       async set(value) {
-        await this.seek(this.currentSlice.channel, this.currentSlice.zStack, value);
+        await this.seek(this.currentChannels, this.currentSlice.zStack, value);
       }
     },
     hasChannels() {
@@ -233,27 +208,50 @@ export default {
     },
     isImageMultidimensional() {
       return this.hasChannels || this.hasDuration || this.hasDepth;
+    },
+    sliceInstances() {
+      return this.imageWrapper.sliceInstances;
+    },
+    hasChannelName() {
+      return this.currentSlice.channelName !== null;
+    },
+    areChannelsMergeable() {
+      return this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS;
+    },
+    allChannelsOption() {
+      return {
+        name: this.$t('all-channels'),
+        value: _.range(0, this.image.extrinsicChannels)
+      };
+    },
+    channelOptions() {
+      let options = this.channels.map(channel => ({value: [channel.index], ...channel}));
+      options.unshift(this.allChannelsOption);
+      return options;
     }
-
   },
   methods: {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    channelValue(channel) {
+      let info = this.channels[channel];
+      return (info) ? info.name : null;
     },
 
     async goToRank(rank) {
       await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
-    async seek(channel, zStack, time) {
-      await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition', {time, channel, zStack});
+    async seek(channels, zStack, time) {
+      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', {channels, zStack, time});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
     async shift(dimension, increment) {
-      let time = (dimension === 'time') ? this.currentSlice.time + increment : this.currentSlice.time;
-      let channel = (dimension === 'channel') ? this.currentSlice.channel + increment : this.currentSlice.channel;
-      let zStack = (dimension === 'zStack') ? this.currentSlice.zStack + increment : this.currentSlice.zStack;
-      await this.seek(channel, zStack, time);
+      let time = (dimension === 'time') ? this.currentTime + increment : this.currentTime;
+      let channels = (dimension === 'channel') ? [this.currentChannel + increment] : this.currentChannels;
+      let zStack = (dimension === 'zStack') ? this.currentZStack + increment : this.currentZStack;
+      await this.seek(channels, zStack, time);
     },
     canShiftForward(dimension) {
       switch (dimension) {
@@ -319,20 +317,24 @@ export default {
           this.currentZStack = this.image.depth - 1;
           return;
         case 'nav-next-c':
-          if (this.canShiftForward('channel')) {
+          if (!this.showMultiChannels && this.canShiftForward('channel')) {
             this.currentChannel++;
           }
           return;
         case 'nav-previous-c':
-          if (this.canShiftBackward('channel')) {
+          if (!this.showMultiChannels && this.canShiftBackward('channel')) {
             this.currentChannel--;
           }
           return;
         case 'nav-first-c':
-          this.currentChannel = 0;
+          if (!this.showMultiChannels) {
+            this.currentChannel = 0;
+          }
           return;
         case 'nav-last-c':
-          this.currentChannel = this.image.channels - 1;
+          if (!this.showMultiChannels) {
+            this.currentChannel = this.image.channels - 1;
+          }
           return;
         case 'nav-next-slice':
           if (this.canShiftForward('rank')) {
@@ -345,10 +347,10 @@ export default {
           }
           return;
         case 'nav-first-slice':
-          await this.seek(0, 0, 0);
+          await this.seek([0], 0, 0);
           return;
         case 'nav-last-slice':
-          await this.seek(this.image.channels - 1, this.image.depth - 1, this.image.duration - 1);
+          await this.seek([this.image.channels - 1], this.image.depth - 1, this.image.duration - 1);
           return;
       }
     }
@@ -382,28 +384,12 @@ export default {
   width: 1rem;
 }
 
-.buttons {
-  float:left;
-  margin: 1px;
-  margin-bottom: 0 !important;
-
-  .button {
-    margin-bottom: 0;
-  }
-}
-
 .image-dimension-slider {
   flex-grow: 3;
 }
 
-.step-counter {
-  position: absolute;
-  top: 0.25em;
-  right: 0.25em;
-  font-size: 0.7em;
-  font-weight: 600;
-  text-align:right;
-  line-height: 0.9em;
+.channel-selector {
+  width: 100%;
 }
 
 </style>

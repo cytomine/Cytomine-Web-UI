@@ -62,12 +62,12 @@ export async function updateTrackProperties(annot) {
  *
  * @param {Object} annot The annotation
  * @param {Object} layer The layer
- * @param {Object} [slice] The slice
+ * @param {Array} [slices] The slice identifiers
  *
  * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
  */
-export function annotBelongsToLayer(annot, layer, slice=null) {
-  if(slice && annot.slice !== slice.id) {
+export function annotBelongsToLayer(annot, layer, slices=null) {
+  if(slices && !slices.includes(annot.slice)) {
     return false;
   }
   let isReviewed = annot.type === AnnotationType.REVIEWED;

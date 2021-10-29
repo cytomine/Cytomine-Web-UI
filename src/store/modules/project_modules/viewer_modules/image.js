@@ -56,7 +56,7 @@ export default {
       profile: null,
       sliceInstances: {},
       loadedSlicePages: [],
-      activeSlice: null,
+      activeSlices: null,
       activePanel: null
     };
   },
@@ -91,7 +91,11 @@ export default {
     },
 
     setActiveSlice(state, slice) {
-      state.activeSlice = slice;
+      state.activeSlices = [slice];
+    },
+
+    setActiveSlices(state, slices) {
+      state.activeSlices = slices;
     },
 
     setProfile(state, profile) {
@@ -100,20 +104,20 @@ export default {
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image, slice}) {
+    async initialize({commit, dispatch}, {image, slices}) {
       let clone = image.clone();
       commit('setImageInstance', clone);
 
-      clone = slice.clone();
-      commit('setActiveSlice', clone);
+      clone = _.cloneDeep(slices);
+      commit('setActiveSlices', clone);
 
       let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
       commit('setProfile', profile);
 
-      await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
+      await dispatch('fetchSliceInstancesAround', {rank: clone[0].rank});
     },
-    async setImageInstance({dispatch, rootState}, {image, slice}) {
-      await dispatch('initialize', {image, slice});
+    async setImageInstance({dispatch, rootState}, {image, slices}) {
+      await dispatch('initialize', {image, slices});
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
@@ -130,6 +134,10 @@ export default {
       let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
       await dispatch('setActiveSliceByRank', rank);
     },
+    async setActiveSlicesByPosition({state, dispatch}, {channels, zStack, time}) {
+      let ranks = channels.map(channel => slicePositionToRank({channel, zStack, time}, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
     async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
       let slice = state.sliceInstances[rank];
       if (!slice) {
@@ -143,19 +151,39 @@ export default {
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
+    async setActiveSlicesByRank({state, commit, dispatch, rootState}, ranks) {
+      let slices = await Promise.all(ranks.map(async rank => {
+        let slice = state.sliceInstances[rank];
+        if (!slice) {
+          await dispatch('fetchSliceInstancesAround', {rank, setActive: false});
+          slice = state.sliceInstances[rank];
+        }
+        return slice;
+      }));
+      commit('setActiveSlices', slices);
+
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+    },
 
     async refreshData({state, commit, dispatch}) {
-      let image = await ImageInstance.fetch(state.imageInstance.id);
-      commit('setImageInstance', image);
+      await Promise.all([
+        ImageInstance.fetch(state.imageInstance.id).then(
+          image => commit('setImageInstance', image)
+        ),
+        Promise.all(state.activeSlices.map(async slice => await SliceInstance.fetch(slice.id))).then(
+          slices => commit('setActiveSlices', slices)
+        )
+      ]);
 
-      let slice = await SliceInstance.fetch(state.activeSlice.id);
-      commit('setActiveSlice', slice);
+      commit('clearSliceInstances');
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: state.image.baseImage})).array.find(cf => cf.type === 'HDF5');
       commit('setProfile', profile);
 
       commit('clearSliceInstances');
-      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+      await dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank});
     },
 
     async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {
