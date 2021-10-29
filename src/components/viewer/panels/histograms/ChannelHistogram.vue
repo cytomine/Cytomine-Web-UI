@@ -82,9 +82,6 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
-    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },

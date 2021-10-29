@@ -113,7 +113,11 @@ export default {
 
     setActiveSlice({commit}) {
       commit('clearSelectedFeatures');
-    }
+    },
+
+    setActiveSlices({commit}) {
+      commit('clearSelectedFeatures');
+    },
   },
 
   getters: {

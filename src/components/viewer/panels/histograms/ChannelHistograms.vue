@@ -1,28 +1,30 @@
 <template>
   <b-tabs type="is-boxed" class="histogram" size="is-small">
-    <b-tab-item v-for="histogram in histograms" :key="tabKey(histogram)">
-      <template #header>
-        <channel-histogram-name :histogram="histogram" />
-      </template>
-      <channel-histogram
-        :index="index"
-        :histogram="histogram"
-        :log-scale="logScale"
-        :revision="revision"
-        :gamma="gamma"
-        :inverse="inverse"
-      />
-    </b-tab-item>
+    <template v-for="histogram in filteredHistograms">
+      <b-tab-item :key="tabKey(histogram)">
+        <template #header>
+          <channel-name :channel="channels[histogram.channel]" />
+        </template>
+        <channel-histogram
+          :index="index"
+          :histogram="histogram"
+          :log-scale="logScale"
+          :revision="revision"
+          :gamma="gamma"
+          :inverse="inverse"
+        />
+      </b-tab-item>
+    </template>
   </b-tabs>
 </template>
 
 <script>
 import ChannelHistogram from '@/components/viewer/panels/histograms/ChannelHistogram';
-import ChannelHistogramName from '@/components/viewer/panels/histograms/ChannelHistogramName';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'ChannelHistograms',
-  components: {ChannelHistogramName, ChannelHistogram},
+  components: {ChannelName, ChannelHistogram},
   props: {
     index: String,
 
@@ -36,9 +38,24 @@ export default {
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
+    },
     image() {
       return this.imageWrapper.imageInstance;
     },
+    channels() {
+      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
+    },
+    sliceChannels() {
+      return this.imageWrapper.activeSlices.map(slice => slice.channel);
+    },
+    filteredHistograms() {
+      if (this.image.extrinsicChannels > 1 && this.image.channels !== this.image.extrinsicChannels) {
+        return this.histograms;
+      }
+      return this.histograms.filter(h => this.sliceChannels.includes(h.channel));
+    }
   },
   methods: {
     tabKey(histogram) {

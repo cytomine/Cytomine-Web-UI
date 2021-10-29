@@ -18,6 +18,7 @@
   <h1>{{$t('colors')}}</h1>
   <div class="color-manipulation-wrapper" :class="{'limited-wrapper': nbImages > 2}">
     <channel-histograms
+      v-if="sampleHistograms"
       :index="index"
       :histograms="sampleHistograms"
       :log-scale="isHistogramScaleLog"
@@ -119,8 +120,8 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
     },
     maxRank() {
       return this.$store.getters[this.imageModule + 'maxRank'];
@@ -192,7 +193,7 @@ export default {
 
   },
   watch: {
-    slice() {
+    slices() {
       this.fetchSampleHistograms();
     }
   },
@@ -224,7 +225,8 @@ export default {
 
     async fetchSampleHistograms() {
       try {
-        this.sampleHistograms = (await this.slice.fetchChannelHistograms({nBins: this.histogramNBins}));
+        //As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
+        this.sampleHistograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
       }
       catch(error) {
         console.log(error);

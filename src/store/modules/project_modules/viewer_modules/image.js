@@ -35,6 +35,7 @@ import annotationsList from './image_modules/annotations-list';
 import controls from './image_modules/controls';
 
 import Vue from 'vue';
+import _ from 'lodash';
 
 import {
   isCluster,
@@ -59,7 +60,7 @@ export default {
       imageGroup: null,
       sliceInstances: {},
       loadedSlicePages: [],
-      activeSlice: null,
+      activeSlices: null,
       activePanel: null,
 
       routedAnnotation: null
@@ -96,7 +97,11 @@ export default {
     },
 
     setActiveSlice(state, slice) {
-      state.activeSlice = slice;
+      state.activeSlices = [slice];
+    },
+
+    setActiveSlices(state, slices) {
+      state.activeSlices = slices;
     },
 
     setProfile(state, profile) {
@@ -120,21 +125,21 @@ export default {
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image, slice}) {
+    async initialize({commit, dispatch}, {image, slices}) {
       let clone = image.clone();
       commit('setImageInstance', clone);
 
-      clone = slice.clone();
-      commit('setActiveSlice', clone);
+      clone = _.cloneDeep(slices);
+      commit('setActiveSlices', clone);
 
       await Promise.all([
         dispatch('fetchProfile'),
         dispatch('fetchImageGroup'),
-        dispatch('fetchSliceInstancesAround', {rank: clone.rank})
+        dispatch('fetchSliceInstancesAround', {rank: clone[0].rank})
       ]);
     },
-    async setImageInstance({dispatch, rootState}, {image, slice}) {
-      await dispatch('initialize', {image, slice});
+    async setImageInstance({dispatch, rootState}, {image, slices}) {
+      await dispatch('initialize', {image, slices});
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
@@ -151,6 +156,10 @@ export default {
       let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
       await dispatch('setActiveSliceByRank', rank);
     },
+    async setActiveSlicesByPosition({state, dispatch}, {channels, zStack, time}) {
+      let ranks = channels.map(channel => slicePositionToRank({channel, zStack, time}, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
     async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
       let slice = state.sliceInstances[rank];
       if (!slice) {
@@ -164,11 +173,30 @@ export default {
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
+    async setActiveSlicesByRank({state, commit, dispatch, rootState}, ranks) {
+      let slices = await Promise.all(ranks.map(async rank => {
+        let slice = state.sliceInstances[rank];
+        if (!slice) {
+          await dispatch('fetchSliceInstancesAround', {rank, setActive: false});
+          slice = state.sliceInstances[rank];
+        }
+        return slice;
+      }));
+      commit('setActiveSlices', slices);
+
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+    },
 
     async refreshData({state, commit, dispatch}) {
       await Promise.all([
-        ImageInstance.fetch(state.imageInstance.id).then(image => commit('setImageInstance', image)),
-        SliceInstance.fetch(state.activeSlice.id).then(slice => commit('setActiveSlice', slice))
+        ImageInstance.fetch(state.imageInstance.id).then(
+          image => commit('setImageInstance', image)
+        ),
+        Promise.all(state.activeSlices.map(async slice => await SliceInstance.fetch(slice.id))).then(
+          slices => commit('setActiveSlices', slices)
+        )
       ]);
 
       commit('clearSliceInstances');
@@ -176,7 +204,7 @@ export default {
       await Promise.all([
         dispatch('fetchProfile'),
         dispatch('fetchImageGroup'),
-        dispatch('fetchSliceInstancesAround', {rank: state.activeSlice.rank})
+        dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank})
       ]);
     },
 
@@ -369,6 +397,24 @@ export default {
       }
 
       return state.imageGroupLink.group;
+    },
+
+    extrinsicChannels: state => {
+      if (state.imageInstance.channels === 1 && state.imageInstance.extrinsicChannels === 3) {
+        return [
+          {index:0, name: defaultChannelName(state.imageInstance, 0), color: defaultChannelColor(state.imageInstance, 0)},
+          {index:1, name: defaultChannelName(state.imageInstance, 1), color: defaultChannelColor(state.imageInstance, 1)},
+          {index:2, name: defaultChannelName(state.imageInstance, 2), color: defaultChannelColor(state.imageInstance, 2)}
+        ];
+      }
+
+      return _.orderBy(Object.values(_.groupBy(state.sliceInstances, 'channel')).map(slices => {
+        return {
+          index: slices[0].channel,
+          name: slices[0].channelName || defaultChannelName(state.imageInstance, slices[0].channel),
+          color: slices[0].channelColor || defaultChannelColor(state.imageInstance, slices[0].channel)
+        };
+      }), 'index');
     }
   },
 
@@ -397,3 +443,38 @@ function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
 
+function defaultChannelName(image, channel) {
+  if (channel === 0 && image.channels === 1 && image.extrinsicChannels === 1) {
+    return 'L';
+  }
+  if (image.channels === 1 && image.extrinsicChannels === 3) {
+    if (channel === 0) {
+      return 'R';
+    }
+    if (channel === 1) {
+      return 'G';
+    }
+    if (channel === 2) {
+      return 'B';
+    }
+  }
+  return null;
+}
+
+function defaultChannelColor(image, channel) {
+  if (channel === 0 && image.channels === 1 && image.extrinsicChannels === 1) {
+    return '#C0C0C0';
+  }
+  if (image.channels === 1 && image.extrinsicChannels === 3) {
+    if (channel === 0) {
+      return '#FF0000';
+    }
+    if (channel === 1) {
+      return '#00FF00';
+    }
+    if (channel === 2) {
+      return '#0000FF';
+    }
+  }
+  return null;
+}

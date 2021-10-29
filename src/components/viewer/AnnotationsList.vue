@@ -50,7 +50,7 @@
           :no-track="noTrack"
 
           :images-ids="[image.id]"
-          :slices-ids="[slice.id]"
+          :slices-ids="sliceIds"
           :users-ids="layersIds"
           :terms-ids="termsOptionsIds"
           :tracks-ids="tracksIds"
@@ -94,10 +94,6 @@ export default {
     ListAnnotationsBy,
     OntologyTree,
     TrackTree,
-    CytomineTerm,
-    CytomineMultiselect,
-    CytomineSlider,
-    AnnotationPreview
   },
   props: [
     'index',
@@ -140,8 +136,11 @@ export default {
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
 
     isDisplayedByTerm() {
@@ -262,7 +261,7 @@ export default {
       }
     },
     isSameView(annot) {
-      return this.displayType === 'TERM' && annot.slice === this.slice.id;
+      return this.displayType === 'TERM' && this.sliceIds.includes(annot.slice);
     },
     select({annot, options}) {
       this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});

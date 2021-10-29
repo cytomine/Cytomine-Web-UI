@@ -27,7 +27,7 @@
       :class="{highlighted: cell && cell.highlighted}"
     >
       <cytomine-image
-        v-if="cell && cell.image && cell.slice"
+        v-if="cell && cell.image && cell.slices"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -106,9 +106,9 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        let slice = this.viewer.images[index].activeSlice;
+        let slices = this.viewer.images[index].activeSlices;
         let highlighted = (this.viewer.images[index].view) ? this.viewer.images[index].view.highlighted : false;
-        cells[i] = {index, image, slice, highlighted};
+        cells[i] = {index, image, slices, highlighted};
       }
       return cells;
     },
@@ -199,9 +199,16 @@ export default {
           await Promise.all(this.idImages.map(async (id, idx) => {
             let image = await ImageInstance.fetch(id);
 
-            let idSlice = this.idSlices[idx];
-            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+            let idSlices = this.idSlices[idx];
+            let slices;
+            if (idSlices) {
+              idSlices = idSlices.split(':');
+              slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+            }
+            else {
+              slices = [await image.fetchReferenceSlice()];
+            }
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices});
           }));
         }
         else {
@@ -224,7 +231,7 @@ export default {
             SliceInstance.fetch(annot.slice)
           ]);
           this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
-          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
         }
         else if (index === null) {
           annot = await Annotation.fetch(annot.id);
@@ -237,7 +244,7 @@ export default {
               ImageInstance.fetch(annot.image),
               SliceInstance.fetch(annot.slice)
             ]);
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
           }
         }
       }

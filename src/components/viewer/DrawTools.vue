@@ -431,7 +431,6 @@ import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLin
 export default {
   name: 'draw-tools',
   components: {
-    PasteAnnotationWithLinkModal,
     AnnotationLinkSelector,
     TrackTree,
     OntologyTree,
@@ -479,7 +478,8 @@ export default {
       return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
     },
     maxRank() {
       return this.$store.getters[this.imageModule + 'maxRank'];

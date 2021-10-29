@@ -183,7 +183,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -200,7 +200,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {
@@ -220,7 +220,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -240,7 +240,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {
