@@ -1026,3 +1026,7 @@ notif-success-source-delete,Trusted source {username}/{dockerUsername} was succe
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
+all-channels,All channels,Tous les canaux
+channel-abbr,ch.,can.
+channel,Channel,Canal
+warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément
