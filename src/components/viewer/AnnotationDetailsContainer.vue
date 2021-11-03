@@ -40,10 +40,12 @@
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
         :images="[image]"
+        :slices="slices"
         :profiles="profiles"
         :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
+        :showChannelInfo="showChannelInfo"
         :key="selectedFeature.id"
         :showComments="showComments"
         @addTerm="$emit('addTerm', $event)"
@@ -94,6 +96,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    showChannelInfo() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
     },
     profiles() {
       return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];
