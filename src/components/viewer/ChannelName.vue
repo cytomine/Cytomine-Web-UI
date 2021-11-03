@@ -16,11 +16,14 @@ export default {
       return this.channel.channel || this.channel.index;
     },
     color() {
-      return (this.channel.color) ? this.channel.color : '#C0C0C0';
+      return this.channel.color || this.channel.channelColor || '#C0C0C0';
     },
     name() {
       if (this.channel.name) {
         return this.channel.name;
+      }
+      if (this.channel.channelName) {
+        return this.channel.channelName;
       }
       return `${this.$t('channel-abbr')} ${this.channelIndex}`;
     },
