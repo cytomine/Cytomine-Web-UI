@@ -68,6 +68,14 @@
       </b-select>
     </b-field>
 
+    <b-field :label="$t('api-key-allowed')" horizontal>
+      <b-switch v-model="internalUser['apiEnabled']" class="switch">
+        <template v-if="internalUser['apiEnabled']">{{$t('yes')}}</template>
+        <template v-else>{{$t('no')}}</template>
+      </b-switch>
+    </b-field>
+
+
     <template #footer>
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
