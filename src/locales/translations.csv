@@ -1074,3 +1074,4 @@ notif-error-project-lock,Failed to lock the project,Une erreur a empêché de ve
 notif-error-project-unlock,Failed to unlock the project,Une erreur a empêché de déverrouiler le projet,Error al desbloquear el proyecto
 notif-success-metadata-update,Metadata have been successfully updated,Les métadonnées ont été modifiées avec succès
 notif-error-metadata-update,An error occured during metadata update,Une erreur est survenue durant la modification des méta-données
+project-is-locked,Project is locked,Le projet est cloturé

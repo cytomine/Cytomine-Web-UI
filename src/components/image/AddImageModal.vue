@@ -238,7 +238,7 @@ export default {
         project: this.project.id,
       });
       if(this.searchString) {
-        collection['search'] = {
+        collection['searchText'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
