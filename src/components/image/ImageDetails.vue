@@ -370,7 +370,7 @@ export default {
   },
   methods: {
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop) && this.configUI[`project-explore-image-${prop}`];
+      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
 
     async cancelReview() {
