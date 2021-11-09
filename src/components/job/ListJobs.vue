@@ -116,6 +116,7 @@
             :job="job"
             @update="revision++"
             @delete="deleteJob(job)"
+            @relaunch="addJob"
           />
         </template>
 
