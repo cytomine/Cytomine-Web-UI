@@ -430,7 +430,7 @@ export default {
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       let collection = new AnnotationCollection({
         project: this.project.id,
-        terms: this.selectedTermsIds.length===this.terms.length ? null : this.selectedTermsIds,
+        terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: this.selectedImagesIds.length===this.images.length ? null : this.selectedImagesIds,
         users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
