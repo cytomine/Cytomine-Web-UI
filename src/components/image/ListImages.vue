@@ -237,12 +237,10 @@
     </div>
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
   </div>
-  <div class="panel-block">
-    <div class="box">
-      <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-      <div class="buttons is-centered">
-        <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
-      </div>
+  <div class="box">
+    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+    <div class="buttons is-centered">
+      <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
     </div>
   </div>
 </div>
