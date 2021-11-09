@@ -32,6 +32,10 @@
           <b-radio-button v-model="activeTab" native-value="report" type="is-link">
             {{$t('scores-report')}}
           </b-radio-button>
+
+          <b-radio-button v-model="activeTab" native-value="consensus" type="is-link">
+            {{$t('consensus-scores')}}
+          </b-radio-button>
         </b-field>
       </div>
     </div>
@@ -53,6 +57,7 @@ import moment from 'moment';
 import ProjectScoresGroupByImage from './ProjectScoresGroupByImage';
 import ProjectScoresGroupByUser from './ProjectScoresGroupByUser';
 import ProjectScoresReport from './ProjectScoresReport';
+import ProjectConsensusScoresGroupByImage from './ProjectConsensusScoresGroupByImage';
 const defaultTab = 'images';
 
 export default {
@@ -67,6 +72,7 @@ export default {
   },
   computed: {
     configUI: get('currentProject/configUI'),
+    scores: get('currentProject/scores'),
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
     },
@@ -84,6 +90,8 @@ export default {
           return ProjectScoresGroupByUser;
         case 'report':
           return ProjectScoresReport;
+        case 'consensus':
+          return ProjectConsensusScoresGroupByImage;
       }
     }
   },

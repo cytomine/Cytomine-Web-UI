@@ -14,7 +14,7 @@
 
 <template>
 <div class="scores-panel">
-  <h1>{{$t('scores')}}</h1>
+  <h1>{{$t('consensus-scores')}}</h1>
   <b-field horizontal :label="score.name" v-for="score in scores" :key="score.id">
     <b-select size="is-small" v-model="selectedScoreValue[score.id]" @input="event => changeValue(event, score)">
       <option :value="null">
@@ -25,9 +25,6 @@
       </option>
     </b-select>
   </b-field>
-  <div>
-    <cytomine-description :object="image" :description-type="'scoring-description'" />
-  </div>
   <div>
     <td colspan="2" class="buttons-wrapper">
       <div class="buttons navigation has-addons">
@@ -45,11 +42,11 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {ImageScoreCollection, ImageScore} from 'cytomine-client';
+import {ConsensusScoreCollection, ConsensusScore} from 'cytomine-client';
 import CytomineDescription from '@/components/description/CytomineDescription';
 
 export default {
-  name: 'scores-panel',
+  name: 'consensus-score-panel',
   components: {
     CytomineDescription
   },
@@ -81,19 +78,19 @@ export default {
   methods: {
     async changeValue(event, score) {
       if (event!=null) {
-        await new ImageScore({imageInstance: this.image.id, score: score.id, scoreValue: event}).save();
+        await new ConsensusScore({imageInstance: this.image.id, score: score.id, scoreValue: event}).save();
       }
       else {
-        await new ImageScore({imageInstance: this.image.id, score: score.id, id: 0}).delete(); // hack: cannot delete if id is null
+        await new ConsensusScore({imageInstance: this.image.id, score: score.id, id: 0}).delete(); // hack: cannot delete if id is null
       }
-      await this.loadImageScore();
+      await this.loadConsensusScore();
     },
-    async loadImageScore() {
-      let imageScores = await new ImageScoreCollection({imageInstance: this.image.id}).fetchAll();
-      console.log('imageScores', imageScores);
+    async loadConsensusScore() {
+      let consensusScores = await new ConsensusScoreCollection({imageInstance: this.image.id}).fetchAll();
+      console.log('consensusScores', consensusScores);
       this.selectedScoreValue = {};
-      imageScores.forEach(imageScore => {
-        this.selectedScoreValue[imageScore.score] = imageScore.scoreValue;
+      consensusScores.forEach(consensusScore => {
+        this.selectedScoreValue[consensusScore.score] = consensusScore.scoreValue;
       });
     },
     async previousImage() {
@@ -132,7 +129,7 @@ export default {
     }
   },
   async created() {
-    await this.loadImageScore();
+    await this.loadConsensusScore();
   }
 };
 </script>
@@ -146,7 +143,6 @@ export default {
   max-height: 32em;
   overflow: auto;
 }
-
 
 .buttons-wrapper {
   padding-left: 0;

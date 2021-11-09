@@ -158,6 +158,14 @@
             </a>
             <scores-panel class="panel-options" v-show="activePanel === 'scores'" :index="index" />
           </li>
+
+          <li v-if="canManageProject">
+            <a @click="togglePanel('consensus')" :class="{active: activePanel === 'consensus'}" >
+              <i class="fas fa-star consensus-icon"></i>
+            </a>
+            <consensus-score-panel class="panel-options" v-show="activePanel === 'consensus'" :index="index" />
+          </li>
+
         </template>
       </ul>
     </div>
@@ -205,6 +213,7 @@ import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
 import ReviewPanel from './panels/ReviewPanel';
 import ScoresPanel from './panels/ScoresPanel';
+import ConsensusScorePanel from './panels/ConsensusScorePanel';
 
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
@@ -250,6 +259,7 @@ export default {
     FollowPanel,
     ReviewPanel,
     ScoresPanel,
+    ConsensusScorePanel,
 
     SelectInteraction,
     DrawInteraction,
@@ -287,6 +297,9 @@ export default {
     },
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
+    },
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
     },
     nbImages() {
       return Object.keys(this.viewerWrapper.images).length;
@@ -720,6 +733,10 @@ $colorOpenedPanelLink: #6c95c8;
 
 .map {
   flex-grow: 1;
+}
+
+.consensus-icon {
+  color: #ff3860;
 }
 
 .draw-tools {
