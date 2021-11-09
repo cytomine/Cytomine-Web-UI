@@ -1032,4 +1032,6 @@ update-score,Update score,Modification du score
 notif-success-score-creation,Score successfully created,La score a bien été créé
 notif-error-score-creation,Failed to create the score,Une erreur a empêché la création du score
 no-score,No score,Pas de score
+no-score-fitting-criteria,No score fitting criteria,Aucun score ne remplissant les critères de recherche
+upload-report,Upload report,Upload du rapport
 consensus-scores,Consensus scores,Scores de consensus
