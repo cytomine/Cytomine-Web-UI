@@ -546,11 +546,12 @@ export default {
       return this.selectedTags.map(t => t.id);
     },
     collection() {
+      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       let collection = new AnnotationCollection({
         project: this.project.id,
-        terms: this.selectedTermsIds,
+        terms: this.selectedTermsIds.length===this.terms.length ? null : this.selectedTermsIds,
         images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
-        users: this.selectedUsersIds,
+        users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
