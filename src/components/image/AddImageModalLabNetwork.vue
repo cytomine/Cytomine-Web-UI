@@ -96,7 +96,7 @@
 
 
         <div class="column is-half">
-          <div class="columns">
+          <div class="columns" v-if="canManageProject">
             <div class="column is-one-quarter has-text-right">
               <strong>{{$t('hv-laboratory')}}</strong>
             </div>
@@ -297,6 +297,9 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
     descriptionWithoutKeywords() {
       return this.description.data.replace(new RegExp(constants.STOP_PREVIEW_KEYWORD, 'g'), '');
     },

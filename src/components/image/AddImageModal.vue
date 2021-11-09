@@ -37,7 +37,7 @@
       <b-collapse :open="filtersOpened">
         <div class="filters">
           <div class="columns">
-            <div class="column filter is-one-third">
+            <div class="column filter is-one-third" v-if="canManageProject">
               <div class="filter-label">
                 {{$t('hv-laboratory')}}
               </div>
@@ -222,6 +222,9 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
     multiSelectFilters() {
       return [
         {prop: 'laboratory', selected: this.selectedLab, total: this.laboratories.length},

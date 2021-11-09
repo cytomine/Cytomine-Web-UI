@@ -83,7 +83,7 @@
           </span>
         </b-table-column>
 
-        <b-table-column label="" centered width="50">
+        <b-table-column label="" centered width="50" v-if="currentUser.adminByNow">
           <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
             {{$t('button-view-activity')}}
           </router-link>
