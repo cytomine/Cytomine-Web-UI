@@ -159,9 +159,7 @@ export default {
     },
     async deleteScore(score) {
       try {
-        console.log('deleteScore1');
         await score.delete();
-        console.log('deleteScore2');
         this.scores.splice(this.scores.indexOf(score), 1);
         this.$notify({
           type: 'success',
@@ -169,11 +167,15 @@ export default {
         });
       }
       catch(error) {
-        console.log(error);
-        this.$notify({
-          type: 'error',
-          text: this.$t('notif-error-score-delete', {scoreName: score.name})
-        });
+        if (error.response && error.response.data) {
+          this.$notify({type: 'error', text: error.response.data.errors});
+        }
+        else {
+          this.$notify({
+            type: 'error',
+            text: this.$t('notif-error-score-delete', {scoreName: score.name})
+          });
+        }
       }
     },
   },
