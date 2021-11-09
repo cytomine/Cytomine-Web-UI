@@ -299,7 +299,7 @@
           </b-table-column>
 
           <b-table-column :field="'score'+score.id" :label="score.name" centered sortable width="100" v-for="score in scores" :key="score.id">
-            {{retrieveScoreValue(image, score)}}
+            {{printScoreAndConsensusValues(image, score)}}
           </b-table-column>
 
           <b-table-column field="antibody" :label="$t('hv-antibody')" centered sortable width="100">
@@ -344,9 +344,14 @@
         </template>
       </cytomine-table>
     </div>
-
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
     <add-image-modal-lab-network :active.sync="addImageModalToNetwork" @addImage="refreshData" />
+  </div>
+  <div class="box">
+    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+    <div class="buttons is-centered">
+      <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
+    </div>
   </div>
 </div>
 </template>
@@ -362,6 +367,7 @@ import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import AddImageModalLabNetwork from './AddImageModalLabNetwork';
 import vendorFromMime from '@/utils/vendor';
+import {Cytomine} from 'cytomine-client';
 
 import {ImageInstanceCollection, TagCollection, HVMetadataCollection} from 'cytomine-client';
 
@@ -442,7 +448,9 @@ export default {
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
     },
-
+    downloadCSV() {
+      return Cytomine.instance.host + `/api/project/${this.project.id}/image-score/stats-report.csv`;
+    },
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
@@ -523,14 +531,35 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+    printScoreAndConsensusValues(image, score) {
+      let scoreColumnName = this.retrieveScoreValue(image, score);
+      let consensusColumnName = this.retrieveConsensusValue(image, score);
+
+      if(scoreColumnName!=null && consensusColumnName!=null) {
+        return consensusColumnName + ' (' + scoreColumnName + ')';
+      }
+      else if(scoreColumnName!=null && consensusColumnName==null) {
+        return '- (' + scoreColumnName + ')';
+      }
+      else if(scoreColumnName==null && consensusColumnName!=null) {
+        return consensusColumnName;
+      }
+      else {
+        return null;
+      }
+    },
     retrieveScoreValue(image, score) {
       let columnName = 'score' + score.id;
-      console.log('image', image);
-      console.log('score', score);
       if (image[columnName]!=null) {
-        console.log('image[columnName]', image[columnName]);
         let value = score.values.find(value => value.value == image[columnName]);
-        console.log('value', value);
+        return (value!=null? value.value : '');
+      }
+      return null;
+    },
+    retrieveConsensusValue(image, score) {
+      let consensusColumnName = 'consensusScore' + score.id;
+      if (image[consensusColumnName]!=null) {
+        let value = score.values.find(value => value.value == image[consensusColumnName]);
         return (value!=null? value.value : '');
       }
       return null;
