@@ -608,22 +608,7 @@ export default {
       this.tags = (await TagCollection.fetchAll()).array;
     },
     downloadURL(format) {
-      // ignore filter terms, users and images filters if all values are selected for these filters
-      let downloadedCollection = new AnnotationCollection({
-        project: this.collection.project,
-        reviewed: this.collection.reviewed,
-
-        terms: (this.collection.terms && this.collection.terms.length===this.terms.length ? null : this.collection.terms),
-        users: (this.collection.users && this.collection.users.length===this.allUsers.length ? null : this.collection.users),
-        reviewUsers: this.collection.reviewUsers,
-        images: (this.collection.images && this.collection.images.length===this.images.length ? null : this.collection.images),
-
-        noTerm: this.collection.noTerm,
-        multipleTerms: this.collection.multipleTerms,
-        afterThan: this.collection.afterThan,
-        beforeThan: this.collection.beforeThan
-      });
-      return downloadedCollection.getDownloadURL(format);
+      return this.collection.getDownloadURL(format);
     },
     addTerm(term) {
       this.terms.push(term);
