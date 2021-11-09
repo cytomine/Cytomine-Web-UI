@@ -1076,4 +1076,6 @@ notif-success-metadata-update,Metadata have been successfully updated,Les métad
 notif-error-metadata-update,An error occured during metadata update,Une erreur est survenue durant la modification des méta-données
 project-is-locked,Project is locked,Le projet est cloturé
 consensus-scores,Consensus scores,Scores de consensus
+api-key-allowed,Api keys enabled,API keys activées
+
 
