@@ -21,12 +21,8 @@
   </b-message>
   <template v-else>
     <b-field>
-      <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
-        <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
-          {{ layerName(layer) }}
-        </option>
-      </b-select>
-      <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t('button-add') }}</button>
+      <cytomine-multiselect v-model="selectedLayer" :options="unselectedLayers"
+                            :multiple="false" :searchable="true" label="label" track-by="value" />
     </b-field>
     <table class="table">
       <thead>
@@ -74,6 +70,7 @@ import {get} from '@/utils/store-helpers';
 
 import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'layers-panel',
@@ -83,6 +80,9 @@ export default {
       type: Array,
       default: () => []
     }
+  },
+  components: {
+    CytomineMultiselect
   },
   data() {
     return {
@@ -148,6 +148,9 @@ export default {
     }
   },
   watch: {
+    selectedLayer() {
+      this.addLayer(this.selectedLayer);
+    },
     activePanel() {
       this.fetchIndexLayers();
     },
@@ -246,8 +249,14 @@ export default {
 
     async fetchLayers() {
       this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
+
       if(this.hasReviewLayer) {
         this.layers.push(this.reviewLayer);
+      }
+
+      for (let i = 0; i < this.layers.length; i++) {
+        this.layers[i].label = this.layerName(this.layers[i]);
+        this.layers[i].value = this.layers[i].id;
       }
 
       // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
@@ -394,4 +403,5 @@ td .button {
   font-size: 0.8em;
   width: 15em;
 }
+
 </style>
