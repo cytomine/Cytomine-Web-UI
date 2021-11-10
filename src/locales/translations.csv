@@ -1062,10 +1062,12 @@ create-score,Create score,Créer un score
 delete-score,Delete score,Supprimer le score,
 delete-score-confirmation-message,Do you really want to delete score {name}?,Êtes-vous sûr de vouloir supprimer le score {name}?,
 notif-success-score-delete,Score {name} was successfully deleted,Le score {name} a bien été supprimé,
-notif-error-score-delete,Failed to delete score {name},Une erreur a empêché de supprimer le score {username},
+notif-error-score-delete,Failed to delete score {name},Une erreur a empêché de supprimer le score {name},
 update-score,Update score,Modification du score
 notif-success-score-creation,Score successfully created,La score a bien été créé
 notif-error-score-creation,Failed to create the score,Une erreur a empêché la création du score
+delete-score-value-confirmation-message,Do you really want to delete score value {scoreValue}?,Êtes-vous sûr de vouloir supprimer la valeur {scoreValue} ?
+notif-error-score-value-delete,Failed to delete score value {scoreValue},Une erreur a empêché de supprimer la valeur {scoreValue},
 no-score,No score,Pas de score
 no-score-fitting-criteria,No score fitting criteria,Aucun score ne remplissant les critères de recherche
 upload-report,Upload report,Upload du rapport
