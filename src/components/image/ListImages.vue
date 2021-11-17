@@ -26,14 +26,9 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('images')}}
-      <span>
-        <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
-          {{$t('button-add-image')}}
-        </button>
-        <button v-if="canAddImage" class="button is-link" @click="addImageModalToNetwork = true">
-          {{$t('button-add-image-lab-network')}}
-        </button>
-      </span>
+      <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
+        {{$t('button-add-image')}}
+      </button>
     </p>
     <div class="panel-block">
       <div class="search-block">
@@ -238,7 +233,6 @@
     </div>
 
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
-    <add-image-modal-lab-network :active.sync="addImageModalToNetwork" @addImage="refreshData" />
   </div>
 </div>
 </template>
@@ -252,7 +246,6 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
-import AddImageModalLabNetwork from './AddImageModalLabNetwork';
 import vendorFromMime from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
@@ -271,8 +264,7 @@ export default {
     CytomineTable,
     CytomineMultiselect,
     CytomineSlider,
-    AddImageModal,
-    AddImageModalLabNetwork
+    AddImageModal
   },
   data() {
     return {
@@ -280,7 +272,6 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
-      addImageModalToNetwork: false,
       excludedProperties: [
         'overview',
         'instanceFilename',
@@ -485,11 +476,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.panel-heading span button{
-  margin-right: 5px;
-  margin-left: 5px;
 }
 
 .image-overview {

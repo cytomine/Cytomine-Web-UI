@@ -20,135 +20,17 @@
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
-  <hr/>
-  <h2>{{$t('protocol-values')}}</h2>
-  <div class="columns">
-    <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('staining')}}</h3>
-    </div>
-    <div class="column is-one-quarter">
-      <configuration-string-array configKey="hv-staining-list"/>
-    </div>
-    <div class="column is-one-half">
-      <article class="message is-info is-small">
-        <section class="message-body">
-          <div class="media">
-            <div class="media-left">
-              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
-            </div>
-            <div class="media-content">
-              {{$t('hv-staining-description')}}
-            </div>
-          </div>
-        </section>
-      </article>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('antibody')}}</h3>
-    </div>
-    <div class="column is-one-quarter">
-      <configuration-string-array configKey="hv-antibody-list"/>
-    </div>
-    <div class="column is-one-half">
-      <article class="message is-info is-small">
-        <section class="message-body">
-          <div class="media">
-            <div class="media-left">
-              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
-            </div>
-            <div class="media-content">
-              {{$t('hv-antibody-description')}}
-            </div>
-          </div>
-        </section>
-      </article>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('detection')}}</h3>
-    </div>
-    <div class="column is-one-quarter">
-      <configuration-string-array configKey="hv-detection-list"/>
-    </div>
-    <div class="column is-one-half">
-      <article class="message is-info is-small">
-        <section class="message-body">
-          <div class="media">
-            <div class="media-left">
-              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
-            </div>
-            <div class="media-content">
-              {{$t('hv-detection-description')}}
-            </div>
-          </div>
-        </section>
-      </article>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('dilution')}}</h3>
-    </div>
-    <div class="column is-one-quarter">
-      <configuration-string-array configKey="hv-dilution-list"/>
-    </div>
-    <div class="column is-one-half">
-      <article class="message is-info is-small">
-        <section class="message-body">
-          <div class="media">
-            <div class="media-left">
-              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
-            </div>
-            <div class="media-content">
-              {{$t('hv-dilution-description')}}
-            </div>
-          </div>
-        </section>
-      </article>
-    </div>
-  </div>
-
-  <div class="columns">
-    <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('instrument')}}</h3>
-    </div>
-    <div class="column is-one-quarter">
-      <configuration-string-array configKey="hv-instrument-list"/>
-    </div>
-    <div class="column is-one-half">
-      <article class="message is-info is-small">
-        <section class="message-body">
-          <div class="media">
-            <div class="media-left">
-              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
-            </div>
-            <div class="media-content">
-              {{$t('hv-instrument-description')}}
-            </div>
-          </div>
-        </section>
-      </article>
-    </div>
-  </div>
-
 </div>
 </template>
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import ConfigurationStringArray from '@/components/configuration/ConfigurationStringArray';
 import {Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor, ConfigurationStringArray},
+  components: {CytomineQuillEditor},
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'})
@@ -186,10 +68,6 @@ export default {
 >>> .cytomine-quill-editor {
   min-height: 25em !important;
   max-height: 25em !important;
-}
-
->>> .button.is-small {
-  margin-left: 5em;
 }
 
 .button {
