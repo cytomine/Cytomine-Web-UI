@@ -95,10 +95,11 @@ export default {
     project: get('currentProject/project'),
     imageCollection() {
       let collection = new AbstractImageCollection({
+        search: true,
         project: this.project.id,
       });
       if(this.searchString) {
-        collection['originalFilename'] = {
+        collection['search'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
