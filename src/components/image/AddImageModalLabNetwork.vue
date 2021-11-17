@@ -66,7 +66,7 @@
 
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('hv-staining-protocol')}}</strong>
+              <strong>{{$t('hv-protocol')}}</strong>
             </div>
             <div class="column is-three-quarters">
               <b-field>
@@ -348,22 +348,7 @@ export default {
   watch: {
     active(val) {
       if(val) {
-        this.selectedStorage = null;
-        this.descriptionContent = '';
-        this.selectedProtocol = null;
-        this.selectedImage = null;
-        this.imageToUpload = null;
-        this.name = null;
-        this.ongoingUpload = false;
-        this.selectedLab = null;
-        this.selectedStaining = null;
-        this.selectedAntibody = null;
-        this.selectedDilution = null;
-        this.selectedDetection = null;
-        this.selectedInstrument = null;
-        this.processing = false;
-        this.success = false;
-        this.failed = false;
+        this.idsAddedImages = [];
       }
     },
     async queryString() {
@@ -478,7 +463,7 @@ export default {
 
       //attached file -- protocol
       try {
-        await new AttachedFile({file: this.selectedProtocol, key: constants.ATTACHED_FILE_HV_STAINING_PROTOCOL, filename: this.selectedProtocol.name}, this.imageToUpload.abstractImage).save();
+        await new AttachedFile({file: this.selectedProtocol, filename: this.selectedProtocol.name}, this.imageToUpload.abstractImage).save();
       }
       catch(error) {
         console.log(error);
@@ -488,16 +473,14 @@ export default {
       }
 
       //description
-      if(this.descriptionContent){
-        try {
-          await new Description({data: this.descriptionContent, object: this.imageToUpload.abstractImage}).save();
-        }
-        catch(error) {
-          console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
-          this.failed = true;
-          this.errorMessage = this.$t('notif-error-update-description');
-        }
+      try {
+        await new Description({data: this.descriptionContent, object: this.imageToUpload.abstractImage}).save();
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-update-description');
       }
     },
     async addToProject(){
