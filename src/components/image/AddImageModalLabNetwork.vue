@@ -335,13 +335,13 @@ export default {
       console.log('this.selectedInstrument');
       console.log(this.selectedInstrument != null);
       console.log('uploadable2');*/
-      return this.selectedStorage != null && this.selectedImage != null;/*  && this.selectedProtocol != null&&
+      return this.selectedStorage != null && this.selectedImage != null && this.selectedProtocol != null &&
         this.selectedLab != null &&
         this.selectedStaining != null &&
         this.selectedAntibody != null &&
         this.selectedDilution != null &&
         this.selectedDetection != null &&
-        this.selectedInstrument != null;*/
+        this.selectedInstrument != null;
 
     }
   },
@@ -459,16 +459,14 @@ export default {
     async associateMetadata(){
       try {
 
-        if(this.selectedLab) this.imageToUpload.abstractImage.laboratory = this.selectedLab.id;
-        if(this.selectedStaining) this.imageToUpload.abstractImage.staining = this.selectedStaining.id;
-        if(this.selectedAntibody) this.imageToUpload.abstractImage.antibody = this.selectedAntibody.id;
-        if(this.selectedDilution) this.imageToUpload.abstractImage.dilution = this.selectedDilution.id;
-        if(this.selectedDetection) this.imageToUpload.abstractImage.detection = this.selectedDetection.id;
-        if(this.selectedInstrument) this.imageToUpload.abstractImage.instrument = this.selectedInstrument.id;
+        this.imageToUpload.abstractImage.laboratory = this.selectedLab.id;
+        this.imageToUpload.abstractImage.staining = this.selectedStaining.id;
+        this.imageToUpload.abstractImage.antibody = this.selectedAntibody.id;
+        this.imageToUpload.abstractImage.dilution = this.selectedDilution.id;
+        this.imageToUpload.abstractImage.detection = this.selectedDetection.id;
+        this.imageToUpload.abstractImage.instrument = this.selectedInstrument.id;
 
-        if(this.selectedLab || this.selectedStaining || this.selectedAntibody ||
-          this.selectedDilution || this.selectedDetection || this.selectedInstrument) await this.imageToUpload.abstractImage.save();
-          
+        await this.imageToUpload.abstractImage.save();
       }
       catch(error) {
         console.log(error);
@@ -479,16 +477,14 @@ export default {
 
 
       //attached file -- protocol
-      if(this.selectedProtocol) {
-        try {
-          await new AttachedFile({file: this.selectedProtocol, key: constants.ATTACHED_FILE_HV_STAINING_PROTOCOL, filename: this.selectedProtocol.name}, this.imageToUpload.abstractImage).save();
-        }
-        catch(error) {
-          console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
-          this.failed = true;
-          this.errorMessage = this.$t('notif-error-attached-file-creation');
-        }
+      try {
+        await new AttachedFile({file: this.selectedProtocol, key: constants.ATTACHED_FILE_HV_STAINING_PROTOCOL, filename: this.selectedProtocol.name}, this.imageToUpload.abstractImage).save();
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
+        this.failed = true;
+        this.errorMessage = this.$t('notif-error-attached-file-creation');
       }
 
       //description
