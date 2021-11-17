@@ -24,10 +24,10 @@
   <h2>{{$t('protocol-values')}}</h2>
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('hv-staining')}}</h3>
+      <h3>{{$t('staining')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <h-v-metadata type="staining"/>
+      <configuration-string-array configKey="hv-staining-list"/>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -47,10 +47,10 @@
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('hv-antibody')}}</h3>
+      <h3>{{$t('antibody')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <h-v-metadata type="antibody"/>
+      <configuration-string-array configKey="hv-antibody-list"/>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -70,10 +70,10 @@
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('hv-detection')}}</h3>
+      <h3>{{$t('detection')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <h-v-metadata type="detection"/>
+      <configuration-string-array configKey="hv-detection-list"/>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -93,10 +93,10 @@
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('hv-dilution')}}</h3>
+      <h3>{{$t('dilution')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <h-v-metadata type="dilution"/>
+      <configuration-string-array configKey="hv-dilution-list"/>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -116,10 +116,10 @@
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
-      <h3>{{$t('hv-instrument')}}</h3>
+      <h3>{{$t('instrument')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <h-v-metadata type="instrument"/>
+      <configuration-string-array configKey="hv-instrument-list"/>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -143,13 +143,12 @@
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
 import ConfigurationStringArray from '@/components/configuration/ConfigurationStringArray';
-import HVMetadata from '@/components/property/HVMetadata';
 import {Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor, ConfigurationStringArray, HVMetadata},
+  components: {CytomineQuillEditor, ConfigurationStringArray},
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'})

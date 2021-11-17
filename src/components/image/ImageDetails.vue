@@ -239,9 +239,6 @@
               <button class="button" @click="isMagnificationModalActive = true">
                 {{$t('button-set-magnification')}}
               </button>
-              <button class="button" @click="isHVMetadataModalActive = true">
-                {{$t('set-metadata')}}
-              </button>
             </template>
             <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
               {{$t('button-download')}}
@@ -280,13 +277,6 @@
     :active.sync="isMetadataModalActive"
     :image="image"
   />
-
-  <h-v-metadata-modal
-    :image="image"
-    :active.sync="isHVMetadataModalActive"
-    @setMetadata="(event) => $emit('setMetadata', event)"
-  />
-
 </div>
 </template>
 
@@ -299,7 +289,6 @@ import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
 import CalibrationModal from './CalibrationModal';
-import HVMetadataModal from './HVMetadataModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
@@ -319,7 +308,6 @@ export default {
     AttachedFiles,
     MagnificationModal,
     CalibrationModal,
-    HVMetadataModal,
     ImageMetadataModal,
     ImageStatus,
     RenameModal
@@ -334,7 +322,6 @@ export default {
       isRenameModalActive: false,
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
-      isHVMetadataModalActive: false,
       isMetadataModalActive: false,
     };
   },

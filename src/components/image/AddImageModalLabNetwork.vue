@@ -98,14 +98,13 @@
         <div class="column is-half">
           <div class="columns">
             <div class="column is-one-quarter has-text-right">
-              <strong>{{$t('hv-laboratory')}}</strong>
+              <strong>{{$t('hv-lab-id')}}</strong>
             </div>
             <div class="column is-half">
               <cytomine-multiselect
                 v-model="selectedLab"
                 :options="laboratories"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
             </div>
           </div>
@@ -118,7 +117,6 @@
                 v-model="selectedStaining"
                 :options="stainings"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
             </div>
           </div>
@@ -131,7 +129,6 @@
                 v-model="selectedAntibody"
                 :options="antibodies"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
 
             </div>
@@ -145,7 +142,6 @@
                 v-model="selectedDilution"
                 :options="dilutions"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
 
             </div>
@@ -159,7 +155,6 @@
                 v-model="selectedDetection"
                 :options="detections"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
 
             </div>
@@ -173,7 +168,6 @@
                 v-model="selectedInstrument"
                 :options="instruments"
                 :close-on-select="true"
-                label="value" track-by="id"
               />
 
             </div>
@@ -246,7 +240,7 @@
 <script>
 import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
-import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, HVMetadataCollection, /*Property, */StorageAccessCollection, UploadedFile/*, UploadedFileStatus*/} from 'cytomine-client';
+import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, Property, StorageAccessCollection, UploadedFile/*, UploadedFileStatus*/} from 'cytomine-client';
 import axios from 'axios';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
@@ -276,17 +270,17 @@ export default {
       name: null,
       ongoingUpload:false,
       laboratories: [],
-      selectedLab: null,
+      selectedLab: [],
       stainings: [],
-      selectedStaining: null,
+      selectedStaining: [],
       antibodies: [],
-      selectedAntibody: null,
+      selectedAntibody: [],
       dilutions: [],
-      selectedDilution: null,
+      selectedDilution: [],
       detections: [],
-      selectedDetection: null,
+      selectedDetection: [],
       instruments: [],
-      selectedInstrument: null,
+      selectedInstrument: [],
       signature: '',
       signatureDate: '',
       processing: false,
@@ -315,33 +309,33 @@ export default {
       return str;
     },
     uploadable(){
-      console.log('uploadable');
-      /*console.log('this.selectedStorage');
+      /*console.log('uploadable');
+      console.log('this.selectedStorage');
       console.log(this.selectedStorage != null);
       console.log('this.selectedImage');
       console.log(this.selectedImage != null);
       console.log('this.selectedProtocol');
       console.log(this.selectedProtocol != null);
       console.log('this.selectedLab');
-      console.log(this.selectedLab != null);
+      console.log(this.selectedLab && this.selectedLab.length > 0);
       console.log('this.selectedStaining');
-      console.log(this.selectedStaining != null);
+      console.log(this.selectedStaining && this.selectedStaining.length > 0);
       console.log('this.selectedAntibody');
-      console.log(this.selectedAntibody != null);
+      console.log(this.selectedAntibody && this.selectedAntibody.length > 0);
       console.log('this.selectedDilution');
-      console.log(this.selectedDilution != null);
+      console.log(this.selectedDilution && this.selectedDilution.length > 0);
       console.log('this.selectedDetection');
-      console.log(this.selectedDetection != null);
+      console.log(this.selectedDetection && this.selectedDetection.length > 0);
       console.log('this.selectedInstrument');
-      console.log(this.selectedInstrument != null);
+      console.log(this.selectedInstrument && this.selectedInstrument.length > 0);
       console.log('uploadable2');*/
       return this.selectedStorage != null && this.selectedImage != null && this.selectedProtocol != null &&
-        this.selectedLab != null &&
-        this.selectedStaining != null &&
-        this.selectedAntibody != null &&
-        this.selectedDilution != null &&
-        this.selectedDetection != null &&
-        this.selectedInstrument != null;
+        this.selectedLab && this.selectedLab.length > 0 &&
+        this.selectedStaining && this.selectedStaining.length > 0 &&
+        this.selectedAntibody && this.selectedAntibody.length > 0 &&
+        this.selectedDilution && this.selectedDilution.length > 0 &&
+        this.selectedDetection && this.selectedDetection.length > 0 &&
+        this.selectedInstrument && this.selectedInstrument.length > 0;
 
     }
   },
@@ -387,18 +381,6 @@ export default {
         }
       }
     },
-    async loadMetadata(type) {
-      let metadatas;
-      if(type == 'staining') metadatas = (await HVMetadataCollection.fetchStaining());
-      else if(type == 'laboratory') metadatas = (await HVMetadataCollection.fetchLaboratory());
-      else if(type == 'antibody') metadatas = (await HVMetadataCollection.fetchAntibody());
-      else if(type == 'detection') metadatas = (await HVMetadataCollection.fetchDetection());
-      else if(type == 'dilution') metadatas = (await HVMetadataCollection.fetchDilution());
-      else if(type == 'instrument') metadatas = (await HVMetadataCollection.fetchInstrument());
-      else metadatas = [];
-      return metadatas;
-    },
-
     async startUpload(fileWrapper) {
       if(fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
         return;
@@ -444,14 +426,22 @@ export default {
     async associateMetadata(){
       try {
 
-        this.imageToUpload.abstractImage.laboratory = this.selectedLab.id;
-        this.imageToUpload.abstractImage.staining = this.selectedStaining.id;
-        this.imageToUpload.abstractImage.antibody = this.selectedAntibody.id;
-        this.imageToUpload.abstractImage.dilution = this.selectedDilution.id;
-        this.imageToUpload.abstractImage.detection = this.selectedDetection.id;
-        this.imageToUpload.abstractImage.instrument = this.selectedInstrument.id;
+        await Promise.all([
+          //lab_id
+          new Property({key: 'hv-laboratory', value: this.selectedLab}, this.imageToUpload.abstractImage).save(),
+          //staining
+          new Property({key: 'hv-staining', value: this.selectedStaining}, this.imageToUpload.abstractImage).save(),
+          //antibody
+          new Property({key: 'hv-antibody', value: this.selectedAntibody}, this.imageToUpload.abstractImage).save(),
+          //detection
+          new Property({key: 'hv-detection', value: this.selectedDilution}, this.imageToUpload.abstractImage).save(),
+          //dilution
+          new Property({key: 'hv-dilution', value: this.selectedDetection}, this.imageToUpload.abstractImage).save(),
+          //instrument
+          new Property({key: 'hv-instrument', value: this.selectedInstrument}, this.imageToUpload.abstractImage).save()
+        ]);
 
-        await this.imageToUpload.abstractImage.save();
+        //await prop.save();
       }
       catch(error) {
         console.log(error);
@@ -534,13 +524,13 @@ export default {
   },
   async created() {
     this.loading = false;
-    this.laboratories = await this.loadMetadata('laboratory');
+    this.laboratories = await this.loadConfigByPrefix('hv-laboratory-list');
     this.fetchStorages();
-    this.stainings = await this.loadMetadata('staining');
-    this.antibodies = await this.loadMetadata('antibody');
-    this.dilutions = await this.loadMetadata('dilution');
-    this.detections = await this.loadMetadata('detection');
-    this.instruments = await this.loadMetadata('instrument');
+    this.stainings = await this.loadConfigByPrefix('hv-staining-list');
+    this.antibodies = await this.loadConfigByPrefix('hv-antibody-list');
+    this.dilutions = await this.loadConfigByPrefix('hv-detection-list');
+    this.detections = await this.loadConfigByPrefix('hv-dilution-list');
+    this.instruments = await this.loadConfigByPrefix('hv-instrument-list');
     this.generateSignature();
   }
 };
