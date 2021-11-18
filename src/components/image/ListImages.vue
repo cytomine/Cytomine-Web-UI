@@ -241,7 +241,7 @@
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
       <div class="buttons is-centered">
-        <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
+        <attached-files :object="project" :atkey="'globalReport'" :canEdit="false" />
       </div>
     </div>
   </div>
@@ -258,10 +258,8 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import vendorFromMime from '@/utils/vendor';
-import {Cytomine} from 'cytomine-client';
-
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
-
+import AttachedFiles from '../attached-file/AttachedFiles';
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
@@ -276,7 +274,8 @@ export default {
     CytomineTable,
     CytomineMultiselect,
     CytomineSlider,
-    AddImageModal
+    AddImageModal,
+    AttachedFiles
   },
   data() {
     return {
@@ -324,9 +323,6 @@ export default {
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
-    },
-    downloadCSV() {
-      return Cytomine.instance.host + `/api/project/${this.project.id}/image-score/stats-report.csv`;
     },
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
