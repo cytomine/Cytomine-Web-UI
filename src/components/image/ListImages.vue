@@ -347,10 +347,12 @@
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
     <add-image-modal-lab-network :active.sync="addImageModalToNetwork" @addImage="refreshData" />
   </div>
-  <div class="box">
-    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-    <div class="buttons is-centered">
-      <a class="button is-link" :href="downloadCSV">{{$t('download-CSV')}}</a>
+  <div class="panel-block">
+    <div class="box">
+      <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+      <div class="buttons is-centered">
+        <attached-files :object="project" :atkey="'globalReport'" :canEdit="false" />
+      </div>
     </div>
   </div>
 </div>
@@ -368,8 +370,8 @@ import AddImageModal from './AddImageModal';
 import AddImageModalLabNetwork from './AddImageModalLabNetwork';
 import vendorFromMime from '@/utils/vendor';
 import {Cytomine} from 'cytomine-client';
-
 import {ImageInstanceCollection, TagCollection, HVMetadataCollection} from 'cytomine-client';
+import AttachedFiles from '../attached-file/AttachedFiles';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -387,6 +389,7 @@ export default {
     CytomineSlider,
     AddImageModal,
     AddImageModalLabNetwork
+    AttachedFiles
   },
   data() {
     return {
@@ -447,9 +450,6 @@ export default {
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
-    },
-    downloadCSV() {
-      return Cytomine.instance.host + `/api/project/${this.project.id}/image-score/stats-report.csv`;
     },
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
