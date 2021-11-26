@@ -347,12 +347,10 @@
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
     <add-image-modal-lab-network :active.sync="addImageModalToNetwork" @addImage="refreshData" />
   </div>
-  <div class="panel-block">
-    <div class="box">
-      <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-      <div class="buttons is-centered">
-        <attached-files :object="project" :atkey="'globalReport'" :canEdit="false" />
-      </div>
+  <div class="box">
+    <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+    <div class="buttons is-centered">
+      <attached-files :object="project" :atkey="'globalReport'" :canEdit="false" />
     </div>
   </div>
 </div>
@@ -369,7 +367,6 @@ import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import AddImageModalLabNetwork from './AddImageModalLabNetwork';
 import vendorFromMime from '@/utils/vendor';
-import {Cytomine} from 'cytomine-client';
 import {ImageInstanceCollection, TagCollection, HVMetadataCollection} from 'cytomine-client';
 import AttachedFiles from '../attached-file/AttachedFiles';
 
@@ -388,7 +385,7 @@ export default {
     CytomineMultiselect,
     CytomineSlider,
     AddImageModal,
-    AddImageModalLabNetwork
+    AddImageModalLabNetwork,
     AttachedFiles
   },
   data() {
