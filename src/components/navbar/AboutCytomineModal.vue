@@ -152,7 +152,7 @@ export default {
           'name': component,
           'enabled': constants[`${component}_ENABLED`] == null || constants[`${component}_ENABLED`],
           'version': constants[`${component}_VERSION`],
-          'namespace': constants[`${component}_NAMESPACE`]
+          'namespace': constants[`${component}_NAMESPACE`] || '-'
         };
       });
     }
