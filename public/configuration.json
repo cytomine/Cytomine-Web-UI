@@ -12,26 +12,21 @@
 
   "CORE_NAMESPACE": "cytomine",
   "CORE_VERSION": "?",
-  "IMS_NAMESPACE": "cytomine",
-  "IMS_VERSION": "?",
+  "PIMS_NAMESPACE": "cytomine",
+  "PIMS_VERSION": "?",
   "WEB_UI_NAMESPACE": "cytomine",
   "WEB_UI_VERSION": "?",
   "NGINX_NAMESPACE": "cytomine",
   "NGINX_VERSION": "?",
-  "MEMCACHED_NAMESPACE": "cytomine",
-  "MEMCACHED_VERSION": "?",
   "POSTGRES_NAMESPACE": "cytomine",
   "POSTGRES_VERSION": "?",
   "MONGODB_NAMESPACE": "cytomine",
   "MONGODB_VERSION": "?",
   "BACKUP_NAMESPACE": "cytomine",
   "BACKUP_VERSION": "?",
-  "IIPCYTO_NAMESPACE": "cytomine",
-  "IIPCYTO_VERSION": "?",
 
-  "IIPJP2_ENABLED": true,
-  "IIPJP2_NAMESPACE": "cytomine",
-  "IIPJP2_VERSION": "?",
+  "PIMS_CACHE_ENABLED": true,
+  "PIMS_CACHE_VERSION": "?",
 
   "BIOFORMAT_ENABLED": true,
   "BIOFORMAT_NAMESPACE": "cytomine",
@@ -40,16 +35,7 @@
   "SOFTWARE_ENABLED": true,
   "SOFTWARE_ROUTER_NAMESPACE": "cytomine",
   "SOFTWARE_ROUTER_VERSION": "?",
-  "RABBITMQ_NAMESPACE": "cytomine",
   "RABBITMQ_VERSION": "?",
   "SLURM_NAMESPACE": "cytomine",
   "SLURM_VERSION": "?",
-
-  "RETRIEVAL_ENABLED": false,
-  "RETRIEVAL_NAMESPACE": "cytomine",
-  "RETRIEVAL_VERSION": "?",
-
-  "IRIS_ENABLED": false,
-  "IRIS_NAMESPACE": "cytomine",
-  "IRIS_VERSION": "?"
 }
