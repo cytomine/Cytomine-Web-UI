@@ -129,7 +129,7 @@ export default {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
-      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname.toLowerCase() < b.lastname.toLowerCase()) ? -1 : 1 );
     },
     nbReviewedAnnotations() {
       return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
