@@ -83,8 +83,10 @@ export default {
       state.loadedSlicePages = [];
     },
 
-    setSliceInstance(state, slice) {
-      Vue.set(state.sliceInstances, slice.rank, slice);
+    setSliceInstances(state, slices) {
+      state.sliceInstances = Object.assign(
+        {}, state.sliceInstances, slices.reduce((acc, v) => ({ ...acc, [v.rank]: v}), {})
+      );
     },
 
     setLoadedSlicePage(state, page) {
@@ -194,26 +196,27 @@ export default {
       let page = findRankPage(rank);
       if (!state.loadedSlicePages.includes(page)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(page).then(data => {
-          data.array.forEach(slice => {
-            commit('setSliceInstance', slice);
-            if (setActive && slice.rank === rank) {
-              commit('setActiveSlice', slice);
+          commit('setSliceInstances', data.array);
+          if (setActive) {
+            let active = data.array.find(slice => slice.rank === rank);
+            if (active) {
+              commit('setActiveSlice', active);
             }
-          });
+          }
         }).then(() => commit('setLoadedSlicePage', page)));
       }
 
       let previous = page - 1;
       if (previous >= 0 && !state.loadedSlicePages.includes(previous)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(previous).then(data => {
-          data.array.forEach(slice => commit('setSliceInstance', slice));
+          commit('setSliceInstances', data.array);
         }).then(() => commit('setLoadedSlicePage', previous)));
       }
 
       let next = page + 1;
       if (next < findSliceInstanceNbPage(state.imageInstance) && !state.loadedSlicePages.includes(previous)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(next).then(data => {
-          data.array.forEach(slice => commit('setSliceInstance', slice));
+          commit('setSliceInstances', data.array);
         }).then(() => commit('setLoadedSlicePage', next)));
       }
 
