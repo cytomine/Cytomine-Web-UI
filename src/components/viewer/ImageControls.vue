@@ -120,7 +120,7 @@
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
 
-import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import {formatMinutesSeconds, slicePositionToRank} from '@/utils/slice-utils.js';
 import constants from '@/utils/constants';
 import _ from 'lodash';
 import ChannelName from '@/components/viewer/ChannelName';
@@ -235,8 +235,16 @@ export default {
       return formatMinutesSeconds(time);
     },
     channelValue(channel) {
-      let info = this.channels[channel];
-      return (info) ? info.name : null;
+      if (this.channels.length === this.image.extrinsicChannels) {
+        let info = this.channels[channel];
+        return (info) ? info.name : null;
+      }
+      else {
+        let rank = slicePositionToRank({channel, zStack: this.currentZStack, time: this.currentTime}, this.image);
+        let slice = this.sliceInstances[rank];
+        return (slice) ? slice.channelName : null;
+      }
+
     },
 
     async goToRank(rank) {
