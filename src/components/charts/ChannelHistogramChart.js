@@ -93,13 +93,14 @@ export default {
       let m = (ymin - ymax) / (this.currentMinLabel - this.currentMaxLabel);
       let p = ymin - m * this.currentMinLabel;
       let gamma = (this.inverse) ? 1/this.gamma : this.gamma;
-      return range.map(idx => {
+      let response = range.map(idx => {
         let label = this.currentLabels[Math.round(idx)];
         return {
           x: label,
           y: Math.pow((m * label + p), gamma) * this.highestValue
         };
       });
+      return _.uniqBy(response, 'x');
     },
     datasets() {
       return [
@@ -111,7 +112,8 @@ export default {
           borderColor: '#333',
           borderWidth: 1,
           type: 'line',
-          order: 2
+          order: 2,
+          cubicInterpolationMode: 'monotone'
         },
         {
           data: this.scaledHistogram,
