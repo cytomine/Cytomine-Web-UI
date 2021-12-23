@@ -15,6 +15,8 @@
 */
 
 
+import constants from '@/utils/constants';
+
 export default {
   state() {
     return {
@@ -131,6 +133,16 @@ export default {
     },
     async refreshDefaultMinMax({commit}, {image}) {
       let minmax = await image.fetchChannelHistogramBounds();
+
+      // --- Hack ---
+      if (image.extrinsicChannels > constants.MAX_MERGEABLE_CHANNELS) {
+        let imageMinmax = await image.fetchHistogramBounds();
+        minmax = minmax.map(histogram => {
+          return {...histogram, minimum: imageMinmax.minimum, maximum: imageMinmax.maximum};
+        });
+      }
+      // ---
+
       commit('setDefaultMinMax', minmax);
       if (image.bitPerSample > 8) {
         commit('setMinMax', deepCopy(minmax));
@@ -153,6 +165,13 @@ export default {
       commit('resetImageColorManipulation');
       commit('setMinMax', deepCopy(minMax));
     },
+
+    setAllMinimumAndMaximum({commit, state}, {minimum, maximum}) {
+      let minmax = state.minMax.map(mm => {
+        return {...mm, minimum, maximum};
+      });
+      commit('setMinMax', deepCopy(minmax));
+    }
 
   }
 };

@@ -87,6 +87,7 @@ import {ImageFilterProjectCollection} from 'cytomine-client';
 
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ChannelHistograms from '@/components/viewer/panels/histograms/ChannelHistograms';
+import constants from '@/utils/constants';
 
 export default {
   name: 'color-manipulation',
@@ -207,10 +208,20 @@ export default {
       this.revisionBrightnessContrast++;
     },
     adjustToSlice() {
-      let minmax = this.sampleHistograms.map(sh => {
-        return {channel: sh.channel, minimum: sh.minimum, maximum: sh.maximum};
-      });
-      this.$store.dispatch(this.imageModule + 'adjustToSlice', minmax);
+      if (this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS) {
+        let minmax = this.sampleHistograms.map(sh => {
+          return {channel: sh.channel, minimum: sh.minimum, maximum: sh.maximum};
+        });
+        this.$store.dispatch(this.imageModule + 'adjustToSlice', minmax);
+      }
+      else {
+        let histogram = this.sampleHistograms[0];
+        this.$store.dispatch(this.imageModule + 'setAllMinimumAndMaximum', {
+          minimum: histogram.minimum,
+          maximum: histogram.maximum
+        });
+      }
+
       this.revisionBrightnessContrast++;
     },
     switchHistogramScale() {
@@ -225,8 +236,13 @@ export default {
 
     async fetchSampleHistograms() {
       try {
-        //As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
-        this.sampleHistograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
+        if (this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS) {
+          // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
+          this.sampleHistograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
+        }
+        else {
+          this.sampleHistograms = (await this.slices[0].fetchHistogram({nBins: this.histogramNBins}));
+        }
       }
       catch(error) {
         console.log(error);
