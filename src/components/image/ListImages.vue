@@ -643,8 +643,8 @@ export default {
       this.laboratories = await this.loadMetadata('laboratory');
       this.stainings = await this.loadMetadata('staining');
       this.antibodies = await this.loadMetadata('antibody');
-      this.dilutions = await this.loadMetadata('detection');
-      this.detections = await this.loadMetadata('dilution');
+      this.dilutions = await this.loadMetadata('dilution');
+      this.detections = await this.loadMetadata('detection');
       this.instruments = await this.loadMetadata('instrument');
       this.loading = false;
     }
