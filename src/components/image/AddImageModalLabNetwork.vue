@@ -180,6 +180,20 @@
           </div>
 
 
+          <div class="columns">
+            <div class="column is-one-quarter has-text-right">
+              <strong>{{$t('tags')}}</strong>
+            </div>
+            <div class="column is-half">
+              <cytomine-multiselect
+                v-model="selectedTags"
+                :multiple="true"
+                :options="tags"
+                label="name" track-by="id"
+              />
+
+            </div>
+          </div>
 
 
         </div>
@@ -246,7 +260,7 @@
 <script>
 import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
-import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, HVMetadataCollection, /*Property, */StorageAccessCollection, UploadedFile/*, UploadedFileStatus*/} from 'cytomine-client';
+import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, HVMetadataCollection, StorageAccessCollection, TagCollection, TagDomainAssociation, UploadedFile} from 'cytomine-client';
 import axios from 'axios';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
@@ -287,6 +301,8 @@ export default {
       selectedDetection: null,
       instruments: [],
       selectedInstrument: null,
+      tags: [],
+      selectedTags: [],
       signature: '',
       signatureDate: '',
       processing: false,
@@ -489,6 +505,18 @@ export default {
         if(this.selectedLab || this.selectedStaining || this.selectedAntibody ||
           this.selectedDilution || this.selectedDetection || this.selectedInstrument) this.imageToUpload.abstractImage = await this.imageToUpload.abstractImage.save();
 
+        let associationPromises = [];
+        for(let i = 0; i < this.selectedTags.length; i++) {
+          associationPromises.push(new TagDomainAssociation({tag : this.selectedTags[i].id}, this.imageToUpload.abstractImage).save());
+        }
+        await Promise.all(associationPromises);
+        /*let newAssocations = await Promise.all(associationPromises).then(function(values) {
+          return values;
+        });
+        this.associatedTags = this.associatedTags.concat(newAssocations);
+        this.sortAssociatedTags();
+        this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});*/
+
       }
       catch(error) {
         console.log(error);
@@ -558,6 +586,14 @@ export default {
         this.newUploadError = true;
       }
     },
+    async fetchTags() {
+      try {
+        this.tags = (await TagCollection.fetchAll()).array.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      catch(error) {
+        console.log(error);
+      }
+    },
     async generateSignature() {
       this.signatureDate = new Date().toISOString();
       try {
@@ -582,6 +618,7 @@ export default {
     this.dilutions = await this.loadMetadata('dilution');
     this.detections = await this.loadMetadata('detection');
     this.instruments = await this.loadMetadata('instrument');
+    this.fetchTags();
     this.generateSignature();
   }
 };
