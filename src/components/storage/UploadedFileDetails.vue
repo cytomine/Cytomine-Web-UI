@@ -117,13 +117,13 @@
             <cytomine-description :object="image" :canEdit="canEdit" />
           </td>
         </tr>
-        <!--
         <tr>
           <td class="prop-label">{{$t('tags')}}</td>
           <td class="prop-content">
             <cytomine-tags :object="image" :canEdit="canEdit" />
           </td>
         </tr>
+        <!--
         <tr>
           <td class="prop-label">{{$t('properties')}}</td>
           <td class="prop-content">

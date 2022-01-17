@@ -17,8 +17,39 @@
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <template v-if="!loading">
     <template>
-      <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-      type="search" icon="search" />
+      <div class="search-block">
+        <b-input
+          class="search-images"
+          v-model="searchString"
+          :placeholder="$t('search-placeholder')"
+          type="search" icon="search"
+        />
+        <button class="button" @click="toggleFilterDisplay()">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+        </button>
+      </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="tags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </b-collapse>
 
       <cytomine-table
         :collection="imageCollection"
@@ -67,7 +98,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
+import {AbstractImageCollection, ImageInstance, TagCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 
@@ -89,10 +120,18 @@ export default {
       currentPage: 1,
       sortField: 'created',
       sortOrder: 'desc',
+      filtersOpened : false,
+      tags: [],
+      selectedTags: [],
     };
   },
   computed: {
     project: get('currentProject/project'),
+    multiSelectFilters() {
+      return [
+        {prop: 'tag', selected: this.selectedTags, total: this.tags.length},
+      ];
+    },
     imageCollection() {
       let collection = new AbstractImageCollection({
         search: true,
@@ -115,6 +154,17 @@ export default {
     }
   },
   methods: {
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    },
+    async fetchTags() {
+      try {
+        this.tags = (await TagCollection.fetchAll()).array.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      catch(error) {
+        console.log(error);
+      }
+    },
     async addImage(abstractImage) {
       let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
       try {
@@ -147,6 +197,7 @@ export default {
   },
   async created() {
     this.loading = false;
+    this.fetchTags();
   }
 };
 </script>
