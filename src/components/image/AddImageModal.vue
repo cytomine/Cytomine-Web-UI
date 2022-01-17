@@ -131,6 +131,18 @@
 
           </div>
 
+          <div class="columns">
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="tags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
+          </div>
+
         </div>
       </b-collapse>
 
@@ -181,7 +193,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {AbstractImageCollection, ImageInstance, HVMetadataCollection} from 'cytomine-client';
+import {AbstractImageCollection, ImageInstance, HVMetadataCollection, TagCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -218,6 +230,8 @@ export default {
       selectedDetection: [],
       instruments: [],
       selectedInstrument: [],
+      tags: [],
+      selectedTags: [],
     };
   },
   computed: {
@@ -233,6 +247,7 @@ export default {
         {prop: 'dilution', selected: this.selectedDilution, total: this.dilutions.length},
         {prop: 'detection', selected: this.selectedDetection, total: this.detections.length},
         {prop: 'instrument', selected: this.selectedInstrument, total: this.instruments.length},
+        {prop: 'tag', selected: this.selectedTags, total: this.tags.length},
       ];
     },
     imageCollection() {
@@ -278,6 +293,14 @@ export default {
       else metadatas = [];
       return metadatas;
     },
+    async fetchTags() {
+      try {
+        this.tags = (await TagCollection.fetchAll()).array.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      catch(error) {
+        console.log(error);
+      }
+    },
     async addImage(abstractImage) {
       let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
       try {
@@ -317,6 +340,7 @@ export default {
     this.dilutions = await this.loadMetadata('detection');
     this.detections = await this.loadMetadata('dilution');
     this.instruments = await this.loadMetadata('instrument');
+    this.fetchTags();
   }
 };
 </script>
