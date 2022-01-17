@@ -94,6 +94,9 @@
           </div>
         </td>
       </tr>
+      <tr v-show="showLabel">
+        <img :src="image.labelURL" class="image-overview" @error="hideImageComponent" @load="showImageComponent">
+      </tr>
     </tbody>
   </table>
 
@@ -117,13 +120,15 @@ export default {
     CalibrationModal
   },
   props: {
-    index: String
+    index: String,
+    showSlideLabelIfExist: Boolean
   },
   data() {
     return {
       calibrationModal: false,
       isFirstImage: false,
-      isLastImage: false
+      isLastImage: false,
+      showLabel: false
     };
   },
   computed: {
@@ -148,6 +153,14 @@ export default {
     }
   },
   methods: {
+    hideImageComponent() {
+      console.log('hide');
+      this.showLabel = false;
+    },
+    showImageComponent() {
+      console.log('show');
+      this.showLabel = this.showSlideLabelIfExist;
+    },
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area

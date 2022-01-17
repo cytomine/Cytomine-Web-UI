@@ -89,7 +89,7 @@
             <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
               <i class="fas fa-info"></i>
             </a>
-            <information-panel class="panel-options" v-show="activePanel === 'info'" :index="index" />
+            <information-panel class="panel-options" v-show="activePanel === 'info'" :index="index" :showSlideLabelIfExist="isPanelDisplayed('slide-label')" />
           </li>
 
           <li v-if="isPanelDisplayed('digital-zoom')">
