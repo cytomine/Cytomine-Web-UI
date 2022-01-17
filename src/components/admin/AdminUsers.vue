@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <b-loading :is-full-page="false" :active="loading" />
@@ -25,6 +24,15 @@
       <div class="columns">
         <div class="column is-one-quarter">
           <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
+
+          <div class="column">
+            <button class="button" @click="filtersOpened = !filtersOpened">
+            <span class="icon">
+              <i class="fas fa-filter"></i>
+            </span>
+              <span>{{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}</span>
+            </button>
+          </div>
         </div>
 
         <div class="column is-one-half has-text-right-desktop">
@@ -33,6 +41,21 @@
           </button>
         </div>
       </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters columns">
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('status')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
+                                    :searchable="false" />
+            </div>
+          </div>
+        </div>
+      </b-collapse>
+
 
       <cytomine-table
         :collection="userCollection"
@@ -44,10 +67,13 @@
         :revision="revision"
       >
         <template #default="{row: user}">
-
           <b-table-column field="username" :label="$t('username')" sortable width="100">
-            {{user.username}}
+            <username :user="user" :online="user.online" :displayFullName="false" />
           </b-table-column>
+
+<!--          <b-table-column field="username" :label="$t('username')" sortable width="100">-->
+<!--            {{user.username}}-->
+<!--          </b-table-column>-->
 
           <b-table-column field="fullName" :label="$t('name')" sortable width="150">
             {{user.firstname}} {{user.lastname}}
@@ -74,6 +100,13 @@
           <b-table-column field="updated" :label="$t('updated')" sortable width="150">
             <template v-if="user.updated">{{Number(user.updated) | moment('ll LT')}}</template>
             <template v-else>-</template>
+          </b-table-column>
+
+          <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
+            <template v-if="user.lastConnection">
+              {{Number(user.lastConnection) | moment('ll LT')}}
+            </template>
+            <em v-else class="has-text-grey">{{$t('no-record')}}</em>
           </b-table-column>
 
           <b-table-column label="" width="100">
@@ -109,18 +142,23 @@
 </template>
 
 <script>
+
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection} from 'cytomine-client';
+import {UserCollection, Cytomine} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
+import Username from '@/components/user/Username';
 
 export default {
   name: 'admin-users',
   components: {
     CytomineTable,
     UserModal,
-    UserDetails
+    UserDetails,
+    Username,
+    CytomineMultiselect
   },
   data() {
     return {
@@ -134,7 +172,12 @@ export default {
       sortOrder: '',
       revision: 0,
       modal: false,
-      editedUser: null
+      editedUser: null,
+      filtersOpened: false,
+      onlineStatus: this.$t('online'),
+      offlineStatus: this.$t('offline'),
+      availableStatus: [],
+      selectedStatus: [],
     };
   },
   computed: {
@@ -142,9 +185,16 @@ export default {
       return rolesMapping;
     },
     userCollection() {
+      let includeOnline = this.selectedStatus.includes(this.onlineStatus);
+      let includeOffline = this.selectedStatus.includes(this.offlineStatus);
+      let includeOnlineAndOffline = includeOnline && includeOffline;
+
+
       let collection = new UserCollection({
         withRoles: true
       });
+      collection['onlineFilter'] = includeOnlineAndOffline ? null : (includeOnline? true : (includeOffline? false : null));
+
       if(this.searchString) {
         collection['fullName'] = {
           ilike: encodeURIComponent(this.searchString)
@@ -200,9 +250,13 @@ export default {
       this.editedUser.populate(user);
     }
   },
-  async created() {
-    this.revision++;
+  async activated() {
     this.loading = false;
+  },
+  async created() {
+    this.availableStatus = [this.onlineStatus, this.offlineStatus];
+    this.selectedStatus = this.availableStatus;
+    this.revision++;
   }
 };
 </script>
