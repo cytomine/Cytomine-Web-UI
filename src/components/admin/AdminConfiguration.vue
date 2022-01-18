@@ -34,6 +34,20 @@
         />
       </b-field>
     </div>
+
+    <div class="panel-block storage">
+      <b-field
+        :key="activityRetention"
+        :label="$t('activities-time-to-live-in-hours')"
+        horizontal
+      >
+        <b-input
+          v-model="activitiesRetentionDelayConfig.value"
+          :name="field"
+          placeholder=""
+        />
+      </b-field>
+    </div>
   </div>
 
   <p class="has-text-right">
@@ -81,6 +95,7 @@ export default {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
       toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'})
+      activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_HOURS, value: '0', readingRole: 'all'})
     };
   },
   methods: {
@@ -105,6 +120,12 @@ export default {
         else if (this.toDeleteAtDelayConfig.value) {
           await this.toDeleteAtDelayConfig.save();
         }
+        if(!this.activitiesRetentionDelayConfig.value) {
+          await this.activitiesRetentionDelayConfig.delete();
+        }
+        else {
+          await this.activitiesRetentionDelayConfig.save();
+        }
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
@@ -117,6 +138,7 @@ export default {
     try {
       await this.welcomeConfig.fetch();
       await this.toDeleteAtDelayConfig.fetch();
+      await this.activitiesRetentionDelayConfig.fetch();
     }
     catch(error) {
       // no welcome message currently set
