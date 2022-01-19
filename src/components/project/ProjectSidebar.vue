@@ -57,6 +57,12 @@
           {{ $t('configuration') }}
         </a>
       </router-link>
+      <li v-if="isTabDisplayed('report')" tag="li" >
+        <a @click="sendEmailReport()">
+          <i class="fas fa-bullhorn"></i>
+          {{ $t('report') }}
+        </a>
+      </li>
     </ul>
   </nav>
 
@@ -76,6 +82,18 @@ export default {
     configUI: get('currentProject/configUI'),
     expanded: sync('currentUser/expandedSidebar')
   },
+  data() {
+    return {
+      outputUrl: '',
+      emailId: '',
+      email: {
+        subject: 'Report about project',
+        cc: '',
+        bcc: '',
+        body: ''
+      }
+    };
+  },
   methods: {
     clickHandler(event) {
       let el = event.target;
@@ -88,7 +106,58 @@ export default {
     },
     transitionEndHandler() { // led to a change of the size of the content div => need to reload OL map
       this.$eventBus.$emit('updateMapSize');
-    }
+    },
+    async sendEmailReport() {
+      this.email.subject = 'Report about project ' + this.project['name'];
+
+      let representatives = (await this.project.fetchRepresentatives()).array;
+      console.log(representatives);
+      this.email.cc = '';
+      this.emailId = '';
+
+      let emailsTo = representatives.map(x => x['email']);
+      console.log('emailsTo', emailsTo);
+      if (emailsTo.length==1) {
+        this.emailId = emailsTo[0];
+      }
+      else if (emailsTo.length>1) {
+        this.emailId = emailsTo[0];
+        emailsTo.shift();
+        this.email.cc = emailsTo.join(',');
+      }
+
+      let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
+      this.email.body = 'Dear project representatives, \n' +
+        '\n' +
+        '\n' +
+        '\n' +
+        'Practical information :\n' +
+        'Project : ' + projectUrl + '\n';
+
+      console.log('this.$route', this.$route);
+      console.log('this.$route.fullPath', this.$route.fullPath);
+      if (this.$route.fullPath.indexOf('?viewer=')!=-1) {
+        this.email.body = this.email.body + 'Image : ' + window.location.origin + '/#' + this.$route.fullPath;
+      }
+      this.openMailto();
+
+    },
+    openMailto() {
+      this.outputUrl = 'mailto:' + this.emailId;
+      const emailKeys = Object.keys(this.email);
+      const remaining = emailKeys.filter(
+        (key) => this.email[key].trim().length > 0
+      );
+      if (remaining.length > 0) {
+        this.outputUrl += '?';
+      }
+      this.outputUrl += remaining
+        .map((key) => `${key}=${encodeURI(this.email[key].trim())}`)
+        .join('&');
+      window.location = this.outputUrl;
+    },
+  },
+  created() {
   },
   mounted() {
     this.$refs.sidebar.addEventListener('transitionend', this.transitionEndHandler);
