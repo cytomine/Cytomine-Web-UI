@@ -1052,3 +1052,5 @@ to-delete-at-configuration, Delete project after (days), Supprimer les projets a
 activities-time-to-live-in-hours, Activities retention delay (hours), Délai de rétention des activités (heures)
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
+logo, Logo, Logo
+top-menu-color, Top menu color, Couleur du menu supérieur

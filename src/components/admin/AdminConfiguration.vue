@@ -73,6 +73,26 @@
 
       </b-field>
     </div>
+
+      <b-field
+        :label="$t('top-menu-color')"
+        horizontal
+      >
+        <b-input
+          v-model="topMenuColorConfig.value"
+          placeholder=""
+        />
+      </b-field>
+      <b-field
+        :label="$t('logo')"
+        horizontal
+      >
+        <b-input
+          v-model="logoConfig.value"
+          placeholder=""
+        />
+      </b-field>
+    </div>
   </div>
 
   <p class="has-text-right">
@@ -96,6 +116,8 @@ export default {
       sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
       toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'})
       activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_HOURS, value: '0', readingRole: 'all'})
+      topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
+      logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'})
     };
   },
   methods: {
@@ -127,6 +149,19 @@ export default {
           await this.activitiesRetentionDelayConfig.save();
         }
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
+        if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
+          await this.topMenuColorConfig.delete();
+        }
+        else if (this.topMenuColorConfig.value) {
+          await this.topMenuColorConfig.save();
+        }
+        if(!this.logoConfig.value && this.logoConfig.id!=null) {
+          await this.logoConfig.delete();
+        }
+        else if (this.logoConfig.value) {
+          await this.logoConfig.save();
+        }
+        this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
       }
       catch(error) {
         console.log(error);
@@ -145,6 +180,13 @@ export default {
     }
     try {
       await this.sharedAnnotationMailMode.fetch();
+      await this.topMenuColorConfig.fetch();
+    }
+    catch(error) {
+      // ignored
+    }
+    try {
+      await this.logoConfig.fetch();
     }
     catch(error) {
       // ignored
