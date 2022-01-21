@@ -1078,6 +1078,6 @@ notif-success-metadata-update,Metadata have been successfully updated,Les métad
 notif-error-metadata-update,An error occured during metadata update,Une erreur est survenue durant la modification des méta-données
 project-is-locked,Project is locked,Le projet est cloturé
 consensus-scores,Consensus scores,Scores de consensus
-api-key-allowed,Api keys enabled,API keys activées
-
-
+shared-annotation-mail-mode, Shared annotation mail mode, Mode des emails de partage des annotations
+notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
+notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations

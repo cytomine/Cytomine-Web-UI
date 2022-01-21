@@ -17,6 +17,28 @@
 <div>
   <h2>{{$t('welcome-message')}}</h2>
   <cytomine-quill-editor v-model="welcomeConfig.value" />
+
+
+  <div class="panel">
+    <p class="panel-heading">
+      {{ $t('configuration') }}
+    </p>
+    <div class="panel-block storage">
+      <b-field
+        :label="$t('shared-annotation-mail-mode')"
+        horizontal
+      >
+        <cytomine-multiselect
+          v-model="sharedAnnotationMailMode.value"
+          :options="['classic', 'restricted']"
+          :allow-empty="false"
+          :searchable="false"
+        />
+
+      </b-field>
+    </div>
+  </div>
+
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
@@ -169,13 +191,15 @@ import ConfigurationStringArray from '@/components/configuration/ConfigurationSt
 import HVMetadata from '@/components/property/HVMetadata';
 import {Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor, ConfigurationStringArray, HVMetadata},
+  components: {CytomineQuillEditor, ConfigurationStringArray, CytomineMultiselect, HVMetadata},
   data() {
     return {
-      welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'})
+      welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
+      sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
     };
   },
   methods: {
@@ -187,11 +211,18 @@ export default {
         else {
           await this.welcomeConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
+
+        if(!this.sharedAnnotationMailMode.value && this.sharedAnnotationMailMode.id!=null) {
+          await this.sharedAnnotationMailMode.delete();
+        }
+        else if (this.sharedAnnotationMailMode.value) {
+          await this.sharedAnnotationMailMode.save();
+        }
+        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-welcome-message-update')});
+        this.$notify({type: 'error', text: this.$t('notif-error-configuration-update')});
       }
     }
   },
@@ -201,6 +232,12 @@ export default {
     }
     catch(error) {
       // no welcome message currently set
+    }
+    try {
+      await this.sharedAnnotationMailMode.fetch();
+    }
+    catch(error) {
+      // ignored
     }
   }
 };
