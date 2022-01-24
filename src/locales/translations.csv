@@ -148,6 +148,9 @@ members,Members,Membres,Miembros
 new-project,New project,Nouveau projet,Nuevo proyecto
 last-activity,Last activity,Dernière activité,Última actividad
 created-on,Created on,Créé le,Creado el
+to-delete-at, To delete at, A supprimer le
+no-date-specified, No date specified, Pas de date specifiée
+snooze-to-delete-at, Stay alive for 7 more days, Décaler la date de suppression de 7 jours
 button-show-filters,Show filters,Montrer les filtres,Mostrar filtros
 button-hide-filters,Hide filters,Cacher les filtres,Ocultar filtros
 all,All,Tous,Todos
@@ -1041,7 +1044,8 @@ no-storage,No storage,Pas d'espace de stockage
 owner, Owner, Propriétaire
 renamed,Renamed,Renommé
 image-renamed,This image has been renamed,Cette image a été renommée
-api-key-allowed,Api keys enabled,API keys activées,
+api-key-allowed,Api keys enabled,API keys activées
 shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des emails de partage des annotations
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
+to-delete-at-configuration, Delete project after (days), Supprimer les projets après (jours)

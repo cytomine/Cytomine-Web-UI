@@ -25,6 +25,28 @@
     </p>
     <div class="panel-block storage">
       <b-field
+        :label="$t('to-delete-at-configuration')"
+        horizontal
+      >
+        <b-input
+          v-model="toDeleteAtDelayConfig.value"
+          placeholder=""
+        />
+      </b-field>
+    </div>
+  </div>
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
+  <div class="panel">
+    <p class="panel-heading">
+      {{ $t('configuration') }}
+    </p>
+    <div class="panel-block storage">
+      <b-field
         :label="$t('shared-annotation-mail-mode')"
         horizontal
       >
@@ -58,6 +80,7 @@ export default {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
+      toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'})
     };
   },
   methods: {
@@ -76,6 +99,12 @@ export default {
         else if (this.sharedAnnotationMailMode.value) {
           await this.sharedAnnotationMailMode.save();
         }
+        if(!this.toDeleteAtDelayConfig.value && this.toDeleteAtDelayConfig.id!=null) {
+          await this.toDeleteAtDelayConfig.delete();
+        }
+        else if (this.toDeleteAtDelayConfig.value) {
+          await this.toDeleteAtDelayConfig.save();
+        }
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
@@ -87,6 +116,7 @@ export default {
   async created() {
     try {
       await this.welcomeConfig.fetch();
+      await this.toDeleteAtDelayConfig.fetch();
     }
     catch(error) {
       // no welcome message currently set

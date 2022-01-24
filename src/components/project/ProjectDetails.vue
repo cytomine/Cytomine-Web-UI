@@ -105,6 +105,17 @@
         {{ Number(project.created) | moment('ll') }}
       </td>
     </tr>
+    <tr v-if="canManageProject">
+      <td class="prop-label">{{$t('to-delete-at')}}</td>
+      <td class="prop-content">
+        <span v-if="project.toDeleteAt">{{ Number(project.toDeleteAt) | moment('ll') }}
+          <button class="button is-small is-link" @click="snoozeDeleteAt()">
+              {{$t('snooze-to-delete-at')}}
+          </button>
+        </span>
+        <em v-else>{{$t('no-date-specified')}}</em>
+      </td>
+    </tr>
     <tr v-if="isPropDisplayed('creator')">
       <td class="prop-label">{{$t('creator')}}</td>
       <td class="prop-content">
@@ -155,6 +166,7 @@ import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
+import {Cytomine} from 'cytomine-client';
 
 export default {
   name: 'project-details',
@@ -216,7 +228,16 @@ export default {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop);
     },
-
+    async snoozeDeleteAt() {
+      try {
+        await Cytomine.instance.api.put(`${Cytomine.instance.host}/api/project/${this.project.id}/method/snooze.json`);
+        await this.$store.dispatch('currentProject/loadProject', this.project.id);
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-project-lock')});
+      }
+    },
     deleteProject() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
