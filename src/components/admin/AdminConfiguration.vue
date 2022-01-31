@@ -18,50 +18,96 @@
   <h2>{{$t('welcome-message')}}</h2>
   <cytomine-quill-editor v-model="welcomeConfig.value" />
 
-
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('configuration') }}
-    </p>
-    <div class="panel-block storage">
-      <b-field
-        :label="$t('shared-annotation-mail-mode')"
-        horizontal
-      >
-        <cytomine-multiselect
-          v-model="sharedAnnotationMailMode.value"
-          :options="['classic', 'restricted']"
-          :allow-empty="false"
-          :searchable="false"
-        />
-
-      </b-field>
+  <hr/>
+  <h2>{{$t('mail-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('shared-annotation-mail-mode')}}</h3>
     </div>
+    <div class="column is-one-quarter">
+      <cytomine-multiselect
+        v-model="sharedAnnotationMailMode.value"
+        :options="['classic', 'restricted']"
+        :allow-empty="false"
+        :searchable="false"
+      />
 
-      <b-field
-        :label="$t('top-menu-color')"
-        horizontal
-      >
-        <b-input
-          v-model="topMenuColorConfig.value"
-          placeholder=""
-        />
-      </b-field>
-      <b-field
-        :label="$t('logo')"
-        horizontal
-      >
-        <b-input
-          v-model="logoConfig.value"
-          placeholder=""
-        />
-      </b-field>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('shared-annotation-mail-mode-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+
+  <hr/>
+  <h2>{{$t('top-menu')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('top-menu-color')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="topMenuColorConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('top-menu-color-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('logo')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="logoConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('logo-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
     </div>
   </div>
 
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
+
 </div>
 </template>
 
