@@ -1041,4 +1041,7 @@ no-storage,No storage,Pas d'espace de stockage
 owner, Owner, Propriétaire
 renamed,Renamed,Renommé
 image-renamed,This image has been renamed,Cette image a été renommée
-api-key-allowed,Api keys enabled,API keys activées
+api-key-allowed,Api keys enabled,API keys activées,
+shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des emails de partage des annotations
+notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
+notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
