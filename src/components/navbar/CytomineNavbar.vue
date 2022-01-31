@@ -107,12 +107,7 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
-<<<<<<< HEAD
-import {Cytomine} from 'cytomine-client';
-import constants from '@/utils/constants.js';
-=======
 import {Cytomine, Configuration} from 'cytomine-client';
->>>>>>> dd8b7cbe... custom color and logo
 import {fullName} from '@/utils/user-utils.js';
 import constants from '@/utils/constants';
 export default {
@@ -127,16 +122,12 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: false,
-<<<<<<< HEAD
       postLogoutURL: constants.LOGOUT_REDIRECTION,
       SSOEnabled: constants.SSO_ENABLED,
-      aboutModal: false
-=======
       aboutModal: false,
       activeColor: '#f5f5f5',
       logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
       //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
->>>>>>> dd8b7cbe... custom color and logo
     };
   },
   computed: {
