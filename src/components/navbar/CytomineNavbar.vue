@@ -108,7 +108,6 @@ import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
 import {Cytomine, Configuration} from 'cytomine-client';
-import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
 import constants from '@/utils/constants';
 export default {

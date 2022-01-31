@@ -18,35 +18,58 @@
   <h2>{{$t('welcome-message')}}</h2>
   <cytomine-quill-editor v-model="welcomeConfig.value" />
 
-
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('configuration') }}
-    </p>
-    <div class="panel-block storage">
-      <b-field
-        :label="$t('to-delete-at-configuration')"
-        horizontal
-      >
-        <b-input
-          v-model="toDeleteAtDelayConfig.value"
-          placeholder=""
-        />
-      </b-field>
+  <hr/>
+  <h2>{{$t('temporary-data-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('to-delete-at-configuration')}}</h3>
     </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="toDeleteAtDelayConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('to-delete-at-configuration-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
 
-    <div class="panel-block storage">
-      <b-field
-        :key="activityRetention"
-        :label="$t('activities-time-to-live-in-hours')"
-        horizontal
-      >
-        <b-input
-          v-model="activitiesRetentionDelayConfig.value"
-          :name="field"
-          placeholder=""
-        />
-      </b-field>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('activities-time-to-live-in-hours')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="activitiesRetentionDelayConfig.value"
+        :name="field"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('activities-time-to-live-in-hours-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
     </div>
   </div>
 
@@ -55,43 +78,35 @@
   </p>
 
 
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('configuration') }}
-    </p>
-    <div class="panel-block storage">
-      <b-field
-        :label="$t('shared-annotation-mail-mode')"
-        horizontal
-      >
-        <cytomine-multiselect
-          v-model="sharedAnnotationMailMode.value"
-          :options="['classic', 'restricted']"
-          :allow-empty="false"
-          :searchable="false"
-        />
 
-      </b-field>
+  <hr/>
+  <h2>{{$t('mail-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('shared-annotation-mail-mode')}}</h3>
     </div>
+    <div class="column is-one-quarter">
+      <cytomine-multiselect
+        v-model="sharedAnnotationMailMode.value"
+        :options="['classic', 'restricted']"
+        :allow-empty="false"
+        :searchable="false"
+      />
 
-      <b-field
-        :label="$t('top-menu-color')"
-        horizontal
-      >
-        <b-input
-          v-model="topMenuColorConfig.value"
-          placeholder=""
-        />
-      </b-field>
-      <b-field
-        :label="$t('logo')"
-        horizontal
-      >
-        <b-input
-          v-model="logoConfig.value"
-          placeholder=""
-        />
-      </b-field>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('shared-annotation-mail-mode-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
     </div>
   </div>
 
@@ -114,8 +129,8 @@ export default {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
-      toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'})
-      activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_HOURS, value: '0', readingRole: 'all'})
+      toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'}),
+      activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_HOURS, value: '0', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'})
     };
