@@ -70,7 +70,8 @@
               <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
             </div>
             <div class="media-content">
-              {{$t('top-menu-color-description')}}
+              {{$t('top-menu-color-description')}} <br/>
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
             </div>
           </div>
         </section>
