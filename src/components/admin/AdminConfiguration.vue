@@ -145,7 +145,6 @@ export default {
         else if (this.sharedAnnotationMailMode.value) {
           await this.sharedAnnotationMailMode.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
         if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
           await this.topMenuColorConfig.delete();
         }
@@ -158,7 +157,7 @@ export default {
         else if (this.logoConfig.value) {
           await this.logoConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
+        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
         console.log(error);
