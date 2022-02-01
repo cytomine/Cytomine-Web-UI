@@ -17,6 +17,71 @@
 <div>
   <h2>{{$t('welcome-message')}}</h2>
   <cytomine-quill-editor v-model="welcomeConfig.value" />
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
+  <hr/>
+  <h2>{{$t('top-menu')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('top-menu-color')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="topMenuColorConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('top-menu-color-description')}} <br/>
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('logo')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="logoConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('logo-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
 
   <hr/>
   <h2>{{$t('temporary-data-settings')}}</h2>
@@ -53,7 +118,6 @@
     <div class="column is-one-quarter">
       <b-input
         v-model="activitiesRetentionDelayConfig.value"
-        :name="field"
         placeholder=""
       />
     </div>
@@ -110,6 +174,7 @@
     </div>
   </div>
 
+
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
@@ -163,7 +228,6 @@ export default {
         else if (this.activitiesRetentionDelayConfig.value) {
           await this.activitiesRetentionDelayConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
         if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
           await this.topMenuColorConfig.delete();
         }
@@ -176,7 +240,7 @@ export default {
         else if (this.logoConfig.value) {
           await this.logoConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
+        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
         console.log(error);
