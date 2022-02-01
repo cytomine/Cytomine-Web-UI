@@ -17,49 +17,11 @@
 <div>
   <h2>{{$t('welcome-message')}}</h2>
   <cytomine-quill-editor v-model="welcomeConfig.value" />
-
-
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('configuration') }}
-    </p>
-    <div class="panel-block storage">
-      <b-field
-        :label="$t('shared-annotation-mail-mode')"
-        horizontal
-      >
-        <cytomine-multiselect
-          v-model="sharedAnnotationMailMode.value"
-          :options="['classic', 'restricted']"
-          :allow-empty="false"
-          :searchable="false"
-        />
-      </b-field>
-
-      <b-field
-        :label="$t('top-menu-color')"
-        horizontal
-      >
-        <b-input
-          v-model="topMenuColorConfig.value"
-          placeholder=""
-        />
-      </b-field>
-      <b-field
-        :label="$t('logo')"
-        horizontal
-      >
-        <b-input
-          v-model="logoConfig.value"
-          placeholder=""
-        />
-      </b-field>
-    </div>
-  </div>
-
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
+
+
   <hr/>
   <h2>{{$t('protocol-values')}}</h2>
   <div class="columns">
@@ -200,20 +162,118 @@
     </div>
   </div>
 
+  <hr/>
+  <h2>{{$t('top-menu')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('top-menu-color')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="topMenuColorConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('top-menu-color-description')}} <br/>
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('logo')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="logoConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('logo-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
+
+  <hr/>
+  <h2>{{$t('mail-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('shared-annotation-mail-mode')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <cytomine-multiselect
+        v-model="sharedAnnotationMailMode.value"
+        :options="['classic', 'restricted']"
+        :allow-empty="false"
+        :searchable="false"
+      />
+
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('shared-annotation-mail-mode-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
 </div>
+
 </template>
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import ConfigurationStringArray from '@/components/configuration/ConfigurationStringArray';
-import HVMetadata from '@/components/property/HVMetadata';
 import {Configuration} from 'cytomine-client';
+import HVMetadata from '@/components/property/HVMetadata';
 import constants from '@/utils/constants.js';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor, ConfigurationStringArray, CytomineMultiselect, HVMetadata},
+  components: {CytomineQuillEditor, CytomineMultiselect, HVMetadata},
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
@@ -238,7 +298,6 @@ export default {
         else if (this.sharedAnnotationMailMode.value) {
           await this.sharedAnnotationMailMode.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
         if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
           await this.topMenuColorConfig.delete();
         }
@@ -251,7 +310,7 @@ export default {
         else if (this.logoConfig.value) {
           await this.logoConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
+        this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
         console.log(error);
@@ -287,10 +346,6 @@ export default {
 >>> .cytomine-quill-editor {
   min-height: 25em !important;
   max-height: 25em !important;
-}
-
->>> .button.is-small {
-  margin-left: 5em;
 }
 
 .button {
