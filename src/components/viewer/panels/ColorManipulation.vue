@@ -22,7 +22,7 @@
       <td>
         <b-select v-model="selectedFilter" size="is-small">
           <option :value="null">{{$t('original-no-filter')}}</option>
-          <option v-for="filter in filters" :key="filter.id" :value="filter.prefix">
+          <option v-for="filter in filters" :key="filter.id" :value="filter.method">
             {{filter.name}}
           </option>
         </b-select>
@@ -133,10 +133,12 @@ export default {
   },
   async created() {
     try {
-      let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
-      let prefixes = filters.map(filter => filter.prefix);
-      if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
+      let filters = (await ImageFilterProjectCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id
+      })).array.filter(filter => filter.available);
+      let methods = filters.map(filter => filter.method);
+      if(this.selectedFilter && !methods.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
       }
       this.filters = filters;

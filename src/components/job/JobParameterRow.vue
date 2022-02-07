@@ -113,6 +113,7 @@ export default {
         result = result.replace('$currentOntology$', this.ontology ? this.ontology.id : null);
         return result;
       }
+      return null;
     },
     validationName() {
       return String(this.param.id);
@@ -127,6 +128,7 @@ export default {
       if (this.options && this.options.length > 0) {
         return this.options[0].class;
       }
+      return null;
     },
     areAnnotationObjects() {
       if(this.objectsClass) {
@@ -136,6 +138,7 @@ export default {
           'be.cytomine.ontology.ReviewedAnnotation'
         ].includes(this.objectsClass);
       }
+      return null;
     },
     areTermObjects() {
       return this.objectsClass === 'be.cytomine.ontology.Term';

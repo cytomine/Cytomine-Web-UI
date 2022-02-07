@@ -21,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="image.associatedImageURL('macro', 256, 'jpg')" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>

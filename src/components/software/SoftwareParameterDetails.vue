@@ -62,10 +62,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import RenameModal from '@/components/utils/RenameModal';
 import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
 
 export default {
   name: 'software-parameter-details',
@@ -75,9 +72,6 @@ export default {
   },
   components: {
     CytomineDescription,
-    CytomineProperties,
-    AttachedFiles,
-    RenameModal
   },
   data() {
     return {

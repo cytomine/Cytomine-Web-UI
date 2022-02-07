@@ -83,14 +83,14 @@
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
       <button class="button is-small" @click="samplePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <img :src="samplePreview.thumbURL">
+    <image-thumbnail :url="samplePreview.thumbURL" :size="512" :key="samplePreview.thumbURL" />
   </template>
   <template v-else-if="slidePreview">
     <h2>
       {{$t('slide-preview-of', {filename: slidePreview.originalFilename})}}
       <button class="button is-small" @click="slidePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <img :src="slidePreview.macroURL">
+    <image-thumbnail :url="slidePreview.macroURL" :size="512" :key="slidePreview.macroURL" :macro="true" />
   </template>
 
   <template v-if="image && profileEnabled">
@@ -115,10 +115,12 @@ import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus 
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
 import ProfileStatus from './ProfileStatus';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'uploaded-file-details',
   components: {
+    ImageThumbnail,
     ProfileStatus,
     SlVueTree,
     UploadedFileStatus
