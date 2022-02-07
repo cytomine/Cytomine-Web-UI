@@ -1056,6 +1056,7 @@ logo, Logo, Logo
 top-menu-color, Top menu color, Couleur du menu supérieur
 top-menu-color-description,"Set the color of the top banner","Renseignez ici la couleur de la bannière supérieur de Cytomine"
 top-menu-color-instruction,"You can set from 140 colors ('red', 'cyan'). By encoding an hexadecimal code ('#FF8C00'), you will be able to set more colors. You will need to refresh to see the changes","Choisissez parmi 140 couleurs ('red', 'cyan'). En renseignant le code hexadecimal ('#FF8C00'), vous pouvez choisir plus précisément la couleur. Un rafraichissement est nécessaire pour que le changement prenne effet"
+update-color,Update color,Modifier la couleur,Actualizar color
 logo-description, Set here the url of the banner top left logo, Renseignez ici l'url du logo à gauche de la bannière
 to-delete-at-configuration-description,"If more than 0, each project created inside the Cytomine platform will be automatically deleted the given number of days after their creation", "Si supérieure à 0, chaque projet créé sur la plateforme Cytomine sera automatiquement supprimé le nombre de jours renseignés après sa création."
 activities-time-to-live-in-hours-description,"If more than 0, each activity log will be automatically deleted the given number of hours after their creation", "Si supérieure à 0, chaque trace d'activité sera automatiquement supprimée le nombre d'heures renseignées après sa création"
