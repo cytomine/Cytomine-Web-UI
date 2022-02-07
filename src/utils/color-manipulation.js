@@ -125,3 +125,21 @@ export function operation(pixels) {
 
   return pixel;
 }
+
+export function randomColor() {
+  return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+}
+
+export let presetColors = [
+  '#F44E3B',
+  '#FB9E00',
+  '#FCDC00',
+  '#68BC00',
+  '#16A5A5',
+  '#009CE0',
+  '#7B10D8',
+  '#F06292',
+  '#000',
+  '#777',
+  '#FFF'
+];

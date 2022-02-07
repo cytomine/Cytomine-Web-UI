@@ -169,10 +169,16 @@
       <h3>{{$t('top-menu-color')}}</h3>
     </div>
     <div class="column is-one-quarter">
-      <b-input
-        v-model="topMenuColorConfig.value"
-        placeholder=""
-      />
+      <div class="columns">
+        <div class="column is-four-fifths">
+          <b-input
+            v-on:updateColor="updateColor($event.target.value)"
+            v-model="topMenuColorConfig.value"
+            placeholder=""
+          />
+        </div>
+        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openModal()"></button>  
+      </div>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -254,11 +260,9 @@
     </div>
   </div>
 
-
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
-
 
 </div>
 
@@ -270,6 +274,7 @@ import {Configuration} from 'cytomine-client';
 import HVMetadata from '@/components/property/HVMetadata';
 import constants from '@/utils/constants.js';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import ColorModal from './ColorModal';
 
 export default {
   name: 'admin-configuration',
@@ -291,7 +296,6 @@ export default {
         else {
           await this.welcomeConfig.save();
         }
-
         if(!this.sharedAnnotationMailMode.value && this.sharedAnnotationMailMode.id!=null) {
           await this.sharedAnnotationMailMode.delete();
         }
@@ -316,7 +320,23 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-configuration-update')});
       }
-    }
+    },
+    updateColor(color) {
+      this.topMenuColorConfig.value = color;
+    },
+    openModal() {
+      this.$buefy.modal.open({
+        parent: this,
+        component: ColorModal,
+        props: {
+          topMenuColor: this.topMenuColorConfig ? this.topMenuColorConfig.value : null,
+        },
+        events: {
+          updateColor: this.updateColor,
+        },
+        hasModalCard: true
+      });
+    },
   },
   async created() {
     try {
@@ -351,4 +371,10 @@ export default {
 .button {
   margin-top: 1em;
 }
+
+.color-picker-button {
+  margin-top: 0.75em;
+  width: 2.25em;
+}
+
 </style>
