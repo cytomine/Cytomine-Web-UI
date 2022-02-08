@@ -13,9 +13,9 @@
  limitations under the License.-->
 
 <template>
-<nav class="navbar is-light" role="navigation" v-bind:style="{backgroundColor: activeColor}">
+<nav class="navbar is-light" role="navigation" :style="{backgroundColor: activeColor}">
   <div class="navbar-brand">
-    <router-link to="/" exact class="navbar-item" v-bind:style="{backgroundColor: activeColor}">
+    <router-link to="/" exact class="navbar-item" :style="{backgroundColor: activeColor}">
       <img :src="logo" id="logo" alt="Cytomine">
     </router-link>
     <a role="" class="navbar-burger" :class="{'is-active':openedTopMenu}" @click="openedTopMenu=!openedTopMenu">
@@ -27,23 +27,23 @@
       <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
         <navigation-tree />
       </navbar-dropdown>
-      <router-link to="/projects" class="navbar-item" v-bind:style="{color: activeFontColor}">
+      <router-link to="/projects" class="navbar-item" :style="getStyle('/projects')">
         <i class="fas fa-list-alt"></i>
         {{ $t('projects') }}
       </router-link>
-      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" v-bind:style="{color: activeFontColor}">
+      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" :style="getStyle('/storage')">
         <i class="fas fa-download"></i>
         {{ $t('storage') }}
       </router-link>
-      <router-link to="/ontology" class="navbar-item" v-bind:style="{color: activeFontColor}">
+      <router-link to="/ontology" class="navbar-item" :style="getStyle('/ontology')">
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item" v-bind:style="{color: activeFontColor}">
+      <router-link to="/software" class="navbar-item" :style="getStyle('/software')">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
-      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item" v-bind:style="{color: activeFontColor}">
+      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item" :style="getStyle('/admin')">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
@@ -59,6 +59,7 @@
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
         :fontColor="{'color': activeFontColor}"
+        :backgroundColor="{'backgroundColor': lighterActiveColor}"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
@@ -111,6 +112,8 @@ import CytomineSearcher from '@/components/search/CytomineSearcher';
 import {Cytomine, Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
+import {getLighterColor} from '@/utils/color-manipulation.js'; 
+
 export default {
   name: 'cytomine-navbar',
   components: {
@@ -127,7 +130,8 @@ export default {
       SSOEnabled: constants.SSO_ENABLED,
       aboutModal: false,
       activeColor: '#f5f5f5',
-      activeFontColor: '#363636;',
+      lighterActiveColor: '#ffffff',
+      activeFontColor: '#363636',
       logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
       //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
     };
@@ -161,6 +165,9 @@ export default {
         component: AboutCytomineModal,
         hasModalCard: true
       });
+    },
+    getStyle(path){
+      return this.$route.path.match(path) ? {backgroundColor: this.lighterActiveColor, color: this.activeFontColor} : {color: this.activeFontColor};
     },
     // ---
 
@@ -215,6 +222,7 @@ export default {
       let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
       if (value && value!=='') {
         this.activeColor = value;
+        this.lighterActiveColor = getLighterColor(value);
       }
     }
     catch(error) {
