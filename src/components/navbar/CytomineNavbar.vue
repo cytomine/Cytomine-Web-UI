@@ -24,7 +24,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')" :style="getStyle('/project/')">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item" :style="getStyle('/projects')">
@@ -215,37 +215,46 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-logout')});
       }
-    }
+    },
+    async fetchConfig() {
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.activeColor = value;
+          this.lighterActiveColor = getLighterColor(value);
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_FONT_COLOR_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.activeFontColor = value;
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_LOGO_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.logo = value;
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+    },
   },
   async created() {
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.activeColor = value;
-        this.lighterActiveColor = getLighterColor(value);
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_FONT_COLOR_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.activeFontColor = value;
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_LOGO_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.logo = value;
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
+    await this.fetchConfig();
+  },
+  mounted() {
+    this.$eventBus.$on('configChanged', this.fetchConfig);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('configChanged', this.fetchConfig);
   }
 };
 </script>

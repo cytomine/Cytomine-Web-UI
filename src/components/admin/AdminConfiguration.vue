@@ -204,6 +204,7 @@ export default {
         else if (this.logoConfig.value) {
           await this.logoConfig.save();
         }
+        this.$eventBus.$emit('configChanged', '');
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {
