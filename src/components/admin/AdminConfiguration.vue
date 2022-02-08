@@ -36,7 +36,7 @@
             placeholder=""
           />
         </div>
-        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openMenuColorModal()"></button>  
+        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openMenuColorModal()"></button>
       </div>
     </div>
     <div class="column is-one-half">
@@ -133,6 +133,7 @@ export default {
         else if (this.topFontMenuColorConfig.value) {
           await this.topFontMenuColorConfig.save();
         }
+        this.$eventBus.$emit('configChanged', '');
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
       catch(error) {

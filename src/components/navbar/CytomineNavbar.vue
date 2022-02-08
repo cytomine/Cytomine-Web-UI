@@ -28,7 +28,8 @@
       icon="fa-folder-open"
       v-if="this.nbActiveProjects > 0"
       :title="$t('workspace')"
-      :listPathes="['/project/']">
+      :listPathes="['/project/']"
+      :style="getStyle('/project/')">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item" :style="getStyle('/projects')">
@@ -116,7 +117,7 @@ import CytomineSearcher from '@/components/search/CytomineSearcher';
 import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
-import {getLighterColor} from '@/utils/color-manipulation.js'; 
+import {getLighterColor} from '@/utils/color-manipulation.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -220,37 +221,46 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-logout')});
       }
-    }
+    },
+    async fetchConfig() {
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.activeColor = value;
+          this.lighterActiveColor = getLighterColor(value);
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_FONT_COLOR_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.activeFontColor = value;
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+      try {
+        let value = (await Configuration.fetch(constants.CONFIG_KEY_LOGO_TOP_MENU)).value;
+        if (value && value!=='') {
+          this.logo = value;
+        }
+      }
+      catch(error) {
+        // no config defined
+      }
+    },
   },
   async created() {
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.activeColor = value;
-        this.lighterActiveColor = getLighterColor(value);
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_FONT_COLOR_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.activeFontColor = value;
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
-    try {
-      let value = (await Configuration.fetch(constants.CONFIG_KEY_LOGO_TOP_MENU)).value;
-      if (value && value!=='') {
-        this.logo = value;
-      }
-    }
-    catch(error) {
-      // no config defined
-    }
+    await this.fetchConfig();
+  },
+  mounted() {
+    this.$eventBus.$on('configChanged', this.fetchConfig);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('configChanged', this.fetchConfig);
   }
 };
 </script>
