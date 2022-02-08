@@ -13,10 +13,10 @@
  limitations under the License.-->
 
 <template>
-<nav class="navbar is-light" role="navigation">
+<nav class="navbar is-light" role="navigation" v-bind:style="{backgroundColor: activeColor}">
   <div class="navbar-brand">
-    <router-link to="/" exact class="navbar-item">
-      <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
+    <router-link to="/" exact class="navbar-item" v-bind:style="{backgroundColor: activeColor}">
+      <img :src="logo" id="logo" alt="Cytomine">
     </router-link>
     <a role="" class="navbar-burger" :class="{'is-active':openedTopMenu}" @click="openedTopMenu=!openedTopMenu">
       <span></span> <span></span> <span></span>
@@ -31,23 +31,23 @@
       :listPathes="['/project/']">
         <navigation-tree />
       </navbar-dropdown>
-      <router-link to="/projects" class="navbar-item">
+      <router-link to="/projects" class="navbar-item" v-bind:style="{color: activeFontColor}">
         <i class="fas fa-list-alt"></i>
         {{ $t('projects') }}
       </router-link>
-      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item">
+      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" v-bind:style="{color: activeFontColor}">
         <i class="fas fa-download"></i>
         {{ $t('storage') }}
       </router-link>
-      <router-link to="/ontology" class="navbar-item">
+      <router-link to="/ontology" class="navbar-item" v-bind:style="{color: activeFontColor}">
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link v-show="algoEnabled" to="/software" class="navbar-item">
+      <router-link v-show="algoEnabled" to="/software" class="navbar-item" v-bind:style="{color: activeFontColor}">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
-      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
+      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item" v-bind:style="{color: activeFontColor}">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
@@ -62,6 +62,7 @@
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
+        :fontColor="{'color': activeFontColor}"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
@@ -88,7 +89,7 @@
         </a>
       </navbar-dropdown>
 
-      <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']">
+      <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']" :fontColor="{'color': activeFontColor}">
         <a class="navbar-item" @click="openHotkeysModal()">
           <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
         </a>
@@ -130,7 +131,11 @@ export default {
       algoEnabled: constants.ALGORITHMS_ENABLED,
       postLogoutURL: constants.LOGOUT_REDIRECTION,
       SSOEnabled: constants.SSO_ENABLED,
-      aboutModal: false
+      aboutModal: false,
+      activeColor: '#f5f5f5',
+      activeFontColor: '#363636;',
+      logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
+      //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
     };
   },
   computed: {
@@ -209,6 +214,35 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-logout')});
       }
+    }
+  },
+  async created() {
+    try {
+      let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
+      if (value && value!=='') {
+        this.activeColor = value;
+      }
+    }
+    catch(error) {
+      // no config defined
+    }
+    try {
+      let value = (await Configuration.fetch(constants.CONFIG_KEY_FONT_COLOR_TOP_MENU)).value;
+      if (value && value!=='') {
+        this.activeFontColor = value;
+      }
+    }
+    catch(error) {
+      // no config defined
+    }
+    try {
+      let value = (await Configuration.fetch(constants.CONFIG_KEY_LOGO_TOP_MENU)).value;
+      if (value && value!=='') {
+        this.logo = value;
+      }
+    }
+    catch(error) {
+      // no config defined
     }
   }
 };
