@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -78,7 +78,8 @@ export default {
             {key: 'project-jobs-tab', label: 'analysis', icon: 'fas fa-tasks'},
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
             {key: 'project-information-tab', label: 'information', icon: 'fas fa-info-circle'},
-            {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'}
+            {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'},
+            {key: 'project-report-tab', label: 'report', icon: 'fas fa-bullhorn'}
           ]
         },
         {
