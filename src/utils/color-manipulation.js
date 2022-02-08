@@ -126,6 +126,20 @@ export function operation(pixels) {
   return pixel;
 }
 
+function integerToHexa(integer) {
+  var hexacode = integer.toString(16);
+  return hexacode.length == 1 ? '0' + hexacode : hexacode;
+}
+
+export function getLighterColor(hexacode) {
+
+  var lighterRed = parseInt(hexacode[1]+hexacode[2],16) + 36;
+  var lighterGreen = parseInt(hexacode[3]+hexacode[4],16) + 36;
+  var lighterBlue = parseInt(hexacode[5]+hexacode[6],16) + 36;
+
+  return '#' + integerToHexa(lighterRed) + integerToHexa(lighterGreen) + integerToHexa(lighterBlue);
+}
+
 export function randomColor() {
   return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
 }
