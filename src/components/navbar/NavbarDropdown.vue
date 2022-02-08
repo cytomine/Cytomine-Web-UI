@@ -14,7 +14,7 @@
 
 <template>
 <div class="navbar-item has-dropdown is-hoverable">
-  <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" tabindex="0">
+  <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" v-bind:style="{...fontColor}" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
@@ -35,7 +35,8 @@ export default {
     tag: Object,
     classes: Array,
     linkClasses: Object,
-    listPathes: Array
+    listPathes: Array,
+    fontColor: Object
   },
   data() {
     return {

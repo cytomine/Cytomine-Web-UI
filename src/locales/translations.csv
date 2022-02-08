@@ -1046,9 +1046,11 @@ shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des em
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
 logo, Logo, Logo
-top-menu-color, Top menu color, Couleur du menu supérieur
-top-menu-color-description,"Set the color of the top banner","Renseignez ici la couleur de la bannière supérieur de Cytomine"
-top-menu-color-instruction,"You can set from 140 colors ('red', 'cyan'). By encoding an hexadecimal code ('#FF8C00'), you will be able to set more colors. You will need to refresh to see the changes","Choisissez parmi 140 couleurs ('red', 'cyan'). En renseignant le code hexadecimal ('#FF8C00'), vous pouvez choisir plus précisément la couleur. Un rafraichissement est nécessaire pour que le changement prenne effet"
+top-menu-color, Top menu color, Couleur du menu supérieur, Color del menú superior
+top-menu-color-description,"Set the color of the top banner","Renseignez ici la couleur de la bannière supérieur de Cytomine", "Establecer el color del menú superior"
+top-menu-color-instruction,"You can set from 140 colors ('red', 'cyan'). By encoding an hexadecimal code ('#FF8C00'), you will be able to set more colors. You will need to refresh to see the changes","Choisissez parmi 140 couleurs ('red', 'cyan'). En renseignant le code hexadecimal ('#FF8C00'), vous pouvez choisir plus précisément la couleur. Un rafraichissement est nécessaire pour que le changement prenne effet", "Elija entre 140 colores ('rojo', 'cian'). Indicando el código hexadecimal ('#FF8C00'), puede elegir el color con mayor precisión. Se requiere una actualización para que el cambio surta efecto"
+top-font-menu-color, Top font menu color, Couleur de la police du menu supérieur, Color de fuente del menú superior
+top-font-menu-color-description,"Set the font color of the top banner","Renseignez ici la couleur de la police de la bannière supérieur de Cytomine", "Establecer el color de fuente del menú superior"
 update-color,Update color,Modifier la couleur,Actualizar color
 logo-description, Set here the url of the banner top left logo, Renseignez ici l'url du logo à gauche de la bannière
 to-delete-at-configuration-description,"If more than 0, each project created inside the Cytomine platform will be automatically deleted the given number of days after their creation", "Si supérieure à 0, chaque projet créé sur la plateforme Cytomine sera automatiquement supprimé le nombre de jours renseignés après sa création."
