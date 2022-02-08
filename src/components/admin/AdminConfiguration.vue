@@ -32,12 +32,12 @@
       <div class="columns">
         <div class="column is-four-fifths">
           <b-input
-            v-on:updateColor="updateColor($event.target.value)"
+            v-on:updateMenuColor="updateMenuColor($event.target.value)"
             v-model="topMenuColorConfig.value"
             placeholder=""
           />
         </div>
-        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openModal()"></button>
+        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openMenuColorModal()"></button>
       </div>
     </div>
     <div class="column is-one-half">
@@ -56,6 +56,40 @@
       </article>
     </div>
   </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('top-font-menu-color')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <div class="columns">
+        <div class="column is-four-fifths">
+          <b-input
+            v-on:updateFontMenuColor="updateFontMenuColor($event.target.value)"
+            v-model="topFontMenuColorConfig.value"
+            placeholder=""
+          />
+        </div>
+        <button class="button color-picker-button" :style="`background-color:${topFontMenuColorConfig.value};`" @click="openFontMenuColorModal()"></button>
+      </div>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('top-font-menu-color-description')}} <br/>
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
 
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
@@ -204,6 +238,7 @@ export default {
       toDeleteAtDelayConfig: new Configuration({key: constants.CONFIG_KEY_DELETE_PROJECT_AFTER_DELAY_IN_DAYS, value: '', readingRole: 'all'}),
       activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_HOURS, value: '0', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
+      topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'})
     };
   },
@@ -240,6 +275,12 @@ export default {
         else if (this.topMenuColorConfig.value) {
           await this.topMenuColorConfig.save();
         }
+        if(!this.topFontMenuColorConfig.value && this.topFontMenuColorConfig.id!=null) {
+          await this.topFontMenuColorConfig.delete();
+        }
+        else if (this.topFontMenuColorConfig.value) {
+          await this.topFontMenuColorConfig.save();
+        }
         if(!this.logoConfig.value && this.logoConfig.id!=null) {
           await this.logoConfig.delete();
         }
@@ -253,22 +294,40 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-configuration-update')});
       }
     },
-    updateColor(color) {
-      this.topMenuColorConfig.value = color;
-    },
-    openModal() {
+    openModal(props, events) {
       this.$buefy.modal.open({
         parent: this,
         component: ColorModal,
-        props: {
-          topMenuColor: this.topMenuColorConfig ? this.topMenuColorConfig.value : null,
-        },
-        events: {
-          updateColor: this.updateColor,
-        },
+        props,
+        events,
         hasModalCard: true
       });
     },
+    updateMenuColor(color) {
+      this.topMenuColorConfig.value = color;
+    },
+    updateFontMenuColor(fontColor) {
+      this.topFontMenuColorConfig.value = fontColor;
+    },
+    openMenuColorModal() {
+      let props = {
+        currentColor: this.topMenuColorConfig ? this.topMenuColorConfig.value : null,
+      };
+      let events= {
+        updateColor: this.updateMenuColor,
+      };
+      this.openModal(props, events);
+    },
+    openFontMenuColorModal() {
+      let props = {
+        currentColor: this.topFontMenuColorConfig ? this.topFontMenuColorConfig.value : null,
+      };
+      let events= {
+        updateColor: this.updateFontMenuColor,
+      };
+      this.openModal(props, events);
+    },
+
   },
   async created() {
     try {
@@ -282,6 +341,7 @@ export default {
     try {
       await this.sharedAnnotationMailMode.fetch();
       await this.topMenuColorConfig.fetch();
+      await this.topFontMenuColorConfig.fetch();
     }
     catch(error) {
       // ignored

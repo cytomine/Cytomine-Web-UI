@@ -37,7 +37,7 @@ import {presetColors, randomColor} from '@/utils/color-manipulation.js';
 export default {
   name: 'color-modal',
   props: {
-    topMenuColor: String
+    currentColor: String
   },
   components: {
     'sketch-picker': Sketch,
@@ -60,7 +60,7 @@ export default {
     }
   },
   created() {
-    this.color = {hex: this.topMenuColor ? this.topMenuColor : randomColor()};
+    this.color = {hex: this.currentColor ? this.currentColor : randomColor()};
   }
 };
 </script>
