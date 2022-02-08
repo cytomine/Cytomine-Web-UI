@@ -375,13 +375,13 @@ export default {
       if (this.imageWrapper.colors.contrast !== 1) {
         params.contrast = this.imageWrapper.colors.contrast;
       }
-      if (this.imageWrapper.colors.gamma !== 1) {
+      /*if (this.imageWrapper.colors.gamma !== 1) {
         params.gammas = this.imageWrapper.colors.gamma;
-      }
+      }*/
       if (this.imageWrapper.colors.inverse) {
         params.colormaps = '!DEFAULT';
       }
-      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      /*let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
       if (minIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.min_intensities = minIntensities.join(',');
@@ -390,7 +390,7 @@ export default {
       if (maxIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.max_intensities = maxIntensities.join(',');
-      }
+      }*/
       return params;
     },
     baseLayerSliceParams() {

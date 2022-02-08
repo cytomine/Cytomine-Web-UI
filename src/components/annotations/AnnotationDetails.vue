@@ -246,7 +246,6 @@ export default {
     CytomineTags,
     CytomineProperties,
     AttachedFiles,
-    AnnotationCommentsModal,
     TrackTree,
     CytomineTrack
   },

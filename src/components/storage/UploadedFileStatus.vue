@@ -83,6 +83,8 @@ export default {
         case 51:
         case 61:
           return 'danger';
+        default:
+          return null;
       }
     },
     tagClass() {

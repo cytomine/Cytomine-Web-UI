@@ -136,8 +136,6 @@ import {get} from '@/utils/store-helpers';
 import {Software, SoftwareParameterCollection, ProjectCollection} from 'cytomine-client';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import SoftwareParameterDetails from '@/components/software/SoftwareParameterDetails';
 import SoftwareStatisticsChart from '@/components/charts/SoftwareStatisticsChart';
 import SoftwareDetails from '@/components/software/SoftwareDetails';
@@ -150,8 +148,6 @@ export default {
     SoftwareStatisticsChart,
     SoftwareParameterDetails,
     CytomineDescription,
-    CytomineProperties,
-    AttachedFiles
   },
   data() {
     return {
