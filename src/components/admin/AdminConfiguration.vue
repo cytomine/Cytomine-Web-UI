@@ -95,11 +95,25 @@
     <div class="column is-one-quarter" style="padding-left:3.5em;">
       <h3>{{$t('logo')}}</h3>
     </div>
-    <div class="column is-one-quarter">
-      <b-input
-        v-model="logoConfig.value"
-        placeholder=""
-      />
+    <div class="column is-one-quarter has-text-centered">
+      <b-upload v-model="selectedImage" type="is-link" drag-drop>
+        <div class="content has-text-centered">
+          <template v-if="!selectedImage">
+            <p><i class="fas fa-upload fa-3x"></i></p>
+            <p>{{$t('choose-file-or-drop')}}</p>
+          </template>
+          <template v-else>
+            <p class="filename is-size-4"><i class="fas fa-file"></i> {{selectedImage.name}}</p>
+            <p class="has-text-grey is-size-6">{{$t('click-or-drop-new-file')}}</p>
+          </template>
+        </div>
+      </b-upload>
+      <div class="has-text-centered" v-if="!isImageSizeValid()">
+          <b-field
+            type="is-danger"
+            :message="$t('logo-upload-error-message')">
+        </b-field>
+      </div>
     </div>
     <div class="column is-one-half">
       <article class="message is-info is-small">
@@ -239,10 +253,34 @@ export default {
       activitiesRetentionDelayConfig: new Configuration({key: constants.CONFIG_KEY_ACTIVITIES_RETENTION_DELAY_IN_DAYS, value: '0', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
-      logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'})
+      logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'}),
+      selectedImage: null,
+      selectedImageSize: {width: 0, height: 0},
     };
   },
+  watch: {
+    selectedImage(file) {
+      let reader = new FileReader();
+
+      // Read file and return the content as base 64 encoded string
+      reader.readAsDataURL(file);
+      reader.onload = evt => {
+
+        let img = new Image();
+        img.onload = () => {
+          this.selectedImageSize.width = img.width;
+          this.selectedImageSize.height = img.height;
+        };    
+
+        this.logoConfig.value = evt.target.result;
+        img.src = this.logoConfig.value;
+      };
+    }
+  },
   methods: {
+    isImageSizeValid(){
+      return (this.selectedImageSize.width <= 150 && this.selectedImageSize.height <= 150);
+    },
     async save() {
       try {
         if(!this.welcomeConfig.value) {
@@ -283,6 +321,9 @@ export default {
         }
         if(!this.logoConfig.value && this.logoConfig.id!=null) {
           await this.logoConfig.delete();
+        }
+        else if (!this.isImageSizeValid()) {
+          throw new TypeError(this.$t('logo-upload-error-message'));
         }
         else if (this.logoConfig.value) {
           await this.logoConfig.save();
