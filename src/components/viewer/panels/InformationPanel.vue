@@ -94,8 +94,9 @@
           </div>
         </td>
       </tr>
-      <tr v-show="showLabel">
-        <img :src="image.labelURL" class="image-overview" @error="hideImageComponent" @load="showImageComponent">
+      <tr v-show="showLabel || showMacro">
+        <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
+        <img :src="image.macroURL" v-show="showMacro" class="image-overview" @error="hideImageMacro" @load="showImageMacro">
       </tr>
     </tbody>
   </table>
@@ -128,7 +129,8 @@ export default {
       calibrationModal: false,
       isFirstImage: false,
       isLastImage: false,
-      showLabel: false
+      showLabel: false,
+      showMacro: false
     };
   },
   computed: {
@@ -153,13 +155,21 @@ export default {
     }
   },
   methods: {
-    hideImageComponent() {
+    hideImageLabel() {
       console.log('hide');
       this.showLabel = false;
     },
-    showImageComponent() {
+    showImageLabel() {
       console.log('show');
       this.showLabel = this.showSlideLabelIfExist;
+    },
+    hideImageMacro() {
+      console.log('hide');
+      this.showMacro = false;
+    },
+    showImageMacro() {
+      console.log('show');
+      this.showMacro = this.showSlideLabelIfExist;
     },
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});

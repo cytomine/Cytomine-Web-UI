@@ -93,6 +93,17 @@
           </em>
         </td>
       </tr>
+      <tr v-if="isPropDisplayed('label-preview')">
+        <td class="prop-label">{{$t('slide-preview')}}</td>
+        <td class="prop-content" colspan="3">
+          <a v-if="image.labelURL" @click="isMetadataModalActive = true">
+            <img :src="image.labelURL" class="image-overview">
+          </a>
+          <em v-else>
+            {{$t('label-preview-not-available')}}
+          </em>
+        </td>
+      </tr>
       <tr v-if="isPropDisplayed('original-filename') && (!blindMode || canManageProject)">
         <td class="prop-label">{{$t('originalFilename')}}</td>
         <td class="prop-content" colspan="3">
