@@ -14,12 +14,12 @@
 
 <template>
 <div class="navbar-item has-dropdown is-hoverable">
-  <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" :style="[isActive ? {...backgroundColor, ...fontColor} : {...fontColor}]" tabindex="0">
+  <span class="navbar-link" @mouseover="mouseOver()" @mouseleave="mouseLeave()" :style="style" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
   </span>
-  <div class="navbar-dropdown" :class="classes">
+  <div class="navbar-dropdown" @mouseover="mouseOver()"  @mouseleave="mouseLeave()" :class="classes">
     <slot></slot>
   </div>
 </div>
@@ -37,24 +37,48 @@ export default {
     linkClasses: Object,
     listPathes: Array,
     fontColor: Object,
-    backgroundColor: Object
+    backgroundColor: Object,
+    hoverBackgroundColor: Object
   },
   data() {
     return {
-      isActive: false
+      isActive: false,
+      style: {backgroundColor: this.backgroundColor.color, color: this.fontColor}
     };
   },
   watch: {
     '$route.path': {
       handler() {
-        if (this.listPathes) {
-          this.isActive = !!this.listPathes.find(p => this.$route.path.match(p));
-        }
+        this.checkItemSelected();
         // required so dropdown doesn't remain open on route change.
         document.activeElement.blur();
       },
       immediate: true
     }
+  },
+  methods: {
+    mouseOver: function(){
+      this.setStyleToColor(this.hoverBackgroundColor.color);
+    },
+    mouseLeave: function(){
+      this.setStyle();
+    },
+    setStyle(){
+      this.isActive ? this.setStyleToColor(this.hoverBackgroundColor.color) : this.setStyleToColor(this.backgroundColor.color);
+    },
+    setStyleToColor(color){
+      this.style.backgroundColor = color;
+    },
+    checkItemSelected() {
+      if (this.listPathes) {
+        this.isActive = !!this.listPathes.find(p => this.$route.path.match(p));
+      }
+      this.setStyle();
+    }
+  },
+  created() {
+    this.style = {backgroundColor: this.backgroundColor.color, color: this.fontColor.color};
+    this.checkItemSelected();
   }
 };
 </script>

@@ -24,31 +24,32 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown
-      icon="fa-folder-open"
-      v-if="this.nbActiveProjects > 0"
-      :title="$t('workspace')"
-      :listPathes="['/project/']"
-      :style="getStyle('/project/')">
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0 && !this.isFetching"
+        :title="$t('workspace')"
+        :listPathes="['/project/']"
+        :fontColor="{'color': activeFontColor}"
+        :backgroundColor="{'color': activeColor}"
+        :hoverBackgroundColor="{'color': lighterActiveColor}"
+      >
         <navigation-tree />
       </navbar-dropdown>
-      <router-link to="/projects" class="navbar-item" :style="getStyle('/projects')">
+      <router-link to="/projects" class="navbar-item" @mouseover.native="mouseOver('projects')" @mouseleave.native="mouseLeave('projects')" :style="itemStyles.projects">
         <i class="fas fa-list-alt"></i>
         {{ $t('projects') }}
       </router-link>
-      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" :style="getStyle('/storage')">
+      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" @mouseover.native="mouseOver('storage')" @mouseleave.native="mouseLeave('storage')" :style="itemStyles.storage">
         <i class="fas fa-download"></i>
         {{ $t('storage') }}
       </router-link>
-      <router-link to="/ontology" class="navbar-item" :style="getStyle('/ontology')">
+      <router-link to="/ontology" class="navbar-item" @mouseover.native="mouseOver('ontology')" @mouseleave.native="mouseLeave('ontology')" :style="itemStyles.ontology">
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link v-show="algoEnabled" to="/software" class="navbar-item" :style="getStyle('/software')">
+      <router-link v-show="algoEnabled" to="/software" class="navbar-item" @mouseover.native="mouseOver('software')" @mouseleave.native="mouseLeave('software')" :style="itemStyles.software">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
-      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item" :style="getStyle('/admin')">
+      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item" @mouseover.native="mouseOver('admin')" @mouseleave.native="mouseLeave('admin')" :style="itemStyles.admin">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
@@ -58,13 +59,15 @@
       <cytomine-searcher />
 
       <navbar-dropdown
+        v-if="!this.isFetching"
         :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
         :title="currentUserFullInfo"
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
         :fontColor="{'color': activeFontColor}"
-        :backgroundColor="{'backgroundColor': lighterActiveColor}"
+        :backgroundColor="{'color': activeColor}"
+        :hoverBackgroundColor="{'color': lighterActiveColor}"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
@@ -91,7 +94,15 @@
         </a>
       </navbar-dropdown>
 
-      <navbar-dropdown icon="fa-question-circle" :title="$t('help')" :classes="['is-right']" :fontColor="{'color': activeFontColor}">
+      <navbar-dropdown
+        v-if="!this.isFetching"
+        icon="fa-question-circle"
+        :title="$t('help')"
+        :classes="['is-right']"
+        :fontColor="{'color': activeFontColor}"
+        :backgroundColor="{'color': activeColor}"
+        :hoverBackgroundColor="{'color': lighterActiveColor}"
+      >
         <a class="navbar-item" @click="openHotkeysModal()">
           <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
         </a>
@@ -138,6 +149,8 @@ export default {
       activeColor: '#f5f5f5',
       lighterActiveColor: '#ffffff',
       activeFontColor: '#363636',
+      itemStyles: {workspace: {}, projects: {}, storage: {}, ontology: {}, software: {}, admin: {}},
+      isFetching: true,
       logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
       //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
     };
@@ -154,6 +167,7 @@ export default {
   watch: {
     $route(){
       this.openedTopMenu = false;
+      this.activeSelectedItem();
     }
   },
   methods: {
@@ -172,8 +186,30 @@ export default {
         hasModalCard: true
       });
     },
-    getStyle(path){
-      return this.$route.path.match(path) ? {backgroundColor: this.lighterActiveColor, color: this.activeFontColor} : {color: this.activeFontColor};
+    // ---
+
+    mouseOver: function(item){
+      this.setItemColor(item, this.lighterActiveColor);
+    },
+    mouseLeave: function(item){
+      this.setItemColor(item, this.activeColor);
+      this.activeSelectedItem();
+    },
+    activeSelectedItem(){
+      this.initItemsStyles();
+      let item = this.$route.path.replace('/', '');
+      // If it's not root path or workspace ('/project/') path.
+      if (item && !this.$route.path.match('/project/')){
+        this.setItemColor(item, this.lighterActiveColor);
+      }
+    },
+    initItemsStyles(){
+      for(let item in this.itemStyles){
+        this.itemStyles[item] = {backgroundColor: this.activeColor, color: this.activeFontColor};
+      }
+    },
+    setItemColor(item, color){
+      this.itemStyles[item].backgroundColor = color;
     },
     // ---
 
@@ -223,6 +259,7 @@ export default {
       }
     },
     async fetchConfig() {
+      this.isFetching = true;
       try {
         let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
         if (value && value!=='') {
@@ -251,6 +288,9 @@ export default {
       catch(error) {
         // no config defined
       }
+      this.initItemsStyles();
+      this.activeSelectedItem();
+      this.isFetching = false;
     },
   },
   async created() {
