@@ -115,16 +115,7 @@ export default {
       this.email.cc = '';
       this.emailId = '';
 
-      let emailsTo = representatives.map(x => x['email']);
-      console.log('emailsTo', emailsTo);
-      if (emailsTo.length==1) {
-        this.emailId = emailsTo[0];
-      }
-      else if (emailsTo.length>1) {
-        this.emailId = emailsTo[0];
-        emailsTo.shift();
-        this.email.cc = emailsTo.join(',');
-      }
+      this.emailId = [...new Set(representatives.map(x => x['email']))].join(',');
 
       let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
       this.email.body = 'Dear project representatives, \n' +
