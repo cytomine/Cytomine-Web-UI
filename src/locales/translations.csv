@@ -1049,7 +1049,7 @@ shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des em
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
 to-delete-at-configuration, Delete project after (days), Supprimer les projets après (jours)
-activities-time-to-live-in-hours, Activities retention delay (hours), Délai de rétention des activités (heures)
+activities-time-to-live-in-hours, Delete activity logs after (days), Supprimer les logs d'activité après (jours)
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
 logo, Logo, Logo
