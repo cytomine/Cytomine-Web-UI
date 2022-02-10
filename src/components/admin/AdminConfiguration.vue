@@ -197,7 +197,7 @@
     </div>
   </div>
 
-  <div class="columns">
+  <div class="columns is-vcentered">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
       <h3>{{$t('top-font-menu-color')}}</h3>
     </div>
@@ -350,7 +350,7 @@ export default {
         img.onload = () => {
           this.selectedImageSize.width = img.width;
           this.selectedImageSize.height = img.height;
-        };    
+        };
 
         this.logoConfig.value = evt.target.result;
         img.src = this.logoConfig.value;
@@ -391,6 +391,7 @@ export default {
           await this.logoConfig.delete();
         }
         else if (!this.isImageSizeValid()) {
+          this.$notify({type: 'error', text: this.$t('logo-upload-error-message')});
           throw new TypeError(this.$t('logo-upload-error-message'));
         }
         else if (this.logoConfig.value) {
