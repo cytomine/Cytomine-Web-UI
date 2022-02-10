@@ -131,13 +131,18 @@ function integerToHexa(integer) {
   return hexacode.length == 1 ? '0' + hexacode : hexacode;
 }
 
+function lighterHexaColor(hexa){
+  var intColor = parseInt(hexa, 16) + 12;
+  if(intColor > 255) intColor = 255;
+  return integerToHexa(intColor);
+}
+
 export function getLighterColor(hexacode) {
+  var lighterRed = lighterHexaColor(hexacode[1]+hexacode[2]);
+  var lighterGreen = lighterHexaColor(hexacode[3]+hexacode[4]);
+  var lighterBlue = lighterHexaColor(hexacode[5]+hexacode[6]);
 
-  var lighterRed = parseInt(hexacode[1]+hexacode[2],16) + 36;
-  var lighterGreen = parseInt(hexacode[3]+hexacode[4],16) + 36;
-  var lighterBlue = parseInt(hexacode[5]+hexacode[6],16) + 36;
-
-  return '#' + integerToHexa(lighterRed) + integerToHexa(lighterGreen) + integerToHexa(lighterBlue);
+  return '#' + lighterRed + lighterGreen + lighterBlue;
 }
 
 export function randomColor() {
