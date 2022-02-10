@@ -145,7 +145,7 @@
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection, Cytomine} from 'cytomine-client';
+import {UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
