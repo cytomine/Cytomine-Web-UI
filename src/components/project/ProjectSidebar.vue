@@ -108,7 +108,7 @@ export default {
       this.$eventBus.$emit('updateMapSize');
     },
     async sendEmailReport() {
-      this.email.subject = 'Report about project ' + this.project['name'];
+      this.email.subject = 'Report about a project you represent';
 
       let representatives = (await this.project.fetchRepresentatives()).array;
       console.log(representatives);
