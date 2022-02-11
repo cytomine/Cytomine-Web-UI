@@ -131,18 +131,17 @@ function integerToHexa(integer) {
   return hexacode.length == 1 ? '0' + hexacode : hexacode;
 }
 
-function lighterHexaColor(hexa){
-  var intColor = parseInt(hexa, 16) + 12;
-  if(intColor > 255) intColor = 255;
+function darkerHexaColor(hexa){
+  var intColor = parseInt(hexa, 16) - 12;
+  if(intColor < 0) intColor = 0;
   return integerToHexa(intColor);
 }
 
-export function getLighterColor(hexacode) {
-  var lighterRed = lighterHexaColor(hexacode[1]+hexacode[2]);
-  var lighterGreen = lighterHexaColor(hexacode[3]+hexacode[4]);
-  var lighterBlue = lighterHexaColor(hexacode[5]+hexacode[6]);
-
-  return '#' + lighterRed + lighterGreen + lighterBlue;
+export function getDarkerColor(hexacode) {
+  var darkerRed = darkerHexaColor(hexacode[1]+hexacode[2]);
+  var darkerGreen = darkerHexaColor(hexacode[3]+hexacode[4]);
+  var darkerBlue = darkerHexaColor(hexacode[5]+hexacode[6]);
+  return '#' + darkerRed + darkerGreen + darkerBlue;
 }
 
 export function randomColor() {

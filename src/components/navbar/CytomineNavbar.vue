@@ -29,7 +29,7 @@
         :listPathes="['/project/']"
         :fontColor="{'color': activeFontColor}"
         :backgroundColor="{'color': activeColor}"
-        :hoverBackgroundColor="{'color': lighterActiveColor}"
+        :hoverBackgroundColor="{'color': darkerActiveColor}"
       >
         <navigation-tree />
       </navbar-dropdown>
@@ -67,7 +67,7 @@
         :listPathes="['/account', '/activity']"
         :fontColor="{'color': activeFontColor}"
         :backgroundColor="{'color': activeColor}"
-        :hoverBackgroundColor="{'color': lighterActiveColor}"
+        :hoverBackgroundColor="{'color': darkerActiveColor}"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
@@ -101,7 +101,7 @@
         :classes="['is-right']"
         :fontColor="{'color': activeFontColor}"
         :backgroundColor="{'color': activeColor}"
-        :hoverBackgroundColor="{'color': lighterActiveColor}"
+        :hoverBackgroundColor="{'color': darkerActiveColor}"
       >
         <a class="navbar-item" @click="openHotkeysModal()">
           <span class="icon"><i class="far fa-keyboard fa-xs"></i></span> {{$t('shortcuts')}}
@@ -128,7 +128,7 @@ import CytomineSearcher from '@/components/search/CytomineSearcher';
 import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
-import {getLighterColor} from '@/utils/color-manipulation.js';
+import {getDarkerColor} from '@/utils/color-manipulation.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -147,7 +147,7 @@ export default {
       SSOEnabled: constants.SSO_ENABLED,
       aboutModal: false,
       activeColor: '#f5f5f5',
-      lighterActiveColor: '#ffffff',
+      darkerActiveColor: '#ffffff',
       activeFontColor: '#363636',
       itemStyles: {workspace: {}, projects: {}, storage: {}, ontology: {}, software: {}, admin: {}},
       isFetching: true,
@@ -189,7 +189,7 @@ export default {
     // ---
 
     mouseOver: function(item){
-      this.setItemColor(item, this.lighterActiveColor);
+      this.setItemColor(item, this.darkerActiveColor);
     },
     mouseLeave: function(item){
       this.setItemColor(item, this.activeColor);
@@ -200,7 +200,7 @@ export default {
       let item = this.$route.path.replace('/', '');
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
-        this.setItemColor(item, this.lighterActiveColor);
+        this.setItemColor(item, this.darkerActiveColor);
       }
     },
     initItemsStyles(){
@@ -264,7 +264,7 @@ export default {
         let value = (await Configuration.fetch(constants.CONFIG_KEY_COLOR_TOP_MENU)).value;
         if (value && value!=='') {
           this.activeColor = value;
-          this.lighterActiveColor = getLighterColor(value);
+          this.darkerActiveColor = getDarkerColor(value);
         }
       }
       catch(error) {
