@@ -481,6 +481,7 @@ no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal
+slide-label,Slide label,Étiquette'
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename}
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename}
 file-tree,File tree,Arborescence de fichiers,Árbol de archivos
@@ -778,6 +779,7 @@ confirm-ontology-change,Confirm ontology change,Confirmer le changement d'ontolo
 confirm-ontology-change-delete-user-terms,Some members of this project have associated terms to annotations ({count} associations). <br> Are you sure you want to delete those associations to change the ontology?,Des membres du projet ont associé des termes à des annotations ({count} associations). Êtes-vous sûr de vouloir supprimer ces associations ?,Algunos miembros de este proyecto tienen términos asociados a anotaciones ({count} asociaciones). <br> ¿Está seguro de que desea eliminar esas asociaciones para cambiar la ontología?
 invalid-token,Invalid token,Token invalide,Token no válido
 slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,Sin vista previa de cristal
+slide-label-not-available,No slide label,Étiquette non disponible
 button-load-more,Load more,Plus,Cargar más
 dont-have-access-to-any-ontology,You don't have access to any ontology,Vous n'avez accès à aucune ontologie,No tiene acceso a ninguna ontología.
 managed-projects,Managed projects,Projets supervisés,Proyectos administrados
