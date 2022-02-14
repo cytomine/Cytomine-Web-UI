@@ -95,7 +95,7 @@
         </td>
       </tr>
       <tr v-show="showLabel">
-        <td><strong>{{$t('magnification')}}</strong></td>
+        <td><strong>{{$t('slide-label')}}</strong></td>
         <td>
           <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
         </td>
