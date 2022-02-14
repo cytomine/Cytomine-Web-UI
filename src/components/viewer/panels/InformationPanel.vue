@@ -94,9 +94,21 @@
           </div>
         </td>
       </tr>
-      <tr v-show="showLabel || showMacro">
-        <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
-        <img :src="image.macroURL" v-show="showMacro" class="image-overview" @error="hideImageMacro" @load="showImageMacro">
+      <tr v-show="showLabel">
+        <td><strong>{{$t('magnification')}}</strong></td>
+        <td>
+          <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
+        </td>
+      </tr>
+      <tr v-show="showMacro">
+        <td colspan="2" class="has-text-centered" style="border-bottom-width: 0;">
+          <strong>{{$t('slide-preview')}}</strong>
+        </td>
+      </tr>
+      <tr v-show="showMacro">
+        <td colspan="2" class="has-text-centered">
+          <img :src="image.macroURL" v-show="showMacro" class="image-overview" @error="hideImageMacro" @load="showImageMacro">
+        </td>
       </tr>
     </tbody>
   </table>
@@ -155,16 +167,18 @@ export default {
     }
   },
   methods: {
-    hideImageLabel() {
+    hideImageLabel(e) {
       console.log('hide');
+      e.target.outerHTML= '<i class="fas fa-ban"></i>';
       this.showLabel = false;
     },
     showImageLabel() {
       console.log('show');
       this.showLabel = this.showSlideLabelIfExist;
     },
-    hideImageMacro() {
+    hideImageMacro(e) {
       console.log('hide');
+      e.target.outerHTML= '<i class="fas fa-ban"></i>';
       this.showMacro = false;
     },
     showImageMacro() {
