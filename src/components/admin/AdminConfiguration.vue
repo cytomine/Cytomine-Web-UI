@@ -52,7 +52,7 @@
 
   <hr/>
   <h2>{{$t('top-menu')}}</h2>
-  <div class="columns">
+  <div class="columns is-vcentered">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
       <h3>{{$t('top-menu-color')}}</h3>
     </div>
@@ -65,7 +65,7 @@
             placeholder=""
           />
         </div>
-        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openMenuColorModal()"></button>  
+        <button class="button color-picker-button" :style="`background-color:${topMenuColorConfig.value};`" @click="openMenuColorModal()"></button>
       </div>
     </div>
     <div class="column is-one-half">
@@ -77,7 +77,7 @@
             </div>
             <div class="media-content">
               {{$t('top-menu-color-description')}} <br/>
-              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">{{$t('top-menu-color-list')}}</a>)
             </div>
           </div>
         </section>
@@ -110,7 +110,7 @@
             </div>
             <div class="media-content">
               {{$t('top-font-menu-color-description')}} <br/>
-              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">{{$t('top-menu-color-list')}}</a>)
             </div>
           </div>
         </section>
@@ -119,28 +119,32 @@
   </div>
 
 
-  <div class="columns">
+  <div class="columns" style="height: 6.5em;">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
       <h3>{{$t('logo')}}</h3>
     </div>
     <div class="column is-one-quarter has-text-centered">
-      <b-upload v-model="selectedImage" type="is-link" drag-drop>
-        <div class="content has-text-centered">
-          <template v-if="!selectedImage">
-            <p><i class="fas fa-upload fa-3x"></i></p>
-            <p>{{$t('choose-file-or-drop')}}</p>
-          </template>
-          <template v-else>
-            <p class="filename is-size-4"><i class="fas fa-file"></i> {{selectedImage.name}}</p>
-            <p class="has-text-grey is-size-6">{{$t('click-or-drop-new-file')}}</p>
-          </template>
+      <div class="upload-container">
+        <div v-if="!fetching">
+          <b-upload v-model="selectedImage" type="is-link" drag-drop :disabled="logoConfig.value != '' ? true : false" >
+              <div class="content has-text-centered b-upload">
+                <template v-if="!logoConfig.value">
+                  <p><i class="fas fa-upload fa-3x"></i></p>
+                  <p>{{$t('choose-file-or-drop')}}</p>
+                </template>
+                <div v-else>
+                  <div class="cross" @click="resetLogoConfig">X</div>
+                  <img :src="logoConfig.value" id="upload_logo" alt="Logo" class="logo"/>
+                </div>
+            </div>
+          </b-upload>
         </div>
-      </b-upload>
-      <div class="has-text-centered" v-if="!isImageSizeValid()">
+        <div v-if="!isImageSizeValid()">
           <b-field
             type="is-danger"
             :message="$t('logo-upload-error-message')">
-        </b-field>
+          </b-field>
+        </div>
       </div>
     </div>
     <div class="column is-one-half">
@@ -152,6 +156,102 @@
             </div>
             <div class="media-content">
               {{$t('logo-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
+  <hr/>
+  <h2>{{$t('temporary-data-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('to-delete-at-configuration')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="toDeleteAtDelayConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('to-delete-at-configuration-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('activities-time-to-live-in-hours')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <b-input
+        v-model="activitiesRetentionDelayConfig.value"
+        placeholder=""
+      />
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('activities-time-to-live-in-hours-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+  <p class="has-text-right">
+    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  </p>
+
+
+
+  <hr/>
+  <h2>{{$t('mail-settings')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('shared-annotation-mail-mode')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <cytomine-multiselect
+        v-model="sharedAnnotationMailMode.value"
+        :options="['classic', 'restricted']"
+        :allow-empty="false"
+        :searchable="false"
+      />
+
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('shared-annotation-mail-mode-description')}}
             </div>
           </div>
         </section>
@@ -178,6 +278,7 @@ export default {
   components: {CytomineQuillEditor, CytomineMultiselect},
   data() {
     return {
+      fetching: true,
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       sharedAnnotationMailMode: new Configuration({key: constants.CONFIG_KEY_SHARE_ANNOTATION_EMAIL_MODE, value: 'classic', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
@@ -201,14 +302,18 @@ export default {
           this.selectedImageSize.height = img.height;
         };
 
-        this.logoConfig.value = evt.target.result;
-        img.src = this.logoConfig.value;
+        let encodedFile = evt.target.result;
+        this.logoConfig.value = encodedFile;
+        img.src = encodedFile;
       };
     }
   },
   methods: {
     isImageSizeValid(){
-      return (this.selectedImageSize.width <= 150 && this.selectedImageSize.height <= 150);
+      if(this.selectedImage){
+        return (this.selectedImageSize.width <= 150 && this.selectedImageSize.height <= 150);
+      }
+      return true;
     },
     async save() {
       try {
@@ -288,6 +393,11 @@ export default {
       this.openModal(props, events);
     },
 
+    resetLogoConfig(event) {
+      event.preventDefault();
+      this.logoConfig.value = '';
+      this.selectedImage = null;
+    }
   },
   async created() {
     try {
@@ -310,11 +420,20 @@ export default {
     catch(error) {
       // ignored
     }
+    this.fetching = false;
   }
 };
 </script>
 
 <style scoped>
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+}
+
 >>> .cytomine-quill-editor {
   min-height: 25em !important;
   max-height: 25em !important;
@@ -327,6 +446,34 @@ export default {
 .color-picker-button {
   margin-top: 0.75em;
   width: 2.25em;
+}
+
+.b-upload{
+  padding: 0em 0.5em 0em 0.5em;
+  width: 20em;
+  height: 6em;
+  opacity: 1;
+}
+
+.logo{
+  margin-top: 0.5em;
+  margin-left: 1.5em;
+  max-width : 30%;
+}
+
+.cross{
+  float: right;
+  transform: scale(1.5, 1.2);
+  cursor: pointer;
+}
+
+</style>
+
+<style>
+
+.upload .upload-draggable.is-disabled {
+  opacity: 1;
+  cursor: not-allowed;
 }
 
 </style>
