@@ -285,7 +285,7 @@ export default {
         }
       }
       catch(error) {
-        // no config defined
+        this.logo = require('@/assets/logo.svg');
       }
       this.initItemsStyles();
       this.activeSelectedItem();
