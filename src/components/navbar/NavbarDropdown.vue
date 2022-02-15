@@ -46,10 +46,7 @@ export default {
     '$route.path': {
       handler() {
         if (this.listPathes) {
-          this.isActive = false;
-          this.listPathes.forEach(path => {
-            this.$route.path.match(path) ? this.isActive = true : '';
-          });
+          this.isActive = !!this.listPathes.find(p => this.$route.path.match(p));
         }
         // required so dropdown doesn't remain open on route change.
         document.activeElement.blur();
