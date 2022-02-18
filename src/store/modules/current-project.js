@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 */
 
 import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
+
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
@@ -131,6 +132,9 @@ export default {
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
+      if (annot.type === AnnotationType.ALGO) {
+        return false;
+      }
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {

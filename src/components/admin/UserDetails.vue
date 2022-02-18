@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="details-wrapper">
   <b-loading :active="loading" :is-full-page="false" class="small" />
   <table v-if="!loading" class="table">
     <tbody>
+      <tr v-if="currentUser.isDeveloper">
+        <td>{{$t('id')}}</td>
+        <td colspan="2">{{user.id}}</td>
+      </tr>
       <tr>
         <td>{{$t('projects')}}</td>
         <td>

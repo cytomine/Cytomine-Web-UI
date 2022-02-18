@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="scale-line" :class="{'interpolation': interpolation}">
@@ -46,16 +45,16 @@ export default {
   },
   computed: {
     magnification() {
-      let magnification = Math.pow(2, this.zoom - this.image.depth) * this.image.magnification;
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
       return Math.round(magnification * 100) / 100;
     },
     resolution() {
-      let resolution = this.image.resolution ? this.image.resolution : 1;
-      return Math.pow(2, this.image.depth - this.zoom) * resolution;
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
+      return Math.pow(2, this.image.zoom - this.zoom) * resolution;
     },
     scaleLength() {
       let length = this.scaleLineLength * this.resolution;
-      if(this.image.resolution) {
+      if(this.image.physicalSizeX) {
         let unit = this.$t('um');
         if (length > 1000) {
           length /= 1000;
@@ -68,7 +67,7 @@ export default {
       }
     },
     interpolation() {
-      return this.zoom > this.image.depth;
+      return this.zoom > this.image.zoom;
     }
   }
 };

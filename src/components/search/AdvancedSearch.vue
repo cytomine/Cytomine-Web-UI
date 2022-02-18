@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="box error" v-if="error">
@@ -82,6 +81,10 @@
                 :is-manager="project.currentUserRoles.admin"
                 :is-representative="project.currentUserRoles.representative"
               />
+            </b-table-column>
+
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{project.id}}
             </b-table-column>
 
             <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -167,6 +170,10 @@
           :revision="revision"
         >
           <template #default="{row: image}">
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{image.id}}
+            </b-table-column>
+
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
                 <img :src="image.thumb" class="image-overview">
@@ -314,6 +321,9 @@ export default {
     },
     regexp() {
       return getWildcardRegexp(this.searchString);
+    },
+    lowCaseSearchString() {
+      return this.searchString.toLowerCase();
     },
     projectCollection() {
       let collection = new ProjectCollection({
