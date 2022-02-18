@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ import {fullName} from '@/utils/user-utils.js';
 import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
+import constants from '@/utils/constants';
 
 export default {
   name: 'list-annotations-by',
@@ -87,7 +88,7 @@ export default {
 
     termsIds: Array,
     tracksIds: Array,
-    tagsIds: {type: Array, default: () => []},
+    tagsIds: Array,
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
@@ -118,6 +119,8 @@ export default {
     };
   },
   computed: {
+    project: get('currentProject/project'),
+
     isByTerm() {
       return this.categorization === 'TERM';
     },
@@ -132,6 +135,16 @@ export default {
     },
     isByTag() {
       return this.categorization === 'TAG';
+    },
+    filteredTermsIds() {
+      return this.termsIds.filter(id => id > 0);
+    },
+    filteredTracksIds() {
+      return this.tracksIds.filter(id => id > 0);
+    },
+
+    tooManyImages() {
+      return this.project.numberOfImages > constants.MAX_IMAGES_FOR_FILTER;
     },
 
     collection() {
@@ -151,11 +164,11 @@ export default {
         multipleTrack: this.multipleTracks,
         noTag: this.noTag,
 
-        terms: (!this.isByTerm) ? this.termsIds.filter(id => id > 0) : null,
-        users: (!this.isByUser) ? this.usersIds : null,
-        images: (!this.isByImage) ? this.imagesIds : null,
-        tracks: (!this.isByTrack) ? this.tracksIds.filter(id => id > 0) : null,
-        tags: (!this.isByTag) ? this.tagsIds.filter(id => id > 0) : null,
+        terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
+        users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
+        images: (!this.isByImage && ((this.tooManyImages && this.imagesIds.length > 0) || (!this.tooManyImages && this.imagesIds.length < this.allImages.length))) ? this.imagesIds : null,
+        tracks: (!this.isByTrack && (this.noTrack || this.multipleTrack || this.filteredTracksIds.length < this.allTracks.length)) ? this.filteredTracksIds.filter(id => id > 0) : null,
+        tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
 
         reviewed: this.reviewed,
         reviewUsers: (!this.isByUser) ? this.reviewUsersIds : null,
@@ -163,10 +176,12 @@ export default {
         showGIS: true,
         showTrack: true,
         showWKT: this.isInViewer,
+        showImage: this.tooManyImages,
         showSlice: true,
         afterThan: this.afterThan,
         beforeThan: this.beforeThan,
-        max: this.nbPerPage
+        max: this.nbPerPage,
+        project: this.currentProject.id
       });
     },
     title() {
@@ -236,13 +251,13 @@ export default {
     currentPage: {
       get() {
         if (this.isInViewer) {
-          return this.imageWrapper.annotationsList.currentPage || 1;
+          return this.imageWrapper.annotationsList.currentPages[this.prop.id] || 1;
         }
         return this.$store.state.projects[this.currentProject.id].listAnnotations.currentPages[this.prop.id] || 1;
       },
       set(page) {
         if (this.isInViewer) {
-          this.$store.commit(this.imageModule + 'setCurrentPage', page);
+          this.$store.commit(this.imageModule + 'setCurrentPage', {prop: this.prop.id, page});
         }
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
@@ -293,8 +308,8 @@ export default {
 
       this.pendingReload = false;
 
-      if(!this.imagesIds.length || (!this.reviewed && !this.usersIds.length)
-        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || !this.tagsIds.length) {
+      if((!this.tooManyImages && !this.imagesIds.length) || (!this.reviewed && !this.usersIds.length)
+        || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || (this.tagsIds ? !this.tagsIds.length : 0)) {
         this.annotations = [];
         this.nbAnnotations = 0;
         return;

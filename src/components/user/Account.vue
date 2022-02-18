@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -68,12 +68,12 @@
           </b-select>
         </b-field>
 
-        <b-field :label="$t('developer-mode')" horizontal>
+        <!--<b-field :label="$t('developer-mode')" horizontal>
           <b-switch v-model="updatedUser.isDeveloper" class="switch">
             <template v-if="updatedUser.isDeveloper">{{$t('yes')}}</template>
             <template v-else>{{$t('no')}}</template>
           </b-switch>
-        </b-field>
+        </b-field>-->
 
         <b-field grouped position="is-right">
           <div class="control">

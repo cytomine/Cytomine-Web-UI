@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
 
-        <tr v-if="profile && isPoint">
+        <tr v-if="profile && isPoint && false">
           <td><strong>{{$t('profile')}}</strong></td>
           <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
@@ -295,7 +295,8 @@ export default {
       return this.canEdit && this.annotation.type === AnnotationType.USER;
     },
     image() {
-      return this.images.find(image => image.id === this.annotation.image) || {};
+      return this.images.find(image => image.id === this.annotation.image) ||
+        {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@
             </div>
           </div>
 
-          <div class="column">
+          <!--<div class="column">
             <div class="filter-label">
               {{$t('favorite')}}
             </div>
@@ -84,7 +84,7 @@
               <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
                 label="label" track-by="value" multiple />
             </div>
-          </div>
+          </div>-->
         </div>
       </div>
 
@@ -98,12 +98,12 @@
         :revision="revision"
       >
         <template #default="{row: job}">
-          <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
+          <!--<b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
             <a @click="toggleFavorite(job)" v-if="canEdit(job)">
               <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
             </a>
             <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
-          </b-table-column>
+          </b-table-column>-->
 
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
             <router-link :to="`/software/${job.software}`">
