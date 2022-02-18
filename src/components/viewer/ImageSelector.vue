@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div>
@@ -111,7 +110,8 @@ export default {
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
-        await this.$store.dispatch(this.viewerModule + 'addImage', image);
+        let slice = await image.fetchReferenceSlice();
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
       }
       catch(error) {
         console.log(error);

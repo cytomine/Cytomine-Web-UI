@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -24,9 +24,12 @@ export default {
   state() {
     return {
       links: [],
+      linkMode: 'ABSOLUTE',
       imageSelector: false,
       activeImage: 0,
-      indexNextImage: 0
+      indexNextImage: 0,
+
+      copiedAnnot: null
     };
   },
 
@@ -43,6 +46,14 @@ export default {
 
     setActiveImage(state, index) {
       state.activeImage = index;
+    },
+
+    setCopiedAnnot(state, annot) {
+      state.copiedAnnot = annot;
+    },
+
+    setLinkMode(state, mode) {
+      state.linkMode = mode;
     },
 
     // ----- View links
@@ -86,11 +97,11 @@ export default {
       router.replace(getters.pathViewer({idAnnotation, action}));
     },
 
-    async addImage({state, commit, getters, dispatch}, image) {
+    async addImage({state, commit, getters, dispatch}, {image, slice}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
-      await dispatch(`images/${index}/initialize`, image);
+      await dispatch(`images/${index}/initialize`, {image, slice});
       dispatch('changePath');
     },
 
@@ -109,33 +120,51 @@ export default {
       }
     },
 
+    refreshTracks({state, dispatch}, {idImage}) {
+      for(let index in state.images) {
+        let image = state.images[index].imageInstance;
+        if(image && image.id === idImage) {
+          dispatch(`images/${index}/refreshTracks`);
+        }
+      }
+    },
+
     setCenter({state, getters, commit}, {index, center}) {
+      let relative = state.linkMode === 'RELATIVE';
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);
-      let refZoom = refImage.imageInstance.depth - refImage.view.zoom;
+      let refZoom = refImage.imageInstance.zoom - refImage.view.zoom;
 
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        let image = state.images[idx];
-        let diffZoom = image.imageInstance.depth - image.view.zoom - refZoom;
-        let zoomFactor = Math.pow(2, diffZoom);
-        commit(`images/${idx}/setCenter`, image.view.center.map((val, i) => val + increments[i]*zoomFactor));
+        let newCenter = center;
+        if (relative) {
+          let image = state.images[idx];
+          let diffZoom = image.imageInstance.zoom - image.view.zoom - refZoom;
+          let zoomFactor = Math.pow(2, diffZoom);
+          newCenter = image.view.center.map((val, i) => val + increments[i]*zoomFactor);
+        }
+        commit(`images/${idx}/setCenter`, newCenter);
       });
     },
 
     setZoom({state, getters, commit}, {index, zoom}) {
+      let relative = state.linkMode === 'RELATIVE';
       let zoomIncrement = zoom - state.images[index].view.zoom;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        commit(`images/${idx}/setZoom`, (state.images[idx].view.zoom + zoomIncrement));
+        let newZoom = (relative) ? (state.images[idx].view.zoom + zoomIncrement) : zoom;
+        commit(`images/${idx}/setZoom`, newZoom);
       });
     },
 
     setRotation({state, getters, commit}, {index, rotation}) {
+      let relative = state.linkMode === 'RELATIVE';
       let rotationInc = rotation - state.images[index].view.rotation + 2*Math.PI;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        commit(`images/${idx}/setRotation`, (state.images[idx].view.rotation + rotationInc) % (2*Math.PI));
+        let newRotation = (relative) ? (state.images[idx].view.rotation + rotationInc) % (2*Math.PI) : rotation;
+        commit(`images/${idx}/setRotation`, newRotation);
       });
     },
 
@@ -168,9 +197,10 @@ export default {
       let idViewer = getters.pathModule[3];
       // ---
       let imagesIds = Object.values(state.images).map(img => img.imageInstance ? img.imageInstance.id : 0);
+      let slicesIds = Object.values(state.images).map(img => img.activeSlice ? img.activeSlice.id : 0);
       let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
       let actionStr = action ? '&action=' + action : '';
-      return `/project/${idProject}/image/${imagesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
+      return `/project/${idProject}/image/${imagesIds.join('-')}/slice/${slicesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
     },
 
     getLinkedIndexes: state => index => { // find all indexes linked to provided index (if image is not linked, return only its index)

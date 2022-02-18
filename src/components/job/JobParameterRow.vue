@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <tr class="job-param-row-wrapper">
@@ -42,7 +41,7 @@
         v-validate="validationRules"
       >
         <template #option="{option}">
-          <div class="is-flex" v-if="annotationObjects">
+          <div class="is-flex" v-if="areAnnotationObjects">
             <div class="thumb-wrapper">
               <img class="thumb" :src="option.smallCropURL + '&draw=true&complete=true&increaseArea=1.25'">
             </div>
@@ -58,8 +57,13 @@
               {{ option[param.uriPrintAttribut] }}
             </span>
           </div>
-          <div class="is-flex" v-else-if="option.color">
+          <div class="is-flex" v-else-if="areTermObjects">
             <cytomine-term :term="option" />
+          </div>
+          <div class="is-flex" v-else-if="areJobObjects">
+            <span class="option__title">
+              {{ formatJob(option, param.uriPrintAttribut) }}
+            </span>
           </div>
         </template>
       </cytomine-multiselect>
@@ -74,6 +78,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import moment from 'moment';
 
 import {Cytomine, Description} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -118,15 +123,25 @@ export default {
         decimal: this.param.type === 'Number'
       };
     },
-    annotationObjects() {
-      if(this.options && this.options.length > 0) {
-        let cytoClass = this.options[0].class;
+    objectsClass() {
+      if (this.options && this.options.length > 0) {
+        return this.options[0].class;
+      }
+    },
+    areAnnotationObjects() {
+      if(this.objectsClass) {
         return [
           'be.cytomine.ontology.AlgoAnnotation',
           'be.cytomine.ontology.UserAnnotation',
           'be.cytomine.ontology.ReviewedAnnotation'
-        ].includes(cytoClass);
+        ].includes(this.objectsClass);
       }
+    },
+    areTermObjects() {
+      return this.objectsClass === 'be.cytomine.ontology.Term';
+    },
+    areJobObjects() {
+      return this.objectsClass === 'be.cytomine.processing.Job';
     }
   },
   watch: {
@@ -158,6 +173,14 @@ export default {
         default:
           return '';
       }
+    },
+    formatJob(job, attribute) {
+      if (['softwareName', 'created', 'fullName', 'number'].includes(attribute)) {
+        let date = moment(Number(job.created)).format('L LTS');
+        return `${job['softwareName']} - ${date} (#${job['number']})`;
+      }
+
+      return job[attribute];
     }
   },
   async created() {

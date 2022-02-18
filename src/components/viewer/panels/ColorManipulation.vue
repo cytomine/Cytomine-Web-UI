@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 
 <template>
@@ -135,7 +134,7 @@ export default {
   async created() {
     try {
       let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      filters.forEach(filter => filter.prefix = filter.processingServer + filter.baseUrl);
+      filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
       let prefixes = filters.map(filter => filter.prefix);
       if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 
 export default {
-  CYTOMINE_CORE_HOST: 'http://localhost-core',
-  CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',
-  STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
-  DIGITAL_ZOOM_INCREMENT: 4,
   SSO_ENABLED: false,
   SSO_LOGIN: '/login/Shibboleth', // or '/saml/login'
   LOGOUT_REDIRECTION: '/',
+  CYTOMINE_CORE_HOST: 'https://localhost-core',
+  CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
+  STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
+  DIGITAL_ZOOM_INCREMENT: 4,
+  PRELOADED_SLICES: 50,
   // features switches
   ALGORITHMS_ENABLED: true,
   // Refresh intervals (expressed in milliseconds)
@@ -30,12 +31,16 @@ export default {
   PING_INTERVAL: 20000, // should be lower than 30 seconds (otherwise, not counted in backend)
   JOB_DETAILS_REFRESH_INTERVAL: 2000,
   JOB_LOGS_REFRESH_INTERVAL: 5000,
-  TASK_REFRESH_INTERVAL: 1000,
+  TASK_REFRESH_INTERVAL: 2000,
   STORAGE_REFRESH_INTERVAL: 10000,
   ONGOING_UPLOAD_REFRESH_INTERVAL: 500,
   SAVE_POSITION_IN_IMAGE_INTERVAL: 5000, // position also stored each time the user moves in the image
   BROADCASTING_USERS_REFRESH_INTERVAL: 10000,
   TRACKING_REFRESH_INTERVAL: 500,
+  HISTOGRAM_REFRESH_INTERVAL: 3000,
+  ANNOTATION_STROKE_COLOR:  [0, 0, 0, 1],
+  ANNOTATION_STROKE_SELECT_COLOR: [0, 153, 255, 1],
+  MAX_IMAGES_FOR_FILTER: 50000,
   // ---
   IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',

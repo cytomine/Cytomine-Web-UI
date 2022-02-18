@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ export default {
       activeTool: 'select',
 
       termsNewAnnots: [],
+      tracksNewAnnots: [],
 
       activeEditTool: null,
       ongoingEdit: false
@@ -47,6 +48,15 @@ export default {
       let idTerms = terms.map(term => term.id);
       state.termsNewAnnots = state.termsNewAnnots.filter(id => idTerms.includes(id));
     },
+
+    setTracksNewAnnots(state, tracks) {
+      state.tracksNewAnnots = tracks;
+    },
+
+    filterTracksNewAnnots(state, tracks) {
+      let idTracks = tracks.map(track => track.id);
+      state.tracksNewAnnots = state.tracksNewAnnots.filter(id => idTracks.includes(id));
+    }
   },
 
   actions: {
@@ -59,8 +69,9 @@ export default {
       commit('activateTool', tool);
     },
 
-    refreshData({commit, rootGetters}) {
+    refreshData({commit, getters, rootGetters}) {
       commit('filterTermsNewAnnots', rootGetters['currentProject/terms'] || []);
-    }
+      commit('filterTracksNewAnnots', getters.tracks || []);
+    },
   }
 };

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,13 +12,22 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <h1>{{$t('digital-zoom')}}</h1>
   <b-checkbox v-model="digitalZoom">
     {{$t('digital-zoom-checkbox-label')}}
   </b-checkbox>
+
+  <div class="actions level">
+    <button class="button is-small level-item" @click="$emit('fitZoom')">
+      {{ $t('button-best-fit-zoom') }}
+    </button>
+    <button class="button is-small level-item" @click="$emit('resetZoom')">
+      {{ $t('button-reset-zoom') }}
+    </button>
+  </div>
+
 </div>
 </template>
 
@@ -46,3 +55,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .actions .button {
+    margin: 3px;
+    box-sizing: border-box;
+  }
+</style>

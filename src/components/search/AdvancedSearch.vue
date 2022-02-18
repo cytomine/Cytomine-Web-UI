@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="box error" v-if="error">
@@ -82,6 +81,10 @@
                 :is-manager="project.currentUserRoles.admin"
                 :is-representative="project.currentUserRoles.representative"
               />
+            </b-table-column>
+
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{project.id}}
             </b-table-column>
 
             <b-table-column field="name" :label="$t('name')" sortable width="250">
@@ -167,6 +170,10 @@
           :revision="revision"
         >
           <template #default="{row: image}">
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{image.id}}
+            </b-table-column>
+
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
                 <img :src="image.thumb" class="image-overview">
@@ -308,8 +315,17 @@ export default {
     pathSearchString() {
       return this.$route.params.searchString;
     },
+    querySearchString() {
+      return this.$route.query.searchString;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     regexp() {
       return getWildcardRegexp(this.searchString);
+    },
+    lowCaseSearchString() {
+      return this.searchString.toLowerCase();
     },
     projectCollection() {
       let collection = new ProjectCollection({
@@ -357,10 +373,24 @@ export default {
       if(val) {
         this.searchString = val;
       }
-    }
+    },
+    querySearchString(val) {
+      if(val && !this.pathSearchString) {
+        this.searchString = val;
+      }
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
   },
   async created() {
-    this.searchString = this.pathSearchString || '';
+    this.searchString = this.pathSearchString || this.querySearchString || '';
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
@@ -369,6 +399,12 @@ export default {
       this.error = true;
     }
     if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
+    }
 
     this.loading = false;
   }

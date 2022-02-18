@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -46,7 +46,16 @@ const moment = require('moment');
 Vue.use(VueMoment, {moment});
 
 import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, { prevent: ['input', 'textarea', '.ql-editor'] });
+Vue.use(VueShortKey, {
+  prevent: [
+    'input[type=text]',
+    'input[type=password]',
+    'input[type=search]',
+    'input[type=email]',
+    'textarea',
+    '.ql-editor'
+  ]
+});
 
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
@@ -64,6 +73,8 @@ Vue.use(RotateInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartZoom from 'chartjs-plugin-zoom';
+Chart.plugins.unregister(ChartZoom);
 Chart.plugins.unregister(ChartDataLabels);
 Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
   anchor: 'end',

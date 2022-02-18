@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <vue-slider
@@ -29,7 +28,9 @@
       @click.stop="startEdition(index)"
     >
         <template v-if="indexEdited !== index">
-          {{Math.round(value * 1000)/1000}}
+          <slot name="default" :value="value" >
+            {{Math.round(value * 1000)/1000}}
+          </slot>
         </template>
         <b-input
           v-else
@@ -68,8 +69,17 @@ export default {
     isArray() {
       return Array.isArray(this.value);
     },
+    middle() {
+      return (this.max - this.min) /2;
+    },
     tooltipPlacement() {
-      return this.isArray ? ['left', 'right'] : ['right'];
+      if (this.isArray)
+        return ['left', 'right'];
+
+      if (this.value >= this.middle)
+        return ['left'];
+
+      return ['right'];
     }
   },
   methods: {

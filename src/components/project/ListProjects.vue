@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="list-projects-wrapper content-wrapper">
@@ -135,7 +134,6 @@
         </div>
       </b-collapse>
 
-
       <cytomine-table
         :collection="projectCollection"
         class="table-projects"
@@ -258,7 +256,6 @@ export default {
       ontologies: [],
       availableTags:[],
 
-
       contributorLabel: this.$t('contributor'),
       managerLabel: this.$t('manager'),
 
@@ -294,11 +291,13 @@ export default {
     availableRoles() {
       return [this.contributorLabel, this.managerLabel];
     },
-
     availableOntologies() {
       return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
     selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
@@ -354,9 +353,9 @@ export default {
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
-          gte: bounds[0],
           lte: bounds[1]
         };
+        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       return collection;
     },
@@ -371,6 +370,15 @@ export default {
     revision() {
       this.fetchOntologies();
       this.fetchMaxFilters();
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
     }
   },
   methods: {
@@ -426,6 +434,12 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;
