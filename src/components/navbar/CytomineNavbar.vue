@@ -112,6 +112,7 @@ import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
 import {Cytomine} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
@@ -126,6 +127,8 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: false,
+      postLogoutURL: constants.LOGOUT_REDIRECTION,
+      SSOEnabled: constants.SSO_ENABLED,
       aboutModal: false
     };
   },
@@ -198,7 +201,8 @@ export default {
         await Cytomine.instance.logout();
         this.$store.dispatch('logout');
         this.changeLanguage();
-        this.$router.push('/');
+        if(this.SSOEnabled) window.location = this.postLogoutURL;
+        else this.$router.push(this.postLogoutURL);
       }
       catch(error) {
         console.log(error);

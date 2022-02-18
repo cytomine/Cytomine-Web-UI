@@ -15,8 +15,11 @@
 */
 
 export default {
-  CYTOMINE_CORE_HOST: 'https://localhost-core',
-  CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
+  SSO_ENABLED: false,
+  SSO_LOGIN: '/login/Shibboleth', // or '/saml/login'
+  LOGOUT_REDIRECTION: '/',
+  CYTOMINE_CORE_HOST: 'http://localhost-core',
+  CYTOMINE_UPLOAD_HOST: 'http://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   PRELOADED_SLICES: 50,

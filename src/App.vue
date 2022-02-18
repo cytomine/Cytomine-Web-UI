@@ -35,7 +35,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <login v-else-if="!currentUser" />
+    <login v-else-if="(!currentUser) && (!SSOEnabled)" />
 
     <template v-else>
       <cytomine-navbar />
@@ -71,7 +71,8 @@ export default {
     return {
       communicationError: false,
       loading: true,
-      timeout: null
+      timeout: null,
+      SSOEnabled: null
     };
   },
   computed: {
@@ -100,6 +101,10 @@ export default {
         }
         if(!this.currentUser && authenticated) {
           await this.fetchUser();
+        }
+        if(!this.currentUser && this.SSOEnabled) {
+          let redirect = encodeURIComponent(window.location.href);
+          window.location = constants.SSO_LOGIN+'?cytomine_redirect='+redirect;
         }
         this.communicationError = false;
       }
@@ -130,6 +135,7 @@ export default {
       }
     }
     Object.freeze(constants);
+    this.SSOEnabled = constants.SSO_ENABLED;
 
     new Cytomine(constants.CYTOMINE_CORE_HOST);
 
