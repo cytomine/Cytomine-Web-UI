@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="box error" v-if="!configUI['project-images-tab']">
@@ -83,7 +82,6 @@
                   label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
               </div>
             </div>
-
           </div>
 
           <div class="columns">
@@ -280,7 +278,8 @@ export default {
         'magnification',
         'numberOfAnnotations',
         'numberOfJobAnnotations',
-        'numberOfReviewedAnnotations'
+        'numberOfReviewedAnnotations',
+        'size'
       ],
       availableFormats: [],
       availableVendors: [],
@@ -335,7 +334,7 @@ export default {
         {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
         {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
-        {prop: 'resolution', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
+        {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
     },
