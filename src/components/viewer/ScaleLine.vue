@@ -46,7 +46,9 @@ export default {
   computed: {
     magnification() {
       let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
-      return Math.round(magnification * 100) / 100;
+      magnification = Math.round(magnification * 100) / 100;
+      this.$emit('update:magnification', magnification);
+      return magnification;
     },
     resolution() {
       let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;

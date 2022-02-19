@@ -17,6 +17,7 @@
 import {Style, Stroke, Fill, Circle, Text} from 'ol/style';
 import {MultiPoint} from 'ol/geom';
 import {asArray as hexToRgb} from 'ol/color';
+import constants from '@/utils/constants';
 
 // -----
 
@@ -100,7 +101,8 @@ export function createTextStyle(text, fontSize='22px', fill=textFill, stroke=tex
       font: `${fontSize} Arial, sans-serif`,
       overflow: true,
       fill,
-      stroke
+      stroke,
+      offsetX: constants.PROPERTY_OFFSET_X
     })
   });
 }
