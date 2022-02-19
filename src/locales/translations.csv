@@ -133,6 +133,7 @@ button-add-image,Add image,Ajouter une image,Añadir imagen
 actions,Actions,Actions,Acciones
 button-rename,Rename,Renommer,Renombrar
 button-properties,Properties,Propriétés,Propiedades
+button-clone,Clone,Dupliquer
 button-download,Download,Télécharger,Descargar
 button-delete,Delete,Supprimer,Eliminar
 recently-opened,Recently opened,Consultés récemment,Abiertas recientemente
@@ -295,6 +296,12 @@ rename-image,Rename the image,Renommer l'image,Renombrar la imagen
 enter-new-name-of-image,Enter the new name to use for this image,Nouveau nom de l'image,Ingrese el nuevo nombre de imagen
 notif-success-image-rename,Image {imageName} was successfully renamed,L'image {imageName} a été renommée avec succès,La imagen {imageName} se renombró correctamente
 notif-error-image-rename,Failed to rename image {imageName},Une erreur a empêché de renommer l'image {imageName},Error al cambiar el nombre de la imagen {imageName}
+clone-image,Clone the image,Dupliquer l'image
+clone-metadata,Clone the associated data,Dupliquer les données associées
+clone-annotations,Clone the annotations,Dupliquer les annotations
+clone-annotations-metadata,Clone the annotations associated data,Dupliquer les données associées aux annotations
+notif-success-image-clone,Image {imageName} was successfully cloned,L'image {imageName} a été dupliquée avec succès
+notif-error-image-clone,Failed to clone image {imageName},Une erreur a empêché de dupliquer l'image {imageName}
 colors,Colors,Couleurs,Colores
 button-lock,Lock,Verrouiller,Bloquear
 button-set-calibration,Set calibration,Calibrer,Establecer calibración
