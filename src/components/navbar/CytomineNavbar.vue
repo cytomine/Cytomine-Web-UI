@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <nav class="navbar is-light" role="navigation">
   <div class="navbar-brand">
@@ -25,7 +24,11 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
+      <navbar-dropdown 
+      icon="fa-folder-open" 
+      v-if="this.nbActiveProjects > 0" 
+      :title="$t('workspace')" 
+      :listPathes="['/project/']">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
@@ -35,7 +34,7 @@
   </template>
 
   <div v-show="!addingComment" class="has-text-centered">
-    <button class="button is-link" @click="addingComment = true">{{$t('button-add-comment')}}</button>
+    <button class="button is-link" v-if="currentUser.userByNow" @click="addingComment = true">{{$t('button-add-comment')}}</button>
   </div>
 
   <div v-show="addingComment">
@@ -77,6 +76,7 @@ import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
+
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import {fullName} from '@/utils/user-utils.js';
 

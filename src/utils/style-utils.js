@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -31,6 +31,29 @@ export function isCluster(feature) {
 
 // -----
 
+export function createStrokeStyle(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  let stroke = new Stroke({color: colorWithOpacity, width: 2});
+
+  return new Style({
+    stroke,
+    image: new Circle({radius:5, stroke: stroke})
+  });
+}
+
+export function createLineStrokeStyle(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  return new Style({stroke: new Stroke({color: colorWithOpacity, width: 5})});
+}
+
+// -----
+
 function createStroke(opacity=0.5) {
   return new Stroke({color: [0, 0, 0, opacity], width: 2});
 }
@@ -58,7 +81,7 @@ export function createColorStyle(color, opacity=0.5) {
 
 // -----
 
-export function createLineStyle(color, opacity=0.5) {
+export function createColorLineStyle(color, opacity=0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
@@ -101,6 +124,11 @@ let lightGreenStroke = new Stroke({color: lightGreen, width: width});
 let redStroke = new Stroke({color: red, width: width + 1});
 let lightRedStroke = new Stroke({color: lightRed, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
+
+export let trackedSelectStyles = [
+  new Style({ stroke: whiteStroke }),
+  new Style({ image: new Circle({radius: 6, stroke: whiteStroke}) })
+];
 
 export let selectStyles = [
   new Style({ stroke: whiteStroke }),

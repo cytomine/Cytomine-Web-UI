@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="layers">
@@ -107,6 +106,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
     },
     activePanel() {
       return this.imageWrapper.activePanel;
@@ -208,12 +210,14 @@ export default {
 
       let name = fullName(layer);
 
+      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${name} (${indexLayer.countAnnotation || 0})`;
+      return `${name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {
-      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
+      return !layer.isReview && !layer.algo && this.$store.getters['currentProject/canEditLayer'](layer.id);
     },
 
     addLayerById(id, visible) {
@@ -269,7 +273,7 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.image.fetchAnnotationsIndex();
+      this.indexLayers = await this.slice.fetchAnnotationsIndex();
     },
 
     shortkeyHandler(key) {

@@ -1,14 +1,15 @@
 <template>
   <div class="annotations-list-wrapper">
+  <!--
     <div v-show="opened" class="annotations-list-opened">
       <button class="delete" @click="opened = false"></button>
 
       <div class="annotations-list-sidebar">
         <b-field position="is-centered" v-if="hasTracks">
-          <b-radio-button v-model="displayType" native-value="term" size="is-small">
+          <b-radio-button v-model="displayType" native-value="TERM" size="is-small">
             {{$t('by-term')}}
           </b-radio-button>
-          <b-radio-button v-model="displayType" native-value="track" size="is-small">
+          <b-radio-button v-model="displayType" native-value="TRACK" size="is-small">
             {{$t('by-track')}}
           </b-radio-button>
         </b-field>
@@ -31,52 +32,29 @@
       </div>
 
       <div class="annotations-list-container">
-        <list-annotations-by-term
-          v-if="isDisplayedByTerm"
+        <list-annotations-by v-if="currentItem" :key="currentItem.id"
+          :categorization="displayType"
           :size="85"
           color="000000"
           :nb-per-page="nbPerPage"
+
+          :prop="currentItem"
 
           :all-terms="terms"
           :all-users="allUsers"
           :all-images="[image]"
           :all-tracks="tracks"
 
-          :term="findTerm(selectedTermId)"
           :multiple-terms="false"
           :no-term="noTerm"
-          :images-ids="[image.id]"
-          :slices-ids="[slice.id]"
-          :users-ids="layersIds"
-          :reviewed="false"
-
-          :visible="opened"
-          :index="index"
-          :revision="revision"
-
-          @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
-          @updateProperties="$emit('updateProperties')"
-          @centerView="$emit('centerView', $event)"
-          @delete="$emit('delete', $event)"
-          @select="select($event)"
-        />
-        <list-annotations-by-track
-          v-else
-          :size="85"
-          color="000000"
-          :nb-per-page="nbPerPage"
-
-          :all-terms="terms"
-          :all-users="allUsers"
-          :all-images="[image]"
-          :all-tracks="tracks"
-
-          :track="findTrack(selectedTrackId)"
           :multiple-track="false"
-          :no-track="false"
+          :no-track="noTrack"
+
           :images-ids="[image.id]"
           :slices-ids="[slice.id]"
           :users-ids="layersIds"
+          :terms-ids="termsOptionsIds"
+          :tracks-ids="tracksIds"
           :reviewed="false"
 
           :visible="opened"
@@ -93,6 +71,7 @@
     </div>
 
     <div v-show="!opened" class="opener" @click="opened = true">{{$t("annotations-list")}} <i class="fas fa-caret-up"></i></div>
+    -->
   </div>
 </template>
 
@@ -105,8 +84,7 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
-import ListAnnotationsByTerm from '@/components/annotations/ListAnnotationsByTerm';
-import ListAnnotationsByTrack from '@/components/annotations/ListAnnotationsByTrack';
+import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
 
 import {fullName} from '@/utils/user-utils.js';
 import {get} from '@/utils/store-helpers';
@@ -115,8 +93,7 @@ import {get} from '@/utils/store-helpers';
 export default {
   name: 'annotations-list',
   components: {
-    ListAnnotationsByTerm,
-    ListAnnotationsByTrack,
+    ListAnnotationsBy,
     OntologyTree,
     TrackTree,
     CytomineTerm,
@@ -130,7 +107,7 @@ export default {
   ],
   data() {
     return {
-      displayType: 'term',
+      displayType: 'TERM',
       nbPerPage: 10,
       selectedTermsIds: [],
       selectedTracksIds: [],
@@ -154,15 +131,6 @@ export default {
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
     },
-    terms() {
-      return this.$store.getters['currentProject/terms'] || [];
-    },
-    hiddenTermsIds() {
-      return this.$store.getters[this.imageModule + 'hiddenTermsIds'];
-    },
-    additionalNodes() {
-      return [this.noTermOption];
-    },
     image() {
       return this.imageWrapper.imageInstance;
     },
@@ -172,12 +140,63 @@ export default {
     slice() {
       return this.imageWrapper.activeSlice;
     },
+
+    isDisplayedByTerm() {
+      return this.displayType === 'TERM';
+    },
+    items() {
+      return (this.isDisplayedByTerm) ? this.termsOptions : this.tracks;
+    },
+    currentItem() {
+      if(this.isDisplayedByTerm) {
+        return this.termsOptions.find(term => term.id === this.selectedTermId);
+      }
+      else {
+        return this.tracks.find(track => track.id === this.selectedTrackId);
+      }
+    },
+
+    additionalNodes() {
+      return [this.noTermOption];
+    },
+    terms() {
+      return this.$store.getters['currentProject/terms'] || [];
+    },
+    hiddenTermsIds() {
+      return this.$store.getters[this.imageModule + 'hiddenTermsIds'];
+    },
+    termsOptions() {
+      return [...this.terms, ...this.additionalNodes].filter(term => !this.hiddenTermsIds.includes(term.id));
+    },
+    termsOptionsIds() {
+      return this.termsOptions.map(term => term.id);
+    },
+
+    selectedTermId() {
+      return (this.selectedTermsIds.length > 0) ? this.selectedTermsIds[0] : null;
+    },
+    noTerm() {
+      return this.isDisplayedByTerm ? this.selectedTermId === this.noTermOption.id : this.termsOptionsIds.includes(this.noTermOption.id);
+    },
+
     tracks() {
       return this.imageWrapper.tracks.tracks;
+    },
+    tracksIds() {
+      let optionsIds = this.tracks.map(track => track.id);
+      optionsIds.push(0); // Add 0 for "no track" option
+      return optionsIds;
     },
     hasTracks() {
       return this.tracks.length > 0;
     },
+    selectedTrackId() {
+      return (this.selectedTracksIds.length > 0) ? this.selectedTracksIds[0] : null;
+    },
+    noTrack() {
+      return this.isDisplayedByTerm;
+    },
+
     layers() {
       let layers = this.imageWrapper.layers.selectedLayers || [];
       layers = layers.filter(layer => layer.visible);
@@ -192,6 +211,7 @@ export default {
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
+
     opened: {
       get() {
         return this.imageWrapper.annotationsList.open;
@@ -200,33 +220,15 @@ export default {
         this.$store.commit(this.imageModule + 'setShowAnnotationsList', value);
       }
     },
-    isDisplayedByTerm() {
-      return this.displayType === 'term';
-    },
-    noTerm() {
-      return this.selectedTermsIds.includes(this.noTermOption.id);
-    },
-    selectedTermId() {
-      return (this.selectedTermsIds.length > 0) ? this.selectedTermsIds[0] : null;
-    },
-    selectedTrackId() {
-      return (this.selectedTracksIds.length > 0) ? this.selectedTracksIds[0] : null;
-    },
   },
   watch: {
     hasTracks(value) {
       if (!value) {
-        this.displayType = 'term';
+        this.displayType = 'TERM';
       }
     }
   },
   methods: {
-    findTerm(idTerm) {
-      return this.terms.find(term => term.id === idTerm);
-    },
-    findTrack(idTrack) {
-      return this.tracks.find(track => track.id === idTrack);
-    },
     async fetchUsers() { // TODO in vuex (project module)
       this.users = (await UserCollection.fetchAll()).array;
     },
@@ -256,9 +258,9 @@ export default {
         this.revision++;
       }
     },
-    select(annot) {
+    async select(annot) {
       if (annot.slice !== this.slice.id) {
-        this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
+        await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
           {time: annot.time, channel: annot.channel, zStack: annot.zStack});
         this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -281,8 +283,7 @@ export default {
     }
   },
   async created() {
-    let availableTerms = [...this.terms, this.noTermOption];
-    this.selectedTermsIds = [availableTerms[0].id];
+    this.selectedTermsIds = (this.termsOptionsIds.length > 0) ? [this.termsOptionsIds[0]] : [];
     this.selectedTracksIds = (this.hasTracks) ? [this.tracks[0].id] : [];
 
     this.fetchUsers();

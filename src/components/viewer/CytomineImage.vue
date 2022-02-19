@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
@@ -31,7 +30,7 @@
         :zoom.sync="zoom"
         :rotation.sync="rotation"
         :max-zoom="maxZoom"
-        :max-resolution="Math.pow(2, image.depth)"
+        :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"
         :projection="projectionName"
         @mounted="viewMounted()"
@@ -47,6 +46,7 @@
           crossOrigin="Anonymous"
           ref="baseSource"
           @mounted="setBaseSource()"
+          :transition="0"
         />
       </vl-layer-tile>
 
@@ -96,7 +96,9 @@
             <a @click="togglePanel('digital-zoom')" :class="{active: activePanel === 'digital-zoom'}">
               <i class="fas fa-search"></i>
             </a>
-            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index" />
+            <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index"
+                          @resetZoom="$refs.view.animate({zoom: image.zoom})"
+                          @fitZoom="fitZoom" />
           </li>
 
           <li v-if="isPanelDisplayed('link') && nbImages > 1">
@@ -153,6 +155,8 @@
       </ul>
     </div>
 
+    <image-controls :index="index" class="image-controls-wrapper" />
+
     <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
     </div>
@@ -171,7 +175,7 @@
 
     <scale-line :magnification.sync="currentMagnification" :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotation-details-container v-if="isPanelDisplayed('annotation-main')" :index="index" :view="$refs.view" />
+    <annotations-container :index="index" :view="$refs.view" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -191,6 +195,8 @@ import AnnotationLayer from './AnnotationLayer';
 import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
 import DrawTools from './DrawTools';
+import ImageControls from './ImageControls';
+import AnnotationsContainer from './AnnotationsContainer';
 
 import InformationPanel from './panels/InformationPanel';
 import DigitalZoom from './panels/DigitalZoom';
@@ -201,8 +207,6 @@ import OntologyPanel from './panels/OntologyPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
 import FollowPanel from './panels/FollowPanel';
 import ReviewPanel from './panels/ReviewPanel';
-
-import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
@@ -216,7 +220,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition} from 'cytomine-client';
+import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -235,8 +239,8 @@ export default {
     RotationSelector,
     ScaleLine,
     DrawTools,
-
-    AnnotationDetailsContainer,
+    ImageControls,
+    AnnotationsContainer,
 
     InformationPanel,
     DigitalZoom,
@@ -294,6 +298,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      return this.imageWrapper.activeSlice;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -373,8 +380,8 @@ export default {
 
     baseLayerURLs() {
       let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileGroup={TileGroup}&x={x}&y={y}&z={z}&channels=0&layer=0&timeframe=0&mimeType=${this.image.mime}`;
-      return this.image.imageServerURLs.map(url => filterPrefix + url + params);
+      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
+      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
     },
 
     colorManipulationOn() {
@@ -420,6 +427,19 @@ export default {
     },
     activeModifyInteraction() {
       return this.activeSelectInteraction && this.activeEditTool && !this.correction;
+    },
+    idealZoom() {
+      let container = this.$refs.container;
+      let idealZoom = this.maxZoom;
+      let factor = this.maxZoom - this.image.zoom;
+      let mapWidth = this.image.width * Math.pow(2, factor);
+      let mapHeight = this.image.height * Math.pow(2, factor);
+      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
+        mapWidth /= 2;
+        mapHeight /= 2;
+        idealZoom --;
+      }
+      return idealZoom;
     }
   },
   watch: {
@@ -445,17 +465,7 @@ export default {
       if(this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
       }
-
-      let container = this.$refs.container;
-      let mapWidth = this.image.width;
-      let mapHeight = this.image.height;
-      let idealZoom = this.image.depth;
-      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
-        mapWidth /= 2;
-        mapHeight /= 2;
-        idealZoom --;
-      }
-      this.zoom = idealZoom;
+      this.zoom = this.idealZoom;
     },
 
     async updateMapSize() {
@@ -486,7 +496,7 @@ export default {
       if(this.routedAnnotation) { // center view on annotation
         let annot = this.routedAnnotation;
         let geometry = new WKT().readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.depth});
+        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -537,6 +547,7 @@ export default {
         try {
           await UserPosition.create({
             image: this.image.id,
+            slice: this.slice.id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -559,6 +570,13 @@ export default {
         this.timeoutSavePosition = setTimeout(this.savePosition, constants.SAVE_POSITION_IN_IMAGE_INTERVAL);
       }
     }, 500),
+
+    fitZoom() {
+      this.$refs.view.animate({
+        zoom: this.idealZoom,
+        center: [this.image.width/2, this.image.height/2]
+      });
+    },
 
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
@@ -654,6 +672,10 @@ export default {
       try {
         let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
+          if(annot.slice !== this.slice.id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+          }
           this.routedAnnotation = annot;
           if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
@@ -886,5 +908,24 @@ $colorOpenedPanelLink: #6c95c8;
   position:absolute;
   top:5rem;
   left:.5em;
+}
+
+/* ----- Image controls ----- */
+.image-controls-wrapper {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 20%;
+  right: calc(#{$widthPanelBar} + 20%);
+  z-index: 5;
+}
+
+/* ----- Annotation list ----- */
+.annotations-table-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: $widthPanelBar;
+  z-index: 20;
+  pointer-events: none;
 }
 </style>

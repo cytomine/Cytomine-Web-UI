@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,8 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
-
 
 <template>
 <div class="list-members-wrapper">
@@ -32,7 +30,7 @@
           {{$t('role')}}
         </div>
         <div class="filter-body">
-          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
             :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
@@ -163,6 +161,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+
     MemberCollection() {
       let collection = new UserCollection({
         filterKey: 'project',
@@ -222,7 +221,6 @@ export default {
         onConfirm: () => this.removeSelectedMembers()
       });
     },
-
     async removeSelectedMembers() {
       try {
         await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
@@ -278,7 +276,12 @@ export default {
     async toggleRepresentative(member) {
       try {
         if(member.role === this.representativeRole.value) {
-          await ProjectRepresentative.delete(0, this.project.id, member.id);
+          if ((await this.project.fetchRepresentatives()).array.length < 2) {
+            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+          }
+          else {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
+          }
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
@@ -287,6 +290,7 @@ export default {
       }
       catch(error) {
         console.log(error);
+        console.log(error.toString());
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
