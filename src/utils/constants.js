@@ -23,6 +23,8 @@ export default {
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   PRELOADED_SLICES: 50,
+  // features switches
+  ALGORITHMS_ENABLED: true,
   // Refresh intervals (expressed in milliseconds)
   VIEWER_ANNOTATIONS_REFRESH_INTERVAL: 10000,
   MEMBERS_ACTIVITY_REFRESH_INTERVAL: 30000,

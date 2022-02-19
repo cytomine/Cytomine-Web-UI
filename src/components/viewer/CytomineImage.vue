@@ -163,6 +163,16 @@
 
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
+    <div class="camera" >
+      <button
+        v-tooltip="$t('screenshot')"
+        class="button"
+        @click="screenshot()"
+      >
+        <span class="icon is-small"><i class="fas fa-camera"></i></span>
+      </button>
+    </div>
+
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
     <annotations-container :index="index" :view="$refs.view" />
@@ -210,7 +220,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -440,6 +450,16 @@ export default {
     }
   },
   methods: {
+    screenshot() {
+      let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
+      extent = extent.map(x => x < 0 ? 0 : Math.round(x));
+      let x = extent[0];
+      let y = this.image.height - Math.min(extent[3],this.image.height);
+      let w = Math.min(extent[2],this.image.width)-x;
+      let h = this.image.height - Math.min(extent[1],this.image.height)-y;
+      let drawScaleBar = (this.image.magnification || this.image.resolution) ? true : false;
+      window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/window-'+x+'-'+y+'-'+w+'-'+h+'.json?maxSize=1000&drawScaleBar='+drawScaleBar, '_blank');
+    },
     setInitialZoom() {
       if(this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
@@ -850,7 +870,7 @@ $colorOpenedPanelLink: #6c95c8;
 .rotation-selector-wrapper {
   position: absolute;
   left: .5em;
-  top: 5rem;
+  top: 8rem;
 }
 
 .custom-overview {
@@ -881,6 +901,12 @@ $colorOpenedPanelLink: #6c95c8;
       display: none;
     }
   }
+}
+
+.camera {
+  position:absolute;
+  top:5rem;
+  left:.5em;
 }
 
 /* ----- Image controls ----- */

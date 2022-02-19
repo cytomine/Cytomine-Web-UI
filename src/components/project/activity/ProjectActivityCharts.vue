@@ -105,7 +105,7 @@
           <strong>{{$t("user-annotations")}}</strong>
         </div>
       </div>
-      <div class="tile is-parent">
+      <div v-show="algoEnabled" class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
             <v-popover>
@@ -284,6 +284,7 @@
 </template>
 
 <script>
+import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
@@ -313,6 +314,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       nbProjectVisits: null,
       nbImageConsultations: null,

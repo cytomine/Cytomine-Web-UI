@@ -375,6 +375,7 @@ remove-yourself-from-manager-confirmation-message,Are you sure you want to remov
 status,Status,Statut,Estado
 offline,Offline users,Utilisateurs hors ligne,Usuarios sin conexión
 notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username},No se pudo cambiar el rol de {username}
+notif-error-not-enough-representative, Failed to remove the representative role. At least one representative must be in the project, Impossible retirer l'utilisateur des personnes de contact. Il faut au moins une personnes de contact dans un projet
 enabled,Enabled,Activé,Habilitado
 disabled,Disabled,Désactivé,Dehabilitado
 no-algorithm,No algorithm to display,Aucun algorithme à afficher,No hay algoritmo que mostrar
@@ -417,6 +418,7 @@ large,Large,Grand,Grande
 huge,Huge,Très grand,Enorme
 number-per-page,Number per page,Nombre par page,Número por pagina
 display,Display,Affichage,Monitor
+screenshot,Screenshot,Capture d'écran
 add-image,Add image,Ajouter une image,Añadir imagen
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName}
 button-more-info,More information,Plus d'informations,Más información

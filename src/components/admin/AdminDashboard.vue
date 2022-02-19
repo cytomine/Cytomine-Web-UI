@@ -99,7 +99,7 @@
         </table>
       </div>
 
-      <div class="column">
+      <div class="column" v-show="algoEnabled">
         <table class="table is-fullwidth">
           <tbody>
             <tr>
@@ -146,6 +146,7 @@
 <script>
 import {Cytomine} from 'cytomine-client';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
+import constants from '@/utils/constants.js';
 import moment from 'moment';
 
 export default {
@@ -158,6 +159,7 @@ export default {
       totalCounts: null,
       storageStats: null,
       chartOptions: [],
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       selectedChartOption: null
     };
   },

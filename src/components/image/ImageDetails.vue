@@ -240,6 +240,11 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
+            <template v-if="canManageProject">
+              <button class="button" @click="isCloneModalActive = true">
+                {{$t('button-clone')}}
+              </button>
+            </template>
             <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
               {{$t('button-download')}}
             </a>
@@ -259,6 +264,13 @@
     :currentName="image.instanceFilename"
     :active.sync="isRenameModalActive"
     @rename="rename"
+  />
+
+  <clone-modal
+    :title="$t('clone-image')"
+    :currentImage="image"
+    :active.sync="isCloneModalActive"
+    @clone="clone"
   />
 
   <magnification-modal
@@ -288,6 +300,7 @@ import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
+import CloneModal from './CloneModal';
 import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
@@ -295,7 +308,7 @@ import RenameModal from '@/components/utils/RenameModal';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance,Cytomine} from 'cytomine-client';
 
 import vendorFromMime from '@/utils/vendor';
 
@@ -310,7 +323,8 @@ export default {
     CalibrationModal,
     ImageMetadataModal,
     ImageStatus,
-    RenameModal
+    RenameModal,
+    CloneModal
   },
   props: {
     image: {type: Object},
@@ -323,6 +337,7 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      isCloneModalActive: false
     };
   },
   computed: {
@@ -381,6 +396,29 @@ export default {
         });
       }
       this.isRenameModalActive = false;
+    },
+
+    async clone(selectedProject, cloneMetadata, cloneAnnot, cloneAnnotMetadata) {
+      let name = this.image.instanceFilename;
+      try {
+        await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/imageinstance/${this.image.id}/clone.json`, {
+          idProject: selectedProject,
+          areImageMetadataCopied: cloneMetadata,
+          areAnnotationsCopied: cloneAnnot,
+          areAnnotationsMetadataCopied: cloneAnnotMetadata
+        });
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-clone', {imageName: name})
+        });
+      }
+      catch(error) {
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-clone', {imageName: name})
+        });
+      }
+      this.isCloneModalActive = false;
     },
 
     confirmDeletion() {

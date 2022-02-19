@@ -1,0 +1,99 @@
+<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
+
+<template>
+<form @submit.prevent="clone()">
+  <cytomine-modal :title="title" :active="active" @close="close()">
+
+    <h2>Project : </h2>
+    <b-field>
+      <b-select
+        size="is-small"
+        v-model="selectedProject"
+        :placeholder="$t('select-project')"
+        name="project"
+      >
+        <option v-for="project in projects" :value="project.id" :key="project.id">
+          {{project.name}}
+        </option>
+      </b-select>
+    </b-field>
+
+    <br/>
+    <h2>Options : </h2>
+    <div class="columns">
+      <div class="column">
+        <b-checkbox v-model="cloneMetadata">
+          {{$t('clone-metadata')}}
+        </b-checkbox>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-half">
+        <b-checkbox v-model="cloneAnnot">
+          {{$t('clone-annotations')}}
+        </b-checkbox>
+      </div>
+      <div class="column is-half">
+        <b-checkbox v-model="cloneAnnotMetadata" :disabled="!cloneAnnot">
+          {{$t('clone-annotations-metadata')}}
+        </b-checkbox>
+      </div>
+    </div>
+
+    <template #footer>
+      <button class="button" type="button" @click="close()">
+        {{$t('button-cancel')}}
+      </button>
+      <button class="button is-link" :disabled="(!selectedProject || selectedProject == currentImage.project)">
+        {{$t('button-clone')}}
+      </button>
+    </template>
+  </cytomine-modal>
+</form>
+</template>
+
+<script>
+import CytomineModal from '@/components/utils/CytomineModal';
+import {ProjectCollection} from 'cytomine-client';
+
+export default {
+  name: 'clone-modal',
+  extends: CytomineModal,
+  props: {
+    title: String,
+    currentImage: null
+  },
+  components: {CytomineModal},
+  data() {
+    return {
+      cloneMetadata:true,
+      cloneAnnot:false,
+      cloneAnnotMetadata:false,
+      selectedProject : null,
+      projects: null
+    };
+  },
+  methods: {
+    async clone() {
+      this.$emit('clone', this.selectedProject, this.cloneMetadata, this.cloneAnnot, this.cloneAnnotMetadata);
+    }
+  },
+  async created() {
+    this.projects = await ProjectCollection.fetchAll();
+  }
+};
+</script>
