@@ -380,6 +380,7 @@ remove-yourself-from-manager-confirmation-message,Are you sure you want to remov
 status,Status,Statut,Estado
 offline,Offline users,Utilisateurs hors ligne,Usuarios sin conexión
 notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username},No se pudo cambiar el rol de {username}
+notif-error-not-enough-representative, Failed to remove the representative role. At least one representative must be in the project, Impossible retirer l'utilisateur des personnes de contact. Il faut au moins une personnes de contact dans un projet
 enabled,Enabled,Activé,Habilitado
 disabled,Disabled,Désactivé,Dehabilitado
 no-algorithm,No algorithm to display,Aucun algorithme à afficher,No hay algoritmo que mostrar
@@ -1066,3 +1067,5 @@ to-delete-at-configuration-description,"If more than 0, each project created ins
 activities-time-to-live-in-hours-description,"If more than 0, each activity log will be automatically deleted the given number of hours after their creation", "Si supérieure à 0, chaque trace d'activité sera automatiquement supprimée le nombre d'heures renseignées après sa création"
 shared-annotation-mail-mode-description,"Used when sharing an annotation. Classic mode will allow sending information about the project and the user sharing the annotation. With restricted mode, emails will contain only a link to the annotation", "Utilisé lors du partage d'annotations. Le mode classic permet l'envoi d'informations concernant le projet et l'utilisateur partageant l'annotation. Avec le mode restricted, les emails ne contiendront que le lien direct vers l'annotation"
 report, Report, Signaler
+images-in-projects,Images in projects,Images au sein des projets
+uploaded-images,Images uploaded,Images téléversées
