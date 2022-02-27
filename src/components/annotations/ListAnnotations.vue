@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -549,7 +549,7 @@ export default {
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       let collection = new AnnotationCollection({
         project: this.project.id,
-        terms: this.selectedTermsIds.length===this.terms.length ? null : this.selectedTermsIds,
+        terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
         users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
         reviewed: this.reviewed,

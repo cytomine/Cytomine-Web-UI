@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0 && !this.isFetching" 
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0 && !this.isFetching"
         :title="$t('workspace')"
         :listPathes="['/project/']"
         :fontColor="{'color': activeFontColor}"
@@ -59,7 +59,7 @@
       <cytomine-searcher />
 
       <navbar-dropdown
-        v-if="!this.isFetching" 
+        v-if="!this.isFetching"
         :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
         :title="currentUserFullInfo"
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
@@ -94,11 +94,11 @@
         </a>
       </navbar-dropdown>
 
-      <navbar-dropdown 
-        v-if="!this.isFetching" 
-        icon="fa-question-circle" 
-        :title="$t('help')" 
-        :classes="['is-right']" 
+      <navbar-dropdown
+        v-if="!this.isFetching"
+        icon="fa-question-circle"
+        :title="$t('help')"
+        :classes="['is-right']"
         :fontColor="{'color': activeFontColor}"
         :backgroundColor="{'color': activeColor}"
         :hoverBackgroundColor="{'color': lighterActiveColor}"
@@ -128,7 +128,7 @@ import CytomineSearcher from '@/components/search/CytomineSearcher';
 import {Cytomine, Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
-import {getLighterColor} from '@/utils/color-manipulation.js'; 
+import {getLighterColor} from '@/utils/color-manipulation.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -186,9 +186,9 @@ export default {
       });
     },
     // ---
-    
+
     mouseOver: function(item){
-      this.setItemColor(item, this.lighterActiveColor);    
+      this.setItemColor(item, this.lighterActiveColor);
     },
     mouseLeave: function(item){
       this.setItemColor(item, this.activeColor);
@@ -199,7 +199,7 @@ export default {
       let item = this.$route.path.replace('/', '');
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
-        this.setItemColor(item, this.lighterActiveColor);    
+        this.setItemColor(item, this.lighterActiveColor);
       }
     },
     initItemsStyles(){
