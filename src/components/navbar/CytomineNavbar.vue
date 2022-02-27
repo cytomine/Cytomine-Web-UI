@@ -24,7 +24,7 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0 && !this.isFetching" 
+      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0 && !this.isFetching"
         :title="$t('workspace')"
         :listPathes="['/project/']"
         :fontColor="{'color': activeFontColor}"
@@ -59,7 +59,7 @@
       <cytomine-searcher />
 
       <navbar-dropdown
-        v-if="!this.isFetching" 
+        v-if="!this.isFetching"
         :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
         :title="currentUserFullInfo"
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
@@ -94,11 +94,11 @@
         </a>
       </navbar-dropdown>
 
-      <navbar-dropdown 
-        v-if="!this.isFetching" 
-        icon="fa-question-circle" 
-        :title="$t('help')" 
-        :classes="['is-right']" 
+      <navbar-dropdown
+        v-if="!this.isFetching"
+        icon="fa-question-circle"
+        :title="$t('help')"
+        :classes="['is-right']"
         :fontColor="{'color': activeFontColor}"
         :backgroundColor="{'color': activeColor}"
         :hoverBackgroundColor="{'color': lighterActiveColor}"
@@ -186,9 +186,9 @@ export default {
       });
     },
     // ---
-    
+
     mouseOver: function(item){
-      this.setItemColor(item, this.lighterActiveColor);    
+      this.setItemColor(item, this.lighterActiveColor);
     },
     mouseLeave: function(item){
       this.setItemColor(item, this.activeColor);
@@ -199,7 +199,7 @@ export default {
       let item = this.$route.path.replace('/', '');
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
-        this.setItemColor(item, this.lighterActiveColor);    
+        this.setItemColor(item, this.lighterActiveColor);
       }
     },
     initItemsStyles(){
