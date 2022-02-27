@@ -74,6 +74,7 @@
 
 <script>
 import {get, sync} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-sidebar',
@@ -108,7 +109,41 @@ export default {
       this.$eventBus.$emit('updateMapSize');
     },
     async sendEmailReport() {
-      this.email.subject = 'Report about project ' + this.project['name'];
+      let felt3;
+      //specificities for HV
+      switch(constants.HV_MODE) {
+        case 'DEVELOPMENT':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Utvikling';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Utvikling';
+          break;
+        case 'QA_UNDERVISNING':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Undervisning';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Undervisning';
+          break;
+        case 'UNDERVISNING':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Undervisning';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Undervisning';
+          break;
+        case 'QA_LABO':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Laboratorienettverk';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Laboratorienettverk';
+          break;
+        case 'LABO':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Laboratorienettverk';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk';
+          break;
+        case 'QA_KOLLEGIAL':
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Kollegialrådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Kollegialrådføring';
+          break;
+        case 'KOLLEGIAL':
+          this.email.subject = 'Kan du sjekke om kan være lagt inn for mye informasjon i Kollegialrådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegialrådføring';
+          break;
+        default:
+          this.email.subject = 'Report about project ' + this.project['name'];
+          felt3='';
+      }
 
       let representatives = (await this.project.fetchRepresentatives()).array;
       console.log(representatives);
@@ -117,13 +152,23 @@ export default {
 
       this.emailId = [...new Set(representatives.map(x => x['email']))].join(',');
 
-      let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
-      this.email.body = 'Dear project representatives, \n' +
+      //let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
+
+      let felt4 = 'Informasjon til deg  som sender "obs" på anonymisering, eller for mye informasjon i kollegial rådføring.\n'+
+        'Din e-post sendes til den eller de som står registret som "Representativ"\n'+
+        'Husk at du ikke må skrive i e-post personinformasjon, men heller f.eks. oppgi ditt telefonnummer og be om at vedkommende tar kontakt med deg for å kunne forklare ytterligere.\n'+
+        'Hvis det haster, finner du kontaktinformasjon løsningens forside.\n'+
+        '\n'+
+        'Bruk av denne e-post mal er ikke ment brukt som et avviksrapporteringssystem.\n'+
+        'Kontakt din egen leder hvis du trenger hjelp eller råd for hvordan rapportere et avvik.';
+
+      this.email.body = 'Til prosjekteier, \n' +
         '\n' +
         '\n' +
+        felt3 +
         '\n' +
-        'Practical information :\n' +
-        'Project : ' + projectUrl + '\n';
+        felt4;
+
 
       console.log('this.$route', this.$route);
       console.log('this.$route.fullPath', this.$route.fullPath);
