@@ -94,18 +94,18 @@
           </div>
         </td>
       </tr>
-      <tr v-show="showLabel">
+      <tr v-show="showLabel && isPropDisplayed('slide-preview')">
         <td><strong>{{$t('slide-label')}}</strong></td>
         <td>
           <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
         </td>
       </tr>
-      <tr v-show="showMacro">
+      <tr v-show="showMacro && isPropDisplayed('slide-preview')">
         <td colspan="2" class="has-text-centered" style="border-bottom-width: 0;">
           <strong>{{$t('slide-preview')}}</strong>
         </td>
       </tr>
-      <tr v-show="showMacro">
+      <tr v-show="showMacro && isPropDisplayed('slide-preview')">
         <td colspan="2" class="has-text-centered">
           <img :src="image.macroURL" v-show="showMacro" class="image-overview" @error="hideImageMacro" @load="showImageMacro">
         </td>
@@ -147,6 +147,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    configUI: get('currentProject/configUI'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -167,6 +168,9 @@ export default {
     }
   },
   methods: {
+    isPropDisplayed(prop) {
+      return this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`];
+    },
     hideImageLabel(e) {
       console.log('hide');
       e.target.outerHTML= '<i class="fas fa-ban"></i>';
