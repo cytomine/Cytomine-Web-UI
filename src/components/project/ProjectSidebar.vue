@@ -119,32 +119,32 @@ export default {
       //specificities for HV
       switch(constants.HV_MODE) {
         case 'DEVELOPMENT':
-          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Utvikling';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Utvikling';
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Utvikling';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Utvikling\n';
           break;
         case 'QA_UNDERVISNING':
-          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Undervisning';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Undervisning';
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Undervisning';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Undervisning\n';
           break;
         case 'UNDERVISNING':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Undervisning';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Undervisning';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Undervisning\n';
           break;
         case 'QA_LABO':
-          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Laboratorienettverk';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Laboratorienettverk';
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Laboratorienettverk';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Laboratorienettverk\n';
           break;
         case 'LABO':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Laboratorienettverk';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk\n';
           break;
         case 'QA_KOLLEGIAL':
-          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i QA og test Kollegialrådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	QA og test Kollegialrådføring';
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Kollegialrådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Kollegialrådføring\n';
           break;
         case 'KOLLEGIAL':
           this.email.subject = 'Kan du sjekke om kan være lagt inn for mye informasjon i Kollegialrådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegialrådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegialrådføring\n';
           break;
         default:
           this.email.subject = 'Report about project ' + this.project['name'];
@@ -158,7 +158,7 @@ export default {
 
       this.emailId = [...new Set(representatives.map(x => x['email']))].join(',');
 
-      //let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
+      let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
 
       let felt4 = 'Informasjon til deg  som sender "obs" på anonymisering, eller for mye informasjon i kollegial rådføring.\n'+
         'Din e-post sendes til den eller de som står registret som "Representativ"\n'+
@@ -166,7 +166,11 @@ export default {
         'Hvis det haster, finner du kontaktinformasjon løsningens forside.\n'+
         '\n'+
         'Bruk av denne e-post mal er ikke ment brukt som et avviksrapporteringssystem.\n'+
-        'Kontakt din egen leder hvis du trenger hjelp eller råd for hvordan rapportere et avvik.';
+        'Kontakt din egen leder hvis du trenger hjelp eller råd for hvordan rapportere et avvik.\n'+
+        '\n'+
+        'Lenker til Proskjet/snitt som du må sjekke ut:\n'+
+        projectUrl+'\n';
+
 
       this.email.body = 'Til prosjekteier, \n' +
         '\n' +
@@ -179,7 +183,7 @@ export default {
       console.log('this.$route', this.$route);
       console.log('this.$route.fullPath', this.$route.fullPath);
       if (this.$route.fullPath.indexOf('?viewer=')!=-1) {
-        this.email.body = this.email.body + 'Image : ' + window.location.origin + '/#' + this.$route.fullPath;
+        this.email.body = this.email.body + window.location.origin + '/#' + this.$route.fullPath;
       }
       this.openMailto();
 
