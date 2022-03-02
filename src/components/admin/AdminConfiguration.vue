@@ -284,6 +284,7 @@ export default {
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'}),
+      isLogoConfigPresent: false,
       selectedImage: null,
       selectedImageSize: {width: 0, height: 0},
     };
@@ -317,6 +318,10 @@ export default {
     },
     async save() {
       try {
+        if (!this.isImageSizeValid()) {
+          this.$notify({type: 'error', text: this.$t('logo-upload-error-message')});
+          throw new TypeError(this.$t('logo-upload-error-message'));
+        }
         if(!this.welcomeConfig.value) {
           await this.welcomeConfig.delete();
         }
@@ -341,14 +346,12 @@ export default {
         else if (this.topFontMenuColorConfig.value) {
           await this.topFontMenuColorConfig.save();
         }
-        if(!this.logoConfig.value && this.logoConfig.id!=null) {
+        if(!this.logoConfig.value && this.isLogoConfigPresent) {
+          this.isLogoConfigPresent = false;
           await this.logoConfig.delete();
         }
-        else if (!this.isImageSizeValid()) {
-          this.$notify({type: 'error', text: this.$t('logo-upload-error-message')});
-          throw new TypeError(this.$t('logo-upload-error-message'));
-        }
         else if (this.logoConfig.value) {
+          this.isLogoConfigPresent = true;
           await this.logoConfig.save();
         }
         this.$eventBus.$emit('configChanged', '');
@@ -416,6 +419,9 @@ export default {
     }
     try {
       await this.logoConfig.fetch();
+      if(this.logoConfig.value){
+        this.isLogoConfigPresent = true;
+      }
     }
     catch(error) {
       // ignored
