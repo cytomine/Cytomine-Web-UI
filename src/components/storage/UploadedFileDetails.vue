@@ -390,6 +390,7 @@ export default {
         this.$emit('update');
       }
       catch(error) {
+        this.image.originalFilename = oldName;
         console.log(error);
         this.$notify({
           type: 'error',
