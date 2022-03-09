@@ -63,8 +63,8 @@
         :integer-only="true"
         class="image-dimension-slider"
       >
-        <template v-if="hasZName" #default="{ value }">
-          {{ zValue(value) || "?" }}
+        <template v-if="hasZName">
+          {{ zValue || "?" }}
         </template>
       </cytomine-slider>
 
@@ -236,6 +236,9 @@ export default {
     },
     hasZName() {
       return this.currentSlice.zName !== null;
+    },
+    zValue() {
+      return this.currentSlice.zName;
     }
   },
   methods: {
@@ -252,9 +255,6 @@ export default {
         let slice = this.sliceInstances[rank];
         return (slice) ? slice.channelName : null;
       }
-    },
-    zValue() {
-      return this.currentSlice.zName;
     },
 
     async goToRank(rank) {
