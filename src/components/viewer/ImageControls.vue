@@ -61,7 +61,12 @@
         v-model="currentZStack"
         :max="image.depth - 1"
         :integer-only="true"
-        class="image-dimension-slider" />
+        class="image-dimension-slider"
+      >
+        <template v-if="hasZName">
+          {{ zValue || "?" }}
+        </template>
+      </cytomine-slider>
 
       <image-controls-shift-buttons
           :index="index"
@@ -228,6 +233,12 @@ export default {
       let options = this.channels.map(channel => ({value: [channel.index], ...channel}));
       options.unshift(this.allChannelsOption);
       return options;
+    },
+    hasZName() {
+      return this.currentSlice.zName !== null;
+    },
+    zValue() {
+      return this.currentSlice.zName;
     }
   },
   methods: {
@@ -244,7 +255,6 @@ export default {
         let slice = this.sliceInstances[rank];
         return (slice) ? slice.channelName : null;
       }
-
     },
 
     async goToRank(rank) {
