@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 */
 
 import {Cytomine, User} from 'cytomine-client';
+import axios from 'axios';
 
 function getDefaultState() {
   return {
@@ -75,7 +76,24 @@ export default {
     },
 
     async login({dispatch}, payload) {
-      await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+      //await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+      const data = { username: payload.username, password: payload.password, rememberMe: payload.rememberMe };
+
+      let host = 'http://localhost-core';
+      let result = await axios.post(`${host}/api/authenticate`, data, {withCredentials: true});
+      console.log(result);
+      console.log(result.data);
+      const jwt = result.data['id_token'];
+
+      if (payload.rememberMe) {
+        localStorage.setItem('cytomine-authentication-token', jwt);
+        sessionStorage.removeItem('cytomine-authentication-token');
+      }
+      else {
+        sessionStorage.setItem('cytomine-authentication-token', jwt);
+        localStorage.removeItem('cytomine-authentication-token');
+      }
+
       await dispatch('fetchUser');
     }
   }
