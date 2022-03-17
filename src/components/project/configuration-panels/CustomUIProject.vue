@@ -79,7 +79,7 @@ export default {
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
             {key: 'project-information-tab', label: 'information', icon: 'fas fa-info-circle'},
             {key: 'project-scores-tab', label: 'scores', icon: 'fas fa-star'},
-            {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'}
+            {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'},
             {key: 'project-report-tab', label: 'report', icon: 'fas fa-bullhorn'}
           ]
         },
