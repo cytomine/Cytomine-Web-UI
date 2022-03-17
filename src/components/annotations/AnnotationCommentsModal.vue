@@ -52,7 +52,12 @@
         {{$t('send-to-some-members')}}
       </b-radio>
     </b-field>
-    <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
+    <b-field style="display:none;">
+      <b-radio v-model="sendToAllMembers" :native-value="null">
+        {{$t('send-to-some-members')}}
+      </b-radio>
+    </b-field>
+    <b-field v-if="sendToAllMembers==false" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
       <domain-tag-input v-model="selectedMembers" :domains="members" placeholder="search-user" name="members" v-validate="'required'" searchedProperty="fullName" displayedProperty="fullName" />
     </b-field>
     <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
@@ -63,7 +68,7 @@
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :class="{'is-loading': loading}"
-        :disabled="loading || members.length == 0 || errors.any()" @click="share()">
+        :disabled="loading || members.length == 0 || sendToAllMembers == null || errors.any()" @click="share()">
         {{$t('button-share')}}
       </button>
     </p>
@@ -94,7 +99,7 @@ export default {
   data() {
     return {
       addingComment: false,
-      sendToAllMembers: true,
+      sendToAllMembers: null,
       selectedMembers: [],
       text: '',
       loading: false
@@ -116,7 +121,7 @@ export default {
       this.text = '';
       this.selectedMembers = [];
       this.$nextTick(() => {
-        this.sendToAllMembers = true;
+        this.sendToAllMembers = null;
         this.$validator.reset();
       });
     }
