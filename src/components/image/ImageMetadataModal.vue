@@ -21,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="appendShortTermToken(image.macroURL, shortTermToken)" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -55,6 +55,8 @@
 import {AbstractImage, PropertyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'image-metadata-modal',
@@ -72,6 +74,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     filteredProps() {
       if(!this.searchString) {
         return this.properties;
@@ -95,6 +98,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     async rotate(val) {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
     }

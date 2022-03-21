@@ -176,7 +176,7 @@
 
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <img :src="image.thumb" class="image-overview">
+                <img :src="appendShortTermToken(image.thumb, shortTermToken)" class="image-overview">
               </router-link>
             </b-table-column>
 
@@ -262,6 +262,7 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'advanced-search',
@@ -303,13 +304,14 @@ export default {
     };
   },
   methods: {
+    appendShortTermToken,
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
     }, 500)
   },
   computed: {
     currentUser: get('currentUser/user'),
-
+    shortTermToken: get('currentUser/shortTermToken'),
     pathSearchString() {
       return this.$route.params.searchString;
     },

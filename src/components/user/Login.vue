@@ -140,8 +140,8 @@ export default {
         }
       }
       catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: error.response.data.message});
+        console.log(error.response);
+        this.$notify({type: 'error', text: error.response.data.errors.message});
       }
     },
     async sendUsername() {

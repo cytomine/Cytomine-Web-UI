@@ -15,7 +15,6 @@
 */
 
 import {Cytomine, User} from 'cytomine-client';
-import axios from 'axios';
 
 function getDefaultState() {
   return {
@@ -32,6 +31,9 @@ export default {
   mutations: {
     setUser(state, user) {
       state.user = user ? user.clone() : null;
+    },
+    setShortTermToken(state, value) {
+      state.shortTermToken = value;
     },
     setAdminByNow(state, value) {
       state.user.adminByNow = value;
@@ -75,25 +77,9 @@ export default {
       commit('setAdminByNow', false);
     },
 
-    async login({dispatch}, payload) {
-      //await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
-      const data = { username: payload.username, password: payload.password, rememberMe: payload.rememberMe };
-
-      let host = 'http://localhost-core';
-      let result = await axios.post(`${host}/api/authenticate`, data, {withCredentials: true});
-      console.log(result);
-      console.log(result.data);
-      const jwt = result.data['id_token'];
-
-      if (payload.rememberMe) {
-        localStorage.setItem('cytomine-authentication-token', jwt);
-        sessionStorage.removeItem('cytomine-authentication-token');
-      }
-      else {
-        sessionStorage.setItem('cytomine-authentication-token', jwt);
-        localStorage.removeItem('cytomine-authentication-token');
-      }
-
+    async login({dispatch, commit}, payload) {
+      let {shortTermToken} = await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+      commit('setShortTermToken', shortTermToken);
       await dispatch('fetchUser');
     }
   }

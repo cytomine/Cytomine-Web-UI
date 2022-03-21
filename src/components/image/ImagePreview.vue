@@ -34,6 +34,9 @@
 </template>
 
 <script>
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
+
 export default {
   name: 'image-preview',
   props: {
@@ -43,11 +46,12 @@ export default {
     blindMode: {type: Boolean, default: false},
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     idImage() {
       return this.image.image || this.image.id; // if provided object is image consultation, image.image
     },
     figureStyle() {
-      return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)}")`};
+      return {backgroundImage: `url("${appendShortTermToken((this.image.thumb || this.image.imageThumb), this.shortTermToken)}")`};
     }
   }
 };

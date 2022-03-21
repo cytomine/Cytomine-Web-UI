@@ -23,13 +23,18 @@
   </span>
   <div v-if="previewUrl" class="preview" :class="{visible: showPreview}">
     <div class="box">
-      <img :src="previewUrl" />
+      <img :src="appendShortTermToken(previewUrl, shortTermToken)" />
     </div>
   </div>
 </li>
 </template>
 
 <script>
+
+
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
+
 const ANNOT = 1;
 const IMAGE = 2;
 const PROJECT = 3;
@@ -47,6 +52,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     actionData() {
       return JSON.parse(this.action.data);
     },
@@ -64,6 +70,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     enter() {
       this.showPreview = true;
     },

@@ -124,8 +124,8 @@
                     <td>{{filesize(data.size)}}</td>
                     <td>
                       <div class="buttons">
-                        <a class="button is-small" :href="data.viewURL" target='_blank'>{{$t('button-view')}}</a>
-                        <a class="button is-small" :href="data.downloadURL">{{$t('button-download')}}</a>
+                        <a class="button is-small" @click="viewData(data)">{{$t('button-view')}}</a>
+                        <a class="button is-small" @click="downloadData(data)">{{$t('button-download')}}</a>
                       </div>
                     </td>
                   </tr>
@@ -203,6 +203,7 @@ import CytomineTags from '@/components/tag/CytomineTags';
 import constants from '@/utils/constants.js';
 const REFRESH_INTERVAL = constants.JOB_DETAILS_REFRESH_INTERVAL;
 const REFRESH_LOG_INTERVAL = constants.JOB_LOGS_REFRESH_INTERVAL;
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'job-details',
@@ -234,6 +235,7 @@ export default {
   computed: {
     project: get('currentProject/project'),
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     canManageJob() {
       return this.$store.getters['currentProject/canManageJob'](this.job);
     },
@@ -257,6 +259,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     async refresh(force=false) {
       if(this.isFinished && !force) {
         return;
@@ -273,6 +276,12 @@ export default {
     },
     filesize(size) {
       return filesize(size, {base: 10});
+    },
+    viewData(data) {
+      window.location.assign(appendShortTermToken(data.viewURL, this.shortTermToken), '_blank');
+    },
+    downloadData(data) {
+      window.location.assign(appendShortTermToken(data.downloadURL, this.shortTermToken), '_blank');
     },
     async fetchLog() {
       if (this.isFinished) {

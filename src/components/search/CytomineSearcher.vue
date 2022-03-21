@@ -88,7 +88,6 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-
     displayResults() {
       return this.isActive && !this.error && this.searchString.length > 0;
     },

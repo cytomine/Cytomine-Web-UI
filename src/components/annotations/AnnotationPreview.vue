@@ -59,6 +59,8 @@
 
 <script>
 import AnnotationDetails from './AnnotationDetails';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
 
 export default {
   name: 'annotation-preview',
@@ -80,12 +82,13 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     styleAnnotDetails() {
       let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`;
-
+      let url = appendShortTermToken(`${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`, this.shortTermToken);
+      console.log('url', url);
       return {
-        backgroundImage: `url(${url})`,
+        backgroundImage: `url("${url}")`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'

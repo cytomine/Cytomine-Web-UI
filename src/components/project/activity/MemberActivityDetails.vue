@@ -119,7 +119,7 @@
 
           <template #footer>
             <p class="has-text-centered">
-              <a class="button is-link" :href="connections.downloadURL" target="_self">
+              <a class="button is-link" @click="downloadConnections(connections)">
                 {{$t('button-export-as-csv')}}
               </a>
             </p>
@@ -182,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <img :src="consultation.imageThumb" class="image-overview">
+                <img :src="appendShortTermToken(consultation.imageThumb, shortTermToken)" class="image-overview">
               </router-link>
             </b-table-column>
 
@@ -221,7 +221,7 @@
 
           <template #footer>
             <p class="has-text-centered">
-              <a class="button is-link" :href="consultations.downloadURL" target="_self">
+              <a class="button is-link" @click="downloadConnections(consultations)">
                 {{$t('button-export-as-csv')}}
               </a>
             </p>
@@ -255,6 +255,8 @@ import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';
 
 import moment from 'moment';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
 
 export default {
   name: 'member-activity-details',
@@ -290,9 +292,11 @@ export default {
     idUser() {
       return Number(this.$route.params.idUser);
     },
-    project: get('currentProject/project')
+    project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken')
   },
   methods: {
+    appendShortTermToken,
     async fetchData() {
       try {
         await Promise.all([
@@ -325,6 +329,9 @@ export default {
     },
     async fetchConsultations() {
       this.consultations = await ImageConsultationCollection.fetchAll({project: this.project.id, user: this.idUser, resume: true});
+    },
+    download(connections) {
+      window.location.assign(appendShortTermToken(connections.downloadURL, this.shortTermToken), '_blank');
     }
   },
   async created() {

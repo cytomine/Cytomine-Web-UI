@@ -308,6 +308,7 @@ import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'list-annotations',
@@ -369,6 +370,7 @@ export default {
     },
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -571,6 +573,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     viewAnnot(annot) {
       this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
     },
@@ -608,7 +611,7 @@ export default {
       this.tags = (await TagCollection.fetchAll()).array;
     },
     downloadURL(format) {
-      return this.collection.getDownloadURL(format);
+      return appendShortTermToken(this.collection.getDownloadURL(format), this.shortTermToken);
     },
     addTerm(term) {
       this.terms.push(term);
