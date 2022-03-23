@@ -286,7 +286,12 @@ export default {
   methods: {
     isImageSizeValid(){
       if(this.selectedImage){
-        return (this.selectedImageSize.width <= 150 && this.selectedImageSize.height <= 150);
+        if(this.selectedImage.type == 'image/svg+xml') {
+          return (this.selectedImage.size <= 7500);
+        }
+        else {
+          return (this.selectedImageSize.width <= 250 && this.selectedImageSize.height <= 250);
+        }
       }
       return true;
     },
