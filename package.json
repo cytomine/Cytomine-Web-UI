@@ -18,7 +18,7 @@
     "chartjs-plugin-datalabels": "^0.6.0",
     "chartjs-plugin-zoom": "^0.7.4",
     "copy-to-clipboard": "^3.0.8",
-    "cytomine-client": "file:../Cytomine-js-client/cytomine-client-0.0.0.tgz",
+    "cytomine-client": "^2.0.0-beta.4",
     "detect-browser": "^4.7.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
