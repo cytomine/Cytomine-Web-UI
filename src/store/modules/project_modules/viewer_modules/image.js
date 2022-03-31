@@ -401,8 +401,8 @@ export default {
       return state.imageGroupLink.group;
     },
 
-    extrinsicChannels: state => {
-      if (state.imageInstance.channels === 1 && state.imageInstance.extrinsicChannels === 3) {
+    apparentChannels: state => {
+      if (state.imageInstance.channels === 1 && state.imageInstance.apparentChannels === 3) {
         return [
           {index:0, name: defaultChannelName(state.imageInstance, 0), color: defaultChannelColor(state.imageInstance, 0)},
           {index:1, name: defaultChannelName(state.imageInstance, 1), color: defaultChannelColor(state.imageInstance, 1)},
@@ -446,10 +446,10 @@ function findSliceInstanceNbPage(image) {
 }
 
 function defaultChannelName(image, channel) {
-  if (channel === 0 && image.channels === 1 && image.extrinsicChannels === 1) {
+  if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
     return 'L';
   }
-  if (image.channels === 1 && image.extrinsicChannels === 3) {
+  if (image.channels === 1 && image.apparentChannels === 3) {
     if (channel === 0) {
       return 'R';
     }
@@ -464,10 +464,10 @@ function defaultChannelName(image, channel) {
 }
 
 function defaultChannelColor(image, channel) {
-  if (channel === 0 && image.channels === 1 && image.extrinsicChannels === 1) {
+  if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
     return '#C0C0C0';
   }
-  if (image.channels === 1 && image.extrinsicChannels === 3) {
+  if (image.channels === 1 && image.apparentChannels === 3) {
     if (channel === 0) {
       return '#FF0000';
     }

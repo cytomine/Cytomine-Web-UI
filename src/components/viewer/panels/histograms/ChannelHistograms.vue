@@ -45,13 +45,13 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     channels() {
-      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
+      return this.$store.getters[this.imageModule + 'apparentChannels'];
     },
     sliceChannels() {
       return this.imageWrapper.activeSlices.map(slice => slice.channel);
     },
     filteredHistograms() {
-      if (this.image.extrinsicChannels > 1 && this.image.channels !== this.image.extrinsicChannels) {
+      if (this.image.apparentChannels > 1 && this.image.channels !== this.image.apparentChannels) {
         return this.histograms;
       }
       return this.histograms.filter(h => this.sliceChannels.includes(h.channel));

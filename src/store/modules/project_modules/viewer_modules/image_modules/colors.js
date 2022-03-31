@@ -135,7 +135,7 @@ export default {
       let minmax = await image.fetchChannelHistogramBounds();
 
       // --- Hack ---
-      if (image.extrinsicChannels > constants.MAX_MERGEABLE_CHANNELS) {
+      if (image.apparentChannels > constants.MAX_MERGEABLE_CHANNELS) {
         let imageMinmax = await image.fetchHistogramBounds();
         minmax = minmax.map(histogram => {
           return {...histogram, minimum: imageMinmax.minimum, maximum: imageMinmax.maximum};

@@ -194,7 +194,7 @@
       <tr v-if="isPropDisplayed('channels')">
         <td class="prop-label">{{$t("image-channels")}}</td>
         <td class="prop-content" colspan="3">
-          {{$tc("count-bands", image.extrinsicChannels, {count: image.extrinsicChannels})}}
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
         </td>
       </tr>
       <tr v-if="isPropDisplayed('size')">
