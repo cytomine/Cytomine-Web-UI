@@ -393,8 +393,8 @@ export default {
       if (this.imageWrapper.colors.inverse) {
         params.colormaps = '!DEFAULT';
       }
-      let filterIntensities = (this.sliceChannels.length !== this.image.apparentChannels) &&
-        (this.image.channels === this.image.apparentChannels);
+      let filterIntensities = (this.sliceChannels.length !== this.image.extrinsicChannels) &&
+        (this.image.channels === this.image.extrinsicChannels);
       let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
       if (filterIntensities) {
         minIntensities = minIntensities.filter((_, index) => this.sliceChannels.includes(index));

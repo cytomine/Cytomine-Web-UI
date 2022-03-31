@@ -131,7 +131,7 @@ export default {
       return this.imageWrapper.activePanel;
     },
     maxValue() {
-      return Math.pow(2, this.image.bits);
+      return Math.pow(2, this.image.bitPerSample);
     },
 
     selectedFilter: {
@@ -189,7 +189,7 @@ export default {
     },
 
     histogramNBins() {
-      return (this.image.bits > 8) ? 2048 : 256;
+      return (this.image.bitPerSample > 8) ? 2048 : 256;
     }
 
   },
@@ -208,7 +208,7 @@ export default {
       this.revisionBrightnessContrast++;
     },
     adjustToSlice() {
-      if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
+      if (this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS) {
         let minmax = this.sampleHistograms.map(sh => {
           return {channel: sh.channel, minimum: sh.minimum, maximum: sh.maximum};
         });
@@ -236,7 +236,7 @@ export default {
 
     async fetchSampleHistograms() {
       try {
-        if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
+        if (this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS) {
           // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
           this.sampleHistograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
         }

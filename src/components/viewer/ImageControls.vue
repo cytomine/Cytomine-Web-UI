@@ -156,7 +156,7 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     channels() {
-      return this.$store.getters[this.imageModule + 'apparentChannels'];
+      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
     },
     currentSlices() {
       return this.imageWrapper.activeSlices;
@@ -221,12 +221,12 @@ export default {
       return this.currentSlice.channelName !== null;
     },
     areChannelsMergeable() {
-      return this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS;
+      return this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS;
     },
     allChannelsOption() {
       return {
         name: this.$t('all-channels'),
-        value: _.range(0, this.image.apparentChannels)
+        value: _.range(0, this.image.extrinsicChannels)
       };
     },
     channelOptions() {
@@ -246,7 +246,7 @@ export default {
       return formatMinutesSeconds(time);
     },
     channelValue(channel) {
-      if (this.channels.length === this.image.apparentChannels) {
+      if (this.channels.length === this.image.extrinsicChannels) {
         let info = this.channels[channel];
         return (info) ? info.name : null;
       }

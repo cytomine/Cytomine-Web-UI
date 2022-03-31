@@ -93,7 +93,7 @@ export default {
       return this.annotation.annotationCropURL(this.thumbSize, 'jpg', this.thumbParams);
     },
     bpc() {
-      return (this.image && this.image.bits) ? this.image.bits: 8;
+      return (this.image && this.image.bitPerSample) ? this.image.bitPerSample: 8;
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');

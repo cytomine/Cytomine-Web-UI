@@ -94,7 +94,7 @@ export default {
     },
 
     theoreticalMax() {
-      return Math.pow(2, this.image.bits) - 1;
+      return Math.pow(2, this.image.bitPerSample) - 1;
     },
     theoreticalMin() {
       return 0;

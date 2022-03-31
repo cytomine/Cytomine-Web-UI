@@ -115,27 +115,27 @@ export default {
       state.histogramScale = scale;
     },
 
-    setMaxValueFromBps(state, bits) {
-      state.maxValue = Math.pow(2, bits) - 1;
+    setMaxValueFromBps(state, bitPerSample) {
+      state.maxValue = Math.pow(2, bitPerSample) - 1;
     }
   },
 
   actions: {
     async initialize({commit, dispatch}, {image}) {
       commit('setIdImage', image.id);
-      commit('setMaxValueFromBps', image.bits);
+      commit('setMaxValueFromBps', image.bitPerSample);
       await dispatch('refreshDefaultMinMax', {image});
     },
     async setImageInstance({commit, dispatch}, {image}) {
       commit('setIdImage', image.id);
-      commit('setMaxValueFromBps', image.bits);
+      commit('setMaxValueFromBps', image.bitPerSample);
       await dispatch('refreshDefaultMinMax', {image});
     },
     async refreshDefaultMinMax({commit}, {image}) {
       let minmax = await image.fetchChannelHistogramBounds();
 
       // --- Hack ---
-      if (image.apparentChannels > constants.MAX_MERGEABLE_CHANNELS) {
+      if (image.extrinsicChannels > constants.MAX_MERGEABLE_CHANNELS) {
         let imageMinmax = await image.fetchHistogramBounds();
         minmax = minmax.map(histogram => {
           return {...histogram, minimum: imageMinmax.minimum, maximum: imageMinmax.maximum};
@@ -144,7 +144,7 @@ export default {
       // ---
 
       commit('setDefaultMinMax', minmax);
-      if (image.bits > 8) {
+      if (image.bitPerSample > 8) {
         commit('setMinMax', deepCopy(minmax));
       }
       else {
