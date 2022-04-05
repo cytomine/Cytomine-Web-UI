@@ -33,8 +33,8 @@
               <img :src="image.preview" class="image-overview">
             </b-table-column>
 
-            <b-table-column field="originalFilename" :label="$t('name')" sortable>
-              {{ image.originalFilename }}
+            <b-table-column field="instanceFilename" :label="$t('name')" sortable>
+              {{ image.instanceFilename }}
             </b-table-column>
 
             <b-table-column field="created" :label="$t('created-on')" sortable>
@@ -105,7 +105,7 @@ export default {
         withImageGroup: true,
       });
       if(this.searchString) {
-        collection['originalFilename'] = {
+        collection['instanceFilename'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
