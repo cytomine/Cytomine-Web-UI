@@ -430,11 +430,13 @@ import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/Paste
 import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector';
 
 import WKT from 'ol/format/WKT';
-import {containsExtent} from 'ol/extent';
+import {containsExtent, getCenter, getIntersection} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType, AnnotationLink} from 'cytomine-client';
-import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
-  listAnnotationsInGroup} from '@/utils/annotation-utils';
+import {
+  Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
+  listAnnotationsInGroup
+} from '@/utils/annotation-utils';
 
 
 export default {
@@ -781,6 +783,35 @@ export default {
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
+    convertLocation(originalLocation, image) {
+      let geometry = new WKT().readGeometry(originalLocation);
+      let wrapper = this.imageWrapper;
+
+      /* Get the center coordinates of the annotation extent */
+      let centerExtent = getCenter(geometry.getExtent());
+
+      /* Translate the original location of the annotation to the center of the current field of view */
+      geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
+
+      /* Check if the translation is within the image boundaries */
+      let imageExtent = [0, 0, image.width, image.height];
+      if (!containsExtent(imageExtent, geometry.getExtent())) {
+        let geomExtent = geometry.getExtent();
+        /* Get the part of annotation within the boundaries */
+        let intersection = getIntersection(imageExtent, geomExtent);
+
+        /* Get the difference between the parts inside and outside the image boundaries */
+        let difference = [];
+        for (let i = 0; i < intersection.length; i++) {
+          difference[i] = intersection[i] - geomExtent[i];
+        }
+
+        /* Translate the difference to have the complete annotation inside the image boundaries */
+        geometry.translate(difference[0] + difference[2], difference[1] + difference[3]);
+      }
+
+      return new WKT().writeGeometry(geometry);
+    },
     async paste() {
       if (!this.copiedAnnot) {
         return;
@@ -793,12 +824,7 @@ export default {
         location = this.copiedAnnot.location;
       }
       else {
-        let extent = geometry.getExtent();
-        let center = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
-        geometry.translate(this.image.width / 2 - center[0], this.image.height / 2 - center[1]);
-        if (containsExtent(this.imageExtent, geometry.getExtent())) {
-          location = new WKT().writeGeometry(geometry);
-        }
+        location = this.convertLocation(this.copiedAnnot.location, this.image);
       }
 
       if (!location) {
