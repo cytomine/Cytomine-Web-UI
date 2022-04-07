@@ -297,9 +297,6 @@ export default {
     sliceIds() {
       return this.slices.map(slice => slice.id);
     },
-    sliceChannels() {
-      return this.slices.map(slice => slice.channel);
-    },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
     },
@@ -379,50 +376,14 @@ export default {
       return this.image.tileSize;
     },
     baseLayerProcessingParams() {
-      let params = {};
-      if (this.imageWrapper.colors.filter) {
-        params.filters = this.imageWrapper.colors.filter;
-      }
-      if (this.imageWrapper.colors.contrast !== 1) {
-        params.contrast = this.imageWrapper.colors.contrast;
-      }
-      if (this.imageWrapper.colors.gamma !== 1) {
-        params.gammas = this.imageWrapper.colors.gamma;
-      }
-      if (this.imageWrapper.colors.inverse) {
-        params.colormaps = '!DEFAULT';
-      }
-      let filterIntensities = (this.sliceChannels.length !== this.image.apparentChannels) &&
-        (this.image.channels === this.image.apparentChannels);
-      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
-      if (filterIntensities) {
-        minIntensities = minIntensities.filter((_, index) => this.sliceChannels.includes(index));
-      }
-      if (minIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.min_intensities = minIntensities.join(',');
-      }
-      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
-      if (filterIntensities) {
-        maxIntensities = maxIntensities.filter((_, index) => this.sliceChannels.includes(index));
-      }
-      if (maxIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.max_intensities = maxIntensities.join(',');
-      }
-
-      return params;
+      return this.$store.getters[this.imageModule + 'tileRequestParams'];
     },
     baseLayerSliceParams() {
-      let params = {
+      return {
         // eslint-disable-next-line camelcase
         z_slices: this.slices[0].zStack,
         timepoints: this.slices[0].time
       };
-      if (this.slices.length < this.image.channels) {
-        params.channels = this.sliceChannels;
-      }
-      return params;
     },
     baseLayerURLQuery() {
       let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();

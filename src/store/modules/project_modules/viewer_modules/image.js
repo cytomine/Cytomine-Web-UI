@@ -161,6 +161,22 @@ export default {
       let ranks = channels.map(channel => slicePositionToRank({channel, zStack, time}, state.imageInstance));
       await dispatch('setActiveSlicesByRank', ranks);
     },
+    async addActiveSliceChannel({state, dispatch}, {channel}) {
+      let activeSlice = state.activeSlices[0];
+      let ranks = state.activeSlices.map(s => s.rank);
+      ranks.push(slicePositionToRank({
+        channel, zStack: activeSlice.zStack, time: activeSlice.time
+      }, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
+    async removeActiveSliceChannel({state, dispatch}, {channel}) {
+      let channels = state.activeSlices.map(s => s.channel).filter(c => c !== channel);
+      let activeSlice = state.activeSlices[0];
+      let ranks = channels.map(channel => slicePositionToRank({
+        channel, zStack: activeSlice.zStack, time: activeSlice.time
+      }, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
     async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
       let slice = state.sliceInstances[rank];
       if (!slice) {
