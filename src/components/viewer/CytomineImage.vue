@@ -51,14 +51,14 @@
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -211,10 +211,9 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
-
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -437,22 +436,22 @@ export default {
       return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
-    colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0
-                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    },
-    operation() {
-      return operation;
-    },
-    lib() {
-      return {
-        ...constLib,
-        brightness: this.imageWrapper.colors.brightness,
-        contrast: this.imageWrapper.colors.contrast,
-        saturation: this.imageWrapper.colors.saturation,
-        hue: this.imageWrapper.colors.hue
-      };
-    },
+    // colorManipulationOn() {
+    //   return this.imageWrapper.colors.brightness !== 0
+    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    // },
+    // operation() {
+    //   return operation;
+    // },
+    // lib() {
+    //   return {
+    //     ...constLib,
+    //     brightness: this.imageWrapper.colors.brightness,
+    //     contrast: this.imageWrapper.colors.contrast,
+    //     saturation: this.imageWrapper.colors.saturation,
+    //     hue: this.imageWrapper.colors.hue
+    //   };
+    // },
 
     layersToPreload() {
       let layers = [];
