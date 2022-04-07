@@ -6,7 +6,7 @@
       <strong class="image-dimension-name">C</strong>
       <template v-if="areChannelsMergeable">
         <b-select v-model="currentChannels" size="is-small" class="channel-selector" expanded>
-          <option v-for="channel in channelOptions" :key="channel.name" :value="channel.value">
+          <option v-for="channel in channelOptions" :key="`${image.id}-${channel.value}-opt`" :value="channel.value">
             <channel-name :channel="channel" />
           </option>
         </b-select>
@@ -156,7 +156,7 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     channels() {
-      return this.$store.getters[this.imageModule + 'apparentChannels'];
+      return this.$store.getters[this.imageModule + 'channels'];
     },
     currentSlices() {
       return this.imageWrapper.activeSlices;
@@ -246,7 +246,7 @@ export default {
       return formatMinutesSeconds(time);
     },
     channelValue(channel) {
-      if (this.channels.length === this.image.apparentChannels) {
+      if (this.channels.length === this.image.channels) {
         let info = this.channels[channel];
         return (info) ? info.name : null;
       }
