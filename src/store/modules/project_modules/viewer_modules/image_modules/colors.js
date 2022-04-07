@@ -14,44 +14,276 @@
 * limitations under the License.
 */
 
+
 export default {
   state() {
     return {
-      brightness: 0,
-      contrast: 0,
-      hue: 0,
-      saturation: 0,
+      idImage: 0,
+      nbBitsPerSample: 8,
+      nbSamplesPerChannel: 1,
+
+      apparentChannels: null,
+
+      gammaPerApparentChannel: true,
+      invertedPerApparentChannel: true,
+      histogramLogScale: true,
 
       filter: null
     };
   },
 
   mutations: {
-    setBrightness(state, value) {
-      state.brightness = value;
+    setIdImage(state, id) {
+      state.idImage = id;
     },
 
-    setContrast(state, value) {
-      state.contrast = value;
+    setNbBitsPerSample(state, value) {
+      state.nbBitsPerSample = value;
     },
 
-    setHue(state, value) {
-      state.hue = value;
+    setNbSamplesPerChannel(state, value) {
+      state.nbSamplesPerChannel = value;
     },
 
-    setSaturation(state, value) {
-      state.saturation = value;
+    setGammaPerApparentChannel(state, value) {
+      state.gammaPerApparentChannel = value;
     },
 
-    resetColorManipulation(state) {
-      state.brightness = 0;
-      state.contrast = 0;
-      state.hue = 0;
-      state.saturation = 0;
+    setInvertedPerApparentChannel(state, value) {
+      state.invertedPerApparentChannel = value;
+    },
+
+    setHistogramLogScale(state, value) {
+      state.histogramLogScale = value;
     },
 
     setFilter(state, filter) {
       state.filter = filter;
-    }
+    },
+
+    setApparentChannels(state, apparentChannels) {
+      state.apparentChannels = apparentChannels;
+    },
+
+    setApparentChannelVisibility(state, {indexApparentChannel, visible}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.visible = visible;
+    },
+
+    setApparentChannelColor(state, {indexApparentChannel, color, isColormap}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.color = color;
+      channel.isColormap = isColormap;
+    },
+
+    setApparentChannelBounds(state, {indexApparentChannel, bounds}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = bounds;
+    },
+
+    setApparentChannelProcessing(state, {indexApparentChannel, gamma, inverted}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.gamma = gamma;
+      channel.inverted = inverted;
+    },
+
+    resetApparentChannel(state, indexApparentChannel) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      resetApparentChannel(channel, state.nbBitsPerSample);
+    },
+    resetApparentChannels(state) {
+      state.apparentChannels.forEach(apparentChannel => {
+        resetApparentChannel(apparentChannel, state.nbBitsPerSample);
+      });
+    },
+    resetImageColorManipulationSettings(state) {
+      state.gammaPerApparentChannel = true;
+      state.invertedPerApparentChannel = true;
+      state.histogramLogScale = true;
+    },
+
+    adjustToImage(state, indexApparentChannel) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = channel.imageBounds;
+    },
+    adjustAllToImage(state) {
+      state.apparentChannels.forEach(apparentChannel => {
+        if (apparentChannel.visible) {
+          apparentChannel.bounds = apparentChannel.imageBounds;
+        }
+      });
+    },
+    adjustToSlice(state, {indexApparentChannel, bounds}) {
+      let nBits = state.nbBitsPerSample;
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = autoAdjustBounds(nBits, bounds);
+    },
+    adjustAllToSlice(state, allBounds) {
+      let nBits = state.nbBitsPerSample;
+      state.apparentChannels.forEach((apparentChannel, i) => {
+        if (apparentChannel.visible) {
+          apparentChannel.bounds = autoAdjustBounds(nBits, allBounds[i]);
+        }
+      });
+    },
+
+    setChannelsVisibility(state, channels) {
+      state.apparentChannels.forEach(ac => {
+        ac.visible = (channels.includes(ac.channel));
+      });
+    },
+  },
+
+  actions: {
+    async initialize({commit, dispatch}, {image, slices}) {
+      commit('setIdImage', image.id);
+      commit('setNbBitsPerSample', image.bitPerSample);
+      commit('setNbSamplesPerChannel', image.samplePerPixel);
+      await dispatch('refreshApparentChannels', {image});
+      let channels = slices.map(slice => slice.channel);
+      commit('setChannelsVisibility', channels);
+    },
+    async setImageInstance({commit, dispatch}, {image}) {
+      commit('setIdImage', image.id);
+      commit('setNbBitsPerSample', image.bitPerSample);
+      commit('setNbSamplesPerChannel', image.samplePerPixel);
+      await dispatch('refreshApparentChannels', {image});
+    },
+    async refreshApparentChannels({commit}, {image}) {
+      let apparentChannels = formatApparentChannels(
+        await fetchApparentChannels(image),
+        image.bitPerSample
+      );
+      commit('setApparentChannels', apparentChannels);
+    },
+
+    resetColorManipulation({commit, dispatch}) {
+      dispatch('resetApparentChannels');
+      commit('resetImageColorManipulationSettings');
+      commit('setFilter', null);
+    },
+
+    setApparentChannelVisibility({commit, state, dispatch}, {indexApparentChannel, visible}) {
+      let apparentChannel = state.apparentChannels[indexApparentChannel];
+      let count = state.apparentChannels.filter(ac =>
+        ac.visible && ac.channel === apparentChannel.channel
+      ).length;
+      if (visible && count === 0) {
+        dispatch('addActiveSliceChannel', {channel: apparentChannel.channel});
+      }
+      else if (!visible && count === 1) {
+        dispatch('removeActiveSliceChannel', {channel: apparentChannel.channel});
+      }
+      commit('setApparentChannelVisibility', {indexApparentChannel, visible});
+    },
+    async setActiveSlice({commit}, slice) {
+      commit('setChannelsVisibility', [slice.channel]);
+    },
+    async setActiveSliceByPosition({commit}, {channel}) {
+      commit('setChannelsVisibility', [channel]);
+    },
+    async setActiveSlicesByPosition({commit}, {channels}) {
+      commit('setChannelsVisibility', channels);
+    },
+    // async setActiveSliceByRank({dispatch}, rank) {
+    //   //TODO
+    // },
+    // async setActiveSlicesByRank({dispatch}, ranks) {
+    //   //TODO
+    // },
+  },
+
+  getters: {
+    tileRequestParams: (state) => {
+      let params = {};
+      if (state.filter !== null) {
+        params.filters = state.filter;
+      }
+      let visibleApparentChannels = state.apparentChannels.filter(
+        apparentChannel => apparentChannel.visible
+      );
+      if (visibleApparentChannels.length > 0) {
+        params.channels = [];
+        // eslint-disable-next-line camelcase
+        params.min_intensities = [];
+        // eslint-disable-next-line camelcase
+        params.max_intensities = [];
+        params.gammas = [];
+        params.colormaps = [];
+
+        visibleApparentChannels.forEach(ac => {
+          params.channels.push(ac.index);
+          params.min_intensities.push(ac.bounds.min);
+          params.max_intensities.push(ac.bounds.max);
+          params.gammas.push(ac.gamma);
+          params.colormaps.push(formatColormapRequestParam(ac.color, ac.inverted));
+        });
+      }
+      return params;
+    },
   }
 };
+
+function formatColormapRequestParam(color, inverted) {
+  if (color === null) {
+    color = 'DEFAULT';
+  }
+  if (inverted) {
+    return `!${color}`;
+  }
+  return color;
+}
+
+function defaultBounds(nBits) {
+  return {min: 0, max: 2**nBits - 1};
+}
+
+function autoAdjustBounds(nBits, {min, max}) {
+  if (nBits > 8) {
+    return {min, max};
+  }
+  return {min: 0, max:255};
+}
+
+async function fetchApparentChannels(image) {
+  return await image.fetchChannelHistogramBounds();
+}
+
+function formatApparentChannels(apparentChannels, nBits) {
+  if (!apparentChannels) {
+    return;
+  }
+
+  return apparentChannels.map(apparentChannel =>
+    formatApparentChannel(apparentChannel, nBits)
+  );
+}
+
+function formatApparentChannel(apparentChannel, nBits) {
+  let result = {index: apparentChannel.apparentChannel};
+  result.channel = apparentChannel.channel;
+  result.sample = apparentChannel.sample;
+
+  result.defaultColor = apparentChannel.color;
+  result.color = apparentChannel.color;
+  result.isColormap = false;
+  result.visible = true;
+  result.gamma = 1.0;
+  result.inverted = false;
+  result.imageBounds = {
+    min: apparentChannel.minimum,
+    max: apparentChannel.maximum
+  };
+  result.bounds = autoAdjustBounds(nBits, result.imageBounds);
+
+  return result;
+}
+
+function resetApparentChannel(apparentChannel, nBits) {
+  apparentChannel.color = apparentChannel.defaultColor;
+  apparentChannel.isColormap = false;
+  apparentChannel.visible = true;
+  apparentChannel.gamma = 1.0;
+  apparentChannel.inverted = false;
+  apparentChannel.bounds = defaultBounds(nBits);
+}
