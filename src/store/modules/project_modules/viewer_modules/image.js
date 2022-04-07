@@ -33,6 +33,7 @@ import tracks from './image_modules/tracks';
 import annotationsList from './image_modules/annotations-list';
 
 import Vue from 'vue';
+import _ from 'lodash';
 
 import {
   isCluster,
@@ -316,20 +317,12 @@ export default {
       return state.imageInstance.depth * state.imageInstance.duration * state.imageInstance.channels;
     },
 
-    apparentChannels: state => {
-      if (state.imageInstance.channels === 1 && state.imageInstance.apparentChannels === 3) {
-        return [
-          {index:0, name: defaultChannelName(state.imageInstance, 0), color: defaultChannelColor(state.imageInstance, 0)},
-          {index:1, name: defaultChannelName(state.imageInstance, 1), color: defaultChannelColor(state.imageInstance, 1)},
-          {index:2, name: defaultChannelName(state.imageInstance, 2), color: defaultChannelColor(state.imageInstance, 2)}
-        ];
-      }
-
+    channels: state => {
       return _.orderBy(Object.values(_.groupBy(state.sliceInstances, 'channel')).map(slices => {
         return {
           index: slices[0].channel,
-          name: slices[0].channelName || defaultChannelName(state.imageInstance, slices[0].channel),
-          color: slices[0].channelColor || defaultChannelColor(state.imageInstance, slices[0].channel)
+          name: slices[0].channelName,
+          color: slices[0].channelColor
         };
       }), 'index');
     }
@@ -359,38 +352,3 @@ function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
 
-function defaultChannelName(image, channel) {
-  if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
-    return 'L';
-  }
-  if (image.channels === 1 && image.apparentChannels === 3) {
-    if (channel === 0) {
-      return 'R';
-    }
-    if (channel === 1) {
-      return 'G';
-    }
-    if (channel === 2) {
-      return 'B';
-    }
-  }
-  return null;
-}
-
-function defaultChannelColor(image, channel) {
-  if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
-    return '#C0C0C0';
-  }
-  if (image.channels === 1 && image.apparentChannels === 3) {
-    if (channel === 0) {
-      return '#FF0000';
-    }
-    if (channel === 1) {
-      return '#00FF00';
-    }
-    if (channel === 2) {
-      return '#0000FF';
-    }
-  }
-  return null;
-}
