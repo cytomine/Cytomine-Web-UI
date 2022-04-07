@@ -784,6 +784,11 @@ export default {
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
     convertLocation(originalLocation, image) {
+      /* If we want to paste in the same image but in another slice */
+      if (this.image.id === this.copiedAnnot.image) {
+        return this.copiedAnnot.location;
+      }
+
       let geometry = new WKT().readGeometry(originalLocation);
       let wrapper = this.imageWrapper;
 
@@ -817,16 +822,8 @@ export default {
         return;
       }
 
-      let location;
-      let geometry = new WKT().readGeometry(this.copiedAnnot.location);
-
-      if (this.image.id === this.copiedAnnot.image || containsExtent(this.imageExtent, geometry.getExtent())) {
-        location = this.copiedAnnot.location;
-      }
-      else {
-        location = this.convertLocation(this.copiedAnnot.location, this.image);
-      }
-
+      /* Convert the location if it is needed */
+      let location = this.convertLocation(this.copiedAnnot.location, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;
