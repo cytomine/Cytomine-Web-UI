@@ -111,10 +111,16 @@
             </div>
           </b-upload>
         </div>
-        <div v-if="!isImageSizeValid()">
+        <div v-if="!isValidImage()">
           <b-field
             type="is-danger"
             :message="$t('logo-upload-error-message')">
+          </b-field>
+        </div>
+        <div v-if="!isValidSVG()">
+          <b-field
+            type="is-danger"
+            :message="$t('logo-upload-svg-error-message')">
           </b-field>
         </div>
       </div>
@@ -287,20 +293,28 @@ export default {
     }
   },
   methods: {
-    isImageSizeValid(){
-      if(this.selectedImage){
-        if(this.selectedImage.type == 'image/svg+xml') {
-          return (this.selectedImage.size <= 7500);
-        }
-        else {
-          return (this.selectedImageSize.width <= 250 && this.selectedImageSize.height <= 250);
-        }
+    isSVG(){
+      return this.selectedImage.type == 'image/svg+xml';
+    },
+    isValidSVG(){
+      if(this.selectedImage && this.isSVG()){
+        return (this.selectedImage.size <= 7500);
+      }
+      return true;
+    },
+    isValidImage(){
+      if(this.selectedImage && !this.isSVG()){
+        return (this.selectedImageSize.width <= 250 && this.selectedImageSize.height <= 250);
       }
       return true;
     },
     async save() {
       try {
-        if (!this.isImageSizeValid()) {
+        if(!this.isValidSVG()) {
+          this.$notify({type: 'error', text: this.$t('logo-upload-svg-error-message')});
+          throw new TypeError(this.$t('logo-upload-svg-error-message'));
+        }
+        else if(!this.isValidImage()) {
           this.$notify({type: 'error', text: this.$t('logo-upload-error-message')});
           throw new TypeError(this.$t('logo-upload-error-message'));
         }
