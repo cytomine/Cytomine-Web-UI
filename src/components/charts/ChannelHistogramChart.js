@@ -102,6 +102,13 @@ export default {
       });
       return _.uniqBy(response, 'x');
     },
+
+    backgroundColor() {
+      if (this.color !== null) {
+        return this.color;
+      }
+      return '#fff';
+    },
     datasets() {
       return [
         {
@@ -117,7 +124,7 @@ export default {
         },
         {
           data: this.scaledHistogram,
-          backgroundColor: this.color,
+          backgroundColor: this.backgroundColor,
           pointRadius: 1,
           order: 1,
         },
@@ -141,6 +148,9 @@ export default {
       this.doRenderChart();
     },
     inverse() {
+      this.doRenderChart();
+    },
+    backgroundColor() {
       this.doRenderChart();
     }
   },
