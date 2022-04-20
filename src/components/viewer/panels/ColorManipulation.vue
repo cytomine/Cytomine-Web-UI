@@ -30,21 +30,11 @@
           <th class="bounds-column">
             <div class="buttons has-addons is-right">
               <button
-                v-tooltip="adjustImageLabel"
-                @click="adjustAllToImage"
-                class="button is-small"
-                :class="{'is-selected': areBoundsAdjustedToImage}"
-              >
-                <span class="icon is-small">
-                  <i class="fas fa-magic"></i>
-                </span>
-              </button>
-              <button
                 v-if="isImageMultidimensional"
                 v-tooltip="$t('button-adjust-slice')"
                 @click="adjustAllToSlice"
                 class="button is-small"
-                :class="{'is-selected': areBoundsAdjustedToSlice}"
+                :disabled="areBoundsAdjustedToSlice"
               >
                 <span class="icon is-small">
                   <i class="fas fa-magic"></i>
@@ -52,10 +42,20 @@
                 </span>
               </button>
               <button
+                v-tooltip="adjustImageLabel"
+                @click="adjustAllToImage"
+                class="button is-small"
+                :disabled="areBoundsAdjustedToImage"
+              >
+                <span class="icon is-small">
+                  <i class="fas fa-magic"></i>
+                </span>
+              </button>
+              <button
                 v-tooltip="$t('button-reset')"
                 @click="resetAll"
                 class="button is-small"
-                :class="{'is-selected': areBoundsDefault}"
+                :disabled="areBoundsDefault"
               >
                 <span class="icon is-small">
                   <i class="fas fa-tint-slash"></i>
@@ -278,7 +278,7 @@ export default {
     },
     areBoundsDefault() {
       const count = this.visibleManipulableChannels.filter(mc =>
-        sameHistogramBounds(mc.bounds, this.defaultBounds)
+        sameHistogramBounds(mc.bounds, this.defaultBounds) && !mc.inverted && mc.gamma === 1.0
       ).length;
       return count === this.nbVisibleManipulableChannels;
     },
@@ -486,11 +486,6 @@ th, >>> td {
   left: 1px;
   font-size: 0.7em;
   font-weight: 600;
-}
-
-.button.is-selected {
-  background-color: #6899d0;
-  color: white;
 }
 
 /** Chart (histogram) **/
