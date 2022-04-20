@@ -1031,3 +1031,4 @@ all-channels,All channels,Tous les canaux
 channel-abbr,ch.,can.
 channel,Channel,Canal
 warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément
+min-max,Min/Max,Min/Max
