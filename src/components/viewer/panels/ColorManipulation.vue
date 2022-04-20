@@ -110,20 +110,18 @@
           >
             <td colspan="4">
               <div class="chart-container channel-histogram">
-                <channel-histogram-chart
+                <histogram-chart
+                  :log-scale="histogramLogScale"
+                  :color="mc.color"
                   :histogram="mc.histogram.histogram"
                   :n-bins="mc.histogram.nBins"
                   :first-bin="mc.histogram.firstBin"
                   :last-bin="mc.histogram.lastBin"
-                  :color="mc.color"
-                  :min="mc.bounds.min"
-                  :max="mc.bounds.max"
-                  :log-scale="histogramLogScale"
-                  :theoretical-max="defaultBounds.max"
-                  :default-max="mc.histogram.maximum"
-                  :default-min="mc.histogram.minimum"
+                  :default-bounds="defaultBounds"
+                  :image-bounds="{min: mc.histogram.minimum, max:mc.histogram.maximum}"
+                  :current-bounds="mc.bounds"
                   :gamma="mc.gamma"
-                  :inverse="mc.inverted"
+                  :inverted="mc.inverted"
                   css-classes="chart"
                 />
               </div>
@@ -170,14 +168,14 @@ import {ImageFilterProjectCollection} from 'cytomine-client';
 
 import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel';
 import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable';
-import ChannelHistogramChart from '@/components/charts/ChannelHistogramChart';
+import HistogramChart from '@/components/charts/HistogramChart';
 
 export default {
   name: 'color-manipulation',
   components: {
     AdjustableLookUpTable,
     CytomineChannel,
-    ChannelHistogramChart
+    HistogramChart
   },
   props: {
     index: String

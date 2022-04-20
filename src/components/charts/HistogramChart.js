@@ -1,24 +1,39 @@
+/*
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 import {Line} from 'vue-chartjs';
 import _ from 'lodash';
 
 export default {
-  name: 'channel-histogram-chart',
+  name: 'histogram-chart',
   extends: Line,
   props: {
     logScale: Boolean,
+    color: String,
+
     histogram: Array,
     nBins: Number,
     firstBin: Number,
     lastBin: Number,
-    color: String,
 
-    theoreticalMax: Number,
-    defaultMin: Number,
-    defaultMax: Number,
-    min: Number,
-    max: Number,
+    defaultBounds: Object,
+    imageBounds: Object,
+    currentBounds: Object,
     gamma: Number,
-    inverse: Boolean,
+    inverted: Boolean,
   },
   data() {
     return {
@@ -27,11 +42,10 @@ export default {
   },
   computed: {
     extendedHistogram() {
-      let missingLeft = new Array(this.firstBin).fill(0);
-      let missingRight = new Array(this.nBins - this.lastBin - 1).fill(0);
+      const missingLeft = new Array(this.firstBin).fill(0);
+      const missingRight = new Array(this.nBins - this.lastBin - 1).fill(0);
       return missingLeft.concat(this.histogram).concat(missingRight);
     },
-
     logHistogram() {
       return this.extendedHistogram.map(v => Math.log(v));
     },
@@ -40,7 +54,7 @@ export default {
     },
 
     binSize() {
-      return (this.theoreticalMax + 1) / this.nBins;
+      return (this.defaultBounds.max + 1) / this.nBins;
     },
     integerBinSize() {
       return Math.round(this.binSize);
@@ -48,31 +62,34 @@ export default {
     labels() {
       return this.extendedHistogram.map((_, idx) => Math.round(idx * this.binSize));
     },
-    defaultMinLabel() {
-      return this.findLabel(this.defaultMin);
+    imageBoundsLabel() {
+      return {
+        min: this.findLabel(this.imageBounds.min),
+        max: this.findLabel(this.imageBounds.max)
+      };
     },
-    defaultMaxLabel() {
-      return this.findLabel(this.defaultMax);
+    currentBoundsLabel() {
+      return {
+        min: Math.max(this.defaultBounds.min, this.findLabel(this.currentBounds.min)),
+        max: Math.min(this.defaultBounds.max, this.findLabel(this.currentBounds.max))
+      };
     },
-    currentMinLabel() {
-      return this.findLabel(this.min);
+    boundsLabel() {
+      return {
+        min: Math.min(this.imageBoundsLabel.min, this.currentBoundsLabel.min),
+        max: Math.max(this.imageBoundsLabel.max, this.currentBoundsLabel.max)
+      };
     },
-    currentMaxLabel() {
-      return Math.min(this.theoreticalMax, this.findLabel(this.max));
-    },
-    minLabel() {
-      return Math.min(this.defaultMinLabel, this.currentMinLabel);
-    },
-    maxLabel() {
-      return Math.max(this.defaultMaxLabel, this.currentMaxLabel);
-    },
+
     currentLabels() {
-      return this.labels.filter(label => label >= this.currentMinLabel && label <= this.currentMaxLabel);
+      return this.labels.filter(label =>
+        label >= this.currentBoundsLabel.min && label <= this.currentBoundsLabel.max
+      );
     },
 
     highestValue() {
-      let minIdx = this.labels.indexOf(this.minLabel);
-      let maxIdx = this.labels.indexOf(this.maxLabel) + 1;
+      let minIdx = this.labels.indexOf(this.boundsLabel.min);
+      let maxIdx = this.labels.indexOf(this.boundsLabel.max) + 1;
       if (maxIdx === 0) maxIdx = this.labels.length;
       return Math.max(...this.scaledHistogram.slice(minIdx, maxIdx));
     },
@@ -88,11 +105,11 @@ export default {
       let step = (this.currentLabels.length - 1) / nbPoints;
       let range = _.range(0, this.currentLabels.length - 1 + step, step);
 
-      let ymin = (this.inverse) ? 1 : 0;
-      let ymax = (this.inverse) ? 0 : 1;
-      let m = (ymin - ymax) / (this.currentMinLabel - this.currentMaxLabel);
-      let p = ymin - m * this.currentMinLabel;
-      let gamma = (this.inverse) ? 1/this.gamma : this.gamma;
+      let ymin = (this.inverted) ? 1 : 0;
+      let ymax = (this.inverted) ? 0 : 1;
+      let m = (ymin - ymax) / (this.currentBoundsLabel.min - this.currentBoundsLabel.max);
+      let p = ymin - m * this.currentBoundsLabel.min;
+      let gamma = (this.inverted) ? 1/this.gamma : this.gamma;
       let response = range.map(idx => {
         let label = this.currentLabels[Math.round(idx)];
         return {
@@ -132,22 +149,13 @@ export default {
     }
   },
   watch: {
-    currentMinLabel() {
-      this.doRenderChart();
-    },
-    currentMaxLabel() {
+    currentBoundsLabel() {
       this.doRenderChart();
     },
     logScale() {
       this.doRenderChart();
     },
-    highestValue() {
-      this.doRenderChart();
-    },
-    gamma() {
-      this.doRenderChart();
-    },
-    inverse() {
+    systemResponse() {
       this.doRenderChart();
     },
     backgroundColor() {
@@ -212,8 +220,7 @@ export default {
                 display: false
               },
               ticks: {
-                min: this.minLabel,
-                max: this.maxLabel,
+                ...this.boundsLabel,
                 fontSize: 10,
               }
             }],
