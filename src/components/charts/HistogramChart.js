@@ -87,17 +87,11 @@ export default {
       );
     },
 
-    highestValue() {
-      let minIdx = this.labels.indexOf(this.boundsLabel.min);
-      let maxIdx = this.labels.indexOf(this.boundsLabel.max) + 1;
-      if (maxIdx === 0) maxIdx = this.labels.length;
-      return Math.max(...this.scaledHistogram.slice(minIdx, maxIdx));
-    },
     systemResponse() {
       if (this.currentLabels.length === 1) {
         return [
           {x: this.currentLabels[0], y: 0},
-          {x: this.currentLabels[0], y: this.highestValue}
+          {x: this.currentLabels[0], y: 255}
         ];
       }
 
@@ -114,7 +108,7 @@ export default {
         let label = this.currentLabels[Math.round(idx)];
         return {
           x: label,
-          y: Math.pow((m * label + p), gamma) * this.highestValue
+          y: Math.pow((m * label + p), gamma) * 255.0
         };
       });
       return _.uniqBy(response, 'x');
@@ -137,13 +131,15 @@ export default {
           borderWidth: 1,
           type: 'line',
           order: 2,
-          cubicInterpolationMode: 'monotone'
+          cubicInterpolationMode: 'monotone',
+          yAxisID: 'yResponse'
         },
         {
           data: this.scaledHistogram,
           backgroundColor: this.backgroundColor,
           pointRadius: 1,
           order: 1,
+          yAxisID: 'yHistogram'
         },
       ];
     }
@@ -225,11 +221,13 @@ export default {
               }
             }],
             yAxes: [{
+              id: 'yHistogram',
               display: false,
-              ticks: {
-                suggestedMax: this.highestValue
-              }
-            }]
+            }, {
+              id: 'yResponse',
+              display: false
+            }
+            ]
           },
         });
       }
