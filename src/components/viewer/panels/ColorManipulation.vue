@@ -89,7 +89,7 @@
                 :nb-samples-per-channel="image.samplePerPixel"
                 :editable-color="true"
                 @setColor="setApparentChannelColor(mc.index, $event)"
-
+                @click="toggleLookUpTableDetails(mc.index)"
               />
             </td>
             <td class="bounds-column">

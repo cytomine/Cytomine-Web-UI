@@ -36,7 +36,12 @@
     </template>
 
   </v-popover>
-  {{formattedName}}
+  <a
+    role="button"
+    @click.stop="$emit('click')"
+  >
+    {{formattedName}}
+  </a>
 
 </div>
 </template>
@@ -141,5 +146,9 @@ export default {
   box-shadow: 0 0 1px #777;
   position: relative;
   top: 0.2em;
+}
+
+a[role="button"] {
+  color: inherit;
 }
 </style>
