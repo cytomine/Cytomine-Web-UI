@@ -27,38 +27,121 @@
           <th class="name-column">
             <b-input v-model="searchString" :placeholder="$t('search-placeholder')" size="is-small" expanded />
           </th>
-          <th class="bounds-column"></th>
-          <th class="checkbox-column"></th>
+          <th class="bounds-column">
+            <div class="buttons has-addons is-right">
+              <button
+                v-tooltip="adjustImageLabel"
+                @click="adjustAllToImage"
+                class="button is-small"
+                :class="{'is-selected': areBoundsAdjustedToImage}"
+              >
+                <span class="icon is-small">
+                  <i class="fas fa-magic"></i>
+                </span>
+              </button>
+              <button
+                v-if="isImageMultidimensional"
+                v-tooltip="$t('button-adjust-slice')"
+                @click="adjustAllToSlice"
+                class="button is-small"
+                :class="{'is-selected': areBoundsAdjustedToSlice}"
+              >
+                <span class="icon is-small">
+                  <i class="fas fa-magic"></i>
+                  <span class="subscript">ZT</span>
+                </span>
+              </button>
+              <button
+                v-tooltip="$t('button-reset')"
+                @click="resetAll"
+                class="button is-small"
+                :class="{'is-selected': areBoundsDefault}"
+              >
+                <span class="icon is-small">
+                  <i class="fas fa-tint-slash"></i>
+                </span>
+              </button>
+            </div>
+          </th>
+          <th class="checkbox-column">
+
+          </th>
         </tr>
       </thead>
       <tbody>
-        <template v-for="manipulableChannel in filteredManipulableChannels">
-          <tr :key="`channel-${image.id}-${manipulableChannel.index}`">
+        <template v-for="mc in filteredManipulableChannels">
+          <tr :key="`channel-${image.id}-${mc.index}`">
             <td class="checkbox-column">
               <b-checkbox
                 size="is-small"
-                :value="manipulableChannel.visible"
-                @input="setApparentChannelVisibility(manipulableChannel.index, $event)"
-                :disabled="nbVisibleManipulableChannels <= 1 && manipulableChannel.visible"
+                :value="mc.visible"
+                @input="setApparentChannelVisibility(mc.index, $event)"
+                :disabled="nbVisibleManipulableChannels <= 1 && mc.visible"
               />
             </td>
             <td class="name-column">
               <cytomine-channel
-                :name="manipulableChannel.name"
-                :color="manipulableChannel.color"
-                :default-color="manipulableChannel.defaultColor"
-                :channel-index="manipulableChannel.channel"
-                :sample-index="manipulableChannel.sample"
+                :name="mc.name"
+                :color="mc.color"
+                :default-color="mc.defaultColor"
+                :channel-index="mc.channel"
+                :sample-index="mc.sample"
                 :nb-samples-per-channel="image.samplePerPixel"
                 :editable-color="true"
-                @setColor="setApparentChannelColor(manipulableChannel.index, $event)"
+                @setColor="setApparentChannelColor(mc.index, $event)"
+
               />
             </td>
             <td class="bounds-column">
-              ({{manipulableChannel.bounds.min}} - {{manipulableChannel.bounds.max}})
+              ({{mc.bounds.min}} - {{mc.bounds.max}})
             </td>
             <td class="checkbox-column">
-
+              <a
+                role="button"
+                @click.stop="toggleLookUpTableDetails(mc.index)">
+                <i class="fas fa-chevron-down" v-if="isVisibleLookUpTableDetails(mc.index)"></i>
+                <i class="fas fa-chevron-up" v-else></i>
+              </a>
+            </td>
+          </tr>
+          <tr
+            :key="`channel-${image.id}-${mc.index}-details`"
+            v-if="isVisibleLookUpTableDetails(mc.index)"
+          >
+            <td colspan="4">
+              <div class="chart-container channel-histogram">
+                <channel-histogram-chart
+                  :histogram="mc.histogram.histogram"
+                  :n-bins="mc.histogram.nBins"
+                  :first-bin="mc.histogram.firstBin"
+                  :last-bin="mc.histogram.lastBin"
+                  :color="mc.color"
+                  :min="mc.bounds.min"
+                  :max="mc.bounds.max"
+                  :log-scale="histogramLogScale"
+                  :theoretical-max="defaultBounds.max"
+                  :default-max="mc.histogram.maximum"
+                  :default-min="mc.histogram.minimum"
+                  :gamma="mc.gamma"
+                  :inverse="mc.inverted"
+                  css-classes="chart"
+                />
+              </div>
+              <adjustable-look-up-table
+                :index="index"
+                :adjust-image-label="adjustImageLabel"
+                :show-adjust-buttons="manipulableChannels.length > 1"
+                :default-bounds="defaultBounds"
+                :gamma="mc.gamma"
+                :inverted="mc.inverted"
+                :bounds="mc.bounds"
+                @setBounds="setApparentChannelBounds(mc.index, $event)"
+                @adjustToImage="adjustToImage(mc.index)"
+                @adjustToSlice="adjustToSlice(mc.index)"
+                @reset="reset(mc.index)"
+                @setGamma="setApparentChannelGamma(mc.index, $event)"
+                @invert="setApparentChannelInverted(mc.index, $event)"
+              />
             </td>
           </tr>
         </template>
@@ -74,20 +157,6 @@
       </b-select>
     </b-field>
   </template>
-
-<!--  </div>-->
-<!--  <div class="actions">-->
-<!--    <div class="level">-->
-<!--      <template v-if="maxRank > 1">-->
-<!--        <button class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust-image')}}</button>-->
-<!--        <button class="level-item button is-small" @click="adjustToSlice()">{{$t('button-adjust-slice')}}</button>-->
-<!--      </template>-->
-<!--      <button v-else class="level-item button is-small" @click="adjustToImage()">{{$t('button-adjust')}}</button>-->
-
-<!--      <button class="level-item button is-small" @click="reset()">{{$t('button-reset')}}</button>-->
-<!--    </div>-->
-<!--    <a class="is-fullwidth button is-small" @click="switchHistogramScale()">{{switchHistogramScaleLabel}}</a>-->
-<!--  </div>-->
 </div>
 </template>
 
@@ -95,15 +164,20 @@
 import {get} from '@/utils/store-helpers';
 import constants from '@/utils/constants';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import {sameHistogramBounds} from '@/utils/histogram-utils';
 
 import {ImageFilterProjectCollection} from 'cytomine-client';
 
 import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel';
+import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable';
+import ChannelHistogramChart from '@/components/charts/ChannelHistogramChart';
 
 export default {
   name: 'color-manipulation',
   components: {
-    CytomineChannel
+    AdjustableLookUpTable,
+    CytomineChannel,
+    ChannelHistogramChart
   },
   props: {
     index: String
@@ -115,8 +189,7 @@ export default {
       loading: false,
       error: false,
       searchString: '',
-
-      revisionBrightnessContrast: 0,
+      visibleLookUpTableDetails: [],
     };
   },
   computed: {
@@ -142,14 +215,24 @@ export default {
         time: this.imageWrapper.activeSlices[0].time
       };
     },
-    maxRank() {
-      return this.$store.getters[this.imageModule + 'maxRank'];
-    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
     apparentChannels() {
       return this.imageWrapper.colors.apparentChannels;
+    },
+
+    isImageMultidimensional() {
+      return this.image.depth * this.image.duration > 1;
+    },
+    adjustImageLabel() {
+      if (this.isImageMultidimensional) {
+        return this.$t('button-adjust-image');
+      }
+      return this.$t('button-adjust');
+    },
+    defaultBounds() {
+      return {min: 0, max: 2**this.image.bitPerSample - 1};
     },
 
     manipulableChannels() {
@@ -161,8 +244,11 @@ export default {
         };
       });
     },
+    visibleManipulableChannels() {
+      return this.manipulableChannels.filter(mc => mc.visible);
+    },
     nbVisibleManipulableChannels() {
-      return this.manipulableChannels.filter(mc => mc.visible).length;
+      return this.visibleManipulableChannels.length;
     },
     regexp() {
       return getWildcardRegexp(this.searchString);
@@ -172,6 +258,31 @@ export default {
         return this.manipulableChannels;
       }
       return this.manipulableChannels.filter(mc => this.regexp.test(mc.name));
+    },
+
+    areBoundsAdjustedToImage() {
+      const count = this.visibleManipulableChannels.filter(mc =>
+        sameHistogramBounds(mc.bounds, mc.imageBounds)
+      ).length;
+      return count === this.nbVisibleManipulableChannels;
+    },
+    areBoundsAdjustedToSlice() {
+      const count = this.visibleManipulableChannels.filter(mc => {
+        const histogram = mc.histogram;
+        if (!histogram) {
+          return false;
+        }
+        return sameHistogramBounds(mc.bounds, {min: histogram.minimum, max: histogram.maximum});
+      }
+
+      ).length;
+      return count === this.nbVisibleManipulableChannels;
+    },
+    areBoundsDefault() {
+      const count = this.visibleManipulableChannels.filter(mc =>
+        sameHistogramBounds(mc.bounds, this.defaultBounds)
+      ).length;
+      return count === this.nbVisibleManipulableChannels;
     },
 
     selectedFilter: {
@@ -197,6 +308,7 @@ export default {
     }
   },
   methods: {
+    /* Apparent channels manipulation */
     setApparentChannelVisibility(indexApparentChannel, visible) {
       this.$store.dispatch(this.imageModule + 'setApparentChannelVisibility',
         {indexApparentChannel, visible}
@@ -207,6 +319,72 @@ export default {
         {indexApparentChannel, color, isColormap: false}
       );
     },
+    setApparentChannelGamma(indexApparentChannel, gamma) {
+      this.$store.commit(this.imageModule + 'setApparentChannelGamma',
+        {indexApparentChannel, gamma}
+      );
+    },
+    setApparentChannelInverted(indexApparentChannel, inverted) {
+      this.$store.commit(this.imageModule + 'setApparentChannelInverted',
+        {indexApparentChannel, inverted}
+      );
+    },
+    setApparentChannelBounds(indexApparentChannel, bounds) {
+      this.$store.commit(this.imageModule + 'setApparentChannelBounds',
+        {indexApparentChannel, bounds}
+      );
+    },
+    reset(indexApparentChannel) {
+      this.$store.commit(this.imageModule + 'resetApparentChannelIntensities',
+        indexApparentChannel
+      );
+    },
+    resetAll() {
+      this.$store.commit(this.imageModule + 'resetApparentChannelsIntensities');
+    },
+    adjustToImage(indexApparentChannel) {
+      this.$store.commit(this.imageModule + 'adjustToImage',
+        indexApparentChannel
+      );
+    },
+    adjustAllToImage() {
+      this.$store.commit(this.imageModule + 'adjustAllToImage');
+    },
+    adjustToSlice(indexApparentChannel) {
+      const mc = this.manipulableChannels[indexApparentChannel];
+      const bounds = {min: mc.histogram.minimum, max: mc.histogram.maximum};
+      this.$store.commit(this.imageModule + 'adjustToSlice',
+        {indexApparentChannel, bounds}
+      );
+    },
+    adjustAllToSlice() {
+      this.$store.commit(this.imageModule + 'adjustAllToSlice',
+        this.manipulableChannels.map(mc => {
+          return {
+            min: mc.histogram.minimum,
+            max: mc.histogram.maximum
+          };
+        })
+      );
+    },
+
+    /* UI LUT details row */
+    toggleLookUpTableDetails(indexApparentChannel) {
+      const found = this.isVisibleLookUpTableDetails(indexApparentChannel);
+
+      if (found) {
+        const i = this.visibleLookUpTableDetails.indexOf(indexApparentChannel);
+        this.visibleLookUpTableDetails.splice(i, 1);
+      }
+      else {
+        this.visibleLookUpTableDetails.push(indexApparentChannel);
+      }
+    },
+    isVisibleLookUpTableDetails(indexApparentChannel) {
+      return this.visibleLookUpTableDetails.indexOf(indexApparentChannel) >= 0;
+    },
+
+    /* Helpers */
     async fetchHistograms() {
       try {
         if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
@@ -236,15 +414,18 @@ export default {
       this.filters = filters;
 
       await this.fetchHistograms();
+
+      // Show LUT details by default if there is only 1 channel.
+      if (this.manipulableChannels.length === 1) {
+        this.toggleLookUpTableDetails(this.manipulableChannels[0].index);
+      }
+
       this.loading = false;
     }
     catch(error) {
       console.log(error);
     }
   },
-  beforeDestroy() {
-    clearTimeout(this.timeout);
-  }
 };
 </script>
 
@@ -256,8 +437,9 @@ export default {
 
 .table tbody {
   display: block;
-  overflow: auto;
-  max-height: 10em;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 30em; /* TODO */
 }
 
 .table thead tr {
@@ -267,13 +449,6 @@ export default {
 th, >>> td {
   padding: 0.25em !important;
   vertical-align: middle !important;
-}
-
->>> td .button {
-  width: 1.5em;
-  height: 1.5em;
-  font-size: 0.9em;
-  padding: 0;
 }
 
 >>> .checkbox-column {
@@ -287,8 +462,10 @@ th, >>> td {
 
 >>> .bounds-column {
   width: 40%;
+  text-align: right;
 }
 
+/** Checkbox **/
 >>> .checkbox .control-label {
   padding: 0 !important;
 }
@@ -297,5 +474,38 @@ th, >>> td {
   margin: 0 !important;
   position: relative;
   top: 0.25em;
+}
+
+/** Buttons & icons **/
+.bounds-column .button .icon:first-child:last-child {
+  margin-left: calc(-0.175em - 1px);
+  margin-right: calc(-0.175em - 1px);
+}
+
+.subscript, >>> .subscript {
+  position: relative;
+  top: 0.65em;
+  left: 1px;
+  font-size: 0.7em;
+  font-weight: 600;
+}
+
+.button.is-selected {
+  background-color: #6899d0;
+  color: white;
+}
+
+/** Chart (histogram) **/
+.chart-container {
+  height: 10em;
+  position: relative;
+}
+</style>
+
+<style>
+.channel-histogram .chart {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 </style>
