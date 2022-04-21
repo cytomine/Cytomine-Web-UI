@@ -452,39 +452,3 @@ function findRankPage(rank) {
 function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
-
-// function defaultChannelName(image, channel) {
-//   if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
-//     return 'L';
-//   }
-//   if (image.channels === 1 && image.apparentChannels === 3) {
-//     if (channel === 0) {
-//       return 'R';
-//     }
-//     if (channel === 1) {
-//       return 'G';
-//     }
-//     if (channel === 2) {
-//       return 'B';
-//     }
-//   }
-//   return null;
-// }
-//
-// function defaultChannelColor(image, channel) {
-//   if (channel === 0 && image.channels === 1 && image.apparentChannels === 1) {
-//     return '#C0C0C0';
-//   }
-//   if (image.channels === 1 && image.apparentChannels === 3) {
-//     if (channel === 0) {
-//       return '#FF0000';
-//     }
-//     if (channel === 1) {
-//       return '#00FF00';
-//     }
-//     if (channel === 2) {
-//       return '#0000FF';
-//     }
-//   }
-//   return null;
-// }
