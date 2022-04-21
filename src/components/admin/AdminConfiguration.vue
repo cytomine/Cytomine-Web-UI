@@ -380,22 +380,26 @@ export default {
   },
   watch: {
     selectedImage(file) {
-      let reader = new FileReader();
+      if(file) {
+      
+        let reader = new FileReader();
 
-      // Read file and return the content as base 64 encoded string
-      reader.readAsDataURL(file);
-      reader.onload = evt => {
+        // Read file and return the content as base 64 encoded string
+        reader.readAsDataURL(file);
+        reader.onload = evt => {
 
-        let img = new Image();
-        img.onload = () => {
-          this.selectedImageSize.width = img.width;
-          this.selectedImageSize.height = img.height;
+          let img = new Image();
+          img.onload = () => {
+            this.selectedImageSize.width = img.width;
+            this.selectedImageSize.height = img.height;
+          };
+
+          let encodedFile = evt.target.result;
+          this.logoConfig.value = encodedFile;
+          img.src = encodedFile;
         };
 
-        let encodedFile = evt.target.result;
-        this.logoConfig.value = encodedFile;
-        img.src = encodedFile;
-      };
+      }
     }
   },
   methods: {
