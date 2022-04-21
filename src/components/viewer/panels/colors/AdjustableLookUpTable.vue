@@ -46,7 +46,7 @@
       </button>
     </div>
     <div class="adjustments">
-      <div class="adjustment">
+      <div class="adjustment" v-show="intensitiesByMinMax">
         <div class="adjustment-label">
           {{ $t('min-max') }}
         </div>
@@ -62,7 +62,7 @@
         />
       </div>
 
-      <div class="adjustment">
+      <div class="adjustment" v-show="!intensitiesByMinMax">
         <div class="adjustment-label">
           {{ $t('brightness') }}
         </div>
@@ -77,7 +77,7 @@
           size="is-small"
         />
       </div>
-      <div class="adjustment">
+      <div class="adjustment" v-show="!intensitiesByMinMax">
         <div class="adjustment-label">
           {{ $t('contrast') }}
         </div>
@@ -140,6 +140,7 @@ export default {
     index: String,
     adjustImageLabel: String,
     showAdjustButtons: Boolean,
+    intensitiesByMinMax: Boolean,
     defaultBounds: Object,
 
     gamma: Number,

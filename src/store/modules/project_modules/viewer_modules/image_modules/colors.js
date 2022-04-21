@@ -27,6 +27,7 @@ export default {
       gammaPerApparentChannel: true,
       invertedPerApparentChannel: true,
       histogramLogScale: true,
+      intensitiesByMinMax: true,
 
       filter: null
     };
@@ -55,6 +56,10 @@ export default {
 
     setHistogramLogScale(state, value) {
       state.histogramLogScale = value;
+    },
+
+    setIntensitiesByMinMax(state, value) {
+      state.intensitiesByMinMax = value;
     },
 
     setFilter(state, filter) {
@@ -140,6 +145,7 @@ export default {
       state.gammaPerApparentChannel = true;
       state.invertedPerApparentChannel = true;
       state.histogramLogScale = true;
+      state.intensitiesByMinMax = true;
     },
   },
 
