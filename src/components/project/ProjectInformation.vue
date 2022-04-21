@@ -21,7 +21,7 @@
   <div class="box">
     <project-details
       :project="project"
-      :excluded-properties="['imagesPreview']"
+      :excluded-properties="excludedProperties"
       editable
       @update="updateProject"
       @delete="deleteProject()"
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 
 import ProjectDetails from './ProjectDetails';
@@ -39,6 +40,14 @@ import {Project} from 'cytomine-client';
 export default {
   name: 'project-information',
   components: {ProjectDetails},
+  data() {
+    return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
+      excludedProperties: [
+        'imagesPreview'
+      ]
+    };
+  },
   computed: {
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI')
@@ -66,6 +75,7 @@ export default {
     }
   },
   created() {
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
     this.$store.dispatch('currentProject/reloadProject');
   }
 };

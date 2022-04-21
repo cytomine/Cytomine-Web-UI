@@ -27,7 +27,7 @@
       {{$t('users')}}
     </b-radio-button>
 
-    <b-radio-button v-model="activeTab" native-value="trusted-sources" type="is-link">
+    <b-radio-button v-show="algoEnabled" v-model="activeTab" native-value="trusted-sources" type="is-link">
       {{$t('trusted-sources')}}
     </b-radio-button>
 
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 
 import AdminDashboard from './AdminDashboard';
@@ -76,7 +77,8 @@ export default {
         'tags',
         'scores',
         'configuration'
-      ]
+      ],
+      algoEnabled: constants.ALGORITHMS_ENABLED
     };
   },
   computed: {
