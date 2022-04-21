@@ -31,7 +31,7 @@
           {{ $t('annotations') }}
         </a>
       </router-link>
-      <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`">
+      <router-link  v-if="isTabDisplayed('jobs') && algoEnabled" tag="li" :to="`/project/${project.id}/analysis`">
         <a>
           <i class="fas fa-tasks"></i>
           {{ $t('analysis') }}
@@ -68,9 +68,15 @@
 
 <script>
 import {get, sync} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-sidebar',
+  data(){
+    return {
+      algoEnabled: constants.ALGORITHMS_ENABLED
+    };
+  },
   computed: {
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),

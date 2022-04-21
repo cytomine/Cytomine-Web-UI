@@ -107,7 +107,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=algo`">
                 {{ project.numberOfJobAnnotations }}
               </router-link>
@@ -211,7 +211,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+            <b-table-column  v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
               <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                 {{ image.numberOfJobAnnotations }}
               </router-link>
@@ -264,7 +264,7 @@ import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {appendShortTermToken} from '@/utils/token-utils.js';
-
+import constants from '@/utils/constants.js';
 export default {
   name: 'advanced-search',
   components: {
@@ -296,6 +296,7 @@ export default {
       openedDetails: [],
       revision: 0,
 
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       excludedProperties: [
         'name',
         'imagesPreview',
@@ -400,6 +401,7 @@ export default {
       console.log(error);
       this.error = true;
     }
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
     if(this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
       if(queriedTags) {
