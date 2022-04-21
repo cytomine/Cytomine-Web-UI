@@ -105,7 +105,7 @@
           <strong>{{$t("user-annotations")}}</strong>
         </div>
       </div>
-      <div class="tile is-parent">
+      <div v-show="algoEnabled" class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
             <v-popover>
@@ -313,6 +313,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       nbProjectVisits: null,
       nbImageConsultations: null,

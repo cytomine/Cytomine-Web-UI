@@ -17,6 +17,7 @@
 import {Bar} from 'vue-chartjs';
 
 import {AnnotationType} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'number-annotations-chart',
@@ -30,6 +31,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       annotationsEvolution: {
         [AnnotationType.USER]: [],
         [AnnotationType.ALGO]: [],
@@ -75,8 +77,14 @@ export default {
       ]);
 
       this.chartData.datasets[0].data = this.annotationsEvolution[AnnotationType.USER].map(item => item.size);
-      this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.ALGO].map(item => item.size);
-      this.chartData.datasets[2].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      if(this.algoEnabled) {
+        this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.ALGO].map(item => item.size);
+        this.chartData.datasets[2].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      }
+      else {
+        this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      }
+
       this.updateLabels();
     },
     updateLabels() {
@@ -101,12 +109,6 @@ export default {
           borderWidth: 0
         },
         {
-          label: this.$t('analysis-annotations'),
-          data: [],
-          backgroundColor: '#aaa',
-          borderWidth: 0
-        },
-        {
           label: this.$t('reviewed-annotations'),
           data: [],
           backgroundColor: '#42ce77',
@@ -114,6 +116,15 @@ export default {
         }
       ]
     };
+
+    if(this.algoEnabled) {
+      this.chartData.datasets.splice(1,0,{
+        label: this.$t('analysis-annotations'),
+        data: [],
+        backgroundColor: '#aaa',
+        borderWidth: 0
+      });
+    }
 
     await this.fetchData();
 
