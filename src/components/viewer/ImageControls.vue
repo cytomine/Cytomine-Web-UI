@@ -257,7 +257,8 @@ export default {
       return this.currentSlice.channelName !== null;
     },
     areChannelsMergeable() {
-      return this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS;
+      // this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS;
+      return true; // TODO [EXPERIMENTAL - large set of merged channels]
     },
     channelOptions() {
       return this.channels.map(channel => ({value: [channel.index], ...channel}));
@@ -284,7 +285,8 @@ export default {
   methods: {
     setCurrentChannelsIndexes(value) {
       if (value === null) {
-        value = _.range(0, this.image.apparentChannels);
+        const max = Math.min(constants.MAX_MERGEABLE_CHANNELS, this.image.apparentChannels);
+        value = _.range(0, max);
       }
       this.currentChannelsIndexes = value;
     },

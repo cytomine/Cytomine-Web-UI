@@ -76,7 +76,7 @@
                 size="is-small"
                 :value="mc.visible"
                 @input="setApparentChannelVisibility(mc.index, $event)"
-                :disabled="nbVisibleManipulableChannels <= 1 && mc.visible"
+                :disabled="isApparentChannelVisibilityDisabled(mc)"
               />
             </td>
             <td class="name-column">
@@ -368,7 +368,12 @@ export default {
       );
     },
 
-    /* UI LUT details row */
+    /* UX logic */
+    isApparentChannelVisibilityDisabled(manipulableChannel) {
+      return (this.nbVisibleManipulableChannels <= 1 && manipulableChannel.visible)
+        || (this.nbVisibleManipulableChannels >= constants.MAX_MERGEABLE_CHANNELS
+          && !manipulableChannel.visible);
+    },
     toggleLookUpTableDetails(indexApparentChannel) {
       const found = this.isVisibleLookUpTableDetails(indexApparentChannel);
 
@@ -387,13 +392,17 @@ export default {
     /* Helpers */
     async fetchHistograms() {
       try {
-        if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
-          // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
-          this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
-        }
-        else {
-          this.histograms = (await this.slices[0].fetchHistogram({nBins: this.histogramNBins}));
-        }
+        // TODO [EXPERIMENTAL - large set of merged channels]
+        // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
+        this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
+
+        // if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
+        //   // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
+        //   this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
+        // }
+        // else {
+        //   this.histograms = (await this.slices[0].fetchHistogram({nBins: this.histogramNBins}));
+        // }
       }
       catch(error) {
         console.log(error);
