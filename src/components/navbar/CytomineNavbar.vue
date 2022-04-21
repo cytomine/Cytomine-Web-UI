@@ -45,7 +45,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item" @mouseover.native="mouseOver('software')" @mouseleave.native="mouseLeave('software')" :style="itemStyles.software">
+      <router-link v-show="algoEnabled" to="/software" class="navbar-item" @mouseover.native="mouseOver('software')" @mouseleave.native="mouseLeave('software')" :style="itemStyles.software">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
@@ -142,6 +142,7 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: false,
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       postLogoutURL: constants.LOGOUT_REDIRECTION,
       SSOEnabled: constants.SSO_ENABLED,
       aboutModal: false,
