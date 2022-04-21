@@ -17,39 +17,29 @@
   <div>
     <div class="buttons has-addons is-centered" v-if="showAdjustButtons">
       <button
-        @click="$emit('adjustToImage')"
-        class="button is-small"
-        :class="{'is-selected': areBoundsAdjustedToImage}"
-      >
-<!--        <span class="icon is-small">-->
-<!--          <i class="fas fa-magic"></i>-->
-<!--        </span>-->
-        <span>
-          {{ adjustImageLabel }}
-        </span>
-      </button>
-      <button
         v-if="isImageMultidimensional"
         @click="$emit('adjustToSlice')"
         class="button is-small"
-        :class="{'is-selected': areBoundsAdjustedToSlice}"
+        :disabled="areBoundsAdjustedToSlice"
       >
-<!--        <span class="icon is-small" style="margin-right: 0.5em;">-->
-<!--          <i class="fas fa-magic"></i>-->
-<!--          <span class="subscript">ZT</span>-->
-<!--        </span>-->
         <span>
           {{ $t('button-adjust-slice') }}
         </span>
       </button>
       <button
+        @click="$emit('adjustToImage')"
+        class="button is-small"
+        :disabled="areBoundsAdjustedToImage"
+      >
+        <span>
+          {{ adjustImageLabel }}
+        </span>
+      </button>
+      <button
         @click="$emit('reset')"
         class="button is-small"
-        :class="{'is-selected': areBoundsDefault}"
+        :disabled="areBoundsDefault"
       >
-<!--        <span class="icon is-small">-->
-<!--          <i class="fas fa-tint-slash"></i>-->
-<!--        </span>-->
         <span>
          {{ $t('button-reset') }}
         </span>
@@ -137,6 +127,7 @@
 </template>
 
 <script>
+import {sameHistogramBounds} from '@/utils/histogram-utils';
 
 import CytomineSlider from '@/components/form/CytomineSlider';
 
@@ -153,7 +144,10 @@ export default {
 
     gamma: Number,
     inverted: Boolean,
-    bounds: Object
+    bounds: Object,
+
+    imageBounds: Object,
+    sliceBounds: Object
   },
   data() {
     return {
@@ -194,15 +188,14 @@ export default {
       return [this.bounds.min, this.bounds.max];
     },
 
-    // TODO
     areBoundsAdjustedToImage() {
-      return false;
+      return sameHistogramBounds(this.bounds, this.imageBounds);
     },
     areBoundsAdjustedToSlice() {
-      return false;
+      return sameHistogramBounds(this.bounds, this.sliceBounds);
     },
     areBoundsDefault() {
-      return false;
+      return sameHistogramBounds(this.bounds, this.defaultBounds) && this.gamma === 1.0 && !this.inverted;
     }
   },
   methods: {

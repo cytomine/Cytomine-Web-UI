@@ -133,6 +133,8 @@
                 :gamma="mc.gamma"
                 :inverted="mc.inverted"
                 :bounds="mc.bounds"
+                :image-bounds="mc.imageBounds"
+                :slice-bounds="{min: mc.histogram.minimum, max: mc.histogram.maximum}"
                 @setBounds="setApparentChannelBounds(mc.index, $event)"
                 @adjustToImage="adjustToImage(mc.index)"
                 @adjustToSlice="adjustToSlice(mc.index)"
