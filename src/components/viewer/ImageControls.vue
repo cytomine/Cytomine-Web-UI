@@ -285,7 +285,7 @@ export default {
   methods: {
     setCurrentChannelsIndexes(value) {
       if (value === null) {
-        const max = Math.min(constants.MAX_MERGEABLE_CHANNELS, this.image.apparentChannels);
+        const max = Math.min(constants.MAX_MERGEABLE_CHANNELS, this.image.channels);
         value = _.range(0, max);
       }
       this.currentChannelsIndexes = value;
