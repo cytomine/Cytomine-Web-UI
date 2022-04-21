@@ -443,16 +443,6 @@ export default {
   width: 1rem;
 }
 
-.buttons {
-  float:left;
-  margin: 1px;
-  margin-bottom: 0 !important;
-
-  .button {
-    margin-bottom: 0;
-  }
-}
-
 .image-dimension-slider {
   flex-grow: 3;
 }
