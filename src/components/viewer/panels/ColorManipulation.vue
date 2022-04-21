@@ -84,6 +84,16 @@
                     </b-radio>
                   </div>
                 </b-field>
+                <b-field :label="$t('intensities-manipulation')" custom-class="is-small">
+                  <div class="block">
+                    <b-radio v-model="intensitiesByMinMax" :native-value="true" size="is-small">
+                      {{$t('min-max')}}
+                    </b-radio>
+                    <b-radio v-model="intensitiesByMinMax" :native-value="false" size="is-small">
+                      {{$t('brightness')}}/{{$t('contrast')}}
+                    </b-radio>
+                  </div>
+                </b-field>
               </b-dropdown-item>
             </b-dropdown>
           </th>
@@ -150,6 +160,7 @@
                 :index="index"
                 :adjust-image-label="adjustImageLabel"
                 :show-adjust-buttons="manipulableChannels.length > 1"
+                :intensities-by-min-max="intensitiesByMinMax"
                 :default-bounds="defaultBounds"
                 :gamma="mc.gamma"
                 :inverted="mc.inverted"
@@ -320,6 +331,14 @@ export default {
       },
       set(value) {
         this.$store.commit(this.imageModule + 'setHistogramLogScale', value);
+      }
+    },
+    intensitiesByMinMax: {
+      get() {
+        return this.imageWrapper.colors.intensitiesByMinMax;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setIntensitiesByMinMax', value);
       }
     },
   },
