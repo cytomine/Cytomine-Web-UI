@@ -264,7 +264,7 @@ export default {
       return this.channels.map(channel => ({value: [channel.index], ...channel}));
     },
     orderedCurrentChannels() {
-      return [...this.currentChannelsIndexes].sort().map(channelIndex =>
+      return [...this.currentChannelsIndexes].sort((a, b) => a - b).map(channelIndex =>
         this.channels.find(c => c.index === channelIndex)
       );
     },
