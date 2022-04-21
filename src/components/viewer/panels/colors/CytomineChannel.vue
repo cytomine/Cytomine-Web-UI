@@ -29,7 +29,7 @@
     <template #popover v-if="showColorSelector">
       <sketch-picker
         :value="formattedColor"
-        @input="$emit('setColor', $event.hex)"
+        @input="setColor"
         :presetColors="presetColors"
         :disable-alpha="true"
       />
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 import {Sketch} from 'vue-color';
 
 export default {
@@ -110,6 +112,9 @@ export default {
         this.showColorSelector = !this.showColorSelector;
       }
     },
+    setColor: _.debounce(function(color) {
+      this.$emit('setColor', color.hex);
+    }, 500, {leading: true}),
   }
 };
 </script>
