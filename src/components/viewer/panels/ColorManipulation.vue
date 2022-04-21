@@ -63,8 +63,29 @@
               </button>
             </div>
           </th>
-          <th class="checkbox-column">
+          <th class="settings-column">
+            <b-dropdown position="is-bottom-left">
+              <template #trigger="{ active }">
+                <button class="button is-small" :class="{'is-selected': active}">
+                  <span class="icon is-small">
+                    <i class="fas fa-cogs"></i>
+                  </span>
+                </button>
+              </template>
 
+              <b-dropdown-item custom>
+                <b-field :label="$t('histogram-scale')" custom-class="is-small">
+                  <div class="block">
+                    <b-radio v-model="histogramLogScale" :native-value="false" size="is-small">
+                      {{$t('linear')}}
+                    </b-radio>
+                    <b-radio v-model="histogramLogScale" :native-value="true" size="is-small">
+                      {{$t('logarithmic')}}
+                    </b-radio>
+                  </div>
+                </b-field>
+              </b-dropdown-item>
+            </b-dropdown>
           </th>
         </tr>
       </thead>
@@ -472,6 +493,26 @@ th, >>> td {
 >>> .bounds-column {
   width: 40%;
   text-align: right;
+}
+
+>>> .settings-column {
+  min-width: 2.2em;
+  font-weight: normal;
+}
+
+/** Settings **/
+.settings-column >>> .dropdown-content {
+  padding: 0;
+}
+
+.settings-column .dropdown-menu .dropdown-item {
+  padding: 0.375rem 0.5rem;
+}
+
+.button.is-selected {
+  background-color: #6899d0;
+  color: white;
+  stroke: white;
 }
 
 /** Checkbox **/
