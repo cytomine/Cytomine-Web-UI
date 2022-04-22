@@ -36,7 +36,7 @@
       </div>
       <button class="delete is-small" @click="expanded=false"></button>
     </div>
-    <cytomine-slider v-model="degreesRotation" :max="360" :integerOnly="false" />
+    <cytomine-slider v-model="degreesRotation" :max="360" :integerOnly="false" :lazy="false" />
   </div>
 </div>
 </template>
@@ -138,6 +138,6 @@ export default {
 <style>
 .rotation-selector-wrapper .vue-slider {
   margin-left: 1em;
-  margin-right: 4em;
+  margin-right: 1em;
 }
 </style>
