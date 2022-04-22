@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {changeImageUrlFormat, SUPPORT_WEBP} from '@/utils/image-utils';
+import {changeImageUrlFormat} from '@/utils/image-utils';
 
 export default {
   name: 'image-preview',
@@ -51,11 +51,8 @@ export default {
     rawPreviewUrl() {
       return this.image.thumb || this.image.imageThumb;
     },
-    imageFormat() {
-      return (SUPPORT_WEBP) ? 'webp' : 'jpg';
-    },
     previewUrl() {
-      return changeImageUrlFormat(this.rawPreviewUrl, this.imageFormat);
+      return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
       return {backgroundImage: `url("${this.previewUrl}")`};
