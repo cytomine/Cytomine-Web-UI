@@ -15,26 +15,19 @@
 */
 
 
-import constants from '@/utils/constants';
-
 export default {
   state() {
     return {
       idImage: 0,
+      nbBitsPerSample: 8,
+      nbSamplesPerChannel: 1,
 
-      contrast: 1,
-      gamma: 1,
-      inverse: false,
+      apparentChannels: null,
 
-      brightness: 0,
-      hue: 0,
-      saturation: 0,
-
-      defaultMinMax: [],
-      minMax: [],
-      maxValue: 0,
-
-      histogramScale: 'log',
+      gammaPerApparentChannel: true,
+      invertedPerApparentChannel: true,
+      histogramLogScale: true,
+      intensitiesByMinMax: true,
 
       filter: null
     };
@@ -45,137 +38,270 @@ export default {
       state.idImage = id;
     },
 
-    setBrightness(state, value) {
-      state.brightness = value;
+    setNbBitsPerSample(state, value) {
+      state.nbBitsPerSample = value;
     },
 
-    setContrast(state, value) {
-      state.contrast = value;
+    setNbSamplesPerChannel(state, value) {
+      state.nbSamplesPerChannel = value;
     },
 
-    setGamma(state, value) {
-      state.gamma = value;
+    setGammaPerApparentChannel(state, value) {
+      state.gammaPerApparentChannel = value;
     },
 
-    setInverse(state, value) {
-      state.inverse = value;
+    setInvertedPerApparentChannel(state, value) {
+      state.invertedPerApparentChannel = value;
     },
 
-    setHue(state, value) {
-      state.hue = value;
+    setHistogramLogScale(state, value) {
+      state.histogramLogScale = value;
     },
 
-    setSaturation(state, value) {
-      state.saturation = value;
-    },
-
-    resetImageColorManipulation(state) {
-      state.brightness = 0;
-      state.contrast = 1;
-      state.gamma = 1;
-      state.inverse = false;
-      state.hue = 0;
-      state.saturation = 0;
-    },
-
-    resetSampleColorManipulation(state) {
-      state.minMax = state.defaultMinMax.map(obj => {
-        let o = Object.assign({}, obj);
-        o.minimum = 0;
-        o.maximum = state.maxValue;
-        return o;
-      });
+    setIntensitiesByMinMax(state, value) {
+      state.intensitiesByMinMax = value;
     },
 
     setFilter(state, filter) {
       state.filter = filter;
     },
 
-    setDefaultMinMax(state, minMax) {
-      state.defaultMinMax = minMax;
+    setApparentChannels(state, apparentChannels) {
+      state.apparentChannels = apparentChannels;
     },
 
-    setMinMax(state, minMax) {
-      state.minMax = minMax;
+    setApparentChannelVisibility(state, {indexApparentChannel, visible}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.visible = visible;
+    },
+    setApparentChannelColor(state, {indexApparentChannel, color, isColormap}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.color = color;
+      channel.isColormap = isColormap;
+    },
+    setApparentChannelBounds(state, {indexApparentChannel, bounds}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = bounds;
+    },
+    setApparentChannelGamma(state, {indexApparentChannel, gamma}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.gamma = gamma;
+    },
+    setApparentChannelInverted(state, {indexApparentChannel, inverted}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.inverted = inverted;
     },
 
-    setMinimum(state, {sample, value}) {
-      let clone = state.minMax;
-      clone[sample].minimum = value;
-      state.minMax = clone;
+    resetApparentChannel(state, indexApparentChannel) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      resetApparentChannel(channel, state.nbBitsPerSample);
+    },
+    resetApparentChannels(state) {
+      state.apparentChannels.forEach(apparentChannel => {
+        resetApparentChannel(apparentChannel, state.nbBitsPerSample);
+      });
     },
 
-    setMaximum(state, {sample, value}) {
-      let clone = state.minMax;
-      clone[sample].maximum = value;
-      state.minMax = clone;
+    resetApparentChannelIntensities(state, indexApparentChannel) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      resetApparentChannel(channel, state.nbBitsPerSample, true);
+    },
+    resetApparentChannelsIntensities(state) {
+      state.apparentChannels.forEach(apparentChannel => {
+        resetApparentChannel(apparentChannel, state.nbBitsPerSample, true);
+      });
     },
 
-    setHistogramScale(state, scale) {
-      state.histogramScale = scale;
+    adjustToImage(state, indexApparentChannel) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = channel.imageBounds;
+    },
+    adjustAllToImage(state) {
+      state.apparentChannels.forEach(apparentChannel => {
+        if (apparentChannel.visible) {
+          apparentChannel.bounds = apparentChannel.imageBounds;
+        }
+      });
+    },
+    adjustToSlice(state, {indexApparentChannel, bounds}) {
+      let channel = state.apparentChannels[indexApparentChannel];
+      channel.bounds = bounds;
+    },
+    adjustAllToSlice(state, allBounds) {
+      state.apparentChannels.forEach((apparentChannel, i) => {
+        if (apparentChannel.visible) {
+          apparentChannel.bounds = allBounds[i];
+        }
+      });
     },
 
-    setMaxValueFromBps(state, bitPerSample) {
-      state.maxValue = Math.pow(2, bitPerSample) - 1;
-    }
+    setChannelsVisibility(state, channels) {
+      state.apparentChannels.forEach(ac => {
+        ac.visible = (channels.includes(ac.channel));
+      });
+    },
+
+    resetImageColorManipulationSettings(state) {
+      state.gammaPerApparentChannel = true;
+      state.invertedPerApparentChannel = true;
+      state.histogramLogScale = true;
+      state.intensitiesByMinMax = true;
+    },
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image}) {
+    async initialize({commit, dispatch}, {image, slices}) {
       commit('setIdImage', image.id);
-      commit('setMaxValueFromBps', image.bitPerSample);
-      await dispatch('refreshDefaultMinMax', {image});
+      commit('setNbBitsPerSample', image.bitPerSample);
+      commit('setNbSamplesPerChannel', image.samplePerPixel);
+      await dispatch('refreshApparentChannels', {image});
+      let channels = slices.map(slice => slice.channel);
+      commit('setChannelsVisibility', channels);
     },
     async setImageInstance({commit, dispatch}, {image}) {
       commit('setIdImage', image.id);
-      commit('setMaxValueFromBps', image.bitPerSample);
-      await dispatch('refreshDefaultMinMax', {image});
+      commit('setNbBitsPerSample', image.bitPerSample);
+      commit('setNbSamplesPerChannel', image.samplePerPixel);
+      await dispatch('refreshApparentChannels', {image});
     },
-    async refreshDefaultMinMax({commit}, {image}) {
-      let minmax = await image.fetchChannelHistogramBounds();
-
-      // --- Hack ---
-      if (image.apparentChannels > constants.MAX_MERGEABLE_CHANNELS) {
-        let imageMinmax = await image.fetchHistogramBounds();
-        minmax = minmax.map(histogram => {
-          return {...histogram, minimum: imageMinmax.minimum, maximum: imageMinmax.maximum};
-        });
-      }
-      // ---
-
-      commit('setDefaultMinMax', minmax);
-      if (image.bitPerSample > 8) {
-        commit('setMinMax', deepCopy(minmax));
-      }
-      else {
-        commit('resetSampleColorManipulation');
-      }
+    async refreshApparentChannels({commit}, {image}) {
+      let apparentChannels = formatApparentChannels(
+        await fetchApparentChannels(image),
+        image.bitPerSample
+      );
+      commit('setApparentChannels', apparentChannels);
     },
 
     resetColorManipulation({commit}) {
-      commit('resetImageColorManipulation');
-      commit('resetSampleColorManipulation');
+      commit('resetApparentChannels');
+      commit('resetImageColorManipulationSettings');
+      commit('setFilter', null);
     },
 
-    adjustToImage({commit, state}) {
-      commit('resetImageColorManipulation');
-      commit('setMinMax', deepCopy(state.defaultMinMax));
+    setApparentChannelVisibility({commit, state, dispatch}, {indexApparentChannel, visible}) {
+      let apparentChannel = state.apparentChannels[indexApparentChannel];
+      let count = state.apparentChannels.filter(ac =>
+        ac.visible && ac.channel === apparentChannel.channel
+      ).length;
+      if (visible && count === 0) {
+        dispatch('addActiveSliceChannel', {channel: apparentChannel.channel});
+      }
+      else if (!visible && count === 1) {
+        dispatch('removeActiveSliceChannel', {channel: apparentChannel.channel});
+      }
+      commit('setApparentChannelVisibility', {indexApparentChannel, visible});
     },
-    adjustToSlice({commit}, minMax) {
-      commit('resetImageColorManipulation');
-      commit('setMinMax', deepCopy(minMax));
+    async setActiveSlice({commit}, slice) {
+      commit('setChannelsVisibility', [slice.channel]);
     },
+    async setActiveSliceByPosition({commit}, {channel}) {
+      commit('setChannelsVisibility', [channel]);
+    },
+    async setActiveSlicesByPosition({commit}, {channels}) {
+      commit('setChannelsVisibility', channels);
+    },
+    // async setActiveSliceByRank({dispatch}, rank) {
+    //   //TODO
+    // },
+    // async setActiveSlicesByRank({dispatch}, ranks) {
+    //   //TODO
+    // },
+  },
 
-    setAllMinimumAndMaximum({commit, state}, {minimum, maximum}) {
-      let minmax = state.minMax.map(mm => {
-        return {...mm, minimum, maximum};
-      });
-      commit('setMinMax', deepCopy(minmax));
-    }
+  getters: {
+    tileRequestParams: (state) => {
+      let params = {};
+      if (state.filter !== null) {
+        params.filters = state.filter;
+      }
+      let visibleApparentChannels = state.apparentChannels.filter(
+        apparentChannel => apparentChannel.visible
+      );
+      if (visibleApparentChannels.length > 0) {
+        params.channels = [];
+        // eslint-disable-next-line camelcase
+        params.min_intensities = [];
+        // eslint-disable-next-line camelcase
+        params.max_intensities = [];
+        params.gammas = [];
+        params.colormaps = [];
 
+        visibleApparentChannels.forEach(ac => {
+          params.channels.push(ac.index);
+          params.min_intensities.push(ac.bounds.min);
+          params.max_intensities.push(ac.bounds.max);
+          params.gammas.push(ac.gamma);
+          params.colormaps.push(formatColormapRequestParam(ac.color, ac.inverted));
+        });
+      }
+      return params;
+    },
   }
 };
 
-function deepCopy(arr) {
-  return arr.map(obj => Object.assign({}, obj));
+function formatColormapRequestParam(color, inverted) {
+  if (color === null) {
+    color = 'DEFAULT';
+  }
+  if (inverted) {
+    return `!${color}`;
+  }
+  return color;
+}
+
+function defaultBounds(nBits) {
+  return {min: 0, max: 2**nBits - 1};
+}
+
+function autoAdjustBounds(nBits, {min, max}) {
+  if (nBits > 8) {
+    return {min, max};
+  }
+  return {min: 0, max:255};
+}
+
+async function fetchApparentChannels(image) {
+  return await image.fetchChannelHistogramBounds();
+}
+
+function formatApparentChannels(apparentChannels, nBits) {
+  if (!apparentChannels) {
+    return;
+  }
+
+  return apparentChannels.map(apparentChannel =>
+    formatApparentChannel(apparentChannel, nBits)
+  );
+}
+
+function formatApparentChannel(apparentChannel, nBits) {
+  let result = {index: apparentChannel.apparentChannel};
+  result.channel = apparentChannel.channel;
+  result.sample = apparentChannel.sample;
+
+  result.defaultColor = apparentChannel.color;
+  result.color = apparentChannel.color;
+  result.isColormap = false;
+  result.visible = true;
+  result.gamma = 1.0;
+  result.inverted = false;
+  result.imageBounds = {
+    min: apparentChannel.minimum,
+    max: apparentChannel.maximum
+  };
+  result.bounds = autoAdjustBounds(nBits, result.imageBounds);
+
+  return result;
+}
+
+function resetApparentChannel(apparentChannel, nBits, onlyIntensities=false) {
+  if (!onlyIntensities) {
+    apparentChannel.color = apparentChannel.defaultColor;
+    apparentChannel.isColormap = false;
+    apparentChannel.visible = true;
+  }
+
+  apparentChannel.gamma = 1.0;
+  apparentChannel.inverted = false;
+  apparentChannel.bounds = defaultBounds(nBits);
 }
