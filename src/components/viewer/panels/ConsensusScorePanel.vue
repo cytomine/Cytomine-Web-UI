@@ -16,7 +16,7 @@
 <div class="scores-panel">
   <h1>{{$t('consensus-scores')}}</h1>
   <b-field horizontal :label="score.name" v-for="score in scores" :key="score.id">
-    <b-select size="is-small" v-model="selectedScoreValue[score.id]" @input="event => changeValue(event, score)">
+    <b-select size="is-small" :disabled="project.isLocked" v-model="selectedScoreValue[score.id]" @input="event => changeValue(event, score)">
       <option :value="null">
         {{$t('no-key-selected')}}
       </option>
@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     scores: get('currentProject/scores'),
+    project: get('currentProject/project'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
