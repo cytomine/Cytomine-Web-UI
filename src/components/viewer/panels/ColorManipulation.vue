@@ -180,7 +180,7 @@
 
       </tbody>
     </table>
-    <b-field horizontal :label="$t('filter')">
+    <b-field horizontal :label="$t('filter')" v-if="filters && filters.length > 0">
       <b-select v-model="selectedFilter" size="is-small" expanded>
         <option :value="null">{{$t('original-no-filter')}}</option>
         <option v-for="filter in filters" :key="filter.id" :value="filter.method">
