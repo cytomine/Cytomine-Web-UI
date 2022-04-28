@@ -71,9 +71,8 @@
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
-
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -673,7 +672,18 @@ export default {
           }
           return;
       }
-    }
+    },
+    async takeScreenshot() {
+      // Removes the 100vh height limit and allows to recover a canvas of the size we want
+      document.body.style.height = '600vh';
+
+      var a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      a.download = 'Image.png';
+
+      document.body.style.height = '';
+      a.click();
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time

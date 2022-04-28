@@ -178,6 +178,16 @@
           <icon-polygon-free-hand />
         </span>
       </button>
+
+      <button
+        v-if="isToolDisplayed('screenshot')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('screenshot')"
+        class="button"
+        @click="$emit('screenshot')"
+      >
+        <span class="icon is-small"><i class="fas fa-camera"></i></span>
+      </button>
     </div>
   </template>
 
@@ -902,6 +912,11 @@ export default {
         case 'tool-freehand-polygon':
           if (this.isToolDisplayed('polygon') && !this.disabledDraw) {
             this.activateTool('freehand-polygon');
+          }
+          return;
+        case 'tool-screenshot':
+          if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
+            this.activateTool('screenshot');
           }
           return;
         case 'tool-delete':
