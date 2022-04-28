@@ -674,15 +674,19 @@ export default {
       }
     },
     async takeScreenshot() {
-      // Removes the 100vh height limit and allows to recover a canvas of the size we want
-      document.body.style.height = '600vh';
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
 
-      var a = document.createElement('a');
+      let a = document.createElement('a');
       a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
-      a.download = 'Image.png';
-
-      document.body.style.height = '';
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
       a.click();
+
+      // Reset container css values as previous
+      document.querySelector('.map-container').style.height = '';
     },
   },
   async created() {

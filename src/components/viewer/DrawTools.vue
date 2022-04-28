@@ -178,16 +178,6 @@
           <icon-polygon-free-hand />
         </span>
       </button>
-
-      <button
-        v-if="isToolDisplayed('screenshot')"
-        :disabled="disabledDraw"
-        v-tooltip="$t('screenshot')"
-        class="button"
-        @click="$emit('screenshot')"
-      >
-        <span class="icon is-small"><i class="fas fa-camera"></i></span>
-      </button>
     </div>
   </template>
 
@@ -213,6 +203,18 @@
     </button>
     </div>
   </template>
+  
+  <div class="buttons has-addons are-small">
+      <button
+      v-if="isToolDisplayed('screenshot')"
+      :disabled="disabledDraw"
+      v-tooltip="$t('screenshot')"
+      class="button"
+      @click="takeScreenshot()"
+    >
+      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+    </button>
+  </div>
 
   <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons are-small">
     <button
@@ -868,6 +870,10 @@ export default {
       this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
     },
 
+    takeScreenshot(){
+      this.$emit('screenshot');
+    },
+
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
@@ -916,7 +922,7 @@ export default {
           return;
         case 'tool-screenshot':
           if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
-            this.activateTool('screenshot');
+            this.takeScreenshot();
           }
           return;
         case 'tool-delete':
