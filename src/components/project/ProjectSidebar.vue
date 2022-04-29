@@ -144,12 +144,12 @@ export default {
           felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk\n';
           break;
         case 'QA_KOLLEGIAL':
-          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Kollegialrådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Kollegialrådføring\n';
+          this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Kollegial rådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Kollegial rådføring\n';
           break;
         case 'KOLLEGIAL':
-          this.email.subject = 'Kan du sjekke om kan være lagt inn for mye informasjon i Kollegialrådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegialrådføring\n';
+          this.email.subject = 'Kan du sjekke om det kan være lagt inn for mye informasjon i Kollegial rådføring';
+          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegial rådføring\n';
           break;
         default:
           this.email.subject = 'Report about project ' + this.project['name'];
@@ -165,20 +165,19 @@ export default {
 
       let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
 
-      let felt4 = 'Informasjon til deg  som sender "obs" på anonymisering, eller for mye informasjon i kollegial rådføring.\n'+
-        'Din e-post sendes til den eller de som står registret som "Representativ"\n'+
-        'Husk at du ikke må skrive i e-post personinformasjon, men heller f.eks. oppgi ditt telefonnummer og be om at vedkommende tar kontakt med deg for å kunne forklare ytterligere.\n'+
-        'Hvis det haster, finner du kontaktinformasjon løsningens forside.\n'+
+      let felt4 = 'Informasjon til deg som er avsender og sender "obs" på anonymisering eller for mye informasjon i Kollegial rådføring.\n'+
+        'Din e-post sendes til den eller de som står registrert som "Representativ"\n'+
+        'Husk at du ikke må skrive personinformasjon i e-post, men heller f.eks. oppgi ditt telefonnummer og be om at vedkommende tar kontakt med deg for å kunne forklare ytterligere.\n'+
+        'Hvis det haster, finner du kontaktinformasjon på løsningens forside.\n'+
         '\n'+
-        'Bruk av denne e-post mal er ikke ment brukt som et avviksrapporteringssystem.\n'+
+        'Bruk av denne e-postmalen er ikke ment brukt som et avviksrapporteringssystem.\n'+
         'Kontakt din egen leder hvis du trenger hjelp eller råd for hvordan rapportere et avvik.\n'+
         '\n'+
-        'Lenker til Proskjet/snitt som du må sjekke ut:\n'+
+        'Lenker til Prosjekt/snitt som du må sjekke ut:\n'+
         projectUrl+'\n';
 
 
       this.email.body = 'Til prosjekteier, \n' +
-        '\n' +
         '\n' +
         felt3 +
         '\n' +
