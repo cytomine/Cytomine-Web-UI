@@ -31,6 +31,7 @@
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         :wsConnected="wsConnected"
+        :userPostitionWebsock="userPostitionWebsock"
         @close="closeMap(cell.index)"
       />
     </div>
@@ -239,16 +240,11 @@ export default {
     async initWebSocket(){
       this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id);
       this.userPostitionWebsock.onopen = this.onOpen;
-      this.userPostitionWebsock.onmessage = this.onMessage;
     },
 
     onOpen(){
       this.wsConnected = true;
       console.log('Web connection open');
-    },
-
-    onMessage(){
-      console.log('Web connection message');
     },
 
     shortkeyEvent(event) {

@@ -67,6 +67,7 @@ export default {
   props: {
     index: String,
     view: Object,
+    userPostitionWebsock: WebSocket,
     wsConnected: Boolean,
   },
   data() {
@@ -211,6 +212,7 @@ export default {
       this.trackedUserModel = id;
 
       if(id) {
+        this.userPostitionWebsock.send(id);
         this.track();
         this.fetchOnline();
       }
@@ -231,8 +233,21 @@ export default {
 
   },
   methods: {
+    onMessage(message){
+      let pos = JSON.parse(message.data);
+      this.moveView(pos);
+    },
+    moveView(pos){
+      this.view.animate({
+        center: [pos.x, pos.y],
+        zoom: pos.zoom,
+        rotation: pos.rotation,
+        duration: 500
+      });
+    },
+
     async track() {
-      if(!this.trackedUser) {
+      if(!this.trackedUser || this.wsConnected) {
         return;
       }
 
@@ -242,12 +257,7 @@ export default {
           return;
         }
 
-        this.view.animate({
-          center: [pos.x, pos.y],
-          zoom: pos.zoom,
-          rotation: pos.rotation,
-          duration: 500
-        });
+        this.moveView(pos);
       }
       catch(error) {
         console.log(error);
@@ -271,9 +281,10 @@ export default {
     },
   },
   created() {
-    console.log('Is ws connected on follow panel: ' + this.wsConnected);
     this.trackedUserModel = this.trackedUser;
     this.broadcastModel = this.broadcast;
+
+    this.userPostitionWebsock.onmessage = this.onMessage;
 
     this.fetchOnline();
     this.track();

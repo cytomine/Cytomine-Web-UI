@@ -142,7 +142,7 @@
             <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
               <i class="fas fa-street-view"></i>
             </a>
-            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" :wsConnected="wsConnected"/>
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" :userPostitionWebsock="userPostitionWebsock" :wsConnected="wsConnected"/>
           </li>
 
           <li v-if="isPanelDisplayed('review') && canEdit">
@@ -220,6 +220,7 @@ export default {
   name: 'cytomine-image',
   props: {
     index: String,
+    userPostitionWebsock: WebSocket,
     wsConnected: Boolean
   },
   components: {
