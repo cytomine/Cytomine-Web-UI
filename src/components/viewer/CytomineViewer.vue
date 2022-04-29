@@ -30,6 +30,7 @@
         v-if="cell && cell.image && cell.slice"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
+        :wsConnected="wsConnected"
         @close="closeMap(cell.index)"
       />
     </div>
@@ -67,11 +68,14 @@ export default {
       errorBadImageProject: false,
       loading: true,
       reloadInterval: null,
-      idViewer: null
+      idViewer: null,
+      wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
+      wsConnected: false
     };
   },
   computed: {
     project: get('currentProject/project'),
+    currentUser: get('currentUser/user'),
     viewers() {
       return this.$store.state.projects[this.project.id].viewers;
     },
@@ -232,6 +236,21 @@ export default {
       }
     },
 
+    async initWebSocket(){
+      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id);
+      this.userPostitionWebsock.onopen = this.onOpen;
+      this.userPostitionWebsock.onmessage = this.onMessage;
+    },
+
+    onOpen(){
+      this.wsConnected = true;
+      console.log('Web connection open');
+    },
+
+    onMessage(){
+      console.log('Web connection message');
+    },
+
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     }
@@ -243,6 +262,7 @@ export default {
       () => this.$eventBus.$emit('reloadAnnotations'),
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
+    this.initWebSocket();
   },
   beforeDestroy() {
     clearInterval(this.reloadInterval);

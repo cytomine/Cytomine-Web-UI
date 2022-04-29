@@ -66,7 +66,8 @@ export default {
   components: {Username},
   props: {
     index: String,
-    view: Object
+    view: Object,
+    wsConnected: Boolean,
   },
   data() {
     return {
@@ -270,6 +271,7 @@ export default {
     },
   },
   created() {
+    console.log('Is ws connected on follow panel: ' + this.wsConnected);
     this.trackedUserModel = this.trackedUser;
     this.broadcastModel = this.broadcast;
 
