@@ -288,7 +288,20 @@ export default {
       else if(type == 'laboratory') metadatas = (await HVMetadataCollection.fetchLaboratory());
       else if(type == 'antibody') metadatas = (await HVMetadataCollection.fetchAntibody());
       else if(type == 'detection') metadatas = (await HVMetadataCollection.fetchDetection());
-      else if(type == 'dilution') metadatas = (await HVMetadataCollection.fetchDilution());
+      else if(type == 'dilution') {
+        metadatas = (await HVMetadataCollection.fetchDilution());
+
+        metadatas = metadatas.sort(function(a, b) {
+          if(/\d:\d*/.test(a.value) && /\d:\d*/.test(b.value)) {
+            let first = a.value.match(/\d:\d*/)[0];
+            let second = b.value.match(/\d:\d*/)[0];
+            return first.split(':')[0]/first.split(':')[1] < second.split(':')[0]/second.split(':')[1];
+          }
+          else {
+            return a.value.localeCompare(b.value);
+          }
+        });
+      }
       else if(type == 'instrument') metadatas = (await HVMetadataCollection.fetchInstrument());
       else metadatas = [];
       return metadatas;
