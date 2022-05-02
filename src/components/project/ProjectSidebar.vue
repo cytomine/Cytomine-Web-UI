@@ -84,11 +84,6 @@ import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-sidebar',
-  data(){
-    return {
-      algoEnabled: constants.ALGORITHMS_ENABLED
-    };
-  },
   computed: {
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
@@ -96,6 +91,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       outputUrl: '',
       emailId: '',
       email: {
