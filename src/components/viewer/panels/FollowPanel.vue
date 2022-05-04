@@ -184,7 +184,9 @@ export default {
         this.$nextTick(() => this.broadcastModel = false);
         return;
       }
-
+      if(!value && this.wsConnected){
+        this.userPostitionWebsock.send('stop-broadcast');
+      }
       this.broadcast = value;
     },
 
@@ -200,11 +202,19 @@ export default {
             this.$store.commit(this.viewerModule + 'unlinkImage', {indexImage: this.index});
             this.trackedUser = value;
           },
-          onCancel: () => this.trackedUserModel = null
+          onCancel: () => {
+            this.trackedUserModel = null;
+            if(this.wsConnected){
+              this.userPostitionWebsock.send('stop-track');
+            }
+          }
         });
       }
       else {
         this.trackedUser = value;
+        if(value == null && this.wsConnected){
+          this.userPostitionWebsock.send('stop-track');
+        }
       }
     },
 

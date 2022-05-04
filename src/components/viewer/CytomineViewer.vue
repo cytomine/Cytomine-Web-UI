@@ -71,6 +71,7 @@ export default {
       reloadInterval: null,
       idViewer: null,
       wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
+      userPostitionWebsock: null,
       wsConnected: false
     };
   },
@@ -244,7 +245,6 @@ export default {
 
     onOpen(){
       this.wsConnected = true;
-      console.log('Web connection open');
     },
 
     shortkeyEvent(event) {
