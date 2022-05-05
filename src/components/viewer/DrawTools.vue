@@ -804,6 +804,15 @@ export default {
       geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
       geometry.scale(scale);
 
+      /* Rescale the annotation if it is larger than the destination image size */
+      let annotExtent = geometry.getExtent();
+      let annotWidth = annotExtent[2] - annotExtent[0];
+      let annotHeight = annotExtent[3] - annotExtent[1];
+      if (annotWidth > destImage.width || annotHeight > destImage.height) {
+        scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
+        geometry.scale(scale);
+      }
+
       /* Check if the translation is within the image boundaries */
       let imageExtent = [0, 0, destImage.width, destImage.height];
       if (!containsExtent(imageExtent, geometry.getExtent())) {
