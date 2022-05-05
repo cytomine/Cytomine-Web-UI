@@ -17,7 +17,7 @@
   <template v-if="!loading">
     <dl>
       <dt>{{$t('version')}}</dt>
-      <dd>{{version || '?'}}</dd>
+      <dd>3.2.1-KOL-220505</dd>
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
