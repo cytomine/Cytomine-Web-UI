@@ -117,6 +117,15 @@ export default {
       commit('setMembers', members);
     },
 
+    async fetchFollowers(_, {userId, imageId}) {
+      let data =  await UserCollection.fetchFollowers(userId, imageId);
+
+      let followers = data.collection;
+      followers.forEach(follower => follower.fullName = fullName(follower));
+
+      return followers;
+    },
+
     async fetchOntology({state, commit}) {
       let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
       commit('setOntology', ontology);

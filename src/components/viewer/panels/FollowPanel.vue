@@ -22,6 +22,15 @@
     </b-checkbox>
   </div>
 
+    <template v-if="broadcast">
+      <h2>{{$t('followers')}} ({{this.followers.length}})</h2>
+      <div class="followers">
+        <div class="field" v-for="user in followers" :key="user.id">
+          <li><username :user="user" /></li>
+        </div>
+      </div>
+    </template>
+
   <h2 :class="{disabled: broadcast}">{{$t('follow-user')}}</h2>
 
   <div class="follow-panel-content" :class="{disabled: broadcast}">
@@ -73,6 +82,7 @@ export default {
   data() {
     return {
       onlineUsers: [],
+      followers: [],
 
       broadcastModel: false,
       trackedUserModel: null,
@@ -167,6 +177,7 @@ export default {
 
     broadcast() {
       if(this.broadcast) {
+        this.stopTrack();
         this.trackedUser = null;
       }
     },
@@ -185,7 +196,7 @@ export default {
         return;
       }
       if(!value && this.wsConnected){
-        this.userPostitionWebsock.send('stop-broadcast');
+        this.userPostitionWebsock.send('stop-broadcast/'+this.currentUser.id+'/'+this.image.id);
       }
       this.broadcast = value;
     },
@@ -203,18 +214,14 @@ export default {
             this.trackedUser = value;
           },
           onCancel: () => {
+            this.stopTrack();
             this.trackedUserModel = null;
-            if(this.wsConnected){
-              this.userPostitionWebsock.send('stop-track');
-            }
           }
         });
       }
       else {
+        this.stopTrack();
         this.trackedUser = value;
-        if(value == null && this.wsConnected){
-          this.userPostitionWebsock.send('stop-track');
-        }
       }
     },
 
@@ -222,7 +229,7 @@ export default {
       this.trackedUserModel = id;
 
       if(id) {
-        this.userPostitionWebsock.send(id);
+        this.userPostitionWebsock.send('no-action/'+id+'/'+this.image.id);
         this.track();
         this.fetchOnline();
       }
@@ -244,8 +251,13 @@ export default {
   },
   methods: {
     onMessage(message){
-      let pos = JSON.parse(message.data);
-      this.moveView(pos);
+      if(message.data == 'stop-track'){
+        this.trackedUser = null;
+      }
+      else{
+        let pos = JSON.parse(message.data);
+        this.moveView(pos);
+      }
     },
     moveView(pos){
       this.view.animate({
@@ -254,6 +266,11 @@ export default {
         rotation: pos.rotation,
         duration: 500
       });
+    },
+    stopTrack(){
+      if(this.trackedUser != null && this.wsConnected){
+        this.userPostitionWebsock.send('stop-track/'+this.trackedUser+'/'+this.image.id);
+      }
     },
 
     async track() {
@@ -285,6 +302,10 @@ export default {
 
       let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting users
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
+      
+      if(this.broadcast){
+        this.followers = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
+      }
 
       clearTimeout(this.timeoutOnlineUsers);
       this.timeoutOnlineUsers = setTimeout(this.fetchOnline, constants.BROADCASTING_USERS_REFRESH_INTERVAL);
@@ -326,6 +347,11 @@ h3 {
 .follow-panel-content {
   max-height: 14em;
   overflow: auto;
+}
+
+.followers{
+  overflow: scroll;
+  max-height: 4.5em;
 }
 </style>
 
