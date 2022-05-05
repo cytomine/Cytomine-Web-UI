@@ -125,7 +125,8 @@ export default {
       .then(response => (settings = response.data));
 
     for (let i in settings) {
-      if (constants.hasOwnProperty(i) || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
+      if (Object.prototype.hasOwnProperty.call(constants, i)
+        || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
         constants[i] = settings[i];
       }
     }
