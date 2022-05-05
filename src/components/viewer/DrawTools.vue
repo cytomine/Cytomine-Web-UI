@@ -652,26 +652,53 @@ export default {
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
+    async convertLocation(copiedAnnot, destImage) {
+      /* If we want to paste in the same image but in another slice */
+      if (destImage.id === copiedAnnot.image) {
+        return copiedAnnot.location;
+      }
+
+      /* Compute the rescaling factor if the resolution is known for both images */
+      let scale = 1;
+      let srcImage = await ImageInstance.fetch(copiedAnnot.image);
+      if (srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null) {
+        scale = srcImage.physicalSizeX / destImage.physicalSizeX;
+      }
+
+      let geometry = new WKT().readGeometry(copiedAnnot.location);
+      let wrapper = this.imageWrapper;
+      let centerExtent = getCenter(geometry.getExtent());
+
+      /* Translate and rescale the original location of the annotation to the center of the current FOV */
+      geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
+      geometry.scale(scale);
+
+      /* Check if the translation is within the image boundaries */
+      let imageExtent = [0, 0, destImage.width, destImage.height];
+      if (!containsExtent(imageExtent, geometry.getExtent())) {
+        let geomExtent = geometry.getExtent();
+        /* Get the part of annotation within the boundaries */
+        let intersection = getIntersection(imageExtent, geomExtent);
+
+        /* Get the difference between the parts inside and outside the image boundaries */
+        let difference = [];
+        for (let i = 0; i < intersection.length; i++) {
+          difference[i] = intersection[i] - geomExtent[i];
+        }
+
+        /* Translate the difference to have the complete annotation inside the image boundaries */
+        geometry.translate(difference[0] + difference[2], difference[1] + difference[3]);
+      }
+
+      return new WKT().writeGeometry(geometry);
+    },
     async paste() {
       if (!this.copiedAnnot) {
         return;
       }
 
-      let location;
-      let geometry = new WKT().readGeometry(this.copiedAnnot.location);
-
-      if (this.image.id === this.copiedAnnot.image || containsExtent(this.imageExtent, geometry.getExtent())) {
-        location = this.copiedAnnot.location;
-      }
-      else {
-        let extent = geometry.getExtent();
-        let center = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
-        geometry.translate(this.image.width / 2 - center[0], this.image.height / 2 - center[1]);
-        if (containsExtent(this.imageExtent, geometry.getExtent())) {
-          location = new WKT().writeGeometry(geometry);
-        }
-      }
-
+      /* Convert the location if it is needed */
+      let location = await this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;
