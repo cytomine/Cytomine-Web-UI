@@ -76,10 +76,6 @@
 <script>
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';

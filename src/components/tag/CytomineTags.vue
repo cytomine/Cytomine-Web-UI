@@ -44,7 +44,6 @@
 <script>
 
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
-import DomainTagInput from '@/components/utils/DomainTagInput';
 import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
 import {get} from '@/utils/store-helpers';
 
@@ -53,10 +52,6 @@ export default {
   props: {
     object: {type: Object},
     canEdit: {type: Boolean, default: true}
-  },
-  components: {
-    DomainTagInput,
-    AddTagDomainAssociationModal
   },
   data() {
     return {
