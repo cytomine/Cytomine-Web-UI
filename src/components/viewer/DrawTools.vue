@@ -432,7 +432,7 @@ import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationL
 import WKT from 'ol/format/WKT';
 import {containsExtent, getCenter, getIntersection} from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType, AnnotationLink} from 'cytomine-client';
+import {Cytomine, Annotation, AnnotationType, AnnotationLink, ImageInstance} from 'cytomine-client';
 import {
   Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
   listAnnotationsInGroup
@@ -783,23 +783,29 @@ export default {
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
-    convertLocation(originalLocation, image) {
+    async convertLocation(copiedAnnot, destImage) {
       /* If we want to paste in the same image but in another slice */
-      if (this.image.id === this.copiedAnnot.image) {
-        return this.copiedAnnot.location;
+      if (destImage.id === copiedAnnot.image) {
+        return copiedAnnot.location;
       }
 
-      let geometry = new WKT().readGeometry(originalLocation);
-      let wrapper = this.imageWrapper;
+      /* Compute the rescaling factor if the resolution is known for both images */
+      let scale = 1;
+      let srcImage = await ImageInstance.fetch(copiedAnnot.image);
+      if (srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null) {
+        scale = srcImage.physicalSizeX / destImage.physicalSizeX;
+      }
 
-      /* Get the center coordinates of the annotation extent */
+      let geometry = new WKT().readGeometry(copiedAnnot.location);
+      let wrapper = this.imageWrapper;
       let centerExtent = getCenter(geometry.getExtent());
 
-      /* Translate the original location of the annotation to the center of the current field of view */
+      /* Translate and rescale the original location of the annotation to the center of the current FOV */
       geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
+      geometry.scale(scale);
 
       /* Check if the translation is within the image boundaries */
-      let imageExtent = [0, 0, image.width, image.height];
+      let imageExtent = [0, 0, destImage.width, destImage.height];
       if (!containsExtent(imageExtent, geometry.getExtent())) {
         let geomExtent = geometry.getExtent();
         /* Get the part of annotation within the boundaries */
@@ -823,7 +829,7 @@ export default {
       }
 
       /* Convert the location if it is needed */
-      let location = this.convertLocation(this.copiedAnnot.location, this.image);
+      let location = await this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;
