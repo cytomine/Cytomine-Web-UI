@@ -53,8 +53,8 @@ export default {
       state.copiedAnnot = annot;
     },
 
-    setCopiedAnnotImageIndex(state, index) {
-      state.copiedAnnotImageIndex = index;
+    setCopiedAnnotImageInstance(state, image) {
+      state.copiedAnnotImageInstance = image;
     },
 
     setLinkMode(state, mode) {

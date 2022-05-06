@@ -598,12 +598,12 @@ export default {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
     },
-    copiedAnnotImageIndex: {
+    copiedAnnotImageInstance: {
       get() {
-        return this.viewerWrapper.copiedAnnotImageIndex;
+        return this.viewerWrapper.copiedAnnotImageInstance;
       },
-      set(index) {
-        this.$store.commit(this.viewerModule + 'setCopiedAnnotImageIndex', index);
+      set(image) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnotImageInstance', image);
       }
     },
     linkableCopiedAnnot() {
@@ -788,7 +788,7 @@ export default {
         return;
       }
 
-      this.copiedAnnotImageIndex = this.index;
+      this.copiedAnnotImageInstance = this.image;
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
@@ -808,7 +808,7 @@ export default {
       /* Compute the rescaling factors if the resolution is known for both images */
       let scaleX = 1;
       let scaleY = 1;
-      let srcImage = this.viewerWrapper.images[this.copiedAnnotImageIndex].imageInstance;
+      let srcImage = this.copiedAnnotImageInstance;
       let hasPhysicalSizeX = srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null;
       let hasPhysicalSizeY = srcImage.physicalSizeY !== null && destImage.physicalSizeY !== null;
 
