@@ -798,27 +798,38 @@ export default {
         return copiedAnnot.location;
       }
 
-      /* Compute the rescaling factor if the resolution is known for both images */
-      let scale = 1;
-      let srcImage = this.viewerWrapper.images[this.copiedAnnotImageIndex].imageInstance;
-      if (srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null) {
-        scale = srcImage.physicalSizeX / destImage.physicalSizeX;
-      }
-
       let geometry = new WKT().readGeometry(copiedAnnot.location);
       let wrapper = this.imageWrapper;
       let centerExtent = getCenter(geometry.getExtent());
 
-      /* Translate and rescale the original location of the annotation to the center of the current FOV */
+      /* Translate the original location of the annotation to the center of the current FOV */
       geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
-      geometry.scale(scale);
+
+      /* Compute the rescaling factors if the resolution is known for both images */
+      let scaleX = 1;
+      let scaleY = 1;
+      let srcImage = this.viewerWrapper.images[this.copiedAnnotImageIndex].imageInstance;
+      let hasPhysicalSizeX = srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null;
+      let hasPhysicalSizeY = srcImage.physicalSizeY !== null && destImage.physicalSizeY !== null;
+
+      if (hasPhysicalSizeX && hasPhysicalSizeY) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
+      }
+      else if (hasPhysicalSizeX) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = scaleX;
+      }
+
+      /* Rescale the annotation */
+      geometry.scale(scaleX, scaleY);
 
       /* Rescale the annotation if it is larger than the destination image size */
       let annotExtent = geometry.getExtent();
       let annotWidth = annotExtent[2] - annotExtent[0];
       let annotHeight = annotExtent[3] - annotExtent[1];
       if (annotWidth > destImage.width || annotHeight > destImage.height) {
-        scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
+        let scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
         geometry.scale(scale);
       }
 
