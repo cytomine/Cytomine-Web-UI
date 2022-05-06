@@ -98,7 +98,8 @@ export default {
           updated: link.updated,
           image: link.image,
           instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
-          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
+          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`,
+          cropURL: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
         });
       });
       annots.sort((a, b) => a.instanceFilename.localeCompare(b.instanceFilename));
