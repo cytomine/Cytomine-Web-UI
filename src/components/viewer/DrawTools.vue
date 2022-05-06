@@ -368,7 +368,7 @@ import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
 import WKT from 'ol/format/WKT';
-import {containsExtent} from 'ol/extent';
+import {containsExtent, getCenter, getIntersection} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
 import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
@@ -515,6 +515,14 @@ export default {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
     },
+    copiedAnnotImageIndex: {
+      get() {
+        return this.viewerWrapper.copiedAnnotImageIndex;
+      },
+      set(index) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnotImageIndex', index);
+      }
+    },
     disabledPaste() {
       return this.disabledDraw || !this.copiedAnnot;
     },
@@ -649,10 +657,11 @@ export default {
         return;
       }
 
+      this.copiedAnnotImageIndex = this.index;
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
-    async convertLocation(copiedAnnot, destImage) {
+    convertLocation(copiedAnnot, destImage) {
       /* If we want to paste in the same image but in another slice */
       if (destImage.id === copiedAnnot.image) {
         return copiedAnnot.location;
@@ -660,7 +669,7 @@ export default {
 
       /* Compute the rescaling factor if the resolution is known for both images */
       let scale = 1;
-      let srcImage = await ImageInstance.fetch(copiedAnnot.image);
+      let srcImage = this.viewerWrapper.images[this.copiedAnnotImageIndex].imageInstance;
       if (srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null) {
         scale = srcImage.physicalSizeX / destImage.physicalSizeX;
       }
@@ -707,7 +716,7 @@ export default {
       }
 
       /* Convert the location if it is needed */
-      let location = await this.convertLocation(this.copiedAnnot, this.image);
+      let location = this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;
