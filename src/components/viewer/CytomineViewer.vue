@@ -30,8 +30,6 @@
         v-if="cell && cell.image && cell.slice"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
-        :wsConnected="wsConnected"
-        :userPostitionWebsock="userPostitionWebsock"
         @close="closeMap(cell.index)"
       />
     </div>
@@ -69,10 +67,7 @@ export default {
       errorBadImageProject: false,
       loading: true,
       reloadInterval: null,
-      idViewer: null,
-      wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
-      userPostitionWebsock: null,
-      wsConnected: false
+      idViewer: null
     };
   },
   computed: {
@@ -238,15 +233,6 @@ export default {
       }
     },
 
-    async initWebSocket(){
-      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id);
-      this.userPostitionWebsock.onopen = this.onOpen;
-    },
-
-    onOpen(){
-      this.wsConnected = true;
-    },
-
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     }
@@ -258,7 +244,6 @@ export default {
       () => this.$eventBus.$emit('reloadAnnotations'),
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
-    this.initWebSocket();
   },
   beforeDestroy() {
     clearInterval(this.reloadInterval);

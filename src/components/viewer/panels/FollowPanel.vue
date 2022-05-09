@@ -75,9 +75,7 @@ export default {
   components: {Username},
   props: {
     index: String,
-    view: Object,
-    userPostitionWebsock: WebSocket,
-    wsConnected: Boolean,
+    view: Object
   },
   data() {
     return {
@@ -90,7 +88,11 @@ export default {
       timeoutOnlineUsers: null,
       timeoutTracking: null,
 
-      disabledBroadcast: false
+      disabledBroadcast: false,
+
+      wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
+      userPostitionWebsock: null,
+      wsConnected: false
     };
   },
   computed: {
@@ -177,6 +179,9 @@ export default {
 
     broadcast() {
       if(this.broadcast) {
+        if(!this.wsConnected){
+          this.initWebSocket();
+        }
         this.stopTrack();
         this.trackedUser = null;
       }
@@ -229,7 +234,9 @@ export default {
       this.trackedUserModel = id;
 
       if(id) {
-        this.userPostitionWebsock.send('no-action/'+id+'/'+this.image.id);
+        if(!this.wsConnected){
+          this.initTracking();
+        }
         this.track();
         this.fetchOnline();
       }
@@ -250,6 +257,26 @@ export default {
 
   },
   methods: {
+    initTracking(){
+      this.initWebSocket();
+      this.userPostitionWebsock.onopen = this.onOpentracking;
+    },
+    initWebSocket(){
+      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id);
+      this.userPostitionWebsock.onopen = this.onOpen;
+      this.userPostitionWebsock.onclose = this.onClose;
+      this.userPostitionWebsock.onmessage = this.onMessage;
+    },
+    onOpen(){
+      this.wsConnected = true;
+    },
+    onOpentracking(){
+      this.onOpen();
+      this.userPostitionWebsock.send('no-action/'+this.trackedUserModel+'/'+this.image.id);
+    },
+    onClose(){
+      this.wsConnected = false;
+    },
     onMessage(message){
       if(message.data == 'stop-track'){
         this.trackedUser = null;
@@ -274,7 +301,7 @@ export default {
     },
 
     async track() {
-      if(!this.trackedUser || this.wsConnected) {
+      if(!this.trackedUser || this.wsConnected){
         return;
       }
 
@@ -292,7 +319,9 @@ export default {
       }
 
       clearTimeout(this.timeoutTracking);
-      this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
+      if(!this.wsConnected){
+        this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
+      }
     },
 
     async fetchOnline() {
@@ -300,7 +329,8 @@ export default {
         return;
       }
 
-      let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting users
+      // let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
+      let onlines = [74];
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
       
       if(this.broadcast){
@@ -314,15 +344,13 @@ export default {
   created() {
     this.trackedUserModel = this.trackedUser;
     this.broadcastModel = this.broadcast;
-
-    this.userPostitionWebsock.onmessage = this.onMessage;
-
     this.fetchOnline();
     this.track();
   },
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
+    this.userPostitionWebsock.close();
   }
 };
 </script>
