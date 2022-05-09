@@ -598,6 +598,14 @@ export default {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
     },
+    copiedAnnotImageInstance: {
+      get() {
+        return this.viewerWrapper.copiedAnnotImageInstance;
+      },
+      set(image) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnotImageInstance', image);
+      }
+    },
     linkableCopiedAnnot() {
       return this.isInImageGroup && this.copiedAnnot && this.copiedAnnot.imageGroup === this.imageGroupId;
     },
@@ -780,26 +788,53 @@ export default {
         return;
       }
 
+      this.copiedAnnotImageInstance = this.image;
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
     },
-    convertLocation(originalLocation, image) {
+    convertLocation(copiedAnnot, destImage) {
       /* If we want to paste in the same image but in another slice */
-      if (this.image.id === this.copiedAnnot.image) {
-        return this.copiedAnnot.location;
+      if (destImage.id === copiedAnnot.image) {
+        return copiedAnnot.location;
       }
 
-      let geometry = new WKT().readGeometry(originalLocation);
+      let geometry = new WKT().readGeometry(copiedAnnot.location);
       let wrapper = this.imageWrapper;
-
-      /* Get the center coordinates of the annotation extent */
       let centerExtent = getCenter(geometry.getExtent());
 
-      /* Translate the original location of the annotation to the center of the current field of view */
+      /* Translate the original location of the annotation to the center of the current FOV */
       geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
 
+      /* Compute the rescaling factors if the resolution is known for both images */
+      let scaleX = 1;
+      let scaleY = 1;
+      let srcImage = this.copiedAnnotImageInstance;
+      let hasPhysicalSizeX = srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null;
+      let hasPhysicalSizeY = srcImage.physicalSizeY !== null && destImage.physicalSizeY !== null;
+
+      if (hasPhysicalSizeX && hasPhysicalSizeY) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
+      }
+      else if (hasPhysicalSizeX) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = scaleX;
+      }
+
+      /* Rescale the annotation */
+      geometry.scale(scaleX, scaleY);
+
+      /* Rescale the annotation if it is larger than the destination image size */
+      let annotExtent = geometry.getExtent();
+      let annotWidth = annotExtent[2] - annotExtent[0];
+      let annotHeight = annotExtent[3] - annotExtent[1];
+      if (annotWidth > destImage.width || annotHeight > destImage.height) {
+        let scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
+        geometry.scale(scale);
+      }
+
       /* Check if the translation is within the image boundaries */
-      let imageExtent = [0, 0, image.width, image.height];
+      let imageExtent = [0, 0, destImage.width, destImage.height];
       if (!containsExtent(imageExtent, geometry.getExtent())) {
         let geomExtent = geometry.getExtent();
         /* Get the part of annotation within the boundaries */
@@ -823,7 +858,7 @@ export default {
       }
 
       /* Convert the location if it is needed */
-      let location = this.convertLocation(this.copiedAnnot.location, this.image);
+      let location = this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;
