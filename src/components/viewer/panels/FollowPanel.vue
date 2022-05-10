@@ -185,6 +185,9 @@ export default {
         this.stopTrack();
         this.trackedUser = null;
       }
+      else{
+        this.userPostitionWebsock.close();
+      }
     },
 
     alreadyBroadcastingImage(value) {
@@ -297,6 +300,7 @@ export default {
     stopTrack(){
       if(this.trackedUser != null && this.wsConnected){
         this.userPostitionWebsock.send('stop-track/'+this.trackedUser+'/'+this.image.id);
+        this.userPostitionWebsock.close();
       }
     },
 
