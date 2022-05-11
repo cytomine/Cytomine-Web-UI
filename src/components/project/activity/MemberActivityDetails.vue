@@ -182,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <img :src="appendShortTermToken(consultation.imageThumb, shortTermToken)" class="image-overview">
+                <image-thumbnail :url="appendShortTermToken(consultation.imageThumb, shortTermToken)" :size="128" :key="consultation.imageThumb" />
               </router-link>
             </b-table-column>
 
@@ -255,12 +255,14 @@ import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';
 
 import moment from 'moment';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 
 export default {
   name: 'member-activity-details',
   components: {
+    ImageThumbnail,
     CytomineDatepicker,
     ProjectConnectionDetails,
     LastConnectionsChart
@@ -358,7 +360,7 @@ li {
   margin-bottom: 0.5em;
 }
 
-.image-overview {
+.image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

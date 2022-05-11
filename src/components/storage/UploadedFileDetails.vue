@@ -83,14 +83,14 @@
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
       <button class="button is-small" @click="samplePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <img :src="appendShortTermToken(samplePreview.thumbURL, this.shortTermToken)">
+    <image-thumbnail :url="appendShortTermToken(samplePreview.thumbURL, this.shortTermToken)" :size="512" :key="samplePreview.thumbURL" />
   </template>
   <template v-else-if="slidePreview">
     <h2>
       {{$t('slide-preview-of', {filename: slidePreview.originalFilename})}}
       <button class="button is-small" @click="slidePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <img :src="appendShortTermToken(slidePreview.macroURL, this.shortTermToken)">
+    <image-thumbnail :url="appendShortTermToken(slidePreview.macroURL, this.shortTermToken)" :size="512" :key="slidePreview.macroURL" :macro="true" />
   </template>
 
   <template v-if="image && profileEnabled">
@@ -117,10 +117,12 @@ import filesize from 'filesize';
 import ProfileStatus from './ProfileStatus';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'uploaded-file-details',
   components: {
+    ImageThumbnail,
     ProfileStatus,
     SlVueTree,
     UploadedFileStatus

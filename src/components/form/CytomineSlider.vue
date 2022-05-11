@@ -20,6 +20,7 @@
   :tooltip="'always'"
   :tooltip-placement="tooltipPlacement"
   :lazy="lazy"
+  @dragging="internalValue = $event"
 >
   <template #tooltip="{value, index}">
     <div
@@ -62,7 +63,8 @@ export default {
   data() {
     return {
       indexEdited: null,
-      editedValue: 0
+      editedValue: 0,
+      internalValue: 0, // Bypass slider lazy update
     };
   },
   computed: {
@@ -76,10 +78,15 @@ export default {
       if (this.isArray)
         return ['left', 'right'];
 
-      if (this.value >= this.middle)
+      if (this.internalValue >= this.middle)
         return ['left'];
 
       return ['right'];
+    }
+  },
+  watch: {
+    value() {
+      this.internalValue = this.value;
     }
   },
   methods: {
@@ -117,6 +124,9 @@ export default {
     focus() {
       this.$refs.inputSlider.focus();
     }
+  },
+  mounted() {
+    this.internalValue = this.value;
   }
 };
 </script>

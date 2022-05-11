@@ -169,7 +169,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="appendShortTermToken(image.thumbURL(256),shortTermToken)" class="image-overview">
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
             </router-link>
           </b-table-column>
 
@@ -246,9 +246,10 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -260,6 +261,7 @@ import {appendShortTermToken} from '@/utils/token-utils.js';
 export default {
   name: 'list-images',
   components: {
+    ImageThumbnail,
     ImageName,
     ImageDetails,
     CytomineTable,
@@ -400,13 +402,19 @@ export default {
 
 
       this.availableFormats = stats.format.list;
-      this.availableVendors = stats.mimeType.list.map(mime => {
-        let vendor = vendorFromMime(mime);
-        return {
-          value: mime || 'null',
+
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
+        let vendorFormatted = {
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
+
+        if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+          this.availableVendors.push(vendorFormatted);
+        }
       });
+
       this.availableMagnifications = stats.magnification.list.map(m => {
         return {
           value: m || 'null',
@@ -481,7 +489,7 @@ export default {
   align-items: center;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

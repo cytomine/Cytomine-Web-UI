@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          crossOrigin="Anonymous"
+          :crossOrigin="slice.imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -367,10 +367,50 @@ export default {
       return [this.image.width, this.image.height];
     },
 
+    baseLayerProcessingParams() {
+      let params = {};
+      if (this.imageWrapper.colors.filter) {
+        params.filters = this.imageWrapper.colors.filter;
+      }
+      if (this.imageWrapper.colors.contrast !== 1) {
+        params.contrast = this.imageWrapper.colors.contrast;
+      }
+      /*if (this.imageWrapper.colors.gamma !== 1) {
+        params.gammas = this.imageWrapper.colors.gamma;
+      }*/
+      if (this.imageWrapper.colors.inverse) {
+        params.colormaps = '!DEFAULT';
+      }
+      /*let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      if (minIntensities.length > 0) {
+        // eslint-disable-next-line camelcase
+        params.min_intensities = minIntensities.join(',');
+      }
+      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
+      if (maxIntensities.length > 0) {
+        // eslint-disable-next-line camelcase
+        params.max_intensities = maxIntensities.join(',');
+      }*/
+      return params;
+    },
+    baseLayerSliceParams() {
+      // TODO: channels !
+      return {
+        // eslint-disable-next-line camelcase
+        z_slices: this.slice.zStack,
+        timepoints: this.slice.time
+      };
+    },
+    baseLayerURLQuery() {
+      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      if (query.length > 0) {
+        return `?${query}`;
+      }
+      return query;
+    },
+
     baseLayerURLs() {
-      let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
-      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
+      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
     colorManipulationOn() {

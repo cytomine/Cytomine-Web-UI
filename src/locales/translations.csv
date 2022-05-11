@@ -438,7 +438,7 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel
 no-result,No result,Aucun résultat,Sin resultados
 upload,Upload,Upload,Subir
 important-notes,Important notes,Remarques importantes,Notas importantes
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF).","Solo se permiten archivos de imagen en formato JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI o BIF"
+allowed-formats-upload-info,"Supported image file formats:","Formats d'image supportés :"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS)
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari."
@@ -474,6 +474,11 @@ extracting-data,Extracting data,Extraction des données en cours,
 error-extraction,Extraction error,Erreur d'extraction,
 deploying,Deploying,Déploiement en cours,
 converting,Converting,Conversion en cours,
+unpacking,Unpacking,Décompression en cours
+error-unpacking,Unpacking error,Erreur de décompression
+unpacked,Unpacked,Décompressé
+checking-integrity,Checking integrity,Vérification de l'intégrité en cours
+error-integrity,Corrupted file,Fichier corrompu
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra
