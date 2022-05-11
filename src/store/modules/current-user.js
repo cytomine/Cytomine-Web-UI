@@ -72,9 +72,9 @@ export default {
       await Cytomine.instance.openAdminSession();
       commit('setAdminByNow', true);
     },
-    async closeAdminSession({commit}) {
+    async closeAdminSession({dispatch}) {
       await Cytomine.instance.closeAdminSession();
-      commit('setAdminByNow', false);
+      await dispatch('fetchUser');
     },
 
     async login({dispatch, commit}, payload) {

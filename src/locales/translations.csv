@@ -375,6 +375,7 @@ remove-yourself-from-manager-confirmation-message,Are you sure you want to remov
 status,Status,Statut,Estado
 offline,Offline users,Utilisateurs hors ligne,Usuarios sin conexión
 notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username},No se pudo cambiar el rol de {username}
+notif-error-not-enough-representative, Failed to remove the representative role. At least one representative must be in the project, Impossible retirer l'utilisateur des personnes de contact. Il faut au moins une personnes de contact dans un projet
 enabled,Enabled,Activé,Habilitado
 disabled,Disabled,Désactivé,Dehabilitado
 no-algorithm,No algorithm to display,Aucun algorithme à afficher,No hay algoritmo que mostrar
@@ -647,7 +648,7 @@ updated,Updated,Mis à jour,Actualizado
 button-new-user,New user,Nouvel utilisateur,Nuevo usuario
 button-unlock,Unlock,Déverrouiller,Desbloquear
 notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur,Error al bloquear el usuario
-notif-error-user-lock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
+notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario
 count-slices,- | 1 slice | {count} slices,- | 1 plan | {count} plans,
 count-frames,- | 1 frame | {count} frames,- | 1 frame | {count} frames,
@@ -1017,3 +1018,5 @@ delete-source,Delete source,Supprimer la source de confiance,
 delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,
 notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée,
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
+images-in-projects,Images in projects,Images au sein des projets
+uploaded-images,Images uploaded,Images téléversées

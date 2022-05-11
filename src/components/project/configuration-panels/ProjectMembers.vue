@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -281,7 +281,12 @@ export default {
     async toggleRepresentative(member) {
       try {
         if(member.role === this.representativeRole.value) {
-          await ProjectRepresentative.delete(0, this.project.id, member.id);
+          if ((await this.project.fetchRepresentatives()).array.length < 2) {
+            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+          }
+          else {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
+          }
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
@@ -290,6 +295,7 @@ export default {
       }
       catch(error) {
         console.log(error);
+        console.log(error.toString());
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
