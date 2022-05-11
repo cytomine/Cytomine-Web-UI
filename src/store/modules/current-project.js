@@ -119,7 +119,7 @@ export default {
 
     async fetchFollowers(_, {userId, imageId}) {
       let followers = await UserCollection.fetchFollowers(userId, imageId);
-      followers.forEach(follower => follower.fullName = fullName(follower));
+      //followers.forEach(follower => follower.fullName = fullName(follower));
       return followers;
     },
 

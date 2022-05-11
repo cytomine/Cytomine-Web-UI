@@ -179,10 +179,10 @@ export default {
 
     broadcast() {
       if(this.broadcast) {
+        this.stopTrack();
         if(!this.wsConnected){
           this.initWebSocket();
         }
-        this.stopTrack();
         this.trackedUser = null;
       }
       else{
@@ -301,6 +301,7 @@ export default {
       if(this.trackedUser != null && this.wsConnected){
         this.userPostitionWebsock.send('stop-track/'+this.trackedUser+'/'+this.image.id);
         this.userPostitionWebsock.close();
+        this.wsConnected = false;
       }
     },
 
@@ -338,7 +339,14 @@ export default {
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
       
       if(this.broadcast){
-        this.followers = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
+        this.followers = [];
+        let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
+
+        this.projectMembers.forEach(member => {
+          if(followersIds.includes(''+member.id)){
+            this.followers.push(member);
+          }
+        });
       }
 
       clearTimeout(this.timeoutOnlineUsers);
