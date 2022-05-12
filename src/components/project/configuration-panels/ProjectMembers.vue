@@ -181,7 +181,6 @@ export default {
       return collection;
     },
 
-
     exportURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
@@ -290,7 +289,6 @@ export default {
       }
       catch(error) {
         console.log(error);
-        console.log(error.toString());
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },

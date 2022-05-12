@@ -227,7 +227,7 @@ export default {
         this.loading = false;
       }
       catch(err) {
-        window.console.log(err);
+        console.log(err);
         this.error = true;
       }
     },

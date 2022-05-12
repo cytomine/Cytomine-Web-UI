@@ -269,7 +269,6 @@ export default {
       await this.refreshJobs();
     },
     async fetchMultiselectOptions() {
-      console.log('fetchMultiselectOptions');
       let stats = await JobCollection.fetchBounds({project: this.project.id});
       this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
@@ -299,7 +298,6 @@ export default {
       }
     },
     async refreshJobs() {
-      console.log('refreshJobs');
       try {
         await this.fetchMultiselectOptions();
         this.loading = false;
@@ -311,7 +309,6 @@ export default {
     },
   },
   async created() {
-    console.log('created');
     await this.refreshJobs();
     this.loading = false;
   }

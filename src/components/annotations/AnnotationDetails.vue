@@ -285,6 +285,7 @@ export default {
       if(this.isReview) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
+      return null;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);
@@ -482,7 +483,7 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    }
+    },
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
