@@ -203,9 +203,6 @@ export default {
         this.$nextTick(() => this.broadcastModel = false);
         return;
       }
-      if(!value && this.wsConnected){
-        this.userPostitionWebsock.send('stop-broadcast/'+this.currentUser.id+'/'+this.image.id);
-      }
       this.broadcast = value;
     },
 
@@ -265,7 +262,7 @@ export default {
       this.userPostitionWebsock.onopen = this.onOpentracking;
     },
     initWebSocket(){
-      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id);
+      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id + '/' + this.image.id + '/' + this.broadcast);
       this.userPostitionWebsock.onopen = this.onOpen;
       this.userPostitionWebsock.onclose = this.onClose;
       this.userPostitionWebsock.onmessage = this.onMessage;
@@ -275,14 +272,14 @@ export default {
     },
     onOpentracking(){
       this.onOpen();
-      this.userPostitionWebsock.send('no-action/'+this.trackedUserModel+'/'+this.image.id);
+      this.userPostitionWebsock.send(this.trackedUserModel);
     },
     onClose(){
       this.wsConnected = false;
     },
     onMessage(message){
       if(message.data == 'stop-track'){
-        this.trackedUser = null;
+        this.stopTrack();
       }
       else{
         let pos = JSON.parse(message.data);
@@ -298,11 +295,11 @@ export default {
       });
     },
     stopTrack(){
-      if(this.trackedUser != null && this.wsConnected){
-        this.userPostitionWebsock.send('stop-track/'+this.trackedUser+'/'+this.image.id);
+      if(this.wsConnected){
         this.userPostitionWebsock.close();
         this.wsConnected = false;
       }
+      this.trackedUser = null;
     },
 
     async track() {
@@ -334,8 +331,7 @@ export default {
         return;
       }
 
-      // let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
-      let onlines = [74];
+      let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
       
       if(this.broadcast){
