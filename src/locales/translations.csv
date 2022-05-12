@@ -151,6 +151,7 @@ button-show-filters,Show filters,Montrer les filtres,Mostrar filtros
 button-hide-filters,Hide filters,Cacher les filtres,Ocultar filtros
 all,All,Tous,Todos
 all-images,All,Toutes,Todas
+all-image-groups,All,Tous,Todas
 all-analyses,All,Toutes,Todas
 all-ontologies,All,Toutes,Todas
 all-resolutions,All,Toutes,Todas
@@ -492,8 +493,8 @@ shortcut-viewer-nav-zoom-in,Zoom in,Zoomer,Aumentar escala
 shortcut-viewer-nav-zoom-out,Zoom out,Dézoomer,Disminuir escala
 shortcut-viewer-nav-next-image,Go to next image,Aller à l'image suivante,Ir a la siguiente imagen
 shortcut-viewer-nav-previous-image,Go to previous image,Aller à l'image précédente,Ir a la imagen anterior
-shortcut-viewer-nav-next-image-in-group,Go to next image in group,Aller à l'image suivante dans le groupe
-shortcut-viewer-nav-previous-image-in-group,Go to previous image in group,Aller à l'image précédente dans le groupe
+shortcut-viewer-nav-next-image-in-group,Go to next image in group,Aller à l'image suivante dans le groupe,
+shortcut-viewer-nav-previous-image-in-group,Go to previous image in group,Aller à l'image précédente dans le groupe,
 draw,Draw,Outils d'annotations,Herramientas de anotación
 shortcut-viewer-tool-select,Select annotation,Sélectionner une annotation,Seleccionar anotación
 shortcut-viewer-tool-point,Draw a point,Dessiner un point,Dibujar un punto
@@ -1003,6 +1004,7 @@ per-term,Per term,Par terme,
 per-track,Per track,Par trace,
 per-user,Per user,Par utilisateur,
 per-image,Per image,Par image,
+per-image-group,Per image group,Par groupe d'images,
 categorization,Categorization,Catégorisation,
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace,
@@ -1045,14 +1047,14 @@ notif-success-image-group-link-deletion,Image {imageName} was successfully remov
 notif-error-image-group-link-deletion,Failed to remove image {imageName} from its image group,Une erreur a empêché le retrait de l'image {imageName} de son groupe d'images
 notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images
-no-image-group,No image group to display,Aucun groupe d'images à afficher
+no-image-group,No image group,Aucun groupe d'images
 add-images-to-image-group,Add images to image group,Ajouter des images au groupe d'images
 already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'images
 already-in-other-image-group,Already in another image group,Déjà dans un autre groupe d'images
 button-add-images-to-image-group,Add images,Ajouter des images
 notif-success-image-group-creation,Image group successfully created,Le groupe d'images a été créé avec succès
 notif-error-image-group-creation,Failed to create image group,Une erreur a empêché la création du groupe d'images
-button-add-image-group,Add image group,Ajouter un groupe d'imges
+button-add-image-group,Add image group,Ajouter un groupe d'images
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe
 button-next-image-in-group,Next image in group,Image suivante dans le groupe
 open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de
