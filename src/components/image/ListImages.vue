@@ -159,6 +159,7 @@
 
       <cytomine-table
         :collection="imageCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -378,6 +379,9 @@ export default {
 
     nbActiveFilters() {
       return this.$store.getters[this.storeModule + '/nbActiveFilters'];
+    },
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'];
     },
 
     currentPage: sync('currentPage', storeOptions),
