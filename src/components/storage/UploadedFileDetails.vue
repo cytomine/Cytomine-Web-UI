@@ -92,20 +92,6 @@
     </h2>
     <img :src="slidePreview.macroURL">
   </template>
-
-  <template v-if="image && profileEnabled">
-    <h2>{{$t('companion-files')}}</h2>
-    <table class="table">
-      <tbody>
-      <tr>
-        <td class="prop-label">{{$t('profile')}}</td>
-        <td class="prop-content">
-          <profile-status :image="image" @update="$emit('update')"></profile-status>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </template>
 </div>
 </template>
 
@@ -114,12 +100,10 @@ import SlVueTree from 'sl-vue-tree';
 import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
-import ProfileStatus from './ProfileStatus';
 
 export default {
   name: 'uploaded-file-details',
   components: {
-    ProfileStatus,
     SlVueTree,
     UploadedFileStatus
   },
@@ -139,8 +123,6 @@ export default {
       nbUploadedFiles: 0,
       currentPage: 1,
       nbPerPage: 10,
-
-      profileEnabled: false
     };
   },
   computed: {

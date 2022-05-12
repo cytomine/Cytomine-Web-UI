@@ -76,15 +76,6 @@
             </div>
           </div>
 
-          <!--<div class="column">
-            <div class="filter-label">
-              {{$t('favorite')}}
-            </div>
-            <div class="filter-body">
-              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
-                label="label" track-by="value" multiple />
-            </div>
-          </div>-->
         </div>
       </div>
 
@@ -98,13 +89,6 @@
         :revision="revision"
       >
         <template #default="{row: job}">
-          <!--<b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
-            <a @click="toggleFavorite(job)" v-if="canEdit(job)">
-              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
-            </a>
-            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
-          </b-table-column>-->
-
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
             <router-link :to="`/software/${job.software}`">
               {{job.softwareName}}
@@ -262,11 +246,6 @@ export default {
   methods: {
     canEdit(job) {
       return this.$store.getters['currentProject/canManageJob'](job);
-    },
-    async toggleFavorite(job) {
-      job.favorite = !job.favorite;
-      await job.setFavorite();
-      await this.refreshJobs();
     },
     async fetchMultiselectOptions() {
       let stats = await JobCollection.fetchBounds({project: this.project.id});
