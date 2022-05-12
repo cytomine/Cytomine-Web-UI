@@ -158,8 +158,10 @@ const methods = {
 const watch = {
   urls() {
     //source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/UrlTile.js#L194
-    const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
-    this.$source.setTileUrlFunction(tileUrlFunction, this.urls.join('\n'));
+    if (this.$source) {
+      const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
+      this.$source.setTileUrlFunction(tileUrlFunction, this.urls.join('\n'));
+    }
   },
 };
 
