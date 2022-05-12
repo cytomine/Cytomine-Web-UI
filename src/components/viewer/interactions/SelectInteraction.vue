@@ -18,7 +18,6 @@
   :filter="filterFunction"
   :features.sync="selectedFeatures"
   :toggle-condition="never"
-  :remove-condition="shiftKeyOnly"
   :multi=true
   ref="interactionSelect"
 >
@@ -34,6 +33,11 @@ export default {
   name: 'select-interaction',
   props: {
     index: String
+  },
+  data() {
+    return {
+      shiftPressed: false
+    };
   },
   computed: {
     imageModule() {
@@ -51,6 +55,10 @@ export default {
         let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
         if(notAnnotations.length == 1){
           value = notAnnotations;
+          if(this.shiftPressed){
+            // TODO : value = this.imageWrapper.selectedFeatures.selectedFeatures + value
+            console.log(this.imageWrapper.selectedFeatures.selectedFeatures);
+          }
           this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
           return;
         }
@@ -96,6 +104,11 @@ export default {
           let annot = value[0].properties.annot;
           annot.recordAction();
         }
+
+        if(this.shiftPressed){
+          value = this.groupedValues(value);
+        }
+
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
@@ -142,6 +155,26 @@ export default {
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
     }
+  },
+  methods: {
+    groupedValues(value){
+      let features = [...value];
+      this.selectedFeatures.forEach(el => {
+        if(!value.map(x => x.id).includes(el.id)){
+          features.push(el);
+        }
+      });
+      return features;
+    }
+  },
+  mounted() {
+    let self = this;
+    window.addEventListener('keydown', function(ev) {
+      self.shiftPressed = ev.shiftKey;
+    });
+    window.addEventListener('keyup', function(ev) {
+      self.shiftPressed = ev.shiftKey;
+    });
   }
 };
 </script>

@@ -20,7 +20,7 @@ import {annotBelongsToLayer} from '@/utils/annotation-utils';
 export default {
   state() {
     return {
-      selectionTargetedFeatures: [], // when we select a feature by clicking on a location, we can have multiple feature at this location.
+      selectionTargetedFeatures: [], // when we select a feature by clicking on a location, we can have multiple feature at this location + we can group multiple features with 'shift+click'.
       selectedFeatures: [],
       annotsToSelect: [],
       showComments: null, // set to the identifier of an annotation to automatically open comments modal if this annotation if the first to be selected
