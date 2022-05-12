@@ -191,7 +191,22 @@
             </div>
           </div>
 
-          <div class="column filter is-one-third">
+          <div class="column filter is-one-third" v-if="isByImageGroup">
+            <div class="filter-label">
+              {{$t('image-groups')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                  v-model="selectedImageGroups"
+                  :options="imageGroups"
+                  :label="'name'"
+                  track-by="id"
+                  multiple
+                  :allPlaceholder="$t('all-image-groups')"
+              />
+            </div>
+          </div>
+          <div class="column filter is-one-third" v-else>
             <div class="filter-label">
               {{$t('images')}}
             </div>
@@ -256,7 +271,7 @@
       :tracks-ids="selectedTracksIds"
       :tags-ids="selectedTagsIds"
       :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
-      :imagesIds="selectedImagesIds"
+      :imagesIds="(isByImageGroup) ? imagesIdsInGroup(prop) : selectedImagesIds"
       :usersIds="selectedUsersIds"
       :reviewed="reviewed"
       :reviewUsersIds="reviewUsersIds"
@@ -298,7 +313,8 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection,
+  AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -342,6 +358,7 @@ export default {
       annotationTypes: [],
 
       images: [],
+      imageGroups: [],
       tags:[],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
@@ -359,6 +376,7 @@ export default {
         {label: this.$t('per-term'), categorization: 'TERM'},
         {label: this.$t('per-track'), categorization: 'TRACK'},
         {label: this.$t('per-user'), categorization: 'USER'},
+        {label: this.$t('per-image-group'), categorization: 'IMAGEGROUP'},
       ];
 
       if (!this.tooManyImages) {
@@ -471,6 +489,7 @@ export default {
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
+    selectedImageGroups: localSyncMultiselectFilter('imageGroups', 'imageGroups'),
     selectedTags: localSyncMultiselectFilter('tags', 'tagsOptions'),
     selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
@@ -508,6 +527,10 @@ export default {
       return this.selectedImages.map(img => img.id);
     },
 
+    selectedImageGroupsIds() {
+      return this.selectedImageGroups.map(group => group.id);
+    },
+
     categoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -522,6 +545,8 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        case 'IMAGEGROUP':
+          return this.imageGroups;
       }
     },
     isByTerm() {
@@ -532,6 +557,9 @@ export default {
     },
     isByTag() {
       return this.selectedCategorization.categorization === 'TAG';
+    },
+    isByImageGroup() {
+      return this.selectedCategorization.categorization === 'IMAGEGROUP';
     },
     noTerm() {
       return this.selectedTermsIds.includes(this.noTermOption.id);
@@ -547,11 +575,15 @@ export default {
       return this.selectedTags.map(t => t.id);
     },
     collection() {
+      let imagesIds = !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null;
+      if (this.isByImageGroup) {
+        imagesIds = this.selectedImageGroups.map(ig => this.imagesIdsInGroup(ig)).flat();
+      }
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
-        images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
+        images: imagesIds,
         users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
@@ -584,6 +616,12 @@ export default {
           light: true
         })).array;
       }
+    },
+    async fetchImageGroups() {
+      this.imageGroups = (await ImageGroupCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id
+      })).array;
     },
     async fetchUsers() {
 
@@ -632,7 +670,12 @@ export default {
           return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
         case 'TRACK':
           return this.selectedTracksIds.includes(prop.id);
+        case 'IMAGEGROUP':
+          return this.selectedImageGroupsIds.includes(prop.id);
       }
+    },
+    imagesIdsInGroup(group) {
+      return group.imageInstances.map(image => image.id);
     }
   },
   watch: {
@@ -678,6 +721,7 @@ export default {
     try {
       await Promise.all([
         this.fetchImages(),
+        this.fetchImageGroups(),
         this.fetchUsers(),
         this.fetchUserJobs(),
         this.fetchTracks(),
