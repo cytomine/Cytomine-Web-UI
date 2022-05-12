@@ -165,8 +165,6 @@ limitations under the License.-->
 <script>
 import {get, sync, syncBoundsFilter} from '@/utils/store-helpers';
 
-import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 
 import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
@@ -192,8 +190,6 @@ export default {
     OpenImageGroupButton,
     ImageGroupPreview,
     ImageGroupDetails,
-    CytomineTable,
-    CytomineMultiselect,
     CytomineSlider,
     AddImageGroupModal
   },

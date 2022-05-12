@@ -101,6 +101,7 @@ export default {
       searchString: '',
       selectedImageGroups: [],
       nbImagesDisplayed: 20,
+      nbFilteredImages: 0,
       loading: true,
       error: false
     };
