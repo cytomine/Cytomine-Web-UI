@@ -72,6 +72,7 @@ display-annot-details,Display details of currently selected annotation,Afficher 
 fill,Fill,Remplir,Rellenar
 modify,Modify,Modifier,Modificar
 move,Move,Déplacer,Mover
+resize,Resize,Redimensionner
 rotate,Rotate,Pivoter,Girar
 delete,Delete,Supprimer,Eliminar
 rename,Rename,Renommer,Renombrar
@@ -885,7 +886,8 @@ shortcut-viewer-tool-correct-add,Correct annotation by adding a freehand area,Co
 shortcut-viewer-tool-correct-remove,Correct annotation by removing a freehand area,Corriger l'annotation en lui soustrayant un polygone à main levée,Correjir anotación eliminando un área a mano alzada
 shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation,Modificar anotación
 shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification,Eliminar un vértice con la herramienta de modificación
-shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation,Mover anotación
+shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
+shortcut-viewer-tool-rescale,Rescale annotation,Redimensionner l'annotation,Mover anotación
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation,Rotar anotación
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information,Alternar panel de información
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom,Alternar panel de zoom
