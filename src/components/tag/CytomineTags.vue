@@ -21,7 +21,10 @@
       <em v-if="error">{{$t('error-fetch-tags')}}</em>
       <div class="control" v-else-if="associatedTags.length > 0" v-for="(association, idx) in associatedTags" :key="association.id">
         <b-taglist attached>
-          <b-tag type="is-info">{{association.tagName.toUpperCase()}}</b-tag>
+          <b-tag type="is-info">
+            {{association.tagName.toUpperCase()}}
+            <span v-if="currentUser.isDeveloper"> ({{$t('id')}}: {{association.tag}})</span>
+          </b-tag>
           <b-tag v-if="canEdit">
             <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
             </button>
@@ -43,6 +46,7 @@
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'cytomine-tags',
@@ -61,6 +65,9 @@ export default {
       addTagModal:false,
       associatedTags: []
     };
+  },
+  computed: {
+    currentUser: get('currentUser/user'),
   },
   methods: {
     displayModal() {
