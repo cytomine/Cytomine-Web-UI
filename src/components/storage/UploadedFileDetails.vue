@@ -92,6 +92,20 @@
     </h2>
     <image-thumbnail :url="slidePreview.macroURL" :size="512" :key="slidePreview.macroURL" :macro="true" />
   </template>
+
+  <template v-if="image">
+    <h2>{{$t('companion-files')}}</h2>
+    <table class="table">
+      <tbody>
+      <tr>
+        <td class="prop-label">{{$t('profile')}}</td>
+        <td class="prop-content">
+          <profile-status :image="image" @update="$emit('update')"></profile-status>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </template>
 </div>
 </template>
 

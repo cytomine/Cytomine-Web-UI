@@ -998,8 +998,8 @@ slice,Slice,Plan,
 pixel-intensity,Intensity,Intensité,
 profile,Profile,Profil,
 inspect-button,Inspect,Inspecter,
-failed-fetch-profile,Failed to fetch image profile,,
-companion-files,Companion files,,
+failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,
+companion-files,Companion files,Fichiers liés,
 not-available,Not available.,Indisponible.,
 no-profile,No profile,Pas de profil,
 developer-mode,Developer mode,Mode développeur,
@@ -1023,6 +1023,10 @@ relative-link-mode,Relative,Relatif,
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
+confirm-profile-computation,Confirm profile computation,Confirmer le calcul du profil
+confirm-profile-computation-message,Are you sure to ask for profile computation for this image (possibly slow)?,Etes-vous certain de demander le calcul du profil pour cette image (potentiellement lent) ?
+notif-error-profile-computation,Error during profile computation,Une erreur a empêché le calcul du profil
+notif-error-profile-deletion,Error during profile deletion,Une erreur a empêché la suppresion du profil
 no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza
 hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,
 notif-deprecated-software,This software is deprecated,,
@@ -1032,6 +1036,14 @@ notif-success-source-delete,Trusted source {username}/{dockerUsername} was succe
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
+average,Average,Moyenne
+profile-projection,Profile projection,Projection du profil
+button-retry,Retry,Réessayer
+step,Step,Saut
+fluorescence-spectra,Fluorescence spectra,Spectre de fluorescence
+depth-spectra,Depth spectra,Spectre de profondeur
+temporal-spectra,Temporal spectra,Spectre temporel
+spatial-projection,Spatial projection,Projection spatiale
 image-groups,Image groups,Groupes d'images
 rename-image-group,Rename the image group,Renommer le groupe d'images
 notif-success-image-group-rename,Image group {imageName} was successfully renamed,Le groupe d'images {imageName} a été renommé avec succès
