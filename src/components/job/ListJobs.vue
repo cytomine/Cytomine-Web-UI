@@ -265,7 +265,7 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    canEdit(job) {
+    canManageJob(job) {
       return this.$store.getters['currentProject/canManageJob'](job);
     },
     async fetchMultiselectOptions() {
