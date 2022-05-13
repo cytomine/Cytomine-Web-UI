@@ -30,7 +30,7 @@
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
-            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`"/>
+            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </b-table-column>
 
           <b-table-column field="originalFilename" :label="$t('name')" sortable>
@@ -71,7 +71,6 @@ import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
-import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'add-image-modal',
@@ -118,7 +117,6 @@ export default {
     }
   },
   methods: {
-    appendShortTermToken,
     async addImage(abstractImage) {
       let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
       try {

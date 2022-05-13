@@ -179,7 +179,7 @@
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80" class="image-overview">
-            <image-thumbnail v-if="uFile.thumbURL" :url="appendShortTermToken(uFile.thumbURL, shortTermToken)" :size="128" :key="uFile.thumbURL" />
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
@@ -235,7 +235,6 @@ import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
-import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'cytomine-storage',
@@ -340,7 +339,6 @@ export default {
     }
   },
   methods: {
-    appendShortTermToken,
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;

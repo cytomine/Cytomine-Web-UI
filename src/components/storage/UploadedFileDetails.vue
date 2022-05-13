@@ -83,14 +83,14 @@
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
       <button class="button is-small" @click="samplePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <image-thumbnail :url="appendShortTermToken(samplePreview.thumbURL, this.shortTermToken)" :size="512" :key="samplePreview.thumbURL" />
+    <image-thumbnail :url="this.shortTermToken" :size="512" :key="samplePreview.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
   </template>
   <template v-else-if="slidePreview">
     <h2>
       {{$t('slide-preview-of', {filename: slidePreview.originalFilename})}}
       <button class="button is-small" @click="slidePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <image-thumbnail :url="appendShortTermToken(slidePreview.macroURL, this.shortTermToken)" :size="512" :key="slidePreview.macroURL" :macro="true" />
+    <image-thumbnail :url="slidePreview.macroURL" :size="512" :key="slidePreview.macroURL" :macro="true" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
   </template>
 
   <template v-if="image && profileEnabled">

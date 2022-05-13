@@ -182,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <image-thumbnail :url="appendShortTermToken(consultation.imageThumb, shortTermToken)" :size="128" :key="consultation.imageThumb" />
+                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 

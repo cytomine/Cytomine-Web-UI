@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import AnnotationDetails from './AnnotationDetails';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 
@@ -83,7 +82,6 @@ export default {
     sameViewOnClick: {type: Boolean, default: false}
   },
   components: {
-    AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
   },
   data() {
     return {
@@ -118,11 +116,10 @@ export default {
       return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
     },
     styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = appendShortTermToken(`${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`, this.shortTermToken);
+      let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
       console.log('url', url);
       return {
-        backgroundImage: `url(${this.cropUrl})`,
+        backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'

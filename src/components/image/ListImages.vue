@@ -169,7 +169,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             </router-link>
           </b-table-column>
 
@@ -256,7 +256,6 @@ const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
-import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'list-images',
@@ -391,7 +390,6 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    appendShortTermToken,
     async fetchFilters() {
       let stats = await new ImageInstanceCollection.fetchBounds({project: this.project.id});
       this.maxWidth = Math.max(100, stats.width.max);
