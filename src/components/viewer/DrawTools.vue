@@ -494,6 +494,9 @@ export default {
         this.$store.commit(this.imageModule + 'activateEditTool', tool);
       }
     },
+    selectedFeatures() {
+      return this.imageWrapper.selectedFeatures.selectedFeatures;
+    },
     selectedFeature() {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
@@ -560,6 +563,10 @@ export default {
     },
 
     isToolDisabled(tool) {
+      if(this.selectedFeatures.length > 1){
+        return !(tool === 'delete');
+      }
+
       if(!this.selectedFeature) {
         return true; // no feature selected -> all edit tools disabled
       }
@@ -621,8 +628,13 @@ export default {
       }
     },
 
-    async deleteAnnot() {
-      let feature = this.selectedFeature;
+    async deleteAnnots() {
+      for(let feature of this.selectedFeatures){
+        await this.deleteAnnot(feature);
+      }
+    },
+
+    async deleteAnnot(feature) {
       if(!feature) {
         return;
       }
@@ -639,18 +651,32 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     },
+
     confirmDeletion() {
+      let nbFeatures = this.selectedFeatures.length;
+      if(nbFeatures > 1){
+        this.confirmDeletionModal(
+          this.$t('confirm-deletion-annotations', {count: nbFeatures}),
+          () => this.deleteAnnots());
+      }
+
       if(!this.selectedFeature) {
         return;
       }
 
+      this.confirmDeletionModal(
+        this.$t('confirm-deletion-annotation'),
+        () => this.deleteAnnot(this.selectedFeature));
+    },
+
+    confirmDeletionModal(message, onConfirmCallback){
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-annotation'),
+        message: message,
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
-        onConfirm: () => this.deleteAnnot()
+        onConfirm: onConfirmCallback
       });
     },
 

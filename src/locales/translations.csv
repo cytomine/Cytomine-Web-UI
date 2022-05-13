@@ -81,6 +81,7 @@ undo,Undo,Annuler,Deshacer
 redo,Redo,Refaire,Rehacer
 confirm-deletion,Confirm deletion,Confirmer la suppression,Confirmar la eliminación
 confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?,¿Estás seguro de que deseas eliminar esta anotación?
+confirm-deletion-annotations,Are you sure you want to delete these {count} annotations?,Êtes-vous sûr de vouloir supprimer ces {count} annotations?,¿Estás seguro de que deseas eliminar estas {count} anotaciónes?
 button-confirm,Confirm,Confirmer,Confirmar
 button-cancel,Cancel,Annuler,Cancelar
 notif-error-annotation-update,Error during annotation update,Une erreur a empêché de modifier l'annotation,Error durante la actualización de la anotación

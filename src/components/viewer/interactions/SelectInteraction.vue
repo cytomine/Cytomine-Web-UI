@@ -55,10 +55,11 @@ export default {
         let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
         if(notAnnotations.length == 1){
           value = notAnnotations;
+
           if(this.shiftPressed){
-            // TODO : value = this.imageWrapper.selectedFeatures.selectedFeatures + value
-            console.log(this.imageWrapper.selectedFeatures.selectedFeatures);
+            value = this.addSelectedFeatures(value);
           }
+
           this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
           return;
         }
@@ -106,7 +107,7 @@ export default {
         }
 
         if(this.shiftPressed){
-          value = this.groupedValues(value);
+          value = this.addSelectedFeatures(value);
         }
 
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
@@ -157,7 +158,8 @@ export default {
     }
   },
   methods: {
-    groupedValues(value){
+    addSelectedFeatures(value){
+      // Diectly modify a state that belongs to Vue return vuex error. Avoid this by doing a copy of the element.
       let features = [...value];
       this.selectedFeatures.forEach(el => {
         if(!value.map(x => x.id).includes(el.id)){
@@ -169,11 +171,10 @@ export default {
   },
   mounted() {
     let self = this;
-    window.addEventListener('keydown', function(ev) {
-      self.shiftPressed = ev.shiftKey;
-    });
-    window.addEventListener('keyup', function(ev) {
-      self.shiftPressed = ev.shiftKey;
+    ['keydown','keyup'].forEach(function(event){
+      window.addEventListener(event, function(ev) {
+        self.shiftPressed = ev.shiftKey;
+      });
     });
   }
 };
