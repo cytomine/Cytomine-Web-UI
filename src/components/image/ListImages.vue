@@ -388,7 +388,7 @@ export default {
       return this.$store.getters[this.storeModule + '/nbActiveFilters'];
     },
     nbEmptyFilters() {
-      return this.$store.getters[this.storeModule + '/nbEmptyFilters'];
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'] + ((this.selectedContentTypes.length > 0) ? 0 : 1);
     },
 
     currentPage: sync('currentPage', storeOptions),
