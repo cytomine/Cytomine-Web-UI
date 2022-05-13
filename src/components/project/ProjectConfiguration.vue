@@ -84,6 +84,7 @@ export default {
         case 'imageFilters':
           return ProjectImageFilters;
       }
+      throw new Error('Cannot load active tabs ' + this.activeTab);
     }
   },
   watch: {

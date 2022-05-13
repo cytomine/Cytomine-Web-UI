@@ -404,6 +404,7 @@ export default {
         case 'reviewed':
           return this.reviewedAnnotationOption;
       }
+      throw new Error('Cannot find annotation type ' + this.$route.query.type);
     },
 
     allUsers() {
@@ -524,6 +525,7 @@ export default {
         case 'TRACK':
           return this.tracksOptions;
       }
+      throw new Error('Cannot load a category options ' + this.selectedCategorization.categorization);
     },
     isByTerm() {
       return this.selectedCategorization.categorization === 'TERM';

@@ -78,14 +78,6 @@
 <script>
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
-import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
-
 import {fullName} from '@/utils/user-utils.js';
 import {get} from '@/utils/store-helpers';
 
@@ -93,13 +85,6 @@ import {get} from '@/utils/store-helpers';
 export default {
   name: 'annotations-list',
   components: {
-    ListAnnotationsBy,
-    OntologyTree,
-    TrackTree,
-    CytomineTerm,
-    CytomineMultiselect,
-    CytomineSlider,
-    AnnotationPreview
   },
   props: [
     'index',

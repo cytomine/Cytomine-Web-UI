@@ -91,6 +91,7 @@ export default {
         case 'tags':
           return AdminTags;
       }
+      throw new Error('Cannot load active tabs ' + this.activeTab);
     }
   },
   watch: {
