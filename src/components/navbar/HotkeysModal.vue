@@ -21,7 +21,7 @@
       icon="search"
       size="is-small"
   />
-  <div v-for="category in categories" :key="category" v-if="filteredShortcuts(category).length > 0">
+  <div v-for="category in filteredCategories" :key="category">
     <h2>{{$t(`shortcut-${category}`)}}</h2>
     <b-table :data="filteredShortcuts(category)" class="shortcut-list">
       <template #default="{row: shortcut}">
@@ -82,6 +82,9 @@ export default {
     },
     noResult() {
       return this.categories.every(category => this.isEmpty(category));
+    },
+    filteredCategories() {
+      return this.categories.filter(category => this.filteredShortcuts(category).length > 0);
     }
   },
   methods: {
