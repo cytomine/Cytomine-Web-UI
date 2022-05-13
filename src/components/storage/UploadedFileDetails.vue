@@ -114,12 +114,14 @@ import SlVueTree from 'sl-vue-tree';
 import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
+import ProfileStatus from './ProfileStatus';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'uploaded-file-details',
   components: {
     ImageThumbnail,
+    ProfileStatus,
     SlVueTree,
     UploadedFileStatus
   },

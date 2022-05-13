@@ -244,6 +244,7 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import ProfileModal from '@/components/viewer/ProfileModal';
 
 export default {
   name: 'annotations-details',
@@ -264,6 +265,7 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
     showComments: {type: Boolean, default: false}
   },
