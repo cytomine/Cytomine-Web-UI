@@ -59,11 +59,11 @@ const routes = [
     component: ListOntologies
   },
   {
-    path: '/software',
+    path: '/algorithm',
     component: ListSoftware
   },
   {
-    path: '/software/:idSoftware',
+    path: '/algorithm/:idSoftware',
     component: SoftwareInformation
   },
   {
@@ -154,6 +154,8 @@ const routes = [
   {path: '/project', redirect: '/projects'},
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
+  {path: '/software', redirect: '/algorithm'},
+  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
