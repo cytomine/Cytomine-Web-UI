@@ -36,9 +36,19 @@
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
 
-        <tr v-if="profile && isPoint && false">
-          <td><strong>{{$t('profile')}}</strong></td>
-          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
+        <tr v-if="profile">
+          <td>
+            <strong v-if="isPoint">{{$t('profile')}}</strong>
+            <strong v-else>{{$t('profile-projection')}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openRegularProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
+
+        <tr v-if="profile && !isPoint">
+          <td>
+            <strong>{{spatialProjection}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openSpatialProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
       </template>
 
@@ -302,7 +312,7 @@ export default {
       return this.image.depth * this.image.duration * this.image.channels;
     },
     profile() {
-      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
+      return this.profiles.find(profile => profile.image === this.image.baseImage);
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -343,6 +353,18 @@ export default {
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
+    },
+    spatialProjection() {
+      if (this.image.channels > 1) {
+        return this.$t('fluorescence-spectra');
+      }
+      else if (this.image.depth > 1) {
+        return this.$t('depth-spectra');
+      }
+      else if (this.image.duration > 1) {
+        return this.$t('temporal-spectra');
+      }
+      return  this.$t('spatial-projection');
     }
   },
   methods: {
@@ -454,11 +476,19 @@ export default {
       this.comments.unshift(comment);
     },
 
-    openProfileModal() {
-      this.$modal.open({
+    openSpatialProfileModal() {
+      this.openProfileModal(true);
+    },
+
+    openRegularProfileModal() {
+      this.openProfileModal(false);
+    },
+
+    openProfileModal(spatialAxis) {
+      this.$buefy.modal.open({
         parent: this,
         component: ProfileModal,
-        props: {annotation: this.annotation, image: this.image},
+        props: {annotation: this.annotation, image: this.image, spatialAxis},
         hasModalCard: true
       });
     },
