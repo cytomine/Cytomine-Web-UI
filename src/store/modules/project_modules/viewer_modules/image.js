@@ -34,6 +34,7 @@ import tracks from './image_modules/tracks';
 import annotationsList from './image_modules/annotations-list';
 
 import Vue from 'vue';
+import _ from 'lodash';
 
 import {
   isCluster,
@@ -359,6 +360,16 @@ export default {
       }
 
       return state.imageGroupLink.group;
+    },
+
+    channels: state => {
+      return _.orderBy(Object.values(_.groupBy(state.sliceInstances, 'channel')).map(slices => {
+        return {
+          index: slices[0].channel,
+          name: slices[0].channelName,
+          color: slices[0].channelColor
+        };
+      }), 'index');
     }
   },
 

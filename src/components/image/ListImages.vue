@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumbURL(256)" class="image-overview">
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
             </router-link>
           </b-table-column>
 
@@ -247,9 +247,10 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -260,6 +261,7 @@ const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, fi
 export default {
   name: 'list-images',
   components: {
+    ImageThumbnail,
     ImageName,
     ImageDetails,
     CytomineTable,
@@ -332,12 +334,18 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
+        {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
+    },
+
+    selectedContentTypes() {
+      let selectedVendors = this.selectedVendors.map(option => option.value);
+      let availableVendors = this.availableVendors.map(option => option.value);
+      let allowUnknown = selectedVendors.includes('null');
+      return this.selectedFormats.filter(ct => (availableVendors.includes(ct)) ? selectedVendors.includes(ct) : allowUnknown);
     },
 
     boundsFilters() {
@@ -367,7 +375,6 @@ export default {
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(prop == 'vendor') prop = 'mimeType';
         if(selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -401,13 +408,19 @@ export default {
 
 
       this.availableFormats = stats.format.list;
-      this.availableVendors = stats.mimeType.list.map(mime => {
-        let vendor = vendorFromMime(mime);
-        return {
-          value: mime || 'null',
+
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
+        let vendorFormatted = {
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
+
+        if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+          this.availableVendors.push(vendorFormatted);
+        }
       });
+
       this.availableMagnifications = stats.magnification.list.map(m => {
         return {
           value: m || 'null',
@@ -482,7 +495,7 @@ export default {
   align-items: center;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

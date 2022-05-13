@@ -402,7 +402,7 @@ export default {
 
     colors() {
       let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
-      colors.push({label: this.$t('no-outline')});
+      colors.push({label: this.$t('no-outline'), hexaCode: ''});
       return colors;
     },
 

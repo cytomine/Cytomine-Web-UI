@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          crossOrigin="Anonymous"
+          :crossOrigin="slice.imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -368,9 +368,20 @@ export default {
     },
 
     baseLayerURLs() {
-      let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
-      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
+      let filter = (this.imageWrapper.colors.filter) ? `&filters=${this.imageWrapper.colors.filter}` : '';
+      let contrast = (this.imageWrapper.colors.contrast !== 1) ? `&contrast=${this.imageWrapper.colors.contrast}` : '';
+      let gamma = (this.imageWrapper.colors.gamma !== 1) ? `&gammas=${this.imageWrapper.colors.gamma}` : '';
+      let inverse = (this.imageWrapper.colors.inverse) ? '&colormaps=!DEFAULT' : '';
+      let params = `?${filter}${contrast}${gamma}${inverse}`;
+
+      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum).join(',');
+      if (minIntensities) params += `&min_intensities=${minIntensities}`;
+      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum).join(',');
+      if (maxIntensities) params += `&max_intensities=${maxIntensities}`;
+
+      params += `&z_slices=${this.slice.zStack}&timepoints=${this.slice.time}`;
+
+      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${params}`];
     },
 
     colorManipulationOn() {

@@ -80,12 +80,33 @@ export default {
     };
   },
   computed: {
-    styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`;
+    cropParameters() {
+      let params = {
+        square: true,
+        complete: true,
+        thickness: 2,
+        increaseArea: 1.25,
+        rev: this.revisionCrop,
+      };
 
+      if (this.color || this.color === '') {
+        params.draw = true;
+      }
+      if (this.color) {
+        params.color = `0x${this.color}`;
+      }
+      if (this.annot.updated) {
+        params.updated = this.annot.updated;
+      }
+
+      return params;
+    },
+    cropUrl() {
+      return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
+    },
+    styleAnnotDetails() {
       return {
-        backgroundImage: `url(${url})`,
+        backgroundImage: `url(${this.cropUrl})`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'

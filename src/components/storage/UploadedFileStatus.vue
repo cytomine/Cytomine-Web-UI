@@ -54,6 +54,11 @@ export default {
         [UploadedFileStatus.ERROR_EXTRACTION]: 'error-extraction',
         [UploadedFileStatus.CONVERTING]: 'converting',
         [UploadedFileStatus.DEPLOYING]: 'deploying',
+        50: 'unpacking',
+        51: 'error-unpacking',
+        60: 'checking-integrity',
+        61: 'error-integrity',
+        106: 'unpacked'
       };
     },
     // eslint-disable-next-line vue/return-in-computed-property
@@ -65,14 +70,19 @@ export default {
         case UploadedFileStatus.CONVERTING:
         case UploadedFileStatus.DEPLOYING:
         case UploadedFileStatus.EXTRACTED:
+        case 50:
+        case 60:
           return 'info';
         case UploadedFileStatus.CONVERTED:
         case UploadedFileStatus.DEPLOYED:
+        case 106:
           return 'success';
         case UploadedFileStatus.ERROR_FORMAT:
         case UploadedFileStatus.ERROR_CONVERSION:
         case UploadedFileStatus.ERROR_DEPLOYMENT:
         case UploadedFileStatus.ERROR_EXTRACTION:
+        case 51:
+        case 61:
           return 'danger';
       }
     },
