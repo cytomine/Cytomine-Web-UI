@@ -32,6 +32,7 @@ import view from './image_modules/view';
 import review from './image_modules/review';
 import tracks from './image_modules/tracks';
 import annotationsList from './image_modules/annotations-list';
+import controls from './image_modules/controls';
 
 import Vue from 'vue';
 import _ from 'lodash';
@@ -395,6 +396,7 @@ export default {
     review,
     tracks,
     annotationsList,
+    controls
   }
 };
 
