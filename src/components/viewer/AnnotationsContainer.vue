@@ -3,7 +3,7 @@
     <annotation-details-container
       v-if="isPanelDisplayed('annotation-main')"
       :index="index"
-      @select="selectAnnotation({annot: $event})"
+      @select="selectAnnotation"
       @centerView="centerView({annot: $event, sameView: true})"
       @addTerm="addTerm"
       @addTrack="addTrack"
@@ -81,8 +81,8 @@ export default {
       this.$eventBus.$emit('deleteAnnotation', annot);
     },
 
-    selectAnnotation({annot, sameView=false}) {
-      let index = (sameView) ? this.index : null;
+    selectAnnotation({annot, options}) {
+      let index = (options.trySameView) ? this.index : null;
       this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
     },
 
