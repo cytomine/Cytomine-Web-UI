@@ -1037,6 +1037,7 @@ in-this-slice,in this slice,dans ce plan,
 link-mode,Mode,Mode,
 absolute-link-mode,Absolute,Absolu,
 relative-link-mode,Relative,Relatif,
+too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.,,
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
