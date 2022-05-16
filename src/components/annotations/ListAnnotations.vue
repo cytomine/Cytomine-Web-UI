@@ -404,7 +404,6 @@ export default {
         case 'reviewed':
           return this.reviewedAnnotationOption;
       }
-      throw new Error('Cannot find annotation type ' + this.$route.query.type);
     },
 
     allUsers() {
