@@ -165,7 +165,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotations-container :index="index" :view="$refs.view" />
+    <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -254,12 +254,15 @@ export default {
 
       baseSource: null,
       routedAnnotation: null,
+      selectedAnnotation: null,
 
       timeoutSavePosition: null,
 
       loading: true,
 
-      overview: null
+      overview: null,
+
+      format: new WKT(),
     };
   },
   computed: {
@@ -403,8 +406,9 @@ export default {
 
     layersToPreload() {
       let layers = [];
-      if(this.routedAnnotation) {
-        layers.push(this.routedAnnotation.type === AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
+      let annot = this.selectedAnnotation || this.routedAnnotation;
+      if(annot) {
+        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : annot.user);
       }
       if(this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);
@@ -482,18 +486,9 @@ export default {
 
     async viewMounted() {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
-
-      if(this.routedAnnotation) { // center view on annotation
-        let annot = this.routedAnnotation;
-        let geometry = new WKT().readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
-
-        // HACK: center set by view.fit() is incorrect => reset it manually
-        this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
-          : [annot.centroid.x, annot.centroid.y];
-        // ---
+      if(this.routedAnnotation) {
+        this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
-
       this.savePosition();
     },
 
@@ -566,6 +561,60 @@ export default {
         zoom: this.idealZoom,
         center: [this.image.width/2, this.image.height/2]
       });
+    },
+
+    async centerViewOnAnnot(annot, duration) {
+      if (annot.image === this.image.id) {
+        if (!annot.location) {
+          //in case annotation location has not been loaded
+          annot = await Annotation.fetch(annot.id);
+        }
+
+        let geometry = this.format.readGeometry(annot.location);
+        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+
+        // HACK: center set by view.fit() is incorrect => reset it manually
+        this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
+          : [annot.centroid.x, annot.centroid.y];
+        // ---
+      }
+    },
+
+    async selectAnnotationHandler({index, annot, center=false, showComments=false}) {
+      if (this.index === index && annot.image === this.image.id) {
+        try {
+          let sliceChange = false;
+          if (!annot.slice) {
+            //in case annotation slice has not been loaded
+            annot = await Annotation.fetch(annot.id);
+          }
+
+          if(annot.slice !== this.slice.id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+            this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            sliceChange = true;
+          }
+
+          if (showComments) {
+            this.$store.commit(this.imageModule + 'setShowComments', annot);
+          }
+
+          this.selectedAnnotation = annot; // used to pre-load annot layer
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+          this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
+
+          if (center) {
+            await this.viewMounted();
+            let duration = (sliceChange) ? undefined : 500;
+            this.centerViewOnAnnot(annot, duration);
+          }
+        }
+        catch(error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        }
+      }
     },
 
     isPanelDisplayed(panel) {
@@ -657,21 +706,35 @@ export default {
       this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
     });
 
-    let idRoutedAnnot = this.$route.params.idAnnotation;
-    if(idRoutedAnnot) {
+    let annot = this.imageWrapper.routedAnnotation;
+    if (!annot) {
+      let idRoutedAnnot = this.$route.params.idAnnotation;
+      if (idRoutedAnnot) {
+        try {
+          annot = await Annotation.fetch(idRoutedAnnot);
+        }
+        catch (error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        }
+      }
+    }
+
+    if (annot) {
       try {
-        let annot = await Annotation.fetch(idRoutedAnnot);
-        if(annot.image === this.image.id) {
-          if(annot.slice !== this.slice.id) {
+        if (annot.image === this.image.id) {
+          if (annot.slice !== this.slice.id) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
           this.routedAnnotation = annot;
-          if(this.routedAction === 'comments') {
+          if (this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         }
+
+        this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       }
       catch(error) {
         console.log(error);
@@ -692,11 +755,13 @@ export default {
   mounted() {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };

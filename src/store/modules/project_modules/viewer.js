@@ -97,10 +97,13 @@ export default {
       router.replace(getters.pathViewer({idAnnotation, action}));
     },
 
-    async addImage({state, commit, getters, dispatch}, {image, slice}) {
+    async addImage({state, commit, getters, dispatch}, {image, slice, annot=null}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
+      if (annot) {
+        commit(`images/${index}/setRoutedAnnotation`, annot);
+      }
       await dispatch(`images/${index}/initialize`, {image, slice});
       dispatch('changePath');
     },
