@@ -188,6 +188,8 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showLink: true,
+        showImageGroup: true,
         showWKT: this.isInViewer,
         showImage: this.tooManyImages,
         showSlice: true,
