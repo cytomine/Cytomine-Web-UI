@@ -320,7 +320,7 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
-    <div class="repeat-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+    <div v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
         :disabled="disabledPaste"
         v-tooltip="$t('paste-repeat')"
@@ -329,11 +329,11 @@
       >
       <span class="icon is-small">
         <i class="fas fa-paste"></i>
-        <i class="fas fa-star"></i>
+        <i class="fas fa-star special-paste-icon"></i>
       </span>
       </button>
 
-      <div class="repeat-container" v-show="showRepeatSelector">
+      <div class="special-paste-container" v-show="showRepeatSelector">
         <p>
           <i18n path="paste-repeat-info">
             <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
@@ -346,6 +346,45 @@
 
       </div>
     </div>
+    <div class="special-paste-selection" v-click-outside="() => showPasteAndLinkModal = false" v-if="isInImageGroup">
+      <button
+        :disabled="disabledPaste || !linkableCopiedAnnot"
+        v-tooltip="$t('paste-with-link')"
+        class="button"
+        @click="openPasteWithLinkModal()"
+      >
+        <span class="icon is-small">
+          <i class="fas fa-paste"></i>
+          <i class="fas fa-link special-paste-icon"></i>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="buttons has-addons are-small"
+       v-if="isInImageGroup && (isToolDisplayed('link') || isToolDisplayed('unlink'))">
+    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false">
+      <button
+          :disabled="isToolDisabled('link')"
+          v-tooltip="$t('link')"
+          class="button"
+          :class="{'is-selected': showAnnotationLinkSelector}"
+          @click="showAnnotationLinkSelector = !showAnnotationLinkSelector"
+      >
+        <span class="icon is-small"><i class="fas fa-link"></i></span>
+      </button>
+      <div class="special-paste-container" v-if="showAnnotationLinkSelector">
+        <annotation-link-selector :index="index" />
+      </div>
+    </div>
+    <button
+        :disabled="isToolDisabled('unlink')"
+        v-tooltip="$t('unlink')"
+        class="button"
+        @click="confirmUnlink()"
+    >
+      <span class="icon is-small"><icon-unlink-annotations /></span>
+    </button>
   </div>
 
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
@@ -377,20 +416,29 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
+import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal';
+import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector';
 
 import WKT from 'ol/format/WKT';
 import {containsExtent} from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
-import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
+import {Cytomine, Annotation, AnnotationType, AnnotationLink} from 'cytomine-client';
+import {
+  Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
+  listAnnotationsInGroup
+} from '@/utils/annotation-utils';
+
 
 export default {
   name: 'draw-tools',
   components: {
+    AnnotationLinkSelector,
     TrackTree,
     OntologyTree,
     IconPolygonFreeHand,
-    IconLineFreeHand
+    IconLineFreeHand,
+    IconUnlinkAnnotations
   },
   props: {
     index: String
@@ -403,6 +451,8 @@ export default {
       showTrackSelector: false,
       searchStringTrack: '',
       showRepeatSelector: false,
+      showAnnotationLinkSelector: false,
+      showPasteAndLinkModal: false,
       nbRepeats: 2,
     };
   },
@@ -425,6 +475,9 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    imageGroupId() {
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     slice() {
       return this.imageWrapper.activeSlice;
@@ -461,6 +514,9 @@ export default {
       set(tracks) {
         this.$store.commit(this.imageModule + 'setTracksNewAnnots', tracks);
       }
+    },
+    isInImageGroup() {
+      return this.imageGroupId !== null;
     },
     backgroundTracksNewAnnot() {
       if(this.tracksToAssociate.length === 1) {
@@ -526,6 +582,9 @@ export default {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
     },
+    linkableCopiedAnnot() {
+      return this.isInImageGroup && this.copiedAnnot && this.copiedAnnot.imageGroup === this.imageGroupId;
+    },
     disabledPaste() {
       return this.disabledDraw || !this.copiedAnnot;
     },
@@ -568,8 +627,15 @@ export default {
         return false;
       }
 
+      if (tool === 'link') {
+        return !this.isInImageGroup;
+      }
+
       let ftr = this.selectedFeature;
       let annot = ftr.properties.annot;
+      if (tool === 'unlink') {
+        return annot.group == null;
+      }
       if(tool === 'accept') {
         return annot.type === AnnotationType.REVIEWED;
       }
@@ -614,6 +680,7 @@ export default {
       try {
         await annot.fill();
         this.$eventBus.$emit('editAnnotation', annot);
+        this.$eventBus.$emit('reloadAnnotationCrop', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
       }
       catch(err) {
@@ -632,6 +699,32 @@ export default {
       try {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
+        if (annot.group) {
+          let editedAnnots = [];
+          if (annot.annotationLink.length === 2) {
+            // If there were 2 links, the group has been deleted by backend
+            let otherId = annot.annotationLink.filter(al => al.annotation !== annot.id)[0].annotation;
+            let other = await Annotation.fetch(otherId);
+            other.imageGroup = annot.imageGroup;
+            await updateTermProperties(other);
+            await updateTrackProperties(other);
+            await updateAnnotationLinkProperties(other);
+
+            editedAnnots = [other];
+          }
+          else {
+            editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
+          }
+          editedAnnots.forEach(a => {
+            this.$eventBus.$emit('editAnnotation', a);
+            if (this.copiedAnnot && a.id === this.copiedAnnot.id) {
+              let copiedAnnot = this.copiedAnnot.clone();
+              copiedAnnot.annotationLink = a.annotationLink;
+              copiedAnnot.group = a.group;
+              this.copiedAnnot = copiedAnnot;
+            }
+          });
+        }
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }
@@ -651,6 +744,17 @@ export default {
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.deleteAnnot()
+      });
+    },
+
+    openPasteWithLinkModal() {
+      this.$buefy.modal.open({
+        component: PasteAnnotationWithLinkModal,
+        parent: this,
+        hasModalCard: true,
+        props: {
+          index: this.index
+        }
       });
     },
 
@@ -705,6 +809,7 @@ export default {
         annot.userByTerm = this.copiedAnnot.term.map(term => {
           return {term, user: [this.currentUser.id]};
         });
+        annot.imageGroup = this.imageGroupId;
         // ----
 
         this.$eventBus.$emit('addAnnotation', annot);
@@ -729,6 +834,70 @@ export default {
       catch(err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
+      }
+    },
+
+    confirmUnlink() {
+      if(!this.selectedFeature) {
+        return;
+      }
+
+      this.$buefy.dialog.confirm({
+        title: this.$t('confirm-deletion'),
+        message: this.$t('confirm-deletion-annotation-link'),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => this.unlink()
+      });
+    },
+    async unlink() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.activateEditTool(null);
+
+      try {
+        let annot = feature.properties.annot;
+        if (!annot.group) {
+          return;
+        }
+        await AnnotationLink.delete(annot.id, annot.group);
+        let updatedAnnot = annot.clone();
+        await updateAnnotationLinkProperties(updatedAnnot);
+
+        let editedAnnots = [];
+        if (annot.annotationLink.length === 2) {
+          // If there were 2 links, the group has been deleted by backend
+          let otherId = annot.annotationLink.filter(al => al.annotation !== annot.id)[0].annotation;
+          let other = await Annotation.fetch(otherId);
+          other.imageGroup = annot.imageGroup;
+          await updateTermProperties(other);
+          await updateTrackProperties(other);
+          await updateAnnotationLinkProperties(other);
+
+          editedAnnots = [updatedAnnot, other];
+        }
+        else {
+          editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
+        }
+
+        editedAnnots.forEach(annot => {
+          this.$eventBus.$emit('editAnnotation', annot);
+          if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
+            let copiedAnnot = this.copiedAnnot.clone();
+            copiedAnnot.annotationLink = annot.annotationLink;
+            copiedAnnot.group = annot.group;
+            this.copiedAnnot = copiedAnnot;
+          }
+        });
+        this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-deletion')});
       }
     },
 
@@ -797,8 +966,10 @@ export default {
         let jsonAnnot = model.annotation || model.reviewedannotation;
         if(jsonAnnot) {
           let annot = new Annotation(jsonAnnot);
+          annot.imageGroup = this.imageGroupId;
           await updateTermProperties(annot);
           await updateTrackProperties(annot);
+          await updateAnnotationLinkProperties(annot);
           return annot;
         }
       }
@@ -1014,7 +1185,7 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection, .track-selection, .repeat-selection {
+.term-selection, .track-selection, .special-paste-selection {
   position: relative;
 }
 
@@ -1025,18 +1196,21 @@ export default {
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .repeat-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .special-paste-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
   margin-top: 5px;
-  background: white;
   min-width: 18em;
   max-width: 20vw;
   max-height: 40vh;
   overflow: auto;
+}
+
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border-radius: 4px;
+  background: white;
 }
 
 .term-selection:not(.has-preview) .color-preview, .track-selection:not(.has-preview) .color-preview {
@@ -1079,7 +1253,7 @@ export default {
 $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
-  .repeat-selection .repeat-container {
+  .special-paste-selection .special-paste-container {
     p {
       margin: 0.75em;
       font-size: 0.9em;
@@ -1115,7 +1289,7 @@ $colorActiveIcon: #fff;
     height: 1.15em !important;
   }
 
-  .icon .fa-star {
+  .icon .special-paste-icon {
     font-size: 0.5em;
     position: absolute;
     right: 0.2rem;

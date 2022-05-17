@@ -21,7 +21,8 @@ export default {
       center: [0, 0],
       rotation: 0,
       digitalZoom: true,
-      overviewCollapsed: false
+      overviewCollapsed: false,
+      highlighted: false
     };
   },
 
@@ -44,6 +45,10 @@ export default {
 
     setOverviewCollapsed(state, value) {
       state.overviewCollapsed = value;
+    },
+
+    setHighlighted(state, value) {
+      state.highlighted = value;
     }
   },
 

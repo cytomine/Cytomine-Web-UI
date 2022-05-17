@@ -501,6 +501,8 @@ shortcut-viewer-nav-next-image,Go to next image,Aller à l'image suivante,Ir a l
 shortcut-viewer-nav-previous-image,Go to previous image,Aller à l'image précédente,Ir a la imagen anterior
 shortcut-viewer-nav-next-image-in-group,Go to next image in group,Aller à l'image suivante dans le groupe,
 shortcut-viewer-nav-previous-image-in-group,Go to previous image in group,Aller à l'image précédente dans le groupe,
+shortcut-viewer-nav-next-annot-link,Go to next linked annotation,Aller à l'annotation liée suivante,
+shortcut-viewer-nav-previous-annot-link,Go to previous linked annotation,Aller à l'annotation liée précédente,
 draw,Draw,Outils d'annotations,Herramientas de anotación
 shortcut-viewer-tool-select,Select annotation,Sélectionner une annotation,Seleccionar anotación
 shortcut-viewer-tool-point,Draw a point,Dessiner un point,Dibujar un punto
@@ -1084,6 +1086,35 @@ notif-error-image-group-link-deletion,Failed to remove image {imageName} from it
 notif-success-image-group-link-creation,Image {imageName} was successfully added to an image group,L'image {imageName} a été ajoutée à un groupe d'images
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images
 no-image-group,No image group,Aucun groupe d'images
+annotation-links,Annotation links,Liens entre annotations
+paste-with-link,Paste with link,Coller avec un lien
+eligible-images-in-this-viewer,Currently displayed images from {imageGroup} image group,Images du groupe d'images {imageGroup} actuellement affichées
+eligible-images-not-in-this-viewer,Currently hidden images from {imageGroup} image group,Images du groupe d'images {imageGroup} actuellement non affichées
+paste-with-link-info,Select image(s) where to paste and link the copied annotation:,Sélectionner la ou les image(s) où coller et lier l'annotation copiée:
+all-images-have-linked-annot,All images in the image group already have annotations linked to the copied annotation.,Toutes les images du groupe d'images ont déjà une annotation liée à l'annotation copiée.
+notif-success-annotation-link-paste,Annotation successfully pasted and linked,L'annotation a été collée en créant des liens avec succès
+notif-error-annotation-link-paste,Failed to paste and link annotation,Une erreur a empêché de coller et lier l'annotation
+viewer-center-position,viewer center position,centre du visualisateur
+image-center-position,image center position,centre de l'image
+annotation-position,original annotation position,position de l'annotation originale
+at,at,au
+linked-annotations,Linked annotations,Annotations liées
+no-linked-annotation,No linked annotation,Aucune annotation liée
+button-show-linked-annots,Show all linked annotations,Montrer toutes les annotations liées
+open-view-select-annot-to-link,Open another view with an image from the same image group and select annotation to link with.,Une nouvelle vue avec une image du même groupe d'images doit être ouverte avec l'annotation à lier sélectionnée.
+selection-in-view,Selection in view {number},Sélection dans la vue {number}
+different-image-group,Incompatible image group,Groupe d'image incompatible
+already-linked,Already linked,Déjà lié
+no-selected-annot,No selected annotation,Pas d'annotation sélectionnée
+link,Link,Lier
+unlink,Unlink,Dissocier
+notif-success-annotation-link-creation,Annotation successfully linked,L'annotation a été liée avec succès
+notif-error-annotation-link-creation,Failed to link annotation,Une erreur a empêché de lier l'annoation
+notif-success-annotation-link-deletion,Annotation successfully unlinked,L'annotation a été dissociée avec succès
+notif-error-annotation-link-deletion,Failed to unlink annotation,Une erreur a empêché de dissocier l'annotation
+confirm-deletion-annotation-link,Are you sure you want to delete the links of this annotation?,Êtes-vous sûr de vouloir supprimer les liens de cette annotation ?
+count-copied-annot-links,Copied annotation has no other link.|Copied annotation already has <strong>one</strong> link.|Copied annotation already has <strong>{count}</strong> links.,L'annotation copiée n'a pas de lien.|L'annotation copiée a déjà <strong>un</strong> lien.|L'annotation copiée a déjà <strong>{count}</strong> liens.
+group-linked-annotations,Group linked annotations,Grouper les annotations liées
 add-images-to-image-group,Add images to image group,Ajouter des images au groupe d'images
 already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'images
 already-in-other-image-group,Already in another image group,Déjà dans un autre groupe d'images
@@ -1093,6 +1124,11 @@ notif-error-image-group-creation,Failed to create image group,Une erreur a empê
 button-add-image-group,Add image group,Ajouter un groupe d'images
 button-previous-image-in-group,Previous image in group,Image précédente dans le groupe
 button-next-image-in-group,Next image in group,Image suivante dans le groupe
+button-previous-annot-link,Previous link,Lien précédent
+button-next-annot-link,Next link,Lien suivant
 open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de
 open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to}
 open-image-index,Open image {index},Ouvrir l'image {index}
+warning-more-links-than-images,There will be more linked annotations (<strong>{nbLinks}</strong>) than images in this group (<strong>{nbImages}</strong>),Il va y avoir plus d'annotations liées (<strong>{nbLinks}</strong>) que d'images dans ce groupe (<strong>{nbImages}</strong>)
+confirm-annotation-link,Confirm annotation linking,Confirmer la création des liens entre annotations
+confirm-annotation-group-merge,The two annotations you are about to link already each have links with different annotations.<br>Are you sure to link these two annotations and their respective existing links?<br>This action can only be undone by unlinking annotations one by one.,Les deux annotations que vous êtes sur le point de lier ont déjà chacune des liens avec des annotations différentes.<br>Êtes-vous certain de vouloir lier ces deux annotations et leurs liens respectifs ?<br>Cette action ne peut être annulée qu'en déliant les annotations une par une.

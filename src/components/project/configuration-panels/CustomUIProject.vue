@@ -59,6 +59,7 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
 
 export default {
   name: 'custom-ui-project',
@@ -128,6 +129,7 @@ export default {
             {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-linked-annotations', label: 'linked-annotations', icon: 'fas fa-link', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment', parentConfiguration: 'project-explore-annotation-main'}
           ]
@@ -160,6 +162,8 @@ export default {
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-link', label: 'link', icon: 'fas fa-link', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-unlink', label: 'unlink', iconComponent: IconUnlinkAnnotations, parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo', parentConfiguration: 'project-tools-main'},
           ]
         }
