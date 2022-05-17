@@ -550,8 +550,6 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.selectedTrackOptions;
-        case 'IMAGEGROUP':
-          return this.selectedImageGroups;
       }
     },
     limitedCategoryOptions() {
