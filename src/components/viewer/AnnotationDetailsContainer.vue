@@ -39,7 +39,7 @@
       <annotation-details
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
-        :images="[image]"
+        :images="images"
         :profiles="profiles"
         :tracks="tracks"
         :users="allUsers"
@@ -56,7 +56,21 @@
         @deletion="$emit('delete', annot)"
       />
     </div>
+
+    <!-- HACK for prev/next linked annotation shortkeys -->
+    <annotation-links-preview
+        v-show="false"
+        :index="index"
+        :show-main-annotation="false"
+        :show-select-all-button="false"
+        :allow-annotation-selection="true"
+        :annotation="selectedFeature.properties.annot"
+        :images="images"
+        @select="$emit('select', $event)"
+    />
   </vue-draggable-resizable>
+
+
 </div>
 </template>
 
@@ -66,10 +80,11 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
 export default {
   name: 'annotations-details-container',
-  components: {VueDraggableResizable, AnnotationDetails},
+  components: {AnnotationLinksPreview, VueDraggableResizable, AnnotationDetails},
   props: {
     index: String,
   },
@@ -94,6 +109,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
     },
     profiles() {
       return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];

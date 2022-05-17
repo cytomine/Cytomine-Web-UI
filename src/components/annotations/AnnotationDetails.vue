@@ -149,6 +149,24 @@
         </td>
       </tr>
 
+      <template v-if="isPropDisplayed('linked-annotations')">
+        <tr>
+          <td colspan="2">
+            <h5>{{$t('linked-annotations')}}</h5>
+              <annotation-links-preview
+                  :size="linkCropSize"
+                  :link-color="linkColor"
+                  :show-main-annotation="false"
+                  :show-select-all-button="!showImageInfo"
+                  :allow-annotation-selection="true"
+                  :annotation="annotation"
+                  :images="images"
+                  @select="$emit('select', $event)"
+              />
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -235,6 +253,7 @@ import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
 export default {
   name: 'annotations-details',
@@ -248,7 +267,8 @@ export default {
     AttachedFiles,
     AnnotationCommentsModal,
     TrackTree,
-    CytomineTrack
+    CytomineTrack,
+    AnnotationLinksPreview
   },
   props: {
     annotation: {type: Object},
@@ -269,6 +289,8 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      linkCropSize: 64,
+      linkColor: '696969'
     };
   },
   computed: {

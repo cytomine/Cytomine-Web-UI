@@ -20,10 +20,13 @@
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-  <div class="annot-preview">
+  <div class="annot-preview" :class="{clickable}">
     <div :style="styleAnnotDetails" @click.self="viewAnnot(sameViewOnClick)">
-      <button class="button is-small" @click="opened = !opened" ref="previewButton">
+      <button class="button is-small" @click="opened = !opened" ref="previewButton" v-if="showDetails">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
+      </button>
+      <button class="button is-small" @click="viewAnnot()" v-else-if="clickable && sameViewOnClick">
+        <i class="fas fa-external-link-alt"></i>
       </button>
 
     </div>
@@ -59,7 +62,6 @@
 </template>
 
 <script>
-import AnnotationDetails from './AnnotationDetails';
 
 export default {
   name: 'annotation-preview',
@@ -71,14 +73,19 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
+    showDetails: {type: Boolean, default: true},
     showImageInfo: {type: Boolean, default: true},
     showSliceInfo: {type: Boolean, default: false},
+    clickable: {type: Boolean, default: true},
     sameViewOnClick: {type: Boolean, default: false}
   },
-  components: {AnnotationDetails},
+  components: {
+    AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
+  },
   data() {
     return {
-      opened: false
+      opened: false,
+      revisionCrop: 0
     };
   },
   computed: {
@@ -99,7 +106,9 @@ export default {
   },
   methods: {
     viewAnnot(trySameView=false) {
-      this.$emit('select', {annot: this.annot, options:{trySameView}});
+      if (this.clickable) {
+        this.$emit('select', {annot: this.annot, options:{trySameView}});
+      }
     },
     close(event) {
       if(!this.opened) {
@@ -121,7 +130,19 @@ export default {
     handleDeletion() {
       this.$eventBus.$emit('deleteAnnotation', this.annot);
       this.$emit('update');
+    },
+    reloadAnnotationCropHandler(annot) {
+      if (annot.id === this.annot.id) {
+        this.revisionCrop++;
+      }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
+  },
+  beforeDestroy() {
+    // unsubscribe from all events
+    this.$eventBus.$off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }
 };
 </script>
@@ -134,8 +155,11 @@ export default {
   margin: 10px;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border: 3px solid white;
-  cursor: pointer;
   text-align: right;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .annot-preview .button {
