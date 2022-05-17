@@ -434,7 +434,9 @@ export default {
           if(/\d:\d*/.test(a.value) && /\d:\d*/.test(b.value)) {
             let first = a.value.match(/\d:\d*/)[0];
             let second = b.value.match(/\d:\d*/)[0];
-            return first.split(':')[0]/first.split(':')[1] < second.split(':')[0]/second.split(':')[1];
+            if(first.split(':')[0]/first.split(':')[1] < second.split(':')[0]/second.split(':')[1])
+              return 1;
+            else return -1;
           }
           else {
             return a.value.localeCompare(b.value);
