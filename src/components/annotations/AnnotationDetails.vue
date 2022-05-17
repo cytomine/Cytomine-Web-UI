@@ -25,6 +25,13 @@
         </td>
       </tr>
 
+      <tr v-if="showChannelInfo">
+        <td><strong>{{$t('channel')}}</strong></td>
+        <td>
+          <channel-name :channel="sliceChannel" />
+        </td>
+      </tr>
+
       <template v-if="isPropDisplayed('geometry-info')">
         <tr v-if="annotation.area > 0">
           <td><strong>{{$t('area')}}</strong></td>
@@ -264,10 +271,12 @@ import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'annotations-details',
   components: {
+    ChannelName,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -285,8 +294,10 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    slices: {type: Array, default: () => []},
     profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
@@ -329,6 +340,9 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+    },
+    sliceChannel() {
+      return this.slices.find(slice => slice.id === this.annotation.slice) || {};
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;

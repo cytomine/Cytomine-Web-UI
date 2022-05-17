@@ -81,6 +81,7 @@ import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 import constants from '@/utils/constants';
+import _ from 'lodash';
 
 export default {
   name: 'list-annotations-by',
@@ -275,8 +276,14 @@ export default {
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
     },
-    activeSlice() {
-      return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
+    activeSlices() {
+      return (this.imageWrapper) ? this.imageWrapper.activeSlices : null;
+    },
+    activeSlicesIds() {
+      return (this.activeSlices) ? this.activeSlices.map(slice => slice.id) : [];
+    },
+    activeSliceWithSmallestRank() {
+      return (this.activeSlices) ? _.orderBy(this.activeSlices, ['rank'])[0] : null;
     },
 
     annotationIds() {
@@ -321,7 +328,7 @@ export default {
         this.fetchPage();
       }
     },
-    activeSlice() {
+    activeSlices() {
       this.findPage();
     }
   },
@@ -343,7 +350,7 @@ export default {
     async findPage() {
       if (this.isInViewer) {
         let countCollection = this.collection.clone();
-        countCollection.beforeSlice = this.activeSlice.id;
+        countCollection.beforeSlice = this.activeSliceWithSmallestRank;
         countCollection.max = 1;
         this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
       }

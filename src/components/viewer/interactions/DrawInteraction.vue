@@ -75,7 +75,8 @@ export default {
       return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
     },
     activeTool() {
       return this.imageWrapper.draw.activeTool;

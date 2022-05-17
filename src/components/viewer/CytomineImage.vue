@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slice.imageServerUrl"
+          :crossOrigin="slices[0].imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -292,8 +292,14 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
+    },
+    sliceChannels() {
+      return this.slices.map(slice => slice.channel);
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -387,12 +393,20 @@ export default {
       if (this.imageWrapper.colors.inverse) {
         params.colormaps = '!DEFAULT';
       }
+      let filterIntensities = (this.sliceChannels.length !== this.image.extrinsicChannels) &&
+        (this.image.channels === this.image.extrinsicChannels);
       let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      if (filterIntensities) {
+        minIntensities = minIntensities.filter((_, index) => this.sliceChannels.includes(index));
+      }
       if (minIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.min_intensities = minIntensities.join(',');
       }
       let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
+      if (filterIntensities) {
+        maxIntensities = maxIntensities.filter((_, index) => this.sliceChannels.includes(index));
+      }
       if (maxIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.max_intensities = maxIntensities.join(',');
@@ -401,12 +415,15 @@ export default {
       return params;
     },
     baseLayerSliceParams() {
-      // TODO: channels !
-      return {
+      let params = {
         // eslint-disable-next-line camelcase
-        z_slices: this.slice.zStack,
-        timepoints: this.slice.time
+        z_slices: this.slices[0].zStack,
+        timepoints: this.slices[0].time
       };
+      if (this.slices.length < this.image.channels) {
+        params.channels = this.sliceChannels;
+      }
+      return params;
     },
     baseLayerURLQuery() {
       let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
@@ -416,7 +433,8 @@ export default {
       return query;
     },
     baseLayerURLs() {
-      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+      let slice = this.slices[0];
+      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
     colorManipulationOn() {
@@ -564,7 +582,7 @@ export default {
         try {
           await UserPosition.create({
             image: this.image.id,
-            slice: this.slice.id,
+            slice: this.slices[0].id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -755,8 +773,9 @@ export default {
 
     if (annot) {
       try {
-        if (annot.image === this.image.id) {
-          if (annot.slice !== this.slice.id) {
+        let annot = await Annotation.fetch(idRoutedAnnot);
+        if(annot.image === this.image.id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }

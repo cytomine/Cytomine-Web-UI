@@ -18,29 +18,44 @@
     <!-- ----- CHANNELS ----- -->
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
-      <image-controls-shift-buttons
-        :index="index"
-        :forward="false"
-        :current="currentSlice.channel"
-        :size="image.channels"
-        dimension="channel"
-        @shift="shift('channel', $event)"
-      />
+      <template v-if="areChannelsMergeable">
+        <b-select v-model="currentChannels" size="is-small" class="channel-selector" expanded>
+          <option v-for="channel in channelOptions" :key="channel.name" :value="channel.value">
+            <channel-name :channel="channel" />
+          </option>
+        </b-select>
 
-      <cytomine-slider
-        v-model="currentChannel"
-        :max="image.channels - 1"
-        :integer-only="true"
-        class="image-dimension-slider" />
+      </template>
+      <template v-else>
+        <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.channel"
+          :size="image.channels"
+          dimension="channel"
+          @shift="shift('channel', $event)"
+        />
 
-      <image-controls-shift-buttons
+        <cytomine-slider
+          v-model="currentChannel"
+          :max="image.channels - 1"
+          :integer-only="true"
+          class="image-dimension-slider"
+        >
+          <template v-if="hasChannelName" #default="{ value }">
+            {{channelValue(value) || "?"}}
+          </template>
+        </cytomine-slider>
+
+        <image-controls-shift-buttons
           :index="index"
           :forward="true"
           :current="currentSlice.channel"
           :size="image.channels"
           dimension="channel"
           @shift="shift('channel', $event)"
-      />
+        />
+      </template>
     </div>
 
 
@@ -120,10 +135,13 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import constants from '@/utils/constants';
+import _ from 'lodash';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'image-controls',
-  components: {ImageControlsShiftButtons, CytomineSlider},
+  components: {ChannelName, ImageControlsShiftButtons, CytomineSlider},
   props: {
     index: String
   },
@@ -146,15 +164,32 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    channels() {
+      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
+    },
+    currentSlices() {
+      return this.imageWrapper.activeSlices;
+    },
     currentSlice() {
-      return this.imageWrapper.activeSlice;
+      return this.currentSlices[0];
     },
     nbSlices() {
       return this.image.depth * this.image.duration * this.image.channels;
     },
+    showMultiChannels() {
+      return this.currentChannels.length > 1;
+    },
     currentChannel: {
       get() {
         return this.currentSlice.channel;
+      },
+      async set(value) {
+        await this.seek([value], this.currentSlice.zStack, this.currentSlice.time);
+      }
+    },
+    currentChannels: {
+      get() {
+        return this.currentSlices.map(slice => slice.channel);
       },
       async set(value) {
         await this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
@@ -165,7 +200,7 @@ export default {
         return this.currentSlice.zStack;
       },
       async set(value) {
-        await this.seek(this.currentSlice.channel, value, this.currentSlice.time);
+        await this.seek(this.currentChannels, value, this.currentSlice.time);
       }
     },
     currentTime: {
@@ -173,7 +208,7 @@ export default {
         return this.currentSlice.time;
       },
       async set(value) {
-        await this.seek(this.currentSlice.channel, this.currentSlice.zStack, value);
+        await this.seek(this.currentChannels, this.currentSlice.zStack, value);
       }
     },
     hasChannels() {
@@ -187,27 +222,50 @@ export default {
     },
     isImageMultidimensional() {
       return this.hasChannels || this.hasDuration || this.hasDepth;
+    },
+    sliceInstances() {
+      return this.imageWrapper.sliceInstances;
+    },
+    hasChannelName() {
+      return this.currentSlice.channelName !== null;
+    },
+    areChannelsMergeable() {
+      return this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS;
+    },
+    allChannelsOption() {
+      return {
+        name: this.$t('all-channels'),
+        value: _.range(0, this.image.extrinsicChannels)
+      };
+    },
+    channelOptions() {
+      let options = this.channels.map(channel => ({value: [channel.index], ...channel}));
+      options.unshift(this.allChannelsOption);
+      return options;
     }
-
   },
   methods: {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    channelValue(channel) {
+      let info = this.channels[channel];
+      return (info) ? info.name : null;
     },
 
     async goToRank(rank) {
       await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
-    async seek(channel, zStack, time) {
-      await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition', {time, channel, zStack});
+    async seek(channels, zStack, time) {
+      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', {channels, zStack, time});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
     async shift(dimension, increment) {
-      let time = (dimension === 'time') ? this.currentSlice.time + increment : this.currentSlice.time;
-      let channel = (dimension === 'channel') ? this.currentSlice.channel + increment : this.currentSlice.channel;
-      let zStack = (dimension === 'zStack') ? this.currentSlice.zStack + increment : this.currentSlice.zStack;
-      await this.seek(channel, zStack, time);
+      let time = (dimension === 'time') ? this.currentTime + increment : this.currentTime;
+      let channels = (dimension === 'channel') ? [this.currentChannel + increment] : this.currentChannels;
+      let zStack = (dimension === 'zStack') ? this.currentZStack + increment : this.currentZStack;
+      await this.seek(channels, zStack, time);
     },
     canShiftForward(dimension) {
       switch (dimension) {
@@ -273,20 +331,24 @@ export default {
           this.currentZStack = this.image.depth - 1;
           return;
         case 'nav-next-c':
-          if (this.canShiftForward('channel')) {
+          if (!this.showMultiChannels && this.canShiftForward('channel')) {
             this.currentChannel++;
           }
           return;
         case 'nav-previous-c':
-          if (this.canShiftBackward('channel')) {
+          if (!this.showMultiChannels && this.canShiftBackward('channel')) {
             this.currentChannel--;
           }
           return;
         case 'nav-first-c':
-          this.currentChannel = 0;
+          if (!this.showMultiChannels) {
+            this.currentChannel = 0;
+          }
           return;
         case 'nav-last-c':
-          this.currentChannel = this.image.channels - 1;
+          if (!this.showMultiChannels) {
+            this.currentChannel = this.image.channels - 1;
+          }
           return;
         case 'nav-next-slice':
           if (this.canShiftForward('rank')) {
@@ -299,10 +361,10 @@ export default {
           }
           return;
         case 'nav-first-slice':
-          await this.seek(0, 0, 0);
+          await this.seek([0], 0, 0);
           return;
         case 'nav-last-slice':
-          await this.seek(this.image.channels - 1, this.image.depth - 1, this.image.duration - 1);
+          await this.seek([this.image.channels - 1], this.image.depth - 1, this.image.duration - 1);
           return;
       }
     }
@@ -336,8 +398,22 @@ export default {
   width: 1rem;
 }
 
+.buttons {
+  float:left;
+  margin: 1px;
+  margin-bottom: 0 !important;
+
+  .button {
+    margin-bottom: 0;
+  }
+}
+
 .image-dimension-slider {
   flex-grow: 3;
+}
+
+.channel-selector {
+  width: 100%;
 }
 
 </style>
