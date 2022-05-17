@@ -51,7 +51,8 @@
         @updateTerms="$emit('updateTermsOrTracks', annot)"
         @updateTracks="$emit('updateTermsOrTracks', annot)"
         @updateProperties="$emit('updateProperties')"
-        @centerView="$emit('centerView', annot)"
+        @select="$emit('select', $event)"
+        @centerView="$emit('centerView', ($event) ? $event : annot)"
         @deletion="$emit('delete', annot)"
       />
     </div>
@@ -71,7 +72,6 @@ export default {
   components: {VueDraggableResizable, AnnotationDetails},
   props: {
     index: String,
-    view: Object
   },
   data() {
     return {
