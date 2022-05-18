@@ -522,6 +522,8 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        default:
+          return [];
       }
     },
     isByTerm() {
