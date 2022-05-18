@@ -116,10 +116,11 @@ export default {
       this.imageWrapper.properties.selectedPropertyValues;
       this.imageWrapper.properties.selectedPropertyColor;
       this.imageWrapper.review.reviewMode;
-      this.imageWrapper.style.wrappedTracks.forEach(track => {
-        track.color;
-      });
-
+      if (this.imageWrapper.style.wrappedTracks) {
+        this.imageWrapper.style.wrappedTracks.forEach(track => {
+          track.color;
+        });
+      }
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];
       };

@@ -92,7 +92,7 @@ export default {
         width: reverse ? height : width,
         height: reverse ? width : height
       };
-    }
+    },
   },
   methods: {
     async rotate(val) {

@@ -393,6 +393,7 @@ export default {
     nbPerPage: sync('perPage', storeOptions),
     selectedColor: sync('outlineColor', storeOptions),
 
+    // eslint-disable-next-line vue/return-in-computed-property
     targetAnnotationType() {
       switch(this.$route.query.type) {
         case 'user':
@@ -521,6 +522,8 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        default:
+          return [];
       }
     },
     isByTerm() {
