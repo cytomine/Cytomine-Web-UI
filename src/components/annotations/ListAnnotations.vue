@@ -583,6 +583,8 @@ export default {
           return this.tracksOptions;
         case 'IMAGEGROUP':
           return this.imageGroups;
+        default:
+          return [];
       }
     },
     // eslint-disable-next-line vue/return-in-computed-property
