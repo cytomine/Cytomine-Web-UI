@@ -773,9 +773,8 @@ export default {
 
     if (annot) {
       try {
-        let annot = await Annotation.fetch(idRoutedAnnot);
-        if(annot.image === this.image.id) {
-          if(!this.sliceIds.includes(annot.slice)) {
+        if (annot.image === this.image.id) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
