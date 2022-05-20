@@ -11,6 +11,17 @@
       @updateProperties="updateProperties"
       @delete="handleDeletion"
     />
+    <annotations-list
+      class="annotations-table-wrapper"
+      :index="index"
+      @select="selectAnnotation"
+      @centerView="centerView"
+      @addTerm="addTerm"
+      @addTrack="addTrack"
+      @updateTermsOrTracks="updateTermsOrTracks"
+      @updateProperties="updateProperties"
+      @delete="handleDeletion"
+    />
   </div>
 </template>
 
@@ -20,6 +31,7 @@ import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annot
 
 import WKT from 'ol/format/WKT';
 
+import AnnotationsList from './AnnotationsList';
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
 import {listAnnotationsInGroup, updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
@@ -36,6 +48,7 @@ export default {
     };
   },
   components: {
+    AnnotationsList,
     AnnotationDetailsContainer,
   },
   computed: {
