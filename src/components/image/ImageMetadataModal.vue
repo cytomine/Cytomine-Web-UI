@@ -105,7 +105,7 @@ export default {
   },
   async created() {
     try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
       this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }
