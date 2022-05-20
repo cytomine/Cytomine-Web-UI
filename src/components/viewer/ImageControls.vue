@@ -19,8 +19,30 @@
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
       <template v-if="areChannelsMergeable">
-        <b-select v-model="currentChannels" size="is-small" class="channel-selector" expanded>
-          <option v-for="channel in channelOptions" :key="channel.name" :value="channel.value">
+        <b-select
+          :value="currentChannelsIndexesOption"
+          @input="setCurrentChannelsIndexes"
+          size="is-small"
+          class="channel-selector"
+          expanded
+        >
+          <option :value="null">
+            {{ $t('merged-channels')}}
+            <template v-if="currentChannelsIndexesOption === null">
+               ({{orderedCurrentChannels.length}}/{{image.channels}})
+              (<span
+                v-for="(channel, i) in orderedCurrentChannels"
+                :key="`${image.id}-${channel.index}-name-list`"
+              >
+                <channel-name :channel="channel"/><template v-if="i !== currentChannelsIndexes.length - 1">|</template>
+              </span>)
+            </template>
+          </option>
+          <option
+            v-for="channel in channelOptions"
+            :key="`${image.id}-${channel.value}-opt`"
+            :value="channel.value"
+          >
             <channel-name :channel="channel" />
           </option>
         </b-select>
@@ -37,7 +59,7 @@
         />
 
         <cytomine-slider
-          v-model="currentChannel"
+          v-model="currentChannelIndex"
           :max="image.channels - 1"
           :integer-only="true"
           class="image-dimension-slider"
@@ -72,7 +94,7 @@
       />
 
       <cytomine-slider
-        v-model="currentZStack"
+        v-model="currentZStackIndex"
         :max="image.depth - 1"
         :integer-only="true"
         class="image-dimension-slider" />
@@ -108,7 +130,7 @@
 <!--      </div>-->
 
       <cytomine-slider
-        v-model="currentTime"
+        v-model="currentTimeIndex"
         :max="image.duration - 1"
         :integer-only="true"
         class="image-dimension-slider"
@@ -134,7 +156,7 @@
 import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
 
-import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import {formatMinutesSeconds, slicePositionToRank} from '@/utils/slice-utils.js';
 import constants from '@/utils/constants';
 import _ from 'lodash';
 import ChannelName from '@/components/viewer/ChannelName';
@@ -165,7 +187,7 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     channels() {
-      return this.$store.getters[this.imageModule + 'extrinsicChannels'];
+      return this.$store.getters[this.imageModule + 'channels'];
     },
     currentSlices() {
       return this.imageWrapper.activeSlices;
@@ -176,10 +198,7 @@ export default {
     nbSlices() {
       return this.image.depth * this.image.duration * this.image.channels;
     },
-    showMultiChannels() {
-      return this.currentChannels.length > 1;
-    },
-    currentChannel: {
+    currentChannelIndex: {
       get() {
         return this.currentSlice.channel;
       },
@@ -187,7 +206,7 @@ export default {
         await this.seek([value], this.currentSlice.zStack, this.currentSlice.time);
       }
     },
-    currentChannels: {
+    currentChannelsIndexes: {
       get() {
         return this.currentSlices.map(slice => slice.channel);
       },
@@ -195,20 +214,20 @@ export default {
         await this.seek(value, this.currentSlice.zStack, this.currentSlice.time);
       }
     },
-    currentZStack: {
+    currentZStackIndex: {
       get() {
         return this.currentSlice.zStack;
       },
       async set(value) {
-        await this.seek(this.currentChannels, value, this.currentSlice.time);
+        await this.seek(this.currentChannelsIndexes, value, this.currentSlice.time);
       }
     },
-    currentTime: {
+    currentTimeIndex: {
       get() {
         return this.currentSlice.time;
       },
       async set(value) {
-        await this.seek(this.currentChannels, this.currentSlice.zStack, value);
+        await this.seek(this.currentChannelsIndexes, this.currentSlice.zStack, value);
       }
     },
     hasChannels() {
@@ -223,6 +242,9 @@ export default {
     isImageMultidimensional() {
       return this.hasChannels || this.hasDuration || this.hasDepth;
     },
+    showMultiChannels() {
+      return this.currentChannelsIndexes.length > 1;
+    },
     sliceInstances() {
       return this.imageWrapper.sliceInstances;
     },
@@ -230,27 +252,50 @@ export default {
       return this.currentSlice.channelName !== null;
     },
     areChannelsMergeable() {
-      return this.image.extrinsicChannels <= constants.MAX_MERGEABLE_CHANNELS;
-    },
-    allChannelsOption() {
-      return {
-        name: this.$t('all-channels'),
-        value: _.range(0, this.image.extrinsicChannels)
-      };
+      // this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS;
+      return true; // TODO [EXPERIMENTAL - large set of merged channels]
     },
     channelOptions() {
-      let options = this.channels.map(channel => ({value: [channel.index], ...channel}));
-      options.unshift(this.allChannelsOption);
-      return options;
+      return this.channels.map(channel => ({value: [channel.index], ...channel}));
+    },
+    orderedCurrentChannels() {
+      return [...this.currentChannelsIndexes].sort((a, b) => a - b).map(channelIndex =>
+        this.channels.find(c => c.index === channelIndex)
+      );
+    },
+
+    currentChannelsIndexesOption() {
+      if (this.currentChannelsIndexes.length > 1) {
+        return null;
+      }
+      return this.currentChannelsIndexes;
     }
   },
   methods: {
+    setCurrentChannelsIndexes(value) {
+      if (value === null) {
+        const max = Math.min(constants.MAX_MERGEABLE_CHANNELS, this.image.channels);
+        value = _.range(0, max);
+      }
+      this.currentChannelsIndexes = value;
+    },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
     },
     channelValue(channel) {
-      let info = this.channels[channel];
-      return (info) ? info.name : null;
+      if (this.channels.length === this.image.channels) {
+        let info = this.channels[channel];
+        return (info) ? info.name : null;
+      }
+      else {
+        let rank = slicePositionToRank({
+          channel,
+          zStack: this.currentZStackIndex,
+          time: this.currentTimeIndex
+        }, this.image);
+        let slice = this.sliceInstances[rank];
+        return (slice) ? slice.channelName : null;
+      }
     },
 
     async goToRank(rank) {
@@ -262,9 +307,9 @@ export default {
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
     },
     async shift(dimension, increment) {
-      let time = (dimension === 'time') ? this.currentTime + increment : this.currentTime;
-      let channels = (dimension === 'channel') ? [this.currentChannel + increment] : this.currentChannels;
-      let zStack = (dimension === 'zStack') ? this.currentZStack + increment : this.currentZStack;
+      let time = (dimension === 'time') ? this.currentTimeIndex + increment : this.currentTimeIndex;
+      let channels = (dimension === 'channel') ? [this.currentChannelIndex + increment] : this.currentChannelsIndexes;
+      let zStack = (dimension === 'zStack') ? this.currentZStackIndex + increment : this.currentZStackIndex;
       await this.seek(channels, zStack, time);
     },
     canShiftForward(dimension) {
@@ -309,45 +354,45 @@ export default {
           }
           return;
         case 'nav-first-t':
-          this.currentTime = 0;
+          this.currentTimeIndex = 0;
           return;
         case 'nav-last-t':
-          this.currentTime = this.image.duration - 1;
+          this.currentTimeIndex = this.image.duration - 1;
           return;
         case 'nav-next-z':
           if (this.canShiftForward('zStack')) {
-            this.currentZStack++;
+            this.currentZStackIndex++;
           }
           return;
         case 'nav-previous-z':
           if (this.canShiftBackward('zStack')) {
-            this.currentZStack--;
+            this.currentZStackIndex--;
           }
           return;
         case 'nav-first-z':
-          this.currentZStack = 0;
+          this.currentZStackIndex = 0;
           return;
         case 'nav-last-z':
-          this.currentZStack = this.image.depth - 1;
+          this.currentZStackIndex = this.image.depth - 1;
           return;
         case 'nav-next-c':
           if (!this.showMultiChannels && this.canShiftForward('channel')) {
-            this.currentChannel++;
+            this.currentChannelIndex++;
           }
           return;
         case 'nav-previous-c':
           if (!this.showMultiChannels && this.canShiftBackward('channel')) {
-            this.currentChannel--;
+            this.currentChannelIndex--;
           }
           return;
         case 'nav-first-c':
           if (!this.showMultiChannels) {
-            this.currentChannel = 0;
+            this.currentChannelIndex = 0;
           }
           return;
         case 'nav-last-c':
           if (!this.showMultiChannels) {
-            this.currentChannel = this.image.channels - 1;
+            this.currentChannelIndex = this.image.channels - 1;
           }
           return;
         case 'nav-next-slice':

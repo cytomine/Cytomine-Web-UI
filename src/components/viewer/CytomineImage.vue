@@ -51,14 +51,14 @@
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -211,10 +211,9 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
-
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -298,9 +297,6 @@ export default {
     sliceIds() {
       return this.slices.map(slice => slice.id);
     },
-    sliceChannels() {
-      return this.slices.map(slice => slice.channel);
-    },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
     },
@@ -380,50 +376,14 @@ export default {
       return this.image.tileSize;
     },
     baseLayerProcessingParams() {
-      let params = {};
-      if (this.imageWrapper.colors.filter) {
-        params.filters = this.imageWrapper.colors.filter;
-      }
-      if (this.imageWrapper.colors.contrast !== 1) {
-        params.contrast = this.imageWrapper.colors.contrast;
-      }
-      if (this.imageWrapper.colors.gamma !== 1) {
-        params.gammas = this.imageWrapper.colors.gamma;
-      }
-      if (this.imageWrapper.colors.inverse) {
-        params.colormaps = '!DEFAULT';
-      }
-      let filterIntensities = (this.sliceChannels.length !== this.image.extrinsicChannels) &&
-        (this.image.channels === this.image.extrinsicChannels);
-      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
-      if (filterIntensities) {
-        minIntensities = minIntensities.filter((_, index) => this.sliceChannels.includes(index));
-      }
-      if (minIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.min_intensities = minIntensities.join(',');
-      }
-      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
-      if (filterIntensities) {
-        maxIntensities = maxIntensities.filter((_, index) => this.sliceChannels.includes(index));
-      }
-      if (maxIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.max_intensities = maxIntensities.join(',');
-      }
-
-      return params;
+      return this.$store.getters[this.imageModule + 'tileRequestParams'];
     },
     baseLayerSliceParams() {
-      let params = {
+      return {
         // eslint-disable-next-line camelcase
         z_slices: this.slices[0].zStack,
         timepoints: this.slices[0].time
       };
-      if (this.slices.length < this.image.channels) {
-        params.channels = this.sliceChannels;
-      }
-      return params;
     },
     baseLayerURLQuery() {
       let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
@@ -437,22 +397,22 @@ export default {
       return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
-    colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0 || this.imageWrapper.colors.contrast !== 0
-                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    },
-    operation() {
-      return operation;
-    },
-    lib() {
-      return {
-        ...constLib,
-        brightness: this.imageWrapper.colors.brightness,
-        contrast: this.imageWrapper.colors.contrast,
-        saturation: this.imageWrapper.colors.saturation,
-        hue: this.imageWrapper.colors.hue
-      };
-    },
+    // colorManipulationOn() {
+    //   return this.imageWrapper.colors.brightness !== 0
+    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    // },
+    // operation() {
+    //   return operation;
+    // },
+    // lib() {
+    //   return {
+    //     ...constLib,
+    //     brightness: this.imageWrapper.colors.brightness,
+    //     contrast: this.imageWrapper.colors.contrast,
+    //     saturation: this.imageWrapper.colors.saturation,
+    //     hue: this.imageWrapper.colors.hue
+    //   };
+    // },
 
     layersToPreload() {
       let layers = [];
