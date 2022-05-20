@@ -198,6 +198,15 @@ export default {
       return sameHistogramBounds(this.bounds, this.defaultBounds) && this.gamma === 1.0 && !this.inverted;
     }
   },
+  watch: {
+    bounds: {
+      deep: true,
+      handler: function() {
+        this.computeBrightness();
+        this.computeContrast();
+      }
+    }
+  },
   methods: {
     setBounds(arrayBounds) {
       const first = arrayBounds[0];
@@ -215,8 +224,6 @@ export default {
       min = Math.max(this.defaultBounds.min, Math.min(min, this.defaultBounds.max));
       max = Math.min(this.defaultBounds.max, Math.max(max, this.defaultBounds.min));
       this.$emit('setBounds', {min, max});
-      this.computeBrightness();
-      this.computeContrast();
     },
     setBrightness(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
