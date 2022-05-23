@@ -87,7 +87,7 @@ import ImageName from '@/components/image/ImageName';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
-import {ImageGroup, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from 'cytomine-client';
+import {ImageInstance, ImageGroup, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from 'cytomine-client';
 import {getCenter, containsExtent, getIntersection} from 'ol/extent';
 import {listAnnotationsInGroup} from '@/utils/annotation-utils';
 
@@ -145,6 +145,9 @@ export default {
       set(annot) {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
       }
+    },
+    copiedAnnotImageInstance() {
+      return this.viewerWrapper.copiedAnnotImageInstance;
     },
     alreadyLinkedAnnotations() {
       return this.copiedAnnot.annotationLink;
@@ -243,19 +246,23 @@ export default {
         }
 
         let collection = new AnnotationCollection();
-        this.selectedImagesAndOptions.forEach(selected => {
-          let location = this.convertLocation(this.copiedAnnot.location, selected.image, selected.position);
-          if (!location) {
-            throw Error(`Invalid location for ${selected}`);
-          }
-          collection.push(new Annotation({
-            image: selected.image,
-            user: this.currentUser.id,
-            term: this.copiedAnnot.term,
-            group: annotGroup.id,
-            location: location
-          }));
-        });
+        await Promise.all(
+          this.selectedImagesAndOptions.map(
+            async (selected) => {
+              let location = await this.convertLocation(this.copiedAnnot.location, selected.image, selected.position);
+              if (!location) {
+                throw Error(`Invalid location for ${selected}`);
+              }
+              collection.push(new Annotation({
+                image: selected.image,
+                user: this.currentUser.id,
+                term: this.copiedAnnot.term,
+                group: annotGroup.id,
+                location: location
+              }));
+            }
+          )
+        );
         await collection.save();
 
         if (existingAnnotGroup === null) {
@@ -294,9 +301,9 @@ export default {
       }
       this.$parent.close();
     },
-    convertLocation(originalLocation, imageId, position) {
-      let image = this.findImage(imageId);
-      if (!image) {
+    async convertLocation(originalLocation, imageId, position) {
+      let destImage = await ImageInstance.fetch(imageId);
+      if (!destImage) {
         return;
       }
 
@@ -304,7 +311,7 @@ export default {
       let centerExtent = getCenter(geometry.getExtent());
 
       if (position === this.imageCenterPosition.value) {
-        geometry.translate((image.width / 2) - centerExtent[0], (image.height / 2) - centerExtent[1]);
+        geometry.translate((destImage.width / 2) - centerExtent[0], (destImage.height / 2) - centerExtent[1]);
       }
       else if (position === this.viewerCenterPosition.value) {
         let wrapper = this.findWrapper(imageId);
@@ -314,19 +321,50 @@ export default {
         geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
       }
 
-      let imageExtent = [0, 0, image.width, image.height];
-      if (!containsExtent(imageExtent, geometry.getExtent())) {
-        let geomExtent = geometry.getExtent();
-        let intersection = getIntersection(geomExtent, image);
-        let scale = Math.min(geomExtent[0]/intersection[0], geomExtent[1]/intersection[1],
-          geomExtent[2]/intersection[2], geomExtent[3]/intersection[3]);
+      /* Compute the rescaling factors if the resolution is known for both images */
+      let scaleX = 1;
+      let scaleY = 1;
+      let srcImage = this.copiedAnnotImageInstance;
+      let hasPhysicalSizeX = srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null;
+      let hasPhysicalSizeY = srcImage.physicalSizeY !== null && destImage.physicalSizeY !== null;
+
+      if (hasPhysicalSizeX && hasPhysicalSizeY) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
+      }
+      else if (hasPhysicalSizeX) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = scaleX;
+      }
+
+      geometry.scale(scaleX, scaleY);
+
+      /* Rescale the annotation if it is larger than the destination image size */
+      let annotExtent = geometry.getExtent();
+      let annotWidth = annotExtent[2] - annotExtent[0];
+      let annotHeight = annotExtent[3] - annotExtent[1];
+      if (annotWidth > destImage.width || annotHeight > destImage.height) {
+        let scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
         geometry.scale(scale);
       }
 
+      /* Check if the translation is within the image boundaries */
+      let imageExtent = [0, 0, destImage.width, destImage.height];
+      if (!containsExtent(imageExtent, geometry.getExtent())) {
+        let geomExtent = geometry.getExtent();
+        let intersection = getIntersection(imageExtent, geomExtent);
+
+        /* Get the difference between the parts inside and outside the image boundaries */
+        let difference = [];
+        for (let i = 0; i < intersection.length; i++) {
+          difference[i] = intersection[i] - geomExtent[i];
+        }
+
+        /* Translate the difference to have the complete annotation inside the image boundaries */
+        geometry.translate(difference[0] + difference[2], difference[1] + difference[3]);
+      }
+
       return new WKT().writeGeometry(geometry);
-    },
-    findImage(id) {
-      return this.eligibleImages.find(image => image.id === id);
     },
     findWrapper(id) {
       return this.imageWrappers.find(wrapper => wrapper.imageInstance.id === id);
