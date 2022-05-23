@@ -356,14 +356,15 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     blindMode() {
-      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+      return ((this.project || {}).blindMode) || false;
     },
     canDownloadImages() {
       // Virtual images (null path) cannot be downloaded.
       return this.image.path !== null && (
         this.canManageProject ||
-        ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false
+        ((this.project || {}).areImagesDownloadable) || false
       );
     },
     canManageProject() {
@@ -440,7 +441,7 @@ export default {
         });
         this.$emit('delete');
 
-        let updatedProject = this.$store.state.currentProject.project.clone();
+        let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
