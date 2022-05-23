@@ -254,7 +254,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" v-if="(canDownloadImages || canManageProject) && image.path" :href="image.downloadURL">
+            <a class="button" v-if="canDownloadImages" :href="image.downloadURL">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -360,7 +360,11 @@ export default {
       return ((this.$store.state.currentProject.project || {}).blindMode) || false;
     },
     canDownloadImages() {
-      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false
+      );
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
