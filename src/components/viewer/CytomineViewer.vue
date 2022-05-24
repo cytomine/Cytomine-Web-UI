@@ -190,36 +190,36 @@ export default {
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
 
-          let imgAndSlices = this.idImages.map(function(e,i) {
-            return {image : e, slice: this.idSlices[i]};
-          }, this);
-          //don't fetch multiple times the same image.
-          let uniqueArray = imgAndSlices.filter(function(item, pos) {
-            return imgAndSlices.map(function(e) {
-              return e.image+'.'+e.slice;
-            }).indexOf(item.image+'.'+item.slice) == pos;
-          });
-          await Promise.all(uniqueArray.map(async (e) => {
-            let image = await ImageInstance.fetch(e.image);
-            let idSlice = e.slice;
-            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+          // List of unique images (prevent to fetch it multiple times)
+          const uniqueIdImages = [...new Set(this.idImages)];
+          let uniqueImages = {};
+          await Promise.all(uniqueIdImages.map(async id => {
+            uniqueImages[id] = await ImageInstance.fetch(id);
           }));
 
-          let images = {};
-          //don't fetch multiple times the same image.
-          let idImages = [...new Set(this.idImages)];
-          await Promise.all(idImages.map(async id => {
-            let image = await ImageInstance.fetch(id);
-            images[id] = image;
-          }));
-          console.log('images', images);
-          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
-          console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
-          if (imagesNotInCurrentProject.length > 0) {
+          // Ensure images are in the right project
+          const nbWrongProjectImages = Object.values(uniqueImages).filter(image =>
+            image.project !== this.project.id
+          ).length;
+          if (nbWrongProjectImages > 0) {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');
           }
+
+          // Register images in the viewer, in right order
+          let indexedImages = {};
+          this.idImages.map(id => {
+            indexedImages[this.viewer.indexNextImage] = uniqueImages[id];
+            this.$store.dispatch(this.viewerModule + 'registerImage');
+          });
+
+          // For each image, initialize them asynchronously, and fetch corresponding slices
+          await Promise.all(Object.entries(indexedImages).map(async ([index, image]) => {
+            const position = this.idImages.indexOf(String(image.id));
+            let idSlice = this.idSlices[position];
+            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slice});
+          }));
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
