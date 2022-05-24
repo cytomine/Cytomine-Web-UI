@@ -87,7 +87,7 @@ import ImageName from '@/components/image/ImageName';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
-import {ImageInstance, ImageGroup, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from 'cytomine-client';
+import {ImageGroup, ImageInstanceCollection, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from 'cytomine-client';
 import {getCenter, containsExtent, getIntersection} from 'ol/extent';
 import {listAnnotationsInGroup} from '@/utils/annotation-utils';
 
@@ -245,24 +245,33 @@ export default {
           annotGroup = await AnnotationGroup.fetch(existingAnnotGroup);
         }
 
+        let imageInstanceCollection = await ImageInstanceCollection.fetchAll({
+          filterKey: 'project',
+          filterValue: this.image.project
+        });
+
         let collection = new AnnotationCollection();
-        await Promise.all(
-          this.selectedImagesAndOptions.map(
-            async (selected) => {
-              let location = await this.convertLocation(this.copiedAnnot.location, selected.image, selected.position);
-              if (!location) {
-                throw Error(`Invalid location for ${selected}`);
-              }
-              collection.push(new Annotation({
-                image: selected.image,
-                user: this.currentUser.id,
-                term: this.copiedAnnot.term,
-                group: annotGroup.id,
-                location: location
-              }));
-            }
-          )
-        );
+        this.selectedImagesAndOptions.forEach(selected => {
+          let imageInstance = imageInstanceCollection.array.find(
+            imageInstance => imageInstance.id === selected.image
+          );
+          if (!imageInstance) {
+            throw Error(`ImageInstance not found for ${selected}`);
+          }
+
+          let location = this.convertLocation(this.copiedAnnot.location, imageInstance, selected.position);
+          if (!location) {
+            throw Error(`Invalid location for ${selected}`);
+          }
+
+          collection.push(new Annotation({
+            image: selected.image,
+            user: this.currentUser.id,
+            term: this.copiedAnnot.term,
+            group: annotGroup.id,
+            location: location
+          }));
+        });
         await collection.save();
 
         if (existingAnnotGroup === null) {
@@ -301,12 +310,7 @@ export default {
       }
       this.$parent.close();
     },
-    async convertLocation(originalLocation, imageId, position) {
-      let destImage = await ImageInstance.fetch(imageId);
-      if (!destImage) {
-        return;
-      }
-
+    convertLocation(originalLocation, destImage, position) {
       let geometry = new WKT().readGeometry(originalLocation);
       let centerExtent = getCenter(geometry.getExtent());
 
@@ -314,7 +318,7 @@ export default {
         geometry.translate((destImage.width / 2) - centerExtent[0], (destImage.height / 2) - centerExtent[1]);
       }
       else if (position === this.viewerCenterPosition.value) {
-        let wrapper = this.findWrapper(imageId);
+        let wrapper = this.findWrapper(destImage.id);
         if (!wrapper) {
           return;
         }
