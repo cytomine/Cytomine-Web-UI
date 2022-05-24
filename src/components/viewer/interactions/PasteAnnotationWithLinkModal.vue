@@ -246,8 +246,8 @@ export default {
         }
 
         let imageInstanceCollection = await ImageInstanceCollection.fetchAll({
-          filterKey: 'project',
-          filterValue: this.image.project
+          filterKey: 'imagegroup',
+          filterValue: this.imageGroupId
         });
 
         let collection = new AnnotationCollection();
