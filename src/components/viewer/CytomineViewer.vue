@@ -225,9 +225,28 @@ export default {
           // For each image, initialize them asynchronously, and fetch corresponding slices
           await Promise.all(Object.entries(indexedImages).map(async ([index, image]) => {
             const position = this.idImages.indexOf(String(image.id));
-            let idSlice = this.idSlices[position];
-            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slice});
+            let idSlices = this.idSlices[position];
+
+            let slices;
+            if (idSlices) {
+              idSlices = [...new Set(idSlices.split(':'))];
+              slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+
+              // Ensure slices are in the right project/image
+              const z = slices[0].zStack;
+              const t = slices[0].time;
+              const nbWrongSlices = slices.filter(slice =>
+                slice.image !== image.id || slice.zStack !== z || slice.time !== t
+              ).length;
+              if (nbWrongSlices > 0) {
+                this.errorBadImageProject = true;
+                throw new Error('Some slices are not from this project or cannot be displayed together');
+              }
+            }
+            else {
+              slices = [await image.fetchReferenceSlice()];
+            }
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
           }));
         }
         else {
