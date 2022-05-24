@@ -250,7 +250,7 @@ export default {
             SliceInstance.fetch(annot.slice)
           ]);
           this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
-          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
         }
         else if (index === null) {
           annot = await Annotation.fetch(annot.id);
@@ -263,7 +263,7 @@ export default {
               ImageInstance.fetch(annot.image),
               SliceInstance.fetch(annot.slice)
             ]);
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
           }
         }
       }

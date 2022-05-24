@@ -599,7 +599,7 @@ export default {
             annot = await Annotation.fetch(annot.id);
           }
 
-          if(annot.slice !== this.slice.id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
             this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
