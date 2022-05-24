@@ -338,7 +338,7 @@ export default {
     annotStyles(annot, index) {
       let groupDetails = this.annotationInGroupDetails[index];
       return {
-        'active': this.isInViewer && annot.slice === this.imageWrapper.activeSlice.id,
+        'active': this.isInViewer && this.activeSlicesIds.includes(annot.slice),
         'group-first': this.regroup && groupDetails.first,
         'group-last': this.regroup && groupDetails.last,
         'group-in': this.regroup && groupDetails.in && !groupDetails.first && !groupDetails.last,
