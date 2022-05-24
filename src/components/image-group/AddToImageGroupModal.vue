@@ -30,7 +30,7 @@
         >
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')">
-              <img :src="image.preview" class="image-overview">
+              <image-thumbnail :url="image.preview" :size="128" :key="image.preview" />
             </b-table-column>
 
             <b-table-column field="instanceFilename" :label="$t('name')" sortable>
@@ -73,6 +73,7 @@ import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection, ImageGroupImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'add-to-image-group-modal',
@@ -82,6 +83,7 @@ export default {
     programmatic: {type: Boolean, default: false}
   },
   components: {
+    ImageThumbnail,
     CytomineTable,
     CytomineModal
   },
@@ -176,7 +178,7 @@ export default {
   height: 80vh;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }
