@@ -53,7 +53,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance, SliceInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance, Annotation} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -232,6 +232,38 @@ export default {
       }
     },
 
+    async selectAnnotationHandler({index, annot, center=false}) {
+      try {
+        if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
+          annot = await Annotation.fetch(annot.id);
+          let [image, slice] = await Promise.all([
+            ImageInstance.fetch(annot.image),
+            SliceInstance.fetch(annot.slice)
+          ]);
+          this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+        }
+        else if (index === null) {
+          annot = await Annotation.fetch(annot.id);
+          if (this.idImages.includes(String(annot.image))) {
+            let index = this.cells.find(cell => cell.image.id === annot.image).index;
+            this.$eventBus.$emit('selectAnnotation', {index, annot, center});
+          }
+          else {
+            let [image, slice] = await Promise.all([
+              ImageInstance.fetch(annot.image),
+              SliceInstance.fetch(annot.slice)
+            ]);
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
+          }
+        }
+      }
+      catch(err) {
+        console.log(err);
+        this.error = true;
+      }
+    },
+
     shortkeyEvent(event) {
       this.$eventBus.$emit('shortkeyEvent', event.srcKey);
     }
@@ -244,7 +276,11 @@ export default {
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
   },
+  mounted() {
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+  },
   beforeDestroy() {
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }
 };
