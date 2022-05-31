@@ -74,6 +74,7 @@ modify,Modify,Modifier,Modificar
 move,Move,Déplacer,Mover
 resize,Resize,Redimensionner
 rotate,Rotate,Pivoter,Girar
+rescale,Rescale,Redimensionner
 delete,Delete,Supprimer,Eliminar
 rename,Rename,Renommer,Renombrar
 undo,Undo,Annuler,Deshacer
