@@ -124,10 +124,15 @@ export default {
         'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
         'tool-freehand-polygon', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
         'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
-        'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
+        'toggle-review-layer', 'toggle-all-review-layer', 'toggle-selected-layers', 'toggle-all-selected-layers',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
         'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
         'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste', 'tool-review-reject', 'tool-review-toggle',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-all-information', 'toggle-all-zoom',
+        'toggle-all-filters', 'toggle-all-layers', 'toggle-all-ontology', 'toggle-all-properties',
+        'toggle-all-broadcast', 'toggle-all-review', 'toggle-all-overview', 'toggle-all-annotations',
+        'toggle-all-current', 'toggle-all-link'];
 
       return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
         object[key.replace('viewer-', '')] = shortcuts[key];
