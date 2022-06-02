@@ -17,6 +17,7 @@
 export default {
   CYTOMINE_CORE_HOST: 'https://localhost-core',
   CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
+  CYTOMINE_USER_POSITION_WEBSOCKET_HOST: 'ws://localhost-core/user-position/',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   PRELOADED_SLICES: 50,
