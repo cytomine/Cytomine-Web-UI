@@ -22,6 +22,15 @@
     </b-checkbox>
   </div>
 
+    <template v-if="broadcast">
+      <h2>{{$t('followers')}} ({{this.followers.length}})</h2>
+      <div class="followers">
+        <div class="field" v-for="user in followers" :key="user.id">
+          <li><username :user="user" /></li>
+        </div>
+      </div>
+    </template>
+
   <h2 :class="{disabled: broadcast}">{{$t('follow-user')}}</h2>
 
   <div class="follow-panel-content" :class="{disabled: broadcast}">
@@ -71,6 +80,7 @@ export default {
   data() {
     return {
       onlineUsers: [],
+      followers: [],
 
       broadcastModel: false,
       trackedUserModel: null,
@@ -78,7 +88,11 @@ export default {
       timeoutOnlineUsers: null,
       timeoutTracking: null,
 
-      disabledBroadcast: false
+      disabledBroadcast: false,
+
+      wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
+      userPostitionWebsock: null,
+      wsConnected: false
     };
   },
   computed: {
@@ -165,7 +179,14 @@ export default {
 
     broadcast() {
       if(this.broadcast) {
+        this.stopTrack();
+        if(!this.wsConnected){
+          this.initWebSocket();
+        }
         this.trackedUser = null;
+      }
+      else{
+        this.userPostitionWebsock.close();
       }
     },
 
@@ -182,7 +203,6 @@ export default {
         this.$nextTick(() => this.broadcastModel = false);
         return;
       }
-
       this.broadcast = value;
     },
 
@@ -198,10 +218,14 @@ export default {
             this.$store.commit(this.viewerModule + 'unlinkImage', {indexImage: this.index});
             this.trackedUser = value;
           },
-          onCancel: () => this.trackedUserModel = null
+          onCancel: () => {
+            this.stopTrack();
+            this.trackedUserModel = null;
+          }
         });
       }
       else {
+        this.stopTrack();
         this.trackedUser = value;
       }
     },
@@ -210,6 +234,9 @@ export default {
       this.trackedUserModel = id;
 
       if(id) {
+        if(!this.wsConnected){
+          this.initTracking();
+        }
         this.track();
         this.fetchOnline();
       }
@@ -230,8 +257,53 @@ export default {
 
   },
   methods: {
+    initTracking(){
+      this.initWebSocket();
+      this.userPostitionWebsock.onopen = this.onOpentracking;
+    },
+    initWebSocket(){
+      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id + '/' + this.image.id + '/' + this.broadcast);
+      this.userPostitionWebsock.onopen = this.onOpen;
+      this.userPostitionWebsock.onclose = this.onClose;
+      this.userPostitionWebsock.onmessage = this.onMessage;
+    },
+    onOpen(){
+      this.wsConnected = true;
+    },
+    onOpentracking(){
+      this.onOpen();
+      this.userPostitionWebsock.send(this.trackedUserModel);
+    },
+    onClose(){
+      this.wsConnected = false;
+    },
+    onMessage(message){
+      if(message.data == 'stop-track'){
+        this.stopTrack();
+      }
+      else{
+        let pos = JSON.parse(message.data);
+        this.moveView(pos);
+      }
+    },
+    moveView(pos){
+      this.view.animate({
+        center: [pos.x, pos.y],
+        zoom: pos.zoom,
+        rotation: pos.rotation,
+        duration: 500
+      });
+    },
+    stopTrack(){
+      if(this.wsConnected){
+        this.userPostitionWebsock.close();
+        this.wsConnected = false;
+      }
+      this.trackedUser = null;
+    },
+
     async track() {
-      if(!this.trackedUser) {
+      if(!this.trackedUser || this.wsConnected){
         return;
       }
 
@@ -241,12 +313,7 @@ export default {
           return;
         }
 
-        this.view.animate({
-          center: [pos.x, pos.y],
-          zoom: pos.zoom,
-          rotation: pos.rotation,
-          duration: 500
-        });
+        this.moveView(pos);
       }
       catch(error) {
         console.log(error);
@@ -254,7 +321,9 @@ export default {
       }
 
       clearTimeout(this.timeoutTracking);
-      this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
+      if(!this.wsConnected){
+        this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
+      }
     },
 
     async fetchOnline() {
@@ -262,8 +331,19 @@ export default {
         return;
       }
 
-      let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting users
+      let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
+      
+      if(this.broadcast){
+        this.followers = [];
+        let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
+
+        this.projectMembers.forEach(member => {
+          if(followersIds.includes(''+member.id)){
+            this.followers.push(member);
+          }
+        });
+      }
 
       clearTimeout(this.timeoutOnlineUsers);
       this.timeoutOnlineUsers = setTimeout(this.fetchOnline, constants.BROADCASTING_USERS_REFRESH_INTERVAL);
@@ -272,13 +352,13 @@ export default {
   created() {
     this.trackedUserModel = this.trackedUser;
     this.broadcastModel = this.broadcast;
-
     this.fetchOnline();
     this.track();
   },
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
+    this.userPostitionWebsock.close();
   }
 };
 </script>
@@ -303,6 +383,11 @@ h3 {
 .follow-panel-content {
   max-height: 14em;
   overflow: auto;
+}
+
+.followers{
+  overflow: scroll;
+  max-height: 4.5em;
 }
 </style>
 
