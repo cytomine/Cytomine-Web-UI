@@ -393,6 +393,7 @@ export default {
     nbPerPage: sync('perPage', storeOptions),
     selectedColor: sync('outlineColor', storeOptions),
 
+    // eslint-disable-next-line vue/return-in-computed-property
     targetAnnotationType() {
       switch(this.$route.query.type) {
         case 'user':
@@ -521,6 +522,8 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        default:
+          return [];
       }
     },
     isByTerm() {
@@ -572,8 +575,8 @@ export default {
     }
   },
   methods: {
-    viewAnnot(annot) {
-      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+    viewAnnot({annot}) {
+      this.$router.push(`/project/${this.project.id}/image/${annot.image}/annotation/${annot.id}`);
     },
     async fetchImages() {
       if (!this.tooManyImages) {

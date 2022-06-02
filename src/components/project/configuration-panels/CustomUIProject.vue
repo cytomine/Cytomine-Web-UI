@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
   <h2> {{ $t('error') }} </h2>
@@ -130,7 +129,6 @@ export default {
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment', parentConfiguration: 'project-explore-annotation-main'}
-
           ]
         },
         {
@@ -157,6 +155,7 @@ export default {
             {key: 'project-tools-fill', label: 'fill', icon: 'fas fa-fill', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-edit', label: 'modify', icon: 'fas fa-edit', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-resize', label: 'rescale', icon: 'fas fa-expand', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy', parentConfiguration: 'project-tools-main'},

@@ -61,6 +61,7 @@ export default {
         106: 'unpacked'
       };
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     result() {
       switch(this.file.status) {
         case UploadedFileStatus.UPLOADED:

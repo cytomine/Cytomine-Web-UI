@@ -62,6 +62,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+
 import CytomineDescription from '@/components/description/CytomineDescription';
 
 export default {

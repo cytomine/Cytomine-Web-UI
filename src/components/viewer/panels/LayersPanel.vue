@@ -170,6 +170,22 @@ export default {
           this.layers = this.layers.filter(layer => !layer.isReview);
         }
       }
+    },
+    layersToPreload: {
+      deep: true,
+      handler: function(layersToPreload) {
+        layersToPreload.forEach(layerId => {
+          let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+          if(index !== -1) {
+            if (!this.selectedLayers[index].visible) {
+              this.toggleLayerVisibility(index);
+            }
+            return;
+          }
+
+          this.addLayerById(layerId, true);
+        });
+      }
     }
   },
   methods: {
@@ -268,11 +284,15 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
-      if(key === 'tool-review-toggle') { // toggle review layer
+      key = key.replace('toggle-all-', 'toggle-');
+      if(key === 'toggle-selected-layers') {
+        this.selectedLayers.forEach((layer, index) => this.toggleLayerVisibility(index));
+      }
+      else if(key === 'toggle-review-layer') {
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if(index !== -1) {
           this.toggleLayerVisibility(index);

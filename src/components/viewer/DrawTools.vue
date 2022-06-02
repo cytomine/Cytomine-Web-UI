@@ -271,6 +271,17 @@
     </button>
 
     <button
+        v-if="isToolDisplayed('resize')"
+        :disabled="isToolDisabled('resize')"
+        v-tooltip="$t('resize')"
+        class="button"
+        :class="{'is-selected': activeEditTool === 'rescale'}"
+        @click="activateEditTool('rescale')"
+    >
+      <span class="icon is-small"><i class="fas fa-expand"></i></span>
+    </button>
+
+    <button
       v-if="isToolDisplayed('rotate')"
       :disabled="isToolDisabled('rotate')"
       v-tooltip="$t('rotate')"
@@ -848,7 +859,7 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
@@ -943,12 +954,18 @@ export default {
             this.activateEditTool('translate');
           }
           return;
+        case 'tool-rescale':
+          if (this.isToolDisplayed('resize') && !this.isToolDisabled('resize')) {
+            this.activateEditTool('rescale');
+          }
+          return;
         case 'tool-rotate':
           if (this.isToolDisplayed('rotate') && !this.isToolDisabled('rotate')) {
             this.activateEditTool('rotate');
           }
           return;
         case 'toggle-current':
+        case 'toggle-all-current':
           if (this.configUI['project-explore-annotation-main'] && this.selectedFeature) {
             this.displayAnnotDetails = !this.displayAnnotDetails;
           }

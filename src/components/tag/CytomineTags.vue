@@ -49,7 +49,6 @@ export default {
     object: {type: Object},
     canEdit: {type: Boolean, default: true}
   },
-  components: {},
   data() {
     return {
       loading: true,

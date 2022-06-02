@@ -72,7 +72,9 @@ display-annot-details,Display details of currently selected annotation,Afficher 
 fill,Fill,Remplir,Rellenar
 modify,Modify,Modifier,Modificar
 move,Move,Déplacer,Mover
+resize,Resize,Redimensionner
 rotate,Rotate,Pivoter,Girar
+rescale,Rescale,Redimensionner
 delete,Delete,Supprimer,Eliminar
 rename,Rename,Renommer,Renombrar
 undo,Undo,Annuler,Deshacer
@@ -375,6 +377,7 @@ remove-yourself-from-manager-confirmation-message,Are you sure you want to remov
 status,Status,Statut,Estado
 offline,Offline users,Utilisateurs hors ligne,Usuarios sin conexión
 notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username},No se pudo cambiar el rol de {username}
+notif-error-not-enough-representative, Failed to remove the representative role. At least one representative must be in the project, Impossible retirer l'utilisateur des personnes de contact. Il faut au moins une personnes de contact dans un projet
 enabled,Enabled,Activé,Habilitado
 disabled,Disabled,Désactivé,Dehabilitado
 no-algorithm,No algorithm to display,Aucun algorithme à afficher,No hay algoritmo que mostrar
@@ -889,7 +892,8 @@ shortcut-viewer-tool-correct-add,Correct annotation by adding a freehand area,Co
 shortcut-viewer-tool-correct-remove,Correct annotation by removing a freehand area,Corriger l'annotation en lui soustrayant un polygone à main levée,Correjir anotación eliminando un área a mano alzada
 shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation,Modificar anotación
 shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification,Eliminar un vértice con la herramienta de modificación
-shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation,Mover anotación
+shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation
+shortcut-viewer-tool-rescale,Rescale annotation,Redimensionner l'annotation,Mover anotación
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation,Rotar anotación
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information,Alternar panel de información
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom,Alternar panel de zoom
@@ -904,7 +908,24 @@ shortcut-viewer-toggle-overview,Toggle overview,Afficher/Masquer l'aperçu,Alter
 shortcut-viewer-toggle-annotations,Toggle annotations panel,Afficher/Masquer le panneau des annotations,Alternar panel de anotaciones
 shortcut-viewer-toggle-current,Toggle currently selected annotation panel,Afficher/Masquer les détails de l'annotation sélectionnée,Alternar el panel de anotaciones seleccionado actualmente
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images,Alternar selector de imagen
+shortcut-viewer-toggle-review-layer,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation
+shortcut-viewer-toggle-all-review-layer,Toggle review layer in review mode in all views,Afficher/masquer le calque de validation en mode validation dans toutes les vues
+shortcut-viewer-toggle-selected-layers,Toggle visibility of selected layers,Afficher/masquer les calques d'annotations sélectionnés
+shortcut-viewer-toggle-all-selected-layers,Toggle visibility of selected layers in all views,Afficher/masquer les calques d'annotations sélectionnés dans toutes les vues
+shortcut-viewer-toggle-all-information,Toggle information panel in all views,Afficher/Masquer le panneau d'information dans toutes les vues
+shortcut-viewer-toggle-all-zoom,Toggle zoom panel in all views,Afficher/Masquer le panneau de zoom dans toutes les vues
+shortcut-viewer-toggle-all-link,Toggle image synchronization panel in all views,Afficher/Masquer le panneau de synchronisation des images dans toutes les vues
+shortcut-viewer-toggle-all-filters,Toggle image color panel in all views,Afficher/Masquer le panneau de colorisation de l'image dans toutes les vues
+shortcut-viewer-toggle-all-layers,Toggle layers panel in all views,Afficher/Masquer le panneau des calques dans toutes les vues
+shortcut-viewer-toggle-all-ontology,Toggle terms panel in all views,Afficher/Masquer le panneau des termes dans toutes les vues
+shortcut-viewer-toggle-all-properties,Toggle properties panel in all views,Afficher/Masquer le panneau des propriétés dans toutes les vues
+shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues
+shortcut-viewer-toggle-all-review,Toggle review panel in all views,Afficher/Masquer le panneau de validation dans toutes les vues
+shortcut-viewer-toggle-all-overview,Toggle overview in all views,Afficher/Masquer l'aperçu dans toutes les vues
+shortcut-viewer-toggle-all-annotations,Toggle annotations panel in all views,Afficher/Masquer le panneau des annotations dans toutes les vues
+shortcut-viewer-toggle-all-current,Toggle currently selected annotation panel in all views,Afficher/Masquer les détails de l'annotation sélectionnée dans toutes les vues
 shortcut-general-close-modal,Close a modal,Fermer une fenêtre,Cerrar una ventana de diálogo
+shortcut-general-shortcuts-modal,Bring up this keyboard shortcut list,Afficher cette liste de raccourcis clavier
 shortcut-text-editor-bold,Format text in bold,Mettre le texte en gras,Negrita
 shortcut-text-editor-italic,Format text in italic,Mettre le texte en italique,Cursiva
 shortcut-text-editor-underline,Format text underlined,Souligner le texte,Subrayado
@@ -1022,3 +1043,5 @@ delete-source,Delete source,Supprimer la source de confiance,
 delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,
 notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée,
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
+images-in-projects,Images in projects,Images au sein des projets
+uploaded-images,Images uploaded,Images téléversées

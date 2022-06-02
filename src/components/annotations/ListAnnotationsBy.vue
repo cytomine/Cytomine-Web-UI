@@ -47,7 +47,7 @@
         @updateProperties="$emit('updateProperties')"
         @centerView="$emit('centerView', annot)"
         @deletion="$emit('delete', annot)"
-        @selectAnnotation="$emit('select', annot)"
+        @select="$emit('select', $event)"
       />
 
       <b-pagination

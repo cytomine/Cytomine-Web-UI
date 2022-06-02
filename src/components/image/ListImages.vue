@@ -444,7 +444,7 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
-    }
+    },
   },
   watch: {
     querySearchTags(values) {

@@ -56,7 +56,9 @@ export default {
       sliceInstances: {},
       loadedSlicePages: [],
       activeSlice: null,
-      activePanel: null
+      activePanel: null,
+
+      routedAnnotation: null
     };
   },
 
@@ -95,6 +97,13 @@ export default {
 
     setProfile(state, profile) {
       state.profile = profile;
+    },
+
+    setRoutedAnnotation(state, annotation) {
+      state.routedAnnotation = annotation;
+    },
+    clearRoutedAnnotation(state) {
+      state.routedAnnotation = null;
     }
   },
 

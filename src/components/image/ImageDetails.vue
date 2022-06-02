@@ -207,7 +207,6 @@
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">
-
               <router-link
                 v-if="!image.reviewed && !image.inReview"
                 :to="`/project/${image.project}/image/${image.id}?action=review`"
@@ -240,7 +239,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
+            <a class="button" v-if="canDownloadImages" :href="image.downloadURL">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -329,11 +328,16 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     blindMode() {
-      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+      return ((this.project || {}).blindMode) || false;
     },
     canDownloadImages() {
-      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.project || {}).areImagesDownloadable) || false
+      );
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
@@ -403,7 +407,7 @@ export default {
         });
         this.$emit('delete');
 
-        let updatedProject = this.$store.state.currentProject.project.clone();
+        let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }

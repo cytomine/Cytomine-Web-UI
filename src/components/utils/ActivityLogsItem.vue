@@ -50,6 +50,7 @@ export default {
     actionData() {
       return JSON.parse(this.action.data);
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     type() {
       switch(this.action.serviceName) {
         case 'userAnnotationService':

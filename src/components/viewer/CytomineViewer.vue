@@ -53,7 +53,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance, SliceInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance, Annotation} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -124,10 +124,15 @@ export default {
         'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
         'tool-freehand-polygon', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
         'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
-        'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
+        'toggle-review-layer', 'toggle-all-review-layer', 'toggle-selected-layers', 'toggle-all-selected-layers',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
         'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
         'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste', 'tool-review-reject', 'tool-review-toggle',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-all-information', 'toggle-all-zoom',
+        'toggle-all-filters', 'toggle-all-layers', 'toggle-all-ontology', 'toggle-all-properties',
+        'toggle-all-broadcast', 'toggle-all-review', 'toggle-all-overview', 'toggle-all-annotations',
+        'toggle-all-current', 'toggle-all-link'];
 
       return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
         object[key.replace('viewer-', '')] = shortcuts[key];
@@ -227,7 +232,39 @@ export default {
         this.loading = false;
       }
       catch(err) {
-        window.console.log(err);
+        console.log(err);
+        this.error = true;
+      }
+    },
+
+    async selectAnnotationHandler({index, annot, center=false}) {
+      try {
+        if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
+          annot = await Annotation.fetch(annot.id);
+          let [image, slice] = await Promise.all([
+            ImageInstance.fetch(annot.image),
+            SliceInstance.fetch(annot.slice)
+          ]);
+          this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+        }
+        else if (index === null) {
+          annot = await Annotation.fetch(annot.id);
+          if (this.idImages.includes(String(annot.image))) {
+            let index = this.cells.find(cell => cell.image.id === annot.image).index;
+            this.$eventBus.$emit('selectAnnotation', {index, annot, center});
+          }
+          else {
+            let [image, slice] = await Promise.all([
+              ImageInstance.fetch(annot.image),
+              SliceInstance.fetch(annot.slice)
+            ]);
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
+          }
+        }
+      }
+      catch(err) {
+        console.log(err);
         this.error = true;
       }
     },
@@ -244,7 +281,11 @@ export default {
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
   },
+  mounted() {
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+  },
   beforeDestroy() {
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }
 };
