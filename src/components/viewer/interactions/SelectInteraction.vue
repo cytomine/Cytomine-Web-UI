@@ -56,8 +56,8 @@ export default {
         if(notAnnotations.length == 1){
           value = notAnnotations;
 
-          if(this.shiftPressed){
-            value = this.addSelectedFeatures(value);
+          if(this.shiftPressed && value.length>=1){
+            value = this.selectMultipleFeatures(value);
           }
 
           this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
@@ -106,8 +106,8 @@ export default {
           annot.recordAction();
         }
 
-        if(this.shiftPressed){
-          value = this.addSelectedFeatures(value);
+        if(this.shiftPressed && value.length>=1){
+          value = this.selectMultipleFeatures(value);
         }
 
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
@@ -158,14 +158,34 @@ export default {
     }
   },
   methods: {
-    addSelectedFeatures(value){
+    selectMultipleFeatures(value){
+      let featureIds = [];
+      let selectedFeatureId = value[0].id;
+      if(this.selectedFeatures){
+        featureIds = this.selectedFeatures.map(feature => feature.id); 
+      }
+      if(!featureIds.includes(selectedFeatureId)){
+        return this.addSelectedFeature(value);
+      }
+      else{
+        return this.removeSelectedFeature(selectedFeatureId);
+      }
+    },
+    addSelectedFeature(value){
       // Diectly modify a state that belongs to Vue return vuex error. Avoid this by doing a copy of the element.
       let features = [...value];
-      this.selectedFeatures.forEach(el => {
-        if(!value.map(x => x.id).includes(el.id)){
-          features.push(el);
+      this.selectedFeatures.forEach(feature => {
+        if(!value.map(v => v.id).includes(feature.id)){
+          features.push(feature);
         }
       });
+      return features;
+    },
+    removeSelectedFeature(id){
+      // Diectly modify a state that belongs to Vue return vuex error. Avoid this by doing a copy of the element.
+      let features = [...this.selectedFeatures];
+      let index = features.findIndex(feature => feature.id === id);
+      features.splice(index, 1);
       return features;
     }
   },
