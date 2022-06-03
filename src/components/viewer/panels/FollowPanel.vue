@@ -65,7 +65,7 @@
 import {get} from '@/utils/store-helpers';
 
 import Username from '@/components/user/Username';
-
+import {appendShortTermToken} from '@/utils/token-utils.js';
 import {UserPosition} from 'cytomine-client';
 
 import constants from '@/utils/constants.js';
@@ -90,7 +90,8 @@ export default {
 
       disabledBroadcast: false,
 
-      wsUserPositionPath: constants.CYTOMINE_USER_POSITION_WEBSOCKET_HOST,
+      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll("https","").replaceAll("http", "") + "/user-position/",
+
       userPostitionWebsock: null,
       wsConnected: false
     };
@@ -98,6 +99,7 @@ export default {
   computed: {
     projectMembers: get('currentProject/members'),
     projectManagers: get('currentProject/managers'),
+    shortTermToken: get('currentUser/shortTermToken'),
     projectContributors() {
       return this.$store.getters['currentProject/contributors'];
     },
@@ -262,10 +264,14 @@ export default {
       this.userPostitionWebsock.onopen = this.onOpentracking;
     },
     initWebSocket(){
-      this.userPostitionWebsock = new WebSocket(this.wsUserPositionPath + this.currentUser.id + '/' + this.image.id + '/' + this.broadcast);
-      this.userPostitionWebsock.onopen = this.onOpen;
-      this.userPostitionWebsock.onclose = this.onClose;
-      this.userPostitionWebsock.onmessage = this.onMessage;
+      try {
+        this.userPostitionWebsock = new WebSocket(appendShortTermToken(this.wsUserPositionPath + this.currentUser.id + '/' + this.image.id + '/' + this.broadcast, this.shortTermToken));
+        this.userPostitionWebsock.onopen = this.onOpen;
+        this.userPostitionWebsock.onclose = this.onClose;
+        this.userPostitionWebsock.onmessage = this.onMessage;
+      } catch (error) {
+        console.log('error', error);
+      }
     },
     onOpen(){
       this.wsConnected = true;
@@ -308,6 +314,7 @@ export default {
       }
 
       try {
+        console.log('fetchLastPosition');
         let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
         if(!pos.id || !pos.broadcast) {
           return;
@@ -333,7 +340,7 @@ export default {
 
       let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
-      
+
       if(this.broadcast){
         this.followers = [];
         let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
