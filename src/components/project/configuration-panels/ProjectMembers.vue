@@ -47,6 +47,7 @@
 
     <cytomine-table
       :collection="MemberCollection"
+      :is-empty="this.selectedRoles.length === 0"
       :currentPage.sync="currentPage"
       :perPage.sync="perPage"
       :sort.sync="sortField"
