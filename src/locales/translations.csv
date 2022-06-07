@@ -179,10 +179,10 @@ annotation-type,Annotation type,Type d'annotation,Tipo de anotación
 multiple-terms,Multiple terms,Plusieurs termes,Múltiples términos
 created-by,Created by,Créé par,Creado por
 properties,Properties,Propriétés,Propiedades
-no-properties,No properties,Aucune propriété,Ninguna propiedad
+no-properties,No property,Aucune propriété,Ninguna propiedad
 tags,Tags,Tags,Etiquetas
 no-tag,No tag,Aucun tag,Sin etiqueta
-new-tag,New tag,Nouveau tag,Nueva etiqueta
+button-new-tag,New tag,Nouveau tag,Nueva etiqueta
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag,Error al crear la etiqueta
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés,Error al crear las etiquetas
@@ -1042,8 +1042,18 @@ in-this-slice,in this slice,dans ce plan,
 link-mode,Mode,Mode,
 absolute-link-mode,Absolute,Absolu,
 relative-link-mode,Relative,Relatif,
-too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.,,
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas
+minimum,Minimum,Minimum
+maximum,Maximum,Maximum
+button-adjust,Adjust,Ajuster
+button-adjust-image,Adjust to image,Ajuster à l'image
+button-adjust-slice,Adjust to slice,Ajuster au plan
+button-switch-histogram-scale-to-log,Switch to log histogram,Utiliser un histogramme log
+button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un histogramme linéaire
+gamma,Gamma,Gamma
+inverse,Inverse,Inverse
+button-compute-histogram,Compute histogram,Calculer l'histogramme
+too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
 confirm-profile-computation,Confirm profile computation,Confirmer le calcul du profil
