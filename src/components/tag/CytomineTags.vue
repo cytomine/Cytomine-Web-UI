@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@
 <script>
 
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
-import DomainTagInput from '@/components/utils/DomainTagInput';
 import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
 import {get} from '@/utils/store-helpers';
 
@@ -53,10 +52,6 @@ export default {
   props: {
     object: {type: Object},
     canEdit: {type: Boolean, default: true}
-  },
-  components: {
-    DomainTagInput,
-    AddTagDomainAssociationModal
   },
   data() {
     return {

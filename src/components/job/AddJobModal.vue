@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
       </div>
     </div>
     <template v-if="selectedSoftware">
+      <b-message v-if="selectedSoftware.deprecated" type="is-info" has-icon icon-size="is-small">
+        {{$t('notif-deprecated-software')}}
+      </b-message>
       <table class="table is-fullwidth">
         <thead>
           <tr>

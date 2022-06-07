@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -135,6 +135,7 @@
             :job="job"
             @update="revision++"
             @delete="deleteJob(job)"
+            @relaunch="addJob"
           />
         </template>
 
@@ -283,6 +284,7 @@ export default {
       await job.setFavorite();
       this.revision++;
     },
+    // eslint-disable-next-line no-unused-vars
     async deleteJob(jobToDelete) {
       try {
         // await jobToDelete.delete();
@@ -299,17 +301,21 @@ export default {
           text: this.$t('notif-error-analysis-deletion')
         });
       }
-    }
+    },
+    async refreshJobs() {
+      try {
+        await this.fetchMultiselectOptions();
+        this.loading = false;
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+    },
   },
   async created() {
-    try {
-      await this.fetchMultiselectOptions();
-      this.loading = false;
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    await this.refreshJobs();
+    this.loading = false;
   }
 };
 </script>

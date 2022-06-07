@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -69,9 +69,9 @@ export default {
       await Cytomine.instance.openAdminSession();
       commit('setAdminByNow', true);
     },
-    async closeAdminSession({commit}) {
+    async closeAdminSession({dispatch}) {
       await Cytomine.instance.closeAdminSession();
-      commit('setAdminByNow', false);
+      await dispatch('fetchUser');
     },
 
     async login({dispatch}, payload) {

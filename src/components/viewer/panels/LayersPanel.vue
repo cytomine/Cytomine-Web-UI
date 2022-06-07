@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ import {get} from '@/utils/store-helpers';
 
 import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
+import _ from 'lodash';
 
 export default {
   name: 'layers-panel',
@@ -107,8 +108,8 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
     },
     activePanel() {
       return this.imageWrapper.activePanel;
@@ -131,7 +132,7 @@ export default {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
-      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
     },
     nbReviewedAnnotations() {
       return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
@@ -204,16 +205,6 @@ export default {
     },
     deleteAnnotationEventHandler(annot) {
       this.annotationEventHandler(annot);
-
-      let updatedProject = this.$store.state.currentProject.project.clone();
-      if(annot.type === 'UserAnnotation') {
-        updatedProject.numberOfAnnotations--;
-      }
-      else {
-        updatedProject.numberOfReviewedAnnotations--;
-      }
-
-      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {
@@ -290,7 +281,17 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.slice.fetchAnnotationsIndex();
+      // TODO: optimize, backend should be able to send indexes for several slices at once.
+      let indexLayers = await Promise.all(this.slices.map(async slice => await slice.fetchAnnotationsIndex()));
+      indexLayers = Object.values(_.groupBy(indexLayers.flat(), 'user'));
+      this.indexLayers = indexLayers.map(userIndexLayers => userIndexLayers.reduce((a, b) => {
+        return {
+          user: a.user,
+          countAnnotation: a.countAnnotation + b.countAnnotation,
+          countReviewedAnnotation: a.countReviewedAnnotation + b.countReviewedAnnotation
+        };
+      }, {user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0}));
+      // ----
     },
 
     shortkeyHandler(key) {

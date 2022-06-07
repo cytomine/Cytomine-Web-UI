@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ export default {
       return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
     },
     activeTool() {
       return this.imageWrapper.draw.activeTool;
@@ -100,6 +101,8 @@ export default {
         case 'freehand-polygon':
         case 'select': // correct mode
           return 'Polygon';
+        default:
+          return ''; // Should not happen
       }
     },
     drawCorrection() {

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -125,7 +125,8 @@ export default {
       .then(response => (settings = response.data));
 
     for (let i in settings) {
-      if (constants.hasOwnProperty(i) || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
+      if (Object.prototype.hasOwnProperty.call(constants, i)
+        || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
         constants[i] = settings[i];
       }
     }

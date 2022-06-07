@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          crossOrigin="Anonymous"
+          :crossOrigin="slices[0].imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -51,14 +51,14 @@
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -211,10 +211,9 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
-
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -292,8 +291,11 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -373,36 +375,44 @@ export default {
     tileSize() {
       return this.image.tileSize;
     },
-
-    baseLayerURLs() {
-      let filterPrefix = this.imageWrapper.colors.filter || '';
-      let contrast = (this.imageWrapper.colors.contrast !== 1) ? `&contrast=${this.imageWrapper.colors.contrast}` : '';
-      let gamma = (this.imageWrapper.colors.gamma !== 1) ? `&gamma=${this.imageWrapper.colors.gamma}` : '';
-      let inverse = (this.imageWrapper.colors.inverse) ? '&inverse=true' : '';
-      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}${contrast}${gamma}${inverse}`;
-
-      let minmax = this.imageWrapper.colors.minMax.map(stat => `${stat.sample+1}:${stat.min},${stat.max}`).join('%7C');
-      if (minmax) params += `&minmax=${minmax}`;
-
-      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
+    baseLayerProcessingParams() {
+      return this.$store.getters[this.imageModule + 'tileRequestParams'];
     },
-
-    colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0
-                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    },
-    operation() {
-      return operation;
-    },
-    lib() {
+    baseLayerSliceParams() {
       return {
-        ...constLib,
-        brightness: this.imageWrapper.colors.brightness,
-        contrast: this.imageWrapper.colors.contrast,
-        saturation: this.imageWrapper.colors.saturation,
-        hue: this.imageWrapper.colors.hue
+        // eslint-disable-next-line camelcase
+        z_slices: this.slices[0].zStack,
+        timepoints: this.slices[0].time
       };
     },
+    baseLayerURLQuery() {
+      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      if (query.length > 0) {
+        return `?${query}`;
+      }
+      return query;
+    },
+    baseLayerURLs() {
+      let slice = this.slices[0];
+      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+    },
+
+    // colorManipulationOn() {
+    //   return this.imageWrapper.colors.brightness !== 0
+    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    // },
+    // operation() {
+    //   return operation;
+    // },
+    // lib() {
+    //   return {
+    //     ...constLib,
+    //     brightness: this.imageWrapper.colors.brightness,
+    //     contrast: this.imageWrapper.colors.contrast,
+    //     saturation: this.imageWrapper.colors.saturation,
+    //     hue: this.imageWrapper.colors.hue
+    //   };
+    // },
 
     layersToPreload() {
       let layers = [];
@@ -505,6 +515,8 @@ export default {
       await this.$refs.map.$createPromise; // wait for ol.Map to be created
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
+      let map = this.$refs.map.$map;
+
       this.overview = new OverviewMap({
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
@@ -512,7 +524,12 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      this.$refs.map.$map.addControl(this.overview);
+      map.addControl(this.overview);
+
+      this.overview.getOverviewMap().on(('click'), (evt) => {
+        let size = map.getSize();
+        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+      });
     },
 
     toggleOverview() {
@@ -528,11 +545,10 @@ export default {
     savePosition: _.debounce(async function() {
       if(this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
-
         try {
           await UserPosition.create({
             image: this.image.id,
-            slice: this.slice.id,
+            slice: this.slices[0].id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -589,7 +605,7 @@ export default {
             annot = await Annotation.fetch(annot.id);
           }
 
-          if(annot.slice !== this.slice.id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
             this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -599,7 +615,7 @@ export default {
           if (showComments) {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
-          
+
           this.selectedAnnotation = annot; // used to pre-load annot layer
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
           this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
@@ -724,7 +740,7 @@ export default {
     if (annot) {
       try {
         if (annot.image === this.image.id) {
-          if (annot.slice !== this.slice.id) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }

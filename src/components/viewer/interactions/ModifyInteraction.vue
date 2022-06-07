@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@
 <script>
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
-import {altKeyOnly, singleClick} from 'ol/events/condition';
+import {singleClick} from 'ol/events/condition';
 import {isRectangle} from '@/utils/geometry-utils';
 
 export default {
@@ -89,7 +89,7 @@ export default {
     },
     deleteCondition() {
       return function(mapBrowserEvent) {
-        return altKeyOnly(mapBrowserEvent) && singleClick(mapBrowserEvent);
+        return mapBrowserEvent.originalEvent.ctrlKey && singleClick(mapBrowserEvent);
       };
     },
     insertVertexCondition() {

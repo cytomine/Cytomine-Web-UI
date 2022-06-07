@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -50,7 +50,11 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in images" :key="image.id" :class="{active: alreadyAdded(image)}">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+          <a
+            class="card-image"
+            @click="addImage(image)"
+            :style="'background-image: url(' + imageThumbUrl(image) + ')'"
+          ></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -85,6 +89,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {IMAGE_FORMAT} from '@/utils/image-utils';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import ImageName from '@/components/image/ImageName';
@@ -145,7 +150,7 @@ export default {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
       catch(error) {
         console.log(error);
@@ -217,6 +222,9 @@ export default {
 
     alreadyAdded(image) {
       return this.viewerImagesIds.includes(image.id);
+    },
+    imageThumbUrl(image) {
+      return image.thumbURL(256, IMAGE_FORMAT);
     }
   },
   async created() {

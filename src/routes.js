@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -182,6 +182,7 @@ const routes = [
   {path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage'},
   {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
   {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation'},
+  {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
   // -----
 
   {

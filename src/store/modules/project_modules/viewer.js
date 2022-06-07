@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ export default {
       activeImage: 0,
       indexNextImage: 0,
 
-      copiedAnnot: null
+      copiedAnnot: null,
+      copiedAnnotImageInstance: null
     };
   },
 
@@ -44,12 +45,20 @@ export default {
       state.indexNextImage++;
     },
 
+    registerImage(state) {
+      state.indexNextImage++;
+    },
+
     setActiveImage(state, index) {
       state.activeImage = index;
     },
 
     setCopiedAnnot(state, annot) {
       state.copiedAnnot = annot;
+    },
+
+    setCopiedAnnotImageInstance(state, image) {
+      state.copiedAnnotImageInstance = image;
     },
 
     setLinkMode(state, mode) {
@@ -94,17 +103,23 @@ export default {
     changePath({getters}) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
       let action = router.currentRoute.query.action;
-      router.replace(getters.pathViewer({idAnnotation, action}));
+      // eslint-disable-next-line no-unused-vars
+      router.replace(getters.pathViewer({idAnnotation, action})).catch(_ => {});
     },
 
-    async addImage({state, commit, getters, dispatch}, {image, slice, annot=null}) {
+    registerImage({state, commit, getters}) {
+      let index = state.indexNextImage;
+      commit('registerImage');
+      this.registerModule(getters.pathImageModule(index), imageModule);
+    },
+    async addImage({state, commit, getters, dispatch}, {image, slices, annot=null}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
       if (annot) {
         commit(`images/${index}/setRoutedAnnotation`, annot);
       }
-      await dispatch(`images/${index}/initialize`, {image, slice});
+      await dispatch(`images/${index}/initialize`, {image, slices});
       dispatch('changePath');
     },
 
@@ -199,8 +214,15 @@ export default {
       let idProject = getters.pathModule[1];
       let idViewer = getters.pathModule[3];
       // ---
-      let imagesIds = Object.values(state.images).map(img => img.imageInstance ? img.imageInstance.id : 0);
-      let slicesIds = Object.values(state.images).map(img => img.activeSlice ? img.activeSlice.id : 0);
+      let imagesIds = Object.values(state.images).map(img =>
+        img.imageInstance ? img.imageInstance.id : 0
+      );
+      let slicesIds = Object.values(state.images).map(img => {
+        if (img.activeSlices && img.activeSlices.length > 0) {
+          return img.activeSlices.map(slice => slice.id).join(':');
+        }
+        return 0;
+      });
       let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
       let actionStr = action ? '&action=' + action : '';
       return `/project/${idProject}/image/${imagesIds.join('-')}/slice/${slicesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;

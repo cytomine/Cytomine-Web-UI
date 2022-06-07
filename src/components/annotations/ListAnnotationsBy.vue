@@ -1,3 +1,17 @@
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.-->
+
 <template>
 <div class="box">
   <b-loading :is-full-page="false" class="small" :active="loading"  />
@@ -67,6 +81,7 @@ import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 import constants from '@/utils/constants';
+import _ from 'lodash';
 
 export default {
   name: 'list-annotations-by',
@@ -87,7 +102,7 @@ export default {
 
     termsIds: Array,
     tracksIds: Array,
-    tagsIds: {type: Array, defaul: null},
+    tagsIds: Array,
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
@@ -161,7 +176,7 @@ export default {
         multipleTerm: this.multipleTerms,
         noTrack: this.noTrack,
         multipleTrack: this.multipleTracks,
-        noTag: (this.tagsIds) ? this.noTag : null,
+        noTag: this.noTag,
 
         terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
         users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
@@ -263,8 +278,14 @@ export default {
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
     },
-    activeSlice() {
-      return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
+    activeSlices() {
+      return (this.imageWrapper) ? this.imageWrapper.activeSlices : null;
+    },
+    activeSlicesIds() {
+      return (this.activeSlices) ? this.activeSlices.map(slice => slice.id) : [];
+    },
+    activeSliceWithSmallestRank() {
+      return (this.activeSlices) ? _.orderBy(this.activeSlices, ['rank'])[0] : null;
     },
 
     annotationIds() {
@@ -309,7 +330,7 @@ export default {
         this.fetchPage();
       }
     },
-    activeSlice() {
+    activeSlices() {
       this.findPage();
     }
   },
@@ -317,7 +338,7 @@ export default {
     annotStyles(annot, index) {
       let groupDetails = this.annotationInGroupDetails[index];
       return {
-        'active': this.isInViewer && annot.slice === this.imageWrapper.activeSlice.id,
+        'active': this.isInViewer && this.activeSlicesIds.includes(annot.slice),
         'group-first': this.regroup && groupDetails.first,
         'group-last': this.regroup && groupDetails.last,
         'group-in': this.regroup && groupDetails.in && !groupDetails.first && !groupDetails.last,
@@ -331,7 +352,7 @@ export default {
     async findPage() {
       if (this.isInViewer) {
         let countCollection = this.collection.clone();
-        countCollection.beforeSlice = this.activeSlice.id;
+        countCollection.beforeSlice = this.activeSliceWithSmallestRank;
         countCollection.max = 1;
         this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
       }

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,15 +24,17 @@ limitations under the License.-->
       class="has-background-light">
     <b-carousel-item v-for="image in imageGroup.imageInstances" :key="`${imageGroup.id}-${image.id}`">
       <div class="has-text-centered">
-        <img :src="image.thumb" class="image-overview">
+        <image-thumbnail :url="image.thumb" :key="`${imageGroup.id}-${image.thumb}`" :size="128" />
       </div>
     </b-carousel-item>
   </b-carousel>
 </template>
 
 <script>
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 export default {
   name: 'image-group-preview',
+  components: {ImageThumbnail},
   props: {
     imageGroup: {type: Object},
   }
@@ -40,7 +42,7 @@ export default {
 </script>
 
 <style scoped>
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

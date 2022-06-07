@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
         class="button"
         :disabled="disabledDraw"
         @click="showTermSelector = !showTermSelector"
+        :title="disabledDrawMessage"
       >
         <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
       </button>
@@ -66,6 +67,7 @@
         class="button"
         :disabled="disabledDraw"
         @click="showTrackSelector = !showTrackSelector"
+        :title="disabledDrawMessage"
       >
         <span class="icon is-small"><i class="fas fa-route"></i></span>
       </button>
@@ -95,6 +97,7 @@
       <button
         v-if="isToolDisplayed('point')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('point')"
         class="button"
         :class="{'is-selected': activeTool === 'point'}"
@@ -106,6 +109,7 @@
       <button
         v-if="isToolDisplayed('line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('line')"
         class="button"
         :class="{'is-selected': activeTool === 'line'}"
@@ -117,6 +121,7 @@
       <button
         v-if="isToolDisplayed('freehand-line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-line')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-line'}"
@@ -136,6 +141,7 @@
       <button
         v-if="isToolDisplayed('rectangle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('rectangle')"
         class="button"
         :class="{'is-selected': activeTool === 'rectangle'}"
@@ -147,6 +153,7 @@
       <button
         v-if="isToolDisplayed('circle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('circle')"
         class="button"
         :class="{'is-selected': activeTool === 'circle'}"
@@ -158,6 +165,7 @@
       <button
         v-if="isToolDisplayed('polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'polygon'}"
@@ -169,6 +177,7 @@
       <button
         v-if="isToolDisplayed('freehand-polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-polygon'}"
@@ -421,17 +430,18 @@ import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/Paste
 import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector';
 
 import WKT from 'ol/format/WKT';
-import {containsExtent} from 'ol/extent';
+import {containsExtent, getCenter, getIntersection} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType, AnnotationLink} from 'cytomine-client';
-import {Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
-  listAnnotationsInGroup} from '@/utils/annotation-utils';
+import {
+  Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
+  listAnnotationsInGroup
+} from '@/utils/annotation-utils';
 
 
 export default {
   name: 'draw-tools',
   components: {
-    PasteAnnotationWithLinkModal,
     AnnotationLinkSelector,
     TrackTree,
     OntologyTree,
@@ -479,7 +489,11 @@ export default {
       return this.$store.getters[this.imageModule + 'imageGroupId'];
     },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
+    },
+    multipleActiveSlices() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
     },
     maxRank() {
       return this.$store.getters[this.imageModule + 'maxRank'];
@@ -559,7 +573,10 @@ export default {
       return !this.layers.find(layer => layer.drawOn);
     },
     disabledDraw() {
-      return this.noActiveLayer;
+      return this.noActiveLayer || this.multipleActiveSlices;
+    },
+    disabledDrawMessage() {
+      return (this.multipleActiveSlices) ? this.$t('warning-cannot-draw-multiple-slices') : null;
     },
     actions() {
       return this.imageWrapper.undoRedo.actions;
@@ -579,6 +596,14 @@ export default {
       },
       set(annot) {
         this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
+    copiedAnnotImageInstance: {
+      get() {
+        return this.viewerWrapper.copiedAnnotImageInstance;
+      },
+      set(image) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnotImageInstance', image);
       }
     },
     linkableCopiedAnnot() {
@@ -763,29 +788,77 @@ export default {
         return;
       }
 
+      this.copiedAnnotImageInstance = this.image;
       this.copiedAnnot = feature.properties.annot.clone();
       this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
+    },
+    convertLocation(copiedAnnot, destImage) {
+      /* If we want to paste in the same image but in another slice */
+      if (destImage.id === copiedAnnot.image) {
+        return copiedAnnot.location;
+      }
+
+      let geometry = new WKT().readGeometry(copiedAnnot.location);
+      let wrapper = this.imageWrapper;
+      let centerExtent = getCenter(geometry.getExtent());
+
+      /* Translate the original location of the annotation to the center of the current FOV */
+      geometry.translate(wrapper.view.center[0] - centerExtent[0], wrapper.view.center[1] - centerExtent[1]);
+
+      /* Compute the rescaling factors if the resolution is known for both images */
+      let scaleX = 1;
+      let scaleY = 1;
+      let srcImage = this.copiedAnnotImageInstance;
+      let hasPhysicalSizeX = srcImage.physicalSizeX !== null && destImage.physicalSizeX !== null;
+      let hasPhysicalSizeY = srcImage.physicalSizeY !== null && destImage.physicalSizeY !== null;
+
+      if (hasPhysicalSizeX && hasPhysicalSizeY) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
+      }
+      else if (hasPhysicalSizeX) {
+        scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
+        scaleY = scaleX;
+      }
+
+      /* Rescale the annotation */
+      geometry.scale(scaleX, scaleY);
+
+      /* Rescale the annotation if it is larger than the destination image size */
+      let annotExtent = geometry.getExtent();
+      let annotWidth = annotExtent[2] - annotExtent[0];
+      let annotHeight = annotExtent[3] - annotExtent[1];
+      if (annotWidth > destImage.width || annotHeight > destImage.height) {
+        let scale = annotHeight > annotWidth ? annotWidth / annotHeight : annotHeight / annotWidth;
+        geometry.scale(scale);
+      }
+
+      /* Check if the translation is within the image boundaries */
+      let imageExtent = [0, 0, destImage.width, destImage.height];
+      if (!containsExtent(imageExtent, geometry.getExtent())) {
+        let geomExtent = geometry.getExtent();
+        /* Get the part of annotation within the boundaries */
+        let intersection = getIntersection(imageExtent, geomExtent);
+
+        /* Get the difference between the parts inside and outside the image boundaries */
+        let difference = [];
+        for (let i = 0; i < intersection.length; i++) {
+          difference[i] = intersection[i] - geomExtent[i];
+        }
+
+        /* Translate the difference to have the complete annotation inside the image boundaries */
+        geometry.translate(difference[0] + difference[2], difference[1] + difference[3]);
+      }
+
+      return new WKT().writeGeometry(geometry);
     },
     async paste() {
       if (!this.copiedAnnot) {
         return;
       }
 
-      let location;
-      let geometry = new WKT().readGeometry(this.copiedAnnot.location);
-
-      if (this.image.id === this.copiedAnnot.image || containsExtent(this.imageExtent, geometry.getExtent())) {
-        location = this.copiedAnnot.location;
-      }
-      else {
-        let extent = geometry.getExtent();
-        let center = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
-        geometry.translate(this.image.width / 2 - center[0], this.image.height / 2 - center[1]);
-        if (containsExtent(this.imageExtent, geometry.getExtent())) {
-          location = new WKT().writeGeometry(geometry);
-        }
-      }
-
+      /* Convert the location if it is needed */
+      let location = this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
         return;

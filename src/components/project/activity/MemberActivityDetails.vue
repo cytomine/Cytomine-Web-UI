@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <img :src="consultation.imageThumb" class="image-overview" :key="consultation.imageThumb">
+                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" />
               </router-link>
             </b-table-column>
 
@@ -255,10 +255,12 @@ import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';
 
 import moment from 'moment';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'member-activity-details',
   components: {
+    ImageThumbnail,
     CytomineDatepicker,
     ProjectConnectionDetails,
     LastConnectionsChart
@@ -351,7 +353,7 @@ li {
   margin-bottom: 0.5em;
 }
 
-.image-overview {
+.image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

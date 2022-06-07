@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -62,8 +62,11 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
     annotsIdsToSelect() {
       return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
@@ -121,7 +124,7 @@ export default {
     },
 
     annotBelongsToLayer(annot) {
-      return annotBelongsToLayer(annot, this.layer, this.slice);
+      return annotBelongsToLayer(annot, this.layer, this.sliceIds);
     },
 
     addAnnotationHandler(annot) {
@@ -222,7 +225,7 @@ export default {
       let annots = await new AnnotationCollection({
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
-        slice: this.slice.id,
+        slices: this.sliceIds,
         reviewed: this.layer.isReview,
         notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
@@ -285,6 +288,13 @@ export default {
       let arrayAnnots;
       try {
         arrayAnnots = await this.fetchAnnots(extent);
+        // Order by size, so bigger ones are always sent to back
+        arrayAnnots.sort(
+          function( a, b ) {
+            if( a.area < b.area ) return 1;
+            else return -1;
+          }
+        );
       }
       catch(error) {
         console.log(error);

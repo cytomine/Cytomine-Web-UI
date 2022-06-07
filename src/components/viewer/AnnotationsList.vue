@@ -50,7 +50,7 @@
           :no-track="noTrack"
 
           :images-ids="[image.id]"
-          :slices-ids="[slice.id]"
+          :slices-ids="sliceIds"
           :users-ids="layersIds"
           :terms-ids="termsOptionsIds"
           :tracks-ids="tracksIds"
@@ -76,10 +76,6 @@
 <script>
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
@@ -94,10 +90,6 @@ export default {
     ListAnnotationsBy,
     OntologyTree,
     TrackTree,
-    CytomineTerm,
-    CytomineMultiselect,
-    CytomineSlider,
-    AnnotationPreview
   },
   props: [
     'index',
@@ -140,8 +132,11 @@ export default {
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
 
     isDisplayedByTerm() {
@@ -262,7 +257,7 @@ export default {
       }
     },
     isSameView(annot) {
-      return this.displayType === 'TERM' && annot.slice === this.slice.id;
+      return this.displayType === 'TERM' && this.sliceIds.includes(annot.slice);
     },
     select({annot, options}) {
       this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});

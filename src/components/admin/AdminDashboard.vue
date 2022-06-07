@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -74,7 +74,11 @@
             </tr>
             <tr>
               <td>{{totalCounts.images}}</td>
-              <td>{{$t('images')}}</td>
+              <td>{{$t('images-in-projects')}}</td>
+            </tr>
+            <tr>
+              <td>{{totalCounts.abstractImages}}</td>
+              <td>{{$t('uploaded-images')}}</td>
             </tr>
           </tbody>
         </table>
@@ -95,6 +99,8 @@
               <td>{{totalCounts.userAnnotations}}</td>
               <td>{{$t('user-annotations')}}</td>
             </tr>
+            <tr>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -113,6 +119,8 @@
             <tr>
               <td>{{totalCounts.jobAnnotations}}</td>
               <td>{{$t('analysis-annotations')}}</td>
+            </tr>
+            <tr>
             </tr>
           </tbody>
         </table>

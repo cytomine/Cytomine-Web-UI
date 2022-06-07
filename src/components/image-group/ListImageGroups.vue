@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -165,8 +165,6 @@ limitations under the License.-->
 <script>
 import {get, sync, syncBoundsFilter} from '@/utils/store-helpers';
 
-import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 
 import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
@@ -192,8 +190,6 @@ export default {
     OpenImageGroupButton,
     ImageGroupPreview,
     ImageGroupDetails,
-    CytomineTable,
-    CytomineMultiselect,
     CytomineSlider,
     AddImageGroupModal
   },

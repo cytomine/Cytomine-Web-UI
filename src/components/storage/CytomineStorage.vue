@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,17 +24,28 @@
       </b-message>
     </div>
     <div class="panel-block" v-else>
-<!--      <b-message type="is-info" has-icon icon-size="is-small">-->
-<!--        <h2>{{$t('important-notes')}}</h2>-->
-<!--        <ul class="small-text">-->
-<!--          <li>{{$t('max-size-upload-info')}}</li>-->
-<!--          <li>{{$t('allowed-formats-upload-info')}}</li>-->
-<!--          <li>{{$t('vms-mrxs-upload-info')}}</li>-->
-<!--          <li>{{$t('zip-upload-info')}}</li>-->
-<!--          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>-->
-<!--          <li>{{$t('link-to-project-upload-info')}}</li>-->
-<!--        </ul>-->
-<!--      </b-message>-->
+      <b-message type="is-info" has-icon icon-size="is-small">
+        <h2>{{$t('important-notes')}}</h2>
+        <ul class="small-text">
+          <li>{{$t('max-size-upload-info')}}</li>
+          <li>
+            {{$t('allowed-formats-upload-info')}}
+            <template v-if="formatInfos.length">
+            <span v-for="(format, index) in formatInfos" :key="format.id">
+              {{format.name}}<v-popover v-if="format.remarks">
+                <i class="fas fa-info-circle"></i>
+                <template #popover>
+                  <p>{{format.remarks}}</p>
+                </template>
+              </v-popover><template v-if="index < formatInfos.length - 1">, </template>
+            </span>
+            </template>
+          </li>
+          <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
+          <li>{{$t('link-to-project-upload-info')}}</li>
+
+        </ul>
+      </b-message>
 
       <div class="columns">
         <div class="column is-one-quarter has-text-right">
@@ -166,8 +177,8 @@
         :openedDetailed.sync="openedDetails"
       >
         <template #default="{row: uFile}">
-          <b-table-column :label="$t('preview')" width="80">
-            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview" :key="uFile.thumbURL">
+          <b-table-column :label="$t('preview')" width="80" class="image-overview">
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" />
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
@@ -222,10 +233,12 @@ import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'cytomine-storage',
   components: {
+    ImageThumbnail,
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails,
@@ -242,6 +255,7 @@ export default {
       selectedStorage: null,
       projects: [],
       selectedProjects: [],
+      formatInfos: [],
 
       searchString: '',
       openedDetails: [],
@@ -341,6 +355,14 @@ export default {
         console.log(error); // not mandatory for upload => only log error, no other action
       }
     },
+    async fetchFormatInfos() {
+      try {
+        this.formatInfos = (await Cytomine.instance.api.get('imageserver/format.json')).data.collection;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
 
     async refreshStatusSessionUploads() {
       let pendingStatus = [
@@ -349,6 +371,8 @@ export default {
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
+        50,
+        60
       ];
 
       let unfinishedConversions = false;
@@ -463,7 +487,12 @@ export default {
         }
       }
     },
-
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500),
     hideFinished() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
@@ -476,19 +505,12 @@ export default {
           idx++;
         }
       }
-    },
-
-    updatedTree() {
-      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
-    },
-
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500)
+    }
   },
   activated() {
     this.fetchStorages();
     this.fetchProjects();
+    this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
@@ -550,7 +572,7 @@ export default {
   padding-top: 0.5em;
 }
 
-.image-overview {
+.image-overview >>> .image-thumbnail {
   max-height: 4em;
   max-width: 6em;
 }

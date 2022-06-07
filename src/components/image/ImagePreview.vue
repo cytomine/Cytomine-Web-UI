@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import {changeImageUrlFormat} from '@/utils/image-utils';
+
 export default {
   name: 'image-preview',
   props: {
@@ -53,8 +55,14 @@ export default {
     isBlindMode() {
       return (this.project) ? this.project.blindMode : this.blindMode;
     },
+    rawPreviewUrl() {
+      return this.image.thumb || this.image.imageThumb;
+    },
+    previewUrl() {
+      return changeImageUrlFormat(this.rawPreviewUrl);
+    },
     figureStyle() {
-      return {backgroundImage: `url("${(this.image.thumb || this.image.imageThumb)}")`};
+      return {backgroundImage: `url("${this.previewUrl}")`};
     }
   }
 };

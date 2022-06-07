@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <img :src="image.thumb" class="image-overview">
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`"/>
           </router-link>
         </td>
       </tr>
@@ -37,12 +37,6 @@
         <td class="prop-label">{{$t('status')}}</td>
         <td class="prop-content" colspan="3">
           <image-status :image="image" />
-        </td>
-      </tr>
-      <tr v-if="isPropDisplayed('created')">
-        <td class="prop-label">{{$t('created-on')}}</td>
-        <td class="prop-content" colspan="3">
-          {{ Number(image.created) | moment('ll') }}
         </td>
       </tr>
       <tr v-if="isPropDisplayed('numberOfAnnotations')">
@@ -87,24 +81,24 @@
           <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('attachedFiles')">
+      <tr v-if="isPropDisplayed('attached-files')">
         <td class="prop-label">{{$t('attached-files')}}</td>
         <td class="prop-content" colspan="3">
           <attached-files :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('slidePreview')">
+      <tr v-if="isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <img :src="image.macroURL" class="image-overview">
+            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`"/>
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
           </em>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
+      <tr v-if="isPropDisplayed('original-filename') && (!blindMode || canManageProject)">
         <td class="prop-label">{{$t('originalFilename')}}</td>
         <td class="prop-content" colspan="3">
           {{image.originalFilename}}
@@ -194,7 +188,8 @@
       <tr v-if="isPropDisplayed('channels')">
         <td class="prop-label">{{$t("image-channels")}}</td>
         <td class="prop-content" colspan="3">
-          {{$tc("count-bands", image.channels, {count: image.channels})}}
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
         </td>
       </tr>
       <tr v-if="isPropDisplayed('size')">
@@ -214,7 +209,7 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content" colspan="3">
           <div class="buttons are-small">
-            <button class="button" @click="isMetadataModalActive = true">
+            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canAddToImageGroup">
@@ -259,7 +254,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" :href="image.downloadURL" v-if="image.path">
+            <a class="button" v-if="canDownloadImages" :href="image.downloadURL">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -318,17 +313,19 @@ import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
 import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
   components: {
     SimpleAddToImageGroupModal,
+    ImageThumbnail,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -358,8 +355,17 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     blindMode() {
-      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+      return ((this.project || {}).blindMode) || false;
+    },
+    canDownloadImages() {
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.project || {}).areImagesDownloadable) || false
+      );
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
@@ -374,7 +380,7 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromMime(this.image.contentType);
+      return vendorFromFormat(this.image.contentType);
     },
     isInImageGroup() {
       return this.imageGroupLinks.length > 0;
@@ -382,7 +388,7 @@ export default {
   },
   methods: {
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop);
+      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
 
     async cancelReview() {
@@ -435,7 +441,7 @@ export default {
         });
         this.$emit('delete');
 
-        let updatedProject = this.$store.state.currentProject.project.clone();
+        let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
@@ -527,7 +533,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }

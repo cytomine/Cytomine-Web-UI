@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="image.associatedImageURL('macro', 256, 'jpg')" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -92,7 +92,7 @@ export default {
         width: reverse ? height : width,
         height: reverse ? width : height
       };
-    }
+    },
   },
   methods: {
     async rotate(val) {

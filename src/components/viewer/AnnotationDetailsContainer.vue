@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@
     :resizable="false"
     drag-handle=".drag"
     @dragstop="dragStop"
-    :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    ref="detailsPanel"
   >
     <div class="actions">
       <h1>{{$t('current-selection')}}</h1>
@@ -39,10 +40,12 @@
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
         :images="images"
+        :slices="slices"
         :profiles="profiles"
         :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
+        :showChannelInfo="showChannelInfo"
         :key="selectedFeature.id"
         :showComments="showComments"
         @addTerm="$emit('addTerm', $event)"
@@ -90,8 +93,7 @@ export default {
   data() {
     return {
       width: 320,
-      height: 500,
-      users: [],
+      projectUsers: [],
       userJobs: [],
       reload: true,
       showComments: false
@@ -116,6 +118,12 @@ export default {
       }
       return [this.image];
     },
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    showChannelInfo() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
+    },
     profiles() {
       return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];
     },
@@ -139,7 +147,7 @@ export default {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     allUsers() {
-      let allUsers = this.users.concat(this.userJobs);
+      let allUsers = this.projectUsers.concat(this.userJobs);
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
@@ -167,7 +175,12 @@ export default {
   },
   methods: {
     async fetchUsers() {
-      this.users = (await UserCollection.fetchAll()).array;
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.image.project.id,
+      });
+
+      this.projectUsers = (await collection.fetchAll()).array;
     },
     async fetchUserJobs() {
       this.userJobs = (await UserJobCollection.fetchAll({
@@ -185,7 +198,11 @@ export default {
 
       if(this.$refs.playground) {
         let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
-        let maxY = Math.max(this.$refs.playground.clientHeight - this.height, 0);
+        let height = 500;
+        if (this.$refs.detailsPanel) {
+          height = this.$refs.detailsPanel.height;
+        }
+        let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
         this.positionAnnotDetails = {x, y};

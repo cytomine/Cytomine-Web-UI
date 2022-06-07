@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2019. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -65,15 +65,15 @@ import ZoomifySource from './vuelayers-suppl/zoomify-source';
 import RasterSource from './vuelayers-suppl/raster-source';
 import TranslateInteraction from './vuelayers-suppl/translate-interaction';
 import RotateInteraction from './vuelayers-suppl/rotate-interaction';
-import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
 import ModifyInteraction from './vuelayers-suppl/modify-interaction';
+import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
 Vue.use(VueLayers);
 Vue.use(ZoomifySource);
 Vue.use(RasterSource);
 Vue.use(TranslateInteraction);
 Vue.use(RotateInteraction);
-Vue.use(RescaleInteraction);
 Vue.use(ModifyInteraction);
+Vue.use(RescaleInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';

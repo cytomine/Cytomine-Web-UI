@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@
         >
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')">
-              <img :src="image.preview" class="image-overview" :key="image.preview">
+              <image-thumbnail :url="image.preview" :size="128" :key="image.preview" />
             </b-table-column>
 
-            <b-table-column field="originalFilename" :label="$t('name')" sortable>
-              {{ image.originalFilename }}
+            <b-table-column field="instanceFilename" :label="$t('name')" sortable>
+              {{ image.instanceFilename }}
             </b-table-column>
 
             <b-table-column field="created" :label="$t('created-on')" sortable>
@@ -73,6 +73,7 @@ import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection, ImageGroupImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'add-to-image-group-modal',
@@ -82,6 +83,7 @@ export default {
     programmatic: {type: Boolean, default: false}
   },
   components: {
+    ImageThumbnail,
     CytomineTable,
     CytomineModal
   },
@@ -105,7 +107,7 @@ export default {
         withImageGroup: true,
       });
       if(this.searchString) {
-        collection['originalFilename'] = {
+        collection['instanceFilename'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
@@ -176,7 +178,7 @@ export default {
   height: 80vh;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

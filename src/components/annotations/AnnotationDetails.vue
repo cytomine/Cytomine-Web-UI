@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,6 +22,13 @@
           <router-link :to="`/project/${annotation.project}/image/${annotation.image}`">
             <image-name :image="image" />
           </router-link>
+        </td>
+      </tr>
+
+      <tr v-if="showChannelInfo">
+        <td><strong>{{$t('channel')}}</strong></td>
+        <td>
+          <channel-name :channel="sliceChannel" />
         </td>
       </tr>
 
@@ -264,10 +271,12 @@ import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'annotations-details',
   components: {
+    ChannelName,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -275,7 +284,6 @@ export default {
     CytomineTags,
     CytomineProperties,
     AttachedFiles,
-    AnnotationCommentsModal,
     TrackTree,
     CytomineTrack,
     AnnotationLinksPreview
@@ -286,8 +294,10 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    slices: {type: Array, default: () => []},
     profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
@@ -317,6 +327,7 @@ export default {
       if(this.isReview) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
+      return null;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);
@@ -329,6 +340,9 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+    },
+    sliceChannel() {
+      return this.slices.find(slice => slice.id === this.annotation.slice) || {};
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;

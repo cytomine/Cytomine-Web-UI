@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
       icon="search"
       size="is-small"
   />
-  <div v-for="category in categories" :key="category" v-if="filteredShortcuts(category).length > 0">
+  <div v-for="category in filteredCategories" :key="category">
     <h2>{{$t(`shortcut-${category}`)}}</h2>
     <b-table :data="filteredShortcuts(category)" class="shortcut-list">
       <template #default="{row: shortcut}">
@@ -82,6 +82,9 @@ export default {
     },
     noResult() {
       return this.categories.every(category => this.isEmpty(category));
+    },
+    filteredCategories() {
+      return this.categories.filter(category => this.filteredShortcuts(category).length > 0);
     }
   },
   methods: {

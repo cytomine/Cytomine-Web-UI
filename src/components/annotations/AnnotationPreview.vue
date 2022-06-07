@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@
       @updateProperties="$emit('updateProperties')"
       @select="$emit('select', $event)"
       @centerView="$emit('centerView')"
-      @deletion="$emit('deletion')"
+      @deletion="handleDeletion"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
@@ -89,13 +89,33 @@ export default {
     };
   },
   computed: {
-    styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let updatedParams = this.annot.updated ? '&updated=' + this.annot.updated : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=true&rev=${this.revisionCrop}&thickness=2&increaseArea=1.25${outlineParams}${updatedParams}`;
+    cropParameters() {
+      let params = {
+        square: true,
+        complete: true,
+        thickness: 2,
+        increaseArea: 1.25,
+        rev: this.revisionCrop,
+      };
 
+      if (this.color || this.color === '') {
+        params.draw = true;
+      }
+      if (this.color) {
+        params.color = `0x${this.color}`;
+      }
+      if (this.annot.updated) {
+        params.updated = this.annot.updated;
+      }
+
+      return params;
+    },
+    cropUrl() {
+      return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
+    },
+    styleAnnotDetails() {
       return {
-        backgroundImage: `url(${url})`,
+        backgroundImage: `url(${this.cropUrl})`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
@@ -127,6 +147,10 @@ export default {
       }
 
       this.opened = false;
+    },
+    handleDeletion() {
+      this.$eventBus.$emit('deleteAnnotation', this.annot);
+      this.$emit('update');
     },
     reloadAnnotationCropHandler(annot) {
       if (annot.id === this.annot.id) {

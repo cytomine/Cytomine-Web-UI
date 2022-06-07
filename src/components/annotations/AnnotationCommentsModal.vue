@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
   </template>
 
   <div v-show="!addingComment" class="has-text-centered">
-    <button class="button is-link" @click="addingComment = true">{{$t('button-add-comment')}}</button>
+    <button class="button is-link" v-if="!currentUser.guestByNow" @click="addingComment = true">{{$t('button-add-comment')}}</button>
   </div>
 
   <div v-show="addingComment">

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')">
-            <img :src="image.preview" class="image-overview" :key="image.preview">
+            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`"/>
           </b-table-column>
 
           <b-table-column field="originalFilename" :label="$t('name')" sortable>
@@ -67,9 +67,11 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+
 import {AbstractImageCollection, ImageInstance} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'add-image-modal',
@@ -77,6 +79,7 @@ export default {
     active: Boolean,
   },
   components: {
+    ImageThumbnail,
     CytomineTable,
     CytomineModal
   },
@@ -161,7 +164,7 @@ export default {
   height: 80vh;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

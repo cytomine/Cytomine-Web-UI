@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <img :src="image.thumb" class="image-overview" :key="image.thumb">
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
             </router-link>
           </b-table-column>
 
@@ -247,9 +247,10 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -260,6 +261,7 @@ const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, fi
 export default {
   name: 'list-images',
   components: {
+    ImageThumbnail,
     ImageName,
     ImageDetails,
     CytomineTable,
@@ -316,6 +318,9 @@ export default {
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
     selectedVendors: localSyncMultiselectFilter('vendors', 'availableVendors'),
     selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
@@ -365,9 +370,9 @@ export default {
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
-          gte: bounds[0],
           lte: bounds[1]
         };
+        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
         if(selected.length > 0 && selected.length < total) {
@@ -404,10 +409,10 @@ export default {
 
       this.availableFormats = stats.format.list;
 
-      stats.format.list.forEach(mime => {
-        let vendor = vendorFromMime(mime);
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
         let vendorFormatted = {
-          value: vendor ? mime : 'null',
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
 
@@ -448,6 +453,17 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+  },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
     }
   },
   async created() {
@@ -462,6 +478,12 @@ export default {
       console.log(error);
       this.error = true;
     }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
+    }
   }
 };
 </script>
@@ -473,7 +495,7 @@ export default {
   align-items: center;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

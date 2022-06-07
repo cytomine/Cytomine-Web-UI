@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,16 +50,15 @@ limitations under the License.-->
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ImageName from '@/components/image/ImageName';
-
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import constants from '@/utils/constants';
+
+import {Annotation} from 'cytomine-client';
 
 export default {
   name: 'annotation-links-preview',
   components: {
     'annotation-preview': AnnotationPreview,
-    ImageName,
   },
   props: {
     index: {type: String, default: null},
@@ -94,13 +93,14 @@ export default {
       }
 
       let annots = this.annotation.annotationLink.map(link => {
-        return {
+        return new Annotation({
           id: link.annotation,
           updated: link.updated,
           image: link.image,
           instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
-          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
-        };
+          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`,
+          cropURL: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
+        });
       });
       annots.sort((a, b) => a.instanceFilename.localeCompare(b.instanceFilename));
       return annots;

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,7 +49,10 @@
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
-        <td>{{$tc("count-bands", image.channels, {count: image.channels})}}</td>
+        <td>
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
+        </td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
@@ -80,7 +83,7 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
-            <a class="button is-small" :href="image.downloadURL" v-if="image.path">
+            <a class="button is-small" v-if="canDownloadImages" :href="image.downloadURL">
               {{$t('button-download')}}
             </a>
           </div>
@@ -165,6 +168,16 @@ export default {
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
     },
+    canDownloadImages() {
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false
+      );
+    },
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     }
@@ -183,7 +196,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -200,7 +213,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {
@@ -220,7 +233,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -240,7 +253,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {
