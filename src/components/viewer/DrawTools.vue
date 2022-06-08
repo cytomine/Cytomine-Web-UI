@@ -282,7 +282,7 @@
     <button
         v-if="isToolDisplayed('resize')"
         :disabled="isToolDisabled('resize')"
-        v-tooltip="$t('resize')"
+        v-tooltip="$t('rescale')"
         class="button"
         :class="{'is-selected': activeEditTool === 'rescale'}"
         @click="activateEditTool('rescale')"
@@ -329,7 +329,7 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
-    <div v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+    <div class="special-paste-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
         :disabled="disabledPaste"
         v-tooltip="$t('paste-repeat')"
@@ -343,15 +343,20 @@
       </button>
 
       <div class="special-paste-container" v-show="showRepeatSelector">
-        <p>
-          <i18n path="paste-repeat-info">
-            <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
-          </i18n>
-          <br>
-        </p>
-        <div class="repeat-button-container">
-          <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+        <div class="panel">
+          <div class="panel-block">
+            <p>
+              <i18n path="paste-repeat-info">
+                <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
+              </i18n>
+              <br>
+            </p>
+            <div class="repeat-button-container">
+              <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+            </div>
+          </div>
         </div>
+
 
       </div>
     </div>
@@ -1329,6 +1334,24 @@ $colorActiveIcon: #fff;
     p {
       margin: 0.75em;
       font-size: 0.9em;
+    }
+
+    .panel-block:last-of-type {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    .panel-block:first-of-type {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    .panel {
+      font-size: 0.9rem;
+    }
+
+    .panel-block {
+      padding: 0.2em 0.5em;
     }
   }
 

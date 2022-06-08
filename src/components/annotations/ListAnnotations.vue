@@ -656,7 +656,7 @@ export default {
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: imagesIds,
-        users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
+        users: (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
