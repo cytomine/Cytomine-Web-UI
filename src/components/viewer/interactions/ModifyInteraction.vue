@@ -32,7 +32,7 @@
   />
 
   <vl-interaction-rescale
-    v-if="activeEditTool === 'resize'"
+    v-if="activeEditTool === 'rescale'"
     :source="selectSource"
     @rescalestart="startEdit"
     @rescaleend="endEdit"

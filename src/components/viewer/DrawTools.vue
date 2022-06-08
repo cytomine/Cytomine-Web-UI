@@ -275,8 +275,8 @@
         :disabled="isToolDisabled('resize')"
         v-tooltip="$t('resize')"
         class="button"
-        :class="{'is-selected': activeEditTool === 'resize'}"
-        @click="activateEditTool('resize')"
+        :class="{'is-selected': activeEditTool === 'rescale'}"
+        @click="activateEditTool('rescale')"
     >
       <span class="icon is-small"><i class="fas fa-expand"></i></span>
     </button>
@@ -959,9 +959,9 @@ export default {
             this.activateEditTool('translate');
           }
           return;
-        case 'tool-resize':
+        case 'tool-rescale':
           if (this.isToolDisplayed('resize') && !this.isToolDisabled('resize')) {
-            this.activateEditTool('resize');
+            this.activateEditTool('rescale');
           }
           return;
         case 'tool-rotate':
