@@ -273,7 +273,7 @@
     <button
         v-if="isToolDisplayed('resize')"
         :disabled="isToolDisabled('resize')"
-        v-tooltip="$t('resize')"
+        v-tooltip="$t('rescale')"
         class="button"
         :class="{'is-selected': activeEditTool === 'rescale'}"
         @click="activateEditTool('rescale')"
