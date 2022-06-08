@@ -205,7 +205,7 @@ import ModifyInteraction from './interactions/ModifyInteraction';
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
 import View from 'ol/View';
-import OverviewMap from 'ol/control/OverviewMap';
+import {OverviewMap} from 'ol/control';
 import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
@@ -261,6 +261,7 @@ export default {
       loading: true,
 
       overview: null,
+      overviewMapZoomed: false,
 
       format: new WKT(),
     };
@@ -497,18 +498,32 @@ export default {
       let map = this.$refs.map.$map;
 
       this.overview = new OverviewMap({
-        view: new View({projection: this.projectionName}),
+        view: new View({
+          maxZoom: -1,
+          projection: this.projectionName,
+        }),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
       map.addControl(this.overview);
+      
+      let overviewMapView = this.overview.getOverviewMap().getView();
+      map.on('moveend', function(){
+        if(map.getView().getZoom() > 6){
+          overviewMapView.setMaxZoom(1);
+        }
+        else{
+          overviewMapView.setMaxZoom(-1);
+        }
+      });
 
       this.overview.getOverviewMap().on(('click'), (evt) => {
         let size = map.getSize();
         map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
       });
+
     },
 
     toggleOverview() {
@@ -785,6 +800,10 @@ $colorOpenedPanelLink: #6c95c8;
   flex-grow: 1;
 }
 
+.ol-overviewmap-box {
+  border: 2px solid rgba(0, 60, 136, 0.7);
+}
+			
 .draw-tools {
   position: absolute;
   top: 0.7em;
