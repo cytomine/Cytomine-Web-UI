@@ -178,10 +178,10 @@ annotation-type,Annotation type,Type d'annotation,Tipo de anotación
 multiple-terms,Multiple terms,Plusieurs termes,Múltiples términos
 created-by,Created by,Créé par,Creado por
 properties,Properties,Propriétés,Propiedades
-no-properties,No properties,Aucune propriété,Ninguna propiedad
+no-properties,No property,Aucune propriété,Ninguna propiedad
 tags,Tags,Tags,Etiquetas
 no-tag,No tag,Aucun tag,Sin etiqueta
-new-tag,New tag,Nouveau tag,Nueva etiqueta
+button-new-tag,New tag,Nouveau tag,Nueva etiqueta
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag,Error al crear la etiqueta
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés,Error al crear las etiquetas
@@ -756,6 +756,7 @@ number-annotations-info-message,The number of annotations that you created,Le no
 number-reviewed-annotations-info-message,The number of annotations that you validated during a review,Le nombre d'annotations que vous avez validées,El número de anotaciones que validadas por el usuario durante una revisión
 blinded-name-indication,Blind,Masqué,Oculto
 language,Language,Langue,Idioma
+system,System,Système,
 no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché,Ninguna propiedad existente coincide con {searchString}
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?
@@ -889,6 +890,8 @@ shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,S
 shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation,Mover anotación
 shortcut-viewer-tool-resize,Resize annotation,Redimensionner l'annotation,
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation,Rotar anotación
+shortcut-viewer-tool-copy,Copy annotation,Copier l'annotation,
+shortcut-viewer-tool-paste,Paste annotation,Coller l'annotation,
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information,Alternar panel de información
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom,Alternar panel de zoom
 shortcut-viewer-toggle-link,Toggle image synchronization panel,Afficher/Masquer le panneau de synchronisation des images,Alternar panel de sincronización de imagen
@@ -990,9 +993,9 @@ version,Version,Version,Versión
 fav,Fav.,Fav.,Fav.
 favorite,Favorite,Favori,Favorito
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas
-button-best-fit-zoom,Fit zoom to viewport,,
-button-reset-zoom,Reset zoom,,
-copy,Copy,Copy,
+button-best-fit-zoom,Fit zoom to viewport,Ajuster le zoom à la vue,
+button-reset-zoom,Reset zoom,Réinitialiser le zoom,
+copy,Copy,Copier,
 paste,Paste,Coller,
 copy-paste,Copy/Paste,Copier/Coller,
 notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée,
@@ -1006,8 +1009,8 @@ slice,Slice,Plan,
 pixel-intensity,Intensity,Intensité,
 profile,Profile,Profil,
 inspect-button,Inspect,Inspecter,
-failed-fetch-profile,Failed to fetch image profile,,
-companion-files,Companion files,,
+failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,
+companion-files,Companion files,Fichiers liés,
 not-available,Not available.,Indisponible.,
 no-profile,No profile,Pas de profil,
 developer-mode,Developer mode,Mode développeur,
