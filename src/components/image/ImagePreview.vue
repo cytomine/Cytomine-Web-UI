@@ -36,6 +36,9 @@
 <script>
 import {changeImageUrlFormat, SUPPORT_WEBP} from '@/utils/image-utils';
 
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
+
 export default {
   name: 'image-preview',
   props: {
@@ -46,6 +49,7 @@ export default {
     blindMode: {type: Boolean, default: false},
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     idImage() {
       return this.image.image || this.image.id; // if provided object is image consultation, image.image
     },
@@ -65,7 +69,7 @@ export default {
       return changeImageUrlFormat(this.rawPreviewUrl, this.imageFormat);
     },
     figureStyle() {
-      return {backgroundImage: `url("${this.previewUrl}")`};
+      return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};
     }
   }
 };

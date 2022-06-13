@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
 
 export default {
   name: 'annotation-preview',
@@ -82,6 +84,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     cropParameters() {
       let params = {
         square: true,
@@ -107,8 +110,10 @@ export default {
       return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
     },
     styleAnnotDetails() {
+      let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
+      console.log('url', url);
       return {
-        backgroundImage: `url(${this.cropUrl})`,
+        backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
@@ -120,7 +125,9 @@ export default {
   },
   methods: {
     viewAnnot(trySameView=false) {
-      this.$emit('select', {annot: this.annot, options:{trySameView}});
+      if (this.clickable) {
+        this.$emit('select', {annot: this.annot, options:{trySameView}});
+      }
     },
     close(event) {
       if(!this.opened) {

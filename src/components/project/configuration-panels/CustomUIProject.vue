@@ -59,11 +59,13 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'custom-ui-project',
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
 
@@ -187,6 +189,7 @@ export default {
   },
   async created() {
     try {
+      if(!this.algoEnabled) this.customUITree[0].props.splice(2,1);
       this.customUI = await this.project.fetchUIConfig();
     }
     catch(error) {

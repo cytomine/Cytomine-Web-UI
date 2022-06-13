@@ -20,7 +20,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`"/>
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </router-link>
         </td>
       </tr>
@@ -86,7 +86,7 @@
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`"/>
+            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
@@ -207,6 +207,7 @@
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">
+
               <router-link
                 v-if="!image.reviewed && !image.inReview"
                 :to="`/project/${image.project}/image/${image.id}?action=review`"
@@ -239,7 +240,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" v-if="canDownloadImages" :href="image.downloadURL">
+            <a class="button" v-if="canDownloadImages || canManageProject" @click="download(image)">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -296,6 +297,9 @@ import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance} from 'cytomine-client';
+
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
 import vendorFromFormat from '@/utils/vendor';
 
 export default {
@@ -329,6 +333,7 @@ export default {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return ((this.project || {}).blindMode) || false;
     },
@@ -353,10 +358,13 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
-
+    download(image) {
+      window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');
+    },
     async cancelReview() {
       let errorLabel = this.image.reviewed ? 'notif-error-unvalidate-review' : 'notif-error-cancel-review';
       try {
@@ -422,7 +430,7 @@ export default {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
     }
-  }
+  },
 };
 </script>
 

@@ -178,7 +178,7 @@
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80" class="image-overview">
-            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" />
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
@@ -270,6 +270,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -520,7 +521,7 @@ export default {
   deactivated() {
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
-  }
+  },
 };
 </script>
 

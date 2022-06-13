@@ -35,6 +35,11 @@
           <td><strong>{{$t(annotation.area > 0 ? 'perimeter' : 'length')}}</strong></td>
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
+
+        <tr v-if="profile && isPoint && false">
+          <td><strong>{{$t('profile')}}</strong></td>
+          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
       </template>
 
       <tr v-if="isPropDisplayed('description')">
@@ -192,7 +197,7 @@
     </a>
 
     <div class="level">
-      <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
+      <a @click="openCrop(annotation)" class="level-item button is-small">
         {{ $t('button-view-crop') }}
       </a>
 
@@ -229,6 +234,8 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import ProfileModal from '@/components/viewer/ProfileModal';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'annotations-details',
@@ -249,6 +256,7 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
     showComments: {type: Boolean, default: false}
   },
@@ -267,6 +275,7 @@ export default {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
@@ -293,6 +302,9 @@ export default {
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
+    },
+    profile() {
+      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -331,12 +343,18 @@ export default {
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
     },
+    isPoint() {
+      return this.annotation.location && this.annotation.location.includes('POINT');
+    }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
-
+    openCrop(annotation) {
+      window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
+    },
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
@@ -441,6 +459,15 @@ export default {
       this.comments.unshift(comment);
     },
 
+    openProfileModal() {
+      this.$modal.open({
+        parent: this,
+        component: ProfileModal,
+        props: {annotation: this.annotation, image: this.image},
+        hasModalCard: true
+      });
+    },
+
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
@@ -460,7 +487,7 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    },
+    }
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {

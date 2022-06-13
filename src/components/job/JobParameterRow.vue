@@ -43,7 +43,7 @@
         <template #option="{option}">
           <div class="is-flex" v-if="areAnnotationObjects">
             <div class="thumb-wrapper">
-              <img class="thumb" :src="option.smallCropURL + '&draw=true&complete=true&increaseArea=1.25'">
+              <img class="thumb" :src="appendShortTermToken(option.smallCropURL + '&draw=true&complete=true&increaseArea=1.25',shortTermToken)">
             </div>
             <span class="option__title">
               {{ option[param.uriPrintAttribut] }}
@@ -51,7 +51,7 @@
           </div>
           <div class="is-flex" v-else-if="option.thumb">
             <div class="thumb-wrapper">
-              <img class="thumb" :src="option.thumb">
+              <img class="thumb" :src="appendShortTermToken(option.thumb, shortTermToken)">
             </div>
             <span class="option__title">
               {{ option[param.uriPrintAttribut] }}
@@ -83,6 +83,7 @@ import moment from 'moment';
 import {Cytomine, Description} from 'cytomine-client';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'job-parameter-row',
@@ -103,6 +104,7 @@ export default {
   computed: {
     project: get('currentProject/project'),
     ontology: get('currentProject/ontology'),
+    shortTermToken: get('currentUser/shortTermToken'),
     processedUri() {
       if(this.param.uri_) {
         let result = this.param.uri_.replace(new RegExp('^' + Cytomine.instance.basePath), '');
@@ -158,6 +160,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     getInitialValue() {
       if(this.param.defaultParamValue) {
         if(this.param.type === 'Boolean') {

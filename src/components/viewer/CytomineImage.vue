@@ -142,7 +142,7 @@
             <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
               <i class="fas fa-street-view"></i>
             </a>
-            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view"/>
           </li>
 
           <li v-if="isPanelDisplayed('review') && canEdit">

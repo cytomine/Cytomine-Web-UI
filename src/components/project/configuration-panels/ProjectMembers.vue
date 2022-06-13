@@ -99,7 +99,7 @@
 
       <template #footer>
         <div class="has-text-centered">
-          <a :href="exportURL" target="_self" class="button is-link">{{$t('button-export-as-csv')}}</a>
+          <a @click="download(exportURL)" class="button is-link">{{$t('button-export-as-csv')}}</a>
         </div>
       </template>
     </cytomine-table>
@@ -125,6 +125,7 @@ import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
 import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'projet-members',
@@ -162,6 +163,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
 
     MemberCollection() {
       let collection = new UserCollection({
@@ -189,6 +191,7 @@ export default {
   },
 
   methods: {
+    appendShortTermToken,
     displayMemberOrigin(member){
       let key;
       if(member.origin === 'LDAP') key = 'LDAP';
@@ -207,7 +210,9 @@ export default {
         this.error = true;
       }
     },
-
+    download(url) {
+      window.open(appendShortTermToken(url, this.shortTermToken));
+    },
     confirmMembersRemoval() {
       this.$buefy.dialog.confirm({
         title: this.$t('remove-members'),
@@ -293,6 +298,9 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
+  },
+  mounted() {
+    appendShortTermToken();
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];

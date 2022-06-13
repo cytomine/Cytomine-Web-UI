@@ -19,7 +19,9 @@ import {Cytomine, User} from 'cytomine-client';
 function getDefaultState() {
   return {
     user: null,
-    expandedSidebar: true
+    expandedSidebar: true,
+    increment: 0,
+    shortTermToken: null
   };
 }
 
@@ -31,6 +33,9 @@ export default {
   mutations: {
     setUser(state, user) {
       state.user = user ? user.clone() : null;
+    },
+    setShortTermToken(state, value) {
+      state.shortTermToken = value;
     },
     setAdminByNow(state, value) {
       state.user.adminByNow = value;
@@ -74,8 +79,9 @@ export default {
       await dispatch('fetchUser');
     },
 
-    async login({dispatch}, payload) {
-      await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+    async login({dispatch, commit}, payload) {
+      let {shortTermToken} = await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
+      commit('setShortTermToken', shortTermToken);
       await dispatch('fetchUser');
     }
   }

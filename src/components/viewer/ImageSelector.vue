@@ -31,7 +31,7 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + appendShortTermToken(image.preview, shortTermToken) + ')'"></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -66,6 +66,7 @@ import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'image-selector',
@@ -81,6 +82,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -107,6 +109,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version

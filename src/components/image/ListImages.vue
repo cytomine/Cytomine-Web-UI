@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             </router-link>
           </b-table-column>
 
@@ -301,6 +301,7 @@ export default {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -428,12 +429,12 @@ export default {
           label: m || this.$t('unknown')
         };
       });
-      this.availableResolutions = stats.resolution.list.map(resolution => {
-        return {
-          value: resolution || 'null',
-          label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
-        };
-      });
+      // this.availableResolutions = stats.resolution.list.map(resolution => {
+      //   return {
+      //     value: resolution || 'null',
+      //     label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
+      //   };
+      // });
     },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];

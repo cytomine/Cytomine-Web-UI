@@ -18,7 +18,7 @@
     <em v-if="error">{{$t('error-attached-files')}}</em>
     <template v-else-if="attachedFiles.length > 0">
       <span class="file-item" v-for="(file, index) in attachedFiles" :key="file.id">
-        <a :href="host + file.url">{{file.filename}}</a>
+        <a @click="downloadAttachedFile(host, file)">{{file.filename}}</a>
         <button v-if="canEdit" class="delete is-small" @click="confirmDeletion(file, index)"></button>
         <template v-if="index < attachedFiles.length - 1">,</template>
       </span>
@@ -32,6 +32,8 @@
 <script>
 import {Cytomine, AttachedFileCollection} from 'cytomine-client';
 import AttachedFileModal from './AttachedFileModal';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
 
 export default {
   name: 'attached-files',
@@ -47,11 +49,13 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     host() {
       return Cytomine.instance.host;
     }
   },
   methods: {
+    appendShortTermToken,
     displayModal() {
       // required to use programmatic modal because the description is sometimes displayed in elements with a
       // CSS transform (e.g. popover) that conflict with the fixed position of the modal
@@ -64,6 +68,9 @@ export default {
         hasModalCard: true,
         events: {'addAttachedFile': this.addAttachedFile}
       });
+    },
+    downloadAttachedFile(host, attachedFile) {
+      window.location.assign(appendShortTermToken(host + attachedFile.url, this.shortTermToken));
     },
     addAttachedFile(attachedFile) {
       this.attachedFiles.push(attachedFile);
