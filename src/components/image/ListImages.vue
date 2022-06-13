@@ -159,6 +159,7 @@
 
       <cytomine-table
         :collection="imageCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -333,12 +334,18 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
+        {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
+    },
+
+    selectedContentTypes() {
+      let selectedVendors = this.selectedVendors.map(option => option.value);
+      let availableVendors = this.availableVendors.map(option => option.value);
+      let allowUnknown = selectedVendors.includes('null');
+      return this.selectedFormats.filter(ct => (availableVendors.includes(ct)) ? selectedVendors.includes(ct) : allowUnknown);
     },
 
     boundsFilters() {
@@ -381,6 +388,9 @@ export default {
     nbActiveFilters() {
       return this.$store.getters[this.storeModule + '/nbActiveFilters'];
     },
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'] + ((this.selectedContentTypes.length > 0) ? 0 : 1);
+    },
 
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
@@ -400,10 +410,10 @@ export default {
 
       this.availableFormats = stats.format.list;
 
-      stats.format.list.forEach(format => {
-        let vendor = vendorFromFormat(format);
+      stats.format.list.forEach(mime => {
+        let vendor = vendorFromMime(mime);
         let vendorFormatted = {
-          value: vendor ? format : 'null',
+          value: vendor ? mime : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
 
