@@ -412,7 +412,7 @@ export default {
       this.availableFormats = stats.format.list;
 
       stats.format.list.forEach(mime => {
-        let vendor = vendorFromMime(mime);
+        let vendor = vendorFromFormat(mime);
         let vendorFormatted = {
           value: vendor ? mime : 'null',
           label: vendor ? vendor.name : this.$t('unknown')

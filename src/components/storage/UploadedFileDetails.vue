@@ -100,7 +100,6 @@ import SlVueTree from 'sl-vue-tree';
 import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
 import filesize from 'filesize';
-import ProfileStatus from './ProfileStatus';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
