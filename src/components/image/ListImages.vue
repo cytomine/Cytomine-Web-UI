@@ -376,7 +376,6 @@ export default {
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(prop == 'vendor') prop = 'mimeType';
         if(selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -411,10 +410,10 @@ export default {
 
       this.availableFormats = stats.format.list;
 
-      stats.format.list.forEach(mime => {
-        let vendor = vendorFromFormat(mime);
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
         let vendorFormatted = {
-          value: vendor ? mime : 'null',
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
 
@@ -429,12 +428,12 @@ export default {
           label: m || this.$t('unknown')
         };
       });
-      // this.availableResolutions = stats.resolution.list.map(resolution => {
-      //   return {
-      //     value: resolution || 'null',
-      //     label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
-      //   };
-      // });
+      this.availableResolutions = stats.resolution.list.map(resolution => {
+        return {
+          value: resolution || 'null',
+          label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
+        };
+      });
     },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];

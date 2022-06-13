@@ -275,7 +275,6 @@ button-unlink,Unlink,Séparer,Desconectar
 terms-new-annotation,Term(s) to associate to new annotations,Terme(s) à associer aux nouvelles annotations,Término(s) a asociar con nuevas anotaciones
 core-cannot-be-reached,Error of communication with Cytomine core,Erreur de communication avec le backend de Cytomine,Error de comunicación con el núcleo de Cytomine
 communication-error,Communication error,Erreur de communication,Error de comunicación
-follower, Follower(s), Suiveur(s), Seguidor(es)
 follow-user,Follow a user,Suivi d'utilisateur,Seguir a un usuario
 online-managers,Online managers,Responsables en ligne,Administradores en línea
 online-contributors,Online contributors,Contributeurs en ligne,Colaboradores en línea
@@ -441,6 +440,7 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel
 no-result,No result,Aucun résultat,Sin resultados
 upload,Upload,Upload,Subir
 important-notes,Important notes,Remarques importantes,Notas importantes
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
 allowed-formats-upload-info,"Supported image file formats:","Formats d'image supportés :"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS)
@@ -1047,4 +1047,14 @@ notif-error-source-delete,Failed to delete trusted source {username}/{dockerUser
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
+all-channels,All channels,Tous les canaux
+channel-abbr,ch.,can.
+channel,Channel,Canal
+warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément
+min-max,Min/Max,Min/Max
+merged-channels,Merged channels,Canaux fusionnés
+histogram-scale,Histogram scale,Echelle des histogrammes
+linear,Linear,Linéaire
+logarithmic,Logarithmic,Logarithmic
+intensities-manipulation,Intensities adjustment,Ajustement des intensités
 followers,Followers,Suiveurs

@@ -45,7 +45,10 @@
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
-        <td>{{$tc("count-bands", image.extrinsicChannels, {count: image.extrinsicChannels})}}</td>
+        <td>
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
+        </td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
@@ -177,7 +180,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -194,7 +197,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {

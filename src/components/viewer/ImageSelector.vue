@@ -62,6 +62,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {IMAGE_FORMAT} from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection} from 'cytomine-client';
@@ -114,7 +115,7 @@ export default {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
       catch(error) {
         console.log(error);
@@ -134,6 +135,9 @@ export default {
       if (key === 'toggle-add-image') {
         this.toggle();
       }
+    },
+    imageThumbUrl(image) {
+      return image.thumbURL(256, IMAGE_FORMAT);
     }
   },
   async created() {

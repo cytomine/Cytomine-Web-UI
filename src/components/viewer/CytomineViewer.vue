@@ -27,7 +27,7 @@
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
     >
       <cytomine-image
-        v-if="cell && cell.image && cell.slice"
+        v-if="cell && cell.image && cell.slices"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -108,8 +108,8 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        let slice = this.viewer.images[index].activeSlice;
-        cells[i] = {index, image, slice};
+        let slices = this.viewer.images[index].activeSlices;
+        cells[i] = {index, image, slices};
       }
       return cells;
     },
@@ -194,22 +194,21 @@ export default {
       try {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
+          //TODO: rewrite !
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
+          await Promise.all(this.idImages.map(async (id, idx) => {
+            let image = await ImageInstance.fetch(id);
 
-          let imgAndSlices = this.idImages.map(function(e,i) {
-            return {image : e, slice: this.idSlices[i]};
-          }, this);
-          //don't fetch multiple times the same image.
-          let uniqueArray = imgAndSlices.filter(function(item, pos) {
-            return imgAndSlices.map(function(e) {
-              return e.image+'.'+e.slice;
-            }).indexOf(item.image+'.'+item.slice) == pos;
-          });
-          await Promise.all(uniqueArray.map(async (e) => {
-            let image = await ImageInstance.fetch(e.image);
-            let idSlice = e.slice;
-            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+            let idSlices = this.idSlices[idx];
+            let slices;
+            if (idSlices) {
+              idSlices = idSlices.split(':');
+              slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+            }
+            else {
+              slices = [await image.fetchReferenceSlice()];
+            }
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices});
           }));
 
           let images = {};

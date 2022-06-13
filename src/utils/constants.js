@@ -22,7 +22,7 @@ export default {
   // features switches
   ALGORITHMS_ENABLED: false,
   PRELOADED_SLICES: 50,
-  MAX_MERGEABLE_CHANNELS: 8,
+  MAX_MERGEABLE_CHANNELS: 36,
   // Refresh intervals (expressed in milliseconds)
   VIEWER_ANNOTATIONS_REFRESH_INTERVAL: 10000,
   MEMBERS_ACTIVITY_REFRESH_INTERVAL: 30000,

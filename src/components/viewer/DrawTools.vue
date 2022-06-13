@@ -37,6 +37,7 @@
         class="button"
         :disabled="disabledDraw"
         @click="showTermSelector = !showTermSelector"
+        :title="disabledDrawMessage"
       >
         <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
       </button>
@@ -66,6 +67,7 @@
         class="button"
         :disabled="disabledDraw"
         @click="showTrackSelector = !showTrackSelector"
+        :title="disabledDrawMessage"
       >
         <span class="icon is-small"><i class="fas fa-route"></i></span>
       </button>
@@ -95,6 +97,7 @@
       <button
         v-if="isToolDisplayed('point')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('point')"
         class="button"
         :class="{'is-selected': activeTool === 'point'}"
@@ -106,6 +109,7 @@
       <button
         v-if="isToolDisplayed('line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('line')"
         class="button"
         :class="{'is-selected': activeTool === 'line'}"
@@ -117,6 +121,7 @@
       <button
         v-if="isToolDisplayed('freehand-line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-line')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-line'}"
@@ -136,6 +141,7 @@
       <button
         v-if="isToolDisplayed('rectangle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('rectangle')"
         class="button"
         :class="{'is-selected': activeTool === 'rectangle'}"
@@ -147,6 +153,7 @@
       <button
         v-if="isToolDisplayed('circle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('circle')"
         class="button"
         :class="{'is-selected': activeTool === 'circle'}"
@@ -158,6 +165,7 @@
       <button
         v-if="isToolDisplayed('polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'polygon'}"
@@ -169,6 +177,7 @@
       <button
         v-if="isToolDisplayed('freehand-polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-polygon'}"
@@ -427,7 +436,11 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
+    },
+    multipleActiveSlices() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
     },
     maxRank() {
       return this.$store.getters[this.imageModule + 'maxRank'];
@@ -504,7 +517,10 @@ export default {
       return !this.layers.find(layer => layer.drawOn);
     },
     disabledDraw() {
-      return this.noActiveLayer;
+      return this.noActiveLayer || this.multipleActiveSlices;
+    },
+    disabledDrawMessage() {
+      return (this.multipleActiveSlices) ? this.$t('warning-cannot-draw-multiple-slices') : null;
     },
     actions() {
       return this.imageWrapper.undoRedo.actions;

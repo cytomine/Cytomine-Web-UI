@@ -43,21 +43,22 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slice.imageServerUrl"
+          :crossOrigin="slices[0].imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
+          :tile-size="tileSize"
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -210,10 +211,9 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
-
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -291,8 +291,11 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -369,39 +372,17 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-
+    tileSize() {
+      return this.image.tileSize;
+    },
     baseLayerProcessingParams() {
-      let params = {};
-      if (this.imageWrapper.colors.filter) {
-        params.filters = this.imageWrapper.colors.filter;
-      }
-      if (this.imageWrapper.colors.contrast !== 1) {
-        params.contrast = this.imageWrapper.colors.contrast;
-      }
-      /*if (this.imageWrapper.colors.gamma !== 1) {
-        params.gammas = this.imageWrapper.colors.gamma;
-      }*/
-      if (this.imageWrapper.colors.inverse) {
-        params.colormaps = '!DEFAULT';
-      }
-      /*let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
-      if (minIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.min_intensities = minIntensities.join(',');
-      }
-      let maxIntensities = this.imageWrapper.colors.minMax.map(stat => stat.maximum);
-      if (maxIntensities.length > 0) {
-        // eslint-disable-next-line camelcase
-        params.max_intensities = maxIntensities.join(',');
-      }*/
-      return params;
+      return this.$store.getters[this.imageModule + 'tileRequestParams'];
     },
     baseLayerSliceParams() {
-      // TODO: channels !
       return {
         // eslint-disable-next-line camelcase
-        z_slices: this.slice.zStack,
-        timepoints: this.slice.time
+        z_slices: this.slices[0].zStack,
+        timepoints: this.slices[0].time
       };
     },
     baseLayerURLQuery() {
@@ -411,27 +392,27 @@ export default {
       }
       return query;
     },
-
     baseLayerURLs() {
-      return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+      let slice = this.slices[0];
+      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
 
-    colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0 || this.imageWrapper.colors.contrast !== 0
-                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    },
-    operation() {
-      return operation;
-    },
-    lib() {
-      return {
-        ...constLib,
-        brightness: this.imageWrapper.colors.brightness,
-        contrast: this.imageWrapper.colors.contrast,
-        saturation: this.imageWrapper.colors.saturation,
-        hue: this.imageWrapper.colors.hue
-      };
-    },
+    // colorManipulationOn() {
+    //   return this.imageWrapper.colors.brightness !== 0
+    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    // },
+    // operation() {
+    //   return operation;
+    // },
+    // lib() {
+    //   return {
+    //     ...constLib,
+    //     brightness: this.imageWrapper.colors.brightness,
+    //     contrast: this.imageWrapper.colors.contrast,
+    //     saturation: this.imageWrapper.colors.saturation,
+    //     hue: this.imageWrapper.colors.hue
+    //   };
+    // },
 
     layersToPreload() {
       let layers = [];
@@ -518,6 +499,7 @@ export default {
       if(this.routedAnnotation) {
         this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
+
       this.savePosition();
     },
 
@@ -567,7 +549,7 @@ export default {
         try {
           await UserPosition.create({
             image: this.image.id,
-            slice: this.slice.id,
+            slice: this.slices[0].id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -758,13 +740,14 @@ export default {
 
     if (annot) {
       try {
-        if (annot.image === this.image.id) {
-          if (annot.slice !== this.slice.id) {
+        let annot = await Annotation.fetch(idRoutedAnnot);
+        if(annot.image === this.image.id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
           this.routedAnnotation = annot;
-          if (this.routedAction === 'comments') {
+          if(this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
@@ -916,18 +899,18 @@ $colorOpenedPanelLink: #6c95c8;
   }
 }
 
-.panels li:nth-child(-n+7) .panel-options {
+.panels li:nth-child(-n+8) .panel-options {
   bottom: -7.5em;
   min-height: 13em;
 }
 
-.panels li:nth-child(-n+3) .panel-options {
+.panels li:nth-child(-n+4) .panel-options {
   top: -1.75em;
   bottom: auto;
   min-height: 7.5em;
 }
 
-.panels li:nth-child(4) .panel-options {
+.panels li:nth-child(5) .panel-options {
   top: -5.5em;
   bottom: auto;
 }
