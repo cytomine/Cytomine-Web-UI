@@ -71,9 +71,8 @@
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
-
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -673,7 +672,22 @@ export default {
           }
           return;
       }
-    }
+    },
+    async takeScreenshot() {
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
+
+      let a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
+      a.click();
+
+      // Reset container css values as previous
+      document.querySelector('.map-container').style.height = '';
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time

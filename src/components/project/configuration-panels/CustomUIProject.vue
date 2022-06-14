@@ -147,6 +147,7 @@ export default {
             {key: 'project-tools-polygon', label: 'polygon', icon: 'fas fa-draw-polygon', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-polygon', label: 'freehand-polygon',
               iconComponent: IconPolygonFreeHand, parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-screenshot', label: 'screenshot', icon: 'fas fa-camera', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-union', label: 'freehand-correct-add', icon: 'fas fa-pencil-alt',
               superscript: 'fas fa-plus', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-diff', label: 'freehand-correct-remove', icon: 'fas fa-pencil-alt',
