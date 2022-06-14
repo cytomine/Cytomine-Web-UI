@@ -236,7 +236,7 @@
     </div>
 
     <div class="list-annots" @scroll="scrollHandler" ref="listAnnots">
-        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${limitedCategoryOptions.categorization}${prop.id}`" 
+        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${limitedCategoryOptions.categorization}${prop.id}`"
         :categorization="selectedCategorization.categorization"
         :size="selectedSize.size"
         :color="selectedColor.hexaCode"
@@ -275,9 +275,12 @@
         @update="revision++"
         @select="viewAnnot($event)"
         />
-    <button class="button" v-if="!loadedAllCategories" @click="loadCategories()">
-      {{$t('button-load-more')}}
-    </button>
+      <button class="button is-medium" v-if="!loadedAllCategories" @click="loadCategories()">
+        <span class="icon">
+          <i class="fas fa-sync"></i>
+        </span>
+        <span>{{$t('button-load-more')}}</span>
+      </button>
     </div>
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
@@ -293,7 +296,6 @@
 
 <script>
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
-import constants from '@/utils/constants.js';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
@@ -308,6 +310,8 @@ import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
 import _ from 'lodash';
+
+import constants from '@/utils/constants.js';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
@@ -451,7 +455,6 @@ export default {
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
     },
-
     filteredTracks() {
       return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
     },
@@ -517,7 +520,7 @@ export default {
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
-
+    // eslint-disable-next-line vue/return-in-computed-property
     categoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -564,7 +567,7 @@ export default {
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
-        users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
+        users: (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
@@ -586,7 +589,8 @@ export default {
   },
   methods: {
     initLimitedCategory(){
-      this.categoriesToShow = categoryBatch;
+      this.categoriesToShow = constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY;
+      this.loadedAllCategories = this.categoryOptions.length < this.categoriesToShow;
       this.limitedCategoryOptions = this.categoryOptions.slice(0, this.categoriesToShow);
     },
     scrollHandler: _.debounce(function() {
