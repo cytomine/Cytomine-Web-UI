@@ -47,6 +47,7 @@
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
+          :tile-size="tileSize"
         />
       </vl-layer-tile>
 
@@ -368,7 +369,9 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-
+    tileSize() {
+      return this.image.tileSize;
+    },
     baseLayerProcessingParams() {
       let params = {};
       if (this.imageWrapper.colors.filter) {
@@ -377,13 +380,13 @@ export default {
       if (this.imageWrapper.colors.contrast !== 1) {
         params.contrast = this.imageWrapper.colors.contrast;
       }
-      /*if (this.imageWrapper.colors.gamma !== 1) {
+      if (this.imageWrapper.colors.gamma !== 1) {
         params.gammas = this.imageWrapper.colors.gamma;
-      }*/
+      }
       if (this.imageWrapper.colors.inverse) {
         params.colormaps = '!DEFAULT';
       }
-      /*let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
       if (minIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.min_intensities = minIntensities.join(',');
@@ -392,7 +395,8 @@ export default {
       if (maxIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.max_intensities = maxIntensities.join(',');
-      }*/
+      }
+
       return params;
     },
     baseLayerSliceParams() {
@@ -410,7 +414,6 @@ export default {
       }
       return query;
     },
-
     baseLayerURLs() {
       return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },

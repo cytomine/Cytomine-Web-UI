@@ -27,7 +27,7 @@
       <b-message type="is-info" has-icon icon-size="is-small">
         <h2>{{$t('important-notes')}}</h2>
         <ul class="small-text">
-<!--          <li>{{$t('max-size-upload-info')}}</li>-->
+          <!--<li>{{$t('max-size-upload-info')}}</li>-->
           <li>
             {{$t('allowed-formats-upload-info')}}
             <template v-if="formatInfos.length">

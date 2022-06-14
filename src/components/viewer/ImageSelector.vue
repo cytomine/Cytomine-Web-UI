@@ -31,7 +31,11 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+          <a
+            class="card-image"
+            @click="addImage(image)"
+            :style="'background-image: url(' + imageThumbUrl(image) + ')'"
+          ></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -62,6 +66,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {IMAGE_FORMAT} from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName';
 import {ImageInstanceCollection} from 'cytomine-client';
@@ -131,6 +136,9 @@ export default {
       if (key === 'toggle-add-image') {
         this.toggle();
       }
+    },
+    imageThumbUrl(image) {
+      return image.thumbURL(256, IMAGE_FORMAT);
     }
   },
   async created() {
