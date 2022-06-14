@@ -349,7 +349,7 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromFormat(this.image.mime);
+      return vendorFromFormat(this.image.contentType);
     }
   },
   methods: {

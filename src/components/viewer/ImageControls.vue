@@ -18,23 +18,14 @@
     <!-- ----- CHANNELS ----- -->
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
-      <div class="buttons has-addons">
-        <button
-          class="button is-small item"
-          :disabled="!canShiftBackward('channel')"
-          @click="shift('channel', -Math.min(step, currentSlice.channel))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-        <button
-          class="button is-small item"
-          :disabled="!canShiftBackward('channel')"
-          @click="shift('channel', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+        :index="index"
+        :forward="false"
+        :current="currentSlice.channel"
+        :size="image.channels"
+        dimension="channel"
+        @shift="shift('channel', $event)"
+      />
 
       <cytomine-slider
         v-model="currentChannel"
@@ -42,47 +33,28 @@
         :integer-only="true"
         class="image-dimension-slider" />
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small item"
-          :disabled="!canShiftForward('channel')"
-          @click="shift('channel', 1)"
-        >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small item"
-          :disabled="!canShiftForward('channel')"
-          @click="shift('channel', Math.min(step, image.channels - currentSlice.channel - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.channel"
+          :size="image.channels"
+          dimension="channel"
+          @shift="shift('channel', $event)"
+      />
     </div>
 
 
     <!-- ----- DEPTH ----- -->
     <div class="image-dimension" v-if="hasDepth">
       <strong class="image-dimension-name">Z</strong>
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('zStack')"
-          @click="shift('zStack', -Math.min(step, currentSlice.zStack))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('zStack')"
-          @click="shift('zStack', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.zStack"
+          :size="image.depth"
+          dimension="zStack"
+          @shift="shift('zStack', $event)"
+      />
 
       <cytomine-slider
         v-model="currentZStack"
@@ -90,23 +62,14 @@
         :integer-only="true"
         class="image-dimension-slider" />
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('zStack')"
-          @click="shift('zStack', 1)"
-        >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('zStack')"
-          @click="shift('zStack', Math.min(step, image.depth - currentSlice.zStack - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.zStack"
+          :size="image.depth"
+          dimension="zStack"
+          @shift="shift('zStack', $event)"
+      />
     </div>
 
 
@@ -114,24 +77,14 @@
     <!-- ----- DURATION ----- -->
     <div class="image-dimension" v-if="hasDuration">
       <strong class="image-dimension-name">T</strong>
-
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('time')"
-          @click="shift('time', -Math.min(step, currentSlice.time))"
-        >
-          <i class="fas fa-fast-backward"></i>
-          <div class="step-counter">-{{step}}</div>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftBackward('time')"
-          @click="shift('time', -1)"
-        >
-          <i class="fas fa-step-backward"></i>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="false"
+          :current="currentSlice.time"
+          :size="image.duration"
+          dimension="time"
+          @shift="shift('time', $event)"
+      />
 
 <!--      <div class="buttons has-addons">-->
 <!--        <button class="button is-small">-->
@@ -150,40 +103,27 @@
         </template>
       </cytomine-slider>
 
-      <div class="buttons has-addons">
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('time')"
-          @click="shift('time', 1)"
-        >
-          <i class="fas fa-step-forward"></i>
-        </button>
-        <button
-          class="button is-small"
-          :disabled="!canShiftForward('time')"
-          @click="shift('time', Math.min(step, image.duration - currentSlice.time - 1))"
-        >
-          <i class="fas fa-fast-forward"></i>
-          <div class="step-counter">+{{step}}</div>
-        </button>
-      </div>
+      <image-controls-shift-buttons
+          :index="index"
+          :forward="true"
+          :current="currentSlice.time"
+          :size="image.duration"
+          dimension="time"
+          @shift="shift('time', $event)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import CytomineSlider from '@/components/form/CytomineSlider';
+import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 export default {
   name: 'image-controls',
-  components: {CytomineSlider},
-  data() {
-    return {
-      step: 2, // TODO: add into configuration
-    };
-  },
+  components: {ImageControlsShiftButtons, CytomineSlider},
   props: {
     index: String
   },
@@ -396,28 +336,8 @@ export default {
   width: 1rem;
 }
 
-.buttons {
-  float:left;
-  margin: 1px;
-  margin-bottom: 0 !important;
-
-  .button {
-    margin-bottom: 0;
-  }
-}
-
 .image-dimension-slider {
   flex-grow: 3;
-}
-
-.step-counter {
-  position: absolute;
-  top: 0.25em;
-  right: 0.25em;
-  font-size: 0.7em;
-  font-weight: 600;
-  text-align:right;
-  line-height: 0.9em;
 }
 
 </style>

@@ -203,6 +203,18 @@
     </button>
     </div>
   </template>
+  
+  <div class="buttons has-addons are-small">
+      <button
+      v-if="isToolDisplayed('screenshot')"
+      :disabled="disabledDraw"
+      v-tooltip="$t('screenshot')"
+      class="button"
+      @click="takeScreenshot()"
+    >
+      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+    </button>
+  </div>
 
   <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons are-small">
     <button
@@ -273,7 +285,7 @@
     <button
         v-if="isToolDisplayed('resize')"
         :disabled="isToolDisabled('resize')"
-        v-tooltip="$t('resize')"
+        v-tooltip="$t('rescale')"
         class="button"
         :class="{'is-selected': activeEditTool === 'rescale'}"
         @click="activateEditTool('rescale')"
@@ -320,7 +332,7 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
-    <div class="repeat-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+    <div class="special-paste-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
         :disabled="disabledPaste"
         v-tooltip="$t('paste-repeat')"
@@ -329,20 +341,25 @@
       >
       <span class="icon is-small">
         <i class="fas fa-paste"></i>
-        <i class="fas fa-star"></i>
+        <i class="fas fa-star special-paste-icon"></i>
       </span>
       </button>
 
-      <div class="repeat-container" v-show="showRepeatSelector">
-        <p>
-          <i18n path="paste-repeat-info">
-            <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
-          </i18n>
-          <br>
-        </p>
-        <div class="repeat-button-container">
-          <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+      <div class="special-paste-container" v-show="showRepeatSelector">
+        <div class="panel">
+          <div class="panel-block">
+            <p>
+              <i18n path="paste-repeat-info">
+                <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
+              </i18n>
+              <br>
+            </p>
+            <div class="repeat-button-container">
+              <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+            </div>
+          </div>
         </div>
+
 
       </div>
     </div>
@@ -858,6 +875,10 @@ export default {
       this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
     },
 
+    takeScreenshot(){
+      this.$emit('screenshot');
+    },
+
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
@@ -902,6 +923,11 @@ export default {
         case 'tool-freehand-polygon':
           if (this.isToolDisplayed('polygon') && !this.disabledDraw) {
             this.activateTool('freehand-polygon');
+          }
+          return;
+        case 'tool-screenshot':
+          if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
+            this.takeScreenshot();
           }
           return;
         case 'tool-delete':
@@ -1014,7 +1040,7 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection, .track-selection, .repeat-selection {
+.term-selection, .track-selection, .special-paste-selection {
   position: relative;
 }
 
@@ -1025,18 +1051,21 @@ export default {
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .repeat-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .special-paste-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
   margin-top: 5px;
-  background: white;
   min-width: 18em;
   max-width: 20vw;
   max-height: 40vh;
   overflow: auto;
+}
+
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border-radius: 4px;
+  background: white;
 }
 
 .term-selection:not(.has-preview) .color-preview, .track-selection:not(.has-preview) .color-preview {
@@ -1079,10 +1108,28 @@ export default {
 $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
-  .repeat-selection .repeat-container {
+  .special-paste-selection .special-paste-container {
     p {
       margin: 0.75em;
       font-size: 0.9em;
+    }
+
+    .panel-block:last-of-type {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    .panel-block:first-of-type {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    .panel {
+      font-size: 0.9rem;
+    }
+
+    .panel-block {
+      padding: 0.2em 0.5em;
     }
   }
 
@@ -1115,7 +1162,7 @@ $colorActiveIcon: #fff;
     height: 1.15em !important;
   }
 
-  .icon .fa-star {
+  .icon .special-paste-icon {
     font-size: 0.5em;
     position: absolute;
     right: 0.2rem;
