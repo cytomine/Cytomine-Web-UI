@@ -24,7 +24,7 @@
           <b-tag type="is-info">
             {{association.tagName.toUpperCase()}}
             <span v-if="currentUser.isDeveloper"> ({{$t('id')}}: {{association.tag}})</span>
-            </b-tag>
+          </b-tag>
           <b-tag v-if="canEdit">
             <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
             </button>
@@ -61,7 +61,7 @@ export default {
       associatedTags: []
     };
   },
-  computed:{
+  computed: {
     currentUser: get('currentUser/user'),
   },
   methods: {
