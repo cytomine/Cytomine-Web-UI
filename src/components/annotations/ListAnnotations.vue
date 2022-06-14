@@ -235,7 +235,11 @@
       </div>
     </div>
 
-    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
+    <b-message type="is-warning" has-icon icon-size="is-small" v-if="reachedLimit">
+      {{ $t('too-much-categories-to-display', {toDisplay: this.selectedCategoryOptions.length, displayed: this.limitedCategoryOptions.length}) }}
+    </b-message>
+
+    <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
       :categorization="selectedCategorization.categorization"
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
@@ -290,7 +294,6 @@
 
 <script>
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
-import constants from '@/utils/constants.js';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
@@ -308,6 +311,9 @@ import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+
+import constants from '@/utils/constants.js';
+const MAX_ITEMS_PER_CATEGORY = constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY;
 
 export default {
   name: 'list-annotations',
@@ -441,7 +447,9 @@ export default {
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
     },
-
+    selectedTermOptions() {
+      return this.termsOptions.filter(option => this.selectedTermsIds.includes(option.id));
+    },
     filteredTracks() {
       return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
     },
@@ -461,6 +469,10 @@ export default {
     trackOptionsIds() {
       return this.tracksOptions.map(option => option.id);
     },
+    selectedTrackOptions() {
+      return this.tracksOptions.filter(option => this.selectedTracksIds.includes(option.id));
+    },
+
 
     tagsOptions() {
       return [...this.tags, this.noTagOption];
@@ -507,8 +519,8 @@ export default {
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
-
-    categoryOptions() {
+    // eslint-disable-next-line vue/return-in-computed-property
+    fullCategoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
           return this.termsOptions;
@@ -525,6 +537,38 @@ export default {
         default:
           return [];
       }
+    },
+    // eslint-disable-next-line vue/return-in-computed-property
+    selectedCategoryOptions() {
+      switch (this.selectedCategorization.categorization) {
+        case 'TERM':
+          return this.selectedTermOptions;
+        case 'IMAGE':
+          return this.selectedImages;
+        case 'USER':
+          if (this.selectedAnnotationType === this.jobAnnotationOption)
+            return this.selectedUserJobs;
+          if (this.reviewed)
+            return this.selectedReviewers;
+          return this.selectedMembers;
+        case 'TRACK':
+          return this.selectedTrackOptions;
+      }
+    },
+    limitedCategoryOptions() {
+      /* We try to return all options and hide unwanted ones with v-show for efficiency
+       * When the number of options is too large, we return only selected options (v-show always true)
+       * If there are still too much selected options, we return only the X first options.
+       * We always have |limited options| <= |selected options| <= |full options|
+       */
+      if (this.fullCategoryOptions.length <= MAX_ITEMS_PER_CATEGORY) {
+        return this.fullCategoryOptions;
+      }
+
+      return this.selectedCategoryOptions.slice(0, MAX_ITEMS_PER_CATEGORY);
+    },
+    reachedLimit() {
+      return this.selectedCategoryOptions.length > MAX_ITEMS_PER_CATEGORY;
     },
     isByTerm() {
       return this.selectedCategorization.categorization === 'TERM';
