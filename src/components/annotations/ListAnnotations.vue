@@ -235,47 +235,53 @@
       </div>
     </div>
 
-    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
-      :categorization="selectedCategorization.categorization"
-      :size="selectedSize.size"
-      :color="selectedColor.hexaCode"
-      :nbPerPage="nbPerPage"
+    <div class="list-annots" @scroll="scrollHandler" ref="listAnnots">
+        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${limitedCategoryOptions.categorization}${prop.id}`"
+        :categorization="selectedCategorization.categorization"
+        :size="selectedSize.size"
+        :color="selectedColor.hexaCode"
+        :nbPerPage="nbPerPage"
 
-      :allTerms="terms"
-      :allUsers="allUsers"
-      :allImages="images"
-      :allTracks="tracks"
-      :allTags="tags"
+        :allTerms="terms"
+        :allUsers="allUsers"
+        :allImages="images"
+        :allTracks="tracks"
+        :allTags="tags"
 
-      :prop="prop"
-      :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
-      :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
-      :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
-      :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
-      :terms-ids="selectedTermsIds"
-      :tracks-ids="selectedTracksIds"
-      :tags-ids="selectedTagsIds"
-      :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
-      :imagesIds="selectedImagesIds"
-      :usersIds="selectedUsersIds"
-      :reviewed="reviewed"
-      :reviewUsersIds="reviewUsersIds"
-      :afterThan="afterThan"
-      :beforeThan="beforeThan"
+        :prop="prop"
+        :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
+        :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
+        :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
+        :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
+        :terms-ids="selectedTermsIds"
+        :tracks-ids="selectedTracksIds"
+        :tags-ids="selectedTagsIds"
+        :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
+        :imagesIds="selectedImagesIds"
+        :usersIds="selectedUsersIds"
+        :reviewed="reviewed"
+        :reviewUsersIds="reviewUsersIds"
+        :afterThan="afterThan"
+        :beforeThan="beforeThan"
+        :revision="revision"
 
-      :revision="revision"
+        v-show="showList(prop)"
+        :visible="showList(prop)"
 
-      v-show="showList(prop)"
-      :visible="showList(prop)"
-
-      @addTerm="addTerm"
-      @addTrack="addTrack"
-      @updateTermsOrTracks="revision++"
-      @delete="revision++"
-      @update="revision++"
-      @select="viewAnnot($event)"
-    />
-
+        @addTerm="addTerm"
+        @addTrack="addTrack"
+        @updateTermsOrTracks="revision++"
+        @delete="revision++"
+        @update="revision++"
+        @select="viewAnnot($event)"
+        />
+      <button class="button is-medium" v-if="!loadedAllCategories" @click="loadCategories()">
+        <span class="icon">
+          <i class="fas fa-sync"></i>
+        </span>
+        <span>{{$t('button-load-more')}}</span>
+      </button>
+    </div>
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
       <div class="buttons is-centered">
@@ -304,11 +310,16 @@ import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
+import _ from 'lodash';
+
+import constants from '@/utils/constants.js';
+
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 import {appendShortTermToken} from '@/utils/token-utils.js';
+const categoryBatch = constants.CATEGORY_ITEMS_PER_BATCH;
 
 export default {
   name: 'list-annotations',
@@ -352,7 +363,11 @@ export default {
       noTrackOption: {id: 0, name: this.$t('no-track')},
       multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')},
 
-      noTagOption: {id: 0, name: this.$t('no-tag')}
+      noTagOption: {id: 0, name: this.$t('no-tag')},
+
+      limitedCategoryOptions: [],
+      categoriesToShow: 0,
+      loadedAllCategories: false
     };
   },
   computed: {
@@ -444,7 +459,6 @@ export default {
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
     },
-
     filteredTracks() {
       return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
     },
@@ -510,7 +524,7 @@ export default {
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
-
+    // eslint-disable-next-line vue/return-in-computed-property
     categoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -582,6 +596,28 @@ export default {
     }
   },
   methods: {
+    initLimitedCategory(){
+      this.categoriesToShow = constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY;
+      this.loadedAllCategories = this.categoryOptions.length < this.categoriesToShow;
+      this.limitedCategoryOptions = this.categoryOptions.slice(0, this.categoriesToShow);
+    },
+    scrollHandler: _.debounce(function() {
+      let scrollBlock = this.$refs.listAnnots;
+      let actualScrollPos = scrollBlock.scrollTop + scrollBlock.clientHeight;
+
+      if (actualScrollPos === scrollBlock.scrollHeight && !this.loadedAllCategories) {
+        this.loadCategories();
+      }
+    }, 100),
+    loadCategories(){
+      if(this.limitedCategoryOptions.length < this.categoryOptions.length){
+        this.limitedCategoryOptions.push(...this.categoryOptions.slice(this.categoriesToShow, this.categoriesToShow + categoryBatch));
+        this.categoriesToShow += categoryBatch;
+      }
+      else{
+        this.loadedAllCategories = true;
+      }
+    },
     appendShortTermToken,
     viewAnnot(data) {
       this.$router.push(`/project/${this.project.id}/image/${data.annot.image}/annotation/${data.annot.id}`);
@@ -733,17 +769,30 @@ export default {
       }
     }
 
+    this.initLimitedCategory();
+
     this.loading = false;
   }
 };
 </script>
 
 <style scoped>
+.list-annots{
+  max-height: 80vh;
+  overflow: auto;
+  margin-bottom: 1em;
+}
+
 .filters:not(:last-child) {
   margin-bottom: 1.25rem;
 }
 
 .filter.column {
   padding: 0.4em 0.75em;
+}
+
+.button {
+  display: block;
+  margin: auto;
 }
 </style>

@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slices[0].imageServerUrl"
+          :crossOrigin="slice.imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -51,14 +51,14 @@
         />
       </vl-layer-tile>
 
-<!--      <vl-layer-image>-->
-<!--        <vl-source-raster-->
-<!--          v-if="baseSource && colorManipulationOn"-->
-<!--          :sources="[baseSource]"-->
-<!--          :operation="operation"-->
-<!--          :lib="lib"-->
-<!--        />-->
-<!--      </vl-layer-image>-->
+      <vl-layer-image>
+        <vl-source-raster
+          v-if="baseSource && colorManipulationOn"
+          :sources="[baseSource]"
+          :operation="operation"
+          :lib="lib"
+        />
+      </vl-layer-image>
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -74,7 +74,7 @@
     </vl-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -211,9 +211,10 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
+import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
-// import {constLib, operation} from '@/utils/color-manipulation.js';
+import {constLib, operation} from '@/utils/color-manipulation.js';
+
 import constants from '@/utils/constants.js';
 
 export default {
@@ -396,7 +397,6 @@ export default {
       let slice = this.slices[0];
       return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
-
     // colorManipulationOn() {
     //   return this.imageWrapper.colors.brightness !== 0
     //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
@@ -499,7 +499,6 @@ export default {
       if(this.routedAnnotation) {
         this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
-
       this.savePosition();
     },
 
@@ -695,7 +694,22 @@ export default {
           }
           return;
       }
-    }
+    },
+    async takeScreenshot() {
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
+
+      let a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
+      a.click();
+
+      // Reset container css values as previous
+      document.querySelector('.map-container').style.height = '';
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time

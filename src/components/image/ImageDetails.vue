@@ -431,7 +431,7 @@ export default {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
     }
-  },
+  }
 };
 </script>
 

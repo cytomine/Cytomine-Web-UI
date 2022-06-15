@@ -141,7 +141,9 @@ export default {
       this.selectTargetOntology();
     },
     selectedOntology(ontology) {
-      this.$store.commit('ontologies/setSelectedOntology', ontology.id);
+      if (ontology) {
+        this.$store.commit('ontologies/setSelectedOntology', ontology.id);
+      }
     }
   },
   methods: {
