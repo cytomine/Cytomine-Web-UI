@@ -365,7 +365,10 @@ export default {
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
-    this.userPostitionWebsock.close();
+    if(this.wsConnected){
+      this.userPostitionWebsock.close();
+      this.wsConnected = false;
+    }
   }
 };
 </script>

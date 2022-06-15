@@ -583,8 +583,8 @@ export default {
   },
   methods: {
     appendShortTermToken,
-    viewAnnot(annot) {
-      this.$router.push(`/project/${this.project.id}/image/${annot.image}/annotation/${annot.id}`);
+    viewAnnot(data) {
+      this.$router.push(`/project/${this.project.id}/image/${data.annot.image}/annotation/${data.annot.id}`);
     },
     async fetchImages() {
       if (!this.tooManyImages) {

@@ -205,7 +205,7 @@ export default {
 
       commit('clearSliceInstances');
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: state.image.baseImage})).array.find(cf => cf.type === 'HDF5');
+      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: state.imageInstance.baseImage})).array.find(cf => cf.type === 'HDF5');
       commit('setProfile', profile);
 
       commit('clearSliceInstances');

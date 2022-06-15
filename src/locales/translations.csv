@@ -1058,3 +1058,6 @@ linear,Linear,Linéaire
 logarithmic,Logarithmic,Logarithmic
 intensities-manipulation,Intensities adjustment,Ajustement des intensités
 followers,Followers,Suiveurs
+button-adjust,Adjust,Ajuster
+button-adjust-slice,Adjust slice,Ajuster l'image
+button-adjust-image,Adjust image,Ajuster le plan

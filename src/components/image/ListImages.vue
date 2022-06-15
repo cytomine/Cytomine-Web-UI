@@ -428,12 +428,12 @@ export default {
           label: m || this.$t('unknown')
         };
       });
-      this.availableResolutions = stats.resolution.list.map(resolution => {
-        return {
-          value: resolution || 'null',
-          label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
-        };
-      });
+      // this.availableResolutions = stats.resolution.list.map(resolution => {
+      //   return {
+      //     value: resolution || 'null',
+      //     label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
+      //   };
+      // });
     },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];

@@ -262,6 +262,7 @@ export default {
     images: {type: Array},
     slices: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
