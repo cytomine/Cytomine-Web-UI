@@ -375,7 +375,6 @@ export default {
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(prop == 'vendor') prop = 'mimeType';
         if(selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -410,10 +409,10 @@ export default {
 
       this.availableFormats = stats.format.list;
 
-      stats.format.list.forEach(mime => {
-        let vendor = vendorFromMime(mime);
+      stats.format.list.forEach(format => {
+        let vendor = vendorFromFormat(format);
         let vendorFormatted = {
-          value: vendor ? mime : 'null',
+          value: vendor ? format : 'null',
           label: vendor ? vendor.name : this.$t('unknown')
         };
 

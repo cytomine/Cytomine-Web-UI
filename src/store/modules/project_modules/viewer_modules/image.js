@@ -34,6 +34,7 @@ import annotationsList from './image_modules/annotations-list';
 import controls from './image_modules/controls';
 
 import Vue from 'vue';
+import _ from 'lodash';
 
 import {
   isCluster,
@@ -324,6 +325,16 @@ export default {
       }
 
       return state.imageInstance.depth * state.imageInstance.duration * state.imageInstance.channels;
+    },
+
+    channels: state => {
+      return _.orderBy(Object.values(_.groupBy(state.sliceInstances, 'channel')).map(slices => {
+        return {
+          index: slices[0].channel,
+          name: slices[0].channelName,
+          color: slices[0].channelColor
+        };
+      }), 'index');
     }
   },
 

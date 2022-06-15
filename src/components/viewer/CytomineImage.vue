@@ -47,6 +47,7 @@
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
+          :tile-size="tileSize"
         />
       </vl-layer-tile>
 
@@ -71,9 +72,8 @@
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
-
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -369,7 +369,9 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-
+    tileSize() {
+      return this.image.tileSize;
+    },
     baseLayerProcessingParams() {
       let params = {};
       if (this.imageWrapper.colors.filter) {
@@ -378,13 +380,13 @@ export default {
       if (this.imageWrapper.colors.contrast !== 1) {
         params.contrast = this.imageWrapper.colors.contrast;
       }
-      /*if (this.imageWrapper.colors.gamma !== 1) {
+      if (this.imageWrapper.colors.gamma !== 1) {
         params.gammas = this.imageWrapper.colors.gamma;
-      }*/
+      }
       if (this.imageWrapper.colors.inverse) {
         params.colormaps = '!DEFAULT';
       }
-      /*let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
+      let minIntensities = this.imageWrapper.colors.minMax.map(stat => stat.minimum);
       if (minIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.min_intensities = minIntensities.join(',');
@@ -393,7 +395,8 @@ export default {
       if (maxIntensities.length > 0) {
         // eslint-disable-next-line camelcase
         params.max_intensities = maxIntensities.join(',');
-      }*/
+      }
+
       return params;
     },
     baseLayerSliceParams() {
@@ -411,7 +414,6 @@ export default {
       }
       return query;
     },
-
     baseLayerURLs() {
       return  [`${this.slice.imageServerUrl}/image/${this.slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
@@ -713,7 +715,22 @@ export default {
           }
           return;
       }
-    }
+    },
+    async takeScreenshot() {
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
+
+      let a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
+      a.click();
+
+      // Reset container css values as previous
+      document.querySelector('.map-container').style.height = '';
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time

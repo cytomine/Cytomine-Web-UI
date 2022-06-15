@@ -25,6 +25,7 @@ function isWebPSupported() {
 }
 
 export const SUPPORT_WEBP = isWebPSupported();
+export const IMAGE_FORMAT = (SUPPORT_WEBP) ? 'webp' : 'jpg';
 
 export function splitImageUrl(rawUrl) {
   let url = new URL(rawUrl);
@@ -48,6 +49,6 @@ export function combineImageUrl({host, pathname, format, params}) {
 }
 
 
-export function changeImageUrlFormat(url, newFormat) {
+export function changeImageUrlFormat(url, newFormat=IMAGE_FORMAT) {
   return combineImageUrl({format: newFormat, ...splitImageUrl(url)});
 }
