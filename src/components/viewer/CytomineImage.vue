@@ -43,7 +43,7 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slice.imageServerUrl"
+          :crossOrigin="slices[0].imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
@@ -51,14 +51,14 @@
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"

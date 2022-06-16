@@ -312,8 +312,6 @@ import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
 import _ from 'lodash';
 
-import constants from '@/utils/constants.js';
-
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
