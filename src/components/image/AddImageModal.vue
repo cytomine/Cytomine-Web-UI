@@ -100,6 +100,7 @@
 import {get} from '@/utils/store-helpers';
 import {AbstractImageCollection, ImageInstance, TagCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
 
 export default {
@@ -109,7 +110,8 @@ export default {
   },
   components: {
     CytomineTable,
-    CytomineModal
+    CytomineModal,
+    CytomineMultiselect
   },
   data() {
     return {
@@ -141,6 +143,13 @@ export default {
         collection['searchText'] = {
           ilike: encodeURIComponent(this.searchString)
         };
+      }
+      for(let {prop, selected, total} of this.multiSelectFilters) {
+        if(selected.length > 0 && selected.length < total) {
+          collection[prop] = {
+            in: selected.map(s => s.id).join()
+          };
+        }
       }
 
       return collection;
