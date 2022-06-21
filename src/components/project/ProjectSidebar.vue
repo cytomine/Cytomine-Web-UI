@@ -157,7 +157,7 @@ export default {
       this.email.cc = '';
       this.emailId = '';
 
-      this.emailId = [...new Set(representatives.map(x => x['email']))].join(',');
+      this.emailId = [...new Set(representatives.map(x => x['email']))].join(';');
 
       let projectUrl = window.location.origin + '/#/project/' + this.project['id'];
 
