@@ -84,5 +84,14 @@ export default {
       commit('setShortTermToken', shortTermToken);
       await dispatch('fetchUser');
     }
+  },
+
+  getters: {
+      currentShortTermToken: (state, _, rootState) => {
+        let currentUser = rootState.currentUser || {};
+        return currentUser.shortTermToken;
+      },
+
   }
+
 };

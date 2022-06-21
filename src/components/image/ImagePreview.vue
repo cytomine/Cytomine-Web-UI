@@ -47,9 +47,9 @@ export default {
     fullHeightCard: {type: Boolean, default: true},
     showProject: {type: Boolean, default: false},
     blindMode: {type: Boolean, default: false},
+    shortTermToken: {type: String, default: null}
   },
   computed: {
-    shortTermToken: get('currentUser/shortTermToken'),
     idImage() {
       return this.image.image || this.image.id; // if provided object is image consultation, image.image
     },
@@ -71,6 +71,9 @@ export default {
     figureStyle() {
       return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};
     }
+  },
+  created() {
+    this.shortTermToken = this.$store.getters['currentUser/currentShortTermToken'];
   }
 };
 </script>
