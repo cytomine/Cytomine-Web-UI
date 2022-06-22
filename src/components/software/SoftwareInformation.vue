@@ -18,7 +18,7 @@
     <div class="content-wrapper" v-if="!loading">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-          <li><router-link :to="`/software`">{{$t('algorithms')}}</router-link></li>
+          <li><router-link :to="`/algorithm`">{{$t('algorithms')}}</router-link></li>
           <li class="is-active"><a href="#" aria-current="page">{{software.fullName}}</a></li>
         </ul>
       </nav>
@@ -136,8 +136,6 @@ import {get} from '@/utils/store-helpers';
 import {Software, SoftwareParameterCollection, ProjectCollection} from 'cytomine-client';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import SoftwareParameterDetails from '@/components/software/SoftwareParameterDetails';
 import SoftwareStatisticsChart from '@/components/charts/SoftwareStatisticsChart';
 import SoftwareDetails from '@/components/software/SoftwareDetails';
@@ -149,9 +147,7 @@ export default {
     SoftwareDetails,
     SoftwareStatisticsChart,
     SoftwareParameterDetails,
-    CytomineDescription,
-    CytomineProperties,
-    AttachedFiles
+    CytomineDescription
   },
   data() {
     return {

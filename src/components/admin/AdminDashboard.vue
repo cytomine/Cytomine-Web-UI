@@ -74,7 +74,11 @@
             </tr>
             <tr>
               <td>{{totalCounts.images}}</td>
-              <td>{{$t('images')}}</td>
+              <td>{{$t('images-in-projects')}}</td>
+            </tr>
+            <tr>
+              <td>{{totalCounts.abstractImages}}</td>
+              <td>{{$t('uploaded-images')}}</td>
             </tr>
           </tbody>
         </table>
@@ -95,6 +99,8 @@
               <td>{{totalCounts.userAnnotations}}</td>
               <td>{{$t('user-annotations')}}</td>
             </tr>
+            <tr>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -113,6 +119,8 @@
             <tr>
               <td>{{totalCounts.jobAnnotations}}</td>
               <td>{{$t('analysis-annotations')}}</td>
+            </tr>
+            <tr>
             </tr>
           </tbody>
         </table>
@@ -144,6 +152,7 @@
 </template>
 
 <script>
+import constants from '@/utils/constants.js';
 import {Cytomine} from 'cytomine-client';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';

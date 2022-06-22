@@ -20,10 +20,13 @@
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
-  <div class="annot-preview">
-    <div :style="styleAnnotDetails" @click.self="viewAnnot()">
-      <button class="button is-small" @click="opened = !opened" ref="previewButton">
+  <div class="annot-preview" :class="{clickable}">
+    <div :style="styleAnnotDetails" @click.self="viewAnnot(sameViewOnClick)">
+      <button class="button is-small" @click="opened = !opened" ref="previewButton" v-if="showDetails">
         <i :class="['fas', opened ? 'fa-minus' : 'fa-plus']"></i>
+      </button>
+      <button class="button is-small" @click="viewAnnot()" v-else-if="clickable && sameViewOnClick">
+        <i class="fas fa-external-link-alt"></i>
       </button>
 
     </div>
@@ -48,8 +51,9 @@
       @updateTerms="$emit('updateTermsOrTracks')"
       @updateTracks="$emit('updateTermsOrTracks')"
       @updateProperties="$emit('updateProperties')"
+      @select="$emit('select', $event)"
       @centerView="$emit('centerView')"
-      @deletion="handleDeletion"
+      @deletion="$emit('deletion')"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
@@ -58,7 +62,8 @@
 </template>
 
 <script>
-import AnnotationDetails from './AnnotationDetails';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers.js';
 
 export default {
   name: 'annotation-preview',
@@ -70,20 +75,50 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
+    showDetails: {type: Boolean, default: true},
     showImageInfo: {type: Boolean, default: true},
-    showSliceInfo: {type: Boolean, default: false}
+    showSliceInfo: {type: Boolean, default: false},
+    clickable: {type: Boolean, default: true},
+    sameViewOnClick: {type: Boolean, default: false}
   },
-  components: {AnnotationDetails},
+  components: {
+    AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
+  },
   data() {
     return {
-      opened: false
+      opened: false,
+      revisionCrop: 0
     };
   },
   computed: {
-    styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = `${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`;
+    shortTermToken: get('currentUser/shortTermToken'),
+    cropParameters() {
+      let params = {
+        square: true,
+        complete: true,
+        thickness: 2,
+        increaseArea: 1.25,
+        rev: this.revisionCrop,
+      };
 
+      if (this.color || this.color === '') {
+        params.draw = true;
+      }
+      if (this.color) {
+        params.color = `0x${this.color}`;
+      }
+      if (this.annot.updated) {
+        params.updated = this.annot.updated;
+      }
+
+      return params;
+    },
+    cropUrl() {
+      return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
+    },
+    styleAnnotDetails() {
+      let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
+      console.log('url', url);
       return {
         backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
@@ -96,8 +131,10 @@ export default {
     }
   },
   methods: {
-    viewAnnot() {
-      this.$emit('selectAnnotation');
+    viewAnnot(trySameView=false) {
+      if (this.clickable) {
+        this.$emit('select', {annot: this.annot, options:{trySameView}});
+      }
     },
     close(event) {
       if(!this.opened) {
@@ -116,10 +153,18 @@ export default {
 
       this.opened = false;
     },
-    handleDeletion() {
-      this.$eventBus.$emit('deleteAnnotation', this.annot);
-      this.$emit('update');
+    reloadAnnotationCropHandler(annot) {
+      if (annot.id === this.annot.id) {
+        this.revisionCrop++;
+      }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
+  },
+  beforeDestroy() {
+    // unsubscribe from all events
+    this.$eventBus.$off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }
 };
 </script>
@@ -132,8 +177,11 @@ export default {
   margin: 10px;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   border: 3px solid white;
-  cursor: pointer;
   text-align: right;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .annot-preview .button {

@@ -73,6 +73,7 @@ fill,Fill,Remplir,Rellenar
 modify,Modify,Modifier,Modificar
 move,Move,Déplacer,Mover
 rotate,Rotate,Pivoter,Girar
+rescale,Rescale,Redimensionner
 delete,Delete,Supprimer,Eliminar
 rename,Rename,Renommer,Renombrar
 undo,Undo,Annuler,Deshacer
@@ -179,10 +180,10 @@ annotation-type,Annotation type,Type d'annotation,Tipo de anotación
 multiple-terms,Multiple terms,Plusieurs termes,Múltiples términos
 created-by,Created by,Créé par,Creado por
 properties,Properties,Propriétés,Propiedades
-no-properties,No properties,Aucune propriété,Ninguna propiedad
+no-properties,No property,Aucune propriété,Ninguna propiedad
 tags,Tags,Tags,Etiquetas
 no-tag,No tag,Aucun tag,Sin etiqueta
-new-tag,New tag,Nouveau tag,Nueva etiqueta
+button-new-tag,New tag,Nouveau tag,Nueva etiqueta
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.
 notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag,Error al crear la etiqueta
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés,Error al crear las etiquetas
@@ -447,7 +448,8 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel
 no-result,No result,Aucun résultat,Sin resultados
 upload,Upload,Upload,Subir
 important-notes,Important notes,Remarques importantes,Notas importantes
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF).","Solo se permiten archivos de imagen en formato JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI o BIF"
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB
+allowed-formats-upload-info,"Supported image file formats:","Formats d'image supportés :"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS)
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari."
@@ -483,6 +485,11 @@ extracting-data,Extracting data,Extraction des données en cours,
 error-extraction,Extraction error,Erreur d'extraction,
 deploying,Deploying,Déploiement en cours,
 converting,Converting,Conversion en cours,
+unpacking,Unpacking,Décompression en cours
+error-unpacking,Unpacking error,Erreur de décompression
+unpacked,Unpacked,Décompressé
+checking-integrity,Checking integrity,Vérification de l'intégrité en cours
+error-integrity,Corrupted file,Fichier corrompu
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra
@@ -764,6 +771,7 @@ number-annotations-info-message,The number of annotations that you created,Le no
 number-reviewed-annotations-info-message,The number of annotations that you validated during a review,Le nombre d'annotations que vous avez validées,El número de anotaciones que validadas por el usuario durante una revisión
 blinded-name-indication,Blind,Masqué,Oculto
 language,Language,Langue,Idioma
+system,System,Système,
 no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché,Ninguna propiedad existente coincide con {searchString}
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?
@@ -896,7 +904,10 @@ shortcut-viewer-tool-correct-remove,Correct annotation by removing a freehand ar
 shortcut-viewer-tool-modify,Modify annotation,Modifier l'annotation,Modificar anotación
 shortcut-viewer-tool-modify-delete-vertex,Delete a vertex with the modify tool,Supprimer un sommêt avec l'outil de modification,Eliminar un vértice con la herramienta de modificación
 shortcut-viewer-tool-move,Move annotation,Déplacer l'annotation,Mover anotación
+shortcut-viewer-tool-rescale,Rescale annotation,Redimensionner l'annotation,
 shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation,Rotar anotación
+shortcut-viewer-tool-copy,Copy annotation,Copier l'annotation,
+shortcut-viewer-tool-paste,Paste annotation,Coller l'annotation,
 shortcut-viewer-toggle-information,Toggle information panel,Afficher/Masquer le panneau d'information,Alternar panel de información
 shortcut-viewer-toggle-zoom,Toggle zoom panel,Afficher/Masquer le panneau de zoom,Alternar panel de zoom
 shortcut-viewer-toggle-link,Toggle image synchronization panel,Afficher/Masquer le panneau de synchronisation des images,Alternar panel de sincronización de imagen
@@ -910,7 +921,24 @@ shortcut-viewer-toggle-overview,Toggle overview,Afficher/Masquer l'aperçu,Alter
 shortcut-viewer-toggle-annotations,Toggle annotations panel,Afficher/Masquer le panneau des annotations,Alternar panel de anotaciones
 shortcut-viewer-toggle-current,Toggle currently selected annotation panel,Afficher/Masquer les détails de l'annotation sélectionnée,Alternar el panel de anotaciones seleccionado actualmente
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images,Alternar selector de imagen
+shortcut-viewer-toggle-review-layer,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation
+shortcut-viewer-toggle-all-review-layer,Toggle review layer in review mode in all views,Afficher/masquer le calque de validation en mode validation dans toutes les vues
+shortcut-viewer-toggle-selected-layers,Toggle visibility of selected layers,Afficher/masquer les calques d'annotations sélectionnés
+shortcut-viewer-toggle-all-selected-layers,Toggle visibility of selected layers in all views,Afficher/masquer les calques d'annotations sélectionnés dans toutes les vues
+shortcut-viewer-toggle-all-information,Toggle information panel in all views,Afficher/Masquer le panneau d'information dans toutes les vues
+shortcut-viewer-toggle-all-zoom,Toggle zoom panel in all views,Afficher/Masquer le panneau de zoom dans toutes les vues
+shortcut-viewer-toggle-all-link,Toggle image synchronization panel in all views,Afficher/Masquer le panneau de synchronisation des images dans toutes les vues
+shortcut-viewer-toggle-all-filters,Toggle image color panel in all views,Afficher/Masquer le panneau de colorisation de l'image dans toutes les vues
+shortcut-viewer-toggle-all-layers,Toggle layers panel in all views,Afficher/Masquer le panneau des calques dans toutes les vues
+shortcut-viewer-toggle-all-ontology,Toggle terms panel in all views,Afficher/Masquer le panneau des termes dans toutes les vues
+shortcut-viewer-toggle-all-properties,Toggle properties panel in all views,Afficher/Masquer le panneau des propriétés dans toutes les vues
+shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues
+shortcut-viewer-toggle-all-review,Toggle review panel in all views,Afficher/Masquer le panneau de validation dans toutes les vues
+shortcut-viewer-toggle-all-overview,Toggle overview in all views,Afficher/Masquer l'aperçu dans toutes les vues
+shortcut-viewer-toggle-all-annotations,Toggle annotations panel in all views,Afficher/Masquer le panneau des annotations dans toutes les vues
+shortcut-viewer-toggle-all-current,Toggle currently selected annotation panel in all views,Afficher/Masquer les détails de l'annotation sélectionnée dans toutes les vues
 shortcut-general-close-modal,Close a modal,Fermer une fenêtre,Cerrar una ventana de diálogo
+shortcut-general-shortcuts-modal,Bring up this keyboard shortcut list,Afficher cette liste de raccourcis clavier
 shortcut-text-editor-bold,Format text in bold,Mettre le texte en gras,Negrita
 shortcut-text-editor-italic,Format text in italic,Mettre le texte en italique,Cursiva
 shortcut-text-editor-underline,Format text underlined,Souligner le texte,Subrayado
@@ -981,9 +1009,9 @@ version,Version,Version,Versión
 fav,Fav.,Fav.,Fav.
 favorite,Favorite,Favori,Favorito
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas
-button-best-fit-zoom,Fit zoom to viewport,,
-button-reset-zoom,Reset zoom,,
-copy,Copy,Copy,
+button-best-fit-zoom,Fit zoom to viewport,Ajuster le zoom à la vue,
+button-reset-zoom,Reset zoom,Réinitialiser le zoom,
+copy,Copy,Copier,
 paste,Paste,Coller,
 copy-paste,Copy/Paste,Copier/Coller,
 notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée,
@@ -997,8 +1025,8 @@ slice,Slice,Plan,
 pixel-intensity,Intensity,Intensité,
 profile,Profile,Profil,
 inspect-button,Inspect,Inspecter,
-failed-fetch-profile,Failed to fetch image profile,,
-companion-files,Companion files,,
+failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,
+companion-files,Companion files,Fichiers liés,
 not-available,Not available.,Indisponible.,
 no-profile,No profile,Pas de profil,
 developer-mode,Developer mode,Mode développeur,
@@ -1018,6 +1046,7 @@ in-this-slice,in this slice,dans ce plan,
 link-mode,Mode,Mode,
 absolute-link-mode,Absolute,Absolu,
 relative-link-mode,Relative,Relatif,
+too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.,,
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas
@@ -1056,3 +1085,21 @@ top-menu-color-instruction,"You can set from 140 colors ('red', 'cyan'). By enco
 top-font-menu-color, Top font menu color, Couleur de la police du menu supérieur, Color de fuente del menú superior
 top-font-menu-color-description,"Set the font color of the top banner","Renseignez ici la couleur de la police de la bannière supérieur de Cytomine", "Establecer el color de fuente del menú superior"
 update-color,Update color,Modifier la couleur,Actualizar color
+images-in-projects,Images in projects,Images au sein des projets
+uploaded-images,Images uploaded,Images téléversées
+step,Step,Saut
+screenshot, Screenshot current image view, Capture d'écran de l'image actuelle
+all-channels,All channels,Tous les canaux
+channel-abbr,ch.,can.
+channel,Channel,Canal
+warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément
+min-max,Min/Max,Min/Max
+merged-channels,Merged channels,Canaux fusionnés
+histogram-scale,Histogram scale,Echelle des histogrammes
+linear,Linear,Linéaire
+logarithmic,Logarithmic,Logarithmic
+intensities-manipulation,Intensities adjustment,Ajustement des intensités
+followers,Followers,Suiveurs
+button-adjust,Adjust,Ajuster
+button-adjust-slice,Adjust slice,Ajuster l'image
+button-adjust-image,Adjust image,Ajuster le plan

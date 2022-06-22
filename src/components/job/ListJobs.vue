@@ -76,20 +76,12 @@
             </div>
           </div>
 
-          <!--<div class="column">
-            <div class="filter-label">
-              {{$t('favorite')}}
-            </div>
-            <div class="filter-body">
-              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
-                label="label" track-by="value" multiple />
-            </div>
-          </div>-->
         </div>
       </div>
 
       <cytomine-table
         :collection="jobCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -98,15 +90,8 @@
         :revision="revision"
       >
         <template #default="{row: job}">
-          <!--<b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
-            <a @click="toggleFavorite(job)" v-if="canEdit(job)">
-              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
-            </a>
-            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
-          </b-table-column>-->
-
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
-            <router-link :to="`/software/${job.software}`">
+            <router-link :to="`/algorithm/${job.software}`">
               {{job.softwareName}}
             </router-link>
           </b-table-column>
@@ -222,6 +207,10 @@ export default {
     selectedStatus: localSyncMultiselectFilter('statuses', 'availableStatus'),
     selectedFavorites: localSyncMultiselectFilter('favorites', 'availableFavorites'),
 
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'];
+    },
+
     jobCollection() {
       let collection = new JobCollection({
         project: this.project.id,
@@ -263,13 +252,7 @@ export default {
     canEdit(job) {
       return this.$store.getters['currentProject/canManageJob'](job);
     },
-    async toggleFavorite(job) {
-      job.favorite = !job.favorite;
-      await job.setFavorite();
-      await this.refreshJobs();
-    },
     async fetchMultiselectOptions() {
-      console.log('fetchMultiselectOptions');
       let stats = await JobCollection.fetchBounds({project: this.project.id});
       this.availableSoftwares = stats.software.list;
       this.availableLaunchers = stats.username.list;
@@ -299,7 +282,6 @@ export default {
       }
     },
     async refreshJobs() {
-      console.log('refreshJobs');
       try {
         await this.fetchMultiselectOptions();
         this.loading = false;
@@ -311,7 +293,6 @@ export default {
     },
   },
   async created() {
-    console.log('created');
     await this.refreshJobs();
     this.loading = false;
   }

@@ -62,8 +62,11 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
     annotsIdsToSelect() {
       return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
@@ -113,15 +116,15 @@ export default {
     }
   },
   methods: {
-    clearFeatures() {
+    clearFeatures(cache=true) {
       if(this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache: true});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
         this.$refs.olSource.clearFeatures();
       }
     },
 
     annotBelongsToLayer(annot) {
-      return annotBelongsToLayer(annot, this.layer, this.slice);
+      return annotBelongsToLayer(annot, this.layer, this.sliceIds);
     },
 
     addAnnotationHandler(annot) {
@@ -146,7 +149,7 @@ export default {
           this.clearFeatures();
         }
         else if(hard) {
-          this.clearFeatures();
+          this.clearFeatures(false);
           this.loader();
         }
         else {
@@ -222,7 +225,7 @@ export default {
       let annots = await new AnnotationCollection({
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
-        slice: this.slice.id,
+        slices: this.sliceIds,
         reviewed: this.layer.isReview,
         notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
@@ -360,7 +363,7 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$on('selectAnnotationInLayer', this.selectAnnotationHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
@@ -369,7 +372,7 @@ export default {
   beforeDestroy() {
     // unsubscribe from all events
     this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);

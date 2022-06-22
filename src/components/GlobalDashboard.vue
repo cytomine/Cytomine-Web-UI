@@ -198,6 +198,7 @@ export default {
         }
         return lastOpened;
       }
+      return false;
     }
   },
   methods: {

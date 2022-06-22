@@ -27,7 +27,7 @@
       {{$t('users')}}
     </b-radio-button>
 
-    <b-radio-button v-show="algoEnabled" v-model="activeTab" native-value="trusted-sources" type="is-link">
+    <b-radio-button v-show="algoEnabled"  v-model="activeTab" native-value="trusted-sources" type="is-link">
       {{$t('trusted-sources')}}
     </b-radio-button>
 
@@ -57,7 +57,7 @@ import AdminUsers from './AdminUsers';
 import AdminSoftware from './AdminSoftware';
 import AdminConfiguration from './AdminConfiguration';
 import AdminTags from './AdminTags';
-
+import constants from '@/utils/constants.js';
 const defaultTab = 'dashboard';
 
 export default {
@@ -80,6 +80,7 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch(this.activeTab) {
         case 'dashboard':
@@ -93,6 +94,7 @@ export default {
         case 'tags':
           return AdminTags;
       }
+      throw new Error('Cannot load active tabs ' + this.activeTab);
     }
   },
   watch: {

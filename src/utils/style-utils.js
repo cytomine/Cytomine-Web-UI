@@ -54,8 +54,15 @@ export function createLineStrokeStyle(color, opacity=0.5) {
 
 // -----
 
+function colorWithOpacity(color, opacity) {
+  let colorWithOpacity = color.slice();
+  colorWithOpacity[3] = opacity;
+  return colorWithOpacity;
+}
+
 function createStroke(opacity=0.5) {
-  return new Stroke({color: [0, 0, 0, opacity], width: 2});
+  let color = (constants.ANNOTATION_STROKE_COLOR) ? constants.ANNOTATION_STROKE_COLOR : black;
+  return new Stroke({color: colorWithOpacity(color, opacity), width: 2});
 }
 
 export function createColorStyle(color, opacity=0.5) {
@@ -117,6 +124,7 @@ let lightGreen = [17, 214, 76, 1];
 let red = [200, 40, 40, 1];
 let lightRed = [255, 56, 56, 1];
 let white = [255, 255, 255, 1];
+let black = [0, 0, 0, 1];
 
 let blueStroke = new Stroke({color: blue, width: width});
 let greenStroke = new Stroke({color: green, width: width + 1});
@@ -125,6 +133,12 @@ let redStroke = new Stroke({color: red, width: width + 1});
 let lightRedStroke = new Stroke({color: lightRed, width: width});
 let whiteStroke = new Stroke({color: white, width: width + 2});
 
+let selectStroke = blueStroke;
+if (constants.ANNOTATION_STROKE_SELECT_COLOR) {
+  let color = colorWithOpacity(constants.ANNOTATION_STROKE_SELECT_COLOR, 1);
+  selectStroke = new Stroke({color, width});
+}
+
 export let trackedSelectStyles = [
   new Style({ stroke: whiteStroke }),
   new Style({ image: new Circle({radius: 6, stroke: whiteStroke}) })
@@ -132,8 +146,8 @@ export let trackedSelectStyles = [
 
 export let selectStyles = [
   new Style({ stroke: whiteStroke }),
-  new Style({ stroke: blueStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: blueStroke}) })
+  new Style({ stroke: selectStroke }),
+  new Style({ image: new Circle({radius: 6, stroke: selectStroke}) })
 ];
 
 export let verticesStyle = new Style({

@@ -45,7 +45,10 @@
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
-        <td>{{$tc("count-bands", image.channels, {count: image.channels})}}</td>
+        <td>
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
+        </td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
@@ -79,9 +82,7 @@
             <button class="button is-small" @click="overview()">
               {{$t('button-get-overview')}}
             </button>
-            <a class="button is-small" :href="image.downloadURL">
-              {{$t('button-download')}}
-            </a>
+            <a class="button is-small" v-if="canDownloadImages" @click="download(image, shortTermToken)">
           </div>
         </td>
       </tr>
@@ -112,6 +113,7 @@
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CalibrationModal from '@/components/image/CalibrationModal';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 import {Cytomine} from 'cytomine-client';
 
 export default {
@@ -132,6 +134,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -147,17 +150,31 @@ export default {
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
     },
+    canDownloadImages() {
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false
+      );
+    },
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
+    },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     }
   },
   methods: {
+    appendShortTermToken,
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
     },
     async overview() {
       window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/camera.json?maxSize=1000', '_blank');
+    },
+    download(image) {
+      window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken));
     },
     async previousImage() {
       try {
@@ -168,7 +185,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -185,7 +202,7 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {

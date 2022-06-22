@@ -112,6 +112,7 @@
       </navbar-dropdown>
     </div>
   </div>
+  <div class="hidden" v-shortkey.once="openHotkeysModalShortcut" @shortkey="openHotkeysModal"></div>
 </nav>
 </template>
 
@@ -129,6 +130,7 @@ import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
 import {getDarkerColor} from '@/utils/color-manipulation.js';
+import shortcuts from '@/utils/shortcuts.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -141,11 +143,11 @@ export default {
   data() {
     return {
       openedTopMenu: false,
-      hotkeysModal: false,
+      hotkeysModal: null,
       algoEnabled: constants.ALGORITHMS_ENABLED,
       postLogoutURL: constants.LOGOUT_REDIRECTION,
       SSOEnabled: constants.SSO_ENABLED,
-      aboutModal: false,
+      aboutModal: null,
       activeColor: '#f5f5f5',
       darkerActiveColor: '#ffffff',
       activeFontColor: '#363636',
@@ -162,6 +164,9 @@ export default {
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
+    },
+    openHotkeysModalShortcut() {
+      return shortcuts['general-shortcuts-modal'];
     }
   },
   watch: {
@@ -173,11 +178,14 @@ export default {
   methods: {
     // required to use programmatic modal for correct display in IE11
     openHotkeysModal() {
-      this.$buefy.modal.open({
-        parent: this,
-        component: HotkeysModal,
-        hasModalCard: true
-      });
+      if (!this.hotkeysModal) {
+        this.hotkeysModal = this.$buefy.modal.open({
+          parent: this,
+          component: HotkeysModal,
+          hasModalCard: true,
+          onCancel: () => this.hotkeysModal = null,
+        });
+      }
     },
     openAboutModal() {
       this.$buefy.modal.open({

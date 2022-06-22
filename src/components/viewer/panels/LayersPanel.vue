@@ -69,6 +69,7 @@ import {get} from '@/utils/store-helpers';
 
 import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
+import _ from 'lodash';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
@@ -107,8 +108,8 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
     },
     activePanel() {
       return this.imageWrapper.activePanel;
@@ -172,6 +173,22 @@ export default {
 
           this.layers = this.layers.filter(layer => !layer.isReview);
         }
+      }
+    },
+    layersToPreload: {
+      deep: true,
+      handler: function(layersToPreload) {
+        layersToPreload.forEach(layerId => {
+          let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+          if(index !== -1) {
+            if (!this.selectedLayers[index].visible) {
+              this.toggleLayerVisibility(index);
+            }
+            return;
+          }
+
+          this.addLayerById(layerId, true);
+        });
       }
     }
   },
@@ -273,15 +290,29 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.slice.fetchAnnotationsIndex();
+      // TODO: optimize, backend should be able to send indexes for several slices at once.
+      let indexLayers = await Promise.all(this.slices.map(async slice => await slice.fetchAnnotationsIndex()));
+      indexLayers = Object.values(_.groupBy(indexLayers.flat(), 'user'));
+      this.indexLayers = indexLayers.map(userIndexLayers => userIndexLayers.reduce((a, b) => {
+        return {
+          user: a.user,
+          countAnnotation: a.countAnnotation + b.countAnnotation,
+          countReviewedAnnotation: a.countReviewedAnnotation + b.countReviewedAnnotation
+        };
+      }, {user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0}));
+      // ----
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
-      if(key === 'tool-review-toggle') { // toggle review layer
+      key = key.replace('toggle-all-', 'toggle-');
+      if(key === 'toggle-selected-layers') {
+        this.selectedLayers.forEach((layer, index) => this.toggleLayerVisibility(index));
+      }
+      else if(key === 'toggle-review-layer') {
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if(index !== -1) {
           this.toggleLayerVisibility(index);

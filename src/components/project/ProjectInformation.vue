@@ -36,7 +36,7 @@ import {get} from '@/utils/store-helpers';
 
 import ProjectDetails from './ProjectDetails';
 import {Project} from 'cytomine-client';
-
+import constants from '@/utils/constants.js';
 export default {
   name: 'project-information',
   components: {ProjectDetails},

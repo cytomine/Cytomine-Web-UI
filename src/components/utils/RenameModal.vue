@@ -61,6 +61,7 @@ export default {
         return;
       }
       this.$emit('rename', this.newName);
+      this.$emit('update:active', false);
     }
   },
   async created() {

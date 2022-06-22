@@ -176,7 +176,7 @@
 
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <img :src="image.thumb" class="image-overview">
+                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 
@@ -211,7 +211,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+            <b-table-column  v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
               <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                 {{ image.numberOfJobAnnotations }}
               </router-link>
@@ -253,7 +253,6 @@
 
 <script>
 import _ from 'lodash';
-import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineTable from '@/components/utils/CytomineTable';
@@ -263,10 +262,13 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-
+import ImageThumbnail from '@/components/image/ImageThumbnail';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import constants from '@/utils/constants.js';
 export default {
   name: 'advanced-search',
   components: {
+    ImageThumbnail,
     IconProjectMemberRole,
     ImageName,
     CytomineTable,
@@ -305,13 +307,14 @@ export default {
     };
   },
   methods: {
+    appendShortTermToken,
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
     }, 500)
   },
   computed: {
     currentUser: get('currentUser/user'),
-
+    shortTermToken: get('currentUser/shortTermToken'),
     pathSearchString() {
       return this.$route.params.searchString;
     },
@@ -430,4 +433,8 @@ export default {
   margin-bottom: 0.4em;
 }
 
+>>> .image-thumbnail {
+  max-height: 4rem;
+  max-width: 10rem;
+}
 </style>

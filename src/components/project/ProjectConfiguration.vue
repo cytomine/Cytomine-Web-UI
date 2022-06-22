@@ -73,6 +73,7 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch(this.activeTab) {
         case 'general':
@@ -86,6 +87,7 @@ export default {
         case 'imageFilters':
           return ProjectImageFilters;
       }
+      throw new Error('Cannot load active tabs ' + this.activeTab);
     }
   },
   watch: {

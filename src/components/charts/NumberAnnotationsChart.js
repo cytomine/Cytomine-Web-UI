@@ -115,7 +115,6 @@ export default {
         }
       ]
     };
-
     if(this.algoEnabled) {
       this.chartData.datasets.splice(1,0,{
         label: this.$t('analysis-annotations'),
@@ -124,7 +123,6 @@ export default {
         borderWidth: 0
       });
     }
-
     await this.fetchData();
 
     this.renderChart(this.chartData, {

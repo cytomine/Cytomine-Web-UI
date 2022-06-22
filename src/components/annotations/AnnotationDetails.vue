@@ -25,6 +25,13 @@
         </td>
       </tr>
 
+      <tr v-if="showChannelInfo">
+        <td><strong>{{$t('channel')}}</strong></td>
+        <td>
+          <channel-name :channel="sliceChannel" />
+        </td>
+      </tr>
+
       <template v-if="isPropDisplayed('geometry-info')">
         <tr v-if="annotation.area > 0">
           <td><strong>{{$t('area')}}</strong></td>
@@ -34,11 +41,6 @@
         <tr v-if="annotation.perimeter > 0">
           <td><strong>{{$t(annotation.area > 0 ? 'perimeter' : 'length')}}</strong></td>
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
-        </tr>
-
-        <tr v-if="profile && isPoint && false">
-          <td><strong>{{$t('profile')}}</strong></td>
-          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
       </template>
 
@@ -197,7 +199,7 @@
     </a>
 
     <div class="level">
-      <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
+      <a @click="openCrop(annotation)" class="level-item button is-small">
         {{ $t('button-view-crop') }}
       </a>
 
@@ -234,11 +236,13 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
-import ProfileModal from '@/components/viewer/ProfileModal';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'annotations-details',
   components: {
+    ChannelName,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -256,8 +260,9 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
-    profiles: {type: Array, default: () => []},
+    slices: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
@@ -275,6 +280,7 @@ export default {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
@@ -285,6 +291,7 @@ export default {
       if(this.isReview) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
+      return null;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditAnnot'](this.annotation);
@@ -298,11 +305,11 @@ export default {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
     },
+    sliceChannel() {
+      return this.slices.find(slice => slice.id === this.annotation.slice) || {};
+    },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
-    },
-    profile() {
-      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -346,10 +353,13 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
-
+    openCrop(annotation) {
+      window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
+    },
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
@@ -452,15 +462,6 @@ export default {
 
     addComment(comment) {
       this.comments.unshift(comment);
-    },
-
-    openProfileModal() {
-      this.$modal.open({
-        parent: this,
-        component: ProfileModal,
-        props: {annotation: this.annotation, image: this.image},
-        hasModalCard: true
-      });
     },
 
     confirmDeletion() {
