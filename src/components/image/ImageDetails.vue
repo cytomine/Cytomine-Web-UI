@@ -93,11 +93,11 @@
           </em>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('slide-preview')">
+      <tr v-if="showLabel && isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-label')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.labelURL" @click="isMetadataModalActive = true">
-            <img :src="image.labelURL" class="image-overview">
+            <img :src="image.labelURL" v-show="showLabel" class="image-overview" @error="hideImageLabel" @load="showImageLabel">
           </a>
           <em v-else>
             {{$t('slide-label-not-available')}}
@@ -334,6 +334,7 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      showLabel: true,
     };
   },
   computed: {
@@ -361,6 +362,13 @@ export default {
   methods: {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
+    },
+    hideImageLabel(e) {
+      e.target.outerHTML= '<i class="fas fa-ban"></i>';
+      this.showLabel = false;
+    },
+    showImageLabel() {
+      this.showLabel = true;
     },
 
     async cancelReview() {
