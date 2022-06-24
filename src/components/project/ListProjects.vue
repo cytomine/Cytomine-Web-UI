@@ -230,7 +230,6 @@
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import constants from '@/utils/constants.js';
 import ProjectDetails from './ProjectDetails';
 import AddProjectModal from './AddProjectModal';
 

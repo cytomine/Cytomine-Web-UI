@@ -83,6 +83,8 @@
               {{$t('button-get-overview')}}
             </button>
             <a class="button is-small" v-if="canDownloadImages" @click="download(image, shortTermToken)">
+              {{$t('button-download')}}
+            </a>
           </div>
         </td>
       </tr>

@@ -152,7 +152,6 @@
 </template>
 
 <script>
-import constants from '@/utils/constants.js';
 import {Cytomine} from 'cytomine-client';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';

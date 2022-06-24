@@ -358,7 +358,7 @@ export default {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
     openCrop(annotation) {
-      window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
+      window.location.assign(appendShortTermToken(annotation.cropUrl + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
     },
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);

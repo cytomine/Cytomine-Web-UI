@@ -67,7 +67,6 @@
 </template>
 
 <script>
-import constants from '@/utils/constants.js';
 import {get, sync} from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
 

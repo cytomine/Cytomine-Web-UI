@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 
 import ProjectDetails from './ProjectDetails';
