@@ -33,7 +33,7 @@
   :disabled="disabled"
 >
 
-  <template #beforeList v-if="multiple && options.length > 0 && selectAllAvailable">
+  <template #beforeList v-if="multiple && options.length > 0 && options.length < 100 && selectAllAvailable">
     <li class="multiselect__element multiselect__select-all" @click="selectAll()">
       <span :class="['multiselect__option', allSelected ? 'multiselect__option--selected' : '']">
         {{$t('select-all')}}
