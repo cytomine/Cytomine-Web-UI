@@ -37,6 +37,12 @@
                 <template #popover>
                   <p>{{format.remarks}}</p>
                 </template>
+              </v-popover>
+              <v-popover v-if="!format.readable && !format.remarks">
+                <i class="fas fa-info-circle"></i>
+                <template #popover>
+                  <p>{{$t('image-format-conversion-mandatory')}}</p>
+                </template>
               </v-popover><template v-if="index < formatInfos.length - 1">, </template>
             </span>
             </template>
