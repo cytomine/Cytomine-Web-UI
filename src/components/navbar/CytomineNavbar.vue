@@ -151,7 +151,7 @@ export default {
       activeColor: '#f5f5f5',
       darkerActiveColor: '#ffffff',
       activeFontColor: '#363636',
-      itemStyles: {workspace: {}, projects: {}, storage: {}, ontology: {}, software: {}, admin: {}},
+      itemStyles: {workspace: {}, projects: {}, storages: {}, storage: {}, ontology: {}, software: {}, admin: {}},
       isFetching: true,
       logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
       //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
@@ -205,7 +205,7 @@ export default {
     },
     activeSelectedItem(){
       this.initItemsStyles();
-      let item = this.$route.path.replace('/', '');
+      let item = this.$route.path.split('/')[1];
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
         this.setItemColor(item, this.darkerActiveColor);
