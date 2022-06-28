@@ -35,7 +35,7 @@
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80">
-            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
@@ -82,7 +82,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {UploadedFileCollection} from 'cytomine-client';
 import filesize from 'filesize';
 import _ from 'lodash';
@@ -94,6 +94,7 @@ export default {
   name: 'list-uploaded-files',
   components: {
     CytomineTable,
+    ImageThumbnail,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails
   },
@@ -115,6 +116,7 @@ export default {
     currentUser: get('currentUser/user'),
     selectedStorage: get('currentStorage/storage'),
     users: get('currentStorage/users'),
+    shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
       return new UploadedFileCollection({
         onlyRootsWithDetails: true,
