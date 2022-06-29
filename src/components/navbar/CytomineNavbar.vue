@@ -126,7 +126,7 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
-import {Cytomine} from 'cytomine-client';
+import {Cytomine, Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import {fullName} from '@/utils/user-utils.js';
 import {getDarkerColor} from '@/utils/color-manipulation.js';
