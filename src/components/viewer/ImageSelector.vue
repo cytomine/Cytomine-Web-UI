@@ -129,7 +129,12 @@ export default {
   },
   watch:{
     async selectedTags(){
-      await this.fetchImages();
+      if(!this.selectedTags.length){
+        this.images = [];
+      }
+      else{
+        await this.fetchImages();
+      }
     }
   },
   methods: {
