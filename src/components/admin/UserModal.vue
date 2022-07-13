@@ -148,6 +148,9 @@ export default {
     }
   },
   watch: {
+    selectedRole() {
+      this.adminConfirm = !this.isChangingRoleToAdmin();
+    },
     active(val) {
       if(val) {
         if(!this.rolesWithIds) {
