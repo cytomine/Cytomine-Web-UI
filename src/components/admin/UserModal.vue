@@ -60,6 +60,12 @@
       </b-select>
     </b-field>
 
+    <b-field horizontal v-if="isChangingRoleToAdmin()">
+      <b-checkbox v-model="adminConfirm">
+        {{$t('admin-warning')}}
+      </b-checkbox>
+    </b-field>
+
     <b-field :label="$t('language')" horizontal>
       <b-select v-model="internalUser['language']">
         <option v-for="{value, name} in languages" :key="value" :value="value">
@@ -79,7 +85,7 @@
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any()">
+      <button class="button is-link" :disabled="errors.any() || !isAdminConfirmed()">
         {{$t('button-save')}}
       </button>
     </template>
@@ -109,6 +115,7 @@ export default {
       rolesWithIds: null,
       selectedRole: defaultRole,
       displayErrors: false,
+      adminConfirm: false,
       languages: [
         {value: 'EN', name:'English'},
         {value: 'FR', name:'Français'},
@@ -151,10 +158,22 @@ export default {
         this.selectedRole = this.user ? this.user.role : defaultRole;
         this.internalUser.language = this.user ? this.user.language : defaultLanguage.value;
         this.displayErrors = false;
+        this.adminConfirm = false;
       }
     }
   },
   methods: {
+    isChangingRoleToAdmin() {
+      let currentRole = this.user ? this.user.role : defaultRole;
+      return this.isNotAdmin(currentRole) && !this.isNotAdmin(this.selectedRole);
+    },
+    isNotAdmin(role){
+      return role != 'ROLE_ADMIN' && role != 'ROLE_SUPER_ADMIN';
+    },
+    isAdminConfirmed(){
+      return this.adminConfirm || !this.isChangingRoleToAdmin();
+    },
+    
     async save() {
       let result = await this.$validator.validateAll();
       if(!result) {
