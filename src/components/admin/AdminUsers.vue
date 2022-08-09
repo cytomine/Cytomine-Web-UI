@@ -83,6 +83,12 @@
             <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
           </b-table-column>
 
+          <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">
+            <span class="tag is-success" v-if="user.apiEnabled">{{$t('api-enabled')}}</span>
+            <span class="tag is-danger" v-else>{{$t('api-disabled')}}</span>
+          </b-table-column>
+
+
           <b-table-column field="email" :label="$t('email')" sortable width="150">
             <a :href="`mailto:${user.email}`">{{ user.email }}</a>
           </b-table-column>
