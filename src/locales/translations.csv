@@ -1111,3 +1111,5 @@ uploaded-images,Images uploaded,Images téléversées
 api-key-allowed,Api keys enabled,API keys activées
 notify-user-in-project, Notify, Notifier
 notify-user-in-project-success, User has been notified with email, L'utilisateur a été notifié par email
+api-enabled,Api enabled,API activée
+api-disabled,Api disabled,API désactivée
