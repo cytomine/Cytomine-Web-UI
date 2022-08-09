@@ -84,9 +84,14 @@
         </b-table-column>
 
         <b-table-column label="" centered width="50" v-if="currentUser.adminByNow">
-          <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
-            {{$t('button-view-activity')}}
-          </router-link>
+          <div class="buttons">
+            <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
+              {{$t('button-view-activity')}}
+            </router-link>
+            <button @click="notifyUserIsInProject(member, project)" class="button is-small is-link">
+              {{$t('notify-user-in-project')}}
+            </button>
+          </div>
         </b-table-column>
       </template>
 
@@ -294,6 +299,16 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
+    async notifyUserIsInProject(member, project) {
+      try {
+        await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${project.id}/user/${member.id}/notifyAddedInProject.json`);
+        this.$notify({type: 'success', text: this.$t('notify-user-in-project-success')});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
+      }
+    }
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];

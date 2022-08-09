@@ -1071,3 +1071,6 @@ shared-annotation-mail-mode-description,"Used when sharing an annotation. Classi
 report, Report, Signaler
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
+api-key-allowed,Api keys enabled,API keys activées
+notify-user-in-project, Notify, Notifier
+notify-user-in-project-success, User has been notified with email, L'utilisateur a été notifié par email
