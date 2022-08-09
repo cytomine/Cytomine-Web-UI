@@ -212,6 +212,13 @@
         </template>
       </cytomine-table>
 
+      <div class="box" v-if="currentUser.adminByNow">
+        <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+        <div class="buttons is-centered">
+          <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
+        </div>
+      </div>
+
       <div class="legend">
           <h2>{{$t('legend')}}</h2>
           <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
@@ -235,8 +242,9 @@ import AddProjectModal from './AddProjectModal';
 
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
-import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
+import {Cytomine,ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+
 export default {
   name: 'list-projects',
   components: {
@@ -382,6 +390,10 @@ export default {
     }
   },
   methods: {
+    downloadURL(format) {
+      let url = Cytomine.instance.host + Cytomine.instance.basePath + 'project/action/download.' + format;
+      return url;
+    },
     async fetchOntologies() {
       let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));
