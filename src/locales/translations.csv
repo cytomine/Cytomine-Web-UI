@@ -482,8 +482,10 @@ count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fich
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal
 slide-label,Slide label,Étiquette'
+image-explore,Explore, Explorer, Explorar
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename}
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename}
+image-explore-of,Exploration of {filename},Exploration de {filename},exploración de {filename}
 file-tree,File tree,Arborescence de fichiers,Árbol de archivos
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?,¿Está seguro de que desea eliminar este archivo?
 view,View,Visualisation d'images,Ver
