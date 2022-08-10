@@ -55,6 +55,10 @@
         <a v-if="node.data.macroURL" @click="slidePreview = node.data">
           {{$t('slide-preview')}}
         </a>
+        <span v-if="node.data.thumbURL">/</span>
+        <a v-if="node.data.image" @click="imageExplore = node.data">
+          {{$t('image-explore')}}
+        </a>
       </p>
     </template>
   </sl-vue-tree>
@@ -91,6 +95,13 @@
       <button class="button is-small" @click="slidePreview = null">{{$t('button-hide')}}</button>
     </h2>
     <img :src="slidePreview.macroURL">
+  </template>
+  <template v-else-if="imageExplore">
+    <h2>
+      {{$t('image-explore-of', {filename: imageExplore.originalFilename})}}
+      <button class="button is-small" @click="imageExplore = null">{{$t('button-hide')}}</button>
+    </h2>
+    <uploaded-file-details-viewer :image="abstractImage"></uploaded-file-details-viewer>
   </template>
 
   <template v-if="image && profileEnabled">
@@ -222,6 +233,7 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from '@/components/image/MagnificationModal';
 import CalibrationModal from '@/components/image/CalibrationModal';
 import RenameModal from '@/components/utils/RenameModal';
+import UploadedFileDetailsViewer from './UploadedFileDetailsViewer.vue';
 import filesize from 'filesize';
 import ProfileStatus from './ProfileStatus';
 
@@ -237,7 +249,8 @@ export default {
     MagnificationModal,
     CalibrationModal,
     RenameModal,
-    UploadedFileStatus
+    UploadedFileStatus,
+    UploadedFileDetailsViewer
   },
   props: {
     file: Object // WARNING: the root of the tree must be the file or its direct parent
@@ -249,8 +262,10 @@ export default {
       uploadedFiles: [],
       nodes: [],
       image: null,
+      abstractImage: null,
       slidePreview: null,
       samplePreview: null,
+      imageExplore: null,
       error: false,
 
       nbUploadedFiles: 0,
@@ -286,13 +301,21 @@ export default {
     slidePreview(val) {
       if(val) {
         this.samplePreview = null; // if slide preview enabled, disable sample preview
+        this.imageExplore = null; // and image explore
       }
     },
     samplePreview(val) {
       if(val) {
         this.slidePreview = null; // if sample preview enabled, disable slide preview
+        this.imageExplore = null; // and image explore
       }
     },
+    imageExplore(val) {
+      if (val) {
+        this.slidePreview = null;
+        this.samplePreview = null;
+      }
+    }
   },
   methods: {
     findRoot() {
@@ -301,7 +324,7 @@ export default {
     async fetchAbstractImage() {
       if (this.file.image && (this.file.status === UFStatus.CONVERTED || this.file.status === UFStatus.DEPLOYED)) {
         try {
-          this.image = await AbstractImage.fetch(this.file.image);
+          this.abstractImage = await AbstractImage.fetch(this.file.image);
         }
         catch(error) {
           console.log(error);
@@ -403,11 +426,8 @@ export default {
   },
   async created() {
     this.findRoot();
-    this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.image.AbstractImage'});
     this.fetchAbstractImage();
-    /*this.makeTree();
-    this.abstractImage = new AbstractImage({id: this.file.image, class: 'be.cytomine.image.AbstractImage'});
-    this.abstractImage = await (this.abstractImage.fetch());*/
+    this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.image.AbstractImage'});
   }
 };
 </script>
