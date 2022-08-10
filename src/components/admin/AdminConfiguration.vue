@@ -206,10 +206,16 @@
         </section>
       </article>
     </div>
+
+    <b-field horizontal v-if="isChangingMailModeToClassic()">
+      <b-checkbox v-model="mailModeConfirm">
+        {{$t('mail-mode-warning')}}
+      </b-checkbox>
+    </b-field>
   </div>
 
-  <p class="has-text-right">
-    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+  <p class="has-text-right" >
+    <button class="button is-link" :disabled="!isClassicModeConfirmed()" @click="save">{{$t('button-save')}}</button>
   </p>
 
 </div>
@@ -237,9 +243,14 @@ export default {
       isLogoConfigPresent: false,
       selectedImage: null,
       selectedImageSize: {width: 0, height: 0},
+      mailModeConfirm: false,
+      currentSharedAnnotationMailModeValue: null,
     };
   },
   watch: {
+    changedMailMode() {
+      this.mailModeConfirm = !this.isChangingMailModeToClassic();
+    },
     selectedImage(file) {
       if (file) {
 
@@ -281,6 +292,7 @@ export default {
     },
     async save() {
       try {
+        this.mailModeConfirm = false;
         if(!this.isValidSVG()) {
           this.$notify({type: 'error', text: this.$t('logo-upload-svg-error-message')});
           throw new TypeError(this.$t('logo-upload-svg-error-message'));
@@ -374,9 +386,25 @@ export default {
       event.preventDefault();
       this.logoConfig.value = '';
       this.selectedImage = null;
-    }
+    },
+
+    isChangingMailModeToClassic() {
+      console.log('currentSharedAnnotationMailModeValue', this.currentSharedAnnotationMailModeValue);
+      console.log('sharedAnnotationMailMode', this.sharedAnnotationMailMode.value);
+      return this.isClassic(this.currentSharedAnnotationMailModeValue) && !this.isClassic(this.sharedAnnotationMailMode!=null? this.sharedAnnotationMailMode.value : null);
+    },
+    isClassic(mode){
+      return mode!=null && mode !== 'classic';
+    },
+    isClassicModeConfirmed(){
+      console.log('mailModeConfirm', this.mailModeConfirm);
+      console.log('isChangingMailModeToClassic', this.isChangingMailModeToClassic());
+      console.log(this.mailModeConfirm || !this.isChangingMailModeToClassic());
+      return this.mailModeConfirm || !this.isChangingMailModeToClassic();
+    },
   },
   async created() {
+    this.mailModeConfirm = false;
     try {
       await this.welcomeConfig.fetch();
       await this.activitiesRetentionDelayConfig.fetch();
@@ -386,6 +414,7 @@ export default {
     }
     try {
       await this.sharedAnnotationMailMode.fetch();
+      this.currentSharedAnnotationMailModeValue = this.sharedAnnotationMailMode!=null? this.sharedAnnotationMailMode.value : null;
       await this.topMenuColorConfig.fetch();
       await this.topFontMenuColorConfig.fetch();
     }
