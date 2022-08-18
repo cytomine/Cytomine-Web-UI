@@ -45,6 +45,7 @@ import StorageConfiguration from './components/storage/StorageConfiguration';
 import StorageRedirection from './components/storage/StorageRedirection';
 import StorageFiles from './components/storage/StorageFiles';
 import ProjectScores from './components/project/ProjectScores';
+import ProjectSubscription from './components/project/subscription/ProjectSubscription';
 
 // Define routes
 const routes = [
@@ -109,6 +110,10 @@ const routes = [
   {
     path: '/account',
     component: Account,
+  },
+  {
+    path: '/project/:idProject/subscription',
+    component: ProjectSubscription
   },
   {
     path: '/project/:idProject',

@@ -782,6 +782,22 @@ notif-error-project-ontology-change-job-terms,Cannot change the ontology of this
 notif-error-project-ontology-change-reviewed-terms,Cannot change the ontology of this project: some terms are associated to reviewed annotations. You must remove these associations prior to the ontology change.,Impossible de changer l'ontologie de ce projet : des termes sont associés à des annotations validées.,No se puede cambiar la ontología de este proyecto: algunos términos están asociados a anotaciones revisadas. Debe eliminar estas asociaciones antes del cambio de ontología.
 confirm-ontology-change,Confirm ontology change,Confirmer le changement d'ontologie,Confirmar cambio de ontología
 confirm-ontology-change-delete-user-terms,Some members of this project have associated terms to annotations ({count} associations). <br> Are you sure you want to delete those associations to change the ontology?,Des membres du projet ont associé des termes à des annotations ({count} associations). Êtes-vous sûr de vouloir supprimer ces associations ?,Algunos miembros de este proyecto tienen términos asociados a anotaciones ({count} asociaciones). <br> ¿Está seguro de que desea eliminar esas asociaciones para cambiar la ontología?
+change-admittance,Change admittance,Changement des permissions d'accès
+button-change-admittance,Change admittance settings,Changer les permissions d'accès
+change-admittance-warning-message,I confirm that I want to open the admittance for this project., Je confirme que je veux changer le mode de permission pour ce projet.
+open-to-admittance,Open to admittance,Ouvert a l'auto-inscription
+visibility-for-all,Visible for all,Visible par tous
+key-for-admittance,Key for admittance,Clé pour l'auto-inscription
+notif-success-project-admittance-change,Admittance settings for project {projectName} were successfully updated,Les modifications de permissions d'accès au projet {projectName} ont bien été enregistrées
+notif-error-project-admittance-change,Failed to change admittance settings for project {projectName},Une erreur a empêché de modifier les permissions d'accès du projet {projectName}
+admittance-message,Do you want to be a member of {projectName}?,Voulez-vous devenir membre du projet {projectName}?,
+admittance-key-message,The project access is restricted by a key,L'accès au projet nécessite une clé,
+admittance-confirmed,You are now member of project {projectName},Vous êtes maintenant membre du projet {projectName},
+admittance-error-key-not-valid,The access key is not valid,La clé n'est pas valide,
+admittance-error,Cannot add you as a member of this project,Impossible de vous ajouter en tant que membre du projet,
+admittance-not-available,Project is not open to subscription or you are already in this project,Le projet n'est pas ouvert a l'inscription ou vous êtes déjà dans ce projet,
+subscribe-to-project,Subscribe,S'inscrire,
+no-project-visible-for-subscription,There is no project opened for subscription,Il n'y a pas de projet ouvert a l'inscription,
 invalid-token,Invalid token,Token invalide,Token no válido
 slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,Sin vista previa de cristal
 slide-label-not-available,No slide label,Étiquette non disponible

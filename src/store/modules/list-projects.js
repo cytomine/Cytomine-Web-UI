@@ -17,6 +17,7 @@
 function getDefaultState() {
   return {
     searchString: '',
+    searchStringSubscription: '',
 
     filtersOpened: false,
     filters: {
@@ -32,6 +33,8 @@ function getDefaultState() {
 
     currentPage: 1,
     perPage: 10,
+    currentPageSubscription: 1,
+    perPageSubscription: 10,
     sortField: 'lastActivity',
     sortOrder: 'desc',
     openedDetails: []
@@ -52,6 +55,10 @@ export default {
       state.searchString = searchString;
     },
 
+    setSearchStringSubscription(state, searchString) {
+      state.searchStringSubscription = searchString;
+    },
+
     setFiltersOpened(state, value) {
       state.filtersOpened = value;
     },
@@ -66,6 +73,14 @@ export default {
 
     setPerPage(state, perPage) {
       state.perPage = perPage;
+    },
+
+    setCurrentPageSubscription(state, page) {
+      state.currentPageSubscription = page;
+    },
+
+    setPerPageSubscription(state, perPage) {
+      state.perPageSubscription = perPage;
     },
 
     setSortField(state, field) {
