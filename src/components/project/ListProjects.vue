@@ -14,219 +14,269 @@
 
 <template>
 <div class="list-projects-wrapper content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :active="loading || loadingSubscription" />
   <div class="box error" v-if="error">
     <h2> {{ $t('error') }} </h2>
     <p>{{ $t('unexpected-error-info-message') }}</p>
   </div>
-  <div v-else-if="!loading" class="panel">
-    <p class="panel-heading">
-      {{$t('projects')}}
-      <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
-        {{$t('new-project')}}
-      </button>
-    </p>
-    <div class="panel-block">
-      <div class="search-block">
-        <b-input
-          class="search-projects"
-          v-model="searchString"
-          :placeholder="$t('search-placeholder')"
-          type="search" icon="search"
-        />
-        <button class="button" @click="toggleFilterDisplay()">
+  <div class="columns">
+    <div v-if="!loading" class="column is-three-quarters">
+      <div class="panel">
+        <p class="panel-heading">
+          {{$t('projects')}}
+          <button v-if="!currentUser.guestByNow" class="button is-link" @click="creationModal = true">
+            {{$t('new-project')}}
+          </button>
+        </p>
+        <div class="panel-block">
+          <div class="search-block">
+            <b-input
+              class="search-projects"
+              v-model="searchString"
+              :placeholder="$t('search-placeholder')"
+              type="search" icon="search"
+            />
+            <button class="button" @click="toggleFilterDisplay()">
           <span class="icon">
             <i class="fas fa-filter"></i>
           </span>
-          <span>
+              <span>
             {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
           </span>
-          <span v-if="nbActiveFilters" class="nb-active-filters">
+              <span v-if="nbActiveFilters" class="nb-active-filters">
             {{nbActiveFilters}}
           </span>
-        </button>
-      </div>
+            </button>
+          </div>
 
-      <b-collapse :open="filtersOpened">
-        <div class="filters">
-          <div class="columns">
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('ontology')}}
+          <b-collapse :open="filtersOpened">
+            <div class="filters">
+              <div class="columns">
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('ontology')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
+                                          label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
+                  </div>
+                </div>
+
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('my-role')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
+                  </div>
+                </div>
+
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('tags')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                                          label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                  </div>
+                </div>
               </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
+
+              <div class="columns">
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('members')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" />
+                  </div>
+                </div>
+
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('images')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-slider v-model="boundsImages" :max="maxNbImages" />
+                  </div>
+                </div>
+
+                <div class="column"></div>
+              </div>
+
+              <div class="columns">
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('user-annotations')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
+                  </div>
+                </div>
+
+                <div v-show="algoEnabled" class="column filter">
+                  <div class="filter-label">
+                    {{$t('analysis-annotations')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
+                  </div>
+                </div>
+
+                <div class="column filter">
+                  <div class="filter-label">
+                    {{$t('reviewed-annotations')}}
+                  </div>
+                  <div class="filter-body">
+                    <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
+                  </div>
+                </div>
+                <div v-show="!algoEnabled" class="column"></div>
               </div>
             </div>
+          </b-collapse>
 
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('my-role')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
-              </div>
-            </div>
+          <cytomine-table
+            :collection="projectCollection"
+            class="table-projects"
+            :currentPage.sync="currentPage"
+            :perPage.sync="perPage"
+            :openedDetailed.sync="openedDetails"
+            :sort.sync="sortField"
+            :order.sync="sortOrder"
+            :revision="revision"
+          >
+            <template #default="{row: project}">
+              <b-table-column field="currentUserRole" label="" centered width="1" sortable>
+                <icon-project-member-role
+                  :is-manager="project.currentUserRoles.admin"
+                  :is-representative="project.currentUserRoles.representative"
+                />
+              </b-table-column>
 
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('tags')}}
+              <b-table-column field="name" :label="$t('name')" sortable width="250">
+                <router-link :to="`/project/${project.id}`">
+                  {{ project.name }}
+                </router-link>
+              </b-table-column>
+
+              <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
+                {{ project.membersCount }}
+              </b-table-column>
+
+              <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
+                <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
+              </b-table-column>
+
+              <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+                <router-link :to="`/project/${project.id}/annotations?type=user`">
+                  {{ project.numberOfAnnotations }}
+                </router-link>
+              </b-table-column>
+
+              <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+                <router-link :to="`/project/${project.id}/annotations?type=algo`">
+                  {{ project.numberOfJobAnnotations }}
+                </router-link>
+              </b-table-column>
+
+              <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+                <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                  {{ project.numberOfReviewedAnnotations }}
+                </router-link>
+              </b-table-column>
+
+              <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
+                {{ Number(project.lastActivity) | moment('ll') }}
+              </b-table-column>
+
+              <b-table-column label=" " centered width="150">
+                <router-link :to="`/project/${project.id}`" class="button is-small is-link">
+                  {{$t('button-open')}}
+                </router-link>
+              </b-table-column>
+            </template>
+
+            <template #detail="{row: project}">
+              <project-details
+                :project="project"
+                :excluded-properties="excludedProperties"
+                editable
+                @update="updateProject()"
+                @delete="deleteProject(project)"
+              />
+            </template>
+
+            <template #empty>
+              <div class="content has-text-grey has-text-centered">
+                <p>{{$t('no-project')}}</p>
               </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
-              </div>
+            </template>
+          </cytomine-table>
+
+          <div class="box" v-if="currentUser.adminByNow">
+            <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+            <div class="buttons is-centered">
+              <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
             </div>
           </div>
 
-          <div class="columns">
-              <div class="column filter">
-                <div class="filter-label">
-                  {{$t('members')}}
-                </div>
-                <div class="filter-body">
-                  <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" />
-                </div>
-              </div>
-
-              <div class="column filter">
-                <div class="filter-label">
-                  {{$t('images')}}
-                </div>
-                <div class="filter-body">
-                  <cytomine-slider v-model="boundsImages" :max="maxNbImages" />
-                </div>
-              </div>
-
-              <div class="column"></div>
-          </div>
-
-          <div class="columns">
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('user-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
-              </div>
-            </div>
-
-            <div v-show="algoEnabled" class="column filter">
-              <div class="filter-label">
-                {{$t('analysis-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
-              </div>
-            </div>
-
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('reviewed-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
-              </div>
-            </div>
-            <div v-show="!algoEnabled" class="column"></div>
+          <div class="legend">
+            <h2>{{$t('legend')}}</h2>
+            <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
+            <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
+            <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
           </div>
         </div>
-      </b-collapse>
+      </div>
+    </div>
 
-      <cytomine-table
-        :collection="projectCollection"
-        class="table-projects"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
-        :revision="revision"
-      >
-        <template #default="{row: project}">
-          <b-table-column field="currentUserRole" label="" centered width="1" sortable>
-            <icon-project-member-role
-              :is-manager="project.currentUserRoles.admin"
-              :is-representative="project.currentUserRoles.representative"
+    <div v-if="!loadingSubscription" class="column is-one-quarter">
+      <div class="panel">
+        <p class="panel-heading">
+          {{$t('open-to-admittance')}}
+        </p>
+        <div class="panel-block">
+          <div class="search-block">
+            <b-input
+              class="search-projects"
+              v-model="searchStringSubscription"
+              :placeholder="$t('search-placeholder')"
+              type="search" icon="search"
             />
-          </b-table-column>
-
-          <b-table-column field="name" :label="$t('name')" sortable width="250">
-            <router-link :to="`/project/${project.id}`">
-              {{ project.name }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
-            {{ project.membersCount }}
-          </b-table-column>
-
-          <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
-          </b-table-column>
-
-          <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=user`">
-              {{ project.numberOfAnnotations }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=algo`">
-              {{ project.numberOfJobAnnotations }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
-              {{ project.numberOfReviewedAnnotations }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-            {{ Number(project.lastActivity) | moment('ll') }}
-          </b-table-column>
-
-          <b-table-column label=" " centered width="150">
-            <router-link :to="`/project/${project.id}`" class="button is-small is-link">
-              {{$t('button-open')}}
-            </router-link>
-          </b-table-column>
-        </template>
-
-        <template #detail="{row: project}">
-          <project-details
-            :project="project"
-            :excluded-properties="excludedProperties"
-            editable
-            @update="updateProject()"
-            @delete="deleteProject(project)"
-          />
-        </template>
-
-        <template #empty>
-          <div class="content has-text-grey has-text-centered">
-            <p>{{$t('no-project')}}</p>
           </div>
-        </template>
-      </cytomine-table>
+          <cytomine-table
+            :collection="projectSubscriptionCollection"
+            class="table-projects"
+            :detailed="false"
+            :currentPage.sync="currentPageSubscription"
+            :perPage.sync="perPageSubscription"
+            :revision="revisionSubscription"
+          >
+            <template #default="{row: project}">
+              <b-table-column field="name" :label="$t('name')" sortable width="250">
+                {{ project.name }}
+              </b-table-column>
 
-      <div class="box" v-if="currentUser.adminByNow">
-        <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
-        <div class="buttons is-centered">
-          <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
+              <b-table-column label=" " centered width="150">
+                <router-link :to="`/project/${project.id}/subscription`" class="button is-small is-link">
+                  {{$t('subscribe-to-project')}}
+                </router-link>
+              </b-table-column>
+            </template>
+
+            <template #empty>
+              <div class="content has-text-grey has-text-centered">
+                <p>{{$t('no-project-visible-for-subscription')}}</p>
+              </div>
+            </template>
+          </cytomine-table>
         </div>
-      </div>
-
-      <div class="legend">
-          <h2>{{$t('legend')}}</h2>
-          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
-          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
-          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
       </div>
     </div>
   </div>
+
+
 
   <add-project-modal :active.sync="creationModal" :ontologies="ontologies" />
 </div>
@@ -258,6 +308,7 @@ export default {
   data() {
     return {
       loading: true,
+      loadingSubscription: true,
       error: false,
 
       projects: [],
@@ -287,13 +338,16 @@ export default {
       maxNbJobAnnotations: 100,
       maxNbReviewedAnnotations: 100,
 
-      revision: 0
+      revision: 0,
+      revisionSubscription: 0,
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
 
     searchString: sync('listProjects/searchString', {debounce: 500}),
+    searchStringSubscription: sync('listProjects/searchStringSubscription', {debounce: 500}),
+
     filtersOpened: sync('listProjects/filtersOpened'),
 
     availableRoles() {
@@ -372,7 +426,23 @@ export default {
     perPage: sync('listProjects/perPage'),
     sortField: sync('listProjects/sortField'),
     sortOrder: sync('listProjects/sortOrder'),
-    openedDetails: sync('listProjects/openedDetails')
+    openedDetails: sync('listProjects/openedDetails'),
+
+    projectSubscriptionCollection() {
+      let collection = new ProjectCollection({
+        openToAdmittance: true,
+      });
+      if(this.searchStringSubscription) {
+        collection['name'] = {
+          ilike: encodeURIComponent(this.searchStringSubscription)
+        };
+      }
+
+      return collection;
+    },
+    currentPageSubscription: sync('listProjects/currentPageSubscription'),
+    perPageSubscription: sync('listProjects/perPageSubscription'),
+
   },
   watch: {
     revision() {
@@ -455,6 +525,7 @@ export default {
     }
 
     this.loading = false;
+    this.loadingSubscription = false;
   }
 };
 </script>

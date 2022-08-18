@@ -31,7 +31,7 @@
 import {get} from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
-
+import {ProjectCollection} from 'cytomine-client';
 export default {
   name: 'cytomine-project',
   components: {ProjectSidebar},
@@ -77,6 +77,22 @@ export default {
         console.log(error);
         if(error.response && error.response.status === 403) {
           this.permissionError = true;
+
+          try {
+            let collection = new ProjectCollection({
+              openToAdmittance: true,
+              targetProject: this.idProject
+            });
+            this.openedProjects = await collection.fetchAll();
+            console.log('this.openedProjects', this.openedProjects);
+            this.selectedProject = this.openedProjects.array.find(project => project.id == this.idProject);
+            if(this.selectedProject!=null) {
+              this.$router.replace(`/project/${this.idProject}/subscription`);
+            }
+          }
+          catch(error) {
+            console.log(error);
+          }
         }
         else {
           this.notFoundError = true;

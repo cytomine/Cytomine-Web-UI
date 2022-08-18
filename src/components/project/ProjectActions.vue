@@ -69,12 +69,70 @@
     </cytomine-modal>
   </form>
 
+  <form @submit.prevent="saveProjectAdmittance()">
+    <cytomine-modal :active="isAdmittanceModalActive" :title="$t('change-admittance')" @close="isAdmittanceModalActive = false">
+      <template>
+        <b-field :label="$t('open-to-admittance')" horizontal>
+          <b-switch v-model="internalAdmittanceProject['openToAdmittance']" class="switch">
+            <template v-if="internalAdmittanceProject['openToAdmittance']">{{$t('yes')}}</template>
+            <template v-else>{{$t('no')}}</template>
+          </b-switch>
+        </b-field>
+
+        <b-field v-if="internalAdmittanceProject['openToAdmittance']" :label="$t('visibility-for-all')" horizontal>
+          <b-switch v-model="internalAdmittanceProject['visibilityForAll']" class="switch">
+            <template v-if="internalAdmittanceProject['visibilityForAll']">{{$t('yes')}}</template>
+            <template v-else>{{$t('no')}}</template>
+          </b-switch>
+        </b-field>
+
+        <b-field v-if="internalAdmittanceProject['openToAdmittance']" :key="'keyForAdmittance'"
+          :label="$t('key-for-admittance')"
+          horizontal
+        >
+          <b-input
+            v-model="internalAdmittanceProject['keyForAdmittance']"
+            :name="'keyForAdmittance'"
+            :type="'text'"
+          />
+        </b-field>
+
+        <b-field horizontal v-if="isChangingAdmittanceToOpen()">
+          <b-checkbox v-model="admittanceOpenConfirm">
+            {{$t('change-admittance-warning-message')}}
+          </b-checkbox>
+        </b-field>
+      </template>
+
+      <template #footer>
+        <button
+          class="button"
+          type="button"
+          @click="isAdmittanceModalActive = false"
+          :disabled="savingAdmittance"
+        >
+          {{$t('button-cancel')}}
+        </button>
+        <button
+          class="button is-link"
+          :class="{'is-loading': savingAdmittance}"
+          :disabled="savingAdmittance || !isAdmittanceOpenConfirmed()"
+        >
+          {{$t('button-save')}}
+        </button>
+      </template>
+    </cytomine-modal>
+  </form>
+
   <div class="buttons">
     <button class="button" :class="size" @click="isRenameModalActive = true">
       {{$t('button-rename')}}
     </button>
     <button class="button" :class="size" @click="isOntologyModalActive = true" :disabled="cannotDeleteOntology">
       {{$t('button-change-ontology')}}
+    </button>
+    <button class="button" :class="size" @click="isAdmittanceModalActive = true">
+      {{$t('button-change-admittance')}}
     </button>
     <button class="button is-danger" :class="size" @click="deleteProject()">
       {{$t('button-delete')}}
@@ -84,7 +142,7 @@
 </template>
 
 <script>
-import {OntologyCollection} from 'cytomine-client';
+import {Cytomine,Project,OntologyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import RenameModal from '@/components/utils/RenameModal';
 
@@ -102,12 +160,16 @@ export default {
     return {
       isRenameModalActive: false,
       isOntologyModalActive: false,
+      isAdmittanceModalActive: false,
       loadingOntologies: true,
       errorOntologies: false,
       ontologies: null,
       selectedOntology: null,
       cannotDeleteOntology: false,
-      savingOntology: false
+      savingOntology: false,
+      savingAdmittance: false,
+      internalAdmittanceProject: {},
+      admittanceOpenConfirm: false,
     };
   },
   watch: {
@@ -128,6 +190,15 @@ export default {
         // preselect the ontology of the project
         this.selectedOntology = this.project.ontology;
         this.savingOntology = false;
+      }
+    },
+    changedAdmittance() {
+      this.admittanceOpenConfirm = !this.isChangingAdmittanceToOpen();
+    },
+    async isAdmittanceModalActive(val) {
+      if(val) {
+        this.internalAdmittanceProject = this.project.clone();
+        this.savingAdmittance = false;
       }
     }
   },
@@ -200,6 +271,53 @@ export default {
       }
       this.savingOntology = false;
       this.isOntologyModalActive = false;
+    },
+
+
+    async saveProjectAdmittance() {
+      this.savingAdmittance = true;
+      this.admittanceOpenConfirm = false;
+      try {
+
+        try {
+          this.loading = true;
+          const options = {
+            headers: {'content-type': 'application/json'}
+          };
+          let params = {};
+          params['openToAdmittance'] = this.internalAdmittanceProject['openToAdmittance'];
+          params['visibilityForAll'] = this.internalAdmittanceProject['visibilityForAll'];
+          params['keyForAdmittance'] = this.internalAdmittanceProject['keyForAdmittance'];
+          await Cytomine.instance.api.put(`${Cytomine.instance.host}/api/project/${this.internalAdmittanceProject.id}/admittance.json`, JSON.stringify(params), options);
+          this.success = true;
+        }
+        catch(error) {
+          this.$notify({type: 'error', text: this.$t('notif-error-admittance')});
+        }
+        let updatededProject = await Project.fetch(this.internalAdmittanceProject.id);
+        this.$emit('update', updatededProject);
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-project-admittance-change', {projectName: this.project.name})
+        });
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-project-admittance-change', {projectName: this.project.name})
+        });
+      }
+      this.savingAdmittance = false;
+      this.isAdmittanceModalActive = false;
+    },
+
+
+    isChangingAdmittanceToOpen() {
+      return !this.project.openToAdmittance && this.internalAdmittanceProject.openToAdmittance;
+    },
+    isAdmittanceOpenConfirmed(){
+      return this.admittanceOpenConfirm || !this.isChangingAdmittanceToOpen();
     },
 
     deleteProject() {
