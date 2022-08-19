@@ -21,7 +21,7 @@
 
         <div class="columns" style="width:100%;">
           <div class="column is-2">
-            <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
+            <b-input class="search-images search" v-model="searchString" :placeholder="$t('search-placeholder')"
                      type="search" icon="search"
             />
           </div>
@@ -39,6 +39,41 @@
 
             <b-collapse :open="filtersOpened">
               <div class="filters">
+                <div class="filter-label">
+                  {{$t('tags')}}
+                </div>
+                <div class="filter-body">
+                  <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                    label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                </div>
+
+                <div class="filter-label" v-if="ontology">
+                  {{$t('terms')}}
+                </div>
+                <div class="filter-body" v-if="ontology">
+                  <cytomine-multiselect v-model="selectedTerms" :options="availableTerms"
+                                        label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                </div>
+
+
+                <div class="filter-label">
+                  {{$t('properties')}}
+                </div>
+
+                <b-input
+                  :value="searchPropertiesKeyString"
+                  @input="debounceSearchPropertiesKeyString"
+                  class="search-uploaded-file"
+                  :placeholder="$t('key')"
+                />
+
+                <b-input
+                  :value="searchPropertiesValueString"
+                  @input="debounceSearchPropertiesValueString"
+                  class="search-uploaded-file"
+                  :placeholder="$t('value')"
+                />
+
                 <div class="columns">
 
                   <b-field horizontal :label="score.name" v-for="score in scores" :key="score.id">
@@ -60,11 +95,6 @@
 
           </div>
         </div>
-
-
-
-
-
 
 
         <button class="delete" @click="imageSelectorEnabled = false"></button>
@@ -113,18 +143,29 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-
 import ImageName from '@/components/image/ImageName';
-import {ImageInstanceCollection} from 'cytomine-client';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
-
+import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
+import _ from 'lodash';
 export default {
   name: 'image-selector',
-  components: {ImageName},
+  components: {
+    ImageName,
+    CytomineMultiselect,
+    OntologyTreeMultiselect
+  },
   data() {
     return {
       images: [],
+      selectedTags: [],
+      availableTags:[],
+      selectedTerms: [],
+      availableTerms:[],
       searchString: '',
+      searchPropertiesKeyString: '',
+      searchPropertiesValueString: '',
       nbImagesDisplayed: 20,
       loading: true,
       error: false,
@@ -135,6 +176,10 @@ export default {
   computed: {
     project: get('currentProject/project'),
     scores: get('currentProject/scores'),
+    ontology: get('currentProject/ontology'),
+    storeModule() {
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
+    },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -148,7 +193,6 @@ export default {
     },
     filteredImages() { // TODO: in backend
       let filtered = this.images;
-
       if(this.searchString) {
         let regexp = getWildcardRegexp(this.searchString);
         filtered =  filtered.filter(image => regexp.test(image.instanceFilename));
@@ -170,6 +214,20 @@ export default {
       return this.filteredImages.slice(0, this.nbImagesDisplayed);
     }
   },
+  watch:{
+    async selectedTags(){
+      await this.fetchImages();
+    },
+    async selectedTerms(){
+      await this.fetchImages();
+    },
+    async searchPropertiesKeyString(){
+      await this.fetchImages();
+    },
+    async searchPropertiesValueString(){
+      await this.fetchImages();
+    },
+  },
   methods: {
     changeValue() {
 
@@ -188,14 +246,55 @@ export default {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     },
+    debounceSearchPropertiesKeyString: _.debounce(async function(value) {
+      this.searchPropertiesKeyString = value;
+    }, 500),
+    debounceSearchPropertiesValueString: _.debounce(async function(value) {
+      this.searchPropertiesValueString = value;
+    }, 500),
+    async fetchImages() {
+      let collection = new ImageInstanceCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+      if(this.selectedTags.length > 0) {
+        collection['tag'] = {
+          in: this.selectedTags.map(option => option.id).join()
+        };
+      }
+      if(this.selectedTerms.length > 0) {
+        collection['term'] = {
+          in: this.selectedTerms.map(option => option.id).join()
+        };
+      }
+      if(this.searchPropertiesKeyString && this.searchPropertiesKeyString!=='') {
+        collection['propertyKey'] = {
+          ilike: encodeURIComponent(this.searchPropertiesKeyString)
+        };
+      }
+
+      if(this.searchPropertiesValueString && this.searchPropertiesValueString!=='') {
+        collection['propertyValue'] = {
+          ilike: encodeURIComponent(this.searchPropertiesValueString)
+        };
+      }
+
+      this.images = (await collection.fetchAll()).array; // TODO: should not load full array, should be done with backend
+    },
+    async fetchTags() {
+      this.availableTags = (await TagCollection.fetchAll()).array;
+      console.log('availableTags', this.availableTags);
+    },
+    async fetchTerms() {
+      this.availableTerms = this.$store.getters['currentProject/terms'] || [];
+      console.log('availableTerms', this.availableTerms);
+    },
     more() {
       this.nbImagesDisplayed += 20;
     },
-
     toggle() {
       this.imageSelectorEnabled = !this.imageSelectorEnabled;
     },
-
     shortkeyHandler(key) {
       if (key === 'toggle-add-image') {
         this.toggle();
@@ -204,10 +303,9 @@ export default {
   },
   async created() {
     try {
-      this.images = (await ImageInstanceCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id
-      })).array; // TODO: should not load full array, should be done with backend
+      this.fetchImages();
+      this.fetchTags();
+      this.fetchTerms();
     }
     catch(error) {
       console.log(error);
@@ -241,10 +339,27 @@ export default {
 .header {
   padding: 0.75em;
   padding-bottom: 0;
+  padding-top: 0;
   display: flex;
   justify-content: space-between;
 }
-
+.search {
+  margin-top: 0.25em;
+}
+.filters {
+  display: flex;
+  padding: 0;
+  background: None;
+}
+.filter-label {
+  font-size: 0.9em;
+  margin-top: 0.7rem;
+  margin-left: 1em;
+  margin-right: 0.5em;
+}
+.delete {
+  margin-top: 1.2rem;
+}
 .image-selector {
   width: 100%;
   overflow: auto;
@@ -252,7 +367,6 @@ export default {
   align-items: center;
   flex: 1;
 }
-
 .card {
   display: inline-block;
   min-width: 12em;
@@ -260,7 +374,6 @@ export default {
   box-sizing: border-box;
   margin: 0.75em;
 }
-
 .card-image {
   display: inline-block;
   width: 100%;
@@ -271,7 +384,6 @@ export default {
   background-color: white;
   border-bottom: 1px solid #ddd;
 }
-
 .card-content {
   padding: 0.75em;
   font-size: 0.8rem;
@@ -279,11 +391,9 @@ export default {
   overflow: hidden;
   height: 5em;
 }
-
 .space {
   margin-left: 0.5em;
 }
-
 .image-selector-button {
   background: #95b5db;
   border: 0.35rem solid white;
