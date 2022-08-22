@@ -83,9 +83,9 @@
           </span>
         </b-table-column>
 
-        <b-table-column label="" centered width="50" v-if="currentUser.adminByNow">
+        <b-table-column label="" centered width="50">
           <div class="buttons">
-            <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
+            <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link" v-if="currentUser.adminByNow">
               {{$t('button-view-activity')}}
             </router-link>
             <button @click="notifyUserIsInProject(member, project)" class="button is-small is-link">
