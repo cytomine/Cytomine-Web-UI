@@ -56,6 +56,33 @@
     </div>
   </div>
 
+  <h2>{{$t('viewer-panels')}}</h2>
+
+
+  <div class="columns">
+    <div class="column is-one-quarter">
+      <div class="columns">
+        <div class="">
+          {{$t('default-opacity')}}
+        </div>
+        <div class="column">
+          <b-slider v-model="opacity" :custom-formatter="(val) => val + '%'" lazy></b-slider>
+        </div>
+        <div class="column">
+          <button class="button is-small" @click="resetOpacity()">{{$t('button-reset')}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <b-message type="is-info" has-icon size="is-small">
+        {{$t('opacity-explanation')}}
+      </b-message>
+    </div>
+  </div>
+
+
+
+
   <h2>{{$t('blind-mode')}}</h2>
 
   <div class="columns">
@@ -164,6 +191,9 @@ import DefaultProperty from './DefaultProperty';
 import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
+import constants from '@/utils/constants.js';
+
+
 export default {
   name: 'general-configuration',
   components: {
@@ -177,7 +207,7 @@ export default {
       hideManagersLayers: null,
       hideContributorsLayers: null,
       imagesDownloadable: null,
-
+      opacity: constants.DEFAULT_OPACITY * 100,
       layerToAdd: null,
       defaultLayers: []
     };
@@ -198,10 +228,17 @@ export default {
     },
     unselectedLayers() {
       let selectedLayersIds = this.defaultLayers.map(layer => layer.user);
-      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname.toLowerCase() < b.lastname.toLowerCase()) ? -1 : 1 );
+      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id));
     }
   },
   watch: {
+    async opacity(){
+      if (this.opacity !== this.project.layersOpacity) {
+        this.project.layersOpacity = this.opacity / 100;
+        await this.project.save();
+      }
+    },
+
     editingMode(mode) {
       if(mode === this.currentEditingMode) {
         return;
@@ -248,6 +285,11 @@ export default {
       this.hideManagersLayers = this.project.hideAdminsLayers;
       this.hideContributorsLayers = this.project.hideUsersLayers;
       this.imagesDownloadable = this.project.areImagesDownloadable;
+      this.opacity = this.project.layersOpacity * 100;
+    },
+
+    async resetOpacity() {
+      this.opacity = constants.DEFAULT_OPACITY * 100;
     },
 
     async fetchDefaultLayers() {
@@ -358,6 +400,15 @@ h2:first-child {
 
 .column {
   padding: 0.8em;
+}
+
+.horizontal {
+  display: flex;
+  align-items: center;
+}
+
+.right-padding {
+  padding-right: 1em;
 }
 
 .column:first-child {

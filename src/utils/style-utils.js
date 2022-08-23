@@ -17,7 +17,7 @@
 import {Style, Stroke, Fill, Circle, Text} from 'ol/style';
 import {MultiPoint} from 'ol/geom';
 import {asArray as hexToRgb} from 'ol/color';
-
+import constants from './constants';
 // -----
 
 export function isCluster(feature) {
@@ -53,8 +53,15 @@ export function createLineStrokeStyle(color, opacity=0.5) {
 
 // -----
 
-function createStroke(opacity=0.5) {
-  return new Stroke({color: [0, 0, 0, opacity], width: 2});
+function colorWithOpacity(color, opacity) {
+  let colorWithOpacity = color.slice();
+  colorWithOpacity[3] = opacity;
+  return colorWithOpacity;
+}
+
+function createStroke() {
+  let color = (constants.ANNOTATION_STROKE_COLOR) ? constants.ANNOTATION_STROKE_COLOR : black;
+  return new Stroke({color: colorWithOpacity(color, constants.ANNOTATION_STROKE_OPACITY), width: 2});
 }
 
 export function createColorStyle(color, opacity=0.5) {
@@ -67,13 +74,13 @@ export function createColorStyle(color, opacity=0.5) {
   let circleStyle = new Circle({
     radius: 5,
     fill: new Fill({color: colorArray}),
-    stroke: createStroke(1),
+    stroke: createStroke(),
   });
   circleStyle.setOpacity(opacity);
 
   return new Style({
     fill,
-    stroke: createStroke(opacity),
+    stroke: createStroke(),
     image: circleStyle
   });
 }
@@ -115,6 +122,7 @@ let lightGreen = [17, 214, 76, 1];
 let red = [200, 40, 40, 1];
 let lightRed = [255, 56, 56, 1];
 let white = [255, 255, 255, 1];
+let black = [0, 0, 0, 1];
 
 let blueStroke = new Stroke({color: blue, width: width});
 let greenStroke = new Stroke({color: green, width: width + 1});
@@ -168,10 +176,7 @@ export let rejectedSelectStyles = [
 // -----
 
 export function changeOpacity(style, opacity) {
-  let stroke = style.getStroke();
-  if(stroke) {
-    stroke.getColor()[3] = opacity;
-  }
+  console.log('changeOpacity', opacity);
   let fill = style.getFill();
   if(fill) {
     fill.getColor()[3] = opacity;
