@@ -26,6 +26,7 @@ export default {
       terms: null,
 
       displayNoTerm: true,
+      isOpacityInitialized: false,
       noTermOpacity: initialTermsOpacity,
       noTermStyle: createColorStyle('#fff', initialLayersOpacity*initialTermsOpacity),
 
@@ -64,23 +65,23 @@ export default {
     setTermOpacity(state, {indexTerm, opacity}) {
       let term = state.terms[indexTerm];
       term.opacity = opacity;
-      changeOpacity(term.olStyle, state.layersOpacity*opacity);
-      changeOpacity(term.olLineStyle, state.layersOpacity*opacity);
+      changeOpacity(term.olStyle, opacity);
+      changeOpacity(term.olLineStyle, opacity);
     },
 
     setNoTermOpacity(state, opacity) {
       state.noTermOpacity = opacity;
-      changeOpacity(state.noTermStyle, state.layersOpacity*opacity);
+      changeOpacity(state.noTermStyle, opacity);
     },
 
-    resetTermOpacities(state) {
+    resetTermOpacities(state, opacity) {
       state.terms.forEach(term => {
-        term.opacity = initialTermsOpacity;
-        changeOpacity(term.olStyle, state.layersOpacity*initialTermsOpacity);
-        changeOpacity(term.olLineStyle, state.layersOpacity*initialTermsOpacity);
+        term.opacity = opacity;
+        changeOpacity(term.olStyle, opacity);
+        changeOpacity(term.olLineStyle, opacity);
       });
-      state.noTermOpacity = initialTermsOpacity;
-      changeOpacity(state.noTermStyle, state.layersOpacity*state.noTermOpacity);
+      state.noTermOpacity = opacity;
+      changeOpacity(state.noTermStyle, opacity);
     },
 
     setLayersOpacity(state, opacity) {
@@ -101,6 +102,7 @@ export default {
         });
       }
       changeOpacity(state.multipleTracksStyle, opacity);
+      state.isOpacityInitialized = true;
     },
   },
 
@@ -171,7 +173,6 @@ export default {
     },
   }
 };
-
 
 function formatTerms(terms, layersOpacity, previousTerms=[]) {
   if(!terms) {

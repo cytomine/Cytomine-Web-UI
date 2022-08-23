@@ -343,6 +343,7 @@ no-default-property,No default property,Pas de propriété par défaut,Sin propi
 images_downloadable_by_contributor,Images downloadable by contributor,Images téléchargeables par les contributeurs,Imágenes descargables por los colaboradores
 images_downloadable_by_contributor-explanation,"If this is enabled, contributors will be able to download the images of this project","Avec cette option, les contributeurs pourront télécharger les images de ce projet","Si esta opción está habilitada, los colaboradores podrán descargar las imágenes de este proyecto."
 download-permission,Download permission,Permission de téléchargement,Permiso de descarga
+opacity-explanation,The default opacity value change will only be applied to new images (already opened viewers need to be close),Le changement de la valeur par défaut de l'opacité sera uniquement visible sur les nouvelles ouvertues d'images,
 notif-error-general-config-update,Error during update of configuration,Une erreur a empêché de mettre à jour la configuration,Error durante la actualización de la configuración
 layer,Layer,Calque,Capa
 hide-by-default,Hide layer by default,Caché par défaut,Ocultar capa por defecto
@@ -413,6 +414,7 @@ notif-success-attached-file-deletion,Attached file {filename} correctly deleted,
 notif-error-attached-file-deletion,Failed to delete attached file {filename},Une erreur a empêché la suppression du fichier joint {filename},Error al eliminar el archivo adjunto {filename}
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?
 opacity,Opacity,Opacité,Opacidad
+default-opacity, Default opacity, Opacité par défaut
 button-reset-opacities,Reset opacities,Réinitialiser les opacités,Restablecer niveles de opacidad
 preview-size,Preview size,Taille de l'aperçu,Tamaño de vista previa
 small,Small,Petit,Pequeña

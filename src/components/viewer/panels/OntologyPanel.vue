@@ -54,7 +54,6 @@
               @change="event => changeOpacity(termsMapping[term.id], event)"
               @input="event => changeOpacity(termsMapping[term.id], event)"
             >
-
             <input
               v-else
               class="slider is-fullwidth is-small" step="0.05" min="0" max="1" type="range"
@@ -88,6 +87,7 @@ export default {
   },
   computed: {
     ontology: get('currentProject/ontology'),
+    project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
@@ -131,7 +131,22 @@ export default {
       this.$store.commit(this.imageModule + 'setTermOpacity', {indexTerm: index, opacity});
     },
     resetOpacities() {
-      this.$store.commit(this.imageModule + 'resetTermOpacities');
+      this.$store.commit(this.imageModule + 'resetTermOpacities', this.project.layersOpacity);
+    }
+  },
+  async created() {
+    if(!this.imageWrapper.style.isOpacityInitialized){
+      try{
+        let opacity = this.project.layersOpacity;
+        if(opacity!=null){
+          this.$store.commit(this.imageModule + 'setLayersOpacity', opacity);
+          this.$store.commit(this.imageModule + 'setNoTermOpacity', opacity);
+          this.terms.forEach((term) => term.opacity = opacity);
+        }
+      }
+      catch(error){
+        console.log('Error during default opacity configuration fetching !');
+      }
     }
   }
 };
