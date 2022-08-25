@@ -176,7 +176,6 @@ export let rejectedSelectStyles = [
 // -----
 
 export function changeOpacity(style, opacity) {
-  console.log('changeOpacity', opacity);
   let fill = style.getFill();
   if(fill) {
     fill.getColor()[3] = opacity;
