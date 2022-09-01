@@ -19,8 +19,8 @@
     <h2> {{ $t('error') }} </h2>
     <p>{{ $t('unexpected-error-info-message') }}</p>
   </div>
-  <div class="columns">
-    <div v-if="!loading" class="column is-three-quarters">
+  <div class="columns is-multiline">
+    <div v-if="!loading" class="column is-full-fullhd" >
       <div class="panel">
         <p class="panel-heading">
           {{$t('projects')}}
@@ -231,7 +231,7 @@
       </div>
     </div>
 
-    <div v-if="!loadingSubscription" class="column is-one-quarter">
+    <div v-if="!loadingSubscription" class="column is-full-fullhd">
       <div class="panel">
         <p class="panel-heading">
           {{$t('open-to-admittance')}}
