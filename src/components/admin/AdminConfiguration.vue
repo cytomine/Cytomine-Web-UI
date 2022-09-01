@@ -457,6 +457,7 @@ export default {
         }
         else if (this.sharedAnnotationMailMode.value) {
           await this.sharedAnnotationMailMode.save();
+          this.currentSharedAnnotationMailModeValue = this.sharedAnnotationMailMode!=null? this.sharedAnnotationMailMode.value : null;
         }
         if(!this.activitiesRetentionDelayConfig.value && this.activitiesRetentionDelayConfig.id!=null) {
           await this.activitiesRetentionDelayConfig.delete();
