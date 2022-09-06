@@ -36,7 +36,7 @@ export default {
   ANNOTATION_STROKE_SELECT_COLOR: [0, 153, 255, 1],
   MAX_IMAGES_FOR_FILTER: 50000,
   // ---
-  IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
+  IDLE_DURATION: 120, // if the user does not move their mouse on the page during this duration, the user is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
