@@ -85,9 +85,6 @@ export default {
 
     async initViewVariables() {
       let slices = (await AbstractSliceCollection.fetchAll({filterKey: 'abstractimage', filterValue: this.image.id})).array;
-      console.log('slices', slices);
-      console.log(this.image);
-      console.log(this.image.imageServerUrl);
       this.slice = slices[0];
       this.createProjection(this.image.id);
 
