@@ -209,7 +209,7 @@ export default {
       }
     },
     setItemColor(item, color){
-      this.itemStyles[item].backgroundColor = color;
+      if(this.itemStyles[item]) this.itemStyles[item].backgroundColor = color;
     },
     // ---
 
