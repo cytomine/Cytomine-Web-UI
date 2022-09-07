@@ -225,7 +225,7 @@ export default {
         {value: 'FR', name:'Français'},
         {value: 'ES', name:'Español'}
       ],
-      externalEditLink: constants.SSO_LOGIN+'/profile/edit',
+      externalEditLink: constants.SSO_LOGIN+'/registration/edit',
     };
   },
   computed: {
