@@ -135,6 +135,15 @@ export default {
     }
   },
   async created() {
+    // check if token is set in the query param, if true => set it in the session storage
+    var parameters = window.location.href.split("?");
+    if (parameters && parameters.length===2 && parameters[1].startsWith('redirect_token') && parameters[1].split('=').length===2) {
+      let token = parameters[1].split('=')[1];
+      localStorage.setItem('cytomine-authentication-token', token);
+      sessionStorage.removeItem('cytomine-authentication-token');
+      history.pushState({}, null, parameters[0]);
+    }
+
     let settings;
     await axios
       .get('configuration.json')
