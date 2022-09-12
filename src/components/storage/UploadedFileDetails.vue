@@ -101,7 +101,7 @@
       {{$t('image-explore-of', {filename: imageExplore.originalFilename})}}
       <button class="button is-small" @click="imageExplore = null">{{$t('button-hide')}}</button>
     </h2>
-    <uploaded-file-details-viewer :image="abstractImage"></uploaded-file-details-viewer>
+    <uploaded-file-details-viewer :image="image"></uploaded-file-details-viewer>
   </template>
 
   <template v-if="image && profileEnabled">
