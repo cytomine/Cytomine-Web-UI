@@ -324,7 +324,7 @@ export default {
     async fetchAbstractImage() {
       if (this.file.image && (this.file.status === UFStatus.CONVERTED || this.file.status === UFStatus.DEPLOYED)) {
         try {
-          this.abstractImage = await AbstractImage.fetch(this.file.image);
+          this.image = await AbstractImage.fetch(this.file.image);
         }
         catch(error) {
           console.log(error);
@@ -426,8 +426,8 @@ export default {
   },
   async created() {
     this.findRoot();
-    this.fetchAbstractImage();
     this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.image.AbstractImage'});
+    this.fetchAbstractImage();
   }
 };
 </script>
