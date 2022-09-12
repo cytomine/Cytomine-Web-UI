@@ -101,7 +101,7 @@
       {{$t('image-explore-of', {filename: imageExplore.originalFilename})}}
       <button class="button is-small" @click="imageExplore = null">{{$t('button-hide')}}</button>
     </h2>
-    <uploaded-file-details-viewer :image="abstractImage"></uploaded-file-details-viewer>
+    <uploaded-file-details-viewer :image="image"></uploaded-file-details-viewer>
   </template>
 
   <template v-if="image && profileEnabled">
@@ -385,7 +385,7 @@ export default {
     async fetchAbstractImage() {
       if (this.file.image && (this.file.status === UFStatus.CONVERTED || this.file.status === UFStatus.DEPLOYED)) {
         try {
-          this.abstractImage = await AbstractImage.fetch(this.file.image);
+          this.image = await AbstractImage.fetch(this.file.image);
         }
         catch(error) {
           console.log(error);
@@ -496,8 +496,8 @@ export default {
   },
   async created() {
     this.findRoot();
-    this.fetchAbstractImage();
     this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.image.AbstractImage'});
+    this.fetchAbstractImage();
   }
 };
 </script>
