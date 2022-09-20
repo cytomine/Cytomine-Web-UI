@@ -73,6 +73,9 @@
           </b-table-column>
 
           <b-table-column label=" " centered>
+            <button class="button is-small"  @click="imageExplore = image; creationModal = true;">
+              {{$t('image-explore')}}
+            </button>
             <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
               {{$t('button-added')}}
             </button>
@@ -93,6 +96,7 @@
       </cytomine-table>
     </template>
   </template>
+  <simple-viewer-modal :active.sync="creationModal" :image="imageExplore"  />
 </cytomine-modal>
 </template>
 
@@ -102,7 +106,7 @@ import {AbstractImageCollection, ImageInstance, TagCollection} from 'cytomine-cl
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-
+import SimpleViewerModal from '@/components/storage/SimpleViewerModal';
 export default {
   name: 'add-image-modal',
   props: {
@@ -111,7 +115,8 @@ export default {
   components: {
     CytomineTable,
     CytomineModal,
-    CytomineMultiselect
+    CytomineMultiselect,
+    SimpleViewerModal
   },
   data() {
     return {
@@ -125,6 +130,9 @@ export default {
       filtersOpened : false,
       tags: [],
       selectedTags: [],
+
+      imageExplore: null,
+      creationModal: false
     };
   },
   computed: {

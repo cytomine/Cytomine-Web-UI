@@ -15,7 +15,7 @@
 <template>
   <div v-if="!loading">
     <vl-map
-      style="height: 500px"
+      style="height: 750px"
       :data-projection="projectionName"
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true"
