@@ -88,11 +88,11 @@ export default {
       state.layersOpacity = opacity;
       if(state.terms) {
         state.terms.forEach(term => {
-          changeOpacity(term.olStyle, opacity*term.opacity);
-          changeOpacity(term.olLineStyle, opacity*term.opacity);
+          changeOpacity(term.olStyle, opacity);
+          changeOpacity(term.olLineStyle, opacity);
         });
       }
-      changeOpacity(state.noTermStyle, opacity*state.noTermOpacity);
+      changeOpacity(state.noTermStyle, opacity);
       changeOpacity(state.multipleTermsStyle, opacity);
       changeOpacity(state.defaultStyle, opacity);
       if(state.wrappedTracks) {
