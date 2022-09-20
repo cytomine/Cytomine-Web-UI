@@ -102,6 +102,10 @@
             {{$t('change-admittance-warning-message')}}
           </b-checkbox>
         </b-field>
+
+        <button class="level-item button is-small" @click="copyURL">
+          {{ $t('button-copy-url') }}
+        </button>
       </template>
 
       <template #footer>
@@ -145,6 +149,7 @@
 import {Cytomine,Project,OntologyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import RenameModal from '@/components/utils/RenameModal';
+import copyToClipboard from 'copy-to-clipboard';
 
 export default {
   name: 'project-actions',
@@ -223,7 +228,11 @@ export default {
       }
       this.isRenameModalActive = false;
     },
-
+    copyURL(e) {
+      copyToClipboard(window.location.origin + '/#/project/' + this.project.id);
+      this.$notify({type: 'success', text: this.$t('notif-success-project-URL-copied')});
+      e.preventDefault();
+    },
     async saveOntology(forceOntologyUpdate=false) {
       this.savingOntology = true; // possibly long operation => give user visual indication that it is in progress
       let updatedProject = this.project.clone();
