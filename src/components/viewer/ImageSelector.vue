@@ -30,33 +30,28 @@
               label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
           </div>
 
+          <div class="filter-label">
+            {{$t('property')}} {{$t('key')}}
+          </div>
+          <div class="filter-body">
+            <cytomine-multiselect v-model="selectedKey" :options="availableKeys" :allow-empty="true"
+                                  label="name" track-by="name" :multiple="false" placeholder="$t('key')" />
+          </div>
+          <div v-if="selectedKey" class="filter-label">
+            {{$t('property')}} {{$t('value')}}
+          </div>
+          <div class="filter-body">
+            <cytomine-multiselect v-if="selectedKey" v-model="selectedValue" :options="availableValues" :allow-empty="true"
+                                  label="name" track-by="name" :multiple="false" placeholder="$t('value')" />
+          </div>
+
           <div class="filter-label" v-if="ontology">
-            {{$t('terms')}}
+            {{$t('annotation')}} {{$t('terms')}}
           </div>
           <div class="filter-body" v-if="ontology">
             <cytomine-multiselect v-model="selectedTerms" :options="availableTerms"
                                   label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
           </div>
-
-
-          <div class="filter-label">
-            {{$t('properties')}}
-          </div>
-
-          <b-input
-            :value="searchPropertiesKeyString"
-            @input="debounceSearchPropertiesKeyString"
-            class="search-uploaded-file"
-            :placeholder="$t('key')"
-          />
-
-          <b-input
-            :value="searchPropertiesValueString"
-            @input="debounceSearchPropertiesValueString"
-            class="search-uploaded-file"
-            :placeholder="$t('value')"
-          />
-
         </div>
         <button class="delete" @click="imageSelectorEnabled = false"></button>
       </div>
@@ -101,10 +96,9 @@
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import {Cytomine, ImageInstanceCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
-import _ from 'lodash';
 export default {
   name: 'image-selector',
   components: {
@@ -119,9 +113,11 @@ export default {
       availableTags:[],
       selectedTerms: [],
       availableTerms:[],
+      selectedKey: null,
+      availableKeys: [],
+      selectedValue: null,
+      availableValues: [],
       searchString: '',
-      searchPropertiesKeyString: '',
-      searchPropertiesValueString: '',
       nbImagesDisplayed: 20,
       loading: true,
       error: false,
@@ -163,10 +159,16 @@ export default {
     async selectedTerms(){
       await this.fetchImages();
     },
-    async searchPropertiesKeyString(){
+    async selectedKey(){
+      this.selectedValue = null;
       await this.fetchImages();
+      let {data} = await Cytomine.instance.api.get(`${Cytomine.instance.host}/api/imageinstance/property/value.json?idProject=${this.project.id}&key=${this.selectedKey.name}`);
+
+      this.availableValues = data.collection.map(function(item) {
+        return {name: item};
+      });
     },
-    async searchPropertiesValueString(){
+    async selectedValue(){
       await this.fetchImages();
     },
   },
@@ -182,12 +184,6 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
     },
-    debounceSearchPropertiesKeyString: _.debounce(async function(value) {
-      this.searchPropertiesKeyString = value;
-    }, 500),
-    debounceSearchPropertiesValueString: _.debounce(async function(value) {
-      this.searchPropertiesValueString = value;
-    }, 500),
     async fetchImages() {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',
@@ -203,15 +199,15 @@ export default {
           in: this.selectedTerms.map(option => option.id).join()
         };
       }
-      if(this.searchPropertiesKeyString && this.searchPropertiesKeyString!=='') {
+      if(this.selectedKey) {
         collection['propertyKey'] = {
-          ilike: encodeURIComponent(this.searchPropertiesKeyString)
+          ilike: encodeURIComponent(this.selectedKey.name)
         };
       }
 
-      if(this.searchPropertiesValueString && this.searchPropertiesValueString!=='') {
+      if(this.selectedValue) {
         collection['propertyValue'] = {
-          ilike: encodeURIComponent(this.searchPropertiesValueString)
+          ilike: encodeURIComponent(this.selectedValue.name)
         };
       }
 
@@ -223,7 +219,14 @@ export default {
     },
     async fetchTerms() {
       this.availableTerms = this.$store.getters['currentProject/terms'] || [];
-      console.log('availableTerms', this.availableTerms);
+    },
+    async fetchPropertyKeys() {
+      let {data} = await Cytomine.instance.api.get(`${Cytomine.instance.host}/api/imageinstance/property/key.json?idProject=${this.project.id}`);
+
+      let keys = data.collection.map(function(item) {
+        return {name: item};
+      });
+      this.availableKeys = keys;
     },
     more() {
       this.nbImagesDisplayed += 20;
@@ -242,6 +245,7 @@ export default {
       this.fetchImages();
       this.fetchTags();
       this.fetchTerms();
+      this.fetchPropertyKeys();
     }
     catch(error) {
       console.log(error);
