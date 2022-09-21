@@ -1094,4 +1094,4 @@ notify-user-in-project-success, User has been notified with email, L'utilisateur
 api-enabled,Api enabled,API activée
 api-disabled,Api disabled,API désactivée
 mail-mode-warning, I confirm that I want to change the mail mode from restricted to classic., Je confirme que je veux changer le mode d'envoi des courriels (de restreint à normal).
-
+notif-success-project-URL-copied, Project URL copied to clipboard,L'URL du projet a été copiée dans le presse-papier
