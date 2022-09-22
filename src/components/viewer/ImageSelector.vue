@@ -40,7 +40,7 @@
             <b-collapse :open="filtersOpened">
               <div class="filters">
                 <div class="filter-label">
-                  {{$t('tags')}}
+                  {{$t('image')}} {{$t('tags')}}
                 </div>
                 <div class="filter-body">
                   <cytomine-multiselect v-model="selectedTags" :options="availableTags"
@@ -48,14 +48,14 @@
                 </div>
 
                 <div class="filter-label">
-                  {{$t('property')}} {{$t('key')}}
+                  {{$t('image')}} {{$t('property')}} {{$t('key')}}
                 </div>
                 <div class="filter-body">
                   <cytomine-multiselect v-model="selectedKey" :options="availableKeys" :allow-empty="true"
                                         label="name" track-by="name" :multiple="false" placeholder="$t('key')" />
                 </div>
                 <div v-if="selectedKey" class="filter-label">
-                  {{$t('property')}} {{$t('value')}}
+                  {{$t('image')}} {{$t('property')}} {{$t('value')}}
                 </div>
                 <div class="filter-body">
                   <cytomine-multiselect v-if="selectedKey" v-model="selectedValue" :options="availableValues" :allow-empty="true"
