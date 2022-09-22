@@ -73,7 +73,7 @@
           </b-table-column>
 
           <b-table-column label=" " centered>
-            <button class="button is-small"  @click="imageExplore = image; creationModal = true;">
+            <button class="button is-small explore-btn"  @click="imageExplore = image; creationModal = true;">
               {{$t('image-explore')}}
             </button>
             <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
@@ -228,6 +228,9 @@ export default {
 >>> .modal-card {
   width: 100%;
   height: 80vh;
+}
+.explore-btn {
+  margin-right: 3px;
 }
 
 .image-overview {
