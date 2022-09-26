@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="panel-block has-text-right" >
-            <button class="button" type="button" @click="cancelSubscription()">
+            <button class="button explore-btn" type="button" @click="cancelSubscription()">
               {{$t('button-cancel')}}
             </button>
             <button class="button is-link" @click="confirmSubscription()">
@@ -151,6 +151,11 @@ export default {
 </script>
 
 <style scoped>
+
+.explore-btn {
+  margin-right: 6px;
+}
+
 .content-wrapper {
   height: 100%;
 }
