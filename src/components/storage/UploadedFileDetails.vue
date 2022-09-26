@@ -161,9 +161,16 @@
           </td>
         </tr>
         <tr>
-          <td class="prop-label">{{$t('resolution')}}</td>
+          <td class="prop-label">{{$t('x-resolution')}}</td>
           <td class="prop-content">
-            <template v-if="image.resolution">{{image.resolution.toFixed(3)}} {{$t('um-per-pixel')}}</template>
+            <template v-if="image.physicalSizeX">{{image.physicalSizeX.toFixed(3)}} {{$t('um-per-pixel')}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('y-resolution')}}</td>
+          <td class="prop-content">
+            <template v-if="image.physicalSizeY">{{image.physicalSizeY.toFixed(3)}} {{$t('um-per-pixel')}}</template>
             <template v-else>{{$t('unknown')}}</template>
           </td>
         </tr>
