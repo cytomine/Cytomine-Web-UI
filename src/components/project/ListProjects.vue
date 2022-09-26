@@ -218,6 +218,7 @@
             <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
             <div class="buttons is-centered">
               <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
+              <a class="button is-link" :href="downloadURL('xls')">{{$t('download-excel')}}</a>
             </div>
           </div>
 
