@@ -103,9 +103,20 @@
           </b-checkbox>
         </b-field>
 
-        <button class="level-item button is-small" @click="copyURL">
-          {{ $t('button-copy-url') }}
-        </button>
+        <b-field v-if="internalAdmittanceProject['openToAdmittance'] && !internalAdmittanceProject['visibilityForAll']" :label="$t('url-to-send-to-users')" horizontal>
+          <div class="columns">
+            <div class="column is-one-quarter">
+              <button class="level-item button is-small" @click="copyURL">
+                {{ $t('button-copy-url') }}
+              </button>
+            </div>
+            <div class="column">
+              <b-message type="is-info" has-icon size="is-small">
+                {{$t('copy-url-admittance-explanation')}}
+              </b-message>
+            </div>
+          </div>
+        </b-field>
       </template>
 
       <template #footer>
