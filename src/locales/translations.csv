@@ -786,8 +786,8 @@ change-admittance-warning-message,I confirm that I want to open the admittance f
 open-to-admittance,Open to admittance,Ouvert a l'auto-inscription
 visibility-for-all,Visible for all,Visible par tous
 key-for-admittance,Key for admittance,Clé pour l'auto-inscription
-url-to-send-to-users,URL to sent to users,URL a envoyer aux utilisateurs
-copy-url-admittance-explanation,Copy this URL and sent it to the users you expect as members of your project.,Copiez cette URL and envoyez là aux utilisateurs qui doivent rejoindre le projet.
+url-to-send-to-users,URL to send to users,URL a envoyer aux utilisateurs
+copy-url-admittance-explanation,Copy this URL and send it to the users you expect as members of your project.,Copiez cette URL and envoyez là aux utilisateurs qui doivent rejoindre le projet.
 notif-success-project-admittance-change,Admittance settings for project {projectName} were successfully updated,Les modifications de permissions d'accès au projet {projectName} ont bien été enregistrées
 notif-error-project-admittance-change,Failed to change admittance settings for project {projectName},Une erreur a empêché de modifier les permissions d'accès du projet {projectName}
 admittance-message,Do you want to be a member of {projectName}?,Voulez-vous devenir membre du projet {projectName}?,
