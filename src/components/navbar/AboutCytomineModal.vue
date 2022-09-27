@@ -17,7 +17,7 @@
   <template v-if="!loading">
     <dl>
       <dt>{{$t('version')}}</dt>
-      <dd>3.2.1-EDU-220505</dd>
+      <dd>{{version || '?'}}</dd>
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
@@ -95,12 +95,18 @@ export default {
     }
   },
   async created() {
-    try {
-      let {version} = await Cytomine.instance.ping();
-      this.version = version;
+    if(constants.HARDCODED_VERSION) {
+      this.version = constants.HARDCODED_VERSION;
     }
-    catch(error) {
-      console.log(error);
+    else {
+      try {
+        let {version} = await Cytomine.instance.ping();
+        this.version = version;
+      }
+      catch(error) {
+        console.log(error);
+        this.version = constants.HARDCODED_VERSION;
+      }
     }
     this.loading = false;
   }
