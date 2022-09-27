@@ -66,7 +66,7 @@
           :type="{'is-danger': errors.has('profile.phone_number')}"
           :message="errors.first('profile.phone_number')"
         >
-          <b-input :value="currentUser.phone_number" :disabled="isFromSSO" />
+          <b-input :value="currentUser.phoneNumber" :disabled="isFromSSO" />
         </b-field>
 
         <b-field :label="$t('language')" horizontal>
