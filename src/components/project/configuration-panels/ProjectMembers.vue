@@ -102,8 +102,12 @@
       </template>
 
       <template #footer>
-        <div class="has-text-centered">
-          <a :href="exportURL" target="_self" class="button is-link">{{$t('button-export-as-csv')}}</a>
+        <div class="box">
+          <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
+          <div class="buttons is-centered">
+            <a class="button is-link" :href="exportCsvURL">{{$t('download-CSV')}}</a>
+            <a class="button is-link" :href="exportXlsURL">{{$t('download-excel')}}</a>
+          </div>
         </div>
       </template>
     </cytomine-table>
@@ -185,11 +189,13 @@ export default {
 
       return collection;
     },
-
-
-    exportURL() {
+    exportCsvURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
+    },
+    exportXlsURL() {
+      // TODO in core: should export only the filtered users
+      return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=xls`;
     },
   },
 
