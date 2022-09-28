@@ -233,7 +233,7 @@ export default {
   },
   watch: {
     async opacity(){
-      if (this.opacity !== this.project.layersOpacity) {
+      if (this.opacity !== this.project.layersOpacity*100) {
         this.project.layersOpacity = this.opacity / 100;
         await this.project.save();
       }

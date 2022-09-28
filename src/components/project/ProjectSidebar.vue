@@ -121,31 +121,31 @@ export default {
       switch(constants.HV_MODE) {
         case 'DEVELOPMENT':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Utvikling';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Utvikling\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Test Utvikling\n';
           break;
         case 'QA_UNDERVISNING':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Undervisning';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Undervisning\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Test Undervisning\n';
           break;
         case 'UNDERVISNING':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Undervisning';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Undervisning\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Undervisning\n';
           break;
         case 'QA_LABO':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Laboratorienettverk';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Laboratorienettverk\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Test Laboratorienettverk\n';
           break;
         case 'LABO':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Laboratorienettverk';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Laboratorienettverk\n';
           break;
         case 'QA_KOLLEGIAL':
           this.email.subject = 'Kan du sjekke om anonymisering er godt nok ivaretatt i Test Kollegial rådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige et anonymiseringsproblem som du må sjekke opp i Cytomine	Test Kollegial rådføring\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig anonymiseringsproblem som du må sjekke opp i Cytomine	Test Kollegial rådføring\n';
           break;
         case 'KOLLEGIAL':
           this.email.subject = 'Kan du sjekke om det kan være lagt inn for mye informasjon i Kollegial rådføring';
-          felt3='Jeg har sendt deg denne e-post om et mulige problem med for mye informasjon i  Cytomine Kollegial rådføring\n';
+          felt3='Jeg har sendt deg denne e-post om et mulig problem med for mye informasjon i  Cytomine Kollegial rådføring\n';
           break;
         default:
           this.email.subject = 'Report about project ' + this.project['name'];

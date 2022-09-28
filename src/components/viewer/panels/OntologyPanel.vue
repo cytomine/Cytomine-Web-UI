@@ -148,6 +148,12 @@ export default {
         console.log('Error during default opacity configuration fetching !');
       }
     }
+    else {
+      let opacity = this.project.layersOpacity;
+      if(opacity!=null){
+        this.terms.forEach((term) => term.opacity = opacity);
+      }
+    }
   }
 };
 </script>
