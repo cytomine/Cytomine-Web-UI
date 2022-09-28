@@ -88,7 +88,7 @@
             <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link" v-if="currentUser.adminByNow">
               {{$t('button-view-activity')}}
             </router-link>
-            <button @click="notifyUserIsInProject(member, project)" class="button is-small is-link">
+            <button @click="notifyUserIsInProject($event, member, project)" class="button is-small is-link">
               {{$t('notify-user-in-project')}}
             </button>
           </div>
@@ -302,13 +302,14 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
-    async notifyUserIsInProject(member, project) {
+    async notifyUserIsInProject(origin, member, project) {
       try {
         await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${project.id}/user/${member.id}/notifyAddedInProject.json`);
         this.$notify({type: 'success', text: this.$t('notify-user-in-project-success')});
+        origin.explicitOriginalTarget.disabled = true;
       }
       catch(error) {
-        console.log(error);
+        window.console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
       }
     }

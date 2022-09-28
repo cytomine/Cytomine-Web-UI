@@ -322,6 +322,19 @@ export default {
       }
     }
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
+
+    if(!this.imageWrapper.style.isOpacityInitialized){
+      try{
+        let opacity = this.project.layersOpacity;
+        if(opacity!=null){
+          this.$store.commit(this.imageModule + 'setLayersOpacity', opacity);
+          this.$store.commit(this.imageModule + 'setNoTermOpacity', opacity);
+        }
+      }
+      catch(error){
+        console.log('Error during default opacity configuration fetching !');
+      }
+    }
   },
   mounted() {
     this.$eventBus.$on('addAnnotation', this.addAnnotationEventHandler);
