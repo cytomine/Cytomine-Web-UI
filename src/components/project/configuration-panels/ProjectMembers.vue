@@ -309,7 +309,7 @@ export default {
       try {
         await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${project.id}/user/${member.id}/notifyAddedInProject.json`);
         this.$notify({type: 'success', text: this.$t('notify-user-in-project-success')});
-        origin.explicitOriginalTarget.disabled = true;
+        origin.target.disabled = true;
       }
       catch(error) {
         window.console.log(error);
