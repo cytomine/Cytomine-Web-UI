@@ -415,6 +415,7 @@ notif-error-attached-file-deletion,Failed to delete attached file {filename},Une
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?
 opacity,Opacity,Opacité,Opacidad
 default-opacity, Default opacity, Opacité par défaut
+button-reset-opacity,Reset opacity,Réinitialiser l'opacité,Restablecer nivel de opacidad
 button-reset-opacities,Reset opacities,Réinitialiser les opacités,Restablecer niveles de opacidad
 preview-size,Preview size,Taille de l'aperçu,Tamaño de vista previa
 small,Small,Petit,Pequeña

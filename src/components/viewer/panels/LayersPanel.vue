@@ -64,6 +64,9 @@
       <label>{{ $t('layers-opacity') }}</label>
       <input class="slider is-fullwidth is-small" v-model="layersOpacity" step="0.05" min="0" max="1" type="range">
     </div>
+    <div class="has-text-right">
+      <button class="button is-small" @click="resetOpacity()">{{$t('button-reset-opacity')}}</button>
+    </div>
   </template>
 </div>
 </template>
@@ -246,6 +249,10 @@ export default {
 
     toggleLayerDrawOn(index) {
       this.$store.commit(this.imageModule + 'toggleLayerDrawOn', index);
+    },
+
+    resetOpacity() {
+      this.$store.commit(this.imageModule + 'setLayersOpacity', this.project.layersOpacity);
     },
 
     async fetchLayers() {
