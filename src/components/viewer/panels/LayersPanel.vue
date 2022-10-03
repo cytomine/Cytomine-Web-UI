@@ -348,6 +348,7 @@ export default {
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    this.resetOpacity();
   },
   beforeDestroy() {
     this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
