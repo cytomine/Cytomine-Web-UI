@@ -24,7 +24,7 @@
       </div>
     </div>
     <template v-if="selectedSoftware">
-      <b-message v-if="selectedSoftware.deprecated" type="is-info" has-icon icon-size="is-small">
+      <b-message v-if="selectedSoftware.deprecated" type="is-warning" has-icon icon-size="is-small">
         {{$t('notif-deprecated-software')}}
       </b-message>
       <table class="table is-fullwidth">

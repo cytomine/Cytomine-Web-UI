@@ -438,6 +438,7 @@ open-admin-session,Open admin session,Ouvrir une session admin,Abrir sesión de 
 close-admin-session,Close admin session,Fermer la session admin,Cerrar sesión de administrador
 admin,Admin,Admin,Admin
 admin-menu,Admin,Administration,Administración
+admin-warning, I confirm that I want to make this user an admin., Je confirme que je veux faire de cet utilisateur un administrateur., Confirmo que quiero hacer de este usuario un administrador.
 page-not-found,Page not found,Page non trouvée,Página no encontrada
 not-found,Not found,Introuvable,No encontrado
 not-found-error,The requested resource could not be loaded,La ressource demandée n'a pas pu être chargée,El recurso solicitado no se pudo cargar
