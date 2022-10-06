@@ -1105,3 +1105,11 @@ followers,Followers,Suiveurs
 button-adjust,Adjust,Ajuster
 button-adjust-slice,Adjust slice,Ajuster l'image
 button-adjust-image,Adjust image,Ajuster le plan
+lti,LTI,LTI
+lti-consumers,LTI Consumers, Clients LTI
+lti-consumer,LTI Consumer, Client LTI
+lti-key,Key,Clé
+lti-name,Name,Name
+lti-secret,Secret,Secret
+lti-username-parameter,Username Parameter,Paramètre du login
+lti-confirm-deletion,Are you sure you want to remove this row?,Êtes-vous sûr de vouloir supprimer cette ligne?
