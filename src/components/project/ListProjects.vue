@@ -317,11 +317,11 @@ export default {
 
     boundsFilters() {
       return [
-        {prop: 'numberOfImages', bounds: this.boundsImages},
-        {prop: 'membersCount', bounds: this.boundsMembers},
-        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations},
-        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations},
-        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations},
+        {prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages},
+        {prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers},
+        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
+        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations, max: this.maxNbJobAnnotations},
+        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
       ];
     },
 
@@ -351,10 +351,16 @@ export default {
           in: this.selectedTags.map(t => t.id).join()
         };
       }
-      for(let {prop, bounds} of this.boundsFilters) {
-        collection[prop] = {
-          lte: bounds[1]
-        };
+      for(let {prop, bounds, max} of this.boundsFilters) {
+        collection[prop] = {};
+        if (bounds[1]!==max) {
+          // if max bounds is the max possible value, do not set the filter in the request
+          // so that if an event (ex: algo creates an annotation) happens between the bounds request and the query request
+          // the image will not be skipped from the result
+          collection[prop] = {
+            lte: bounds[1]
+          };
+        }
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       return collection;
