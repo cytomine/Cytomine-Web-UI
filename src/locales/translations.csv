@@ -43,7 +43,7 @@ private-key,Private key,Clé privée
 regenerate-api-keys,Regenerate,Regénérer
 notif-success-keys-regenerated,API keys correctly updated,Clés API mises à jour avec succès
 notif-error-keys-not-regenerated,Error during the regeneration of API keys,Une erreur a empêché de regénérer les clés API
-login,Log in,Authentification
+login,Log into ULiège R&D Cytomine server,Authentification au serveur d'ULiège R&D Cytomine
 remember-me,Remember me,Se rappeler de moi
 notif-success-login,Welcome on Cytomine,Bienvenue sur Cytomine
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite
