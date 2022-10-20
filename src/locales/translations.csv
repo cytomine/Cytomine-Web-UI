@@ -1113,3 +1113,4 @@ lti-name,Name,Name
 lti-secret,Secret,Secret
 lti-username-parameter,Username Parameter,Paramètre du login
 lti-confirm-deletion,Are you sure you want to remove this row?,Êtes-vous sûr de vouloir supprimer cette ligne?
+select-unselect-layers,Select/Unselect all layers,Sélectionner/Désélectionner tous les calques

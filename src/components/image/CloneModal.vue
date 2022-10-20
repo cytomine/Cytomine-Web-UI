@@ -58,19 +58,32 @@
       <br/>
       <h2>{{$t('annotation-layers')}} : </h2>
 
+      <div class="columns">
+        <div class="column is-half">
+          <b-checkbox v-model="selectUnselectAllChoice">
+            {{$t('select-unselect-layers')}}
+          </b-checkbox>
+        </div>
+      </div>
+
       <table class="table is-fullwidth">
         <thead>
           <tr>
+            <th></th>
             <th>{{$t('name')}}</th>
             <th>{{$t('destination')}}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="layer in annotationLayersTransfert" :value="layer.source" :key="layer.source">
+            <td>
+              <b-checkbox v-model="selectedLayers[layer.source]">
+              </b-checkbox>
+            </td>
             <td>{{layer.label}}</td>
             <td>
               <b-field>
-                <b-select
+                <b-select :disabled="!selectedLayers[layer.source]"
                   size="is-small"
                   v-model="layer.destination"
                   :placeholder="$t('select-layer')"
@@ -123,11 +136,17 @@ export default {
       destinationAnnotationLayers:[],
       sourceAnnotationLayers:[],
       indexLayers: [],
+      selectUnselectAllChoice: false,
+      selectedLayers: {},
+      disabled: false
     };
   },
   methods: {
-    async clone() {
-      this.$emit('clone', this.selectedProject, this.cloneMetadata, this.cloneAnnot, this.cloneAnnotMetadata, this.annotationLayersTransfert);
+    isLayerSelected(layer) {
+      return this.selectedLayers[layer.source] && layer.destination!=null;
+    },
+    clone() {
+      this.$emit('clone', this.selectedProject, this.cloneMetadata, this.cloneAnnot, this.cloneAnnotMetadata, this.annotationLayersTransfert.filter(this.isLayerSelected));
     },
     async fetchLayers() {
       this.sourceAnnotationLayers = (await this.project.fetchUserLayers(this.currentImage.id)).array;
@@ -136,11 +155,18 @@ export default {
       this.destinationAnnotationLayers = (await (new Project({id: this.selectedProject})).fetchUserLayers()).array.sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
     },
     async fetchIndexLayers() {
+      console.log(this.currentImage.id);
       this.indexLayers = await this.currentImage.fetchAnnotationsIndex();
     },
     fullName(layer) {
       return fullName(layer);
     },
+    selectAll() {
+      Object.keys(this.selectedLayers).forEach(v => this.selectedLayers[v] = true);
+    },
+    unselectAll() {
+      Object.keys(this.selectedLayers).forEach(v => this.selectedLayers[v] = false);
+    }
   },
   computed : {
     project: get('currentProject/project'),
@@ -148,6 +174,7 @@ export default {
       this.sourceAnnotationLayers; // to force listening.
 
       let mergedLayers = this.indexLayers.map(t1 => ({...t1, ...this.sourceAnnotationLayers.find(t2 => t2.id === t1.user)}));
+      mergedLayers.forEach(v => this.$set(this.selectedLayers, v.id, false));
       return mergedLayers.sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 ).map(layer => ({source : layer.id, label :`${fullName(layer)} (${layer.countAnnotation || 0})`, destination:null} ));
     }
   },
@@ -156,6 +183,13 @@ export default {
       if(this.selectedProject == null) this.destinationAnnotationLayers = [];
       else {
         this.fetchDestinationLayers();
+      }
+    },
+    selectUnselectAllChoice(value) {
+      if (value) {
+        this.selectAll();
+      } else {
+        this.unselectAll();
       }
     }
   },
