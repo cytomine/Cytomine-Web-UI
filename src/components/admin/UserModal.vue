@@ -61,10 +61,27 @@
     </b-field>
 
     <b-field horizontal v-if="isChangingRoleToAdmin()">
-      <b-checkbox v-model="adminConfirm">
-        {{$t('admin-warning')}}
+      <b-message type="is-warning" has-icon size="is-small">
+        <b-checkbox v-model="adminConfirm">
+          {{$t('public-warning')}}
+        </b-checkbox>
+      </b-message>
+    </b-field>
+
+
+    <b-field :label="$t('public')" horizontal>
+      <b-checkbox v-model="selectedPublic">
       </b-checkbox>
     </b-field>
+
+    <b-field horizontal v-if="isChangingRoleToPublic()">
+      <b-message type="is-warning" has-icon size="is-small">
+        <b-checkbox v-model="publicConfirm">
+          {{$t('public-warning')}}
+        </b-checkbox>
+      </b-message>
+    </b-field>
+
 
     <b-field :label="$t('language')" horizontal>
       <b-select v-model="internalUser['language']">
@@ -74,18 +91,18 @@
       </b-select>
     </b-field>
 
-    <b-field :label="$t('developer-mode')" horizontal>
-      <b-switch v-model="internalUser.isDeveloper" class="switch">
-        <template v-if="internalUser.isDeveloper">{{$t('yes')}}</template>
-        <template v-else>{{$t('no')}}</template>
-      </b-switch>
-    </b-field>
+<!--    <b-field :label="$t('developer-mode')" horizontal>-->
+<!--      <b-switch v-model="internalUser.isDeveloper" class="switch">-->
+<!--        <template v-if="internalUser.isDeveloper">{{$t('yes')}}</template>-->
+<!--        <template v-else>{{$t('no')}}</template>-->
+<!--      </b-switch>-->
+<!--    </b-field>-->
 
     <template #footer>
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any() || !isAdminConfirmed()">
+      <button class="button is-link" :disabled="errors.any() || !isAdminConfirmed() || !isPublicConfirmed()">
         {{$t('button-save')}}
       </button>
     </template>
@@ -114,8 +131,10 @@ export default {
       internalUser: {},
       rolesWithIds: null,
       selectedRole: defaultRole,
+      selectedPublic: false,
       displayErrors: false,
       adminConfirm: false,
+      publicConfirm: false,
       languages: [
         {value: 'EN', name:'English'},
         {value: 'FR', name:'Français'},
@@ -150,6 +169,9 @@ export default {
     selectedRole() {
       this.adminConfirm = !this.isChangingRoleToAdmin();
     },
+    selectedPublic() {
+      this.publicConfirm = !this.isChangingRoleToPublic();
+    },
     active(val) {
       if(val) {
         if(!this.rolesWithIds) {
@@ -159,6 +181,7 @@ export default {
         }
         this.internalUser = this.user ? this.user.clone() : new User();
         this.selectedRole = this.user ? this.user.role : defaultRole;
+        this.selectedPublic = this.user ? this.user.public : false;
         this.internalUser.language = this.user ? this.user.language : defaultLanguage.value;
         this.displayErrors = false;
         this.adminConfirm = false;
@@ -170,13 +193,21 @@ export default {
       let currentRole = this.user ? this.user.role : defaultRole;
       return this.isNotAdmin(currentRole) && !this.isNotAdmin(this.selectedRole);
     },
+    isChangingRoleToPublic() {
+      return this.isNotPublic(this.user) && this.selectedPublic;
+    },
     isNotAdmin(role){
       return role != 'ROLE_ADMIN' && role != 'ROLE_SUPER_ADMIN';
+    },
+    isNotPublic(user){
+      return user==null || !user.publicUser;
     },
     isAdminConfirmed(){
       return this.adminConfirm || !this.isChangingRoleToAdmin();
     },
-    
+    isPublicConfirmed(){
+      return this.publicConfirm || !this.isChangingRoleToPublic();
+    },
     async save() {
       let result = await this.$validator.validateAll();
       if(!result) {
@@ -186,6 +217,7 @@ export default {
       let labelTranslation = this.editionMode ? 'update' : 'creation';
 
       try {
+        this.internalUser.publicUser = this.selectedPublic;
         await this.internalUser.save();
         if(!this.editionMode || this.selectedRole !== this.user.role) {
           await this.internalUser.defineRole(this.idRole);

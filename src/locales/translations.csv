@@ -1081,12 +1081,17 @@ no-storage,No storage,Pas d'espace de stockage
 owner, Owner, Propriétaire
 notif-success-configuration-update,Configurations successfully updated,La configuration a bien été mis à jour
 notif-error-configuration-update,Failed to update configurations,Une erreur a empêché de mettre à jour des configurations
+logo, Logo, Logo, Logo
 top-menu-color, Top menu color, Couleur du menu supérieur, Color del menú superior
 top-menu-color-description,"Set the color of the top banner","Renseignez ici la couleur de la bannière supérieur de Cytomine", "Establecer el color del menú superior"
 top-menu-color-instruction,"You can set from 140 colors ('red', 'cyan'). By encoding an hexadecimal code ('#FF8C00'), you will be able to set more colors.","Choisissez parmi 140 couleurs ('red', 'cyan'). En renseignant le code hexadecimal ('#FF8C00'), vous pouvez choisir plus précisément la couleur.", "Elija entre 140 colores ('rojo', 'cian'). Indicando el código hexadecimal ('#FF8C00'), puede elegir el color con mayor precisión."
+top-menu-color-list,Color List,Liste des couleurs,Lista de colores
 top-font-menu-color, Top font menu color, Couleur de la police du menu supérieur, Color de fuente del menú superior
 top-font-menu-color-description,"Set the font color of the top banner","Renseignez ici la couleur de la police de la bannière supérieur de Cytomine", "Establecer el color de fuente del menú superior"
 update-color,Update color,Modifier la couleur,Actualizar color
+logo-description, Upload the banner top left logo. The size must be less than 250 pixels per 250 pixels, Upload du logo à gauche de la bannière. La taille doit être infèrieur à 250 pixels par 250 pixels
+logo-upload-error-message, Image size must be less than 250 pixels per 250 pixels, La taille de l'image doit être infèrieur à 250 pixels par 250 pixels
+logo-upload-svg-error-message, Image size must be less than 7.5 Mo, La taille de l'image doit être infèrieur à 7.5 Mo
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
@@ -1114,3 +1119,7 @@ lti-secret,Secret,Secret
 lti-username-parameter,Username Parameter,Paramètre du login
 lti-confirm-deletion,Are you sure you want to remove this row?,Êtes-vous sûr de vouloir supprimer cette ligne?
 select-unselect-layers,Select/Unselect all layers,Sélectionner/Désélectionner tous les calques
+public,Public,Public
+only-public-user,Only include public user,N'inclure que les utilisateurs public
+public-warning, This will define this user as a public user. Everyone with the connection token will be able to log in this Cytomine instance. Are you sure to set this user as a public one ?, Cette action va définir l'utilisateur comme étant public. Quiconque en possession du jeton de connexion pourra s'authentifier dans cette instance Cytomine. Êtes vous sûr de définir cet utilisateur comme étant public ?
+button-token,Token,Clé

@@ -49,6 +49,7 @@ export default {
   watch: {
     '$route.path': {
       handler() {
+        this.isActive = false;
         this.checkItemSelected();
         // required so dropdown doesn't remain open on route change.
         document.activeElement.blur();

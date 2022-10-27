@@ -37,7 +37,7 @@
         <i class="fas fa-list-alt"></i>
         {{ $t('projects') }}
       </router-link>
-      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" @mouseover.native="mouseOver('storage')" @mouseleave.native="mouseLeave('storage')" :style="itemStyles.storage">
+      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item" @mouseover.native="mouseOver('storages')" @mouseleave.native="mouseLeave('storages')" :style="itemStyles.storages">
         <i class="fas fa-download"></i>
         {{ $t('storage') }}
       </router-link>
@@ -45,7 +45,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link v-show="algoEnabled" to="/software" class="navbar-item" @mouseover.native="mouseOver('software')" @mouseleave.native="mouseLeave('software')" :style="itemStyles.software">
+      <router-link v-show="algoEnabled" to="/software" class="navbar-item" @mouseover.native="mouseOver('software')" @mouseleave.native="mouseLeave('software')" :style="itemStyles.algorithm">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
@@ -149,9 +149,9 @@ export default {
       SSOEnabled: constants.SSO_ENABLED,
       aboutModal: null,
       activeColor: '#f5f5f5',
-      darkerActiveColor: '#ffffff',
+      darkerActiveColor: '#e8e8e8',
       activeFontColor: '#363636',
-      itemStyles: {workspace: {}, projects: {}, storages: {}, storage: {}, ontology: {}, software: {}, admin: {}},
+      itemStyles: {workspace: {}, projects: {}, storages: {}, storage: {}, ontology: {}, algorithm: {}, admin: {}},
       isFetching: true,
       logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
       //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
@@ -205,10 +205,15 @@ export default {
     },
     activeSelectedItem(){
       this.initItemsStyles();
+      console.log('this.$route', this.$route.path);
       let item = this.$route.path.split('/')[1];
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
-        this.setItemColor(item, this.darkerActiveColor);
+        if (item === 'storage') { // if user has 1 storage, route path is /storage but menu option is /storages
+          this.setItemColor('storages', this.darkerActiveColor);
+        } else {
+          this.setItemColor(item, this.darkerActiveColor);
+        }
       }
     },
     initItemsStyles(){
@@ -217,7 +222,8 @@ export default {
       }
     },
     setItemColor(item, color){
-      this.itemStyles[item].backgroundColor = color;
+      console.log(this.itemStyles);
+      if(this.itemStyles[item]) this.itemStyles[item].backgroundColor = color;
     },
     // ---
 
@@ -294,7 +300,7 @@ export default {
         }
       }
       catch(error) {
-        // no config defined
+        this.logo = require('@/assets/logo.svg');
       }
       this.initItemsStyles();
       this.activeSelectedItem();

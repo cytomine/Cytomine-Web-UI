@@ -16,7 +16,11 @@
 <template>
 <div>
   <h2>{{$t('welcome-message')}}</h2>
-  <cytomine-quill-editor v-model="welcomeConfig.value" />
+  <div class="columns">
+    <div class="column is-full" style="padding-left:3.5em;padding-bottom: 3.5em;">
+      <cytomine-quill-editor v-model="welcomeConfig.value" />
+    </div>
+  </div>
 <!--  <p class="has-text-right">-->
 <!--    <button class="button is-link" @click="save">{{$t('button-save')}}</button>-->
 <!--  </p>-->
@@ -48,7 +52,7 @@
             </div>
             <div class="media-content">
               {{$t('top-menu-color-description')}} <br/>
-              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">{{$t('top-menu-color-list')}}</a>)
             </div>
           </div>
         </section>
@@ -81,7 +85,7 @@
             </div>
             <div class="media-content">
               {{$t('top-font-menu-color-description')}} <br/>
-              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">Color list</a>)
+              {{$t('top-menu-color-instruction')}} (<a href="https://www.w3schools.com/colors/colors_names.asp" target="_blank">{{$t('top-menu-color-list')}}</a>)
             </div>
           </div>
         </section>
@@ -89,63 +93,119 @@
     </div>
   </div>
 
+
+  <div class="columns" style="height: 6.5em;">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('logo')}}</h3>
+    </div>
+    <div class="column is-one-quarter has-text-centered">
+      <div class="upload-container">
+        <div v-if="!fetching">
+          <b-upload v-model="selectedImage" type="is-link" drag-drop :disabled="logoConfig.value != '' ? true : false" >
+            <div class="content has-text-centered b-upload">
+              <template v-if="!logoConfig.value">
+                <p><i class="fas fa-upload fa-3x"></i></p>
+                <p>{{$t('choose-file-or-drop')}}</p>
+              </template>
+              <div v-else>
+                <div class="cross" @click="resetLogoConfig">X</div>
+                <img :src="logoConfig.value" id="upload_logo" alt="Logo" class="logo"/>
+              </div>
+            </div>
+          </b-upload>
+        </div>
+        <div v-if="!isValidImage()">
+          <b-field
+            type="is-danger"
+            :message="$t('logo-upload-error-message')">
+          </b-field>
+        </div>
+        <div v-if="!isValidSVG()">
+          <b-field
+            type="is-danger"
+            :message="$t('logo-upload-svg-error-message')">
+          </b-field>
+        </div>
+      </div>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('logo-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+
   <hr/>
-  <h2>{{ $t('lti') }}</h2>
 
-  <h3 class="has-text-weight-bold lti-consumer">{{ $t('lti-consumers') }}</h3>
-  <button class="button is-small add-prop is-marginless"  @click="ltiConsumers.push({key:'', name:'',secret:'',usernameParameter:''})" key="showForm">
-    {{$t('button-add')}}
-  </button>
-  <div style="margin-top: 1em;" class="columns" v-for="(consumer, index) in ltiConsumers">
-    <div class="column is-one-fifth" style="padding-left:3.5em;">
+  <div v-if="ltiEnabled">
+    <h2>{{ $t('lti') }}</h2>
 
-      <span class="has-text-weight-bold">{{$t('lti-consumer') + ' ' + index}} </span>
+    <h3 class="has-text-weight-bold lti-consumer">{{ $t('lti-consumers') }}</h3>
+    <button class="button is-small add-prop is-marginless"  @click="ltiConsumers.push({key:'', name:'',secret:'',usernameParameter:''})" key="showForm">
+      {{$t('button-add')}}
+    </button>
+    <div style="margin-top: 1em;" class="columns" v-for="(consumer, index) in ltiConsumers">
+      <div class="column is-one-fifth" style="padding-left:3.5em;">
 
-<!--      <button class="edit is-small" :title="$t('button-edit')" @click="editedLTI=index">-->
-<!--        <i class="fas fa-pencil-alt"></i>-->
-<!--      </button>-->
-      <button class="delete is-small" :title="$t('button-delete')" @click="confirmLTIConsumerDeletion(index)"></button>
-<!--      <button class="button is-link" @click="ltiConsumers.splice(index, 1)">{{$t('button-remove')}}</button>-->
+        <span class="has-text-weight-bold">{{$t('lti-consumer') + ' ' + index}} </span>
 
-    </div>
+        <!--      <button class="edit is-small" :title="$t('button-edit')" @click="editedLTI=index">-->
+        <!--        <i class="fas fa-pencil-alt"></i>-->
+        <!--      </button>-->
+        <button class="delete is-small" :title="$t('button-delete')" @click="confirmLTIConsumerDeletion(index)"></button>
+        <!--      <button class="button is-link" @click="ltiConsumers.splice(index, 1)">{{$t('button-remove')}}</button>-->
 
-    <div class="column is-one-fifth" style="padding-left:3.5em;">
-      <div class="column is-one-half" style="padding-left:3.5em;">
-        {{$t('lti-key')}}
       </div>
-      <div class="column is-one-half">
-        <b-input v-model="ltiConsumers[index].key" placeholder=""/>
-<!--        <span v-if="editedLTI!=index" >{{ltiConsumers[index].key}}</span>-->
-      </div>
-    </div>
 
-    <div class="column is-one-fifth" style="padding-left:3.5em;">
-      <div class="column is-one-half" style="padding-left:3.5em;">
-        {{$t('lti-name')}}
+      <div class="column is-one-fifth" style="padding-left:3.5em;">
+        <div class="column is-one-half" style="padding-left:3.5em;">
+          {{$t('lti-key')}}
+        </div>
+        <div class="column is-one-half">
+          <b-input v-model="ltiConsumers[index].key" placeholder=""/>
+          <!--        <span v-if="editedLTI!=index" >{{ltiConsumers[index].key}}</span>-->
+        </div>
       </div>
-      <div class="column is-one-half">
-        <b-input v-model="ltiConsumers[index].name" placeholder=""/>
-      </div>
-    </div>
 
-    <div class="column is-one-fifth" style="padding-left:3.5em;">
-      <div class="column is-one-half" style="padding-left:3.5em;">
-        {{$t('lti-secret')}}
+      <div class="column is-one-fifth" style="padding-left:3.5em;">
+        <div class="column is-one-half" style="padding-left:3.5em;">
+          {{$t('lti-name')}}
+        </div>
+        <div class="column is-one-half">
+          <b-input v-model="ltiConsumers[index].name" placeholder=""/>
+        </div>
       </div>
-      <div class="column is-one-half">
-        <b-input v-model="ltiConsumers[index].secret" placeholder=""/>
-      </div>
-    </div>
 
-    <div class="column is-one-fifth" style="padding-left:3.5em;">
-      <div class="column is-one-half" style="padding-left:3.5em;">
-        {{$t('lti-username-parameter')}}
+      <div class="column is-one-fifth" style="padding-left:3.5em;">
+        <div class="column is-one-half" style="padding-left:3.5em;">
+          {{$t('lti-secret')}}
+        </div>
+        <div class="column is-one-half">
+          <b-input v-model="ltiConsumers[index].secret" placeholder=""/>
+        </div>
       </div>
-      <div class="column is-one-half">
-        <b-input v-model="ltiConsumers[index].usernameParameter" placeholder=""/>
+
+      <div class="column is-one-fifth" style="padding-left:3.5em;">
+        <div class="column is-one-half" style="padding-left:3.5em;">
+          {{$t('lti-username-parameter')}}
+        </div>
+        <div class="column is-one-half">
+          <b-input v-model="ltiConsumers[index].usernameParameter" placeholder=""/>
+        </div>
       </div>
     </div>
   </div>
+
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
@@ -154,7 +214,7 @@
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import {Configuration} from 'cytomine-client';
+import {Cytomine, Configuration} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import ColorModal from './ColorModal';
 
@@ -163,17 +223,71 @@ export default {
   components: {CytomineQuillEditor},
   data() {
     return {
+      fetching: true,
       ltiConsumers: [],
+      ltiEnabled: false,
       editedLTI: null,
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
+      logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'}),
+      isLogoConfigPresent: false,
+      selectedImage: null,
+      selectedImageSize: {width: 0, height: 0},
       ltiConsumersConfig: new Configuration({key: constants.CONFIG_KEY_LTI_CONSUMERS, value: '[]', readingRole: 'all'}),
     };
   },
+  watch: {
+    selectedImage(file) {
+      if (file) {
+
+        let reader = new FileReader();
+
+        // Read file and return the content as base 64 encoded string
+        reader.readAsDataURL(file);
+        reader.onload = evt => {
+
+          let img = new Image();
+          img.onload = () => {
+            this.selectedImageSize.width = img.width;
+            this.selectedImageSize.height = img.height;
+          };
+
+          let encodedFile = evt.target.result;
+          this.logoConfig.value = encodedFile;
+          img.src = encodedFile;
+        };
+
+      }
+    }
+  },
   methods: {
+    isSVG(){
+      return this.selectedImage.type == 'image/svg+xml';
+    },
+    isValidSVG(){
+      if(this.selectedImage && this.isSVG()){
+        return (this.selectedImage.size <= 7500);
+      }
+      return true;
+    },
+    isValidImage(){
+      if(this.selectedImage && !this.isSVG()){
+        return (this.selectedImageSize.width <= 250 && this.selectedImageSize.height <= 250);
+      }
+      return true;
+    },
     async save() {
       try {
+        this.mailModeConfirm = false;
+        if(!this.isValidSVG()) {
+          this.$notify({type: 'error', text: this.$t('logo-upload-svg-error-message')});
+          throw new TypeError(this.$t('logo-upload-svg-error-message'));
+        }
+        else if(!this.isValidImage()) {
+          this.$notify({type: 'error', text: this.$t('logo-upload-error-message')});
+          throw new TypeError(this.$t('logo-upload-error-message'));
+        }
         if(!this.welcomeConfig.value) {
           await this.welcomeConfig.delete();
         }
@@ -192,6 +306,14 @@ export default {
         else if (this.topFontMenuColorConfig.value) {
           await this.topFontMenuColorConfig.save();
         }
+        if(!this.logoConfig.value && this.isLogoConfigPresent) {
+          this.isLogoConfigPresent = false;
+          await this.logoConfig.delete();
+        }
+        else if (this.logoConfig.value) {
+          this.isLogoConfigPresent = true;
+          await this.logoConfig.save();
+        }
         if((!this.ltiConsumers || this.ltiConsumers.length===0) && this.ltiConsumersConfig.id!=null) {
           await this.ltiConsumersConfig.delete();
         }
@@ -205,7 +327,7 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-welcome-message-update')});
+        this.$notify({type: 'error', text: this.$t('notif-error-configuration-update')});
       }
     },
     openModal(props, events) {
@@ -241,6 +363,11 @@ export default {
       };
       this.openModal(props, events);
     },
+    resetLogoConfig(event) {
+      event.preventDefault();
+      this.logoConfig.value = '';
+      this.selectedImage = null;
+    },
     confirmLTIConsumerDeletion(index) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
@@ -259,6 +386,14 @@ export default {
   },
   async created() {
     try {
+      let {ltiEnabled} = await Cytomine.instance.ping();
+      this.ltiEnabled = ltiEnabled;
+    }
+    catch(error) {
+      this.ltiEnabled = false;
+    }
+
+    try {
       await this.welcomeConfig.fetch();
     }
     catch(error) {
@@ -272,17 +407,36 @@ export default {
       // ignored
     }
     try {
+      await this.logoConfig.fetch();
+      if(this.logoConfig.value){
+        this.isLogoConfigPresent = true;
+      }
+    }
+    catch(error) {
+      // ignored
+    }
+
+    try {
       await this.ltiConsumersConfig.fetch();
       this.ltiConsumers = JSON.parse(this.ltiConsumersConfig.value);
     }
     catch(error) {
       // no consumers definitions
     }
+    this.fetching = false;
   }
 };
 </script>
 
 <style scoped>
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+}
+
 >>> .cytomine-quill-editor {
   min-height: 25em !important;
   max-height: 25em !important;
@@ -296,6 +450,31 @@ export default {
   margin-top: 0.75em;
   width: 2.25em;
 }
+
+.b-upload{
+  padding: 0em 0.5em 0em 0.5em;
+  width: 20em;
+  height: 6em;
+  opacity: 1;
+}
+
+.upload .upload-draggable.is-disabled {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.logo{
+  margin-top: 0.5em;
+  margin-left: 1.5em;
+  max-width : 30%;
+}
+
+.cross{
+  float: right;
+  transform: scale(1.5, 1.2);
+  cursor: pointer;
+}
+
 button.edit {
   height: 16px;
   width: 16px;

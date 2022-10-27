@@ -43,7 +43,7 @@
       <div class="column">
         <b-collapse :open="filtersOpened">
           <div class="filters columns">
-            <div class="column filter">
+            <div class="column filter is-one-quarter">
               <div class="filter-label">
                 {{$t('status')}}
               </div>
@@ -51,6 +51,11 @@
                 <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
                                       :searchable="false" />
               </div>
+            </div>
+            <div class="column filter is-one-quarter" style="padding: 2.5rem">
+              <b-checkbox v-model="onlyPublicUser">
+                {{$t('only-public-user')}}
+              </b-checkbox>
             </div>
           </div>
         </b-collapse>
@@ -67,7 +72,7 @@
       >
         <template #default="{row: user}">
           <b-table-column field="username" :label="$t('username')" sortable width="100">
-            <username :user="user" :online="user.online" :displayFullName="false" />
+            <username :user="user" :online="user.online" :displayFullName="false" /> <span v-if="user.publicUser" class="icon"><i class="fas fa-users"></i></span>
           </b-table-column>
 
           <b-table-column field="fullName" :label="$t('name')" sortable width="150">
@@ -78,10 +83,10 @@
             <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
           </b-table-column>
 
-          <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">
-            <span class="tag is-success" v-if="user.apiEnabled">{{$t('api-enabled')}}</span>
-            <span class="tag is-danger" v-else>{{$t('api-disabled')}}</span>
-          </b-table-column>
+<!--          <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">-->
+<!--            <span class="tag is-success" v-if="user.apiEnabled">{{$t('api-enabled')}}</span>-->
+<!--            <span class="tag is-danger" v-else>{{$t('api-disabled')}}</span>-->
+<!--          </b-table-column>-->
 
 
           <b-table-column field="email" :label="$t('email')" sortable width="150">
@@ -121,6 +126,9 @@
               <button v-else class="button is-success is-small" @click="unlock(user)">
                 {{$t('button-unlock')}}
               </button>
+              <button v-if="user.publicUser" class="button is-link is-small" @click="generateToken(user)">
+                {{$t('button-token')}}
+              </button>
             </div>
           </b-table-column>
         </template>
@@ -146,7 +154,7 @@
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection} from 'cytomine-client';
+import {Cytomine, UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
@@ -179,6 +187,7 @@ export default {
       offlineStatus: this.$t('offline'),
       availableStatus: [],
       selectedStatus: [],
+      onlyPublicUser: false,
     };
   },
   computed: {
@@ -195,6 +204,12 @@ export default {
         withRoles: true
       });
       collection['onlineFilter'] = includeOnlineAndOffline ? null : (includeOnline? true : (includeOffline? false : null));
+
+      if (this.onlyPublicUser) {
+        collection['publicUser'] = {
+          equals: true
+        }
+      }
 
       if(this.searchString) {
         collection['fullName'] = {
@@ -236,6 +251,21 @@ export default {
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
+      }
+    },
+    async generateToken(user) {
+      try {
+        let token = await Cytomine.instance.token(user.username, -1);
+        this.$buefy.dialog.alert({
+          title: this.$t('token'),
+          message: token,
+          type: 'is-info',
+          confirmText: this.$t('button-close')
+        });
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
       }
     },
     startUserCreation() {

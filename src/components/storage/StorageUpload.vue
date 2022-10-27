@@ -129,9 +129,17 @@
             </progress>
 
             <div class="buttons">
-              <b-upload :value="plainFiles" type="is-link" multiple drag-drop @input="filesChange">
-                <a class="button is-success">{{$t('add-files')}}</a>
-              </b-upload>
+              <div>
+                <b-upload :value="plainFiles" type="is-link" multiple drag-drop @input="filesChange"> <!-- webkitdirectory -->
+                  <a class="button is-success">{{$t('add-files')}}</a>
+                </b-upload>
+              </div>
+              <div>
+                <b-upload :value="plainFiles" type="is-link" multiple drag-drop webkitdirectory @input="filesChange"> <!--  -->
+                  <a class="button is-success">{{$t('add-directories')}}</a>
+                </b-upload>
+              </div>
+
               <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">
                 {{$t('start-upload')}}
               </button>
