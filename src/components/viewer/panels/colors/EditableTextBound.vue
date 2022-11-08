@@ -1,12 +1,12 @@
 <template>
   <div>
     (
-    <span v-if="!editing" @click="editing = true">{{ min }}</span>
+    <span v-if="!editing" @click="editing = true">{{ bounds.min }}</span>
     <span v-else>
       <input class="input" v-model="minVal" v-on:keyup.enter="setBounds(minVal, maxVal)"/>
     </span>
     -
-    <span v-if="!editing" @click="editing = true">{{ max }}</span>
+    <span v-if="!editing" @click="editing = true">{{ bounds.max }}</span>
     <span v-else>
       <input class="input" v-model="maxVal" v-on:keyup.enter="setBounds(minVal, maxVal)"/>
     </span>
@@ -18,21 +18,32 @@
 export default {
   name: 'editable-text-bound',
   props: {
-    min: Number,
-    max: Number,
+    bounds: Object,
+    defaultBounds: Object,
   },
   data() {
     return {
       editing: false,
-      minVal: this.min,
-      maxVal: this.max,
+      minVal: this.bounds.min,
+      maxVal: this.bounds.max,
     };
   },
   methods: {
     setBounds(min, max) {
       this.editing = false;
-      min = Number(min);
-      max = Number(max);
+
+      min = Math.max(this.defaultBounds.min, Math.min(Number(min), this.defaultBounds.max));
+      max = Math.min(this.defaultBounds.max, Math.max(Number(max), this.defaultBounds.min));
+
+      if (min > max) {
+        this.minVal = this.bounds.min;
+        this.maxVal = this.bounds.max;
+        return;
+      }
+
+      this.minVal = min;
+      this.maxVal = max;
+
       this.$emit('setBounds', {min, max});
     },
   },

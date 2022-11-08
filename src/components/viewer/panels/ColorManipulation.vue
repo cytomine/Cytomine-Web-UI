@@ -125,8 +125,8 @@
             </td>
             <td class="bounds-column">
               <editable-text-bound
-                :min="mc.bounds.min"
-                :max="mc.bounds.max"
+                :bounds="mc.bounds"
+                :default-bounds="defaultBounds"
                 @setBounds="setApparentChannelBounds(mc.index, $event)"
               />
             </td>
