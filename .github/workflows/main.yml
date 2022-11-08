@@ -1,0 +1,37 @@
+name: Docker Image BUILD AND PUSH
+
+on:
+  push:    
+   branches:
+   - master
+   - release/*
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  buildAndpush:
+
+    runs-on: ubuntu-latest
+    env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+
+    steps:
+    - id: commit
+      uses: pr-mpt/actions-commit-hash@v2
+    - name: Docker Login
+      uses: docker/login-action@v2.1.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: |
+        docker build --no-cache . --file scripts/docker/web-ui/Dockerfile --tag seapapa/web_ui:${{ steps.commit.outputs.short }}
+        docker tag seapapa/web_ui:${{ steps.commit.outputs.short }} seapapa/web_ui:latest
+
+    - name: Docker push
+      run: | 
+        docker push seapapa/web_ui:${{ steps.commit.outputs.short }}
+        docker push seapapa/web_ui:latest
