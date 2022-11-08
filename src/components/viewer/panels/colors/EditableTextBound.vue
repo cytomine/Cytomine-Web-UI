@@ -53,6 +53,6 @@ export default {
 <style scoped>
 .input {
   font-size: 0.7rem;
-  width: 2rem;
+  width: 2.8rem;
 }
 </style>

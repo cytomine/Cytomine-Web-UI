@@ -512,11 +512,11 @@ th, >>> td {
 }
 
 >>> .name-column {
-  width: 60%;
+  width: 50%;
 }
 
 >>> .bounds-column {
-  width: 40%;
+  width: 50%;
   text-align: right;
 }
 
