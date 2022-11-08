@@ -35,7 +35,7 @@ export default {
       min = Math.max(this.defaultBounds.min, Math.min(Number(min), this.defaultBounds.max));
       max = Math.min(this.defaultBounds.max, Math.max(Number(max), this.defaultBounds.min));
 
-      if (min > max) {
+      if (min > max || isNaN(min) || isNaN(max)) {
         this.minVal = this.bounds.min;
         this.maxVal = this.bounds.max;
         return;
