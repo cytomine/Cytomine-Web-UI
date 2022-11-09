@@ -49,9 +49,9 @@
     "vuex": "^3.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.14",
-    "@vue/cli-plugin-eslint": "^4.5.14",
-    "@vue/cli-service": "^4.5.14",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "babel-eslint": "^10.1.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^6.7.2",
