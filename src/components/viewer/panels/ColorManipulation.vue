@@ -128,6 +128,7 @@
                 :bounds="mc.bounds"
                 :default-bounds="defaultBounds"
                 @setBounds="setApparentChannelBounds(mc.index, $event)"
+                @editing="toggleLookUpTableDetailsIfNotVisible(mc.index)"
               />
             </td>
             <td class="checkbox-column">
@@ -433,6 +434,13 @@ export default {
     },
     isVisibleLookUpTableDetails(indexApparentChannel) {
       return this.visibleLookUpTableDetails.indexOf(indexApparentChannel) >= 0;
+    },
+    toggleLookUpTableDetailsIfNotVisible(indexApparentChannel) {
+      if (this.isVisibleLookUpTableDetails(indexApparentChannel)) {
+        return;
+      }
+
+      this.toggleLookUpTableDetails(indexApparentChannel);
     },
 
     /* Helpers */

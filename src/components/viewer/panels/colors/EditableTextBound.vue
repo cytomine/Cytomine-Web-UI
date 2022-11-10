@@ -1,12 +1,12 @@
 <template>
   <div>
     (
-    <span v-if="!editing" @click="editing = true">{{ bounds.min }}</span>
+    <span v-if="!editing" @click="editing = true; $emit('editing');">{{ bounds.min }}</span>
     <span v-else>
       <input class="input" v-model="minVal" v-on:keyup.enter="setBounds(minVal, maxVal)"/>
     </span>
     -
-    <span v-if="!editing" @click="editing = true">{{ bounds.max }}</span>
+    <span v-if="!editing" @click="editing = true; $emit('editing');">{{ bounds.max }}</span>
     <span v-else>
       <input class="input" v-model="maxVal" v-on:keyup.enter="setBounds(minVal, maxVal)"/>
     </span>
