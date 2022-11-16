@@ -214,7 +214,7 @@ export default {
       this.images = (await collection.fetchAll()).array; // TODO: should not load full array, should be done with backend
     },
     async fetchTags() {
-      this.availableTags = (await TagCollection.fetchAll()).array;
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
       console.log('availableTags', this.availableTags);
     },
     async fetchTerms() {
