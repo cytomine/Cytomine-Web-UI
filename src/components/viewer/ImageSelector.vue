@@ -39,6 +39,17 @@
 
             <b-collapse :open="filtersOpened">
               <div class="filters">
+
+                <template v-for="score in scores" >
+                  <div class="filter-label" :key="score.id">
+                    {{score.name}}
+                  </div>
+                  <div class="filter-body" :key="score.id">
+                    <cytomine-multiselect @input="event => changeValue()" v-model="selectedScoreValue[score.id]" :options="[{id: -1, value: 'No value'}, ...score.values]"
+                                          label="value" track-by="id" :multiple="false" :allPlaceholder="$t('all')" />
+                  </div>
+                </template>
+
                 <div class="filter-label">
                   {{$t('image')}} {{$t('tags')}}
                 </div>
@@ -71,22 +82,6 @@
                                         label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
                 </div>
 
-                <div class="columns">
-
-                  <b-field horizontal :label="score.name" v-for="score in scores" :key="score.id">
-                    <b-select size="is-small" v-model="selectedScoreValue[score.id]" @input="event => changeValue()">
-                      <option :value="null">
-
-                      </option>
-                      <option :value="-1">
-                        No value
-                      </option>
-                      <option v-for="scoreValue in score.values" :value="scoreValue.value" :key="scoreValue.id">
-                        {{ scoreValue.value }}
-                      </option>
-                    </b-select>
-                  </b-field>
-                </div>
               </div>
             </b-collapse>
 
@@ -198,12 +193,12 @@ export default {
       }
 
       for (const [key, value] of Object.entries(this.selectedScoreValue)) {
-        console.log(`${key}: ${value}`);
+        console.log(`${key}: ${value.value}`);
         console.log(filtered);
-        if (value!=null && value!==-1) {
-          filtered =  filtered.filter(image => image['score' + key]!=null && image['score' + key]==value );
+        if (value.id!=null && value.id!==-1) {
+          filtered =  filtered.filter(image => image['score' + key]!=null && image['score' + key]==value.value );
         }
-        else if(value===-1) {
+        else if(value.id===-1) {
           filtered =  filtered.filter(image => image['score' + key]==null );
         }
       }
@@ -235,7 +230,7 @@ export default {
   },
   methods: {
     changeValue() {
-
+      this.fetchImages();
     },
     async addImage(image) {
       try {
@@ -281,7 +276,7 @@ export default {
       this.images = (await collection.fetchAll()).array; // TODO: should not load full array, should be done with backend
     },
     async fetchTags() {
-      this.availableTags = (await TagCollection.fetchAll()).array;
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
       console.log('availableTags', this.availableTags);
     },
     async fetchTerms() {
