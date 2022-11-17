@@ -241,7 +241,14 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-switch-back-as-real-user')});
+        if (error.message.indexOf('404')!==-1) {
+          // OP-1596 ; strange bug where the redirect location is an url giving a 404
+          await this.$store.dispatch('currentUser/fetchUser');
+          this.$router.push('/');
+        }
+        else {
+          this.$notify({type: 'error', text: this.$t('notif-error-failed-to-switch-back-as-real-user')});
+        }
       }
     },
 
