@@ -36,27 +36,45 @@
     <button class="button is-small" @click="unlink()">{{$t('button-unlink')}}</button>
   </div>
 
-  <template v-if="otherGroups.length || otherSoloImages.length">
-    <p v-if="linkedIndexes">{{$t('link-other-images-to-this-group')}}</p>
-    <p v-else>{{$t('link-view-with')}}</p>
-    <p v-for="{images, index, number} in otherGroups" :key="`group${number}`">
-      <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, index)">
-        {{$t('link-group', {number})}}
-        <ul class="group">
-          <li v-for="indexImage in images" :key="indexImage">
-            <i class="fas fa-caret-right"></i>
-            {{$t('viewer-view', {number: imagesWithNum[indexImage].number})}}
-            (<image-name :image="imagesWithNum[indexImage].image" />) <br/>
-          </li>
-        </ul>
-      </b-checkbox>
-    </p>
-    <p v-for="{image, index, number} in otherSoloImages" :key="index">
-      <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, null, index)">
-        {{$t('viewer-view', {number})}} (<image-name :image="image" />)
-      </b-checkbox>
-    </p>
+  <template>
+    <table class="table">
+      <thead>
+      <tr>
+        <th><span class="fas fa-link"></span></th>
+        <th> {{ $t('link-view-with') }}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Display other groups to linked with -->
+      <tr v-for="{images, index, number} in otherGroups" :key="`group${number}`">
+        <td>
+          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, index)"/>
+        </td>
+        <td>
+          {{$t('link-group', {number})}}
+          <ul class="group">
+            <li v-for="indexImage in images" :key="indexImage">
+              <i class="fas fa-caret-right"></i>
+              {{$t('viewer-view', {number: imagesWithNum[indexImage].number})}}
+              (<image-name :image="imagesWithNum[indexImage].image" />) <br/>
+            </li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- Display unlinked images -->
+      <tr v-for="{image, index, number} in otherSoloImages" :key="index">
+        <td>
+          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, null, index)"/>
+        </td>
+        <td>
+          {{$t('viewer-view', {number})}} (<image-name :image="image" />)
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </template>
+
 </div>
 </template>
 
@@ -223,5 +241,21 @@ ul.group {
 /deep/ .b-checkbox {
   align-items: flex-start !important;
   margin-top: 0.25em;
+}
+
+.table {
+  margin-bottom: 1em !important;
+  font-size: 0.9em;
+}
+
+.table tbody {
+  display: block;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 10em;
+}
+
+.table thead tr {
+  display: block;
 }
 </style>
