@@ -24,18 +24,6 @@
     </b-select>
   </b-field>
 
-  <div class="current-group" v-if="linkedIndexes">
-    <p>{{$t('view-linked-with')}}</p>
-    <ul>
-      <li v-for="index in linkedIndexes" :key="index">
-        <i class="fas fa-caret-right"></i>
-          {{$t('viewer-view', {number: imagesWithNum[index].number})}}
-          (<image-name :image="imagesWithNum[index].image" />) <br/>
-      </li>
-    </ul>
-    <button class="button is-small" @click="unlink()">{{$t('button-unlink')}}</button>
-  </div>
-
   <template>
     <table class="table">
       <thead>
@@ -45,6 +33,17 @@
       </tr>
       </thead>
       <tbody>
+      <!-- Display linked images -->
+      <tr v-for="index in linkedIndexes" :key="index">
+        <td>
+          <b-checkbox :value="true" @input="unlink"/>
+        </td>
+        <td>
+          {{$t('viewer-view', {number: imagesWithNum[index].number})}}
+          (<image-name :image="imagesWithNum[index].image" />)
+        </td>
+      </tr>
+
       <!-- Display other groups to linked with -->
       <tr v-for="{images, index, number} in otherGroups" :key="`group${number}`">
         <td>
@@ -181,7 +180,6 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            event.target.checked = false; // reset state of checkbox
             this.$store.commit(this.imageModule + 'setTrackedUser', null);
             this.link(indexGroup, indexImage);
           },
@@ -189,7 +187,6 @@ export default {
         });
       }
       else {
-        event.target.checked = false; // reset state of checkbox
         this.link(indexGroup, indexImage);
       }
     },
