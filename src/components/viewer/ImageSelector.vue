@@ -45,7 +45,7 @@
                     {{score.name}}
                   </div>
                   <div class="filter-body" :key="score.id">
-                    <cytomine-multiselect @input="event => changeValue()" v-model="selectedScoreValue[score.id]" :options="[{id: -1, value: 'No value'}, ...score.values]"
+                    <cytomine-multiselect @input="event => changeValue()" v-model="selectedScoreValue[score.id]" :options="[{id: 0, value: $t('all')}, {id: -1, value: 'No value'}, ...score.values]"
                                           label="value" track-by="id" :multiple="false" :allPlaceholder="$t('all')" />
                   </div>
                 </template>
@@ -195,7 +195,10 @@ export default {
       for (const [key, value] of Object.entries(this.selectedScoreValue)) {
         console.log(`${key}: ${value.value}`);
         console.log(filtered);
-        if (value.id!=null && value.id!==-1) {
+        if (value.value === 'All') {
+          // do not filter
+        }
+        else if (value.id!=null && value.id!==-1) {
           filtered =  filtered.filter(image => image['score' + key]!=null && image['score' + key]==value.value );
         }
         else if(value.id===-1) {
