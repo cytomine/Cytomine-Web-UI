@@ -266,11 +266,8 @@ button-reset,Reset,Réinitialiser
 select-image-to-add,Select an image to add,Sélectionner une image à ajouter
 link-images,Link images,Synchronisation d'images
 link-view-with,Link this view with...,Synchroniser cette image avec...
-link-other-images-to-this-group,Link this group with additional images...,Synchroniser ce groupe avec d'autres images...
-view-linked-with,This view is linked with,Cette image est synchronisée avec :
 viewer-view,View {number},Image {number}
 link-group,Group {number},Groupe {number}
-button-unlink,Unlink,Séparer
 terms-new-annotation,Term(s) to associate to new annotations,Terme(s) à associer aux nouvelles annotations
 core-cannot-be-reached,Error of communication with Cytomine core,Erreur de communication avec le backend de Cytomine
 communication-error,Communication error,Erreur de communication
