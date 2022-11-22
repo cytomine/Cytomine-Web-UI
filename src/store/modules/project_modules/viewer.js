@@ -171,6 +171,10 @@ export default {
       });
     },
 
+    setScaleLineCollapsed({commit}, {index, collapsed}) {
+      commit(`images/${index}/setScaleLineCollapsed`, collapsed);
+    },
+
     async refreshData({state, dispatch}) {
       await Promise.all(Object.keys(state.images).map(async index => {
         await dispatch(`images/${index}/refreshData`);
