@@ -41,7 +41,7 @@
       :order.sync="sortOrder"
       :detailed=false
       :checkable=true
-      :isRowCheckable="(row) => row.id !== currentUser.id && row.id !== storage.user"
+      :isRowCheckable="(row) => row.id !== storage.user"
       :checkedRows.sync="selectedUsers"
       :revision="revision"
     >
@@ -216,7 +216,7 @@ export default {
       }
     },
     confirmToggleAdministrator(user) {
-      if(user.id === this.currentUser.id && user.role !== this.administrationRole.value) {
+      if(user.id === this.currentUser.id && user.role !== this.readOnlyRole.value && user.role !== this.readWriteRole.value) {
         this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-administrator'),
           message: this.$tc('remove-yourself-from-administrator-confirmation-message'),
@@ -239,6 +239,7 @@ export default {
           await this.storage.changePermission(user.id, this.administrationRole.value);
         }
         this.revision++;
+        this.refreshUsers();
       }
       catch(error) {
         console.log(error);
@@ -254,6 +255,7 @@ export default {
           await this.storage.changePermission(user.id, this.readOnlyRole.value);
         }
         this.revision++;
+        this.refreshUsers();
       }
       catch(error) {
         console.log(error);

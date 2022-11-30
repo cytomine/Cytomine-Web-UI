@@ -24,9 +24,12 @@
       <p class="panel-heading">
         {{ $t('upload') }}
       </p>
-      <div class="panel-block" v-if="newUploadError">
-        <b-message type="is-danger" has-icon icon-size="is-small">
-          {{ $t('error-cannot-upload') }}
+      <div class="panel-block" v-if="newUploadError || !userCanWriteInStorage">
+        <b-message type="is-info" has-icon icon-size="is-small" v-if="newUploadError">
+             {{ $t('error-cannot-upload') }}
+        </b-message>
+        <b-message type="is-info" has-icon icon-size="is-small" v-if="!userCanWriteInStorage">
+          {{ $t('info-cannot-upload-if-admin-not-in-storage') }}
         </b-message>
       </div>
       <div class="panel-block" v-else>
@@ -188,6 +191,10 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     selectedStorage: get('currentStorage/storage'),
+    selectedStorageUsers: get('currentStorage/users'),
+    userCanWriteInStorage() {
+      return this.selectedStorageUsers===undefined ? false : this.selectedStorageUsers.findIndex(u => u.id === this.currentUser.id && (u.role === 'ADMINISTRATION' || u.role === 'WRITE'))!==-1;
+    },
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -404,12 +411,17 @@ export default {
       }
     }
   },
+  // async activated() {
+  //   console.log('activated', this.userNotAdminInStorage);
+  //   this.userNotAdminInStorage = this.selectedStorage.users.findIndex(u => u.id === this.currentUser.id && (u.role === 'ADMINISTRATION' || u.role === 'WRITE'))===-1;
+  // },
   created() {
     console.log('created');
     this.fetchProjects();
     this.refreshStatusSessionUploads();
     this.generateSignature();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
+    //this.userNotAdminInStorage = this.selectedStorage.users.findIndex(u => u.id === this.currentUser.id && (u.role === 'ADMINISTRATION' || u.role === 'WRITE'))===-1;
   },
   async destroyed() {
     console.log('deactivated');
