@@ -28,9 +28,12 @@
       <p class="panel-heading">
         {{ $t('upload') }}
       </p>
-      <div class="panel-block" v-if="newUploadError">
-        <b-message type="is-danger" has-icon icon-size="is-small">
-          {{ $t('error-cannot-upload') }}
+      <div class="panel-block" v-if="newUploadError || !userCanWriteInStorage">
+        <b-message type="is-info" has-icon icon-size="is-small" v-if="newUploadError">
+             {{ $t('error-cannot-upload') }}
+        </b-message>
+        <b-message type="is-info" has-icon icon-size="is-small" v-if="!userCanWriteInStorage">
+          {{ $t('info-cannot-upload-if-admin-not-in-storage') }}
         </b-message>
       </div>
       <div class="panel-block" v-else>
@@ -193,6 +196,10 @@ export default {
     currentUser: get('currentUser/user'),
     selectedStorage: get('currentStorage/storage'),
     currentStorageUserPermission: get('currentStorage/currentUserRole'),
+    selectedStorageUsers: get('currentStorage/users'),
+    userCanWriteInStorage() {
+      return this.selectedStorageUsers===undefined ? false : this.selectedStorageUsers.findIndex(u => u.id === this.currentUser.id && (u.role === 'ADMINISTRATION' || u.role === 'WRITE'))!==-1;
+    },
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -229,7 +236,7 @@ export default {
         str += `&idStorage=${this.selectedStorage.id}`;
       }
       if(this.selectedProjects) {
-        str += `${this.selectedProjects.map(project => '&idProject=' + project.id).join('')}`;
+        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
       }
       return str;
     },

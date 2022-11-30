@@ -34,7 +34,7 @@
               <strong>{{$t('image')}}</strong>
             </div>
             <div class="column is-three-quarters">
-              <b-field>
+              <b-field v-if="!selectedStorage || userCanWriteInStorage">
                 <b-upload v-model="selectedImage" type="is-link" drag-drop>
                   <section class="section">
                     <div class="content has-text-centered">
@@ -49,6 +49,11 @@
                     </div>
                   </section>
                 </b-upload>
+              </b-field>
+              <b-field v-else>
+                <b-message type="is-info" has-icon icon-size="is-small" v-if="!userCanWriteInStorage">
+                  {{ $t('info-cannot-upload-if-admin-not-in-storage') }}
+                </b-message>
               </b-field>
             </div>
           </div>
@@ -260,7 +265,7 @@
 <script>
 import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
-import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, HVMetadataCollection, StorageAccessCollection, TagCollection, TagDomainAssociation, UploadedFile} from 'cytomine-client';
+import {Cytomine, AbstractImage, AttachedFile, Configuration, Description, ImageInstance, HVMetadataCollection, StorageAccessCollection, TagCollection, TagDomainAssociation, UploadedFile, StorageUserCollection} from 'cytomine-client';
 import axios from 'axios';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
@@ -283,6 +288,7 @@ export default {
       loading: true,
       storages:[],
       selectedStorage:null,
+      selectedStorageUsers: [],
       descriptionContent: '',
       selectedProtocol:null,
       selectedImage:null,
@@ -354,7 +360,7 @@ export default {
       console.log('this.selectedInstrument');
       console.log(this.selectedInstrument != null);
       console.log('uploadable2');*/
-      return this.selectedStorage != null && this.selectedImage != null;/*  && this.selectedProtocol != null&&
+      return this.selectedStorage != null && this.selectedImage != null && this.userCanWriteInStorage;/*  && this.selectedProtocol != null&&
         this.selectedLab != null &&
         this.selectedStaining != null &&
         this.selectedAntibody != null &&
@@ -362,7 +368,10 @@ export default {
         this.selectedDetection != null &&
         this.selectedInstrument != null;*/
 
-    }
+    },
+    userCanWriteInStorage() {
+      return this.selectedStorageUsers===undefined ? false : this.selectedStorageUsers.findIndex(u => u.id === this.currentUser.id && (u.role === 'ADMINISTRATION' || u.role === 'WRITE'))!==-1;
+    },
   },
   watch: {
     active(val) {
@@ -399,6 +408,11 @@ export default {
           abstractImage: null, // null if upload not finished, false if upload failed, AbstractImage instance if upload successful
           cancelToken: null
         };
+      }
+    },
+    async selectedStorage(storage) {
+      if (storage) {
+        this.selectedStorageUsers = (await StorageUserCollection.fetchAll({filterKey: 'storage', filterValue: this.selectedStorage.id})).array;
       }
     }
   },
