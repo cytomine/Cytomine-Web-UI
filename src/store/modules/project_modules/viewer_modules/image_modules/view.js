@@ -22,7 +22,8 @@ export default {
       rotation: 0,
       digitalZoom: true,
       overviewCollapsed: false,
-      highlighted: false
+      highlighted: false,
+      scaleLineCollapsed: false,
     };
   },
 
@@ -45,6 +46,10 @@ export default {
 
     setOverviewCollapsed(state, value) {
       state.overviewCollapsed = value;
+    },
+
+    setScaleLineCollapsed(state, value) {
+      state.scaleLineCollapsed = value;
     },
 
     setHighlighted(state, value) {
