@@ -1059,7 +1059,7 @@ notif-success-add-storage-users,The selected users were correctly added to the s
 notif-error-add-storage-users,Failed to add the selected user to the storage,Une erreur a empêché d'ajouter les utilisateurs sélectionnés à l'espace de stockage
 notif-success-remove-storage-users,The selected users were correctly removed from storage,Les utilisateurs sélectionnés ont bien été retirés de l'espace de stockage
 notif-error-remove-storage-users,Failed to remove the selected users from storage,Une erreur a empêché de retirer les utilisateurs sélectionnés de l'espace de stockage
-info-cannot-upload-if-admin-not-in-storage,"You are in admin mode but you are not a member of the storage. If you want to upload a file, add yourself to this storage first","Vous êtes connecté en tant qu'admin mais vous n'avez pas accès à l'espace de stockage. Pour uploader une image, vous devez vous ajouter comme membre de l'espace de stockage"
+info-cannot-upload-if-admin-not-in-storage,"Your are in admin mode but your are not a member of this storage. If you want to upload a file in this storage, please add yourself as a member of this storage first, or get connected as an other member.","Vous êtes connecté en tant qu'admin mais vous n'avez pas accès à l'espace de stockage. Pour uploader une image, vous devez vous ajouter comme membre de l'espace de stockage"
 remove-users,Remove users,Retirer les utilisateurs
 remove-users-confirmation-message,- | Do you really want to remove user {username} from storage? Its uploaded files will be linked to the storage owner | Do you really want to remove the {count} selected users from storage? Their uploaded files will be linked to the storage owner,- | Êtes-vous sûr de vouloir retirer {username} de l'espace de stockage ? Ses fichiers uploadés seront lié au propriétaire de l'espace de stockage | Êtes-vous sûr de vouloir supprimer les {count} utilisateurs sélectionnés de l'espace de stockage ? Leurs fichiers uploadés seront liés au propriétaire de l'espace de stockage
 readonly-icon-label,You have read only access to this storage,Vous avez uniquement des droits de lecture sur l'espace de stockage
@@ -1134,5 +1134,5 @@ notify-user-in-project, Notify, Notifier
 notify-user-in-project-success, User has been notified with email, L'utilisateur a été notifié par email
 api-enabled,Api enabled,API activée
 api-disabled,Api disabled,API désactivée
-mail-mode-warning, I confirm that I want to change the mail mode from restricted to classic., Je confirme que je veux changer le mode d'envoi des courriels (de restreint à normal).
+mail-mode-warning, I confirm that I want to change the mail mode from restricted to classic. I understand the security issues concerning information that will be now sent by email !, Je confirme que je veux changer le mode d'envoi des courriels (de restreint à normal). J'ai compris les problèmes de sécurité concernant des informations qui seront envoyés par courriels.
 notif-success-project-URL-copied, Project URL copied to clipboard,L'URL du projet a été copiée dans le presse-papier
