@@ -725,7 +725,7 @@ error-attached-files,Error fetching attached files,Erreur lors du chargement des
 error-fetch-properties,Error fetching properties,Erreur lors du chargement des propriétés,Error al recuperar propiedades
 failed-fetch-recent-projects,Failed to fetch recent projects,Erreur lors du chargement des projets récents,Error al buscar proyectos recientes
 error-cannot-upload,Unexpected error prevents upload,Une erreur inattendue empêche les uploads,Un error inesperado impide la carga
-info-cannot-upload-if-admin-not-in-storage,"You are in admin mode but you are not a member of the storage. If you want to upload a file, add yourself to this storage first","Vous êtes connecté en tant qu'admin mais vous n'avez pas accès à l'espace de stockage. Pour uploader une image, vous devez vous ajouter comme membre de l'espace de stockage"
+info-cannot-upload-if-admin-not-in-storage,"Your are in admin mode but your are not a member of this storage. If you want to upload a file in this storage, please add yourself as a member of this storage first, or get connected as an other member.","Vous êtes connecté en tant qu'admin mais vous n'avez pas accès à l'espace de stockage. Pour uploader une image, vous devez vous ajouter comme membre de l'espace de stockage"
 notif-error-fetch-annotations-viewer,An error occurred while fetching annotations,Erreur lors du chargement des annotations,Se produjo un error al recuperar anotaciones
 notif-error-save-user-position,Failed to save your position in the image,Une erreur empêche de sauvegarder votre position dans l'image,Error al guardar tu posición en la imagen
 notif-error-save-image-consultation,Failed to save image consultation,Une erreur empêche de sauvegarder la consultation de l'image,Error al guardar la consulta de imagen
@@ -1097,5 +1097,5 @@ notify-user-in-project, Notify, Notifier
 notify-user-in-project-success, User has been notified with email, L'utilisateur a été notifié par email
 api-enabled,Api enabled,API activée
 api-disabled,Api disabled,API désactivée
-mail-mode-warning, I confirm that I want to change the mail mode from restricted to classic., Je confirme que je veux changer le mode d'envoi des courriels (de restreint à normal).
+mail-mode-warning, I confirm that I want to change the mail mode from restricted to classic. I understand the security issues concerning information that will be now sent by email !, Je confirme que je veux changer le mode d'envoi des courriels (de restreint à normal). J'ai compris les problèmes de sécurité concernant des informations qui seront envoyés par courriels.
 notif-success-project-URL-copied, Project URL copied to clipboard,L'URL du projet a été copiée dans le presse-papier
