@@ -1143,3 +1143,5 @@ histogram-scale,Histogram scale,Echelle des histogrammes
 linear,Linear,Linéaire
 logarithmic,Logarithmic,Logarithmic
 intensities-manipulation,Intensities adjustment,Ajustement des intensités
+curtain,Curtain,Rideau
+select-curtain-image,Select the curtain image,Choisir l'image rideau

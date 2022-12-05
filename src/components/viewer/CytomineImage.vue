@@ -51,6 +51,19 @@
         />
       </vl-layer-tile>
 
+      <vl-layer-tile :extent="extent" ref="curtainLayer">
+        <vl-source-zoomify
+          :projection="projectionName"
+          :urls="curtainLayerURLs"
+          :size="imageSize"
+          :extent="extent"
+          :crossOrigin="slices[0].imageServerUrl"
+          :transition="0"
+          :tile-size="tileSize"
+          ref="curtainSource"
+        />
+      </vl-layer-tile>
+
 <!--      <vl-layer-image>-->
 <!--        <vl-source-raster-->
 <!--          v-if="baseSource && colorManipulationOn"-->
@@ -257,6 +270,7 @@ export default {
       projectedMousePosition: [0, 0],
 
       baseSource: null,
+      curtainSource: null,
       routedAnnotation: null,
       selectedAnnotation: null,
 
@@ -399,6 +413,32 @@ export default {
     baseLayerURLs() {
       let slice = this.slices[0];
       return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+    },
+    curtainLayerURLQuery() {
+      /* Get the slice of the curtain image */
+      let index = this.imageWrapper.curtainImage ? this.imageWrapper.curtainImage['index'] : this.index;
+      let slice = this.viewerWrapper.images[index].activeSlices[0];
+      let parameters = {
+        // eslint-disable-next-line camelcase
+        z_slices: slice.zStack,
+        timepoints: slice.time,
+      };
+
+      /* If no curtain image, choose base layer parameters */
+      if (this.imageWrapper.curtainImage === null) {
+        Object.assign(parameters, this.baseLayerProcessingParams);
+      }
+
+      let query = new URLSearchParams(parameters).toString();
+      if (query.length > 0) {
+        return `?${query}`;
+      }
+      return query;
+    },
+    curtainLayerURLs() {
+      let slice = this.slices[0];
+      let path = this.imageWrapper.curtainImage ? this.imageWrapper.curtainImage['image'].path : slice.path;
+      return [`${slice.imageServerUrl}/image/${path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.curtainLayerURLQuery}`];
     },
 
     // colorManipulationOn() {

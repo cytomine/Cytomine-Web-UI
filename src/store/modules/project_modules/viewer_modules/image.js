@@ -61,8 +61,8 @@ export default {
       loadedSlicePages: [],
       activeSlices: null,
       activePanel: null,
-
-      routedAnnotation: null
+      routedAnnotation: null,
+      curtainImage: null,
     };
   },
 
@@ -122,7 +122,11 @@ export default {
     },
     clearRoutedAnnotation(state) {
       state.routedAnnotation = null;
-    }
+    },
+
+    setCurtainImage(state, image) {
+      state.curtainImage = image;
+    },
   },
 
   actions: {

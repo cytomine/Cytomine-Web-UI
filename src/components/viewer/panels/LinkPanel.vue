@@ -16,6 +16,17 @@
 <div>
   <h1>{{$t('link-images')}}</h1>
 
+  <b-field horizontal :label="$t('curtain')">
+    <b-select v-model="curtainImage" size="is-small" expanded>
+      <option :value="null">
+        {{$t('none')}}
+      </option>
+      <option v-for="(image, index) in images" :key="image.id" :value="{index: index, image: image.imageInstance}">
+        {{ image.imageInstance.instanceFilename }}
+      </option>
+    </b-select>
+  </b-field>
+
   <b-field horizontal :label="$t('link-mode')">
     <b-select v-model="linkMode" size="is-small" expanded>
       <option v-for="option in modeOptions" :key="option.label" :value="option.key">
@@ -107,12 +118,23 @@ export default {
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
     },
+    imageWrapper() {
+      return this.viewerWrapper.images[this.index];
+    },
     linkMode: {
       get() {
         return this.viewerWrapper.linkMode;
       },
       set(mode) {
         this.$store.commit(this.viewerModule + 'setLinkMode', mode);
+      }
+    },
+    curtainImage: {
+      get() {
+        return this.imageWrapper.curtainImage;
+      },
+      set(image) {
+        this.$store.commit(this.imageModule + 'setCurtainImage', image);
       }
     },
     images() {
