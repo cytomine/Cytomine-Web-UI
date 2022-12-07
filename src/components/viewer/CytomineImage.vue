@@ -182,7 +182,7 @@
 
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
-    <div class="swipe-wrapper" v-show="imageWrapper.curtainImage">
+    <div class="curtain-wrapper" v-show="imageWrapper.curtainImage">
       <input class="slider is-fullwidth is-small" step="0.01" min="0" max="1" type="range" v-model="position" />
     </div>
 
@@ -1068,11 +1068,19 @@ $colorOpenedPanelLink: #6c95c8;
 }
 
 /* ----- Curtain image ----- */
-.swipe-wrapper {
+.curtain-wrapper {
   position: absolute;
-  bottom: 3em;
-  left: 25rem;
-  width: 50%;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 1px #777;
+  padding: 0.5rem;
+  bottom: 1.5em;
+  left: 20%;
+  width: 55%;
   z-index: 40;
+}
+
+.curtain-wrapper input[type="range"].slider {
+  margin: 0;
 }
 </style>
