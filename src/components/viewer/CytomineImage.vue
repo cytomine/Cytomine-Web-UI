@@ -435,6 +435,12 @@ export default {
         timepoints: slice.time,
       };
 
+      /* Add image colors manipulation */
+      Object.assign(
+        parameters,
+        this.$store.getters[this.$store.getters['currentProject/imageModule'](index) + 'tileRequestParams']
+      );
+
       /* If no curtain image, choose base layer parameters */
       if (this.imageWrapper.curtainImage === null) {
         Object.assign(parameters, this.baseLayerProcessingParams);
