@@ -51,7 +51,7 @@
         />
       </vl-layer-tile>
 
-      <vl-layer-tile :extent="extent" ref="curtainLayer">
+      <vl-layer-tile :extent="extent" @mounted="addCurtainLayer" ref="curtainLayer">
         <vl-source-zoomify
           :projection="projectionName"
           :urls="curtainLayerURLs"
@@ -60,7 +60,6 @@
           :crossOrigin="slices[0].imageServerUrl"
           :transition="0"
           :tile-size="tileSize"
-          ref="curtainSource"
         />
       </vl-layer-tile>
 
@@ -183,6 +182,10 @@
 
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
+    <div class="swipe-wrapper" v-show="imageWrapper.curtainImage">
+      <input class="slider is-fullwidth is-small" step="0.01" min="0" max="1" type="range" v-model="position" />
+    </div>
+
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
         <image-name :image="image" />
@@ -270,7 +273,6 @@ export default {
       projectedMousePosition: [0, 0],
 
       baseSource: null,
-      curtainSource: null,
       routedAnnotation: null,
       selectedAnnotation: null,
 
@@ -377,6 +379,15 @@ export default {
       },
       set(value) {
         this.$store.dispatch(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
+      }
+    },
+    position: {
+      get() {
+        return this.imageWrapper.style.curtainPosition;
+      },
+      set(position) {
+        this.$store.commit(this.imageModule + 'setCurtainPosition', Number(position));
+        this.$refs.map.$map.render();
       }
     },
 
@@ -570,6 +581,24 @@ export default {
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
       this.$refs.map.$map.addControl(this.overview);
+    },
+
+    swipeCurtain(context) {
+      let width = context.canvas.width * (this.imageWrapper.style.curtainPosition);
+      context.save();
+      context.beginPath();
+      context.rect(width, 0, context.canvas.width - width, context.canvas.height);
+      context.clip();
+    },
+
+    async addCurtainLayer() {
+      await this.$refs.map.$createPromise; // wait for ol.Map to be created
+      await this.$refs.curtainLayer.$createPromise; // wait for ol.Layer to be created
+
+      /* https://openlayers.org/en/v5.3.0/examples/layer-swipe.html?q=swipe */
+
+      this.$refs.curtainLayer.$on('precompose', event => this.swipeCurtain(event.context));
+      this.$refs.curtainLayer.$on('postcompose', event => event.context.restore());
     },
 
     toggleOverview() {
@@ -1036,5 +1065,14 @@ $colorOpenedPanelLink: #6c95c8;
   right: $widthPanelBar;
   z-index: 40;
   pointer-events: none;
+}
+
+/* ----- Curtain image ----- */
+.swipe-wrapper {
+  position: absolute;
+  bottom: 3em;
+  left: 25rem;
+  width: 50%;
+  z-index: 40;
 }
 </style>
