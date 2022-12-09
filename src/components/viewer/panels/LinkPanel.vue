@@ -21,8 +21,8 @@
       <option :value="null">
         {{$t('none')}}
       </option>
-      <option v-for="(image, index) in images" :key="image.id" :value="{index: index, image: image.imageInstance}">
-        {{ image.imageInstance.instanceFilename }}
+      <option v-for="image in unselectedCurtainImages" :key="image.id" :value="image">
+        {{ image.instanceFilename }}
       </option>
     </b-select>
   </b-field>
@@ -151,6 +151,24 @@ export default {
         number++;
         return obj;
       }, []);
+    },
+    unselectedCurtainImages() {
+      /* Take all the images currently opened in the viewer by default */
+      let images = Object.values(this.images).map(image => ({
+        id: image.imageInstance.id,
+        instanceFilename: image.imageInstance.instanceFilename
+      }));
+
+      /* Take all the images in the image group if it exists */
+      if (this.imageWrapper.imageGroup) {
+        images = this.imageWrapper.imageGroup.imageInstances.map(image => ({
+          id: image.id,
+          instanceFilename: image.instanceFilename
+        }));
+      }
+
+      /* Remove the current image from the available list of curtain images */
+      return images.filter(image => image.id !== this.imageWrapper.imageInstance.id);
     },
     linkGroups() {
       return this.viewerWrapper.links;
