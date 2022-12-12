@@ -15,6 +15,19 @@
 <template>
   <div class="image-controls-container" v-if="isImageMultidimensional">
 
+    <!-- ----- CURTAIN IMAGE ----- -->
+    <div class="image-dimension" v-if="hasCurtainImage">
+      <strong class="image-dimension-name"><span class="fas fa-exchange-alt"></span></strong>
+      <input
+        v-model="currentCurtainPosition"
+        step="0.01"
+        min="0"
+        max="1"
+        type="range"
+        class="image-dimension-slider"
+      />
+    </div>
+
     <!-- ----- CHANNELS ----- -->
     <div class="image-dimension" v-if="hasChannels">
       <strong class="image-dimension-name">C</strong>
@@ -235,6 +248,15 @@ export default {
         await this.seek(this.currentChannelsIndexes, this.currentSlice.zStack, value);
       }
     },
+    currentCurtainPosition: {
+      get() {
+        return this.imageWrapper.style.curtainPosition;
+      },
+      set(position) {
+        this.$store.commit(this.imageModule + 'setCurtainPosition', Number(position));
+        this.$emit('updateCurtainImage');
+      }
+    },
     hasChannels() {
       return this.image.channels > 1;
     },
@@ -244,8 +266,11 @@ export default {
     hasDuration() {
       return this.image.duration > 1;
     },
+    hasCurtainImage() {
+      return this.imageWrapper.curtainImage !== null;
+    },
     isImageMultidimensional() {
-      return this.hasChannels || this.hasDuration || this.hasDepth;
+      return this.hasChannels || this.hasDuration || this.hasDepth || this.hasCurtainImage;
     },
     showMultiChannels() {
       return this.currentChannelsIndexes.length > 1;

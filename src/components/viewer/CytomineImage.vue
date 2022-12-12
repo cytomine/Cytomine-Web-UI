@@ -168,7 +168,7 @@
       </ul>
     </div>
 
-    <image-controls :index="index" class="image-controls-wrapper" />
+    <image-controls :index="index" class="image-controls-wrapper" @updateCurtainImage="renderMap" />
 
     <div class="broadcast" v-if="imageWrapper.tracking.broadcast">
       <i class="fas fa-circle"></i> {{$t('live')}}
@@ -181,10 +181,6 @@
     <toggle-scale-line :index="index" />
 
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
-
-    <div class="curtain-wrapper" v-show="imageWrapper.curtainImage">
-      <input class="slider is-fullwidth is-small" step="0.01" min="0" max="1" type="range" v-model="position" />
-    </div>
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -390,15 +386,6 @@ export default {
         this.$store.dispatch(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
       }
     },
-    position: {
-      get() {
-        return this.imageWrapper.style.curtainPosition;
-      },
-      set(position) {
-        this.$store.commit(this.imageModule + 'setCurtainPosition', Number(position));
-        this.$refs.map.$map.render();
-      }
-    },
 
     viewState() {
       return {center: this.center, zoom: this.zoom, rotation: this.rotation};
@@ -524,6 +511,10 @@ export default {
       if(this.$refs.map) {
         this.$refs.map.updateSize();
       }
+    },
+
+    renderMap() {
+      this.$refs.map.$map.render();
     },
 
     async updateKeyboardInteractions() {
