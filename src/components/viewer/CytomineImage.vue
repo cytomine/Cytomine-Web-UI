@@ -118,7 +118,7 @@
             <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
               <i class="fas fa-link"></i>
             </a>
-            <link-panel class="panel-options" v-show="activePanel === 'link'" :index="index" />
+            <link-panel class="panel-options" v-show="activePanel === 'link'" :index="index" :images="images" />
           </li>
 
           <li v-if="isPanelDisplayed('color-manipulation')">
@@ -230,7 +230,14 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType, ImageConsultation, SliceInstance, UserPosition} from 'cytomine-client';
+import {
+  Annotation,
+  AnnotationType,
+  ImageConsultation,
+  ImageInstanceCollection,
+  SliceInstance,
+  UserPosition,
+} from 'cytomine-client';
 
 // import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
@@ -283,6 +290,7 @@ export default {
       overview: null,
 
       format: new WKT(),
+      images: [],
     };
   },
   computed: {
@@ -293,6 +301,7 @@ export default {
       return this.$route.query.action;
     },
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -425,37 +434,11 @@ export default {
       let slice = this.slices[0];
       return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
     },
-    curtainLayerURLQuery() {
-      /* Get the slice of the curtain image */
-      let index = this.imageWrapper.curtainImage ? this.imageWrapper.curtainImage['index'] : this.index;
-      let slice = this.viewerWrapper.images[index].activeSlices[0];
-      let parameters = {
-        // eslint-disable-next-line camelcase
-        z_slices: slice.zStack,
-        timepoints: slice.time,
-      };
-
-      /* Add image colors manipulation */
-      Object.assign(
-        parameters,
-        this.$store.getters[this.$store.getters['currentProject/imageModule'](index) + 'tileRequestParams']
-      );
-
-      /* If no curtain image, choose base layer parameters */
-      if (this.imageWrapper.curtainImage === null) {
-        Object.assign(parameters, this.baseLayerProcessingParams);
-      }
-
-      let query = new URLSearchParams(parameters).toString();
-      if (query.length > 0) {
-        return `?${query}`;
-      }
-      return query;
-    },
     curtainLayerURLs() {
       let slice = this.slices[0];
-      let path = this.imageWrapper.curtainImage ? this.imageWrapper.curtainImage['image'].path : slice.path;
-      return [`${slice.imageServerUrl}/image/${path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.curtainLayerURLQuery}`];
+      let path = this.imageWrapper.curtainImage ? this.imageWrapper.curtainImage.path : slice.path;
+      let query = this.imageWrapper.curtainImage ? '' : this.baseLayerURLQuery;
+      return [`${slice.imageServerUrl}/image/${path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${query}`];
     },
 
     // colorManipulationOn() {
@@ -773,6 +756,11 @@ export default {
     }
   },
   async created() {
+    this.images = (await ImageInstanceCollection.fetchAll({
+      filterKey: 'project',
+      filterValue: this.project.id,
+    })).array;
+
     if(!getProj(this.projectionName)) { // if image opened for the first time
       let projection = createProj({code: this.projectionName, units: 'pixels', extent: this.extent});
       addProj(projection);

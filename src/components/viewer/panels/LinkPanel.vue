@@ -94,13 +94,11 @@ import ImageName from '@/components/image/ImageName';
 export default {
   name: 'link-panel',
   props: {
-    index: String
+    index: String,
+    images: Array,
   },
-  components: {ImageName},
-  data() {
-    return {
-      revisionNumber: 0
-    };
+  components: {
+    ImageName,
   },
   computed: {
     modeOptions: function () {
@@ -137,16 +135,16 @@ export default {
         this.$store.commit(this.imageModule + 'setCurtainImage', image);
       }
     },
-    images() {
+    openedImages() {
       return this.viewerWrapper.images;
     },
     imagesWithNum() {
       let number = 1;
-      return Object.keys(this.images).reduce((obj, index) => {
+      return Object.keys(this.openedImages).reduce((obj, index) => {
         obj[index] = {
           number,
           index,
-          image: this.images[index].imageInstance
+          image: this.openedImages[index].imageInstance
         };
         number++;
         return obj;
@@ -154,21 +152,27 @@ export default {
     },
     unselectedCurtainImages() {
       /* Take all the images currently opened in the viewer by default */
-      let images = Object.values(this.images).map(image => ({
+      let unselectedImages = Object.values(this.openedImages).map(image => ({
         id: image.imageInstance.id,
         instanceFilename: image.imageInstance.instanceFilename
       }));
 
       /* Take all the images in the image group if it exists */
       if (this.imageWrapper.imageGroup) {
-        images = this.imageWrapper.imageGroup.imageInstances.map(image => ({
+        unselectedImages = this.imageWrapper.imageGroup.imageInstances.map(image => ({
           id: image.id,
           instanceFilename: image.instanceFilename
         }));
       }
 
+      /* Add the path on the disk of the images */
+      unselectedImages.forEach(image => {
+        let imageInstance = this.images?.find(img => img.id === image.id);
+        image['path'] = imageInstance?.path;
+      });
+
       /* Remove the current image from the available list of curtain images */
-      return images.filter(image => image.id !== this.imageWrapper.imageInstance.id);
+      return unselectedImages.filter(image => image.id !== this.imageWrapper.imageInstance.id);
     },
     linkGroups() {
       return this.viewerWrapper.links;
