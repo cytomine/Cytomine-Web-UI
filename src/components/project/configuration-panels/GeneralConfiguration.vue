@@ -43,6 +43,7 @@
     </div>
   </div>
 
+
   <div class="columns">
     <div class="column is-one-quarter">
       <b-radio v-model="editingMode" native-value="READ-ONLY">
@@ -55,6 +56,21 @@
       </b-message>
     </div>
   </div>
+  <p class="explanation">{{$t('editing-mode-explanation-with-managers')}}</p>
+
+  <div class="columns">
+    <div class="column is-one-quarter">
+      <b-radio v-model="editingMode" native-value="LOCKED">
+        {{$t('locked')}}
+      </b-radio>
+    </div>
+    <div class="column">
+      <b-message type="is-info" has-icon size="is-small">
+        {{$t('locked-mode-explanation')}}
+      </b-message>
+    </div>
+  </div>
+
 
   <h2>{{$t('viewer-panels')}}</h2>
 
@@ -217,7 +233,7 @@ export default {
     layers: get('currentProject/members'),
 
     currentEditingMode() {
-      return this.project.isReadOnly ? 'READ-ONLY' : this.project.isRestricted ? 'RESTRICTED' : 'CLASSIC';
+      return this.project.isReadOnly ? 'READ-ONLY' : this.project.isRestricted ? 'RESTRICTED' : this.project.isLocked ? 'LOCKED' : 'CLASSIC';
     },
 
     selectedLayers() {
@@ -243,7 +259,7 @@ export default {
       if(mode === this.currentEditingMode) {
         return;
       }
-      this.updateProject({isReadOnly: mode === 'READ-ONLY', isRestricted: mode === 'RESTRICTED'});
+      this.updateProject({isReadOnly: mode === 'READ-ONLY', isRestricted: mode === 'RESTRICTED', isLocked: mode === 'LOCKED'});
     },
 
     blindMode() {
@@ -308,8 +324,16 @@ export default {
       }
       catch(error) {
         console.log(error);
+        console.log(error.response.data.errors);
+        console.log(error.response.status);
+        if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.indexOf('locked')!==-1) {
+          this.$notify({type: 'error', text: error.response.data.errors});
+        }
+        else {
+          this.$notify({type: 'error', text: this.$t('notif-error-general-config-update')});
+        }
         this.initData(); // reset data
-        this.$notify({type: 'error', text: this.$t('notif-error-general-config-update')});
+
       }
     },
 

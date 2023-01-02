@@ -324,6 +324,8 @@ undo-redo,Undo/Redo,Annuler/Refaire,Deshacer/Rehacer
 notif-error-custom-ui-change,Failed to change custom UI property,Une erreur a empêché de mettre à jour les choix de personnalisation de l'interface,Error al cambiar la propiedad de interfaz personalizada
 editing-mode,Editing mode,Mode d'édition,Modo de edición
 editing-mode-explanation,"Editing mode will change authorisations of contributors. Project managers will still be able to see, add, edit or delete data for this project.","Le mode d'édition détermine les permissions des contributeurs. Les responsables du projet auront toujours la possibilité de voir, ajouter, éditer et supprimer les données de ce projet","El modo de edición cambiará las autorizaciones de los colaboradores. Los administradores de proyecto aún podrán ver, agregar, editar o eliminar datos para este proyecto."
+editing-mode-explanation-with-managers,The editing mode here above concern both contributors and managers
+locked-mode-explanation,"Contributors and managers will not be able to add, edit, delete project data, images, annotations, properties, tags, descriptions, score, etc within this project. Managers will only be able to edit the configuration of the project, including members."
 classic,Classic (fully collaborative),Classique (collaboratif),Clásico (totalmente colaborativo)
 classic-mode-explanation,"Contributors will be able to add, edit or delete project data, annotations, properties and descriptions on all layers.","Les contributeurs auront le droit d'ajouter, d'éditer et de supprimer des données dans ce projet sans restriction, y compris des annotations, des propriétés et des descriptions sur les calques d'autres utilisateurs.","Los colaboradores podrán agregar, editar o eliminar datos del proyecto, anotaciones, propiedades y descripciones en todas las capas."
 restricted,Restricted,Restreint,Restringido
@@ -1105,6 +1107,8 @@ notif-error-project-unlock,Failed to unlock the project,Une erreur a empêché d
 notif-success-metadata-update,Metadata have been successfully updated,Les métadonnées ont été modifiées avec succès
 notif-error-metadata-update,An error occured during metadata update,Une erreur est survenue durant la modification des méta-données
 project-is-locked,Project is locked,Le projet est cloturé
+locked,Locked,Cloturé
+go-to-project-configuration,Go to the project configuration to change the locking status of this project.,
 consensus-scores,Consensus scores,Scores de consensus
 api-key-allowed,Api keys enabled,API keys activées,
 shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des emails de partage des annotations
