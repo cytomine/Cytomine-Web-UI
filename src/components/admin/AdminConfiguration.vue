@@ -16,11 +16,31 @@
 <template>
 <div>
   <h2>{{$t('welcome-message')}}</h2>
-  <div class="columns">
-    <div class="column is-full" style="padding-left:3.5em;padding-bottom: 3.5em;">
-      <cytomine-quill-editor v-model="welcomeConfig.value" />
+  <b-field class="radio-buttons-fullwidth">
+    <b-radio-button v-model="activeTab" native-value="welcome" type="is-link">
+      {{$t('dashboard-welcome-message')}}
+    </b-radio-button>
+
+    <b-radio-button v-model="activeTab" native-value="login" type="is-link">
+      {{$t('login-welcome-message')}}
+    </b-radio-button>
+  </b-field>
+
+  <div v-if="activeTab==='welcome'">
+    <div class="columns">
+      <div class="column is-full" style="padding-left:3.5em;padding-bottom: 3.5em;">
+        <cytomine-quill-editor v-model="welcomeConfig.value" />
+      </div>
     </div>
   </div>
+  <div v-else>
+    <div class="columns">
+      <div class="column is-full" style="padding-left:3.5em;padding-bottom: 3.5em;">
+        <cytomine-quill-editor v-model="loginWelcomeConfig.value" />
+      </div>
+    </div>
+  </div>
+
 <!--  <p class="has-text-right">-->
 <!--    <button class="button is-link" @click="save">{{$t('button-save')}}</button>-->
 <!--  </p>-->
@@ -223,11 +243,13 @@ export default {
   components: {CytomineQuillEditor},
   data() {
     return {
+      activeTab: 'login',
       fetching: true,
       ltiConsumers: [],
       ltiEnabled: false,
       editedLTI: null,
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
+      loginWelcomeConfig: new Configuration({key: constants.CONFIG_KEY_LOGIN_WELCOME, value: '', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'}),
@@ -289,10 +311,25 @@ export default {
           throw new TypeError(this.$t('logo-upload-error-message'));
         }
         if(!this.welcomeConfig.value) {
-          await this.welcomeConfig.delete();
+          try {
+            await this.welcomeConfig.delete();
+          } catch (error) {
+            // may already have been deleted
+          }
         }
         else {
           await this.welcomeConfig.save();
+        }
+
+        if(!this.loginWelcomeConfig.value) {
+          try {
+            await this.loginWelcomeConfig.delete();
+          } catch (error) {
+            // may already have been deleted
+          }
+        }
+        else {
+          await this.loginWelcomeConfig.save();
         }
         if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
           await this.topMenuColorConfig.delete();
@@ -321,6 +358,8 @@ export default {
           this.ltiConsumersConfig.value = JSON.stringify(this.ltiConsumers);
           await this.ltiConsumersConfig.save();
         }
+
+
 
         this.$eventBus.$emit('configChanged', '');
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
@@ -395,6 +434,12 @@ export default {
 
     try {
       await this.welcomeConfig.fetch();
+    }
+    catch(error) {
+      // no welcome message currently set
+    }
+    try {
+      await this.loginWelcomeConfig.fetch();
     }
     catch(error) {
       // no welcome message currently set

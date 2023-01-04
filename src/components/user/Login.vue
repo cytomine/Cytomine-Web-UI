@@ -14,6 +14,8 @@
 
 <template>
 <div class="panel">
+  <div v-if="loginWelcomeMessage" class="box" v-html="loginWelcomeMessage"></div>
+
   <template v-if="forgotUsername">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -99,8 +101,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
-import {Cytomine} from 'cytomine-client';
+import {Cytomine, Configuration} from 'cytomine-client';
 import Register from './Register';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'login',
@@ -112,6 +115,7 @@ export default {
       password: '',
       email: '',
       rememberMe: true,
+      loginWelcomeMessage: null,
 
       allowedRegistration: false, // TODO: retrieve info from core
 
@@ -163,7 +167,21 @@ export default {
       catch(error) {
         this.$notify({type: 'error', text: this.$t('notif-error-forgot-password')});
       }
-    }
+    },
+    async fetchLoginWelcomeMessage() {
+      try {
+        this.loginWelcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_LOGIN_WELCOME)).value;
+      }
+      catch(error) {
+        // no welcome message defined
+      }
+    },
+  },
+  async created() {
+    await Promise.all([
+      this.fetchLoginWelcomeMessage()
+    ].map(p => p.catch(e => console.log(e))));
+    this.loading = false;
   }
 };
 </script>

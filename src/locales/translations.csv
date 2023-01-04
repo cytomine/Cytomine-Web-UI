@@ -656,6 +656,8 @@ used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de alm
 total,Total,Total,Total
 count-active-users,no active user | one active user | {count} active users,aucun utilisateur actif | un utilisateur actif | {count} utilisateurs actifs,sin usuario activo | un usuario activo | {count} usuarios activos
 welcome-message,Welcome message,Message de bienvenue,Mensaje de bienvenida
+dashboard-welcome-message,Dashboard welcome message,Message de bienvenue du Tableau de bord
+login-welcome-message,Login welcome message,Message de bienvenue au formulaire de connection
 enter-text,Enter text,Saisissez du texte,Introduzca texto
 notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito
 notif-error-welcome-message-update,Failed to update the welcome message,Une erreur a empêché de mettre à jour le message de bienvenue,Error al actualizar el mensaje de bienvenida
