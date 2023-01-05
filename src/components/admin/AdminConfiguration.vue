@@ -226,6 +226,167 @@
     </div>
   </div>
 
+
+
+
+
+
+
+  <div v-if="ldapEnabled">
+    <h2>{{ $t('ldap') }}</h2>
+
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-server')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.server.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-server-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-principal')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.principal.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-principal-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-password')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.password.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-password-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-search')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.search.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-search-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-attributes')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.attributes.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-attributes-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-one-quarter" style="padding-left:3.5em;">
+        <h3>{{$t('ldap-passwordAttributeName')}}</h3>
+      </div>
+      <div class="column is-one-quarter">
+        <b-input
+          v-model="ldap.passwordAttributeName.value"
+          placeholder=""
+        />
+      </div>
+      <div class="column is-one-half">
+        <article class="message is-info is-small">
+          <section class="message-body">
+            <div class="media">
+              <div class="media-left">
+                <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+              </div>
+              <div class="media-content">
+                {{$t('ldap-passwordAttributeName-explaination')}}
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+  </div>
+
   <p class="has-text-right">
     <button class="button is-link" @click="save">{{$t('button-save')}}</button>
   </p>
@@ -247,6 +408,7 @@ export default {
       fetching: true,
       ltiConsumers: [],
       ltiEnabled: false,
+      ldapEnabled: false,
       editedLTI: null,
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       loginWelcomeConfig: new Configuration({key: constants.CONFIG_KEY_LOGIN_WELCOME, value: '', readingRole: 'all'}),
@@ -257,6 +419,14 @@ export default {
       selectedImage: null,
       selectedImageSize: {width: 0, height: 0},
       ltiConsumersConfig: new Configuration({key: constants.CONFIG_KEY_LTI_CONSUMERS, value: '[]', readingRole: 'all'}),
+      ldap: {
+        server: new Configuration({key: constants.CONFIG_KEY_LDAP_SERVER, value: '', readingRole: 'admin'}),
+        principal: new Configuration({key: constants.CONFIG_KEY_LDAP_PRINCIPAL, value: '', readingRole: 'admin'}),
+        password: new Configuration({key: constants.CONFIG_KEY_LDAP_PASSWORD, value: '', readingRole: 'admin'}),
+        search: new Configuration({key: constants.CONFIG_KEY_LDAP_SEARCH, value: '', readingRole: 'admin'}),
+        attributes: new Configuration({key: constants.CONFIG_KEY_LDAP_ATTRIBUTES, value: '', readingRole: 'admin'}),
+        passwordAttributeName: new Configuration({key: constants.CONFIG_KEY_LDAP_PASSWORD_ATTRIBUTE_NAME, value: '', readingRole: 'admin'}),
+      }
     };
   },
   watch: {
@@ -359,8 +529,23 @@ export default {
           await this.ltiConsumersConfig.save();
         }
 
+        if(this.ldapEnabled) {
+          for (const [key, configuration] of Object.entries(this.ldap)) {
+            console.log(`${key}: ${configuration}`);
 
+            if(!configuration.value) {
+              try {
+                await configuration.delete();
+              } catch (error) {
+                // may already have been deleted
+              }
+            }
+            else {
+              await configuration.save();
+            }
 
+          }
+        }
         this.$eventBus.$emit('configChanged', '');
         this.$notify({type: 'success', text: this.$t('notif-success-configuration-update')});
       }
@@ -425,11 +610,13 @@ export default {
   },
   async created() {
     try {
-      let {ltiEnabled} = await Cytomine.instance.ping();
+      let {ltiEnabled, ldapEnabled} = await Cytomine.instance.ping();
       this.ltiEnabled = ltiEnabled;
+      this.ldapEnabled = ldapEnabled;
     }
     catch(error) {
       this.ltiEnabled = false;
+      this.ldapEnabled = false;
     }
 
     try {
@@ -468,6 +655,27 @@ export default {
     catch(error) {
       // no consumers definitions
     }
+
+
+    try {
+      await this.ltiConsumersConfig.fetch();
+      this.ltiConsumers = JSON.parse(this.ltiConsumersConfig.value);
+    }
+    catch(error) {
+      // no consumers definitions
+    }
+
+    if(this.ldapEnabled) {
+      for (const [key, configuration] of Object.entries(this.ldap)) {
+        console.log(`${key}: ${configuration}`);
+        try {
+          await configuration.fetch();
+        } catch (error) {
+          // may not exists
+        }
+      }
+    }
+
     this.fetching = false;
   }
 };
