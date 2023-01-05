@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -46,7 +46,20 @@ const moment = require('moment');
 Vue.use(VueMoment, {moment});
 
 import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, { prevent: ['input', 'textarea', '.ql-editor'] });
+Vue.use(VueShortKey, {
+  prevent: [
+    'input[type=text]',
+    'input[type=password]',
+    'input[type=search]',
+    'input[type=email]',
+    'textarea',
+    '.ql-editor'
+  ]
+});
+
+import VueHtml2Canvas from 'vue-html2canvas';
+
+Vue.use(VueHtml2Canvas);
 
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
@@ -56,14 +69,20 @@ import ZoomifySource from './vuelayers-suppl/zoomify-source';
 import RasterSource from './vuelayers-suppl/raster-source';
 import TranslateInteraction from './vuelayers-suppl/translate-interaction';
 import RotateInteraction from './vuelayers-suppl/rotate-interaction';
+import ModifyInteraction from './vuelayers-suppl/modify-interaction';
+import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
 Vue.use(VueLayers);
 Vue.use(ZoomifySource);
 Vue.use(RasterSource);
 Vue.use(TranslateInteraction);
 Vue.use(RotateInteraction);
+Vue.use(ModifyInteraction);
+Vue.use(RescaleInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartZoom from 'chartjs-plugin-zoom';
+Chart.plugins.unregister(ChartZoom);
 Chart.plugins.unregister(ChartDataLabels);
 Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
   anchor: 'end',

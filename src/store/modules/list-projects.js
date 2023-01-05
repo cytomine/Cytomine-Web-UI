@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ function getDefaultState() {
 
     filtersOpened: false,
     filters: {
-      selectedOntologies: [],
-      selectedRoles: [],
-      selectedTags: [],
+      selectedOntologies: null,
+      selectedRoles: null,
+      selectedTags: null,
       boundsMembers: null,
       boundsImages: null,
       boundsUserAnnotations: null,
@@ -83,7 +83,11 @@ export default {
 
   getters: {
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+    },
+
+    nbEmptyFilters: state => {
+      return Object.values(state.filters).filter(val => val && val.length === 0).length;
     }
   }
 };

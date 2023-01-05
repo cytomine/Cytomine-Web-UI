@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {AnnotationTermCollection, AnnotationType} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -47,16 +47,27 @@ export async function updateTermProperties(annot) {
 }
 
 /**
+ * Fetch the tracks associated to the provided annot, and populate track and annotationTrack properties accordingly
+ *
+ * @param {Object} annot The annotation to update
+ */
+export async function updateTrackProperties(annot) {
+  let annotTracks = await AnnotationTrackCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id});
+  annot.track = annotTracks.array.map(at => at.track);
+  annot.annotationTrack = annotTracks.array;
+}
+
+/**
  * Checks whether an annotation belongs to the provided layer and image
  *
  * @param {Object} annot The annotation
  * @param {Object} layer The layer
- * @param {Object} [image] The image
+ * @param {Array} [slices] The slice identifiers
  *
  * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
  */
-export function annotBelongsToLayer(annot, layer, image=null) {
-  if(image && annot.image !== image.id) {
+export function annotBelongsToLayer(annot, layer, slices=null) {
+  if(slices && !slices.includes(annot.slice)) {
     return false;
   }
   let isReviewed = annot.type === AnnotationType.REVIEWED;

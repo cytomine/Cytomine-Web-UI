@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="box error" v-if="!configUI['project-information-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -22,7 +21,7 @@
   <div class="box">
     <project-details
       :project="project"
-      :excluded-properties="['imagesPreview']"
+      :excluded-properties="excludedProperties"
       editable
       @update="updateProject"
       @delete="deleteProject()"
@@ -36,10 +35,18 @@ import {get} from '@/utils/store-helpers';
 
 import ProjectDetails from './ProjectDetails';
 import {Project} from 'cytomine-client';
-
+import constants from '@/utils/constants.js';
 export default {
   name: 'project-information',
   components: {ProjectDetails},
+  data() {
+    return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
+      excludedProperties: [
+        'imagesPreview'
+      ]
+    };
+  },
   computed: {
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI')
@@ -65,6 +72,10 @@ export default {
         });
       }
     }
+  },
+  created() {
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
+    this.$store.dispatch('currentProject/reloadProject');
   }
 };
 </script>

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 */
 
 import {Bar} from 'vue-chartjs';
+import constants from '@/utils/constants.js';
 
 import {AnnotationType} from 'cytomine-client';
 
@@ -30,6 +31,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       annotationsEvolution: {
         [AnnotationType.USER]: [],
         [AnnotationType.ALGO]: [],
@@ -75,8 +77,13 @@ export default {
       ]);
 
       this.chartData.datasets[0].data = this.annotationsEvolution[AnnotationType.USER].map(item => item.size);
-      this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.ALGO].map(item => item.size);
-      this.chartData.datasets[2].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      if(this.algoEnabled) {
+        this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.ALGO].map(item => item.size);
+        this.chartData.datasets[2].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      }
+      else {
+        this.chartData.datasets[1].data = this.annotationsEvolution[AnnotationType.REVIEWED].map(item => item.size);
+      }
       this.updateLabels();
     },
     updateLabels() {
@@ -101,12 +108,6 @@ export default {
           borderWidth: 0
         },
         {
-          label: this.$t('analysis-annotations'),
-          data: [],
-          backgroundColor: '#aaa',
-          borderWidth: 0
-        },
-        {
           label: this.$t('reviewed-annotations'),
           data: [],
           backgroundColor: '#42ce77',
@@ -114,10 +115,17 @@ export default {
         }
       ]
     };
-        
+    if(this.algoEnabled) {
+      this.chartData.datasets.splice(1,0,{
+        label: this.$t('analysis-annotations'),
+        data: [],
+        backgroundColor: '#aaa',
+        borderWidth: 0
+      });
+    }
     await this.fetchData();
 
-    this.renderChart(this.chartData, { 
+    this.renderChart(this.chartData, {
       maintainAspectRatio: false,
       scales: {
         yAxes: [{

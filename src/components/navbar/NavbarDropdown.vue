@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,19 +12,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
-<div class="navbar-item has-dropdown"
-  :class="{'is-active': opened}"
-  @mouseover="opened = true"
-  @mouseout="opened = false"
->
-  <a class="navbar-link" :class="{'is-active': isActive, ...linkClasses}">
+<div class="navbar-item has-dropdown is-hoverable">
+  <span class="navbar-link" @mouseover="mouseOver()" @mouseleave="mouseLeave()" :style="style" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
     <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
-  </a>
-  <div class="navbar-dropdown" :class="classes" @click="opened = false;">
+  </span>
+  <div class="navbar-dropdown" @mouseover="mouseOver()"  @mouseleave="mouseLeave()" :class="classes">
     <slot></slot>
   </div>
 </div>
@@ -40,25 +35,51 @@ export default {
     tag: Object,
     classes: Array,
     linkClasses: Object,
-    listPathes: Array
+    listPathes: Array,
+    fontColor: Object,
+    backgroundColor: Object,
+    hoverBackgroundColor: Object
   },
   data() {
     return {
-      opened: false,
-      isActive: false
+      isActive: false,
+      style: {backgroundColor: this.backgroundColor.color, color: this.fontColor}
     };
   },
   watch: {
-    '$route.path': function(newPath) {
-      if(this.listPathes) {
-        this.isActive = this.listPathes.includes(newPath);
+    '$route.path': {
+      handler() {
+        this.isActive = false;
+        this.checkItemSelected();
+        // required so dropdown doesn't remain open on route change.
+        document.activeElement.blur();
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    mouseOver: function(){
+      this.setStyleToColor(this.hoverBackgroundColor.color);
+    },
+    mouseLeave: function(){
+      this.setStyle();
+    },
+    setStyle(){
+      this.isActive ? this.setStyleToColor(this.hoverBackgroundColor.color) : this.setStyleToColor(this.backgroundColor.color);
+    },
+    setStyleToColor(color){
+      this.style.backgroundColor = color;
+    },
+    checkItemSelected() {
+      if (this.listPathes) {
+        this.isActive = !!this.listPathes.find(p => this.$route.path.match(p));
       }
+      this.setStyle();
     }
   },
   created() {
-    if(this.listPathes) {
-      this.isActive = this.listPathes.includes(this.$route.path);
-    }
+    this.style = {backgroundColor: this.backgroundColor.color, color: this.fontColor.color};
+    this.checkItemSelected();
   }
 };
 </script>
@@ -66,5 +87,13 @@ export default {
 <style>
 .navbar-item .tag {
   margin-left: 0.5rem;
+}
+@media screen and (min-width: 1024px) {
+  .navbar-item.is-hoverable:hover .navbar-dropdown {
+    display: block;
+  }
+  .navbar-item.is-hoverable:focus-within:not(:hover) .navbar-dropdown {
+    display: none;
+  }
 }
 </style>

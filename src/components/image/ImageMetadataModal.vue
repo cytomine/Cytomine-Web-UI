@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <cytomine-modal :active="active" :title="$t('image-metadata')" @close="$emit('update:active', false)">
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
@@ -22,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="image.macroURL" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="appendShortTermToken(image.associatedImageURL('macro', 256, 'jpg'), shortTermToken)" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -56,6 +55,8 @@
 import {AbstractImage, PropertyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'image-metadata-modal',
@@ -73,6 +74,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     filteredProps() {
       if(!this.searchString) {
         return this.properties;
@@ -93,16 +95,17 @@ export default {
         width: reverse ? height : width,
         height: reverse ? width : height
       };
-    }
+    },
   },
   methods: {
+    appendShortTermToken,
     async rotate(val) {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
     }
   },
   async created() {
     try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
       this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }

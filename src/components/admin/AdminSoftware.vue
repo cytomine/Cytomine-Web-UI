@@ -40,6 +40,9 @@
                 <button class="button is-link is-small" @click="refresh(source)">
                   {{$t('button-refresh')}}
                 </button>
+                <button class="button is-danger is-small" @click="deleteSourceDialog(source)">
+                  {{$t('button-delete')}}
+                </button>
               </div>
             </b-table-column>
           </template>
@@ -132,7 +135,34 @@ export default {
     updateSource(source) {
       this.formatSource(source);
       this.editedSource.populate(source);
-    }
+    },
+    deleteSourceDialog(source) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete'),
+        message: this.$t('delete-source-confirmation-message', {username: source.username, dockerUsername: source.dockerUsername}),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: () => this.deleteSource(source)
+      });
+    },
+    deleteSource(source) {
+      try {
+        source.delete();
+        this.trustedSources.splice(this.trustedSources.indexOf(source), 1);
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-source-delete', {username: source.username, dockerUsername: source.dockerUsername})
+        });
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-source-delete', {username: source.username, dockerUsername: source.dockerUsername})
+        });
+      }
+    },
   },
   async created() {
     try {

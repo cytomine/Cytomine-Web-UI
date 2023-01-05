@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
   <div>
     <b-loading :is-full-page="false" :active="loading" />
@@ -25,12 +24,19 @@
         <tr>
           <td colspan="2">
             <strong>{{$t('terms')}}</strong>
-            <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
+            <b-message type="is-info" has-icon icon-size="is-small">
+            {{$t('hierarchical-drag-drop-term')}}
+          </b-message>
+          <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
               <template #no-result>
                 <em class="has-text-grey">{{$t('no-term')}}</em>
               </template>
             </ontology-tree>
           </td>
+        </tr>
+        <tr v-if="currentUser.isDeveloper">
+          <td><strong>{{$t('id')}}</strong></td>
+          <td>{{ontology.id}}</td>
         </tr>
         <tr>
           <td><strong>{{$t('projects')}}</strong></td>
@@ -200,7 +206,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-ontology', {name: this.ontology.name}),
         type: 'is-danger',

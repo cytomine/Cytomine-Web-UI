@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="panel">
+  <div v-if="loginWelcomeMessage" class="box" v-html="loginWelcomeMessage"></div>
+
   <template v-if="forgotUsername">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -100,8 +101,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
-import {Cytomine} from 'cytomine-client';
+import {Cytomine, Configuration} from 'cytomine-client';
 import Register from './Register';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'login',
@@ -113,6 +115,7 @@ export default {
       password: '',
       email: '',
       rememberMe: true,
+      loginWelcomeMessage: null,
 
       allowedRegistration: false, // TODO: retrieve info from core
 
@@ -141,8 +144,8 @@ export default {
         }
       }
       catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: error.response.data.message});
+        console.log(error.response);
+        this.$notify({type: 'error', text: error.response.data.errors.message});
       }
     },
     async sendUsername() {
@@ -164,7 +167,21 @@ export default {
       catch(error) {
         this.$notify({type: 'error', text: this.$t('notif-error-forgot-password')});
       }
-    }
+    },
+    async fetchLoginWelcomeMessage() {
+      try {
+        this.loginWelcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_LOGIN_WELCOME)).value;
+      }
+      catch(error) {
+        // no welcome message defined
+      }
+    },
+  },
+  async created() {
+    await Promise.all([
+      this.fetchLoginWelcomeMessage()
+    ].map(p => p.catch(e => console.log(e))));
+    this.loading = false;
   }
 };
 </script>

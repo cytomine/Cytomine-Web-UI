@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="tile is-ancestor is-vertical project-activity-charts-wrapper">
@@ -106,7 +105,7 @@
           <strong>{{$t("user-annotations")}}</strong>
         </div>
       </div>
-      <div class="tile is-parent">
+      <div v-show="algoEnabled" class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
             <v-popover>
@@ -296,6 +295,7 @@ import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js'
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
 import {AnnotationType} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-activity-charts',
@@ -314,6 +314,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       nbProjectVisits: null,
       nbImageConsultations: null,

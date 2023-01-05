@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -41,21 +41,21 @@ let vendors = {
   }
 };
 
-export default function vendorFromMime(mime) {
-  switch(mime) {
-    case 'openslide/ndpi':
-    case 'openslide/vms':
+export default function vendorFromFormat(format) {
+  switch(format) {
+    case 'NDPI':
+    case 'VMS':
       return vendors['hamamatsu'];
-    case 'openslide/mrxs':
+    case 'MRXS':
       return vendors['3dh'];
-    case 'openslide/svs':
+    case 'SVS':
       return vendors['aperio'];
-    case 'openslide/scn':
+    case 'SCN':
       return vendors['leica'];
-    case 'ventana/tif':
-    case 'ventana/bif':
+    case 'VENTANA':
+    case 'BIF':
       return vendors['roche'];
-    case 'philips/tif':
+    case 'PHILIPS':
       return vendors['philips'];
     default:
       return null;

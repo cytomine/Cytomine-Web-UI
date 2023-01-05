@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="box error" v-if="permissionError || notFoundError">
@@ -31,7 +30,7 @@
       v-if="image"
       :image="image"
       editable
-      @setResolution="resolution => image.resolution = resolution"
+      @setResolution="resolution => setResolution(resolution)"
       @setMagnification="magnification => image.magnification = magnification"
       @delete="deleteImage()"
     />
@@ -44,6 +43,7 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 
 import {ImageInstance} from 'cytomine-client';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-information',
@@ -75,7 +75,9 @@ export default {
       this.permissionError = false;
       this.notFoundError = false;
       try {
-        this.image = await ImageInstance.fetch(this.idImage);
+        let image = await ImageInstance.fetch(this.idImage);
+        image.vendor = vendorFromFormat(image.contentType);
+        this.image = image;
       }
       catch(error) {
         console.log(error);
@@ -91,6 +93,12 @@ export default {
     deleteImage() {
       this.$router.push(`/project/${this.image.project}`);
     },
+    setResolution(resolution) {
+      this.image.physicalSizeX = resolution.x;
+      this.image.physicalSizeY = resolution.y;
+      this.image.physicalSizeZ = resolution.z;
+      this.image.fps = resolution.t;
+    }
   },
   created() {
     this.loadImage();

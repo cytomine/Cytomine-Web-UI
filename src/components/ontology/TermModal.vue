@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,10 +12,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="save()">
-  <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">
+  <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="color-picker-modal">
     <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
       <b-input v-model="name" name="name" v-validate="'required'" />
     </b-field>
@@ -38,6 +37,7 @@
 import {Term} from 'cytomine-client';
 import {Sketch} from 'vue-color';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import {presetColors,randomColor} from '@/utils/color-manipulation.js';
 
 export default {
   name: 'term-modal',
@@ -58,25 +58,10 @@ export default {
   },
   computed: {
     presetColors() {
-      return [
-        '#F44E3B',
-        '#FB9E00',
-        '#FCDC00',
-        '#68BC00',
-        '#16A5A5',
-        '#009CE0',
-        '#7B10D8',
-        '#F06292',
-        '#000',
-        '#777',
-        '#FFF'
-      ];
+      return presetColors;
     }
   },
   methods: {
-    randomColor() {
-      return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
-    },
     async save() {
       let result = await this.$validator.validateAll();
       if(!result) {
@@ -120,41 +105,41 @@ export default {
   },
   created() {
     this.name = this.term ? this.term.name : '';
-    this.color = {hex: this.term ? this.term.color : this.randomColor()};
+    this.color = {hex: this.term ? this.term.color : randomColor()};
   }
 };
 </script>
 
 <style>
-.term-modal .vc-sketch {
+.color-picker-modal .vc-sketch {
   width: auto;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-active-color {
+.color-picker-modal .vc-sketch-active-color {
   box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-saturation-wrap {
+.color-picker-modal .vc-sketch-saturation-wrap {
   padding-bottom: 15vh;
 }
 
 /* hide alpha channel */
-.term-modal .vc-sketch-field--single:last-child {
+.color-picker-modal .vc-sketch-field--single:last-child {
   display: none;
 }
 /* --- */
 
-.term-modal .vc-sketch-sliders {
+.color-picker-modal .vc-sketch-sliders {
   display: flex;
   align-items: center;
 }
 
-.term-modal .vc-sketch-hue-wrap {
+.color-picker-modal .vc-sketch-hue-wrap {
   flex-grow: 1;
 }
 
-.term-modal .vc-sketch-alpha-wrap {
+.color-picker-modal .vc-sketch-alpha-wrap {
   display: none;
 }
 </style>

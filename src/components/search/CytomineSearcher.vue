@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
@@ -89,7 +88,6 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-
     displayResults() {
       return this.isActive && !this.error && this.searchString.length > 0;
     },

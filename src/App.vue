@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <login v-else-if="!currentUser" />
+    <login v-else-if="(!currentUser) && (!SSOEnabled)" />
 
     <template v-else>
       <cytomine-navbar />
@@ -71,7 +71,8 @@ export default {
     return {
       communicationError: false,
       loading: true,
-      timeout: null
+      timeout: null,
+      SSOEnabled: null
     };
   },
   computed: {
@@ -81,7 +82,9 @@ export default {
   methods: {
     async loginWithToken() {
       try {
-        await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+        let {shortTermToken} = await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+
         await this.fetchUser();
       }
       catch(error) {
@@ -94,18 +97,31 @@ export default {
         return; // window not visible or inactive user => stop pinging
       }
       try {
-        let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+        let {authenticated, shortTermToken} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+
+        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+
         if(this.currentUser && !authenticated) {
           await this.$store.dispatch('logout');
         }
         if(!this.currentUser && authenticated) {
           await this.fetchUser();
         }
+        if(!this.currentUser && this.SSOEnabled) {
+          let redirect = encodeURIComponent(window.location.href);
+          window.location = constants.SSO_LOGIN+'?cytomine_redirect='+redirect;
+        }
         this.communicationError = false;
       }
       catch(error) {
         console.log(error);
-        this.communicationError = true;
+        if (error.toString().indexOf('401')!==-1) {
+          this.communicationError = false;
+          Cytomine.instance.logout();
+        }
+        else {
+          this.communicationError = true;
+        }
       }
 
       clearTimeout(this.timeout);
@@ -119,17 +135,28 @@ export default {
     }
   },
   async created() {
-    let Settings;
+    // check if token is set in the query param, if true => set it in the session storage
+    var parameters = window.location.href.split("?");
+    if (parameters && parameters.length===2 && parameters[1].startsWith('redirect_token') && parameters[1].split('=').length===2) {
+      let token = parameters[1].split('=')[1];
+      localStorage.setItem('cytomine-authentication-token', token);
+      sessionStorage.removeItem('cytomine-authentication-token');
+      history.pushState({}, null, parameters[0]);
+    }
+
+    let settings;
     await axios
       .get('configuration.json')
-      .then(response => (Settings = response.data));
+      .then(response => (settings = response.data));
 
-    for(var i in constants){
-      if(Settings.hasOwnProperty(i)) {
-        constants[i] = Settings[i];
+    for (let i in settings) {
+      if (Object.prototype.hasOwnProperty.call(constants, i)
+        || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
+        constants[i] = settings[i];
       }
     }
     Object.freeze(constants);
+    this.SSOEnabled = constants.SSO_ENABLED;
 
     new Cytomine(constants.CYTOMINE_CORE_HOST);
 

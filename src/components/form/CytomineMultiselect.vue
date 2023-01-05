@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <multiselect
   :value="value" @input="$emit('input', $event)"
@@ -25,7 +24,7 @@
   :optionHeight="30"
   :showLabels="false"
   :multiple="multiple"
-  :close-on-select="multiple ? false : true"
+  :close-on-select="internalCloseOnSelect"
   :searchable="searchable"
   :clear-on-select="multiple ? false : true"
   :showPointer="false"
@@ -78,6 +77,7 @@ export default {
     groupLabel: {type: String},
     groupValues: {type: String},
     multiple: {type: Boolean, default: false},
+    closeOnSelect: {type: Boolean, default: null},
     selectAllAvailable: {type: Boolean, default: true},
     searchable: {type: Boolean, default: true},
     allowEmpty: {type: Boolean, default: true},
@@ -102,6 +102,9 @@ export default {
     },
     countNotDisplayed() {
       return this.value.length - this.maxNbDisplayed;
+    },
+    internalCloseOnSelect() {
+      return (this.closeOnSelect === null) ? (!this.multiple) : this.closeOnSelect;
     }
   },
   methods: {

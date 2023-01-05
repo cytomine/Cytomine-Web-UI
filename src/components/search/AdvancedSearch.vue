@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="box error" v-if="error">
@@ -84,6 +83,10 @@
               />
             </b-table-column>
 
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{project.id}}
+            </b-table-column>
+
             <b-table-column field="name" :label="$t('name')" sortable width="250">
               <router-link :to="`/project/${project.id}`">
                 {{ project.name }}
@@ -104,7 +107,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=algo`">
                 {{ project.numberOfJobAnnotations }}
               </router-link>
@@ -167,9 +170,13 @@
           :revision="revision"
         >
           <template #default="{row: image}">
+            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper">
+              {{image.id}}
+            </b-table-column>
+
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <img :src="image.thumb" class="image-overview">
+                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 
@@ -204,7 +211,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+            <b-table-column  v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
               <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                 {{ image.numberOfJobAnnotations }}
               </router-link>
@@ -255,10 +262,13 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-
+import ImageThumbnail from '@/components/image/ImageThumbnail';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import constants from '@/utils/constants.js';
 export default {
   name: 'advanced-search',
   components: {
+    ImageThumbnail,
     IconProjectMemberRole,
     ImageName,
     CytomineTable,
@@ -286,6 +296,7 @@ export default {
       openedDetails: [],
       revision: 0,
 
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       excludedProperties: [
         'name',
         'imagesPreview',
@@ -296,18 +307,28 @@ export default {
     };
   },
   methods: {
+    appendShortTermToken,
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
     }, 500)
   },
   computed: {
     currentUser: get('currentUser/user'),
-
+    shortTermToken: get('currentUser/shortTermToken'),
     pathSearchString() {
       return this.$route.params.searchString;
     },
+    querySearchString() {
+      return this.$route.query.searchString;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     regexp() {
       return getWildcardRegexp(this.searchString);
+    },
+    lowCaseSearchString() {
+      return this.searchString.toLowerCase();
     },
     projectCollection() {
       let collection = new ProjectCollection({
@@ -355,16 +376,37 @@ export default {
       if(val) {
         this.searchString = val;
       }
-    }
+    },
+    querySearchString(val) {
+      if(val && !this.pathSearchString) {
+        this.searchString = val;
+      }
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
   },
   async created() {
-    this.searchString = this.pathSearchString || '';
+    this.searchString = this.pathSearchString || this.querySearchString || '';
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;
@@ -391,4 +433,8 @@ export default {
   margin-bottom: 0.4em;
 }
 
+>>> .image-thumbnail {
+  max-height: 4rem;
+  max-width: 10rem;
+}
 </style>

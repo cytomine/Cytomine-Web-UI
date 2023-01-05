@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 */
 
 import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
+
 import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
@@ -82,6 +83,10 @@ export default {
       }
       await Promise.all(promises);
     },
+    async reloadProject({state, commit}) {
+      let project = await Project.fetch(state.project.id);
+      commit('setProject', project);
+    },
 
     async updateProject({state, dispatch, commit}, updatedProject) {
       let reloadOntology = state.project.ontology !== updatedProject.ontology;
@@ -112,6 +117,12 @@ export default {
       commit('setMembers', members);
     },
 
+    async fetchFollowers(_, {userId, imageId}) {
+      let followers = await UserCollection.fetchFollowers(userId, imageId);
+      //followers.forEach(follower => follower.fullName = fullName(follower));
+      return followers;
+    },
+
     async fetchOntology({state, commit}) {
       let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
       commit('setOntology', ontology);
@@ -123,10 +134,13 @@ export default {
       let currentUser = rootState.currentUser.user;
       let project = state.project;
       return getters.canManageProject ||
-        (!currentUser.guestByNow && !project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
+        (!project.isReadOnly && (idLayer === currentUser.id || !project.isRestricted));
     },
 
     canEditAnnot: (_, getters, rootState) => annot => {
+      if (annot.type === AnnotationType.ALGO) {
+        return false;
+      }
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
       if(annot.type === AnnotationType.REVIEWED) {

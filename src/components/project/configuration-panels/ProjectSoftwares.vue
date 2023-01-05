@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="project-softwares-wrapper">
@@ -33,7 +32,7 @@
     >
       <template #default="{row: software}">
         <b-table-column field="name" :label="$t('name')" sortable width="100">
-          <router-link :to="`/software/${software.id}`">
+          <router-link :to="`/algorithm/${software.id}`">
             {{ software.fullName }}
           </router-link>
         </b-table-column>
@@ -47,7 +46,7 @@
         </b-table-column>
 
         <b-table-column field="selected" :label="$t('status')" sortable width="100">
-          <button :class="['button', software.selected ? 'is-success' : 'is-danger']" @click="toggleSoftware(software)">
+          <button :disabled="loadingToggleSoftware[software.id]" :class="['button', software.selected ? 'is-success' : 'is-danger']" @click="toggleSoftware(software)">
             {{$t(software.selected ? 'enabled' : 'disabled')}}
           </button>
         </b-table-column>
@@ -93,7 +92,8 @@ export default {
       searchString: '',
       perPage: 10,
 
-      softwares: []
+      softwares: [],
+      loadingToggleSoftware: {}
     };
   },
   computed: {
@@ -107,6 +107,7 @@ export default {
   methods: {
     async toggleSoftware(software) {
       try {
+        this.$set(this.loadingToggleSoftware, software.id, true);
         if(software.selected) {
           await software.softwareProject.delete();
           software.selected = false;
@@ -127,6 +128,7 @@ export default {
           text: this.$t('notif-error-change-status-algorithm-project', {softwareName: software.name})
         });
       }
+      this.$set(this.loadingToggleSoftware, software.id, false);
     },
     sortBySoftwareStatus(a, b, asc) {
       return ((asc) ? 1 : -1) * (this.getSoftwareStatusValue(a) - this.getSoftwareStatusValue(b));

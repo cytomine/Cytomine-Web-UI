@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
   <div>
     <i
       class="fas fa-user-cog"
-      :class="{disabled: !isManager, clickable: editable}"
+      :class="{disabled: !isManager, editable: editable}"
       :title="$t(label)"
       @click="$emit('toggleManager')"
     >

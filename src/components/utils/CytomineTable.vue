@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -85,7 +85,8 @@ export default {
   name: 'cytomine-table',
   props: {
     collection: Object,
-    perPageOptions: {type: Array, default: () => [10, 25, 50, 100]},
+    isEmpty: {type: Boolean, default: false},
+    perPageOptions: {type: Array, default: () => [5, 10, 25, 50, 100]},
     perPage: {type: Number, default: 25},
     currentPage: {type: Number, default: 1},
     detailed: {type: Boolean, default: true},
@@ -167,7 +168,14 @@ export default {
       }
 
       try {
-        let data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
+        let data = {array: [], totalNbItems: 0};
+        if (this.isEmpty) {
+          this.internalCurrentPage = 1;
+        }
+        else {
+          data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
+        }
+
         this.data = data.array;
         this.total = data.totalNbItems;
 

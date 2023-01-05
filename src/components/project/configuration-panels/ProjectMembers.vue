@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,8 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
-
 
 <template>
 <div class="list-members-wrapper">
@@ -32,7 +30,7 @@
           {{$t('role')}}
         </div>
         <div class="filter-body">
-          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" :multiple="true"
+          <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple
             :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
@@ -49,6 +47,7 @@
 
     <cytomine-table
       :collection="MemberCollection"
+      :is-empty="this.selectedRoles.length === 0"
       :currentPage.sync="currentPage"
       :perPage.sync="perPage"
       :sort.sync="sortField"
@@ -100,7 +99,7 @@
 
       <template #footer>
         <div class="has-text-centered">
-          <a :href="exportURL" target="_self" class="button is-link">{{$t('button-export-as-csv')}}</a>
+          <a @click="download(exportURL)" class="button is-link">{{$t('button-export-as-csv')}}</a>
         </div>
       </template>
     </cytomine-table>
@@ -118,7 +117,7 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -126,6 +125,7 @@ import AddMemberModal from './AddMemberModal';
 import {fullName} from '@/utils/user-utils.js';
 import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'projet-members',
@@ -163,6 +163,8 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
+
     MemberCollection() {
       let collection = new UserCollection({
         filterKey: 'project',
@@ -182,7 +184,6 @@ export default {
       return collection;
     },
 
-
     exportURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
@@ -190,6 +191,7 @@ export default {
   },
 
   methods: {
+    appendShortTermToken,
     displayMemberOrigin(member){
       let key;
       if(member.origin === 'LDAP') key = 'LDAP';
@@ -208,9 +210,11 @@ export default {
         this.error = true;
       }
     },
-
+    download(url) {
+      window.open(appendShortTermToken(url, this.shortTermToken));
+    },
     confirmMembersRemoval() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('remove-members'),
         message: this.$tc('remove-members-confirmation-message', this.selectedMembers.length, {
           count: this.selectedMembers.length,
@@ -222,7 +226,6 @@ export default {
         onConfirm: () => this.removeSelectedMembers()
       });
     },
-
     async removeSelectedMembers() {
       try {
         await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
@@ -237,7 +240,7 @@ export default {
 
     confirmToggleManager(member) {
       if(member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
-        this.$dialog.confirm({
+        this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
           message: this.$tc('remove-yourself-from-manager-confirmation-message'),
           type: 'is-danger',
@@ -278,7 +281,12 @@ export default {
     async toggleRepresentative(member) {
       try {
         if(member.role === this.representativeRole.value) {
-          await ProjectRepresentative.delete(0, this.project.id, member.id);
+          if ((await this.project.fetchRepresentatives()).array.length < 2) {
+            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+          }
+          else {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
+          }
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
@@ -290,6 +298,9 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
       }
     },
+  },
+  mounted() {
+    appendShortTermToken();
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];

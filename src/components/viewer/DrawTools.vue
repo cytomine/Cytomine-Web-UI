@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="draw-tools-wrapper">
@@ -39,6 +38,7 @@
         class="button"
         :disabled="disabledDraw"
         @click="showTermSelector = !showTermSelector"
+        :title="disabledDrawMessage"
       >
         <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
       </button>
@@ -57,22 +57,60 @@
         />
       </div>
     </div>
+    <div
+      v-if="tracks && maxRank > 1"
+      class="buttons has-addons are-small track-selection"
+      :class="{'has-preview': tracksToAssociate.length > 0}"
+      v-click-outside="() => showTrackSelector = false"
+    >
+      <button
+        v-tooltip="$t('tracks-new-annotation')"
+        class="button"
+        :disabled="disabledDraw"
+        @click="showTrackSelector = !showTrackSelector"
+        :title="disabledDrawMessage"
+      >
+        <span class="icon is-small"><i class="fas fa-route"></i></span>
+      </button>
+
+      <div class="color-preview" :style="{'border-color': backgroundTracksNewAnnot}">
+        <span v-if="tracksToAssociate.length > 1">{{tracksToAssociate.length}}</span>
+      </div>
+
+      <div class="tracks-tree-container" v-show="showTrackSelector">
+        <b-input v-model="searchStringTrack" :placeholder="$t('search-placeholder')" size="is-small" />
+        <track-tree
+          class="track-tree"
+          v-model="tracksToAssociate"
+          :tracks="tracks"
+          :searchString="searchStringTrack"
+          :allow-new="true"
+          :allow-edition="true"
+          :image="image"
+          @newTrack="refreshTracks"
+          @updatedTrack="refreshTracks"
+          @deletedTrack="refreshTracks"
+        />
+      </div>
+    </div>
 
     <div class="buttons has-addons are-small">
       <button
         v-if="isToolDisplayed('point')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('point')"
         class="button"
         :class="{'is-selected': activeTool === 'point'}"
         @click="activateTool('point')"
       >
-        <span class="icon is-small"><i class="fas fa-map-marker-alt"></i></span>
+        <span class="icon is-small"><i class="fas fa-map-pin"></i></span>
       </button>
 
       <button
         v-if="isToolDisplayed('line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('line')"
         class="button"
         :class="{'is-selected': activeTool === 'line'}"
@@ -84,6 +122,7 @@
       <button
         v-if="isToolDisplayed('freehand-line')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-line')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-line'}"
@@ -103,6 +142,7 @@
       <button
         v-if="isToolDisplayed('rectangle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('rectangle')"
         class="button"
         :class="{'is-selected': activeTool === 'rectangle'}"
@@ -114,6 +154,7 @@
       <button
         v-if="isToolDisplayed('circle')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('circle')"
         class="button"
         :class="{'is-selected': activeTool === 'circle'}"
@@ -125,6 +166,7 @@
       <button
         v-if="isToolDisplayed('polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'polygon'}"
@@ -136,6 +178,7 @@
       <button
         v-if="isToolDisplayed('freehand-polygon')"
         :disabled="disabledDraw"
+        :title="disabledDrawMessage"
         v-tooltip="$t('freehand-polygon')"
         class="button"
         :class="{'is-selected': activeTool === 'freehand-polygon'}"
@@ -170,6 +213,18 @@
     </button>
     </div>
   </template>
+
+  <div class="buttons has-addons are-small">
+      <button
+      v-if="isToolDisplayed('screenshot')"
+      :disabled="disabledDraw"
+      v-tooltip="$t('screenshot')"
+      class="button"
+      @click="takeScreenshot()"
+    >
+      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+    </button>
+  </div>
 
   <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons are-small">
     <button
@@ -238,6 +293,17 @@
     </button>
 
     <button
+        v-if="isToolDisplayed('resize')"
+        :disabled="isToolDisabled('resize')"
+        v-tooltip="$t('rescale')"
+        class="button"
+        :class="{'is-selected': activeEditTool === 'rescale'}"
+        @click="activateEditTool('rescale')"
+    >
+      <span class="icon is-small"><i class="fas fa-expand"></i></span>
+    </button>
+
+    <button
       v-if="isToolDisplayed('rotate')"
       :disabled="isToolDisabled('rotate')"
       v-tooltip="$t('rotate')"
@@ -257,6 +323,56 @@
     >
       <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
     </button>
+  </div>
+
+  <div class="buttons has-addons are-small" v-if="isToolDisplayed('copy-paste')">
+    <button
+      :disabled="isToolDisabled('copy')"
+      v-tooltip="$t('copy')"
+      class="button"
+      @click="copy()"
+    >
+      <span class="icon is-small"><i class="fas fa-copy"></i></span>
+    </button>
+    <button
+      :disabled="disabledPaste"
+      v-tooltip="$t('paste')"
+      class="button"
+      @click="paste()"
+    >
+      <span class="icon is-small"><i class="fas fa-paste"></i></span>
+    </button>
+    <div class="special-paste-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+      <button
+        :disabled="disabledPaste"
+        v-tooltip="$t('paste-repeat')"
+        class="button"
+        @click="showRepeatSelector = !showRepeatSelector"
+      >
+      <span class="icon is-small">
+        <i class="fas fa-paste"></i>
+        <i class="fas fa-star special-paste-icon"></i>
+      </span>
+      </button>
+
+      <div class="special-paste-container" v-show="showRepeatSelector">
+        <div class="panel">
+          <div class="panel-block">
+            <p>
+              <i18n path="paste-repeat-info">
+                <input v-model="nbRepeats" type="number" place="input" class="repeat-input" min="1" :max="maxRepeats"/>
+              </i18n>
+              <br>
+            </p>
+            <div class="repeat-button-container">
+              <button class="button is-small" @click="repeat()">{{$t('paste-repeat')}}</button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
   </div>
 
   <div v-if="isToolDisplayed('undo-redo')" class="buttons has-addons are-small">
@@ -285,17 +401,20 @@
 import {get} from '@/utils/store-helpers';
 
 import OntologyTree from '@/components/ontology/OntologyTree';
+import TrackTree from '@/components/track/TrackTree';
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 
 import WKT from 'ol/format/WKT';
+import {containsExtent} from 'ol/extent';
 
 import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
-import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
+import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
 
 export default {
   name: 'draw-tools',
   components: {
+    TrackTree,
     OntologyTree,
     IconPolygonFreeHand,
     IconLineFreeHand
@@ -307,12 +426,17 @@ export default {
     return {
       showTermSelector: false,
       format: new WKT(),
-      searchStringTerm: ''
+      searchStringTerm: '',
+      showTrackSelector: false,
+      searchStringTrack: '',
+      showRepeatSelector: false,
+      nbRepeats: 2,
     };
   },
   computed: {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
+    currentUser: get('currentUser/user'),
 
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -320,11 +444,24 @@ export default {
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
     },
+    viewerModule() {
+      return this.$store.getters['currentProject/currentViewerModule'];
+    },
     imageWrapper() {
       return this.viewerWrapper.images[this.index];
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slice() {
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
+    },
+    multipleActiveSlices() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
+    },
+    maxRank() {
+      return this.$store.getters[this.imageModule + 'maxRank'];
     },
     ongoingCalibration() {
       return this.imageWrapper.ongoingCalibration;
@@ -343,6 +480,25 @@ export default {
     backgroundTermsNewAnnot() {
       if(this.termsToAssociate.length === 1) {
         return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
+      }
+      else {
+        return '#e2e2e2';
+      }
+    },
+    tracks() {
+      return this.imageWrapper.tracks.tracks;
+    },
+    tracksToAssociate: {
+      get() {
+        return this.imageWrapper.draw.tracksNewAnnots;
+      },
+      set(tracks) {
+        this.$store.commit(this.imageModule + 'setTracksNewAnnots', tracks);
+      }
+    },
+    backgroundTracksNewAnnot() {
+      if(this.tracksToAssociate.length === 1) {
+        return this.tracks.find(track => this.tracksToAssociate[0] === track.id).color;
       }
       else {
         return '#e2e2e2';
@@ -382,7 +538,10 @@ export default {
       return !this.layers.find(layer => layer.drawOn);
     },
     disabledDraw() {
-      return this.noActiveLayer || this.ongoingCalibration;
+      return this.noActiveLayer || this.multipleActiveSlices || this.ongoingCalibration;
+    },
+    disabledDrawMessage() {
+      return (this.multipleActiveSlices) ? this.$t('warning-cannot-draw-multiple-slices') : null;
     },
     actions() {
       return this.imageWrapper.undoRedo.actions;
@@ -395,6 +554,23 @@ export default {
     },
     reviewMode() {
       return this.imageWrapper.review.reviewMode;
+    },
+    copiedAnnot: {
+      get() {
+        return this.viewerWrapper.copiedAnnot;
+      },
+      set(annot) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
+    disabledPaste() {
+      return this.disabledDraw || !this.copiedAnnot;
+    },
+    imageExtent() {
+      return [0, 0, this.image.width, this.image.height];
+    },
+    maxRepeats() {
+      return this.maxRank - this.slice.rank - 1;
     }
   },
   watch: {
@@ -423,6 +599,10 @@ export default {
     isToolDisabled(tool) {
       if(!this.selectedFeature) {
         return true; // no feature selected -> all edit tools disabled
+      }
+
+      if (tool === 'copy') {
+        return false;
       }
 
       let ftr = this.selectedFeature;
@@ -501,7 +681,7 @@ export default {
         return;
       }
 
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-annotation'),
         type: 'is-danger',
@@ -509,6 +689,84 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.deleteAnnot()
       });
+    },
+
+    copy() {
+      let feature = this.selectedFeature;
+      if(!feature) {
+        return;
+      }
+
+      this.copiedAnnot = feature.properties.annot.clone();
+      this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
+    },
+    async paste() {
+      if (!this.copiedAnnot) {
+        return;
+      }
+
+      let location;
+      let geometry = new WKT().readGeometry(this.copiedAnnot.location);
+
+      if (this.image.id === this.copiedAnnot.image || containsExtent(this.imageExtent, geometry.getExtent())) {
+        location = this.copiedAnnot.location;
+      }
+      else {
+        let extent = geometry.getExtent();
+        let center = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
+        geometry.translate(this.image.width / 2 - center[0], this.image.height / 2 - center[1]);
+        if (containsExtent(this.imageExtent, geometry.getExtent())) {
+          location = new WKT().writeGeometry(geometry);
+        }
+      }
+
+      if (!location) {
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
+        return;
+      }
+
+      let annot = new Annotation({
+        location: location,
+        image: this.image.id,
+        slice: this.slice.id,
+        user: this.currentUser.id,
+        term: this.copiedAnnot.term,
+        track: this.copiedAnnot.track
+      });
+
+      try {
+        await annot.save();
+        // TODO in backend: response should include userByTerm and correct value for term
+        // (https://github.com/cytomine/Cytomine-core/issues/1143)
+        annot.term = this.copiedAnnot.term.slice();
+        annot.userByTerm = this.copiedAnnot.term.map(term => {
+          return {term, user: [this.currentUser.id]};
+        });
+        // ----
+
+        this.$eventBus.$emit('addAnnotation', annot);
+        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+        this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+      }
+    },
+    async repeat() {
+      if (!this.copiedAnnot) {
+        return;
+      }
+
+      try {
+        await this.copiedAnnot.repeat(this.slice.id, this.nbRepeats);
+        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
+        this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
+      }
     },
 
 
@@ -577,6 +835,7 @@ export default {
         if(jsonAnnot) {
           let annot = new Annotation(jsonAnnot);
           await updateTermProperties(annot);
+          await updateTrackProperties(annot);
           return annot;
         }
       }
@@ -632,8 +891,16 @@ export default {
       }
     },
 
+    refreshTracks() {
+      this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
+    },
+
+    takeScreenshot(){
+      this.$emit('screenshot');
+    },
+
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
@@ -678,18 +945,23 @@ export default {
             this.activateTool('freehand-polygon');
           }
           return;
+        case 'tool-screenshot':
+          if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
+            this.takeScreenshot();
+          }
+          return;
         case 'tool-delete':
-          if (this.isToolDisplayed('delete') && !this.isToolDisplayed('delete')) {
+          if (this.isToolDisplayed('delete') && !this.disabledDraw) {
             this.confirmDeletion();
           }
           return;
         case 'tool-undo':
-          if (this.isToolDisplayed('undo')) {
+          if (this.isToolDisplayed('undo-redo')) {
             this.undo();
           }
           return;
         case 'tool-redo':
-          if (this.isToolDisplayed('redo')) {
+          if (this.isToolDisplayed('undo-redo')) {
             this.redo();
           }
           return;
@@ -728,14 +1000,30 @@ export default {
             this.activateEditTool('translate');
           }
           return;
+        case 'tool-rescale':
+          if (this.isToolDisplayed('resize') && !this.isToolDisabled('resize')) {
+            this.activateEditTool('rescale');
+          }
+          return;
         case 'tool-rotate':
           if (this.isToolDisplayed('rotate') && !this.isToolDisabled('rotate')) {
             this.activateEditTool('rotate');
           }
           return;
         case 'toggle-current':
+        case 'toggle-all-current':
           if (this.configUI['project-explore-annotation-main'] && this.selectedFeature) {
             this.displayAnnotDetails = !this.displayAnnotDetails;
+          }
+          return;
+        case 'tool-copy':
+          if (this.isToolDisplayed('copy-paste') && !this.isToolDisabled('copy')) {
+            this.copy();
+          }
+          return;
+        case 'tool-paste':
+          if (this.isToolDisplayed('copy-paste') && !this.disabledPaste) {
+            this.paste();
           }
           return;
       }
@@ -772,32 +1060,35 @@ export default {
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 
-.term-selection {
+.term-selection, .track-selection, .special-paste-selection {
   position: relative;
 }
 
-.term-selection.has-preview i.fas {
+.term-selection.has-preview i.fas, .track-selection.has-preview i.fas {
   position: relative;
   right: 0.25em;
   top: 0.2em;
   font-size: 0.9em;
 }
 
-.term-selection .ontology-tree-container {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container, .special-paste-container {
   position: absolute;
   top: 100%;
   left: -1.5em;
   margin-top: 5px;
-  background: white;
   min-width: 18em;
   max-width: 20vw;
   max-height: 40vh;
   overflow: auto;
-  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
-  border-radius: 4px;
 }
 
-.term-selection:not(.has-preview) .color-preview {
+.term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+  border-radius: 4px;
+  background: white;
+}
+
+.term-selection:not(.has-preview) .color-preview, .track-selection:not(.has-preview) .color-preview {
   display:none;
 }
 
@@ -817,22 +1108,64 @@ export default {
   line-height: 0.9em;
   font-family: Arial;
 }
+
+.track-selection .color-preview {
+  border: 1.5px solid;
+}
+
+.repeat-input {
+  width: 50px;
+}
+
+.repeat-button-container {
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
 </style>
 
 <style lang="scss">
 $colorActiveIcon: #fff;
 
 .draw-tools-wrapper {
+  .special-paste-selection .special-paste-container {
+    p {
+      margin: 0.75em;
+      font-size: 0.9em;
+    }
 
-  .term-selection .ontology-tree-container {
+    .panel-block:last-of-type {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    .panel-block:first-of-type {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    .panel {
+      font-size: 0.9rem;
+    }
+
+    .panel-block {
+      padding: 0.2em 0.5em;
+    }
+  }
+
+  .term-selection .ontology-tree-container, .track-selection .tracks-tree-container {
 
     .control {
       margin: 0.75em;
       margin-bottom: 0;
     }
 
-    .ontology-tree {
+    .ontology-tree, .track-tree {
       padding: 0.75em 0;
+    }
+
+    .sl-vue-tree-sidebar {
+      margin-right: 1.5em;
     }
   }
 
@@ -847,6 +1180,13 @@ $colorActiveIcon: #fff;
 
   .icon svg {
     height: 1.15em !important;
+  }
+
+  .icon .special-paste-icon {
+    font-size: 0.5em;
+    position: absolute;
+    right: 0.2rem;
+    top: 0.2rem;
   }
 }
 </style>

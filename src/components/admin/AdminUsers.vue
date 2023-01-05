@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div>
   <b-loading :is-full-page="false" :active="loading" />
@@ -22,16 +21,44 @@
       <p> {{ $t('unexpected-error-info-message') }} </p>
     </b-message>
     <template v-else>
-      <div class="columns">
+      <div class="columns is-marginless">
         <div class="column is-one-quarter">
           <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
         </div>
-
+        <div class="column is-one-quarter">
+          <button class="button" @click="filtersOpened = !filtersOpened">
+            <span class="icon">
+              <i class="fas fa-filter"></i>
+            </span>
+            <span>{{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}</span>
+          </button>
+        </div>
         <div class="column is-one-half has-text-right-desktop">
           <button class="button is-link" @click="startUserCreation()">
             {{$t('button-new-user')}}
           </button>
         </div>
+      </div>
+
+      <div class="column">
+        <b-collapse :open="filtersOpened">
+          <div class="filters columns">
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('status')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
+                                      :searchable="false" />
+              </div>
+            </div>
+            <div class="column filter is-one-quarter" style="padding: 2.5rem">
+              <b-checkbox v-model="onlyPublicUser">
+                {{$t('only-public-user')}}
+              </b-checkbox>
+            </div>
+          </div>
+        </b-collapse>
       </div>
 
       <cytomine-table
@@ -44,9 +71,8 @@
         :revision="revision"
       >
         <template #default="{row: user}">
-
           <b-table-column field="username" :label="$t('username')" sortable width="100">
-            {{user.username}}
+            <username :user="user" :online="user.online" :displayFullName="false" /> <span v-if="user.publicUser" class="icon"><i class="fas fa-users"></i></span>
           </b-table-column>
 
           <b-table-column field="fullName" :label="$t('name')" sortable width="150">
@@ -56,6 +82,12 @@
           <b-table-column field="role" :label="$t('role')" sortable width="50">
             <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
           </b-table-column>
+
+<!--          <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">-->
+<!--            <span class="tag is-success" v-if="user.apiEnabled">{{$t('api-enabled')}}</span>-->
+<!--            <span class="tag is-danger" v-else>{{$t('api-disabled')}}</span>-->
+<!--          </b-table-column>-->
+
 
           <b-table-column field="email" :label="$t('email')" sortable width="150">
             <a :href="`mailto:${user.email}`">{{ user.email }}</a>
@@ -76,6 +108,13 @@
             <template v-else>-</template>
           </b-table-column>
 
+          <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
+            <template v-if="user.lastConnection">
+              {{Number(user.lastConnection) | moment('ll LT')}}
+            </template>
+            <em v-else class="has-text-grey">{{$t('no-record')}}</em>
+          </b-table-column>
+
           <b-table-column label="" width="100">
             <div class="buttons">
               <button class="button is-link is-small" @click="startUserEdition(user)">
@@ -86,6 +125,9 @@
               </button>
               <button v-else class="button is-success is-small" @click="unlock(user)">
                 {{$t('button-unlock')}}
+              </button>
+              <button v-if="user.publicUser" class="button is-link is-small" @click="generateToken(user)">
+                {{$t('button-token')}}
               </button>
             </div>
           </b-table-column>
@@ -109,19 +151,23 @@
 </template>
 
 <script>
+
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection} from 'cytomine-client';
+import {Cytomine, UserCollection} from 'cytomine-client';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import Username from '@/components/user/Username';
 
 export default {
   name: 'admin-users',
   components: {
     CytomineTable,
     UserModal,
-    UserDetails
+    UserDetails,
+    Username,
+    CytomineMultiselect
   },
   data() {
     return {
@@ -135,7 +181,13 @@ export default {
       sortOrder: '',
       revision: 0,
       modal: false,
-      editedUser: null
+      editedUser: null,
+      filtersOpened: false,
+      onlineStatus: this.$t('online'),
+      offlineStatus: this.$t('offline'),
+      availableStatus: [],
+      selectedStatus: [],
+      onlyPublicUser: false,
     };
   },
   computed: {
@@ -143,9 +195,22 @@ export default {
       return rolesMapping;
     },
     userCollection() {
+      let includeOnline = this.selectedStatus.includes(this.onlineStatus);
+      let includeOffline = this.selectedStatus.includes(this.offlineStatus);
+      let includeOnlineAndOffline = includeOnline && includeOffline;
+
+
       let collection = new UserCollection({
         withRoles: true
       });
+      collection['onlineFilter'] = includeOnlineAndOffline ? null : (includeOnline? true : (includeOffline? false : null));
+
+      if (this.onlyPublicUser) {
+        collection['publicUser'] = {
+          equals: true
+        }
+      }
+
       if(this.searchString) {
         collection['fullName'] = {
           ilike: encodeURIComponent(this.searchString)
@@ -159,7 +224,10 @@ export default {
     displayMemberOrigin(member){
       let key;
       if(member.origin === 'LDAP') key = 'LDAP';
-      if(member.origin === 'BOOTSTRAP') key = 'system';
+      else if(member.origin === 'BOOTSTRAP') key = 'system';
+      else if(member.origin === 'SHIBBOLETH') key = 'Shibboleth';
+      else if(member.origin === 'SAML') key = 'SAML';
+      else if(member.origin === 'LTI') key = 'LTI';
       else key = 'manual';
 
       return this.$t(key);
@@ -185,6 +253,21 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
       }
     },
+    async generateToken(user) {
+      try {
+        let token = await Cytomine.instance.token(user.username, -1);
+        this.$buefy.dialog.alert({
+          title: this.$t('token'),
+          message: token,
+          type: 'is-info',
+          confirmText: this.$t('button-close')
+        });
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
+      }
+    },
     startUserCreation() {
       this.editedUser = null;
       this.modal = true;
@@ -201,9 +284,13 @@ export default {
       this.editedUser.populate(user);
     }
   },
-  async created() {
-    this.revision++;
+  async activated() {
     this.loading = false;
+  },
+  async created() {
+    this.availableStatus = [this.onlineStatus, this.offlineStatus];
+    this.selectedStatus = this.availableStatus;
+    this.revision++;
   }
 };
 </script>

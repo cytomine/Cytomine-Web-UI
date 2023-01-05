@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="sidebar-wrapper" :class="{expanded: expanded}" ref="sidebar">
@@ -32,7 +31,7 @@
           {{ $t('annotations') }}
         </a>
       </router-link>
-      <router-link  v-if="isTabDisplayed('jobs')" tag="li" :to="`/project/${project.id}/analysis`">
+      <router-link  v-if="isTabDisplayed('jobs') && algoEnabled" tag="li" :to="`/project/${project.id}/analysis`">
         <a>
           <i class="fas fa-tasks"></i>
           {{ $t('analysis') }}
@@ -69,9 +68,15 @@
 
 <script>
 import {get, sync} from '@/utils/store-helpers';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-sidebar',
+  data(){
+    return {
+      algoEnabled: constants.ALGORITHMS_ENABLED
+    };
+  },
   computed: {
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),

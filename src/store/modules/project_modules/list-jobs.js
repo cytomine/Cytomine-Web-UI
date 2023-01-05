@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ export default {
   state() {
     return {
       filters: {
-        softwares: [],
-        launchers: [],
-        statuses: []
+        softwares: null,
+        launchers: null,
+        statuses: null,
+        favorites: null
       },
       executionDate: null,
 
@@ -61,6 +62,16 @@ export default {
 
     setOpenedDetails(state, value) {
       state.openedDetails = value;
+    }
+  },
+
+  getters: {
+    nbActiveFilters: state => {
+      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+    },
+
+    nbEmptyFilters: state => {
+      return Object.values(state.filters).filter(val => val && val.length === 0).length;
     }
   }
 };

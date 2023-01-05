@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="user-activity-wrapper">
@@ -120,7 +119,7 @@
 
           <template #footer>
             <p class="has-text-centered">
-              <a class="button is-link" :href="connections.downloadURL" target="_self">
+              <a class="button is-link" @click="downloadConnections(connections)">
                 {{$t('button-export-as-csv')}}
               </a>
             </p>
@@ -183,7 +182,7 @@
           <template #default="{row: consultation}">
             <b-table-column :label="$t('overview')" field="created">
               <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <img :src="consultation.imageThumb" class="image-overview">
+                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 
@@ -222,7 +221,7 @@
 
           <template #footer>
             <p class="has-text-centered">
-              <a class="button is-link" :href="consultations.downloadURL" target="_self">
+              <a class="button is-link" @click="downloadConnections(consultations)">
                 {{$t('button-export-as-csv')}}
               </a>
             </p>
@@ -256,10 +255,14 @@ import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import constants from '@/utils/constants.js';
 
 import moment from 'moment';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
 
 export default {
   name: 'member-activity-details',
   components: {
+    ImageThumbnail,
     CytomineDatepicker,
     ProjectConnectionDetails,
     LastConnectionsChart
@@ -291,9 +294,11 @@ export default {
     idUser() {
       return Number(this.$route.params.idUser);
     },
-    project: get('currentProject/project')
+    project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken')
   },
   methods: {
+    appendShortTermToken,
     async fetchData() {
       try {
         await Promise.all([
@@ -326,6 +331,9 @@ export default {
     },
     async fetchConsultations() {
       this.consultations = await ImageConsultationCollection.fetchAll({project: this.project.id, user: this.idUser, resume: true});
+    },
+    downloadConnections(connections) {
+      window.location.assign(appendShortTermToken(connections.downloadURL, this.shortTermToken), '_blank');
     }
   },
   async created() {
@@ -352,7 +360,7 @@ li {
   margin-bottom: 0.5em;
 }
 
-.image-overview {
+.image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }

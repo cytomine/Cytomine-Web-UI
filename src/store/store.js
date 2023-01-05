@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ import Vuex from 'vuex';
 
 import currentUser from './modules/current-user.js';
 import currentProject from './modules/current-project.js';
+import currentStorage from './modules/current-storage.js';
 import ontologies from './modules/ontologies.js';
 import listProjects from './modules/list-projects.js';
 import listSoftware from './modules/list-software.js';
+import listStorages from './modules/list-storages.js';
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
@@ -29,9 +31,12 @@ let store = new Vuex.Store({
     logout({state, commit}) {
       commit('currentUser/resetState');
       commit('currentProject/resetState');
+      commit('currentStorage/resetState');
       commit('ontologies/resetState');
       commit('listProjects/resetState');
       commit('listSoftware/resetState');
+      commit('listStorages/resetState');
+
       for(let key in state.projects) {
         this.unregisterModule(['projects', key]);
       }
@@ -40,10 +45,15 @@ let store = new Vuex.Store({
   modules: {
     currentUser,
     currentProject,
+    currentStorage,
     ontologies,
     listProjects,
     listSoftware,
+    listStorages,
     projects: {
+      namespaced: true
+    },
+    storages: {
       namespaced: true
     }
   },

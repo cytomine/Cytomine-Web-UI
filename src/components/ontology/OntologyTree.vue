@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
@@ -86,7 +85,8 @@ export default {
     multipleSelection: {type: Boolean, default: true},
     allowDrag: {type: Boolean, default: false},
     allowEdition: {type: Boolean, default: false},
-    allowNew: {type: Boolean, default: false}
+    allowNew: {type: Boolean, default: false},
+    hiddenNodes: {type: Array, default: () => []}
   },
   components: {
     SlVueTree,
@@ -120,16 +120,14 @@ export default {
     },
     regexp() {
       this.filter();
+    },
+    hiddenNodes() {
+      this.filter();
     }
   },
   methods: {
     makeTree() {
-      if(!this.ontology) {
-        this.treeNodes = [];
-        return;
-      }
-
-      let nodes = this.createSubTree(this.ontology.children.array.slice());
+      let nodes = (this.ontology) ? this.createSubTree(this.ontology.children.array.slice()) : [];
       let additionalNodes = this.createSubTree(this.additionalNodes.slice());
       this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
@@ -152,7 +150,7 @@ export default {
           name: term.name,
           color: term.color,
           parent: term.parent,
-          ontology: this.ontology.id,
+          ontology: (this.ontology) ? this.ontology.id : null,
           hidden: false
         },
         children: term.children && term.children.length > 0 ? this.createSubTree(term.children) : []
@@ -161,7 +159,7 @@ export default {
 
     filter() {
       this.applyToAllNodes(node => {
-        let match = this.regexp.test(node.title);
+        let match = this.regexp.test(node.title) && !this.hiddenNodes.includes(node.data.id);
         if(node.children) {
           let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
           node.isExpanded = matchInChildren;
@@ -199,7 +197,9 @@ export default {
             }
           }
           else {
-            this.internalSelectedNodes = [node.data.id];
+            if(this.internalSelectedNodes.includes(node.data.id)) this.internalSelectedNodes = [];
+            else this.internalSelectedNodes = [node.data.id];
+
             this.$emit('select', node.data.id);
           }
         });
@@ -250,7 +250,7 @@ export default {
     },
 
     openModal() {
-      this.$modal.open({
+      this.$buefy.modal.open({
         parent: this,
         component: TermModal,
         props: {
@@ -289,7 +289,7 @@ export default {
     },
 
     confirmTermDeletion(node) {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-term', {name: node.data.name}),
         type: 'is-danger',

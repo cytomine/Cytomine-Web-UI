@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 import VueRouter from 'vue-router';
 
 // Import Components
@@ -39,6 +38,12 @@ import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 import SoftwareInformation from './components/software/SoftwareInformation.vue';
+import ListStorages from './components/storage/ListStorages';
+import StorageHome from './components/storage/StorageHome';
+import StorageUpload from './components/storage/StorageUpload';
+import StorageConfiguration from './components/storage/StorageConfiguration';
+import StorageRedirection from './components/storage/StorageRedirection';
+import StorageFiles from './components/storage/StorageFiles';
 
 // Define routes
 const routes = [
@@ -51,19 +56,49 @@ const routes = [
     component: ListProjects,
   },
   {
+    path: '/storages',
+    component: ListStorages,
+  },
+  {
     path: '/storage',
+    component: StorageRedirection, // if only 1 storage, redirect on /storage/:id otherwise, redirect on /storageS
+  },
+  {
+    path: '/storage/:idStorage',
     component: CytomineStorage,
+    children: [
+      {
+        path: '',
+        component: StorageHome
+      },
+      {
+        path: 'upload',
+        component: StorageUpload
+      },
+      {
+        path: 'uploaded-files',
+        component: StorageFiles
+      },
+      {
+        path: 'configuration',
+        component: StorageConfiguration
+      },
+      {
+        path: '*',
+        component: PageNotFound
+      }
+    ]
   },
   {
     path: '/ontology/:idOntology?',
     component: ListOntologies
   },
   {
-    path: '/software',
+    path: '/algorithm',
     component: ListSoftware
   },
   {
-    path: '/software/:idSoftware',
+    path: '/algorithm/:idSoftware',
     component: SoftwareInformation
   },
   {
@@ -91,11 +126,19 @@ const routes = [
         component: CytomineViewer
       },
       {
+        path: 'image/:idImages/slice/:idSlices',
+        component: CytomineViewer
+      },
+      {
         path: 'image/:idImage/information',
         component: ImageInformation
       },
       {
         path: 'image/:idImages/annotation/:idAnnotation',
+        component: CytomineViewer
+      },
+      {
+        path: 'image/:idImages/slice/:idSlices/annotation/:idAnnotation',
         component: CytomineViewer
       },
       {
@@ -142,6 +185,8 @@ const routes = [
   {path: '/project', redirect: '/projects'},
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
+  {path: '/software', redirect: '/algorithm'},
+  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},

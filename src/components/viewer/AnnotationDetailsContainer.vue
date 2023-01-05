@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="annotation-details-playground" ref="playground">
   <vue-draggable-resizable
@@ -23,7 +22,8 @@
     :resizable="false"
     drag-handle=".drag"
     @dragstop="dragStop"
-    :w="width" :h="height" :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+    ref="detailsPanel"
   >
     <div class="actions">
       <h1>{{$t('current-selection')}}</h1>
@@ -39,15 +39,23 @@
       <annotation-details
         :annotation="selectedFeature.properties.annot"
         :terms="terms"
+        :images="[image]"
+        :slices="slices"
+        :profiles="profiles"
+        :tracks="tracks"
         :users="allUsers"
         :showImageInfo="false"
+        :showChannelInfo="showChannelInfo"
         :key="selectedFeature.id"
         :showComments="showComments"
-        @addTerm="addTerm"
-        @updateTerms="updateTerms()"
-        @updateProperties="updateProperties()"
-        @centerView="centerViewOnAnnot()"
-        @deletion="handleDeletion()"
+        @addTerm="$emit('addTerm', $event)"
+        @addTrack="$emit('addTrack', $event)"
+        @updateTerms="$emit('updateTermsOrTracks', annot)"
+        @updateTracks="$emit('updateTermsOrTracks', annot)"
+        @updateProperties="$emit('updateProperties')"
+        @select="$emit('select', $event)"
+        @centerView="$emit('centerView', ($event) ? $event : annot)"
+        @deletion="$emit('delete', annot)"
       />
     </div>
   </vue-draggable-resizable>
@@ -60,25 +68,19 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
-import {Action, updateTermProperties} from '@/utils/annotation-utils.js';
-
-import WKT from 'ol/format/WKT';
 
 export default {
   name: 'annotations-details-container',
   components: {VueDraggableResizable, AnnotationDetails},
   props: {
     index: String,
-    view: Object
   },
   data() {
     return {
       width: 320,
-      height: 500,
-      users: [],
+      projectUsers: [],
       userJobs: [],
       reload: true,
-      format: new WKT(),
       showComments: false
     };
   },
@@ -94,6 +96,15 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    showChannelInfo() {
+      return this.imageWrapper.activeSlices && this.imageWrapper.activeSlices.length > 1;
+    },
+    profiles() {
+      return this.imageWrapper.profile ? [this.imageWrapper.profile] : [];
     },
     displayAnnotDetails: {
       get() {
@@ -115,7 +126,7 @@ export default {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     allUsers() {
-      let allUsers = this.users.concat(this.userJobs);
+      let allUsers = this.projectUsers.concat(this.userJobs);
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
@@ -124,6 +135,9 @@ export default {
     },
     terms() {
       return this.$store.getters['currentProject/terms'] || [];
+    },
+    tracks() {
+      return this.imageWrapper.tracks.tracks;
     }
   },
   watch: {
@@ -140,39 +154,18 @@ export default {
   },
   methods: {
     async fetchUsers() {
-      this.users = (await UserCollection.fetchAll()).array;
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.image.project.id,
+      });
+
+      this.projectUsers = (await collection.fetchAll()).array;
     },
     async fetchUserJobs() {
       this.userJobs = (await UserJobCollection.fetchAll({
         filterKey: 'project',
         filterValue: this.image.project
       })).array;
-    },
-
-    centerViewOnAnnot() {
-      let geometry = this.format.readGeometry(this.annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.depth});
-    },
-
-    addTerm(term) {
-      this.$store.dispatch(this.viewerModule + 'addTerm', term);
-    },
-
-    async updateTerms() {
-      let updatedAnnot = await this.annot.clone().fetch();
-      await updateTermProperties(updatedAnnot);
-
-      this.$eventBus.$emit('editAnnotation', updatedAnnot);
-      this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
-    },
-
-    updateProperties() {
-      this.$store.dispatch(this.imageModule + 'refreshProperties', this.index);
-    },
-
-    handleDeletion() {
-      this.$store.commit(this.imageModule + 'addAction', {annot: this.annot, type: Action.DELETE});
-      this.$eventBus.$emit('deleteAnnotation', this.annot);
     },
 
     dragStop(x, y) {
@@ -184,7 +177,11 @@ export default {
 
       if(this.$refs.playground) {
         let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
-        let maxY = Math.max(this.$refs.playground.clientHeight - this.height, 0);
+        let height = 500;
+        if (this.$refs.detailsPanel) {
+          height = this.$refs.detailsPanel.height;
+        }
+        let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
         this.positionAnnotDetails = {x, y};

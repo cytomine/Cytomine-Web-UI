@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="layers">
   <h1>{{ $t('annotation-layers') }}</h1>
@@ -21,12 +20,8 @@
   </b-message>
   <template v-else>
     <b-field>
-      <b-select :placeholder="$t('select-layer')" size="is-small" v-model="selectedLayer">
-        <option v-for="layer in unselectedLayers" :value="layer" :key="layer.id">
-          {{ layerName(layer) }}
-        </option>
-      </b-select>
-      <button class="button is-small" @click="addLayer()" :disabled="!selectedLayer">{{ $t('button-add') }}</button>
+      <cytomine-multiselect v-model="selectedLayer" :options="unselectedLayers"
+                            :multiple="false" :searchable="true" label="label" track-by="value" />
     </b-field>
     <table class="table">
       <thead>
@@ -74,6 +69,8 @@ import {get} from '@/utils/store-helpers';
 
 import {fullName} from '@/utils/user-utils.js';
 import {ProjectDefaultLayerCollection} from 'cytomine-client';
+import _ from 'lodash';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'layers-panel',
@@ -83,6 +80,9 @@ export default {
       type: Array,
       default: () => []
     }
+  },
+  components: {
+    CytomineMultiselect
   },
   data() {
     return {
@@ -108,6 +108,9 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
@@ -129,7 +132,7 @@ export default {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
-      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname.toLowerCase() < b.lastname.toLowerCase()) ? -1 : 1 );
     },
     nbReviewedAnnotations() {
       return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
@@ -148,6 +151,9 @@ export default {
     }
   },
   watch: {
+    selectedLayer() {
+      this.addLayer(this.selectedLayer);
+    },
     activePanel() {
       this.fetchIndexLayers();
     },
@@ -168,6 +174,22 @@ export default {
           this.layers = this.layers.filter(layer => !layer.isReview);
         }
       }
+    },
+    layersToPreload: {
+      deep: true,
+      handler: function(layersToPreload) {
+        layersToPreload.forEach(layerId => {
+          let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
+          if(index !== -1) {
+            if (!this.selectedLayers[index].visible) {
+              this.toggleLayerVisibility(index);
+            }
+            return;
+          }
+
+          this.addLayerById(layerId, true);
+        });
+      }
     }
   },
   methods: {
@@ -186,16 +208,6 @@ export default {
     },
     deleteAnnotationEventHandler(annot) {
       this.annotationEventHandler(annot);
-
-      let updatedProject = this.$store.state.currentProject.project.clone();
-      if(annot.type === 'UserAnnotation') {
-        updatedProject.numberOfAnnotations--;
-      }
-      else {
-        updatedProject.numberOfReviewedAnnotations--;
-      }
-
-      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {
@@ -215,12 +227,14 @@ export default {
 
       let name = fullName(layer);
 
+      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${name} (${indexLayer.countAnnotation || 0})`;
+      return `${name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {
-      return !layer.isReview && this.$store.getters['currentProject/canEditLayer'](layer.id);
+      return !layer.isReview && !layer.algo && this.$store.getters['currentProject/canEditLayer'](layer.id);
     },
 
     addLayerById(id, visible) {
@@ -256,8 +270,14 @@ export default {
 
     async fetchLayers() {
       this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
+
       if(this.hasReviewLayer) {
         this.layers.push(this.reviewLayer);
+      }
+
+      for (let i = 0; i < this.layers.length; i++) {
+        this.layers[i].label = this.layerName(this.layers[i]);
+        this.layers[i].value = this.layers[i].id;
       }
 
       // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
@@ -270,15 +290,29 @@ export default {
       if(!force && this.activePanel !== 'layers') {
         return;
       }
-      this.indexLayers = await this.image.fetchAnnotationsIndex();
+      // TODO: optimize, backend should be able to send indexes for several slices at once.
+      let indexLayers = await Promise.all(this.slices.map(async slice => await slice.fetchAnnotationsIndex()));
+      indexLayers = Object.values(_.groupBy(indexLayers.flat(), 'user'));
+      this.indexLayers = indexLayers.map(userIndexLayers => userIndexLayers.reduce((a, b) => {
+        return {
+          user: a.user,
+          countAnnotation: a.countAnnotation + b.countAnnotation,
+          countReviewedAnnotation: a.countReviewedAnnotation + b.countReviewedAnnotation
+        };
+      }, {user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0}));
+      // ----
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
-      if(key === 'tool-review-toggle') { // toggle review layer
+      key = key.replace('toggle-all-', 'toggle-');
+      if(key === 'toggle-selected-layers') {
+        this.selectedLayers.forEach((layer, index) => this.toggleLayerVisibility(index));
+      }
+      else if(key === 'toggle-review-layer') {
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if(index !== -1) {
           this.toggleLayerVisibility(index);
@@ -404,4 +438,5 @@ td .button {
   font-size: 0.8em;
   width: 15em;
 }
+
 </style>

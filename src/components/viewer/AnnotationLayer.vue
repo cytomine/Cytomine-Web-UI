@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.-->
-
 
 <template>
 <vl-layer-vector
@@ -63,6 +62,12 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
+    },
     annotsIdsToSelect() {
       return this.imageWrapper.selectedFeatures.annotsToSelect.map(annot => annot.id);
     },
@@ -85,6 +90,7 @@ export default {
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
         term.visible;
+        term.color;
         term.opacity;
       });
       this.imageWrapper.style.displayNoTerm;
@@ -92,6 +98,9 @@ export default {
       this.imageWrapper.properties.selectedPropertyKey;
       this.imageWrapper.properties.selectedPropertyColor;
       this.imageWrapper.review.reviewMode;
+      this.imageWrapper.style.wrappedTracks.forEach(track => {
+        track.color;
+      });
 
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];
@@ -107,15 +116,15 @@ export default {
     }
   },
   methods: {
-    clearFeatures() {
+    clearFeatures(cache=true) {
       if(this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache: true});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
         this.$refs.olSource.clearFeatures();
       }
     },
 
     annotBelongsToLayer(annot) {
-      return annotBelongsToLayer(annot, this.layer, this.image);
+      return annotBelongsToLayer(annot, this.layer, this.sliceIds);
     },
 
     addAnnotationHandler(annot) {
@@ -134,10 +143,14 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear=false}={}) {
+    reloadAnnotationsHandler({idImage, clear=false, hard=false}={}) {
       if(!idImage || idImage === this.image.id) {
         if(clear) {
           this.clearFeatures();
+        }
+        else if(hard) {
+          this.clearFeatures(false);
+          this.loader();
         }
         else {
           this.loader();
@@ -212,12 +225,14 @@ export default {
       let annots = await new AnnotationCollection({
         user: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
+        slices: this.sliceIds,
         reviewed: this.layer.isReview,
         notReviewedOnly: !this.layer.isReview && this.reviewMode,
         bbox: extent.join(),
         showWKT: true,
         showTerm: true,
         showGIS: true,
+        showTrack: true,
         kmeans: true
       }).fetchAll();
 
@@ -348,7 +363,7 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$on('selectAnnotationInLayer', this.selectAnnotationHandler);
     this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
@@ -357,7 +372,7 @@ export default {
   beforeDestroy() {
     // unsubscribe from all events
     this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
     this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
     this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);

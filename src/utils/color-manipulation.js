@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2020. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -125,3 +125,39 @@ export function operation(pixels) {
 
   return pixel;
 }
+
+function integerToHexa(integer) {
+  var hexacode = integer.toString(16);
+  return hexacode.length == 1 ? '0' + hexacode : hexacode;
+}
+
+function darkerHexaColor(hexa){
+  var intColor = parseInt(hexa, 16) - 12;
+  if(intColor < 0) intColor = 0;
+  return integerToHexa(intColor);
+}
+
+export function getDarkerColor(hexacode) {
+  var darkerRed = darkerHexaColor(hexacode[1]+hexacode[2]);
+  var darkerGreen = darkerHexaColor(hexacode[3]+hexacode[4]);
+  var darkerBlue = darkerHexaColor(hexacode[5]+hexacode[6]);
+  return '#' + darkerRed + darkerGreen + darkerBlue;
+}
+
+export function randomColor() {
+  return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+}
+
+export let presetColors = [
+  '#F44E3B',
+  '#FB9E00',
+  '#FCDC00',
+  '#68BC00',
+  '#16A5A5',
+  '#009CE0',
+  '#7B10D8',
+  '#F06292',
+  '#000',
+  '#777',
+  '#FFF'
+];

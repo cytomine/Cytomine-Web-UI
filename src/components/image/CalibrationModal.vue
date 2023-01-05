@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,31 +12,53 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <form @submit.prevent="setResolution()">
-  <cytomine-modal :active="active" :title="$t('calibrate-image')" @close="$emit('update:active', false)" :can-cancel="!loading">
+  <cytomine-modal :active="active" :title="$t('calibrate-image')" @close="$emit('update:active', false)">
     <b-message type="is-warning" has-icon icon-size="is-small">
       {{ $t('warning-change-applies-in-project-only') }}
     </b-message>
-
     <div class="columns">
       <div class="column">
-        <b-field
-          :label="$t(pixelLength ? 'length-of-drawn-segment' : 'resolution')"
-          :type="fieldType"
-          :message="errors.first('resolution')"
-        >
+        <b-field :label="$t(pixelLength ? 'length-of-drawn-segment' : 'resolution')" :type="{'is-danger': this.errors.has('resolution')}" :message="errors.first('resolution')">
           <b-field :type="fieldType">
-            <b-input v-model="calibrationField" name="resolution" v-validate="'required|decimal|positive'" expanded />
-            <b-select v-model="calibrationFactor">
+            <b-input v-model="calibrationFieldX" name="resolution" v-validate="'required|decimal|positive'" expanded />
+            <b-select v-model="calibrationFactorX">
               <option :value="0.001"> {{ $t(pixelLength ? 'nm' : 'nm-per-pixel') }}</option>
               <option :value="1">{{ $t(pixelLength ? 'um' : 'um-per-pixel') }}</option>
               <option :value="1000">{{ $t(pixelLength ? 'mm' : 'mm-per-pixel') }}</option>
             </b-select>
           </b-field>
+
+          <b-field v-if="this.image.depth > 1" :label="$t('z-resolution')"
+                   :type="{'is-danger': this.errors.has('resolution-z')}" :message="errors.first('resolution-z')">
+            <b-field :type="{'is-danger': this.errors.has('resolution-z')}">
+              <b-input v-model="calibrationFieldZ" name="resolution-z" v-validate="'required|decimal|positive'" expanded />
+              <b-select v-model="calibrationFactorZ">
+                <option :value="0.001"> {{ $t('nm-per-slice') }}</option>
+                <option :value="1">{{ $t('um-per-slice') }}</option>
+                <option :value="1000">{{ $t('mm-per-slice') }}</option>
+              </b-select>
+            </b-field>
+          </b-field>
+
+          <b-field v-if="this.image.duration > 1" :label="$t('frame-rate')"
+                   :type="{'is-danger': this.errors.has('resolution-t')}" :message="errors.first('resolution-t')">
+            <b-field :type="{'is-danger': this.errors.has('resolution-t')}">
+              <b-input v-model="calibrationFieldT" name="resolution-t" v-validate="'required|decimal|positive'" expanded />
+              <p class="control">
+                <span class="button is-static">{{$t('frame-per-second')}}</span>
+              </p>
+            </b-field>
+          </b-field>
+
         </b-field>
       </div>
+
+
+
+
+
 
       <p v-if="!pixelLength" class="control column is-narrow">
         <button class="button" type="button" @click="$emit('setScale')">{{ $t('button-set-scale') }}</button>
@@ -75,8 +97,11 @@ export default {
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-      calibrationField: '',
-      calibrationFactor: 1,
+      calibrationFieldX: '',
+      calibrationFactorX: 1,
+      calibrationFieldZ: '',
+      calibrationFactorZ: 1,
+      calibrationFieldT: '',
       loading: false
     };
   },
@@ -88,7 +113,7 @@ export default {
       return {'is-danger': this.errors.has('resolution')};
     },
     computedResolution() {
-      let resolution = Number(this.calibrationField)*this.calibrationFactor;
+      let resolution = Number(this.calibrationFieldX)*this.calibrationFactorX;
       if(this.pixelLength) {
         resolution /= this.pixelLength;
       }
@@ -98,7 +123,9 @@ export default {
   watch: {
     active(val) {
       if(val) {
-        this.calibrationField = this.pixelLength ? '' : this.image.resolution;
+        this.calibrationFieldX = this.pixelLength ? '' :this.image.physicalSizeX;
+        this.calibrationFieldZ = this.pixelLength ? '' : this.image.physicalSizeZ;
+        this.calibrationFieldT = this.pixelLength ? '' : this.image.fps;
       }
     }
   },
@@ -113,10 +140,22 @@ export default {
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();
-        updateImage.resolution = this.computedResolution;
+        updateImage.physicalSizeX = this.computedResolution;
+        updateImage.physicalSizeY = Number(this.calibrationFieldX)*this.calibrationFactorX;
+        if (this.image.depth > 1) {
+          updateImage.physicalSizeZ = Number(this.calibrationFieldZ)*this.calibrationFactorZ;
+        }
+        if (this.image.duration > 1) {
+          updateImage.fps = Number(this.calibrationFieldT);
+        }
         await updateImage.save();
 
-        this.$emit('setResolution', updateImage.resolution);
+        this.$emit('setResolution', {
+          x: updateImage.physicalSizeX,
+          y: updateImage.physicalSizeY,
+          z: updateImage.physicalSizeZ,
+          t: updateImage.fps
+        });
 
         this.$notify({
           type: 'success',
