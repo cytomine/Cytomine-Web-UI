@@ -141,7 +141,7 @@ export default {
       try {
         let updateImage = this.image.clone();
         updateImage.physicalSizeX = this.computedResolution;
-        updateImage.physicalSizeY = Number(this.calibrationFieldX)*this.calibrationFactorX;
+        updateImage.physicalSizeY = this.computedResolution;;
         if (this.image.depth > 1) {
           updateImage.physicalSizeZ = Number(this.calibrationFieldZ)*this.calibrationFactorZ;
         }
@@ -175,10 +175,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.columns {
-  align-items: flex-end;
-  margin-bottom: 0px !important;
-}
-</style>

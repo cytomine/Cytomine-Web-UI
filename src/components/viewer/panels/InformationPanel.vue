@@ -79,9 +79,6 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
-            <button class="button is-small" @click="overview()">
-              {{$t('button-get-overview')}}
-            </button>
             <a class="button is-small" v-if="canDownloadImages" @click="download(image, shortTermToken)">
               {{$t('button-download')}}
             </a>
@@ -172,9 +169,6 @@ export default {
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
       this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
-    },
-    async overview() {
-      window.open(Cytomine.instance.host+'/api/imageinstance/'+this.image.id+'/camera.json?maxSize=1000', '_blank');
     },
     download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken));
