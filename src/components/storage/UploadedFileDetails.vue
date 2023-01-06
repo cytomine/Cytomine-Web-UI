@@ -55,6 +55,10 @@
         <a v-if="node.data.macroURL" @click="slidePreview = node.data">
           {{$t('slide-preview')}}
         </a>
+        <span v-if="node.data.thumbURL">/</span>
+        <a v-if="node.data.image" @click="imageExplore = node.data">
+          {{$t('image-explore')}}
+        </a>
       </p>
     </template>
   </sl-vue-tree>
@@ -92,6 +96,129 @@
     </h2>
     <image-thumbnail :url="slidePreview.macroURL" :size="512" :key="slidePreview.macroURL" :macro="true" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
   </template>
+  <template v-else-if="imageExplore">
+    <h2>
+      {{$t('image-explore-of', {filename: imageExplore.originalFilename})}}
+      <button class="button is-small" @click="imageExplore = null">{{$t('button-hide')}}</button>
+    </h2>
+    <uploaded-file-details-viewer :image="image"></uploaded-file-details-viewer>
+  </template>
+
+  <template v-if="image && profileEnabled">
+    <h2>{{$t('companion-files')}}</h2>
+    <table class="table">
+      <tbody>
+      <tr>
+        <td class="prop-label">{{$t('profile')}}</td>
+        <td class="prop-content">
+          <profile-status :image="image" @update="$emit('update')"></profile-status>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </template>
+
+  <h2>{{$t('image-metadata')}}</h2>
+  <div class="image-details-wrapper">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="prop-label">{{$t('description')}}</td>
+          <td class="prop-content">
+            <cytomine-description :object="image" :canEdit="canEdit" />
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('tags')}}</td>
+          <td class="prop-content">
+            <cytomine-tags :object="image" :canEdit="canEdit" />
+          </td>
+        </tr>
+        <!--
+        <tr>
+          <td class="prop-label">{{$t('properties')}}</td>
+          <td class="prop-content">
+            <cytomine-properties :object="image" :canEdit="canEdit" />
+          </td>
+        </tr>
+        -->
+        <tr>
+          <td class="prop-label">{{$t('attached-files')}}</td>
+          <td class="prop-content">
+            <attached-files :object="image" :canEdit="canEdit" />
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('filename')}}</td>
+          <td class="prop-content">
+            {{image.originalFilename}}
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('image-size')}}</td>
+          <td class="prop-content">
+            {{`${image.width} x ${image.height} ${$t('pixels')}`}}
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('resolution')}}</td>
+          <td class="prop-content">
+            <template v-if="image.resolution">{{image.resolution.toFixed(3)}} {{$t('um-per-pixel')}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('magnification')}}</td>
+          <td class="prop-content">
+            <template v-if="image.magnification">{{image.magnification}}</template>
+            <template v-else>{{$t('unknown')}}</template>
+          </td>
+        </tr>
+        <tr>
+          <td class="prop-label">{{$t('actions')}}</td>
+          <td class="prop-content">
+            <div class="buttons are-small">
+              <template v-if="canEdit">
+                <button class="button" @click="isRenameModalActive = true">
+                  {{$t('button-rename')}}
+                </button>
+                <!--
+                <button class="button" @click="isCalibrationModalActive = true">
+                  {{$t('button-set-calibration')}}
+                </button>
+                <button class="button" @click="isMagnificationModalActive = true">
+                  {{$t('button-set-magnification')}}
+                </button>
+                -->
+              </template>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <rename-modal
+      :title="$t('rename-image')"
+      :currentName="image.originalFilename"
+      :active.sync="isRenameModalActive"
+      @rename="rename"
+    />
+
+    <!--
+    <magnification-modal
+      :image="image"
+      :active.sync="isMagnificationModalActive"
+      @setMagnification="(magnification) => image.magnification=magnification"
+    />
+
+    <calibration-modal
+      :image="image"
+      :active.sync="isCalibrationModalActive"
+      @setResolution="(resolution) => image.resolution=resolution"
+    />
+    -->
+  </div>
+
 </div>
 </template>
 
@@ -99,6 +226,14 @@
 import SlVueTree from 'sl-vue-tree';
 import {UploadedFile, UploadedFileCollection, AbstractImage, UploadedFileStatus as UFStatus} from 'cytomine-client';
 import UploadedFileStatus from './UploadedFileStatus';
+import CytomineDescription from '@/components/description/CytomineDescription';
+import CytomineProperties from '@/components/property/CytomineProperties';
+import CytomineTags from '@/components/tag/CytomineTags';
+import AttachedFiles from '@/components/attached-file/AttachedFiles';
+import MagnificationModal from '@/components/image/MagnificationModal';
+import CalibrationModal from '@/components/image/CalibrationModal';
+import RenameModal from '@/components/utils/RenameModal';
+import UploadedFileDetailsViewer from '@/components/storage/UploadedFileDetailsViewer';
 import filesize from 'filesize';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
@@ -109,24 +244,40 @@ export default {
   components: {
     ImageThumbnail,
     SlVueTree,
-    UploadedFileStatus
+    CytomineDescription,
+    CytomineTags,
+    CytomineProperties,
+    AttachedFiles,
+    MagnificationModal,
+    CalibrationModal,
+    RenameModal,
+    UploadedFileStatus,
+    UploadedFileDetailsViewer
   },
   props: {
     file: Object // WARNING: the root of the tree must be the file or its direct parent
   },
   data() {
     return {
+      canEdit : true,
       rootId: null,
       uploadedFiles: [],
       nodes: [],
       image: null,
+      abstractImage: null,
       slidePreview: null,
       samplePreview: null,
+      imageExplore: null,
       error: false,
 
       nbUploadedFiles: 0,
       currentPage: 1,
       nbPerPage: 10,
+
+      profileEnabled: false,
+      isRenameModalActive: false,
+      isCalibrationModalActive: false,
+      isMagnificationModalActive: false,
     };
   },
   computed: {
@@ -153,13 +304,21 @@ export default {
     slidePreview(val) {
       if(val) {
         this.samplePreview = null; // if slide preview enabled, disable sample preview
+        this.imageExplore = null; // and image explore
       }
     },
     samplePreview(val) {
       if(val) {
         this.slidePreview = null; // if sample preview enabled, disable slide preview
+        this.imageExplore = null; // and image explore
       }
     },
+    imageExplore(val) {
+      if (val) {
+        this.slidePreview = null;
+        this.samplePreview = null;
+      }
+    }
   },
   methods: {
     appendShortTermToken,
@@ -249,13 +408,33 @@ export default {
         this.$notify({type: 'error', text});
       }
     },
-    download(data) {
-      window.location.assign(appendShortTermToken(data.downloadURL, this.shortTermToken));
-    }
+    async rename(newName) {
+      let oldName = this.image.originalFilename;
+      try {
+        this.image.originalFilename = newName;
+        await this.image.save();
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-rename', {imageName: this.image.originalFilename})
+        });
+        this.$emit('update');
+      }
+      catch(error) {
+        this.image.originalFilename = oldName;
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-rename', {imageName: oldName})
+        });
+      }
+      this.isRenameModalActive = false;
+    },
+
   },
-  created() {
+  async created() {
     this.findRoot();
     this.fetchAbstractImage();
+    this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.domain.image.AbstractImage'});
   }
 };
 </script>
