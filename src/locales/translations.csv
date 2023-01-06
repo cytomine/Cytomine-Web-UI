@@ -1131,3 +1131,5 @@ leave-calibration-mode,Leave the calibration mode,Quitter le mode calibration
 calibration-annotation-must-be-segment,Error: the calibration annotation must be a segment,L'annotation servant à la calibration doit être un segment
 length-of-drawn-segment,Length of drawn segment,Longueur du segment tracé
 computed-resolution,Computed resolution,Résolution calculée
+image-explore,Explore, Explorer, Explorar
+image-explore-of,Exploration of {filename},Exploration de {filename},exploración de {filename}
