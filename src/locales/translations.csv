@@ -1101,14 +1101,14 @@ notif-error-score-value-delete,Failed to delete score value {scoreValue},Une err
 no-score,No score,Pas de score
 no-score-fitting-criteria,No score fitting criteria,Aucun score ne remplissant les critères de recherche
 upload-report,Upload report,Upload du rapport
-project-locking,Project locking,Verrouillage du projet
+project-locking-status,Project locking status,Status du verrouillage du projet
 notif-error-project-lock,Failed to lock the project,Une erreur a empêché de verrouiler le projet,Error al bloquear el proyecto
 notif-error-project-unlock,Failed to unlock the project,Une erreur a empêché de déverrouiler le projet,Error al desbloquear el proyecto
 notif-success-metadata-update,Metadata have been successfully updated,Les métadonnées ont été modifiées avec succès
 notif-error-metadata-update,An error occured during metadata update,Une erreur est survenue durant la modification des méta-données
 project-is-locked,Project is locked,Le projet est cloturé
 locked,Locked,Cloturé
-go-to-project-configuration,Go to the project configuration to change the locking status of this project.,
+unlocked,Unlocked,Ouvert
 consensus-scores,Consensus scores,Scores de consensus
 api-key-allowed,Api keys enabled,API keys activées,
 shared-annotation-mail-mode, Shared annotation mail mode, Mode de partage des emails de partage des annotations

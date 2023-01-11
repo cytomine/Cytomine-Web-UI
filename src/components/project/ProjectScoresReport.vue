@@ -44,18 +44,14 @@
       </div>
       <hr/>
       <div class="sub-panel">
-        <h2 class="has-text-centered"> {{ $t('project-locking') }}
-          <span v-if="!project.isLocked" class="tag is-success">
+        <h2 class="has-text-centered"> {{ $t('project-locking-status') }}</h2>
+        <div class="tags is-centered">
+            <span v-if="!project.isLocked" class="tag is-success">
               {{$t('unlocked')}}
-          </span>
+            </span>
           <span v-else class="tag is-danger">
               {{$t('locked')}}
-          </span>
-        </h2>
-        <div class="buttons is-centered">
-            <router-link :to="`/project/${project.id}/configuration`">
-              {{ $t('go-to-project-configuration') }}
-            </router-link>
+            </span>
         </div>
       </div>
     </div>
