@@ -122,78 +122,186 @@
   <div class="image-details-wrapper">
     <table class="table">
       <tbody>
-        <tr>
-          <td class="prop-label">{{$t('description')}}</td>
-          <td class="prop-content">
-            <cytomine-description :object="image" :canEdit="canEdit" />
+      <tr v-if="isPropDisplayed('overview')">
+        <td class="prop-label">{{$t('overview')}}</td>
+        <td class="prop-content" colspan="3">
+          <router-link :to="`/project/${image.project}/image/${image.id}`">
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+          </router-link>
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('status')">
+        <td class="prop-label">{{$t('status')}}</td>
+        <td class="prop-content" colspan="3">
+          <image-status :image="image" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('numberOfAnnotations')">
+        <td class="prop-label">{{$t('user-annotations')}}</td>
+        <td class="prop-content" colspan="3">
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
+            {{ image.numberOfAnnotations }}
+          </router-link>
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
+        <td class="prop-label">{{$t('analysis-annotations')}}</td>
+        <td class="prop-content" colspan="3">
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
+            {{ image.numberOfJobAnnotations }}
+          </router-link>
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
+        <td class="prop-label">{{$t('reviewed-annotations')}}</td>
+        <td class="prop-content" colspan="3">
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+            {{ image.numberOfReviewedAnnotations }}
+          </router-link>
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('description')">
+        <td class="prop-label">{{$t('description')}}</td>
+        <td class="prop-content" colspan="3">
+          <cytomine-description :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('tags')">
+        <td class="prop-label">{{$t('tags')}}</td>
+        <td class="prop-content" colspan="3">
+          <cytomine-tags :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('properties')">
+        <td class="prop-label">{{$t('properties')}}</td>
+        <td class="prop-content" colspan="3">
+          <cytomine-properties :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('attached-files')">
+        <td class="prop-label">{{$t('attached-files')}}</td>
+        <td class="prop-content" colspan="3">
+          <attached-files :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('original-filename')">
+        <td class="prop-label">{{$t('originalFilename')}}</td>
+        <td class="prop-content" colspan="3">
+          {{image.originalFilename}}
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('format')">
+        <td class="prop-label">{{$t('format')}}</td>
+        <td class="prop-content format" colspan="3">
+          {{image.contentType}}
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('vendor')">
+        <td class="prop-label">{{$t('vendor')}}</td>
+        <td class="prop-content" colspan="3">
+          <img v-if="vendor" :src="vendor.imgPath" :alt="vendor.name" :title="vendor.name" class="vendor-img">
+          <template v-else>{{$t('unknown')}}</template>
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('width') || isPropDisplayed('physicalSizeX')">
+        <template v-if="isPropDisplayed('width')">
+          <td class="prop-label">{{$t("image-width")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('physicalSizeX') ? 1 : 3">
+            {{image.width}} {{$t("pixels")}}
+            <template v-if="image.physicalSizeX">({{(image.width * image.physicalSizeX).toFixed(3)}} {{$t("um")}})</template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('tags')}}</td>
-          <td class="prop-content">
-            <cytomine-tags :object="image" :canEdit="canEdit" />
+        </template>
+        <template v-if="isPropDisplayed('physicalSizeX')">
+          <td class="prop-label">{{$t("x-resolution")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('width') ? 1 : 3">
+            <template v-if="image.physicalSizeX">{{image.physicalSizeX.toFixed(3)}} {{$t("um-per-pixel")}}</template>
+            <template v-else>{{$t("unknown")}}</template>
           </td>
-        </tr>
-        <!--
-        <tr>
-          <td class="prop-label">{{$t('properties')}}</td>
-          <td class="prop-content">
-            <cytomine-properties :object="image" :canEdit="canEdit" />
+        </template>
+      </tr>
+      <tr v-if="isPropDisplayed('height') || isPropDisplayed('physicalSizeY')">
+        <template v-if="isPropDisplayed('height')">
+          <td class="prop-label">{{$t("image-height")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('physicalSizeY') ? 1 : 3">
+            {{image.height}} {{$t("pixels")}}
+            <template v-if="image.physicalSizeY">({{(image.height * image.physicalSizeY).toFixed(3)}} {{$t("um")}})</template>
           </td>
-        </tr>
-        -->
-        <tr>
-          <td class="prop-label">{{$t('attached-files')}}</td>
-          <td class="prop-content">
-            <attached-files :object="image" :canEdit="canEdit" />
+        </template>
+        <template v-if="isPropDisplayed('physicalSizeY')">
+          <td class="prop-label">{{$t("y-resolution")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('height') ? 1 : 3">
+            <template v-if="image.physicalSizeY">{{image.physicalSizeY.toFixed(3)}} {{$t("um-per-pixel")}}</template>
+            <template v-else>{{$t("unknown")}}</template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('filename')}}</td>
-          <td class="prop-content">
-            {{image.originalFilename}}
+        </template>
+      </tr>
+      <tr v-if="isPropDisplayed('depth') || isPropDisplayed('physicalSizeZ')">
+        <template v-if="isPropDisplayed('depth')">
+          <td class="prop-label">{{$t("image-depth")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('physicalSizeZ') ? 1 : 3">
+            {{$tc("count-slices", image.depth, {count: image.depth})}}
+            <template v-if="image.physicalSizeZ">({{(image.depth * image.physicalSizeZ).toFixed(3)}} {{$t("um")}})</template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('image-size')}}</td>
-          <td class="prop-content">
-            {{`${image.width} x ${image.height} ${$t('pixels')}`}}
+        </template>
+        <template v-if="isPropDisplayed('physicalSizeZ')">
+          <td class="prop-label">{{$t("z-resolution")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('depth') ? 1 : 3">
+            <template v-if="image.physicalSizeZ">{{image.physicalSizeZ.toFixed(3)}} {{$t("um-per-slice")}}</template>
+            <template v-else-if="image.depth < 2">-</template>
+            <template v-else>{{$t("unknown")}}</template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('resolution')}}</td>
-          <td class="prop-content">
-            <template v-if="image.resolution">{{image.resolution.toFixed(3)}} {{$t('um-per-pixel')}}</template>
-            <template v-else>{{$t('unknown')}}</template>
+        </template>
+      </tr>
+      <tr v-if="isPropDisplayed('time') || isPropDisplayed('fps')">
+        <template v-if="isPropDisplayed('time')">
+          <td class="prop-label">{{$t("image-time")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('fps') ? 1 : 3">
+            {{$tc("count-frames", image.duration, {count: image.duration})}}
+            <template v-if="image.fps && image.duration > 0">
+              ({{formatMinutesSeconds(image.duration / image.fps)}})
+            </template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('magnification')}}</td>
-          <td class="prop-content">
-            <template v-if="image.magnification">{{image.magnification}}</template>
-            <template v-else>{{$t('unknown')}}</template>
+        </template>
+        <template v-if="isPropDisplayed('fps')">
+          <td class="prop-label">{{$t("frame-rate")}}</td>
+          <td class="prop-content-half" :colspan="isPropDisplayed('time') ? 1 : 3">
+            <template v-if="image.fps">{{image.fps.toFixed(3)}} {{$t("frame-per-second")}}</template>
+            <template v-else-if="image.time < 2">-</template>
+            <template v-else>{{$t("unknown")}}</template>
           </td>
-        </tr>
-        <tr>
-          <td class="prop-label">{{$t('actions')}}</td>
-          <td class="prop-content">
-            <div class="buttons are-small">
-              <template v-if="canEdit">
-                <button class="button" @click="isRenameModalActive = true">
-                  {{$t('button-rename')}}
-                </button>
-                <!--
-                <button class="button" @click="isCalibrationModalActive = true">
-                  {{$t('button-set-calibration')}}
-                </button>
-                <button class="button" @click="isMagnificationModalActive = true">
-                  {{$t('button-set-magnification')}}
-                </button>
-                -->
-              </template>
-            </div>
-          </td>
-        </tr>
+        </template>
+      </tr>
+      <tr v-if="isPropDisplayed('channels')">
+        <td class="prop-label">{{$t("image-channels")}}</td>
+        <td class="prop-content" colspan="3">
+          {{image.channels}} x {{image.samplePerPixel}}
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('size')">
+        <td class="prop-label">{{$t('image-size')}}</td>
+        <td class="prop-content" colspan="3">
+          {{`${image.width} x ${image.height} ${$t('pixels')}`}}
+        </td>
+      </tr>
+      <tr v-if="isPropDisplayed('magnification')">
+        <td class="prop-label">{{$t('magnification')}}</td>
+        <td class="prop-content" colspan="3">
+          <template v-if="image.magnification">{{image.magnification}}</template>
+          <template v-else>{{$t('unknown')}}</template>
+        </td>
+      </tr>
+      <tr>
+        <td class="prop-label">{{$t('actions')}}</td>
+        <td class="prop-content" colspan="3">
+          <div class="buttons are-small">
+            <template v-if="canEdit">
+              <button class="button" @click="isRenameModalActive = true">
+                {{$t('button-rename')}}
+              </button>
+            </template>
+          </div>
+        </td>
+      </tr>
       </tbody>
     </table>
 
@@ -238,7 +346,7 @@ import filesize from 'filesize';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
-
+import vendorFromFormat from '@/utils/vendor';
 export default {
   name: 'uploaded-file-details',
   components: {
@@ -252,7 +360,8 @@ export default {
     CalibrationModal,
     RenameModal,
     UploadedFileStatus,
-    UploadedFileDetailsViewer
+    UploadedFileDetailsViewer,
+    vendorFromFormat
   },
   props: {
     file: Object // WARNING: the root of the tree must be the file or its direct parent
@@ -288,6 +397,9 @@ export default {
         max: this.nbPerPage
       });
     },
+    vendor() {
+      return vendorFromFormat(this.image.contentType);
+    },
   },
   watch: {
     async file() {
@@ -322,6 +434,9 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    isPropDisplayed(prop) {
+      return true; // the current implementation is not able to hide data as we are outside of the project view
+    },
     findRoot() {
       this.rootId = this.file.root || this.file.id;
     },
@@ -511,10 +626,11 @@ h2 .button {
   padding-bottom: 0.5rem !important;
 }
 
+
 .table {
-  /*background: none;*/
+  background: none;
   position: relative;
-  height: 3em;
+  margin-bottom: 0 !important;
 }
 
 td.prop-label {
@@ -524,5 +640,18 @@ td.prop-label {
 
 td.prop-content {
   width: 100%;
+}
+
+td.prop-content-half {
+  width: 50%;
+}
+
+.format {
+  text-transform: uppercase;
+}
+
+.vendor-img {
+  max-height: 4rem;
+  max-width: 12rem;
 }
 </style>

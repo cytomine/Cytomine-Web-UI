@@ -26,9 +26,14 @@
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('images')}}
-      <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
-        {{$t('button-add-image')}}
-      </button>
+      <span>
+        <button v-if="canAddImage" class="button is-link" @click="addImageModal = true">
+          {{$t('button-add-image')}}
+        </button>
+        <button v-if="canAddImage" class="button is-link" @click="addImageFromUploadModal = true">
+          {{$t('button-add-image-from-upload')}}
+        </button>
+      </span>
     </p>
     <div class="panel-block">
       <div class="search-block">
@@ -252,6 +257,7 @@
     </div>
 
     <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
+    <add-image-from-upload-modal :active.sync="addImageFromUploadModal" @addImage="refreshData" />
   </div>
 </div>
 </template>
@@ -265,6 +271,8 @@ import CytomineSlider from '@/components/form/CytomineSlider';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
+import AddImageFromUploadModal from './AddImageFromUploadModal';
+
 import vendorFromFormat from '@/utils/vendor';
 import constants from '@/utils/constants.js';
 
@@ -286,7 +294,8 @@ export default {
     CytomineTable,
     CytomineMultiselect,
     CytomineSlider,
-    AddImageModal
+    AddImageModal,
+    AddImageFromUploadModal,
   },
   data() {
     return {
@@ -295,6 +304,7 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
+      addImageFromUploadModal: false,
       excludedProperties: [
         'overview',
         'instanceFilename',
@@ -522,7 +532,12 @@ export default {
   align-items: center;
 }
 
->>> .image-thumbnail {
+.panel-heading span button{
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+.image-overview {
   max-height: 4rem;
   max-width: 10rem;
 }
