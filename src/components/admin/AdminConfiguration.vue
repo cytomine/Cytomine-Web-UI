@@ -404,7 +404,7 @@ export default {
   components: {CytomineQuillEditor},
   data() {
     return {
-      activeTab: 'login',
+      activeTab: 'welcome',
       fetching: true,
       ltiConsumers: [],
       ltiEnabled: false,
