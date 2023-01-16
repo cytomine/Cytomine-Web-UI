@@ -19,7 +19,7 @@
       <template v-if="!processing">
 
         <div class="columns">
-          <div class="column is-half">
+          <div class="column is-full">
             <div class="columns">
               <div class="column is-one-quarter has-text-right">
                 <strong>{{$t('storage')}}</strong>
