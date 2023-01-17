@@ -464,6 +464,7 @@ button-start,Start,Uploader,Comenzar
 button-hide,Hide,Masquer,Ocultar
 upload-error,Upload error,Erreur d'upload,Error al cargar
 add-files,Add files...,Ajouter des fichiers...,Agregar archivos...
+add-directories,Add directory..., Ajouter un répertoire...
 start-upload,Start upload,Lancer l'upload,Iniciar la carga
 cancel-upload,Cancel upload,Annuler l'upload,Cancelar carga
 preview,Preview,Aperçu,Vista previa
