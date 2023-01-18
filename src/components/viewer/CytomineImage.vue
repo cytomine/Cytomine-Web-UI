@@ -114,7 +114,7 @@
                           @fitZoom="fitZoom" />
           </li>
 
-          <li v-if="isPanelDisplayed('link') && nbImages > 1">
+          <li v-if="isPanelDisplayed('link')">
             <a @click="togglePanel('link')" :class="{active: activePanel === 'link'}">
               <i class="fas fa-link"></i>
             </a>
@@ -306,9 +306,6 @@ export default {
     },
     viewerWrapper() {
       return this.$store.getters['currentProject/currentViewer'];
-    },
-    nbImages() {
-      return Object.keys(this.viewerWrapper.images).length;
     },
     imageWrapper() {
       return this.viewerWrapper.images[this.index];
@@ -704,7 +701,7 @@ export default {
           }
           return;
         case 'toggle-link':
-          if (this.isPanelDisplayed('link') && this.nbImages > 1) {
+          if (this.isPanelDisplayed('link')) {
             this.togglePanel('link');
           }
           return;

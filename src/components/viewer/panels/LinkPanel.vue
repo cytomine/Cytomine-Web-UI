@@ -27,7 +27,7 @@
     </b-select>
   </b-field>
 
-  <b-field horizontal :label="$t('link-mode')">
+  <b-field horizontal v-if="nbImages > 1" :label="$t('link-mode')">
     <b-select v-model="linkMode" size="is-small" expanded>
       <option v-for="option in modeOptions" :key="option.label" :value="option.key">
         {{option.label}}
@@ -35,7 +35,7 @@
     </b-select>
   </b-field>
 
-  <template>
+  <template v-if="nbImages > 1">
     <table class="table">
       <thead>
       <tr>
@@ -134,6 +134,9 @@ export default {
       set(image) {
         this.$store.commit(this.imageModule + 'setCurtainImage', image);
       }
+    },
+    nbImages() {
+      return Object.keys(this.viewerWrapper.images).length;
     },
     openedImages() {
       return this.viewerWrapper.images;
