@@ -164,12 +164,14 @@ export default {
 
       /* Take all the images in the image group if it exists */
       if (this.imageWrapper.imageGroup) {
-        unselectedImages = this.imageWrapper.imageGroup.imageInstances.map(image => ({
-          id: image.id,
-          instanceFilename: image.instanceFilename,
-          height: image.height,
-          width: image.width,
-        }));
+        unselectedImages = unselectedImages.concat(
+          this.imageWrapper.imageGroup.imageInstances.map(image => ({
+            id: image.id,
+            instanceFilename: image.instanceFilename,
+            height: image.height,
+            width: image.width,
+          }))
+        );
       }
 
       /* Keep only the images of same height and width dimension */
