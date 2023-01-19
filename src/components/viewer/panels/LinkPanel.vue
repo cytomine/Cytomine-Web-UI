@@ -157,16 +157,26 @@ export default {
       /* Take all the images currently opened in the viewer by default */
       let unselectedImages = Object.values(this.openedImages).map(image => ({
         id: image.imageInstance.id,
-        instanceFilename: image.imageInstance.instanceFilename
+        instanceFilename: image.imageInstance.instanceFilename,
+        height: image.imageInstance.height,
+        width: image.imageInstance.width,
       }));
 
       /* Take all the images in the image group if it exists */
       if (this.imageWrapper.imageGroup) {
         unselectedImages = this.imageWrapper.imageGroup.imageInstances.map(image => ({
           id: image.id,
-          instanceFilename: image.instanceFilename
+          instanceFilename: image.instanceFilename,
+          height: image.height,
+          width: image.width,
         }));
       }
+
+      /* Keep only the images of same height and width dimension */
+      unselectedImages = unselectedImages.filter((image) =>
+        (this.imageWrapper.imageInstance.height === image.height) &&
+        (this.imageWrapper.imageInstance.width === image.width)
+      );
 
       /* Add the path on the disk of the images */
       unselectedImages.forEach(image => {
