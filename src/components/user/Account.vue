@@ -13,8 +13,8 @@
  limitations under the License.-->
 
 <template>
-<div class="content-wrapper">
-  <div class="panel">
+<div class="content-wrapper" v-if="!currentUser.publicUser">
+  <div class="panel"  >
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{ $t('profile') }}

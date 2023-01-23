@@ -16,6 +16,12 @@
 <div class="panel">
   <div v-if="loginWelcomeMessage" class="box" v-html="loginWelcomeMessage"></div>
 
+  <div v-if="demoAccountUsername" class="box">
+    <button class="button is-link is-large is-fullwidth" @click="loginAsDemoAccount()">
+      {{$t('try-with-demo-account')}}
+    </button>
+  </div>
+
   <template v-if="forgotUsername">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -116,7 +122,7 @@ export default {
       email: '',
       rememberMe: true,
       loginWelcomeMessage: null,
-
+      demoAccountUsername: null,
       allowedRegistration: false, // TODO: retrieve info from core
 
       forgotUsername: false,
@@ -176,8 +182,31 @@ export default {
         // no welcome message defined
       }
     },
+    async loginAsDemoAccount() {
+      console.log('try with account', this.demoAccountUsername);
+      let token = await Cytomine.instance.token(this.demoAccountUsername, -1);
+      this.loginWithToken(this.demoAccountUsername, token);
+    },
+    async loginWithToken(username, token) {
+      try {
+        let {shortTermToken} = await Cytomine.instance.loginWithToken(this.demoAccountUsername, token);
+        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+        await this.$store.dispatch('currentUser/fetchUser');
+        this.$router.push('/');
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('invalid-token')});
+      }
+    },
   },
   async created() {
+    try {
+      this.demoAccountUsername = (await Configuration.fetch(constants.CONFIG_KEY_DEMO_ACCOUNT)).value;
+    }
+    catch(error) {
+      // no demo account set
+    }
     await Promise.all([
       this.fetchLoginWelcomeMessage()
     ].map(p => p.catch(e => console.log(e))));

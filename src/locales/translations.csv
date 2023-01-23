@@ -1136,3 +1136,6 @@ computed-resolution,Computed resolution,Résolution calculée
 image-explore,Explore, Explorer, Explorar
 image-explore-of,Exploration of {filename},Exploration de {filename},exploración de {filename}
 select-project, Select project, Sélectionner un projet
+demo-account,Demo account,Compte de démonstration,
+demo-account-description,You can select a public user that will be use for the 'login with demo' functionality, Vous pouvez sélectionner un utilisateur publique qui sera utilisé pour le
+try-with-demo-account,Try with demo account,Faire un essai avec un compte de démo

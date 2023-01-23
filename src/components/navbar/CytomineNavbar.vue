@@ -69,7 +69,7 @@
         :backgroundColor="{'color': activeColor}"
         :hoverBackgroundColor="{'color': darkerActiveColor}"
       >
-        <router-link to="/account" class="navbar-item">
+        <router-link v-if="!currentUser.publicUser" to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
         </router-link>
         <router-link to="/activity" class="navbar-item">

@@ -46,6 +46,37 @@
 <!--  </p>-->
 
   <hr/>
+  <h2>{{$t('demo-account')}}</h2>
+  <div class="columns">
+    <div class="column is-one-quarter" style="padding-left:3.5em;">
+      <h3>{{$t('demo-account')}}</h3>
+    </div>
+    <div class="column is-one-quarter">
+      <div class="columns">
+        <div class="column is-four-fifths">
+          <cytomine-multiselect v-model="selectedPublicUser" :options="availablePublicUsers"
+                                label="username" track-by="username"  :multiple="false" :allPlaceholder="$t('all-public-users')" />
+        </div>
+      </div>
+    </div>
+    <div class="column is-one-half">
+      <article class="message is-info is-small">
+        <section class="message-body">
+          <div class="media">
+            <div class="media-left">
+              <span class="icon is-small is-info"><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div class="media-content">
+              {{$t('demo-account-description')}}
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+
+
+  <hr/>
   <h2>{{$t('top-menu')}}</h2>
   <div class="columns">
     <div class="column is-one-quarter" style="padding-left:3.5em;">
@@ -395,13 +426,14 @@
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import {Cytomine, Configuration} from 'cytomine-client';
+import {Cytomine, Configuration, UserCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import ColorModal from './ColorModal';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor},
+  components: {CytomineQuillEditor, CytomineMultiselect},
   data() {
     return {
       activeTab: 'welcome',
@@ -410,8 +442,11 @@ export default {
       ltiEnabled: false,
       ldapEnabled: false,
       editedLTI: null,
+      selectedPublicUser: null,
+      availablePublicUsers: [],
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
       loginWelcomeConfig: new Configuration({key: constants.CONFIG_KEY_LOGIN_WELCOME, value: '', readingRole: 'all'}),
+      demoAccountConfig: new Configuration({key: constants.CONFIG_KEY_DEMO_ACCOUNT, value: '', readingRole: 'all'}),
       topMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       topFontMenuColorConfig: new Configuration({key: constants.CONFIG_KEY_FONT_COLOR_TOP_MENU, value: '', readingRole: 'all'}),
       logoConfig: new Configuration({key: constants.CONFIG_KEY_LOGO_TOP_MENU, value: '', readingRole: 'all'}),
@@ -500,6 +535,25 @@ export default {
         }
         else {
           await this.loginWelcomeConfig.save();
+        }
+        this.demoAccountConfig.value = (this.selectedPublicUser!=null? this.selectedPublicUser.username : null);
+        console.log('this.selectedPublicUser', this.selectedPublicUser);
+        console.log(this.demoAccountConfig);
+        if(!this.demoAccountConfig.value && this.demoAccountConfig.id!=null) {
+          console.log('delete demo account');
+          try {
+            await this.demoAccountConfig.delete();
+          } catch (error) {
+            // may already have been deleted
+          }
+        }
+        else if (this.demoAccountConfig.value){
+          console.log('save demo account', this.demoAccountConfig.key);
+          try {
+            await this.demoAccountConfig.save();
+          } catch (error) {
+            console.log('error', error);
+          }
         }
         if(!this.topMenuColorConfig.value && this.topMenuColorConfig.id!=null) {
           await this.topMenuColorConfig.delete();
@@ -609,6 +663,26 @@ export default {
 
   },
   async created() {
+
+    let collection = new UserCollection();
+    collection['publicUser'] = {
+      equals: true
+    }
+    this.availablePublicUsers = (await collection.fetchAll()).array;
+    try {
+      await this.demoAccountConfig.fetch();
+      if (this.demoAccountConfig!=null && this.demoAccountConfig.value!=null && this.demoAccountConfig.value!=='') {
+        this.selectedPublicUser = this.availablePublicUsers.find(elem => elem.username===this.demoAccountConfig.value);
+      }
+    }
+    catch(error) {
+      // no demo account currently set
+      console.log(error);
+    }
+
+
+
+
     try {
       let {ltiEnabled, ldapEnabled} = await Cytomine.instance.ping();
       this.ltiEnabled = ltiEnabled;
