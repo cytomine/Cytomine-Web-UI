@@ -166,7 +166,7 @@ export default {
     },
     async cloneProject(project, name, cloneSetup, cloneMembers, cloneImages, cloneAnnotations) {
       try {
-        await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${this.project.id}/clone.json`, {
+        let response = await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${this.project.id}/clone.json`, {
           name: name,
           cloneSetup: cloneSetup,
           cloneMembers: cloneMembers,
@@ -177,7 +177,8 @@ export default {
           type: 'success',
           text: this.$t('notif-success-project-clone', {oldName: project.name, newName: name})
         });
-        this.
+        console.log(response);
+        this.$router.push(`/project/${response.data.project.id}/configuration`);
       }
       catch(error) {
         this.$notify({
