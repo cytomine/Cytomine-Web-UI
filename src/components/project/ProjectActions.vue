@@ -20,6 +20,12 @@
     :active.sync="isRenameModalActive"
     @rename="rename"
   />
+  <clone-project-modal
+    :title="$t('clone-project')"
+    :currentProject="project"
+    :active.sync="isCloneProjectModalActive"
+    @cloneProject="cloneProject"
+  />
 
   <form @submit.prevent="saveOntology()">
     <cytomine-modal :active="isOntologyModalActive" :title="$t('change-ontology')" @close="isOntologyModalActive = false">
@@ -73,6 +79,9 @@
     <button class="button" :class="size" @click="isRenameModalActive = true">
       {{$t('button-rename')}}
     </button>
+    <button class="button" :class="size" @click="isCloneProjectModalActive = true">
+      {{$t('button-clone')}}
+    </button>
     <button class="button" :class="size" @click="isOntologyModalActive = true" :disabled="cannotDeleteOntology">
       {{$t('button-change-ontology')}}
     </button>
@@ -84,9 +93,10 @@
 </template>
 
 <script>
-import {OntologyCollection} from 'cytomine-client';
+import {Cytomine, OntologyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import RenameModal from '@/components/utils/RenameModal';
+import CloneProjectModal from './CloneProjectModal';
 
 export default {
   name: 'project-actions',
@@ -96,12 +106,14 @@ export default {
   },
   components: {
     CytomineModal,
-    RenameModal
+    RenameModal,
+    CloneProjectModal
   },
   data() {
     return {
       isRenameModalActive: false,
       isOntologyModalActive: false,
+      isCloneProjectModalActive: false,
       loadingOntologies: true,
       errorOntologies: false,
       ontologies: null,
@@ -152,7 +164,29 @@ export default {
       }
       this.isRenameModalActive = false;
     },
-
+    async cloneProject(project, name, cloneSetup, cloneMembers, cloneImages, cloneAnnotations) {
+      try {
+        await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/project/${this.project.id}/clone.json`, {
+          name: name,
+          cloneSetup: cloneSetup,
+          cloneMembers: cloneMembers,
+          cloneImages: cloneImages,
+          cloneAnnotations: cloneAnnotations
+        });
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-project-clone', {oldName: project.name, newName: name})
+        });
+        this.
+      }
+      catch(error) {
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-project-clone', {oldName: project.name, newName: name})
+        });
+      }
+      this.isCloneProjectModalActive = false;
+    },
     async saveOntology(forceOntologyUpdate=false) {
       this.savingOntology = true; // possibly long operation => give user visual indication that it is in progress
       let updatedProject = this.project.clone();
