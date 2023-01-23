@@ -25,7 +25,7 @@
         :placeholder="$t('select-project')"
         name="project"
       >
-        <option v-for="project in projects" :value="project.id" :key="project.id">
+        <option v-for="project in projectsWithoutOriginalProject" :value="project.id" :key="project.id">
           {{project.name}}
         </option>
       </b-select>
@@ -170,6 +170,9 @@ export default {
   },
   computed : {
     project: get('currentProject/project'),
+    projectsWithoutOriginalProject() {
+      return this.projects.filter(x => x.id !== this.project.id)
+    },
     annotationLayersTransfert(){
       this.sourceAnnotationLayers; // to force listening.
 
