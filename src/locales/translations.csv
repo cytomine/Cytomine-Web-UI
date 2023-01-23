@@ -1139,3 +1139,8 @@ select-project, Select project, Sélectionner un projet
 demo-account,Demo account,Compte de démonstration,
 demo-account-description,You can select a public user that will be use for the 'login with demo' functionality, Vous pouvez sélectionner un utilisateur publique qui sera utilisé pour le
 try-with-demo-account,Try with demo account,Faire un essai avec un compte de démo
+clone-setup, Clone settings, Cloner les paramètres
+clone-members, Clone members, Cloner les membres
+clone-images, Clone images, Cloner les images
+notif-success-project-clone, Project {oldName} correctly cloned, Le projet {oldName} a été correctement cloné
+
