@@ -17,7 +17,7 @@
   <b-loading :is-full-page="false" :active.sync="loading" />
 
   <template v-if="!loading">
-    <div v-if="welcomeMessage" class="box" v-html="welcomeMessage"></div>
+    <div v-if="welcomeMessage" style="height:fit-content" class="box ql-editor" v-html="welcomeMessage"></div>
 
     <div class="columns">
       <div class="column is-two-thirds">

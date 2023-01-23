@@ -14,7 +14,7 @@
 
 <template>
 <div class="panel">
-  <div v-if="loginWelcomeMessage" class="box" v-html="loginWelcomeMessage"></div>
+  <div v-if="loginWelcomeMessage" style="height:fit-content" class="box ql-editor" v-html="loginWelcomeMessage"></div>
 
   <div v-if="demoAccountUsername" class="box">
     <button class="button is-link is-large is-fullwidth" @click="loginAsDemoAccount()">
