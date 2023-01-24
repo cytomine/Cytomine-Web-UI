@@ -169,15 +169,15 @@
 
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
-    <div class="camera" >
-      <button
-        v-tooltip="$t('screenshot')"
-        class="button"
-        @click="screenshot()"
-      >
-        <span class="icon is-small"><i class="fas fa-camera"></i></span>
-      </button>
-    </div>
+<!--    <div class="camera" >-->
+<!--      <button-->
+<!--        v-tooltip="$t('screenshot')"-->
+<!--        class="button"-->
+<!--        @click="screenshot()"-->
+<!--      >-->
+<!--        <span class="icon is-small"><i class="fas fa-camera"></i></span>-->
+<!--      </button>-->
+<!--    </div>-->
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
