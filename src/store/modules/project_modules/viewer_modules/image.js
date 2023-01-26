@@ -299,7 +299,7 @@ export default {
         styles.push(state.style.noTermStyle);
       }
 
-      let nbTracks = annot.track!=undefined ? annot.track.length : 0;
+      let nbTracks = annot.track ? annot.track.length : 0;
       let isReviewed = annot.type === AnnotationType.REVIEWED;
       let isRejected = state.review.reviewMode && !isReviewed;
 
@@ -407,4 +407,3 @@ function findRankPage(rank) {
 function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
-
