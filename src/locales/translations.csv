@@ -1093,9 +1093,9 @@ top-menu-color-list,Color List,Liste des couleurs,Lista de colores
 top-font-menu-color, Top font menu color, Couleur de la police du menu supérieur, Color de fuente del menú superior
 top-font-menu-color-description,"Set the font color of the top banner","Renseignez ici la couleur de la police de la bannière supérieur de Cytomine", "Establecer el color de fuente del menú superior"
 update-color,Update color,Modifier la couleur,Actualizar color
-logo-description, Upload the banner top left logo. The size must be less than 250 pixels per 250 pixels, Upload du logo à gauche de la bannière. La taille doit être infèrieur à 250 pixels par 250 pixels
+logo-description, "Upload the banner top left logo. The size must be less than 250 pixels per 250 pixels for a bitmap (png, jpg) and the weight must be less than 7500 octets for a SVG.", "Upload du logo à gauche de la bannière. La taille doit être infèrieur à 250 pixels par 250 pixels for les images bitmap (png, jpg) et la taille doit être moins de 7500 octets pour un SVG"
 logo-upload-error-message, Image size must be less than 250 pixels per 250 pixels, La taille de l'image doit être infèrieur à 250 pixels par 250 pixels
-logo-upload-svg-error-message, Image size must be less than 7.5 Mo, La taille de l'image doit être infèrieur à 7.5 Mo
+logo-upload-svg-error-message, SVG image weight must be less than 7.5 Ko, La taille de l'image doit être infèrieur à 7.5 Ko
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
@@ -1143,4 +1143,6 @@ clone-setup, Clone settings, Cloner les paramètres
 clone-members, Clone members, Cloner les membres
 clone-images, Clone images, Cloner les images
 notif-success-project-clone, Project {oldName} correctly cloned, Le projet {oldName} a été correctement cloné
-
+api-enabled,Api enabled,API activée
+api-disabled,Api disabled,API désactivée
+api-key-allowed,Api keys enabled,API keys activées,

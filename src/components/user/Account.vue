@@ -141,7 +141,7 @@
     </div>
   </div>
 
-  <div class="panel"> <!-- QUESTION: remove ? or only show for technical users ? -->
+  <div class="panel" v-if="currentUser.apiEnabled"> <!-- QUESTION: remove ? or only show for technical users ? -->
     <p class="panel-heading">
       <i class="fas fa-exchange-alt" aria-hidden="true"></i>
       {{ $t('api-keys') }}
