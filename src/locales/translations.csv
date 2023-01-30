@@ -418,6 +418,7 @@ medium,Medium,Moyen,Mediana
 large,Large,Grand,Grande
 huge,Huge,Très grand,Enorme
 number-per-page,Number per page,Nombre par page,Número por pagina
+number-per-category,Number per category,Nombre par catégorie
 display,Display,Affichage,Monitor
 add-image,Add image,Ajouter une image,Añadir imagen
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName}

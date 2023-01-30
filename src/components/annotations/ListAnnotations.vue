@@ -60,7 +60,7 @@
           </div>
           <div class="column filter">
             <div class="filter-label">
-              {{$t('number-per-page')}}
+              {{$t('number-per-category')}}
             </div>
             <div class="filter-body">
               <cytomine-multiselect
