@@ -121,9 +121,6 @@ export default {
       clone = _.cloneDeep(slices);
       commit('setActiveSlices', clone);
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
-
       await dispatch('fetchSliceInstancesAround', {rank: clone[0].rank});
     },
     async setImageInstance({dispatch, rootState}, {image, slices}) {
@@ -202,11 +199,6 @@ export default {
           slices => commit('setActiveSlices', slices)
         )
       ]);
-
-      commit('clearSliceInstances');
-
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: state.imageInstance.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
 
       commit('clearSliceInstances');
       await dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank});
