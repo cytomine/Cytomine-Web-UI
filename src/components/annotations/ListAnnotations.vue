@@ -236,7 +236,7 @@
     </div>
 
     <div class="list-annots" @scroll="scrollHandler" ref="listAnnots">
-        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${limitedCategoryOptions.categorization}${prop.id}`"
+        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
         :categorization="selectedCategorization.categorization"
         :size="selectedSize.size"
         :color="selectedColor.hexaCode"
@@ -275,7 +275,7 @@
         @update="revision++"
         @select="viewAnnot($event)"
         />
-      <button class="button is-medium" v-if="!loadedAllCategories" @click="loadCategories()">
+      <button class="button" v-if="!areAllOptionsLoaded" @click="loadCategories()">
         <span class="icon">
           <i class="fas fa-sync"></i>
         </span>
@@ -363,9 +363,12 @@ export default {
 
       noTagOption: {id: 0, name: this.$t('no-tag')},
 
-      limitedCategoryOptions: [],
-      categoriesToShow: 0,
-      loadedAllCategories: false
+      nLoadedOptionsPerCategory: {
+        'TERM': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'IMAGE': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'USER': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'TRACK': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY
+      },
     };
   },
   computed: {
@@ -542,6 +545,12 @@ export default {
       }
       throw new Error('Cannot load a category options ' + this.selectedCategorization.categorization);
     },
+    limitedCategoryOptions() {
+      return this.categoryOptions.slice(0, this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization]);
+    },
+    areAllOptionsLoaded() {
+      return this.categoryOptions.length === this.limitedCategoryOptions.length;
+    },
     isByTerm() {
       return this.selectedCategorization.categorization === 'TERM';
     },
@@ -594,26 +603,22 @@ export default {
     }
   },
   methods: {
-    initLimitedCategory(){
-      this.categoriesToShow = constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY;
-      this.loadedAllCategories = this.categoryOptions.length < this.categoriesToShow;
-      this.limitedCategoryOptions = this.categoryOptions.slice(0, this.categoriesToShow);
-    },
     scrollHandler: _.debounce(function() {
       let scrollBlock = this.$refs.listAnnots;
       let actualScrollPos = scrollBlock.scrollTop + scrollBlock.clientHeight;
 
-      if (actualScrollPos === scrollBlock.scrollHeight && !this.loadedAllCategories) {
+      if (actualScrollPos === scrollBlock.scrollHeight && !this.areAllOptionsLoaded) {
+        console.log("Loading new categories from scroll handler.");
         this.loadCategories();
       }
     }, 100),
     loadCategories(){
-      if(this.limitedCategoryOptions.length < this.categoryOptions.length){
-        this.limitedCategoryOptions.push(...this.categoryOptions.slice(this.categoriesToShow, this.categoriesToShow + categoryBatch));
-        this.categoriesToShow += categoryBatch;
+      const newCount = this.limitedCategoryOptions.length + categoryBatch;
+      if (newCount >= this.categoryOptions.length) {
+        this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = this.categoryOptions.length;
       }
-      else{
-        this.loadedAllCategories = true;
+      else {
+        this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = newCount;
       }
     },
     appendShortTermToken,
@@ -766,8 +771,6 @@ export default {
         this.selectedTags = queriedTags;
       }
     }
-
-    this.initLimitedCategory();
 
     this.loading = false;
   }
