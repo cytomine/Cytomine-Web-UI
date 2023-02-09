@@ -33,7 +33,7 @@ ARG SCRIPTS_REPO_TAG
 ARG SCRIPTS_REPO_BRANCH
 
 WORKDIR /root
-RUN mkdir scripts
+RUN mkdir -p /root/scripts
 RUN --mount=type=secret,id=scripts_repo_url \
     git clone $(cat /run/secrets/scripts_repo_url) /root/scripts \
     && cd /root/scripts \
