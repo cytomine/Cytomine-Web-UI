@@ -44,12 +44,16 @@ RUN --mount=type=secret,id=scripts_repo_url \
 FROM nginx:1.22.1-alpine as frontend-server
 
 WORKDIR /app
-COPY --from=frontend-builder /app/Cytomine-Web-UI/dist /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+
+COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
+
+# actual front end
+COPY --from=frontend-builder /app/Cytomine-Web-UI/dist /app
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
