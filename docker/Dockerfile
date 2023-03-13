@@ -14,7 +14,6 @@
 # limitations under the License.
 
 ARG SCRIPTS_REPO_TAG
-ARG SCRIPTS_REPO_BRANCH
 
 #######################################################################################
 ## Stage 1: build front-end
@@ -30,14 +29,13 @@ RUN npm run build
 ## Stage 2: downloading provisioning scripts
 FROM alpine/git:2.36.3 as scripts-downloader
 ARG SCRIPTS_REPO_TAG
-ARG SCRIPTS_REPO_BRANCH
 
 WORKDIR /root
 RUN mkdir -p /root/scripts
 RUN --mount=type=secret,id=scripts_repo_url \
     git clone $(cat /run/secrets/scripts_repo_url) /root/scripts \
     && cd /root/scripts \
-    && git checkout tags/${SCRIPTS_REPO_TAG} -b ${SCRIPTS_REPO_BRANCH}
+    && git checkout tags/${SCRIPTS_REPO_TAG}
 
 #######################################################################################
 ## Stage 3: building nginx image serving the front-end
