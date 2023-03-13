@@ -11,6 +11,9 @@ stages:
 # - SCRIPTS_REPO_ACCESS_TOKEN_VALUE: access token value for docker-entrypoint-scripts repo
 # - SCRIPTS_REPO_URL: git url (no scheme/protocol) of the docker-entrypoint-scripts repo
 
+variables:
+  DOCKER_TMP_IMAGE_NAME: $CI_PIPELINE_ID:latest
+
 default:
   tags:
     - docker
