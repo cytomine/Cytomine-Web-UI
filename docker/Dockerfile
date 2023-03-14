@@ -14,10 +14,11 @@
 # limitations under the License.
 
 ARG SCRIPTS_REPO_TAG
+ARG NODE_VERSION=14.16.1-alpine3.13
 
 #######################################################################################
-## Stage 1: build front-end
-FROM node:13.12.0 as frontend-builder
+## Stage: build front-end
+FROM node:${NODE_VERSION} as frontend-builder
 WORKDIR /app
 
 ADD . /app/Cytomine-Web-UI
@@ -26,7 +27,7 @@ RUN npm install
 RUN npm run build
 
 #######################################################################################
-## Stage 2: downloading provisioning scripts
+## Stage: downloading provisioning scripts
 FROM alpine/git:2.36.3 as scripts-downloader
 ARG SCRIPTS_REPO_TAG
 
@@ -38,8 +39,27 @@ RUN --mount=type=secret,id=scripts_repo_url \
     && git checkout tags/${SCRIPTS_REPO_TAG}
 
 #######################################################################################
-## Stage 3: building nginx image serving the front-end
-FROM nginx:1.22.1-alpine as frontend-server
+## Stage: dev image (with hot swap)
+FROM node:${NODE_VERSION} as dev-server
+
+WORKDIR /app
+# ui source code should be mounted in /app
+
+RUN apk update && apk add gettext
+
+RUN mkdir /docker-entrypoint-cytomine.d/
+COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+
+ENV WEB_UI_PORT=8887
+
+ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
+# rebuild (ignoring current node-module folder) then serve
+CMD ["npm", "run", "serve"]
+
+#######################################################################################
+## Stage: building nginx image serving the front-end
+FROM nginx:1.22.1-alpine as prod-server
 
 WORKDIR /app
 

@@ -40,5 +40,5 @@ fi
 docker build \
   --build-arg SCRIPTS_REPO_TAG=$SCRIPTS_REPO_TAG \
   --secret id=scripts_repo_url,env=SCRIPTS_REPO_URL \
-  -t "$DOCKER_NAMESPACE/web_ui:$WEB_UI_VERSION" -f docker/Dockerfile .
+  -t "$DOCKER_NAMESPACE/web_ui:$WEB_UI_VERSION" -f docker/Dockerfile . $@
 
