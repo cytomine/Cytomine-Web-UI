@@ -51,111 +51,11 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
-        <div class="filters">
-          <div class="columns">
-            <div class="column filter is-one-quarter">
-              <div class="filter-label">
-                {{$t('format')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" multiple />
-              </div>
-            </div>
-
-            <div class="column filter is-one-quarter">
-              <div class="filter-label">
-                {{$t('vendor')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors"
-                    :multiple="true" label="label" track-by="value"/>
-              </div>
-            </div>
-
-            <div class="column filter is-one-quarter">
-              <div class="filter-label">
-                {{$t('tags')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
-              </div>
-            </div>
-          </div>
-
-          <div class="columns">
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('magnification')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedMagnifications" :options="availableMagnifications"
-                    :multiple="true" :searchable="false" label="label" track-by="value"/>
-              </div>
-            </div>
-
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('resolution')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedResolutions" :options="availableResolutions"
-                    :multiple="true" :searchable="false" label="label" track-by="value" />
-              </div>
-            </div>
-
-            <div class="column">
-              <div class="filter-label">
-                {{$t('width')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
-              </div>
-            </div>
-
-            <div class="column">
-              <div class="filter-label">
-                {{$t('height')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
-              </div>
-            </div>
-          </div>
-
-          <div class="columns">
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('user-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
-              </div>
-            </div>
-
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('analysis-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
-              </div>
-            </div>
-
-            <div class="column filter">
-              <div class="filter-label">
-                {{$t('reviewed-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
-              </div>
-            </div>
-
-            <div class="column filter"></div>
-          </div>
-        </div>
-      </b-collapse>
+      <metadata-search
+        v-if="filtersOpened"
+        :formats="availableFormats"
+        :tags="availableTags"
+      />
 
       <cytomine-table
         :collection="imageCollection"
@@ -241,8 +141,7 @@
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
+import MetadataSearch from '@/components/search/MetadataSearch.vue';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
@@ -264,9 +163,8 @@ export default {
     ImageName,
     ImageDetails,
     CytomineTable,
-    CytomineMultiselect,
-    CytomineSlider,
-    AddImageModal
+    AddImageModal,
+    MetadataSearch,
   },
   data() {
     return {
