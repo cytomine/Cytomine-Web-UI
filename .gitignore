@@ -6,6 +6,9 @@ node_modules
 .env.local
 .env.*.local
 
+# config files likely attached by docker
+vue.config.js
+
 # generated translation files
 src/locales/json
 

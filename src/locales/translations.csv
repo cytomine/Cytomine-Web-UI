@@ -129,7 +129,6 @@ nm-per-slice,nm/slice,nm/plan,
 mm-per-slice,mm/slice,mm/plan,
 vendor,Vendor,Marque du scanner,Vendedor
 image-size,Image size,Taille de l'image,Tamaño de imagen
-status,Status,Statut,Estado
 button-add-image,Add image,Ajouter une image,Añadir imagen
 actions,Actions,Actions,Acciones
 button-rename,Rename,Renommer,Renombrar
@@ -511,7 +510,6 @@ review,Review,Validation,Revisión
 shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Valider l'annotation sélectionnée en mode validation,Aceptar anotaciones seleccionadas en modo revisión
 shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation,Rechazar la anotación seleccionada en modo revisión
 shortcut-viewer-tool-review-toggle,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation,Alternar capa de revisión en modo revisión
-version,Version,Version,Versión
 sponsors,Sponsors,Sponsors,Patrocinadores
 website,Website,Site web,Sitio web
 source-code,Source code,Code source,Código fuente
@@ -534,8 +532,6 @@ notif-error-fetch-next-image,Failed to load next image,Une erreur a empêché de
 viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images),Grupo de espectadores ({nbImages} imágenes)
 activity-charts,Activity charts,Graphiques d'activité,Gráficos de actividad
 activity-logs,Activity logs,Logs d'activité,Registros de actividad
-project-connections,Project Connections,Connexions au projet,Conexiones del proyecto
-image-consultations,Image Consultations,Consultations d'images,Consultas de imagen
 number-annotations,Number of annotations,Nombre d'annotations,Número de anotaciones
 manual-annotations-vs-term,Manual annotations VS. term,Annotations manuelles VS. terme,Anotaciones manuales por término
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término
@@ -764,7 +760,6 @@ number-annotations-info-message,The number of annotations that you created,Le no
 number-reviewed-annotations-info-message,The number of annotations that you validated during a review,Le nombre d'annotations que vous avez validées,El número de anotaciones que validadas por el usuario durante una revisión
 blinded-name-indication,Blind,Masqué,Oculto
 language,Language,Langue,Idioma
-system,System,Système,
 no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché,Ninguna propiedad existente coincide con {searchString}
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?
@@ -1015,7 +1010,6 @@ notif-error-annotation-repeat,Failed to repeat the annotation,L'annotation n'a p
 button-compute-profile,Compute profile,Calculer le profil,
 slice,Slice,Plan,
 pixel-intensity,Intensity,Intensité,
-profile,Profile,Profil,
 inspect-button,Inspect,Inspecter,
 failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,
 companion-files,Companion files,Fichiers liés,
