@@ -5,7 +5,7 @@
     "serve": "npm run watch-translations & vue-cli-service serve",
     "build": "npm run translations-csv2json && vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
+    "translations-csv2json": "node scripts/export_i18n_csv.mjs src/locales/translations.csv src/locales/json",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
   },
   "dependencies": {
@@ -53,7 +53,6 @@
     "@vue/cli-service": "^4.5.14",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^5.16.0",
-    "i18n-csv2json-cli": "^1.0.2",
     "node-sass": "^4.13.0",
     "onchange": "^5.2.0",
     "sass-loader": "^7.1.0",
