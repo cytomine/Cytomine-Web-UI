@@ -54,7 +54,16 @@
       <metadata-search
         v-if="filtersOpened"
         :formats="availableFormats"
+        :magnifications="availableMagnifications"
+        :max-height="maxHeight"
+        :max-width="maxWidth"
+        :max-nb-job-annotations="maxNbJobAnnotations"
+        :max-nb-reviewed-annotations="maxNbReviewedAnnotations"
+        :max-nb-user-annotations="maxNbUserAnnotations"
+        :metadata="metadata"
+        :resolutions="availableResolutions"
         :tags="availableTags"
+        :vendors="availableVendors"
       />
 
       <cytomine-table
@@ -147,7 +156,7 @@ import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import vendorFromFormat from '@/utils/vendor';
 
-import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import {AbstractImage, ImageInstanceCollection, PropertyCollection, TagCollection} from 'cytomine-client';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
@@ -171,6 +180,7 @@ export default {
       loading: true,
       error: false,
       images: [],
+      metadata: {},
       addImageModal: false,
       excludedProperties: [
         'overview',
@@ -274,6 +284,7 @@ export default {
           };
         }
       }
+
       return collection;
     },
 
@@ -327,6 +338,24 @@ export default {
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
+    async fetchImages() {
+      this.images = (await ImageInstanceCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      })).array;
+
+      await Promise.all(this.images.map(async (image) => {
+        let abstractImage = new AbstractImage({id: image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
+        let properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
+        properties.sort((a, b) => a.key.localeCompare(b.key));
+
+        if (!(image.contentType in this.metadata)) {
+          this.metadata[image.contentType] = {};
+        }
+
+        this.metadata[image.contentType][image.id] = properties;
+      }));
+    },
 
     async refreshData() {
       try {
@@ -360,7 +389,8 @@ export default {
     try {
       await Promise.all([
         this.fetchFilters(),
-        this.fetchTags()
+        this.fetchTags(),
+        this.fetchImages(),
       ]);
       this.loading = false;
     }

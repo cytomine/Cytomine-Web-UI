@@ -26,7 +26,8 @@ function getDefaultState() {
     ontology: null,
     managers: [],
     members: [],
-    currentViewer: null
+    currentViewer: null,
+    currentMetadataSearch: {},
   };
 }
 
@@ -62,7 +63,15 @@ export default {
 
     setCurrentViewer(state, id) {
       state.currentViewer = id;
-    }
+    },
+
+    setCurrentMetadataSearch(state, {format, key, searchValue}) {
+      if (!(key in state.currentMetadataSearch)) {
+        state.currentMetadataSearch[format] = {};
+      }
+
+      state.currentMetadataSearch[format][key] = searchValue;
+    },
   },
 
   actions: {
@@ -169,6 +178,10 @@ export default {
 
     terms: (state) => {
       return state.ontology ? getAllTerms(state.ontology) : null;
+    },
+
+    currentMetadataSearch: (state) => {
+      return state.currentMetadataSearch;
     },
 
     currentProjectModule: (state) => {
