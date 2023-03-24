@@ -142,6 +142,9 @@ export default {
     internalPerPage(perPage) {
       this.$emit('update:perPage', perPage);
     },
+    total(total) {
+      this.$emit('setCollectionSize', total);
+    },
     revision() {
       this.fetchPage();
     },
@@ -185,7 +188,6 @@ export default {
         });
 
         this.$emit('update:checkedRows', this.internalCheckedRows);
-        this.$emit('update:data', data);
       }
       catch(error) {
         if(this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page
