@@ -51,7 +51,7 @@ build-docker-image:
       artifacts: true
   script:
     - export SCRIPTS_REPO_FULL_URL=https://$SCRIPTS_REPO_ACCESS_TOKEN_NAME:$SCRIPTS_REPO_ACCESS_TOKEN_VALUE@$SCRIPTS_REPO_URL
-    - docker build --build-arg SCRIPTS_REPO_TAG=latest --secret id=scripts_repo_url,env=SCRIPTS_REPO_FULL_URL -t $DOCKER_TMP_IMAGE_NAME -f docker/Dockerfile .
+    - docker build -t $DOCKER_TMP_IMAGE_NAME -f docker/Dockerfile .
 
 publish-docker-image:
   stage: publish
