@@ -138,7 +138,8 @@ export default {
       languages: [
         {value: 'EN', name:'English'},
         {value: 'FR', name:'Français'},
-        {value: 'ES', name:'Español'}
+        {value: 'ES', name:'Español'},
+        {value: 'NL', name:'Nederlands'}
       ]
     };
   },

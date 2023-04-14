@@ -25,7 +25,8 @@ export default new VueI18n({
   messages: {
     'en': require('./locales/json/en.i18n.json'),
     'es': require('./locales/json/es.i18n.json'),
-    'fr': require('./locales/json/fr.i18n.json')
+    'fr': require('./locales/json/fr.i18n.json'),
+    'nl': require('./locales/json/nl.i18n.json')
   }
 });
 
