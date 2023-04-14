@@ -7,7 +7,7 @@ You can also find, on our official documentation [how to install it](https://doc
 
 The main features of this new front-end are :
 * A complete new Cytomine experience.
-* Support of internationalization i.e. multiple languages (English and French currently available). You can contribute by adding new languages (See [here](https://documentation.cytomine.org/How-to-contribute?structure=Contributors).
+* Support of internationalization i.e. multiple languages (English and French currently available). You can contribute by adding new languages (See [here](https://documentation.cytomine.org/community/how-to-contribute#translate-cytomine-in-your-language)).
 * Reactive application.
 * New lists of project, image, job with sorting, searching and filtering.
 * Display details of images, jobs and projects in all the lists.
