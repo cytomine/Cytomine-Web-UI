@@ -158,10 +158,16 @@
             {{ creator.fullName }}
           </td>
         </tr>
-        <tr v-if="!isReview">
-          <td><strong>{{$t('created-on')}}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }} </td>
-        </tr>
+        <template v-if="!isReviewedAnnotation">
+          <tr>
+            <td><strong>{{ $t('created-on') }}</strong></td>
+              <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td> {{ $t('reviewed-annotation-status-rejected') }} </td>
+          </tr>
+        </template>
         <template v-else>
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
@@ -172,6 +178,10 @@
           <tr>
             <td><strong>{{$t('reviewed-on')}}</strong></td>
             <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td> {{ $t('reviewed-annotation-status-validated') }} </td>
           </tr>
         </template>
       </template>
@@ -284,11 +294,11 @@ export default {
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
-    isReview() {
+    isReviewedAnnotation() {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
     reviewer() {
-      if(this.isReview) {
+      if(this.isReviewedAnnotation) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
@@ -304,6 +314,9 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+    },
+    isImageInReviewMode() {
+      return this.image.inReview;
     },
     sliceChannel() {
       return this.slices.find(slice => slice.id === this.annotation.slice) || {};
