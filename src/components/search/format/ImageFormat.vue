@@ -5,7 +5,7 @@
       {{ key }} : {{ value }}
     </div>
 
-    <div class="search-block" v-if="keys">
+    <div class="search-block" v-if="filteredKeys">
       <b-dropdown v-model="currentKey" :placeholder="$t('search-placeholder')" scrollable>
         <template #trigger>
           <b-button :label="currentKey" type="is-primary"/>
@@ -34,7 +34,12 @@
         type="search"
       />
 
-      <b-button @click="filters = searchValue">{{ $t('button-add') }}</b-button>
+      <b-button
+        @click="filters = searchValue; searchValue = ''"
+        :disabled="searchValue === ''"
+      >
+        {{ $t('button-add') }}
+      </b-button>
     </div>
   </div>
 </template>
@@ -72,11 +77,15 @@ export default {
           'currentProject/setCurrentMetadataSearch',
           {format: this.format, key: this.currentKey, searchValue: value},
         );
+        this.$forceUpdate();
       }
     },
     filteredKeys() {
       return this.keys.filter((item) => item.toLowerCase().indexOf(this.searchKey.toLowerCase()) >= 0);
     },
+  },
+  created() {
+    this.$store.commit('currentProject/setImageFormat', this.format);
   }
 };
 </script>

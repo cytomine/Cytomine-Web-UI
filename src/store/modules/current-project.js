@@ -65,11 +65,11 @@ export default {
       state.currentViewer = id;
     },
 
-    setCurrentMetadataSearch(state, {format, key, searchValue}) {
-      if (!(key in state.currentMetadataSearch)) {
-        state.currentMetadataSearch[format] = {};
-      }
+    setImageFormat(state, format) {
+      state.currentMetadataSearch[format] = {};
+    },
 
+    setCurrentMetadataSearch(state, {format, key, searchValue}) {
       state.currentMetadataSearch[format][key] = searchValue;
     },
   },
