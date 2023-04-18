@@ -32,7 +32,9 @@
             <span class="icon">
               <i class="fas fa-image"></i>
             </span>
-            <span class="is-align-content-baseline">Open in viewer</span>
+            <span class="is-align-content-baseline"></span>
+              {{ $t('open-in-viewer')}}
+            </span>
           </span>
         </button> 
       </router-link>
@@ -42,7 +44,9 @@
             <span class="icon">
               <i class="fas fa-arrow-left"></i>
             </span>
-            <span class="is-align-content-baseline">Go back</span>
+            <span class="is-align-content-baseline">
+              {{ $t('go-back')}}
+            </span>
           </span>
         </button> 
       </router-link>
@@ -82,6 +86,7 @@ export default {
       prevRoute: null
     };
   },
+  // https://v3.router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.prevRoute = from
