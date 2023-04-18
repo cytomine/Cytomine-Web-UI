@@ -27,7 +27,24 @@
         </router-link>
       </i18n>
       <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
-        <span class="icon"><i class="fas fa-window-close fa-lg"></i></span> 
+        <button class="button is-link">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-image"></i>
+            </span>
+            <span class="is-align-content-baseline">Open in viewer</span>
+          </span>
+        </button> 
+      </router-link>
+      <router-link place="imageName" :to="prevRoute">
+        <button class="button is-link">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-arrow-left"></i>
+            </span>
+            <span class="is-align-content-baseline">Go back</span>
+          </span>
+        </button> 
       </router-link>
     </div>
 
@@ -61,8 +78,14 @@ export default {
       loading: true,
       image: null,
       permissionError: false,
-      notFoundError: false
+      notFoundError: false,
+      prevRoute: null
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   },
   computed: {
     idImage() {
@@ -115,14 +138,12 @@ export default {
   .box-title {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 
     h1 {
       flex: auto
-    }
-
-    a:nth-child(2) {
-      text-decoration: none;
-      color: black;
     }
   }
 </style>
