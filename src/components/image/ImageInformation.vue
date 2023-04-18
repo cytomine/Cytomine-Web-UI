@@ -20,11 +20,16 @@
 <div class="content-wrapper" v-else>
   <b-loading :is-full-page="false" :active.sync="loading" />
   <div class="box" v-if="!loading">
-    <i18n path="detailed-image-information" tag="h1">
+    <div class="box-title">
+      <i18n path="detailed-image-information" tag="h1">
+        <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
+          <image-name :image="image" />
+        </router-link>
+      </i18n>
       <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
-        <image-name :image="image" />
+        <span class="icon"><i class="fas fa-window-close fa-lg"></i></span> 
       </router-link>
-    </i18n>
+    </div>
 
     <image-details
       v-if="image"
@@ -105,3 +110,19 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+  .box-title {
+    display: flex;
+    flex-direction: row;
+
+    h1 {
+      flex: auto
+    }
+
+    a:nth-child(2) {
+      text-decoration: none;
+      color: black;
+    }
+  }
+</style>
