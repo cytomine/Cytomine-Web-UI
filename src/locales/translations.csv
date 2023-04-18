@@ -744,9 +744,9 @@ reviewers,Reviewers,Validateurs,Revisores
 review-layer,Review layer,Calque de validation,Capa de revisión
 reviewed-by,Reviewed by,Validé par,Revisado por
 reviewed-on,Reviewed on,Validé le,Revisado el
-reviewed-annotation-status,Status,Statut,Estado
+reviewed-annotation-status,Review Status,Statut de la révision,Estado de revisión
 reviewed-annotation-status-validated,Validated,Validé,Validado
-reviewed-annotation-status-rejected,Rejected,Rejeté,Rechazado
+reviewed-annotation-status-not-validated,Not validated,Non validé,No validado
 button-metadata,Metadata,Métadonnées,Metadatos
 image-metadata,Image metadata,Métadonnées de l'image,Metadatos de imagen
 registration-date,Registration date,Date d'inscription,Fecha de registro

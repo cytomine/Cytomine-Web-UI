@@ -165,7 +165,11 @@
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
-            <td> {{ $t('reviewed-annotation-status-rejected') }} </td>
+            <td> 
+              <span class="tag is-danger">
+                {{ $t('reviewed-annotation-status-not-validated') }}
+              </span>  
+            </td>
           </tr>
         </template>
         <template v-else>
@@ -181,7 +185,11 @@
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
-            <td> {{ $t('reviewed-annotation-status-validated') }} </td>
+            <td>
+              <span class="tag is-success">
+                {{ $t('reviewed-annotation-status-validated') }}
+              </span>
+            </td>
           </tr>
         </template>
       </template>
