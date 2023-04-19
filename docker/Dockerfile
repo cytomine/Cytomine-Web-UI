@@ -18,12 +18,21 @@ ARG NODE_VERSION=14.16.1-alpine3.13
 #######################################################################################
 ## Stage: build front-end
 FROM node:${NODE_VERSION} as frontend-builder
-WORKDIR /app
+
+# URL of the package registry (no scheme)
+ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
 
 ADD . /app/Cytomine-Web-UI
 WORKDIR /app/Cytomine-Web-UI
-RUN npm install
-RUN npm run build
+
+# create .npmrc for fetching JS Client from private package repository
+# js_client_repo_auth_token: a build secret, the access token (in GitLab, this token must have with 'read_api' scope and at least 'Reporter' role ) 
+RUN --mount=type=secret,id=js_client_repo_auth_token \
+    echo "@cm:registry=https://$JS_CLIENT_REPO_URL" | tee -a .npmrc && \
+    echo "//$JS_CLIENT_REPO_URL:_authToken=$(cat /run/secrets/js_client_repo_auth_token)" | tee -a .npmrc && \
+    npm install && \
+    npm run build && \
+    rm .npmrc
 
 #######################################################################################
 ## Stage: downloading provisioning scripts
