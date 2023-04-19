@@ -4,6 +4,9 @@
     <div v-for="(value, key) in filters" :key="key">
       {{ key }} : {{ value }}
     </div>
+    <div>
+      image IDs = {{ filteredImageIds }}
+    </div>
 
     <div class="search-block" v-if="filteredKeys">
       <b-dropdown v-model="currentKey" :placeholder="$t('search-placeholder')" scrollable>
@@ -35,7 +38,7 @@
       />
 
       <b-button
-        @click="filters = searchValue; searchValue = ''"
+        @click="searchImage"
         :disabled="searchValue === ''"
       >
         {{ $t('button-add') }}
@@ -45,16 +48,20 @@
 </template>
 
 <script>
+import {Cytomine} from 'cytomine-client';
+
 export default {
   name: 'image-format',
   props: {
     format: String,
+    imageIds: Array,
     keys: Array,
   },
   data() {
     return {
       currentKey: 'Select metadata',
       currentValue: '',
+      filteredImageIds: [],
       searchKey: '',
       searchValue: '',
     };
@@ -83,6 +90,20 @@ export default {
     filteredKeys() {
       return this.keys.filter((item) => item.toLowerCase().indexOf(this.searchKey.toLowerCase()) >= 0);
     },
+  },
+  methods: {
+    async searchImage() {
+      this.filters = this.searchValue;
+      this.searchValue = '';
+
+      let data = {
+        'filters': this.filters,
+        'imageIds': this.imageIds,
+      }
+
+      this.filteredImageIds = (await Cytomine.instance.api.post('search.json', data)).data["collection"];
+      this.$eventBus.$emit('includeImageIDs', this.filteredImageIds);
+    }
   },
   created() {
     this.$store.commit('currentProject/setImageFormat', this.format);

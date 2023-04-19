@@ -114,6 +114,7 @@
     <div v-for="format in selectedFormats" :key="format">
       <image-format
         :format="format"
+        :image-ids="imageIds[format]"
         :keys="metadataKeys[format]"
       />
     </div>
@@ -141,6 +142,7 @@ export default {
   },
   props: {
     formats: Array,
+    imageIds: Object,
     magnifications: Array,
     maxHeight: Number,
     maxWidth: Number,

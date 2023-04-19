@@ -54,6 +54,7 @@
       <metadata-search
         v-if="filtersOpened"
         :formats="availableFormats"
+        :image-ids="imageIds"
         :magnifications="availableMagnifications"
         :max-height="maxHeight"
         :max-width="maxWidth"
@@ -181,6 +182,7 @@ export default {
       error: false,
       images: [],
       metadata: {},
+      filteredImageIDs: [],
       addImageModal: false,
       excludedProperties: [
         'overview',
@@ -285,7 +287,19 @@ export default {
         }
       }
 
+      collection['include'] = {
+        in: this.filteredImageIDs.join(', ')
+      };
+
       return collection;
+    },
+
+    imageIds() {
+      let ids = {};
+      this.availableFormats.forEach(format => ids[format] = []);
+      this.images.forEach(image => ids[image.contentType].push(image.baseImage));
+
+      return ids;
     },
 
     nbActiveFilters() {
@@ -372,6 +386,11 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+
+    includeImageIDs(imageIDs) {
+      this.filteredImageIDs = this.filteredImageIDs.concat(imageIDs);
+      console.log(imageIDs, this.filteredImageIDs.join(', '));
     }
   },
   watch: {
@@ -404,6 +423,12 @@ export default {
         this.selectedTags = queriedTags;
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('includeImageIDs', this.includeImageIDs);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('includeImageIDs', this.includeImageIDs);
   }
 };
 </script>
