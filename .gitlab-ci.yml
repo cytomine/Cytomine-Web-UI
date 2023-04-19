@@ -40,7 +40,8 @@ build-docker-image:
     - job: make-version-name
       artifacts: true
   script:
-    - docker build -t $DOCKER_TMP_IMAGE_NAME --build-arg JS_CLIENT_REPO_URL=${CI_API_V4_URL#https://} --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -f docker/Dockerfile .
+    - export BASE_PKG_URL=${CI_API_V4_URL#https://}packages/npm/
+    - docker build -t $DOCKER_TMP_IMAGE_NAME --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -f docker/Dockerfile .
 
 publish-docker-image:
   stage: publish
