@@ -1,6 +1,7 @@
 # Cytomine front-end
 
 ## Presentation
+
 The Cytomine-WebUI is the official front-end for Cytomine, developed in VueJS.  
 You will find more information about the Cytomine project on the [website](https://www.cytomine.org).  
 You can also find, on our official documentation [how to install it](https://documentation.cytomine.org/How-to-install-Cytomine?structure=Admins) and [an user guide](https://documentation.cytomine.org/UsersV2?structure=UsersV2).
