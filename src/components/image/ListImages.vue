@@ -244,7 +244,7 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
+        {prop: 'contentType', selected: this.selectedFormats, total: this.availableFormats.length},
         {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
@@ -287,9 +287,11 @@ export default {
         }
       }
 
-      collection['include'] = {
-        in: this.filteredImageIDs.join(', ')
-      };
+      if (this.filteredImageIDs.length > 0) {
+        collection['include'] = {
+          in: Array.from(new Set(this.filteredImageIDs)).join(',')
+        };
+      }
 
       return collection;
     },
@@ -390,7 +392,6 @@ export default {
 
     includeImageIDs(imageIDs) {
       this.filteredImageIDs = this.filteredImageIDs.concat(imageIDs);
-      console.log(imageIDs, this.filteredImageIDs.join(', '));
     }
   },
   watch: {
