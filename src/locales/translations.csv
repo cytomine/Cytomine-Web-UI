@@ -1026,7 +1026,8 @@ per-term,Per term,Par terme,
 per-track,Per track,Par trace,
 per-user,Per user,Par utilisateur,
 per-image,Per image,Par image,
-categorization,Categorization,Catégorisation,
+uncategorized,Uncategorized,Non classé,Sin categoría
+categorization,Categorization,Catégorisation,Categorización
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace,
 the-term,term,le terme,
@@ -1064,3 +1065,4 @@ followers,Followers,Suiveurs
 button-adjust,Adjust,Ajuster
 button-adjust-slice,Adjust slice,Ajuster l'image
 button-adjust-image,Adjust image,Ajuster le plan
+all-annotations-uncategorized,All annotations uncategorized,Toutes les annotations non classées,Todas las anotaciones sin categorizar
