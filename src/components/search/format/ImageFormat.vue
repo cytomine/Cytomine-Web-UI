@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <div class="image-format">
     <h2>{{ format }}</h2>
-    <div v-for="(value, key) in filters" :key="key">
-      {{ key }} : {{ value }}
-    </div>
-    <div>
-      image IDs = {{ filteredImageIds }}
+    <div class="columns is-multiline">
+      <div class="column is-narrow" v-for="(value, key) in filters" :key="key">
+        <div class="box">
+          <div class="filter">{{ key }}: {{ value }}</div>
+          <button class="delete" @click="removeFilter(key)"/>
+        </div>
+      </div>
     </div>
 
     <div class="search-block" v-if="filteredKeys">
@@ -61,7 +63,6 @@ export default {
     return {
       currentKey: 'Select metadata',
       currentValue: '',
-      filteredImageIds: [],
       searchKey: '',
       searchValue: '',
     };
@@ -84,7 +85,6 @@ export default {
           'currentProject/setCurrentMetadataSearch',
           {format: this.format, key: this.currentKey, searchValue: value},
         );
-        this.$forceUpdate();
       }
     },
     filteredKeys() {
@@ -92,17 +92,32 @@ export default {
     },
   },
   methods: {
-    async searchImage() {
-      this.filters = this.searchValue;
-      this.searchValue = '';
+    async removeFilter(key) {
+      this.$store.commit(
+        'currentProject/removeMetadataFilter',
+        {format: this.format, key},
+      );
 
-      let data = {
-        'filters': this.filters,
-        'imageIds': this.imageIds,
+      await this.searchImage();
+      this.$forceUpdate();
+    },
+    async searchImage() {
+      if (this.searchValue) {
+        this.filters = this.searchValue;
+        this.searchValue = '';
       }
 
-      this.filteredImageIds = (await Cytomine.instance.api.post('search.json', data)).data["collection"];
-      this.$eventBus.$emit('includeImageIDs', this.filteredImageIds);
+      let filteredImageIds = this.imageIds;
+      if (Object.keys(this.filters).length) {
+        let data = {
+          'filters': this.filters,
+          'imageIds': this.imageIds,
+        };
+
+        filteredImageIds = (await Cytomine.instance.api.post('search.json', data)).data['collection'];
+      }
+
+      this.$eventBus.$emit('includeImageIDs', this.format, filteredImageIds);
     }
   },
   created() {
@@ -112,6 +127,25 @@ export default {
 </script>
 
 <style scoped>
+.box {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete {
+  float: right;
+}
+
+.filter {
+  display: flex;
+  margin-right: 10px;
+}
+
+.image-format {
+  margin: 10px;
+}
+
 .search-block {
   display: flex;
 }
@@ -119,6 +153,7 @@ export default {
 >>> .search-images {
   display: flex;
   max-width: 30rem;
+  margin-left: 1rem;
   margin-right: 1rem;
 }
 </style>

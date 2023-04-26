@@ -287,11 +287,17 @@ export default {
         }
       }
 
-      if (this.filteredImageIDs.length > 0) {
-        collection['include'] = {
-          in: Array.from(new Set(this.filteredImageIDs)).join(',')
-        };
+      let filteredIDs = [];
+      this.selectedFormats.forEach(format => filteredIDs = filteredIDs.concat(this.filteredImageIDs[format]));
+      if (filteredIDs.length === 0) {
+        for (let ids of Object.values(this.filteredImageIDs)) {
+          filteredIDs = filteredIDs.concat(ids);
+        }
       }
+
+      collection['include'] = {
+        in: filteredIDs.join(',')
+      };
 
       return collection;
     },
@@ -336,6 +342,8 @@ export default {
         if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
           this.availableVendors.push(vendorFormatted);
         }
+
+        this.filteredImageIDs[format] = [];
       });
 
       this.availableMagnifications = stats.magnification.list.map(m => {
@@ -370,6 +378,7 @@ export default {
         }
 
         this.metadata[image.contentType][image.id] = properties;
+        this.filteredImageIDs[image.contentType].push(image.baseImage);
       }));
     },
 
@@ -390,8 +399,9 @@ export default {
       this.filtersOpened = !this.filtersOpened;
     },
 
-    includeImageIDs(imageIDs) {
-      this.filteredImageIDs = this.filteredImageIDs.concat(imageIDs);
+    includeImageIDs(format, imageIDs) {
+      this.$delete(this.filteredImageIDs, format);
+      this.$set(this.filteredImageIDs, format, imageIDs);
     }
   },
   watch: {
