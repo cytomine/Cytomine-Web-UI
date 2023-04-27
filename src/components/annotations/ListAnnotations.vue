@@ -363,11 +363,14 @@ export default {
 
       noTagOption: {id: 0, name: this.$t('no-tag')},
 
+      uncategorizedOption: {id: 0, name: this.$t('uncategorized')},
+
       nLoadedOptionsPerCategory: {
         'TERM': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
         'IMAGE': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
         'USER': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
-        'TRACK': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY
+        'TRACK': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'UNCATEGORIZED': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY
       },
     };
   },
@@ -382,6 +385,9 @@ export default {
       if (!this.tooManyImages) {
         categorizations.push({label: this.$t('per-image'), categorization: 'IMAGE'});
       }
+
+      // Adding an uncategorized option at the end of the array
+      categorizations.push({label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED'});
 
       return categorizations;
     },
@@ -526,6 +532,11 @@ export default {
       return this.selectedImages.map(img => img.id);
     },
     // eslint-disable-next-line vue/return-in-computed-property
+    /**
+     * This computed property returns an array.
+     * The array will be either empty or will be multiple objects of the same type.
+     * The type of these objects depends on the selected categorization.
+     */
     categoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -540,11 +551,18 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        case 'UNCATEGORIZED':
+          // Return an array containing one option to stick to the current behavior
+          return [this.uncategorizedOption];
         default:
           return [];
       }
-      throw new Error('Cannot load a category options ' + this.selectedCategorization.categorization);
     },
+    /**
+     * In the template, we loop over the limitedCategoryOptions computed property.
+     * Zero, one or multiple ListAnnotationBy component can be rendered from this array.
+     * The array is built by slicing the categoryOptions computed property.
+     */
     limitedCategoryOptions() {
       return this.categoryOptions.slice(0, this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization]);
     },
@@ -575,8 +593,6 @@ export default {
     },
     collection() {
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
-      console.log('users', users);
-      console.log('this.selectedUsersIds', this.selectedUsersIds);
 
       let collection = new AnnotationCollection({
         project: this.project.id,
@@ -681,6 +697,14 @@ export default {
           return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
         case 'TRACK':
           return this.selectedTracksIds.includes(prop.id);
+        /**
+         * We will only have one ListAnnotationBy component rendered
+         * when the selectedCategorization is uncategorized.
+         * Removing or adding terms, images, etc, 
+         * in the filters shouldn't change the component visibility.
+         */
+        case 'UNCATEGORIZED':
+          return true;
       }
     }
   },
