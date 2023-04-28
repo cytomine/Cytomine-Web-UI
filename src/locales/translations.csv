@@ -182,7 +182,7 @@ tags,Tags,Tags,Etiquetas,Tags
 no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag 
 button-new-tag,New tag,Nouveau tag,Nueva etiqueta,nieuwe tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.,De tag is succesvol aangemaakt
-notif-error-tag-creation,Failed to create the tag,Une erreur a emp?ché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
+notif-error-tag-creation,Failed to create the tag,Une erreur a empêché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés,Error al crear las etiquetas,Een fout verhinderde het maken van de geselecteerde tags
 associate-tags,Associate tags,Associer des tags,Etiquetas asociadas,Tags koppelen
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
@@ -393,8 +393,8 @@ notif-error-magnification-update,Failed to update the magnification image {image
 length,Length,Longueur,Longitud,Lengte
 create-project,Create project,Créer un projet,Crear proyecto,Een project aanmaken
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé,El proyecto fue creado exitosamente,Het project is succesvol aangemaakt
-notif-error-project-creation,Failed to create the project,Une erreur a emp?ché la création du projet,,Door een fout kon het project niet worden aangemaakt
-notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a emp?ché la création du projet: ce nom de projet est déjà utilisé,,Een fout verhinderde het aanmaken van het project: deze projectnaam is al in gebruik
+notif-error-project-creation,Failed to create the project,Une erreur a empêché la création du projet,,Door een fout kon het project niet worden aangemaakt
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empêché la création du projet: ce nom de projet est déjà utilisé,,Een fout verhinderde het aanmaken van het project: deze projectnaam is al in gebruik
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente,Gebruik een bestaande ontologie
 select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología,Kies ontologie
@@ -417,6 +417,7 @@ medium,Medium,Moyen,Mediana,Medium
 large,Large,Grand,Grande,Groot
 huge,Huge,Très grand,Enorme,Erg groot
 number-per-page,Number per page,Nombre par page,Número por pagina,Aantal per pagina
+number-per-category,Number per category,Nombre par catégorie,,
 display,Display,Affichage,Monitor,Display
 add-image,Add image,Ajouter une image,Añadir imagen,Voeg een afbeelging toe
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName},Gedetailleerde informatie van de afbeelding {imageName}
@@ -439,7 +440,8 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel,Excel downlo
 no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 upload,Upload,Upload,Subir,Uploaden
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
-allowed-formats-upload-info,"Only image files (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF) are allowed","Seules des images peuvent être uploadées (formats acceptés : JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF).","Solo se permiten archivos de imagen en formato JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI o BIF","Er kunnen alleen afbeeldingen worden geüpload (aanvaardbare formaten: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,,
+allowed-formats-upload-info,Supported image file formats:,Formats d'image supportés:,Formatos de imagen compatibles:,Ondersteunde beeldbestandsformaten:
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.,VMS- en MRXS-files moeten worden gecomprimeerd in een ZIP (de ZIP moet zowel het VMS/MRXS/VSI-file als de bijbehorende files bevatten).
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari.","Als u Google Chrome, Mozilla Firefox of Apple Safari gebruikt, kunt u files van uw computer naar de ""{labelButton}""-knop slepen en neerzetten."
@@ -475,10 +477,15 @@ extracting-data,Extracting data,Extraction des données en cours,,Gegevensextrac
 error-extraction,Extraction error,Erreur d'extraction,,Ophaal error
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
 converting,Converting,Conversion en cours,,Conversie bezig
+unpacking,Unpacking,Décompression en cours,,
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado,Geen file
+error-unpacking,Unpacking error,Erreur de décompression,,
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos,0 file| 1 file | {count} files
+unpacked,Unpacked,Décompressé,,
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra,Afbeeldingsvoorbeeld
+checking-integrity,Checking integrity,Vérification de l'intégrité en cours,,
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal,Slide preview
+error-integrity,Corrupted file,Fichier corrompu,,
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename},Afbeeldingsvoorbeeld {filename}
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename},Slide-voorbeeld van {filename}
 file-tree,File tree,Arborescence de fichiers,Árbol de archivos,Fileboom
@@ -503,8 +510,8 @@ review,Review,Validation,Revisión,Review
 shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Valider l'annotation sélectionnée en mode validation,Aceptar anotaciones seleccionadas en modo revisión,Valideer geselecteerde annotatie in reviewmodus
 shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation,Rechazar la anotación seleccionada en modo revisión,Weiger geselecteerde annotatie in reviewmodus
 shortcut-viewer-tool-review-toggle,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation,Alternar capa de revisión en modo revisión,Toon/verberg validatielaag in reviewmodus
-version,Version,Version,Versión,Versie
 sponsors,Sponsors,Sponsors,Patrocinadores,Sponsoren
+version,Version,Version,Versión,Versie
 website,Website,Site web,Sitio web,Website
 source-code,Source code,Code source,Código fuente,Source code
 documentation,Documentation,Documentation,Documentación,Documentatie
@@ -514,7 +521,7 @@ cytomine-company,Cytomine company,société Cytomine,Compañía de Cytomine,Cyto
 cytomine-website-info,You can find more information on the website of the Cytomine project located at {websiteLink}.,Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.,Puede encontrar más información en el sitio web del proyecto Cytomine ubicado en {websiteLink}.,Meer informatie vindt u op de website van het Cytomine-project: {websiteLink}.
 source-code-info,Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code is available on our {githubLink}.,Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.,Cytomine es un software de código abierto distribuido bajo las licencias Apache2 y LGPL 2.1. El código fuente está disponible en nuestro {githubLink}.,Cytomine is open source-software. Het wordt gedistribueerd onder de Apache2- en LGPL 2.1-licenties. De broncode is beschikbaar op onze {githubLink}.
 github-repository,GitHub repository,répertoire GitHub,Repositorio de GitHub,GitHub-gids
-documentation-info,A complete documentation is available {docLink}. More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.,Une documentation complète est disponible {docLink}. Des informations plus détaillées sur l'API de Cytomine sont aussi disponibles {apiDocLink}.,La documentación completa está disponible {docLink}. También hay disponible documentación más detallada sobre la API de Cytomine {apiDocLink}.,Volledige documentatie is beschikbaar {docLink}. Meer gedetailleerde informatie over de Cytomine API is ook beschikbaar {apiDocLink}.
+documentation-info,A complete documentation is available {docLink}.,Une documentation complète est disponible {docLink}.,La documentación completa está disponible {docLink}.,Volledige documentatie is beschikbaar {docLink}.
 here,here,ici,aquí,hier
 contact-info,You can contact the Cytomine Team at {contactMail},Vous pouvez contacter l'équipe de Cytomine à l'adresse {contactMail}.,Puede ponerse en contacto con el equipo de Cytomine en {contactMail},U kunt contact opnemen met het Cytomine-team via {contactMail}.
 button-previous-image,Previous image,Image précédente,Imagen anterior,Vorige afbeelding
@@ -526,10 +533,10 @@ notif-error-fetch-next-image,Failed to load next image,Une erreur a empêché de
 viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images),Grupo de espectadores ({nbImages} imágenes),Groep afbeeldingen ({nbImages} afbeeldingen)
 activity-charts,Activity charts,Graphiques d'activité,Gráficos de actividad,Activiteit grafieken
 activity-logs,Activity logs,Logs d'activité,Registros de actividad,Activiteitenlogboeken
-project-connections,Project connections,Connexions au projet,Conexiones del proyecto,Projectverbindingen
-image-consultations,Image consultations,Consultations d'images,Consultas de imagen,Afbeeldingen bekijken
 number-annotations,Number of annotations,Nombre d'annotations,Número de anotaciones,Aantal annotaties
+project-connections,Project connections,Connexions au projet,Conexiones del proyecto,Projectverbindingen
 manual-annotations-vs-term,Manual annotations VS. term,Annotations manuelles VS. terme,Anotaciones manuales por término,Manuele annotaties VS. term
+image-consultations,Image consultations,Consultations d'images,Consultas de imagen,Afbeeldingen bekijken
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término,Geannoteerde afbeeldingen VS. term
 manual-annotations-vs-contributor,Manual annotations VS. contributor,Annotations manuelles VS. contributeur,Anotaciones manuales por colaborador,Manuele annotaties VS. bijdrager
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
@@ -1040,3 +1047,17 @@ images-in-projects,Images in projects,Images au sein des projets,,Afbeeldingen b
 uploaded-images,Images uploaded,Images téléversées,,Geüploade afbeeldingen
 step,Step,Saut,,Stap
 screenshot, Screenshot current image view, Capture d'écran de l'image actuelle,, Screenshot van de huidige afbeelding
+all-channels,All channels,Tous les canaux,,
+channel-abbr,ch.,can.,,
+channel,Channel,Canal,,
+warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément,,
+min-max,Min/Max,Min/Max,,
+merged-channels,Merged channels,Canaux fusionnés,,
+histogram-scale,Histogram scale,Echelle des histogrammes,,
+linear,Linear,Linéaire,,
+logarithmic,Logarithmic,Logarithmic,,
+intensities-manipulation,Intensities adjustment,Ajustement des intensités,,
+followers,Followers,Suiveurs,,
+button-adjust,Adjust,Ajuster,,
+button-adjust-slice,Adjust slice,Ajuster l'image,,
+button-adjust-image,Adjust image,Ajuster le plan,,
