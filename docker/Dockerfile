@@ -50,7 +50,7 @@ RUN apk update && apk add gettext
 RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-
+COPY --chmod=774 scripts/run_npm_install.sh /docker-entrypoint-cytomine.d/750-run_npm_install.sh
 ENV WEB_UI_PORT=8887
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
