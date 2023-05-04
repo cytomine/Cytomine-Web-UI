@@ -22,8 +22,8 @@ FROM node:${NODE_VERSION} as frontend-builder
 # URL of the package registry (no scheme)
 ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
 
-ADD . /app/Cytomine-Web-UI
-WORKDIR /app/Cytomine-Web-UI
+ADD . /app
+WORKDIR /app
 
 # create .npmrc for fetching JS Client from private package repository
 # js_client_repo_auth_token: a build secret, the access token (in GitLab, this token must have with 'read_api' scope and at least 'Reporter' role ) 
@@ -35,20 +35,8 @@ RUN --mount=type=secret,id=js_client_repo_auth_token \
     rm .npmrc
 
 #######################################################################################
-## Stage: downloading provisioning scripts
-FROM alpine/git:2.36.3 as scripts-downloader
-ARG SCRIPTS_REPO_TAG="latest"
-ARG SCRIPTS_REPO_URL="https://github.com/cytomine/cytomine-docker-entrypoint-scripts.git"
-
-WORKDIR /root
-RUN mkdir -p /root/scripts
-RUN git clone $SCRIPTS_REPO_URL /root/scripts \
-    && cd /root/scripts \
-    && git checkout tags/$SCRIPTS_REPO_TAG
-
-#######################################################################################
 ## Stage: dev image (with hot swap)
-FROM node:${NODE_VERSION} as dev-server
+FROM frontend-builder as dev-server
 
 WORKDIR /app
 # ui source code should be mounted in /app
@@ -56,10 +44,8 @@ WORKDIR /app
 RUN apk update && apk add gettext
 
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-
-ENV WEB_UI_PORT=8887
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve
@@ -73,13 +59,13 @@ WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
 
 # actual front end
-COPY --from=frontend-builder /app/Cytomine-Web-UI/dist /app
+COPY --from=frontend-builder /app/dist /app
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
