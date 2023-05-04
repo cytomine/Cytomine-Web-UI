@@ -11,5 +11,9 @@ module.exports = {
         'cytomine-client': '@cm/cytomine-client'
       }
     }
+  },
+  devServer: {
+    // domain whitelist for dev server
+    allowedHosts: ['.cytomine.local']
   }
 }
