@@ -119,8 +119,8 @@ def find_transalation_for_key(key, langs, entry1, entry2):
   data = {"key": key}
   ambiguity = False
   for lang in langs:
-    exists_in_1 = (entry1 is not None and lang in entry1 and entry1[lang] is not None and len(entry1) > 0)
-    exists_in_2 = (entry2 is not None and lang in entry2 and entry2[lang] is not None and len(entry2) > 0)
+    exists_in_1 = (entry1 is not None and lang in entry1 and entry1[lang] is not None and len(entry1[lang].strip()) > 0)
+    exists_in_2 = (entry2 is not None and lang in entry2 and entry2[lang] is not None and len(entry2[lang].strip()) > 0)
     if not exists_in_1 and not exists_in_2:
       data[lang] = ""
     elif not exists_in_1 and exists_in_2:
@@ -138,8 +138,8 @@ def find_transalation_for_key(key, langs, entry1, entry2):
 
 def main():
   # Specify the conflicting translation files here
-  file1_path = "main-ce_translations.csv"
-  file2_path = "nl_translations.csv"
+  file1_path = "src/locales/translations.csv"
+  file2_path = "/home/rmormont/Downloads/translations__2023_0503_IS_nl.csv"
 
   lang1, entries1 = read_translations(file1_path)
   lang2, entries2 = read_translations(file2_path)
