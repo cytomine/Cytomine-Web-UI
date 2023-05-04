@@ -27,20 +27,8 @@ RUN npm install
 RUN npm run build
 
 #######################################################################################
-## Stage: downloading provisioning scripts
-FROM alpine/git:2.36.3 as scripts-downloader
-ARG SCRIPTS_REPO_TAG="latest"
-ARG SCRIPTS_REPO_URL="https://github.com/cytomine/cytomine-docker-entrypoint-scripts.git"
-
-WORKDIR /root
-RUN mkdir -p /root/scripts
-RUN git clone $SCRIPTS_REPO_URL /root/scripts \
-    && cd /root/scripts \
-    && git checkout tags/$SCRIPTS_REPO_TAG
-
-#######################################################################################
 ## Stage: dev image (with hot swap)
-FROM node:${NODE_VERSION} as dev-server
+FROM frontend-builder as dev-server
 
 WORKDIR /app
 # ui source code should be mounted in /app
@@ -48,10 +36,8 @@ WORKDIR /app
 RUN apk update && apk add gettext
 
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --chmod=774 scripts/run_npm_install.sh /docker-entrypoint-cytomine.d/750-run_npm_install.sh
-ENV WEB_UI_PORT=8887
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve
@@ -65,8 +51,8 @@ WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=scripts-downloader --chmod=774 /root/scripts/envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
 
