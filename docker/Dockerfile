@@ -21,14 +21,14 @@ ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as frontend-builder
 WORKDIR /app
 
-ADD . /app/Cytomine-Web-UI
-WORKDIR /app/Cytomine-Web-UI
+ADD . /app
+WORKDIR /app
 RUN npm install
 RUN npm run build
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
-FROM frontend-builder as dev-server
+FROM node:${NODE_VERSION} as dev-server
 
 WORKDIR /app
 # ui source code should be mounted in /app
@@ -36,8 +36,9 @@ WORKDIR /app
 RUN apk update && apk add gettext
 
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=774 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve
@@ -51,13 +52,13 @@ WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.2.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
 
 # actual front end
-COPY --from=frontend-builder /app/Cytomine-Web-UI/dist /app
+COPY --from=frontend-builder /app/dist /app
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
