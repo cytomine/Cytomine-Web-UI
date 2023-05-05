@@ -9,6 +9,9 @@ node_modules
 # generated translation files
 src/locales/json
 
+# sensitive
+.npmrc
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
