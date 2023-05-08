@@ -426,7 +426,7 @@ medium,Medium,Moyen,Mediana,Medium
 large,Large,Grand,Grande,Groot
 huge,Huge,Très grand,Enorme,Erg groot
 number-per-page,Number per page,Nombre par page,Número por pagina,Aantal per pagina
-number-per-category,Number per category,Nombre par catégorie,,Aantal per categorie
+number-per-category,Number per category,Nombre par catégorie,Número por categoría,Aantal per categorie
 display,Display,Affichage,Monitor,Display
 add-image,Add image,Ajouter une image,Añadir imagen,Voeg een afbeelging toe
 screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
@@ -867,8 +867,8 @@ notif-success-track-update,The track was successfully updated,La trace a bien é
 notif-error-track-update,Failed to update the track,Erreur durant la modification de la trace,,Fout bij het wijzigen van de track
 confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?,,Bent u zeker dat u de {name}-tracering wilt verwijderen?
 notif-error-track-deletion,Failed to delete the track.,Erreur lors de la suppression de la trace,,Fout bij verwijderen van de track
-tracks,Tracks,Traces,,Tracks
-no-track,No track,Pas de trace,,Geen track
+tracks,Tracks,Traces,Pistas,Tracks
+no-track,No track,Pas de trace,Sin pista,Geen track 
 multiple-tracks,Multiple tracks,Traces multiples,,Meerdere tracks
 no-track-to-add,No track to add,Pas de trace à ajouter,,Geen track toe te voegen
 notif-error-add-track,Failed to add the track,Impossible d'ajouter la trace,,De track mag niet toegevoegd worden
@@ -1032,11 +1032,10 @@ developer-mode,Developer mode,Mode développeur,,Developersmodus
 id,ID,ID,,ID
 job-id,Analysis ID,ID de l'analyse,,Analyse-ID
 userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse,,Analyse user-ID
-per-term,Per term,Par terme,,Per termijn
-per-track,Per track,Par trace,,Per track
-per-user,Per user,Par utilisateur,,Per user
-per-image,Per image,Par image,,Per afbeelding
-categorization,Categorization,Catégorisation,,Categorisering
+per-term,Per term,Par terme,Por trimestre,Per termijn
+per-track,Per track,Par trace,Por pista,Per track
+per-user,Per user,Par utilisateur,Por usuario,Per user
+per-image,Per image,Par image,Por imagen,Per afbeelding
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,,Momenteel zichtbaar annotatie met
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace,,Annotaties die momenteel zichtbaar zijn voor de tracering
 the-term,term,le terme,,de term
@@ -1126,3 +1125,11 @@ leave-calibration-mode,Leave the calibration mode,Quitter le mode calibration,,
 calibration-annotation-must-be-segment,Error: the calibration annotation must be a segment,L'annotation servant à la calibration doit être un segment,,
 length-of-drawn-segment,Length of drawn segment,Longueur du segment tracé,,
 computed-resolution,Computed resolution,Résolution calculée,,
+go-back,Go back,Page Précédente,Página anterior,Vorige pagina
+open-in-viewer,Open in viewer,Ouvrir dans le visualisateur,Abrir en visor,Openen in de viewer
+all-annotations-uncategorized,All annotations uncategorized,Toutes les annotations non classées,Todas las anotaciones sin categorizar,Alle annotaties ongecategoriseerd
+categorization,Categorization,Catégorisation,Categorización,Categorisering
+reviewed-annotation-status,Review Status,Statut de la révision,Estado de revisión,Review Status
+reviewed-annotation-status-validated,Validated,Validé,Validado,Gevalideerd
+reviewed-annotation-status-not-validated,Not validated,Non validé,No validado,Niet gevalideerd
+uncategorized,Uncategorized,Non classé,Sin categoría,Uncategorized
