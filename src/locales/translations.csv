@@ -417,7 +417,7 @@ medium,Medium,Moyen,Mediana,Medium
 large,Large,Grand,Grande,Groot
 huge,Huge,Très grand,Enorme,Erg groot
 number-per-page,Number per page,Nombre par page,Número por pagina,Aantal per pagina
-number-per-category,Number per category,Nombre par catégorie,,Aantal per categorie
+number-per-category,Number per category,Nombre par catégorie,Número por categoría,Aantal per categorie
 display,Display,Affichage,Monitor,Display
 add-image,Add image,Ajouter une image,Añadir imagen,Voeg een afbeelging toe
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName},Gedetailleerde informatie van de afbeelding {imageName}
@@ -441,7 +441,7 @@ no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 upload,Upload,Upload,Subir,Uploaden
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
 max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,,De maximale grootte per bestand is 100 GB
-allowed-formats-upload-info,Supported image file formats:,Formats d'image supportés:,Formatos de imagen compatibles:,Ondersteunde beeldbestandsformaten:
+allowed-formats-upload-info,"Supported image file formats (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Formats d'image supportés(JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Formatos de archivo de imagen compatibles (formatos aceptados: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Er kunnen alleen afbeeldingen worden geüpload (aanvaardbare formaten: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.,VMS- en MRXS-files moeten worden gecomprimeerd in een ZIP (de ZIP moet zowel het VMS/MRXS/VSI-file als de bijbehorende files bevatten).
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari.","Als u Google Chrome, Mozilla Firefox of Apple Safari gebruikt, kunt u files van uw computer naar de ""{labelButton}""-knop slepen en neerzetten."
@@ -516,12 +516,12 @@ website,Website,Site web,Sitio web,Website
 source-code,Source code,Code source,Código fuente,Source code
 documentation,Documentation,Documentation,Documentación,Documentatie
 contact,Contact,Contact,Contacto,Contact
-cytomine-sponsors-info,Cytomine is developed by the {cytomineCompanyLink} in collaboration with the University of Liège and was previously funded by research grants of the Wallonia.,Cytomine est développé par la {cytomineCompanyLink} en collaboration avec l'Université de Liège et a été subventionné par des conventions de recherche de la Région Wallone.,Cytomine es desarrollado por {cytomineCompanyLink} en colaboración con la Universidad de Lieja y anteriormente fue financiado mediante becas de investigación de Valonia.,Cytomine werd ontwikkeld door {cytomineCompanyLink} in samenwerking met de Universiteit van Luik en wordt gesubsidieerd door onderzoeksovereenkomsten van het Waalse Gewest.
-cytomine-company,Cytomine company,société Cytomine,Compañía de Cytomine,Cytomine bedrijf
+cytomine-sponsors-info,Cytomine Community Edition is developed by the {cytomineCompanyLink} in collaboration with the University of Liège and was previously funded by research grants of the Wallonia.,Cytomine Community Edition est développé par la {cytomineCompanyLink} en collaboration avec l'Université de Liège et a été subventionné par des conventions de recherche de la Région Wallone.,Cytomine Community Edition es desarrollado por {cytomineCompanyLink} en colaboración con la Universidad de Lieja y anteriormente fue financiado mediante becas de investigación de Valonia.,Cytomine Community Edition werd ontwikkeld door {cytomineCompanyLink} in samenwerking met de Universiteit van Luik en wordt gesubsidieerd door onderzoeksovereenkomsten van het Waalse Gewest.
+cytomine-company,Cytomine company,Société Cytomine,Compañía de Cytomine,Cytomine bedrijf
 cytomine-website-info,You can find more information on the website of the Cytomine project located at {websiteLink}.,Vous trouverez davantage d'information sur le site web du projet Cytomine : {websiteLink}.,Puede encontrar más información en el sitio web del proyecto Cytomine ubicado en {websiteLink}.,Meer informatie vindt u op de website van het Cytomine-project: {websiteLink}.
 source-code-info,Cytomine is an open-source software. The licenses are Apache2 and LGPL 2.1. The source code is available on our {githubLink}.,Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.,Cytomine es un software de código abierto distribuido bajo las licencias Apache2 y LGPL 2.1. El código fuente está disponible en nuestro {githubLink}.,Cytomine is open source-software. Het wordt gedistribueerd onder de Apache2- en LGPL 2.1-licenties. De broncode is beschikbaar op onze {githubLink}.
 github-repository,GitHub repository,répertoire GitHub,Repositorio de GitHub,GitHub-gids
-documentation-info,A complete documentation is available {docLink}.,Une documentation complète est disponible {docLink}.,La documentación completa está disponible {docLink}.,Volledige documentatie is beschikbaar {docLink}.
+documentation-info,A complete documentation is available {docLink}. More detailed documentation regarding the API of Cytomine is also available {apiDocLink}.,Une documentation complète est disponible {docLink}. Des informations plus détaillées sur l'API de Cytomine sont aussi disponibles {apiDocLink}.,La documentación completa está disponible {docLink}. También hay disponible documentación más detallada sobre la API de Cytomine {apiDocLink}.,Volledige documentatie is beschikbaar {docLink}. Meer gedetailleerde informatie over de Cytomine API is ook beschikbaar {apiDocLink}.
 here,here,ici,aquí,hier
 contact-info,You can contact the Cytomine Team at {contactMail},Vous pouvez contacter l'équipe de Cytomine à l'adresse {contactMail}.,Puede ponerse en contacto con el equipo de Cytomine en {contactMail},U kunt contact opnemen met het Cytomine-team via {contactMail}.
 button-previous-image,Previous image,Image précédente,Imagen anterior,Vorige afbeelding
@@ -854,8 +854,8 @@ notif-success-track-update,The track was successfully updated,La trace a bien é
 notif-error-track-update,Failed to update the track,Erreur durant la modification de la trace,,Fout bij het wijzigen van de track
 confirm-deletion-track,Are you sure you want to delete track {name}?,Etes-vous certain de vouloir supprimer la trace {name} ?,,Bent u zeker dat u de {name}-tracering wilt verwijderen?
 notif-error-track-deletion,Failed to delete the track.,Erreur lors de la suppression de la trace,,Fout bij verwijderen van de track
-tracks,Tracks,Traces,,Tracks
-no-track,No track,Pas de trace,,Geen track 
+tracks,Tracks,Traces,Pistas,Tracks
+no-track,No track,Pas de trace,Sin pista,Geen track 
 multiple-tracks,Multiple tracks,Traces multiples,,Meerdere tracks
 no-track-to-add,No track to add,Pas de trace à ajouter,,Geen track toe te voegen
 notif-error-add-track,Failed to add the track,Impossible d'ajouter la trace,,De track mag niet toegevoegd worden
@@ -1019,11 +1019,10 @@ developer-mode,Developer mode,Mode développeur,,Developersmodus
 id,ID,ID,,ID
 job-id,Analysis ID,ID de l'analyse,,Analyse-ID
 userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse,,Analyse user-ID
-per-term,Per term,Par terme,,Per termijn
-per-track,Per track,Par trace,,Per track
-per-user,Per user,Par utilisateur,,Per user
-per-image,Per image,Par image,,Per afbeelding
-categorization,Categorization,Catégorisation,,Categorisering
+per-term,Per term,Par terme,Por trimestre,Per termijn
+per-track,Per track,Par trace,Por pista,Per track
+per-user,Per user,Par utilisateur,Por usuario,Per user
+per-image,Per image,Par image,Por imagen,Per afbeelding
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,,Momenteel zichtbaar annotatie met
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace,,Annotaties die momenteel zichtbaar zijn voor de tracering
 the-term,term,le terme,,de term
@@ -1036,8 +1035,8 @@ too-much-categories-to-display,There are too much categories to display ({toDisp
 hide-successful-upload,Hide successful uploads,Cacher les uploads réussis,Ocultar cargas exitosas,Succesvolle uploads verbergen
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza,Geen trusted source die aan de zoekcriteria voldoet
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
-no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza,Geen trusted source  
-hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,,Termen kunnen hiërarchisch worden georganiseerd door middel van Drag & Drop 
+no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza,Geen trusted source
+hierarchical-drag-drop-term,Terms can be organized hierarchically using Drag & Drop,Les termes peuvent être organisés de manière hiérarchique en utilisant le drag and drop,,Termen kunnen hiërarchisch worden georganiseerd door middel van Drag & Drop
 notif-deprecated-software,This software is deprecated,,,Deze software is verouderd
 delete-source,Delete source,Supprimer la source de confiance,,De trusted source verwijderen
 delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,,Weet u zeker dat u de trusted source {username}/{dockerUsername} wilt verwijderen?
@@ -1046,7 +1045,7 @@ notif-error-source-delete,Failed to delete trusted source {username}/{dockerUser
 images-in-projects,Images in projects,Images au sein des projets,,Afbeeldingen binnen projecten
 uploaded-images,Images uploaded,Images téléversées,,Geüploade afbeeldingen
 step,Step,Saut,,Stap
-screenshot, Screenshot current image view, Capture d'écran de l'image actuelle,, Screenshot van de huidige afbeelding
+screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
 all-channels,All channels,Tous les canaux,,Alle kanalen
 channel-abbr,ch.,can.,,kan.
 channel,Channel,Canal,,Kanaal
@@ -1061,3 +1060,11 @@ followers,Followers,Suiveurs,,Volgers
 button-adjust,Adjust,Ajuster,,Aanpassen
 button-adjust-slice,Adjust slice,Ajuster l'image,,Afbeelding aanpassen
 button-adjust-image,Adjust image,Ajuster le plan,,Plan aanpassen
+go-back,Go back,Page Précédente,Página anterior,Vorige pagina
+open-in-viewer,Open in viewer,Ouvrir dans le visualisateur,Abrir en visor,Openen in de viewer
+all-annotations-uncategorized,All annotations uncategorized,Toutes les annotations non classées,Todas las anotaciones sin categorizar,Alle annotaties ongecategoriseerd
+categorization,Categorization,Catégorisation,Categorización,Categorisering
+reviewed-annotation-status,Review Status,Statut de la révision,Estado de revisión,Review Status
+reviewed-annotation-status-validated,Validated,Validé,Validado,Gevalideerd
+reviewed-annotation-status-not-validated,Not validated,Non validé,No validado,Niet gevalideerd
+uncategorized,Uncategorized,Non classé,Sin categoría,Uncategorized
