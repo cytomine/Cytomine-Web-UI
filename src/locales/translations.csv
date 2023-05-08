@@ -185,7 +185,7 @@ tags,Tags,Tags,Etiquetas,Tags
 no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag
 button-new-tag,New tag,Nouveau tag,Nueva etiqueta,nieuwe tag
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.,De tag is succesvol aangemaakt
-notif-error-tag-creation,Failed to create the tag,Une erreur a empếché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
+notif-error-tag-creation,Failed to create the tag,Une erreur a empêché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
 notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer les tags sélectionnés,Error al crear las etiquetas,Een fout verhinderde het maken van de geselecteerde tags
 associate-tags,Associate tags,Associer des tags,Etiquetas asociadas,Tags koppelen
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
@@ -231,7 +231,7 @@ ql-header-4,Header 4,Titre 4,Encabezado 4,Titel 4
 ql-font,Font,Police,Fuente,Lettertype
 ql-bold,Bold,Gras,Negrita,Vetgedrukt
 ql-italic,Italic,Italique,Itálica,Cursief
-ql-underline,Underline,Souliqué,Subrayar,Onderstrepen
+ql-underline,Underline,Souligné,Subrayar,Onderstrepen
 ql-subscript,Subscript,Indice,Subíndice,index
 ql-superscript,Superscript,Exposant,Superíndice,Superscript tekst
 ql-font-color,Font color,Couleur du texte,Color de fuente,Tekst kleur
@@ -402,8 +402,8 @@ notif-error-magnification-update,Failed to update the magnification image {image
 length,Length,Longueur,Longitud,Lengte
 create-project,Create project,Créer un projet,Crear proyecto,Een project aanmaken
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé,El proyecto fue creado exitosamente,Het project is succesvol aangemaakt
-notif-error-project-creation,Failed to create the project,Une erreur a empếché la création du projet,,Door een fout kon het project niet worden aangemaakt
-notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empếché la création du projet: ce nom de projet est déjà utilisé,,Een fout verhinderde het aanmaken van het project: deze projectnaam is al in gebruik
+notif-error-project-creation,Failed to create the project,Une erreur a empêché la création du projet,,Door een fout kon het project niet worden aangemaakt
+notif-error-project-already-exists,Failed to create the project: This project name is already used,Une erreur a empêché la création du projet: ce nom de projet est déjà utilisé,,Een fout verhinderde het aanmaken van het project: deze projectnaam is al in gebruik
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente,Gebruik een bestaande ontologie
 select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología,Kies ontologie
@@ -426,9 +426,10 @@ medium,Medium,Moyen,Mediana,Medium
 large,Large,Grand,Grande,Groot
 huge,Huge,Très grand,Enorme,Erg groot
 number-per-page,Number per page,Nombre par page,Número por pagina,Aantal per pagina
+number-per-category,Number per category,Nombre par catégorie,,Aantal per categorie
 display,Display,Affichage,Monitor,Display
-screenshot,Screenshot,Capture d'écran,,Screenshot van de huidige afbeelding
 add-image,Add image,Ajouter une image,Añadir imagen,Voeg een afbeelging toe
+screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName},Gedetailleerde informatie van de afbeelding {imageName}
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
 access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
@@ -449,8 +450,8 @@ download-excel,Download Excel,Télécharger l'Excel,Descargar Excel,Excel downlo
 no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 upload,Upload,Upload,Subir,Uploaden
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
-max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,,
-allowed-formats-upload-info,Supported image file formats:,Formats d'image supportés :,,"Er kunnen alleen afbeeldingen worden geüpload (aanvaardbare formaten: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF)."
+max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,,De maximale grootte per bestand is 100 GB
+allowed-formats-upload-info,"Supported image file formats (JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Formats d'image supportés(JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Formatos de archivo de imagen compatibles (formatos aceptados: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):","Er kunnen alleen afbeeldingen worden geüpload (aanvaardbare formaten: JP(E)G, PNG, BMP, TIF, TIFF, SVS, SCN, NDPI, VMS, MRXS, VSI, BIF):"
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.,VMS- en MRXS-files moeten worden gecomprimeerd in een ZIP (de ZIP moet zowel het VMS/MRXS/VSI-file als de bijbehorende files bevatten).
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari.","Als u Google Chrome, Mozilla Firefox of Apple Safari gebruikt, kunt u files van uw computer naar de ""{labelButton}""-knop slepen en neerzetten."
@@ -486,15 +487,15 @@ extracting-data,Extracting data,Extraction des données en cours,,Gegevensextrac
 error-extraction,Extraction error,Erreur d'extraction,,Ophaal error
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
 converting,Converting,Conversion en cours,,Conversie bezig
-unpacking,Unpacking,Décompression en cours,,
-error-unpacking,Unpacking error,Erreur de décompression,,
-unpacked,Unpacked,Décompressé,,
-checking-integrity,Checking integrity,Vérification de l'intégrité en cours,,
-error-integrity,Corrupted file,Fichier corrompu,,
+unpacking,Unpacking,Décompression en cours,,Decompressie bezig
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado,Geen file
+error-unpacking,Unpacking error,Erreur de décompression,,Decompressie fout
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos,0 file| 1 file | {count} files
+unpacked,Unpacked,Décompressé,,Uuitgepakt
 sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra,Afbeeldingsvoorbeeld
+checking-integrity,Checking integrity,Vérification de l'intégrité en cours,,Integriteitscontrole wordt uitgevoerd
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal,Slide preview
+error-integrity,Corrupted file,Fichier corrompu,,Beschadigd bestand
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename},Afbeeldingsvoorbeeld {filename}
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename},Slide-voorbeeld van {filename}
 file-tree,File tree,Arborescence de fichiers,Árbol de archivos,Fileboom
@@ -520,6 +521,7 @@ shortcut-viewer-tool-review-accept,Accept selected annotation in review mode,Val
 shortcut-viewer-tool-review-reject,Reject selected annotation in review mode,Rejeter l'annotation sélectionnée en mode validation,Rechazar la anotación seleccionada en modo revisión,Weiger geselecteerde annotatie in reviewmodus
 shortcut-viewer-tool-review-toggle,Toggle review layer in review mode,Afficher/masquer le calque de validation en mode validation,Alternar capa de revisión en modo revisión,Toon/verberg validatielaag in reviewmodus
 sponsors,Sponsors,Sponsors,Patrocinadores,Sponsoren
+version,Version,Version,Versión,Versie
 website,Website,Site web,Sitio web,Website
 source-code,Source code,Code source,Código fuente,Source code
 documentation,Documentation,Documentation,Documentación,Documentatie
@@ -542,7 +544,9 @@ viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images
 activity-charts,Activity charts,Graphiques d'activité,Gráficos de actividad,Activiteit grafieken
 activity-logs,Activity logs,Logs d'activité,Registros de actividad,Activiteitenlogboeken
 number-annotations,Number of annotations,Nombre d'annotations,Número de anotaciones,Aantal annotaties
+project-connections,Project connections,Connexions au projet,Conexiones del proyecto,Projectverbindingen
 manual-annotations-vs-term,Manual annotations VS. term,Annotations manuelles VS. terme,Anotaciones manuales por término,Manuele annotaties VS. term
+image-consultations,Image consultations,Consultations d'images,Consultas de imagen,Afbeeldingen bekijken
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término,Geannoteerde afbeeldingen VS. term
 manual-annotations-vs-contributor,Manual annotations VS. contributor,Annotations manuelles VS. contributeur,Anotaciones manuales por colaborador,Manuele annotaties VS. bijdrager
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
@@ -624,8 +628,6 @@ notif-success-analysis-launch,Successfully launched the analysis,L'analyse a bie
 notif-error-analysis-launch,Failed to launch the analysis,Une erreur a empêché de lancer l'analyse,Error al iniciar el análisis,Door een fout kon de analyse niet worden gestart
 notif-error-analysis-parameters-options,Failed to retrieve the options for parameter {paramName},Une erreur a empêché de récupérer les options disponibles pour le paramètre {paramName},Error al recuperar las opciones para el parámetro {paramName},Een fout verhinderde het ophalen van beschikbare opties voor de parameter {paramName}
 activity-of-user,Activity of {username},Activité de l'utilisateur {username},Actividad de {username},Usersactiviteit {username}
-project-connections,Project connections,Connexions au projet,Conexiones del proyecto,Projectverbindingen
-image-consultations,Image consultations,Consultations d'images,Consultas de imagen,Afbeeldingen bekijken
 annotation-selections,Annotation selections,Sélections d'annotations,Selecciones de anotaciones,Annotatie selecties
 detailed-project-connections,Detailed project connections,Détails des connexions au projet,Conexiones detalladas del proyecto,Details van projectverbindingen
 detailed-image-consultations,Detailed image consultations,Détails des consultations d'image,Consultas detalladas de imagen,Afbeeldingsweergave details
@@ -746,7 +748,7 @@ button-share,Share,Partager,Compartir,Delen
 enter-comment,Enter your comment,Saisissez votre commentaire,Introduzca su comentario,Voer uw opmerking in
 send-to-all-project-members,Send to all project members,Envoyer à tous les membres du projet,Enviar a todos los miembros del proyecto,Stuur naar alle projectleden
 send-to-some-members,Send to some project members only,Envoyer à certains membres seulement,Enviar solo a algunos miembros del proyecto,Alleen naar bepaalde projectleden verzenden
-add-new-comment,Add new comment,Ajouter un commentaire,Añadir nuevo comentario,Voeg een nieuwe commentaar toe
+add-new-comment,Add new comment,Ajouter un nouveau commentaire,Añadir nuevo comentario,Voeg een nieuwe commentaar toe
 button-add-comment,Add comment,Ajouter un commentaire,Añadir comentario,Voeg een commentaar toe
 comment-will-be-sent-by-email,The comment will be sent by email to the selected users,Le commentaire sera envoyé par e-mail aux utilisateurs sélectionnés,El comentario se enviará por correo electrónico a los usuarios seleccionados.,De opmerking wordt per e-mail naar de geselecteerde users verzonden
 notif-error-new-comment,Failed to add a comment to the annotation,Une erreur a empêché la création du commentaire,Error al añadir un comentario a la anotación,Een fout verhinderde het maken van de opmerking
@@ -1004,7 +1006,6 @@ notif-success-source-update,Trusted source successfully updated,La source de con
 notif-error-source-update,Failed to update the trusted source,Une erreur a empêché la modification de la source de confiance,Error al actualizar la fuente de confianza,Een fout verhinderde de wijziging van de trusted source
 notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée,Se solicitó la actualización de la fuente de confianza,Update van de trusted source is aangevraagd
 notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance,Error durante la actualización de la fuente de confianza,Fout tijdens het updaten van de trusted source
-version,Version,Version,Versión,Versie
 fav,Fav.,Fav.,Fav.,Fav.
 favorite,Favorite,Favori,Favorito,Favoriet
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
@@ -1092,20 +1093,20 @@ images-in-projects,Images in projects,Images au sein des projets,,Afbeeldingen b
 uploaded-images,Images uploaded,Images téléversées,,Geüploade afbeeldingen
 step,Step,Saut,,Stap
 screenshot-current-view,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
-all-channels,All channels,Tous les canaux,,
-channel-abbr,ch.,can.,,
-channel,Channel,Canal,,
-warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément,,
-min-max,Min/Max,Min/Max,,
-merged-channels,Merged channels,Canaux fusionnés,,
-histogram-scale,Histogram scale,Echelle des histogrammes,,
-linear,Linear,Linéaire,,
-logarithmic,Logarithmic,Logarithmic,,
-intensities-manipulation,Intensities adjustment,Ajustement des intensités,,
-followers,Followers,Suiveurs,,
-button-adjust,Adjust,Ajuster,,
-button-adjust-slice,Adjust slice,Ajuster l'image,,
-button-adjust-image,Adjust image,Ajuster le plan,,
+all-channels,All channels,Tous les canaux,,Alle kanalen
+channel-abbr,ch.,can.,,kan.
+channel,Channel,Canal,,Kanaal
+warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément,,Kan niet op meerdere kanalen tegelijk tekenen
+min-max,Min/Max,Min/Max,,Min/Max
+merged-channels,Merged channels,Canaux fusionnés,,Samengevoegde kanalen
+histogram-scale,Histogram scale,Echelle des histogrammes,,Schaal van histogrammen
+linear,Linear,Linéaire,,Lineair
+logarithmic,Logarithmic,Logarithmic,,Logaritmisch
+intensities-manipulation,Intensities adjustment,Ajustement des intensités,,Aanpassing van intensiteiten
+followers,Followers,Suiveurs,,Volgers
+button-adjust,Adjust,Ajuster,,Aanpassen
+button-adjust-slice,Adjust slice,Ajuster l'image,,Afbeelding aanpassen
+button-adjust-image,Adjust image,Ajuster le plan,,Plan aanpassen
 lti,LTI,LTI,,
 lti-consumers,LTI Consumers,Clients LTI,,
 lti-consumer,LTI Consumer,Client LTI,,
