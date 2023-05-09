@@ -203,7 +203,6 @@ import {ImageFilterProjectCollection} from 'cytomine-client';
 import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel';
 import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable';
 import HistogramChart from '@/components/charts/HistogramChart';
-import Cytomine from 'cytomine-client/src/cytomine';
 
 export default {
   name: 'color-manipulation',
@@ -269,17 +268,13 @@ export default {
     },
 
     manipulableChannels() {
-      console.log(this.apparentChannels);
-      console.log('this.histograms', this.histograms);
-      let response = this.apparentChannels.map(ac => {
+      return this.apparentChannels.map(ac => {
         return {
           ...ac,
           histogram: this.histograms.find(h => h.apparentChannel === ac.index),
           name: this.sliceChannels[ac.channel].name
         };
       });
-      console.log('response', response);
-      return response;
     },
     visibleManipulableChannels() {
       return this.manipulableChannels.filter(mc => mc.visible);

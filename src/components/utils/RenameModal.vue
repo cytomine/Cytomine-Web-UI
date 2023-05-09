@@ -69,3 +69,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+::v-deep input[type=text] {
+  width: 26em;
+}
+</style>

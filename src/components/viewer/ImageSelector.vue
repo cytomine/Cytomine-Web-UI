@@ -40,7 +40,7 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + appendShortTermToken(image.preview, shortTermToken) + ')'"></a>
+          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + appendShortTermToken(imageThumbUrl(image), shortTermToken) + ')'"></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -188,8 +188,8 @@ export default {
   },
   async created() {
     try {
-      this.fetchImages();
-      this.fetchTags();
+      await this.fetchImages();
+      await this.fetchTags();
     }
     catch(error) {
       console.log(error);
