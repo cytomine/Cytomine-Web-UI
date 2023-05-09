@@ -185,9 +185,11 @@ export default {
     this.selectedFormats.forEach(format => this.showSpecificMetadata[format] = true);
 
     for (const [key, value] of Object.entries(this.metadata)) {
-      let keys = [];
-      Object.values(value)[0].forEach(property => keys.push(property.key));
-      this.metadataKeys[key] = keys;
+      let keys = new Set();
+      Object.values(value).forEach(properties => {
+        properties.forEach(property => keys.add(property.key));
+      })
+      this.metadataKeys[key] = Array.from(keys);
     }
   }
 };
