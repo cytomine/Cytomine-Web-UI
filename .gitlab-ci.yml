@@ -80,7 +80,7 @@ publish-docker-image:
   script:
     - |
       if [ $IS_OPEN_SOURCE_RELEASE_CANDIDATE = "true" ]; then
-        export DOCKER_IMAGE_NAME=cytomine/web-ui
+        export DOCKER_IMAGE_NAME=cytomine/web_ui
         export TARGET_CI_REGISTRY=$DOCKERHUB_URL
         export TARGET_CI_REGISTRY_USER=$DOCKERHUB_USER
         export TARGET_CI_REGISTRY_PASSWORD=$DOCKERHUB_PASSWORD
