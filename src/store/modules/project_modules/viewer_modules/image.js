@@ -126,9 +126,6 @@ export default {
       clone = _.cloneDeep(slices);
       commit('setActiveSlices', clone);
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
-
       await dispatch('fetchSliceInstancesAround', {rank: clone[0].rank});
     },
     async setImageInstance({dispatch, rootState}, {image, slices}) {
@@ -207,11 +204,6 @@ export default {
           slices => commit('setActiveSlices', slices)
         )
       ]);
-
-      commit('clearSliceInstances');
-
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: state.imageInstance.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
 
       commit('clearSliceInstances');
       await dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank});
@@ -314,7 +306,7 @@ export default {
         styles.push(state.style.noTermStyle);
       }
 
-      let nbTracks = annot.track!=undefined ? annot.track.length : 0;
+      let nbTracks = annot.track ? annot.track.length : 0;
       let isReviewed = annot.type === AnnotationType.REVIEWED;
       let isRejected = state.review.reviewMode && !isReviewed;
 
@@ -422,4 +414,3 @@ function findRankPage(rank) {
 function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
-

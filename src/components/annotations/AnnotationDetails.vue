@@ -158,10 +158,20 @@
             {{ creator.fullName }}
           </td>
         </tr>
-        <tr v-if="!isReview">
-          <td><strong>{{$t('created-on')}}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }} </td>
-        </tr>
+        <template v-if="!isReviewedAnnotation">
+          <tr>
+            <td><strong>{{ $t('created-on') }}</strong></td>
+              <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td> 
+              <span class="tag is-danger">
+                {{ $t('reviewed-annotation-status-not-validated') }}
+              </span>  
+            </td>
+          </tr>
+        </template>
         <template v-else>
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
@@ -172,6 +182,14 @@
           <tr>
             <td><strong>{{$t('reviewed-on')}}</strong></td>
             <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td>
+              <span class="tag is-success">
+                {{ $t('reviewed-annotation-status-validated') }}
+              </span>
+            </td>
           </tr>
         </template>
       </template>
@@ -284,11 +302,11 @@ export default {
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
-    isReview() {
+    isReviewedAnnotation() {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
     reviewer() {
-      if(this.isReview) {
+      if(this.isReviewedAnnotation) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
@@ -304,6 +322,9 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+    },
+    isImageInReviewMode() {
+      return this.image.inReview;
     },
     sliceChannel() {
       return this.slices.find(slice => slice.id === this.annotation.slice) || {};
@@ -555,11 +576,17 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
->>> .sl-vue-tree-node-item {
+/**
+* https://stackoverflow.com/a/55368933
+* Since the project is using Sass and Vue 2.6.10, use `::v-deep` instead of `>>>` so it doesn't break validation.
+* Note that it's deprecated but will in Vue 3.
+* TODO: update >>> and ::v-deep using the unified :deep() selector when using the latest Vue.
+*/
+::v-deep .sl-vue-tree-node-item {
   font-size: 0.9em;
 }
 
->>> .tag {
+::v-deep .tag {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);
