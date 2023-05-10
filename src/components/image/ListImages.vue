@@ -191,7 +191,7 @@
         :revision="revision"
       >
         <template #default="{row: image}">
-          <b-table-column :label="$t('overview')" width="100">
+          <b-table-column :label="$t('overview')" width="100" :visible="isPropDisplayed('overview')">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
               <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             </router-link>
@@ -490,6 +490,10 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+
+    isPropDisplayed(prop) {
+      return this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
   },
   watch: {

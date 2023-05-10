@@ -87,7 +87,7 @@
       {{$t('sample-preview-of', {filename: samplePreview.originalFilename})}}
       <button class="button is-small" @click="samplePreview = null">{{$t('button-hide')}}</button>
     </h2>
-    <image-thumbnail :url="samplePreview.thumbURL" :size="512" :key="samplePreview.thumbURL" />
+    <image-thumbnail :url="samplePreview.thumbURL" :size="512" :key="samplePreview.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }" />
   </template>
   <template v-else-if="slidePreview">
     <h2>

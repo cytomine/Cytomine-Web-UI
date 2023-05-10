@@ -118,7 +118,7 @@ export default {
     },
     styleAnnotDetails() {
       let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
-      console.log('url', url);
+      //console.log('url', url);
       return {
         backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
