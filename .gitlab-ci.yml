@@ -21,7 +21,7 @@ default:
 make-version-name:
   stage: prepare
   # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
-  image: bash:5.2.15-alpine3.16
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
   script:
     - if [[ "$CI_COMMIT_REF_NAME" =~ ^refs/tags/ ]] then
         echo "CM_VERSION=$CI_COMMIT_TAG" > .env;
@@ -35,7 +35,7 @@ make-version-name:
 
 build-docker-image:
   stage: build
-  image: docker:latest
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
   needs:
     - job: make-version-name
       artifacts: true
@@ -45,7 +45,7 @@ build-docker-image:
 
 publish-docker-image:
   stage: publish
-  image: docker:latest
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
   needs:
     - job: build-docker-image
       artifacts: false  # artifact are in docker cache (is it a safe assumption in a multi-runner env ?)
