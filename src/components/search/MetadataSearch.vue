@@ -116,6 +116,8 @@
         :format="format"
         :image-ids="imageIds[format]"
         :keys="metadataKeys[format]"
+        :max="metadataMax"
+        :type="metadataType"
       />
     </div>
 
@@ -123,6 +125,7 @@
 </template>
 
 <script>
+import {isNumeric} from '@/utils/string-utils';
 import {syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -162,6 +165,8 @@ export default {
       availableResolutions: this.resolutions,
       availableTags: this.tags,
       metadataKeys: {},
+      metadataMax: {},
+      metadataType: {},
       showSpecificMetadata: {},
     };
   },
@@ -187,8 +192,19 @@ export default {
     for (const [key, value] of Object.entries(this.metadata)) {
       let keys = new Set();
       Object.values(value).forEach(properties => {
-        properties.forEach(property => keys.add(property.key));
-      })
+        properties.forEach(property => {
+          keys.add(property.key);
+          this.metadataType[property.key] = isNumeric(property.value) ? Number : String;
+
+          if (!(property.key in this.metadataMax)) {
+            this.metadataMax[property.key] = property.value;
+          }
+
+          if (this.metadataMax[property.key] < property.value) {
+            this.metadataMax[property.key] = isNumeric(property.value) ? +property.value : property.value;
+          }
+        });
+      });
       this.metadataKeys[key] = Array.from(keys);
     }
   }

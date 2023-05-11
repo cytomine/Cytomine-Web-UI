@@ -30,8 +30,15 @@
         </b-dropdown-item>
       </b-dropdown>
 
+      <div class="metadata" v-if="type[currentKey] === Number">
+        <div class="metadata-slider">
+          <cytomine-slider v-model="sliderValue" :max="max[currentKey]+1"/>
+        </div>
+      </div>
+
       <b-input
         class="search-images"
+        v-else
         v-model="searchValue"
         :disabled="currentKey === 'Select metadata'"
         :placeholder="$t('search-placeholder')"
@@ -41,7 +48,7 @@
 
       <b-button
         @click="searchImage"
-        :disabled="searchValue === ''"
+        :disabled="(searchValue === '') && (type[currentKey] === String)"
       >
         {{ $t('button-add') }}
       </b-button>
@@ -52,12 +59,19 @@
 <script>
 import {Cytomine} from 'cytomine-client';
 
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
+
 export default {
   name: 'image-format',
+  components: {
+    CytomineSlider,
+  },
   props: {
     format: String,
     imageIds: Array,
     keys: Array,
+    max: Object,
+    type: Object,
   },
   data() {
     return {
@@ -65,6 +79,7 @@ export default {
       currentValue: '',
       searchKey: '',
       searchValue: '',
+      sliderValues: {},
     };
   },
   computed: {
@@ -85,6 +100,15 @@ export default {
           'currentProject/setCurrentMetadataSearch',
           {format: this.format, key: this.currentKey, searchValue: value},
         );
+      }
+    },
+    sliderValue: {
+      get() {
+        return this.sliderValues[this.currentKey];
+      },
+      set(value) {
+        this.$set(this.sliderValues, this.currentKey, value);
+        this.searchValue = this.sliderValues[this.currentKey];
       }
     },
     filteredKeys() {
@@ -120,8 +144,20 @@ export default {
       this.$eventBus.$emit('includeImageIDs', this.format, filteredImageIds);
     }
   },
+  watch: {
+    currentKey() {
+      if (this.type[this.currentKey] === Number) {
+        this.searchValue = this.sliderValues[this.currentKey];
+      }
+      else {
+        this.searchValue = '';
+      }
+    }
+  },
   created() {
     this.$store.commit('currentProject/setImageFormat', this.format);
+
+    this.keys.forEach(key => this.sliderValues[key] = [0, this.max[key]]);
   }
 };
 </script>
@@ -144,6 +180,14 @@ export default {
 
 .image-format {
   margin: 10px;
+}
+
+.metadata {
+  width: 300px;
+}
+
+.metadata-slider {
+  flex-grow: 3;
 }
 
 .search-block {
