@@ -36,14 +36,16 @@
         </div>
       </div>
 
-      <b-input
+      <b-autocomplete
         class="search-images"
         v-else
         v-model="searchValue"
+        :data="searchChoices"
         :disabled="currentKey === 'Select metadata'"
         :placeholder="$t('search-placeholder')"
         icon="search"
         type="search"
+        clearable
       />
 
       <b-button
@@ -77,6 +79,7 @@ export default {
     return {
       currentKey: 'Select metadata',
       currentValue: '',
+      searchChoices: [],
       searchKey: '',
       searchValue: '',
       sliderValues: {},
@@ -116,6 +119,12 @@ export default {
     },
   },
   methods: {
+    async fetchAutoCompletion(search) {
+      return (await Cytomine.instance.api.get(
+        'search/autocomplete.json',
+        {params: {key: this.currentKey, searchTerm: this.searchValue}}
+      )).data['collection'];
+    },
     async removeFilter(key) {
       this.$store.commit(
         'currentProject/removeMetadataFilter',
@@ -151,6 +160,11 @@ export default {
       }
       else {
         this.searchValue = '';
+      }
+    },
+    async searchValue() {
+      if (this.type[this.currentKey] === String) {
+        this.searchChoices = await this.fetchAutoCompletion();
       }
     }
   },
