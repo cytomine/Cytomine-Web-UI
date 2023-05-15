@@ -82,7 +82,7 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
-      version: null,
+      version: 'CE 2023.1',
       loading: true
     };
   },
@@ -90,8 +90,7 @@ export default {
   },
   async created() {
     try {
-      let {version} = await Cytomine.instance.ping();
-      this.version = version;
+      await Cytomine.instance.ping();
     }
     catch(error) {
       console.log(error);
