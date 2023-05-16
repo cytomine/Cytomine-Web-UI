@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
-  <template v-if="!loading">
+  <template>
     <dl>
       <dt>{{$t('version')}}</dt>
       <dd>{{version || '?'}}</dd>
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import {Cytomine} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
@@ -82,20 +82,10 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
-      version: 'CE 2023.1',
-      loading: true
+      version: constants.CYTOMINE_COMMERCIAL_VERSION
     };
   },
   computed: {
-  },
-  async created() {
-    try {
-      await Cytomine.instance.ping();
-    }
-    catch(error) {
-      console.log(error);
-    }
-    this.loading = false;
   }
 };
 </script>
