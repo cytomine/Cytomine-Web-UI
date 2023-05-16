@@ -17,7 +17,7 @@
   <template>
     <dl>
       <dt>{{$t('version')}}</dt>
-      <dd>{{$options.version || '?'}}</dd>
+      <dd>{{version || '?'}}</dd>
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
@@ -76,11 +76,9 @@
 <script>
 import constants from '@/utils/constants.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
-import CONFIG from '../../../public/configuration.json';
 
 export default {
   name: 'about-cytomine-wrapper',
-  version: CONFIG.CYTOMINE_COMMERCIAL_VERSION, // doesn't need to be reactive (for now)
   components: {CytomineModalCard},
   data() {
     return {
