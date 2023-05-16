@@ -13,152 +13,147 @@
  limitations under the License.-->
 
 <template>
-<div>
-  <b-loading :is-full-page="false" :active="loading" />
-  <template v-if="!loading">
-    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
-      <h2> {{ $t('error') }} </h2>
-      <p> {{ $t('unexpected-error-info-message') }} </p>
-    </b-message>
-    <template v-else>
-      <div class="columns is-marginless">
-        <div class="column is-one-quarter">
-          <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
-        </div>
-        <div class="column is-one-quarter">
-          <button class="button" @click="filtersOpened = !filtersOpened">
-            <span class="icon">
-              <i class="fas fa-filter"></i>
-            </span>
-            <span>{{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}</span>
-          </button>
-        </div>
-        <div class="column is-one-half has-text-right-desktop">
-          <button class="button is-link" @click="startUserCreation()">
-            {{$t('button-new-user')}}
-          </button>
-        </div>
-      </div>
-
-      <div class="column">
-        <b-collapse :open="filtersOpened">
-          <div class="filters columns">
-            <div class="column filter is-one-quarter">
-              <div class="filter-label">
-                {{$t('status')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
-                                      :searchable="false" />
-              </div>
-            </div>
-            <div class="column filter is-one-quarter" style="padding: 2.5rem">
-              <b-checkbox v-model="onlyPublicUser">
-                {{$t('only-public-user')}}
-              </b-checkbox>
-            </div>
+  <div>
+    <b-loading :is-full-page="false" :active="loading" />
+    <template v-if="!loading">
+      <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+        <h2> {{ $t('error') }} </h2>
+        <p> {{ $t('unexpected-error-info-message') }} </p>
+      </b-message>
+      <template v-else>
+        <div class="columns is-marginless">
+          <div class="column is-one-quarter">
+            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
           </div>
-        </b-collapse>
-      </div>
-
-      <cytomine-table
-        :collection="userCollection"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
-        :detailed=true
-        :revision="revision"
-      >
-        <template #default="{row: user}">
-          <b-table-column field="username" :label="$t('username')" sortable width="100">
-            <username :user="user" :online="user.online" :displayFullName="false" /> <span v-if="user.publicUser" class="icon"><i class="fas fa-users"></i></span>
-          </b-table-column>
-
-          <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-            {{user.firstname}} {{user.lastname}}
-          </b-table-column>
-
-          <b-table-column field="role" :label="$t('role')" sortable width="50">
-            <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
-          </b-table-column>
-
-          <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">
-            <span class="tag is-success" v-if="user.apiEnabled">{{$t('api-enabled')}}</span>
-            <span class="tag is-danger" v-else>{{$t('api-disabled')}}</span>
-          </b-table-column>
-
-
-          <b-table-column field="email" :label="$t('email')" sortable width="150">
-            <a :href="`mailto:${user.email}`">{{ user.email }}</a>
-          </b-table-column>
-
-          <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
-            <span :class="['tag', user.LDAP ? 'is-link' : 'is-grey']">
-              {{displayMemberOrigin(user)}}
-            </span>
-          </b-table-column>
-
-          <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{Number(user.created) | moment('ll LT')}}
-          </b-table-column>
-
-          <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-            <template v-if="user.updated">{{Number(user.updated) | moment('ll LT')}}</template>
-            <template v-else>-</template>
-          </b-table-column>
-
-          <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
-            <template v-if="user.lastConnection">
-              {{Number(user.lastConnection) | moment('ll LT')}}
-            </template>
-            <em v-else class="has-text-grey">{{$t('no-record')}}</em>
-          </b-table-column>
-
-          <b-table-column label="" width="100">
-            <div class="buttons">
-              <button class="button is-link is-small" @click="startUserEdition(user)">
-                {{$t('button-edit')}}
-              </button>
-              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
-                {{$t('button-lock')}}
-              </button>
-              <button v-else class="button is-success is-small" @click="unlock(user)">
-                {{$t('button-unlock')}}
-              </button>
-              <button v-if="user.publicUser" class="button is-link is-small" @click="generateToken(user)">
-                {{$t('button-token')}}
-              </button>
-            </div>
-          </b-table-column>
-        </template>
-
-        <template #detail="{row: user}">
-          <user-details :user="user" />
-        </template>
-
-        <template #empty>
-          <div class="content has-text-grey has-text-centered">
-            <p>{{$t('no-user-fitting-criteria')}}</p>
+          <div class="column is-one-quarter">
+            <button class="button" @click="filtersOpened = !filtersOpened">
+              <span class="icon">
+                <i class="fas fa-filter"></i>
+              </span>
+              <span>{{ filtersOpened ? $t('button-hide-filters') : $t('button-show-filters') }}</span>
+            </button>
           </div>
-        </template>
-      </cytomine-table>
+          <div class="column is-one-half has-text-right-desktop">
+            <button class="button is-link" @click="startUserCreation()">
+              {{ $t('button-new-user') }}
+            </button>
+          </div>
+        </div>
 
-      <user-modal :active.sync="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
+        <div class="column">
+          <b-collapse :open="filtersOpened">
+            <div class="filters columns">
+              <div class="column filter is-one-quarter">
+                <div class="filter-label">
+                  {{ $t('status') }}
+                </div>
+                <div class="filter-body">
+                  <cytomine-multiselect v-model="selectedStatus" :options="availableStatus" multiple
+                    :searchable="false" />
+                </div>
+              </div>
+              <div class="column filter is-one-quarter" style="padding: 2.5rem">
+                <b-checkbox v-model="onlyPublicUser">
+                  {{ $t('only-public-user') }}
+                </b-checkbox>
+              </div>
+            </div>
+          </b-collapse>
+        </div>
+
+        <cytomine-table :collection="userCollection" :currentPage.sync="currentPage" :perPage.sync="perPage"
+          :sort.sync="sortField" :order.sync="sortOrder" :detailed=true :revision="revision">
+          <template #default="{ row: user }">
+            <b-table-column field="username" :label="$t('username')" sortable width="100">
+              <username :user="user" :online="user.online" :displayFullName="false" /> <span v-if="user.publicUser"
+                class="icon"><i class="fas fa-users"></i></span>
+            </b-table-column>
+
+            <b-table-column field="fullName" :label="$t('name')" sortable width="150">
+              {{ user.firstname }} {{ user.lastname }}
+            </b-table-column>
+
+            <b-table-column field="role" :label="$t('role')" sortable width="50">
+              <span class="tag" :class="getRoleData(user).class">{{ $t(getRoleData(user).label) }}</span>
+            </b-table-column>
+
+            <b-table-column field="apiEnabled" :label="$t('api-enabled')" sortable width="50">
+              <span class="tag is-success" v-if="user.apiEnabled">{{ $t('api-enabled') }}</span>
+              <span class="tag is-danger" v-else>{{ $t('api-disabled') }}</span>
+            </b-table-column>
+
+
+            <b-table-column field="email" :label="$t('email')" sortable width="150">
+              <a :href="`mailto:${user.email}`">{{ user.email }}</a>
+            </b-table-column>
+
+            <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
+              <span :class="['tag', user.LDAP ? 'is-link' : 'is-grey']">
+                {{ displayMemberOrigin(user) }}
+              </span>
+            </b-table-column>
+
+            <b-table-column field="created" :label="$t('created')" sortable width="150">
+              {{ Number(user.created) | moment('ll LT') }}
+            </b-table-column>
+
+            <b-table-column field="updated" :label="$t('updated')" sortable width="150">
+              <template v-if="user.updated">{{ Number(user.updated) | moment('ll LT') }}</template>
+              <template v-else>-</template>
+            </b-table-column>
+
+            <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
+              <template v-if="user.lastConnection">
+                {{ Number(user.lastConnection) | moment('ll LT') }}
+              </template>
+              <em v-else class="has-text-grey">{{ $t('no-record') }}</em>
+            </b-table-column>
+
+            <b-table-column label="" width="100">
+              <div class="buttons">
+                <button class="button is-link is-small" @click="startUserEdition(user)">
+                  {{ $t('button-edit') }}
+                </button>
+                <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">
+                  {{ $t('button-lock') }}
+                </button>
+                <button v-else class="button is-success is-small" @click="unlock(user)">
+                  {{ $t('button-unlock') }}
+                </button>
+                <button v-if="user.publicUser" class="button is-link is-small" @click="generateToken(user)">
+                  {{ $t('button-token') }}
+                </button>
+              </div>
+            </b-table-column>
+          </template>
+
+          <template #detail="{ row: user }">
+            <user-details :user="user" />
+          </template>
+
+          <template #empty>
+            <div class="content has-text-grey has-text-centered">
+              <p>{{ $t('no-user-fitting-criteria') }}</p>
+            </div>
+          </template>
+        </cytomine-table>
+
+        <user-modal :active.sync="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
+      </template>
     </template>
-  </template>
-</div>
+  </div>
 </template>
-
+  
 <script>
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineTable from '@/components/utils/CytomineTable';
-import {Cytomine, UserCollection} from 'cytomine-client';
-import UserModal from './UserModal';
-import UserDetails from './UserDetails';
-import {rolesMapping} from '@/utils/role-utils';
 import Username from '@/components/user/Username';
+import CytomineTable from '@/components/utils/CytomineTable';
+import { rolesMapping } from '@/utils/role-utils';
+import { Cytomine, UserCollection } from 'cytomine-client';
+import constants from '@/utils/constants';
+import UserDetails from './UserDetails';
+import UserModal from './UserModal';
 
 export default {
   name: 'admin-users',
@@ -203,7 +198,7 @@ export default {
       let collection = new UserCollection({
         withRoles: true
       });
-      collection['onlineFilter'] = includeOnlineAndOffline ? null : (includeOnline? true : (includeOffline? false : null));
+      collection['onlineFilter'] = includeOnlineAndOffline ? null : (includeOnline ? true : (includeOffline ? false : null));
 
       if (this.onlyPublicUser) {
         collection['publicUser'] = {
@@ -211,7 +206,7 @@ export default {
         }
       }
 
-      if(this.searchString) {
+      if (this.searchString) {
         collection['fullName'] = {
           ilike: encodeURIComponent(this.searchString)
         };
@@ -221,13 +216,13 @@ export default {
     }
   },
   methods: {
-    displayMemberOrigin(member){
+    displayMemberOrigin(member) {
       let key;
-      if(member.origin === 'LDAP') key = 'LDAP';
-      else if(member.origin === 'BOOTSTRAP') key = 'system';
-      else if(member.origin === 'SHIBBOLETH') key = 'Shibboleth';
-      else if(member.origin === 'SAML') key = 'SAML';
-      else if(member.origin === 'LTI') key = 'LTI';
+      if (member.origin === 'LDAP') key = 'LDAP';
+      else if (member.origin === 'BOOTSTRAP') key = 'system';
+      else if (member.origin === 'SHIBBOLETH') key = 'Shibboleth';
+      else if (member.origin === 'SAML') key = 'SAML';
+      else if (member.origin === 'LTI') key = 'LTI';
       else key = 'manual';
 
       return this.$t(key);
@@ -239,33 +234,35 @@ export default {
       try {
         await user.lock();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-lock')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-user-lock') });
       }
     },
     async unlock(user) {
       try {
         await user.unlock();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-user-unlock') });
       }
     },
     async generateToken(user) {
       try {
         let token = await Cytomine.instance.token(user.username, -1);
-        this.$buefy.dialog.alert({
-          title: this.$t('token'),
-          message: token,
+        this.$buefy.dialog.confirm({
+          title: this.$t('token-auth'),
+          message: `${user.username}: <code>${token}</code>`,
           type: 'is-info',
-          confirmText: this.$t('button-close')
+          cancelText: this.$t('button-close'),
+          confirmText: this.$t('button-copy-url-token-auth'),
+          onConfirm: () => this.setTokenLoginURLToClipBoard(token, user.username, constants.TOKEN_AUTH_REDIRECT)
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
+        this.$notify({ type: 'error', text: this.$t('notif-unexpected-error') });
       }
     },
     startUserCreation() {
@@ -282,6 +279,50 @@ export default {
     updateUser(user) {
       this.revision++;
       this.editedUser.populate(user);
+    },
+    /**
+     * Write in the clipboard a URL encoded endpoint containing tokenKey, username and redirect parameters.
+     * 
+     * @param {string} tokenKey The generated token
+     * @param {string} username A string representing username
+     * @param {string} redirect Where to redirect to after a successful login
+     */
+    async setTokenLoginURLToClipBoard(tokenKey, username, redirect = constants.TOKEN_AUTH_REDIRECT) {
+      try {
+        // URL object with something like 'http://cytomine.local/login/loginWithToken'
+        const tokenLoginURL = new URL(`${window.location.origin}${constants.TOKEN_AUTH_ENDPOINT}`);
+
+        // Adding the parameters
+        tokenLoginURL.searchParams.set('tokenKey', tokenKey);
+        tokenLoginURL.searchParams.set('username', username);
+        tokenLoginURL.searchParams.set('redirect', redirect);
+
+        /**
+         * In general, navigator.clipboard should be used as document.execCommand('copy') is deprecated.
+         * As navigator.clipboard works in secure context (https), we also make use of document.execCommand('copy').
+         * In the future, we may strictly rely on the Clipboard API.
+         * For more details:
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/Clipboard
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+         */
+        if (navigator.clipboard && window.isSecureContext) {
+          console.log('Using navigator.clipboard.writeText');
+          await navigator.clipboard.writeText(tokenLoginURL.toString()); // TODO: check this works in HTTPS
+        } else {
+          // execCommand('copy') works with <input> and <textarea>
+          // We also need to call select on the element before copying.
+          const input = document.createElement("input");
+          input.value = tokenLoginURL.toString();
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          document.body.removeChild(input);
+        }
+        this.$notify({ type: 'success', text: this.$t('notif-success-copy-url-token-auth') })
+      } catch (error) {
+        console.error(error);
+        this.$notify({ type: 'error', text: this.$t('notif-unexpected-error') })
+      }
     }
   },
   async activated() {
