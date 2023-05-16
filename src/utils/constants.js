@@ -20,6 +20,8 @@ export default {
   LOGOUT_REDIRECTION: '/',
   CYTOMINE_CORE_HOST: 'https://localhost-core',
   CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
+  TOKEN_AUTH_ENDPOINT: '/login/loginWithToken',
+  TOKEN_AUTH_REDIRECT: '/',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   PRELOADED_SLICES: 50,

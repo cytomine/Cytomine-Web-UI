@@ -1140,3 +1140,6 @@ notif-success-project-clone,Project {oldName} correctly cloned,Le projet {oldNam
 api-enabled,Api enabled,API activée,,
 api-disabled,Api disabled,API désactivée,,
 api-key-allowed,Api keys enabled,API keys activées,,
+token-auth,Token for authentication without password,Token pour l'authentification sans mot de passe,Token para autenticación sin contraseña,Token voor authenticatie zonder wachtwoord
+button-copy-url-token-auth,Copy URL for token based authentication,Copier l'URL pour l'authentification basée sur les tokens,Copie la URL para la autenticación basada en token,Kopieer de URL voor authenticatie op basis van tokens
+notif-success-copy-url-token-auth,URL for token authentication was copied,L'URL pour l'authentification par token a été copiée,Se copió la URL para la autenticación del token,URL voor tokenverificatie is gekopieerd
