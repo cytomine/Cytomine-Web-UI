@@ -242,8 +242,8 @@
               </button>
             </template>
             <template v-if="canManageProject">
-              <button class="button" @click="isCloneModalActive = true">
-                {{$t('button-clone')}}
+              <button class="button" @click="isCopyModalActive = true">
+                {{$t('button-copy')}}
               </button>
             </template>
             <a class="button" v-if="canDownloadImages || canManageProject" @click="download(image)">
@@ -267,11 +267,11 @@
     @rename="rename"
   />
 
-  <clone-modal
-    :title="$t('clone-image')"
+  <copy-modal
+    :title="$t('copy-image-other-project')"
     :currentImage="image"
-    :active.sync="isCloneModalActive"
-    @clone="clone"
+    :active.sync="isCopyModalActive"
+    @copy="copy"
   />
 
   <magnification-modal
@@ -302,7 +302,7 @@ import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from './MagnificationModal';
-import CloneModal from './CloneModal';
+import CopyModal from './CopyModal.vue';
 import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
@@ -330,7 +330,7 @@ export default {
     ImageMetadataModal,
     ImageStatus,
     RenameModal,
-    CloneModal
+    CopyModal
   },
   props: {
     image: {type: Object},
@@ -343,7 +343,7 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
-      isCloneModalActive: false
+      isCopyModalActive: false
     };
   },
   computed: {
@@ -413,29 +413,29 @@ export default {
       this.isRenameModalActive = false;
     },
 
-    async clone(selectedProject, cloneMetadata, cloneAnnot, cloneAnnotMetadata, annotationsTranfertMap) {
+    async copy(selectedProject, copyMetadata, copyAnnot, copyAnnotMetadata, annotationsTranfertMap) {
       let name = this.image.instanceFilename;
       try {
         await Cytomine.instance.api.post(`${Cytomine.instance.host}/api/imageinstance/${this.image.id}/clone.json`, {
           idProject: selectedProject,
-          areImageMetadataCopied: cloneMetadata,
-          areAnnotationsCopied: cloneAnnot,
-          areAnnotationsMetadataCopied: cloneAnnotMetadata,
+          areImageMetadataCopied: copyMetadata,
+          areAnnotationsCopied: copyAnnot,
+          areAnnotationsMetadataCopied: copyAnnotMetadata,
           layersArray: annotationsTranfertMap.map(item => item.source).join(','),
           annotationsTranfertMap: annotationsTranfertMap
         });
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-clone', {imageName: name})
+          text: this.$t('notif-success-image-copy', {imageName: name})
         });
       }
       catch(error) {
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-clone', {imageName: name})
+          text: this.$t('notif-error-image-copy', {imageName: name})
         });
       }
-      this.isCloneModalActive = false;
+      this.isCopyModalActive = false;
     },
 
     confirmDeletion() {
@@ -505,7 +505,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
->>> .image-thumbnail {
+::v-deep .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }

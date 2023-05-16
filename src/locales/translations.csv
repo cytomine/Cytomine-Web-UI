@@ -304,8 +304,8 @@ clone-image,Clone the image,Dupliquer l'image,,
 clone-metadata,Clone the associated data,Dupliquer les données associées,,
 clone-annotations,Clone the annotations,Dupliquer les annotations,,
 clone-annotations-metadata,Clone the annotations associated data,Dupliquer les données associées aux annotations,,
-notif-success-image-clone,Image {imageName} was successfully cloned,L'image {imageName} a été dupliquée avec succès,,
-notif-error-image-clone,Failed to clone image {imageName},Une erreur a empêché de dupliquer l'image {imageName},,
+notif-success-image-copy,Image {imageName} was successfully copied,L'image {imageName} a été copiée avec succès,La imagen {imageName} se copió correctamente,Afbeelding {imageName} is succesvol gekopieerd
+notif-error-image-copy,Failed to copy image {imageName},Une erreur a empêché de copier l'image {imageName},Error al copiar la imagen {imageName},Kan afbeelding {imageName} niet kopiëren
 colors,Colors,Couleurs,Colores,Kleuren
 button-lock,Lock,Verrouiller,Bloquear,blokkeren
 button-set-calibration,Set calibration,Calibrer,Establecer calibración,Kalibreren
@@ -1116,7 +1116,7 @@ lti-name,Name,Name,,
 lti-secret,Secret,Secret,,
 lti-username-parameter,Username Parameter,Paramètre du login,,
 lti-confirm-deletion,Are you sure you want to remove this row?,Êtes-vous sûr de vouloir supprimer cette ligne?,,
-select-unselect-layers,Select/Unselect all layers,Sélectionner/Désélectionner tous les calques,,
+select-unselect-layers,Select/Unselect all layers,Sélectionner/Désélectionner tous les calques,Seleccionar/Deseleccionar todas las capas,Selecteer/deselecteer alle lagen
 public,Public,Public,Público,Openbaar
 only-public-user,Only include public user,N'inclure que les utilisateurs public,,
 public-warning,"Define a user as public means that anyone owning his connection token will be able to log in this Cytomine instance in the name of this user without any password based authentication. This could represent a security breach and be against the rules of your institution. Are you sure to set this user as a public one ?","Définir un utilisateur comme étant public signifie que quiconque possède son jeton de connexion pourra s'authentifier dans cette instance Cytomine en son nom sans devoir préciser un mot de passe. Ceci pourrait représenter une faille de sécurité et être contraire aux règles de votre institution. Êtes vous sûr de définir cet utilisateur comme étant public ?","Definir a un usuario como público significa que cualquier persona con su token de inicio de sesión podrá autenticarse en esta instancia de Cytomine en su nombre sin tener que especificar una contraseña. Esto podría representar una brecha de seguridad y estar en contra de las reglas de su institución. ¿Estás seguro de que configuraste este usuario como público?","Definieer een gebruiker als openbaar betekent dat iedereen die zijn verbindingstoken bezit, in staat zal zijn om in deze Cytomine-instantie in naam van deze gebruiker in te loggen zonder enige authenticatie op basis van een wachtwoord. Dit kan een inbreuk op de beveiliging vormen en in strijd zijn met de regels van uw instelling. Weet u zeker dat u deze gebruiker als openbaar wilt instellen?"
@@ -1140,6 +1140,15 @@ notif-success-project-clone,Project {oldName} correctly cloned,Le projet {oldNam
 api-enabled,Api enabled,API activée,,
 api-disabled,Api disabled,API désactivée,,
 api-key-allowed,Api keys enabled,API keys activées,,
+copy-image-other-project,Copy this image in an other project,Copier cette image dans un autre project,Copiar esta imagen a otro proyecto,Kopieer deze afbeelding in een ander project
+destination-project,Destination Project,Projet Destination,Proyecto Destino,Bestemmingsproject
+copy-metadata,"Copy image metadata (description, tags, properties, etc), not its annotations.","Copier les métadonnées de l'image (description, tags, propriétés, etc.), et non ses annotations.","Copie los metadatos de la imagen (descripción, etiquetas, propiedades, etc.), no sus anotaciones.","Kopieer de metadata van de afbeelding (beschrijving, tags, eigenschappen, enz.), niet de annotaties."
+copy-annotations,Copy annotations,Copier les annotations,Copiar anotaciones,Kopieer annotaties
+copy-annotations-metadata,"Copy the annotations metadata (description, tags, properties, etc).","Copier les métadonnées des annotations (description, balises, propriétés, etc.).","Copie los metadatos de las anotaciones (descripción, etiquetas, propiedades, etc.).","Kopieer annotatiemetadata (beschrijving, tags, eigenschappen, enz.)."
+copy-annotations-metadata-important-note,Terms will only be copied if the destination project uses the same ontology than this one.","Les termes ne seront copiés que si le projet de destination utilise la même ontologie que celle-ci.","Los términos solo se copiarán si el proyecto de destino utiliza la misma ontología que este.","Termen worden alleen gekopieerd als het bestemmingsproject dezelfde ontologie gebruikt als deze."
+annotation-layers-to-copy,ANNOTATION LAYERS TO COPY,CALQUES D'ANNOTATION À COPIER,CAPAS DE ANOTACIONES PARA COPIAR,ANNOTATIELAGEN OM TE KOPIËREN
+source-annotation-layer,Source annotation layer,Calque d'annotations source,Capa de anotaciones de origen,Bronannotatielaag
+destination-annotation-layer,Destination annotation layer,Calque d'annotations de destination,Capa de anotaciones de destino,Bestemming annotatielaag
 token-auth,Token for authentication without password,Token pour l'authentification sans mot de passe,Token para autenticación sin contraseña,Token voor authenticatie zonder wachtwoord
 button-copy-url-token-auth,Copy URL for token based authentication,Copier l'URL pour l'authentification basée sur les tokens,Copie la URL para la autenticación basada en token,Kopieer de URL voor authenticatie op basis van tokens
 notif-success-copy-url-token-auth,URL for token authentication was copied,L'URL pour l'authentification par token a été copiée,Se copió la URL para la autenticación del token,URL voor tokenverificatie is gekopieerd
