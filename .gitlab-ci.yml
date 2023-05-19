@@ -55,7 +55,7 @@ build-push-docker-image:
 
     - echo "Build the docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
     - docker build --build-arg CORE_VERSION=${CM_VERSION} -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} -f docker/Dockerfile .
-    - docker build --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} -f docker/Dockerfile .
+    - docker build --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -f docker/Dockerfile .
 
     - echo "Pushing docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
     - docker push ${DOCKER_IMAGE_NAME}:${CM_VERSION}
