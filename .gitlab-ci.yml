@@ -2,9 +2,10 @@ stages:
   - prepare
   - build
   - publish
-  
+
 
 variables:
+  DOCKER_IMAGE_NAME: 'registry.cytom.in/cm/rnd/cytomine/products/entreprise-edition-teaching/web-ui-ee'
   DOCKER_TMP_IMAGE_NAME: $CI_PIPELINE_ID:latest
 
 default:
@@ -35,7 +36,7 @@ make-version-name:
     reports:
       dotenv: .env
 
-build-docker-image:
+build-push-docker-image:
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
   needs:
@@ -44,27 +45,51 @@ build-docker-image:
   rules:
     - if: $CI_COMMIT_TAG
   script:
+    - echo "Log in to Gitlab docker registry"
+    - mkdir -p ~/.docker
+    - echo ${DOCKER_REGISTRY_CYTOM_IN_AUTH_CONFIG} > ~/.docker/config.json
+
+    # Prepare some vars
     - export BASE_PKG_URL=${CI_API_V4_URL#https://}/packages/npm/
     - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}/g" public/index.html
-    - docker build -t $DOCKER_TMP_IMAGE_NAME --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -f docker/Dockerfile .
 
-publish-docker-image:
-  stage: publish
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
-  needs:
-    - job: build-docker-image
-      artifacts: false  # artifact are in docker cache (is it a safe assumption in a multi-runner env ?)
-    - job: make-version-name
-      artifacts: true
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - export DOCKER_IMAGE_NAME_FULL=$CI_REGISTRY_IMAGE:$CM_VERSION
-    - docker tag $DOCKER_TMP_IMAGE_NAME $DOCKER_IMAGE_NAME_FULL
-    - docker push $DOCKER_IMAGE_NAME_FULL
-    - docker rmi $DOCKER_IMAGE_NAME_FULL
-  after_script:
-    # cleaning up images
-    - docker rmi $DOCKER_TMP_IMAGE_NAME
+    - echo "Build the docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
+    - docker build --build-arg CORE_VERSION=${CM_VERSION} -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} -f docker/Dockerfile .
+    - docker build --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} -f docker/Dockerfile .
+
+    - echo "Pushing docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
+    - docker push ${DOCKER_IMAGE_NAME}:${CM_VERSION}
+
+#build-docker-image:
+#  stage: build
+#  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
+#  needs:
+#    - job: make-version-name
+#      artifacts: true
+#  rules:
+#    - if: $CI_COMMIT_TAG
+#  script:
+#    - export BASE_PKG_URL=${CI_API_V4_URL#https://}/packages/npm/
+#    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}/g" public/index.html
+#    - docker build -t $DOCKER_TMP_IMAGE_NAME --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --secret "id=js_client_repo_auth_token,env=CI_JOB_TOKEN" -f docker/Dockerfile .
+
+#publish-docker-image:
+#  stage: publish
+#  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
+#  needs:
+#    - job: build-docker-image
+#      artifacts: false  # artifact are in docker cache (is it a safe assumption in a multi-runner env ?)
+#    - job: make-version-name
+#      artifacts: true
+#  rules:
+#    - if: $CI_COMMIT_TAG
+#  script:
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#    - export DOCKER_IMAGE_NAME_FULL=$CI_REGISTRY_IMAGE:$CM_VERSION
+#    - docker tag $DOCKER_TMP_IMAGE_NAME $DOCKER_IMAGE_NAME_FULL
+#    - docker push $DOCKER_IMAGE_NAME_FULL
+#    - docker rmi $DOCKER_IMAGE_NAME_FULL
+#  after_script:
+#    # cleaning up images
+#    - docker rmi $DOCKER_TMP_IMAGE_NAME
 
