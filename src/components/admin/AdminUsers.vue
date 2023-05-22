@@ -276,9 +276,10 @@ export default {
       this.editedUser = user;
       this.modal = true;
     },
-    updateUser(user) {
+    async updateUser(user) {
       this.revision++;
       this.editedUser.populate(user);
+      await this.$store.dispatch('currentUser/setNewKeys', user);
     },
     /**
      * Write in the clipboard a URL encoded endpoint containing tokenKey, username and redirect parameters.
