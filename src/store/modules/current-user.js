@@ -43,6 +43,11 @@ export default {
     setExpandedSidebar(state, val) {
       state.expandedSidebar = val;
     },
+    setKeys(state, user) {
+      state.user.apiEnabled = user.apiEnabled;
+      state.user.privateKey = user.privateKey;
+      state.user.publicKey = user.publicKey;
+    },
     resetState(state) {
       Object.assign(state, getDefaultState());
     },
@@ -62,6 +67,13 @@ export default {
     async updateUser({commit}, user) {
       await user.update();
       commit('setUser', user);
+    },
+
+    // Workaround the current update user
+    // For now, in some cases, we have the updated user
+    // and we would like to be able to upload images
+    async setNewKeys({commit}, user) {
+      commit('setKeys', user);
     },
 
     async regenerateKeys({state, commit}) {

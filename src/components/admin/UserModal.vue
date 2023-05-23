@@ -111,7 +111,7 @@
 </form>
 </template>
 
-<script>
+<script lang="js">
 import {User, RoleCollection} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
@@ -255,7 +255,7 @@ export default {
   display: none;
 }
 
->>> .modal-card, >>> .modal-card-body {
+::v-deep .modal-card, ::v-deep .modal-card-body {
   width: 100vw;
   max-width: 800px;
 }
