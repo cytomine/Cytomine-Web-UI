@@ -47,7 +47,7 @@ build-push-docker-image:
   script:
     - echo "Log in to Gitlab docker registry"
     - mkdir -p ~/.docker
-    - echo ${DOCKER_REGISTRY_CYTOM_IN_AUTH_CONFIG} > ~/.docker/config.json
+    - echo ${DOCKER_AUTH_CONFIG} > ~/.docker/config.json
 
     # Prepare some vars
     - export BASE_PKG_URL=${CI_API_V4_URL#https://}/packages/npm/
