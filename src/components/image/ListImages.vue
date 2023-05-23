@@ -295,9 +295,11 @@ export default {
         }
       }
 
-      collection['include'] = {
-        in: filteredIDs.join(',')
-      };
+      if (filteredIDs.length > 0) {
+        collection['include'] = {
+          in: filteredIDs.join(',')
+        };
+      }
 
       return collection;
     },
