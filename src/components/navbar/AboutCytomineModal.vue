@@ -21,7 +21,7 @@
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
-        <a href="https://cytomine.coop" target="_blank">
+        <a href="https://cytomine.com" target="_blank">
           <img src="@/assets/sponsors/logo-cytomine-coop.png" class="sponsor">
         </a>
         <a href="https://www.uliege.be" target="_blank">
@@ -35,7 +35,7 @@
       <dt>{{$t('description')}}</dt>
       <dd>
         <i18n path="cytomine-sponsors-info">
-          <a place="cytomineCompanyLink" href="https://cytomine.coop" target="_blank">
+          <a place="cytomineCompanyLink" href="https://cytomine.com" target="_blank">
             {{$t('cytomine-company')}}</a>
         </i18n>
       </dd>
@@ -43,7 +43,7 @@
       <dt>{{$t('website')}}</dt>
       <dd>
         <i18n path="cytomine-website-info">
-          <a place="websiteLink" href="https://cytomine.coop" target="_blank">cytomine.org</a>
+          <a place="websiteLink" href="https://cytomine.com" target="_blank">cytomine.com</a>
         </i18n>
       </dd>
 
