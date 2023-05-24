@@ -137,7 +137,7 @@ const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilte
 const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
 
 export default {
-  name: 'list-images',
+  name: 'metadata-search',
   components: {
     CytomineMultiselect,
     CytomineSlider,
