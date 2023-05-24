@@ -18,7 +18,6 @@
   :filter="filterFunction"
   :features.sync="selectedFeatures"
   :toggle-condition="never"
-  :remove-condition="shiftKeyOnly"
   :multi=true
   ref="interactionSelect"
 >
@@ -34,6 +33,11 @@ export default {
   name: 'select-interaction',
   props: {
     index: String
+  },
+  data() {
+    return {
+      shiftPressed: false
+    };
   },
   computed: {
     imageModule() {
@@ -51,6 +55,11 @@ export default {
         let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
         if(notAnnotations.length == 1){
           value = notAnnotations;
+
+          if(this.shiftPressed && value.length>=1){
+            value = this.selectMultipleFeatures(value);
+          }
+
           this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
           return;
         }
@@ -96,6 +105,11 @@ export default {
           let annot = value[0].properties.annot;
           annot.recordAction();
         }
+
+        if(this.shiftPressed && value.length>=1){
+          value = this.selectMultipleFeatures(value);
+        }
+
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
     },
@@ -142,6 +156,46 @@ export default {
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
     }
+  },
+  methods: {
+    selectMultipleFeatures(value){
+      let featureIds = [];
+      let selectedFeatureId = value[0].id;
+      if(this.selectedFeatures){
+        featureIds = this.selectedFeatures.map(feature => feature.id); 
+      }
+      if(!featureIds.includes(selectedFeatureId)){
+        return this.addSelectedFeature(value);
+      }
+      else{
+        return this.removeSelectedFeature(selectedFeatureId);
+      }
+    },
+    addSelectedFeature(value){
+      // Diectly modify a state that belongs to Vue return vuex error. Avoid this by doing a copy of the element.
+      let features = [...value];
+      this.selectedFeatures.forEach(feature => {
+        if(!value.map(v => v.id).includes(feature.id)){
+          features.push(feature);
+        }
+      });
+      return features;
+    },
+    removeSelectedFeature(id){
+      // Diectly modify a state that belongs to Vue return vuex error. Avoid this by doing a copy of the element.
+      let features = [...this.selectedFeatures];
+      let index = features.findIndex(feature => feature.id === id);
+      features.splice(index, 1);
+      return features;
+    }
+  },
+  mounted() {
+    let self = this;
+    ['keydown','keyup'].forEach(function(event){
+      window.addEventListener(event, function(ev) {
+        self.shiftPressed = ev.shiftKey;
+      });
+    });
   }
 };
 </script>
