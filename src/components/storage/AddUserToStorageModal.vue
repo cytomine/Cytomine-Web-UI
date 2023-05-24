@@ -17,7 +17,7 @@
     <b-loading :is-full-page="false" :active="loading" class="small" />
     <template v-if="!loading">
       <b-field>
-        <domain-tag-input v-model="selectedUsers" :domains="notStorageUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>
+        <domain-tag-input v-model="selectedUsers" :domains="notGuestAndNotStorageUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>
       </b-field>
 
       <!--<b-field>
@@ -54,6 +54,7 @@ import {UserCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {fullName} from '@/utils/user-utils.js';
+import {ROLES} from '../../utils/role-utils';
 
 export default {
   name: 'add-user-to-storage-modal',
@@ -82,6 +83,12 @@ export default {
     },
     notStorageUsers() {
       return this.users.filter(user => !this.userInStorageIds.includes(user.id));
+    },
+    /**
+     * Return an array of users without users already in the storage or guest users
+     */
+    notGuestAndNotStorageUsers() {
+      return this.notStorageUsers.filter(user => user.role !== ROLES.ROLE_GUEST)
     }
   },
   watch: {
@@ -92,7 +99,6 @@ export default {
   methods: {
     async addUsers() {
       try {
-        console.log('users', this.selectedUsers.map(user => user.id), 'permission', this.permission);
         await this.storage.addUsers(this.selectedUsers.map(user => user.id), this.permission);
         this.$emit('addUsersInStorage');
         this.$notify({type: 'success', text: this.$t('notif-success-add-storage-users')});
@@ -106,7 +112,14 @@ export default {
     }
   },
   async created() {
-    let users = (await UserCollection.fetchAll()).array;
+    /**
+     * A guest user can't have a storage, and it currently can't be added to one.
+     * The API doesn't support a request like getAllUserWhereRoleIsNot('GUEST').
+     * The filtering will happen on the frontend.
+     * To filter user of type GUEST, we need to have the roles in the API response.
+     */
+    const userCollection = new UserCollection({withRoles: true})
+    let users = (await userCollection.fetchAll()).array;
     users.forEach(u => u.fullName = fullName(u));
     this.users = users;
     this.loading = false;
@@ -115,7 +128,7 @@ export default {
 </script>
 
 <style scoped>
->>> .modal-card, >>> .modal-card-body {
+::v-deep .modal-card, ::v-deep .modal-card-body {
   overflow: visible !important;
   width: 60vw !important;
 }
