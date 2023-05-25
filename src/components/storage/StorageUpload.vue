@@ -284,6 +284,8 @@ export default {
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
+        50, // unpacking
+        60  // checking integrity
       ];
 
       let unfinishedConversions = false;
