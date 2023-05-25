@@ -38,7 +38,21 @@
           <h2>{{$t('important-notes')}}</h2>
           <ul class="small-text">
             <li>{{$t('max-size-upload-info')}}</li>
-            <li>{{$t('allowed-formats-upload-info')}}</li>
+            <li>
+              {{$t('allowed-formats-upload-info')}}
+              <template v-if="formatInfos.length">
+                <span v-for="(format, index) in formatInfos" :key="format.id">
+                  {{format.name}}
+                  <v-popover v-if="format.remarks">
+                    <i class="fas fa-info-circle"></i>
+                    <template #popover>
+                      <p>{{format.remarks}}</p>
+                    </template>
+                  </v-popover>
+                  <template v-if="index < formatInfos.length - 1">, </template>
+                </span>
+              </template>
+            </li>
             <li>{{$t('vms-mrxs-upload-info')}}</li>
             <li>{{$t('zip-upload-info')}}</li>
             <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
@@ -189,6 +203,7 @@ export default {
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
       projects: [],
       selectedProjects: [],
+      formatInfos: [],
 
       dropFiles: [],
 
@@ -254,7 +269,6 @@ export default {
   methods: {
     async generateSignature() {
       this.signatureDate = new Date().toISOString();
-      console.log('watch.queryString');
       try {
         this.signature = await Cytomine.instance.fetchSignature({
           uri: this.uri,
@@ -268,12 +282,20 @@ export default {
       }
     },
     async fetchProjects() {
-      console.log('fetchProjects');
       try {
         this.projects = (await ProjectCollection.fetchAll()).array;
       }
       catch(error) {
         console.log(error); // not mandatory for upload => only log error, no other action
+      }
+    },
+
+    async fetchFormatInfos() {
+      try {
+        this.formatInfos = (await Cytomine.instance.api.get('imageserver/format.json')).data.collection;
+      }
+      catch (error) {
+        console.log(error);
       }
     },
 
@@ -418,15 +440,14 @@ export default {
       }
     }
   },
-  created() {
-    console.log('created');
+  async created() {
     this.fetchProjects();
+    this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.generateSignature();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   async destroyed() {
-    console.log('deactivated');
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
   }
