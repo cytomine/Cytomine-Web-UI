@@ -20,3 +20,10 @@ export const rolesMapping = Object.freeze({
   'ROLE_ADMIN': {label: 'admin', index: 2, class: 'is-success'},
   'ROLE_SUPER_ADMIN': {label: 'super-admin', index: 3, class: 'is-success'},
 });
+
+export const ROLES = {
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_GUEST: 'ROLE_GUEST',
+  ROLE_SUPER_ADMIN: 'ROLE_SUPER_ADMIN',
+  ROLE_USER: 'ROLE_USER',
+}
