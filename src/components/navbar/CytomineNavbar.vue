@@ -205,7 +205,6 @@ export default {
     },
     activeSelectedItem(){
       this.initItemsStyles();
-      console.log('this.$route', this.$route.path);
       let item = this.$route.path.split('/')[1];
       // If it's not root path or workspace ('/project/') path.
       if (item && !this.$route.path.match('/project/')){
@@ -222,7 +221,6 @@ export default {
       }
     },
     setItemColor(item, color){
-      console.log(this.itemStyles);
       if(this.itemStyles[item]) this.itemStyles[item].backgroundColor = color;
     },
     // ---
