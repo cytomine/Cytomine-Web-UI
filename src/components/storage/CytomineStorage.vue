@@ -405,11 +405,51 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
+
+    multiSelectFilters() {
+      return [
+        { prop: 'contentType', selected: this.selectedFormats, total: this.availableFormats.length },
+        { prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length },
+        { prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length },
+      ];
+    },
+
+    boundsFilters() {
+      return [
+        { prop: 'height', bounds: this.boundsHeight },
+        { prop: 'width', bounds: this.boundsWidth },
+      ];
+    },
+
     uploadedFileCollection() {
-      return new UploadedFileCollection({
+      let collection = new UploadedFileCollection({
         onlyRootsWithDetails: true,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
+
+      for (let { prop, bounds } of this.boundsFilters) {
+        collection[prop] = {
+          lte: bounds[1]
+        };
+
+        if(bounds[0] > 0) {
+          collection[prop]['gte'] = bounds[0]
+        };
+      }
+
+      for (let { prop, selected, total } of this.multiSelectFilters) {
+        if (prop === 'vendor') {
+          prop = 'mimeType';
+        }
+
+        if (selected.length > 0 && selected.length < total) {
+          collection[prop] = {
+            in: selected.join()
+          };
+        }
+      }
+
+      return collection;
     }
   },
   watch: {
