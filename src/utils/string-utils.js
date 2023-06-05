@@ -25,3 +25,12 @@ export function getWildcardRegexp(str) {
   let escapedString = _.escapeRegExp(str); // escape all RegExp special characters (only * should have a special behaviour)
   return new RegExp('(' + escapedString.split('\\*').join('.*') + ')', 'i');
 }
+
+/**
+ * Check if a string is a valid number.
+ * @param {String} str The string entered by the user
+ * @return {RegExp}
+ */
+export function isNumeric(str) {
+  return !isNaN(str);
+}

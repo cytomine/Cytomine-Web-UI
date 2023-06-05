@@ -161,13 +161,79 @@
       {{ $t('storage') }}
     </p>
     <div class="panel-block storage">
-      <b-input
-        :value="searchString"
-        @input="debounceSearchString"
-        class="search-uploaded-file"
-        :placeholder="$t('search-placeholder')"
-        icon="search"
-      />
+      <div class="search-block">
+        <b-input
+          :value="searchString"
+          @input="debounceSearchString"
+          class="search-uploaded-file"
+          :placeholder="$t('search-placeholder')"
+          icon="search"
+          type="search"
+        />
+
+        <button class="button" @click="filtersOpened = !filtersOpened">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+        </button>
+      </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('vendor') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedVendors"
+                  :multiple="true"
+                  :options="availableVendors"
+                  label="label"
+                  track-by="value"
+                />
+              </div>
+
+              <div class="filter-label">{{ $t('format') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedFormats"
+                  :multiple="true"
+                  :options="availableFormats"
+                />
+              </div>
+            </div>
+
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('magnification') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedMagnifications"
+                  :options="availableMagnifications"
+                  :multiple="true"
+                  :searchable="false"
+                  label="label"
+                  track-by="value"
+                />
+              </div>
+            </div>
+
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('height') }}</div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
+              </div>
+
+              <div class="filter-label">{{ $t('width') }}</div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </b-collapse>
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -223,7 +289,15 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
+import {
+  AbstractImageCollection,
+  Cytomine,
+  StorageCollection,
+  ProjectCollection,
+  UploadedFileCollection,
+  UploadedFile,
+  UploadedFileStatus
+} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
 import _ from 'lodash';
@@ -232,14 +306,17 @@ import constants from '@/utils/constants.js';
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import CytomineSlider from '@/components/form/CytomineSlider';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'cytomine-storage',
   components: {
     ImageThumbnail,
     CytomineMultiselect,
+    CytomineSlider,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails,
     CytomineTable
@@ -250,6 +327,19 @@ export default {
       newUploadError: false,
       timeoutRefreshSessionUploads: null,
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
+
+      abstractImages: [],
+      availableFormats: [],
+      availableMagnifications: [],
+      availableVendors: [],
+      boundsHeight: [],
+      boundsWidth: [],
+      filtersOpened: false,
+      maxHeight: 100,
+      maxWidth: 100,
+      selectedFormats: [],
+      selectedMagnifications: [],
+      selectedVendors: [],
 
       storages: [],
       selectedStorage: null,
@@ -314,11 +404,51 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
+
+    multiSelectFilters() {
+      return [
+        { prop: 'contentType', selected: this.selectedFormats, total: this.availableFormats.length },
+        { prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length },
+        { prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length },
+      ];
+    },
+
+    boundsFilters() {
+      return [
+        { prop: 'height', bounds: this.boundsHeight },
+        { prop: 'width', bounds: this.boundsWidth },
+      ];
+    },
+
     uploadedFileCollection() {
-      return new UploadedFileCollection({
+      let collection = new UploadedFileCollection({
         onlyRootsWithDetails: true,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
+
+      for (let { prop, bounds } of this.boundsFilters) {
+        collection[prop] = {
+          lte: bounds[1]
+        };
+
+        if(bounds[0] > 0) {
+          collection[prop]['gte'] = bounds[0]
+        };
+      }
+
+      for (let { prop, selected, total } of this.multiSelectFilters) {
+        if (prop === 'vendor') {
+          prop = 'mimeType';
+        }
+
+        if (selected.length > 0 && selected.length < total) {
+          collection[prop] = {
+            in: selected.join()
+          };
+        }
+      }
+
+      return collection;
     }
   },
   watch: {
@@ -338,6 +468,41 @@ export default {
     }
   },
   methods: {
+    async fetchAbstractImages() {
+      this.abstractImages = (await  AbstractImageCollection.fetchAll()).array;
+      this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height));
+      this.maxWidth = Math.max(...this.abstractImages.map(ai => ai.width));
+      this.boundsHeight = [0, this.maxHeight];
+      this.boundsWidth = [0, this.maxWidth];
+
+      let formats = new Set();
+      let magnifications = new Set();
+
+      this.abstractImages.forEach(ai => {
+        formats.add(ai.contentType);
+        magnifications.add(ai.magnification);
+      });
+
+      this.availableFormats = Array.from(formats);
+      this.availableMagnifications = Array.from(magnifications).map(m => {
+        return {
+          value: m || 'null',
+          label: m || this.$t('unknown')
+        }
+      });
+
+      this.availableFormats.forEach(format => {
+        let vendor = vendorFromFormat(format);
+        let vendorFormatted = {
+          value: vendor ? format : 'null',
+          label: vendor ? vendor.name : this.$t('unknown')
+        };
+
+        if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+          this.availableVendors.push(vendorFormatted);
+        }
+      });
+    },
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
@@ -517,6 +682,7 @@ export default {
     }, 500)
   },
   activated() {
+    this.fetchAbstractImages();
     this.fetchStorages();
     this.fetchProjects();
     this.fetchFormatInfos();
@@ -590,6 +756,10 @@ export default {
   min-height: 20vh;
   position: relative;
 }
+
+.search-block {
+  display: flex;
+}
 </style>
 
 <style>
@@ -604,6 +774,7 @@ export default {
 }
 
 .search-uploaded-file {
+  margin-right: 1rem;
   max-width: 25em;
 }
 </style>
