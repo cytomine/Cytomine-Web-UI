@@ -54,10 +54,11 @@ build-dist:
     - job: make-version-name
       artifacts: true
   script:
-    - "sed -i -- 's/\"version\": \"0.0.0\"/\"version\": \"$CM_VERSION\"/g' package.json"
+    - "sed -i -- 's/\"version\": \"0.0.0\"/\"version\": \"${CM_VERSION}\"/g' package.json"
+    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}/g" public/index.html
     - npm install
     - npm run build
-    - mv dist dist-$CM_VERSION
+    - mv dist dist-${CM_VERSION}
   artifacts:
     when: on_success
     expire_in: never
