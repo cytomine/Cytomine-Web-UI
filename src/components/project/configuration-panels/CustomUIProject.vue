@@ -94,6 +94,7 @@ export default {
             {key: 'project-explore-image-attached-files', label: 'attached-files', icon: 'fas fa-paperclip'},
             {key: 'project-explore-image-slide-preview', label: 'slide-preview', icon: 'fas fa-image'},
             {key: 'project-explore-image-original-filename', label: 'originalFilename', icon: 'fas fa-info'},
+            {key: 'project-explore-image-metadata', label: 'image-metadata', icon: 'fas fa-asterisk'},
             /*{key: 'project-explore-image-format', label: 'format'},
             {key: 'project-explore-image-vendor', label: 'vendor'},
             {key: 'project-explore-image-size', label: 'size'},
@@ -191,7 +192,9 @@ export default {
   async created() {
     try {
       if(!this.algoEnabled) this.customUITree[0].props.splice(2,1);
+
       this.customUI = await this.project.fetchUIConfig();
+      console.log(this.customUI);
     }
     catch(error) {
       console.log(error);
