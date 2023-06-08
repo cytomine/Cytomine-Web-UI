@@ -126,6 +126,7 @@
 
 <script>
 import {isNumeric} from '@/utils/string-utils';
+import {stripIDfromKey} from '@/utils/metadata.js';
 import {syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
@@ -193,15 +194,16 @@ export default {
       let keys = new Set();
       Object.values(value).forEach(properties => {
         properties.forEach(property => {
-          keys.add(property.key);
-          this.metadataType[property.key] = isNumeric(property.value) ? Number : String;
+          let key = stripIDfromKey(property.key);
+          keys.add(key);
+          this.metadataType[key] = isNumeric(property.value) ? Number : String;
 
-          if (!(property.key in this.metadataMax)) {
-            this.metadataMax[property.key] = property.value;
+          if (!(key in this.metadataMax)) {
+            this.metadataMax[key] = property.value;
           }
 
-          if (this.metadataMax[property.key] < property.value) {
-            this.metadataMax[property.key] = isNumeric(property.value) ? +property.value : property.value;
+          if (this.metadataMax[key] < property.value) {
+            this.metadataMax[key] = isNumeric(property.value) ? +property.value : property.value;
           }
         });
       });

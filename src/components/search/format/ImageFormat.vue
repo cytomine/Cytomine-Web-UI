@@ -119,7 +119,7 @@ export default {
     },
   },
   methods: {
-    async fetchAutoCompletion(search) {
+    async fetchAutoCompletion() {
       return (await Cytomine.instance.api.get(
         'search/autocomplete.json',
         {params: {key: this.currentKey, searchTerm: this.searchValue}}
