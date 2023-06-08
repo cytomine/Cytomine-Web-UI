@@ -73,7 +73,14 @@
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content" colspan="3">
-          <cytomine-properties :object="image" :canEdit="canEdit" />
+          <cytomine-properties 
+            :object="image"
+            :error="loadPropertiesError"
+            :canEdit="canEdit"
+            :properties="metadataFilteredProperties"
+            @deleted="removeProp"
+            @added="addProp"
+          />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('attached-files')">
@@ -85,7 +92,7 @@
       <tr v-if="isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
-          <a v-if="image.macroURL" @click="isMetadataModalActive = true">
+          <a v-if="image.macroURL && !isBlindModeAndContributor" @click="isMetadataModalActive = true">
             <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </a>
           <em v-else>
@@ -204,7 +211,7 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content" colspan="3">
           <div class="buttons are-small">
-            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
+            <button v-if="isPropDisplayed('metadata') && !isBlindModeAndContributor" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">
@@ -277,8 +284,11 @@
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
     :image="image"
+    :properties="onlyMetadataProperties"
+    :error="loadPropertiesError"
   />
 </div>
+
 </template>
 
 <script>
@@ -302,6 +312,8 @@ import {ImageInstance} from 'cytomine-client';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 import vendorFromFormat from '@/utils/vendor';
+import {PropertyCollection} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'image-details',
@@ -328,6 +340,8 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      properties: [],
+      loadPropertiesError: false
     };
   },
   computed: {
@@ -357,6 +371,48 @@ export default {
     vendor() {
       return vendorFromFormat(this.image.contentType);
     },
+    internalUseFilteredProperties() {
+      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
+    },
+    metadataFilteredProperties() {
+      // The "constants" will be set with a string representing a list of \n separated "key=value."
+      // metadataPrefixes will be an array each element will be a ".value"
+      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
+      const props = this.internalUseFilteredProperties.filter(prop => {
+        for (const prefix of metadataPrefixes) {
+          if (prop.key.startsWith(prefix)) {
+            return false;
+          }
+        }
+        return true;
+      });
+      return props
+    },
+    onlyMetadataProperties() {
+      // The "constants" will be set with a string representing a list of \n separated "key=value."
+      // metadataPrefixes will be an array each element will be a ".value"
+      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
+      let props = this.internalUseFilteredProperties.filter(prop => {
+        for (const prefix of metadataPrefixes) {
+          if (prop.key.startsWith(prefix)) {
+            return true;
+          }
+        }
+        return false;
+      });
+      // We sort the properties to improve ease of use in the metadata modal
+      return props.sort((a, b) => a.key.localeCompare(b.key));
+    },
+    /**
+     * BLIND   MANAGER    RESULT
+     * 0       0          1
+     * 0       1          1
+     * 1       0          0
+     * 1       1          1
+     */
+    isBlindModeAndContributor() {
+      return this.blindMode && !this.canManageProject; 
+    }
   },
   methods: {
     appendShortTermToken,
@@ -430,9 +486,26 @@ export default {
     },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    removeProp(prop) {
+      this.properties = this.properties.filter(p => p.id !== prop.id);
+    },
+    addProp(prop) {
+      console.log(prop);
+      this.properties.push(prop);
+      console.log(this.properties);
+    }
+  },
+  async created() {
+    try {
+      this.properties = (await PropertyCollection.fetchAll({ object: this.image })).array;
+    }
+    catch (error) {
+      this.loadPropertiesError = true;
+      console.log(error);
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -464,7 +537,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
->>> .image-thumbnail {
+::v-deep .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }
