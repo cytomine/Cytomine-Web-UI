@@ -541,7 +541,7 @@ export default {
   margin-left: 5px;
 }
 
-.image-overview {
+::v-deep .image-thumbnail {
   max-height: 4rem;
   max-width: 10rem;
 }
@@ -550,12 +550,12 @@ export default {
   display: flex;
 }
 
->>> .search-images {
+::v-deep .search-images {
   max-width: 30rem;
   margin-right: 1rem;
 }
 
->>> td, >>> th {
+::v-deep td, ::v-deep th {
   vertical-align: middle !important;
 }
 </style>

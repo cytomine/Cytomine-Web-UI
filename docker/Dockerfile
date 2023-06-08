@@ -50,6 +50,7 @@ RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
+COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/875-generate-metadata-prefix-json-file.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve
@@ -65,6 +66,7 @@ WORKDIR /app
 RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
 

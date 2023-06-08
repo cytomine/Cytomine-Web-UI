@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import {AbstractImage, PropertyCollection} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import {appendShortTermToken} from '@/utils/token-utils.js';
@@ -62,13 +61,13 @@ export default {
   name: 'image-metadata-modal',
   props: {
     active: Boolean,
-    image: Object
+    image: Object,
+    properties: {type: Array},
+    error: {type: Boolean, default: false}
   },
   components: {CytomineModal},
   data() {
     return {
-      error: false,
-      properties: [],
       searchString: '',
       rotationAngle: 0
     };
@@ -101,17 +100,6 @@ export default {
     appendShortTermToken,
     async rotate(val) {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
-    }
-  },
-  async created() {
-    try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
-      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
-      this.properties.sort((a, b) => a.key.localeCompare(b.key));
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
     }
   }
 };
