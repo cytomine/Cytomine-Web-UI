@@ -491,9 +491,7 @@ export default {
       this.properties = this.properties.filter(p => p.id !== prop.id);
     },
     addProp(prop) {
-      console.log(prop);
       this.properties.push(prop);
-      console.log(this.properties);
     }
   },
   async created() {
