@@ -42,6 +42,7 @@ export default {
   IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
+  METADATA_PREFIXES: '',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
   DEFAULT_IMAGE_CONTROLS_STEP: 2,
   CATEGORY_ITEMS_PER_BATCH: 10,

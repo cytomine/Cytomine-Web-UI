@@ -65,7 +65,6 @@ export default {
       if (this.macro) {
         return this.image.associatedImageURL('macro', this.size, format, this.extraParameters);
       }
-      console.log(this.image);
       return this.image.thumbURL(this.size, format, this.extraParameters);
     }
   }
