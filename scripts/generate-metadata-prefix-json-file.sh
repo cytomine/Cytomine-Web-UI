@@ -8,7 +8,7 @@
 
 ### Generated with chat gpt, then refined manually
 
-output_file="/app/meta-prefixes.json"
+output_file="/app/public/meta-prefixes.json"
 
 if [[ -z "$METADATA_PREFIXES" ]]; then
   echo "No metadata prefixes provided, creating an empty $output_file."
