@@ -175,7 +175,14 @@
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content" colspan="3">
-          <cytomine-properties :object="image" :canEdit="canEdit" />
+          <cytomine-properties 
+            :object="image"
+            :error="loadPropertiesError"
+            :canEdit="canEdit"
+            :properties="metadataFilteredProperties"
+            @deleted="removeProp"
+            @added="addProp"
+          />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('attached-files')">
@@ -294,6 +301,10 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content" colspan="3">
           <div class="buttons are-small">
+            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
+              {{$t('button-metadata')}}
+            </button>
+
             <template v-if="canEdit">
               <button class="button" @click="isRenameModalActive = true">
                 {{$t('button-rename')}}
@@ -310,6 +321,13 @@
       :currentName="image.originalFilename"
       :active.sync="isRenameModalActive"
       @rename="rename"
+    />
+
+    <image-metadata-modal
+      :active.sync="isMetadataModalActive"
+      :image="image"
+      :properties="onlyMetadataProperties"
+      :error="loadPropertiesError"
     />
 
     <!--
@@ -341,12 +359,17 @@ import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import MagnificationModal from '@/components/image/MagnificationModal';
 import CalibrationModal from '@/components/image/CalibrationModal';
 import RenameModal from '@/components/utils/RenameModal';
+import ImageMetadataModal from '../../components/image/ImageMetadataModal.vue';
+import ImageStatus from '../image/ImageStatus.vue';
 import UploadedFileDetailsViewer from '@/components/storage/UploadedFileDetailsViewer';
 import filesize from 'filesize';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import vendorFromFormat from '@/utils/vendor';
+import {PropertyCollection} from 'cytomine-client';
+import constants from '@/utils/constants.js';
+
 export default {
   name: 'uploaded-file-details',
   components: {
@@ -359,9 +382,11 @@ export default {
     MagnificationModal,
     CalibrationModal,
     RenameModal,
+    ImageMetadataModal,
     UploadedFileStatus,
     UploadedFileDetailsViewer,
-    vendorFromFormat
+    vendorFromFormat,
+    ImageStatus
   },
   props: {
     file: Object // WARNING: the root of the tree must be the file or its direct parent
@@ -387,6 +412,9 @@ export default {
       isRenameModalActive: false,
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
+      isMetadataModalActive: false,
+      properties: [], // Properties of the abstractImage
+      loadPropertiesError: false
     };
   },
   computed: {
@@ -399,6 +427,32 @@ export default {
     },
     vendor() {
       return vendorFromFormat(this.image.contentType);
+    },
+    internalUseFilteredProperties() {
+      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
+    },
+    metadataFilteredProperties() {
+      let props = this.internalUseFilteredProperties.filter(prop => {
+        for (const key in constants.METADATA_PREFIXES) {
+          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+            return false;
+          }
+        }
+        return true;
+      });
+      return props
+    },
+    onlyMetadataProperties() {
+      let props = this.internalUseFilteredProperties.filter(prop => {
+        for (const key in constants.METADATA_PREFIXES) {
+          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+            return true;
+          }
+        }
+        return false;
+      });
+      // We sort the properties to improve ease of use in the metadata modal
+      return props.sort((a, b) => a.key.localeCompare(b.key));
     },
   },
   watch: {
@@ -544,12 +598,24 @@ export default {
       }
       this.isRenameModalActive = false;
     },
-
+    removeProp(prop) {
+      this.properties = this.properties.filter(p => p.id !== prop.id);
+    },
+    addProp(prop) {
+      this.properties.push(prop);
+    }
   },
   async created() {
     this.findRoot();
     this.fetchAbstractImage();
     this.image = new AbstractImage({id: this.file.image, class: 'be.cytomine.domain.image.AbstractImage'});
+    try {
+      this.properties = (await PropertyCollection.fetchAll({ object: this.image })).array;
+    }
+    catch (error) {
+      this.loadPropertiesError = true;
+      console.log(error);
+    }
   }
 };
 </script>
@@ -595,13 +661,13 @@ h2 .button {
   text-transform: none;
 }
 
->>> .sl-vue-tree-sidebar {
+::v-deep .sl-vue-tree-sidebar {
   display: flex;
   align-items: top;
   justify-content: flex-end;
 }
 
->>> .sl-vue-tree-gap {
+::v-deep .sl-vue-tree-gap {
   border: 0 dotted #bbb;
   border-left-width: 1px;
   position: relative;
@@ -609,16 +675,16 @@ h2 .button {
   bottom: 1.25em;
 }
 
->>> .sl-vue-tree-toggle {
+::v-deep .sl-vue-tree-toggle {
   background: #fafafa;
   z-index: 1;
 }
 
->>> .sl-vue-tree-gap:nth-last-child(3) {
+::v-deep .sl-vue-tree-gap:nth-last-child(3) {
   border-width: 0 0 1px 1px !important;
 }
 
->>> ul.pagination-list {
+::v-deep ul.pagination-list {
   justify-content: flex-end;
 }
 
