@@ -908,6 +908,9 @@ review-explanation,You can review the visible annotations individually using the
 review-layer,Review layer,Calque de validation,Capa de revisión,Review laag
 review-list-visible-layers,The following layers are currently displayed: {visibleLayers}.,Les calques suivant sont affichés : {visibleLayers}.,Las siguientes capas se muestran actualmente: {visibleLayers}.,De volgende lagen worden weergegeven: {visibleLayers}.
 review,Review,Validation,Revisión,Review
+reviewed-annotation-status-not-validated,Not validated,Non validé,No validado,Niet gevalideerd
+reviewed-annotation-status-validated,Validated,Validé,Validado,Gevalideerd
+reviewed-annotation-status,Review Status,Statut de la révision,Estado de revisión,Review Status
 reviewed-annotations-info-message,Annotations validated during the review process,Annotations validées durant le processus de validaion,Anotaciones validadas durante el proceso de revisión.,Annotaties gevalideerd tijdens het reviewproces
 reviewed-annotations,Reviewed Annotations,Annotations validées,Anotaciones revisadas,Gevalideerde annotaties
 reviewed-by,Reviewed by,Validé par,Revisado por,Reviewed door
