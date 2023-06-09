@@ -130,36 +130,6 @@
           </router-link>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('status')">
-        <td class="prop-label">{{$t('status')}}</td>
-        <td class="prop-content" colspan="3">
-          <image-status :image="image" />
-        </td>
-      </tr>
-      <tr v-if="isPropDisplayed('numberOfAnnotations')">
-        <td class="prop-label">{{$t('user-annotations')}}</td>
-        <td class="prop-content" colspan="3">
-          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
-            {{ image.numberOfAnnotations }}
-          </router-link>
-        </td>
-      </tr>
-      <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-        <td class="prop-label">{{$t('analysis-annotations')}}</td>
-        <td class="prop-content" colspan="3">
-          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
-            {{ image.numberOfJobAnnotations }}
-          </router-link>
-        </td>
-      </tr>
-      <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
-        <td class="prop-label">{{$t('reviewed-annotations')}}</td>
-        <td class="prop-content" colspan="3">
-          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
-            {{ image.numberOfReviewedAnnotations }}
-          </router-link>
-        </td>
-      </tr>
       <tr v-if="isPropDisplayed('description')">
         <td class="prop-label">{{$t('description')}}</td>
         <td class="prop-content" colspan="3">
