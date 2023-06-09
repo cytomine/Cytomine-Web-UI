@@ -26,7 +26,7 @@ export default {
   DIGITAL_ZOOM_INCREMENT: 4,
   PRELOADED_SLICES: 50,
   // features switches
-  ALGORITHMS_ENABLED: true,
+  ALGORITHMS_ENABLED: false,  // set to false by default while we do not have an AppEngine
   MAX_MERGEABLE_CHANNELS: 36,
   // Refresh intervals (expressed in milliseconds)
   VIEWER_ANNOTATIONS_REFRESH_INTERVAL: 10000,
