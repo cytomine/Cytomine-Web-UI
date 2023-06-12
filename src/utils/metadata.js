@@ -48,3 +48,10 @@ export function stripIDfromKey(key) {
 
     return striped.join('.');
 }
+
+export function filterAutoCompletion(key, suggestions) {
+    let subKeys = key.split('.');
+    let subKey = subKeys[subKeys.length - 2];
+
+    return suggestions.filter(suggestion => suggestion.startsWith(subKey));
+}

@@ -60,6 +60,7 @@
 
 <script>
 import {Cytomine} from 'cytomine-client';
+import {filterAutoCompletion} from '@/utils/metadata.js';
 
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
@@ -163,8 +164,17 @@ export default {
       }
     },
     async searchValue() {
-      if (this.type[this.currentKey] === String) {
-        this.searchChoices = await this.fetchAutoCompletion();
+      if (this.type[this.currentKey] !== String) {
+        return;
+      }
+
+      this.searchChoices = await this.fetchAutoCompletion();
+
+      if (this.currentKey.endsWith('alias') || this.currentKey.endsWith('id')) {
+        this.searchChoices = filterAutoCompletion(
+          this.currentKey,
+          this.searchChoices
+        );
       }
     }
   },
