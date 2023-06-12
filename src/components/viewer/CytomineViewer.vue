@@ -218,9 +218,7 @@ export default {
             let image = await ImageInstance.fetch(id);
             images[id] = image;
           }));
-          console.log('images', images);
           const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
-          console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
           if (imagesNotInCurrentProject.length > 0) {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');
