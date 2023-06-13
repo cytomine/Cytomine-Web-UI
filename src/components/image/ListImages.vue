@@ -318,6 +318,9 @@ export default {
     searchString: sync('searchString', {...storeOptions, debounce: 500}),
     filtersOpened: sync('filtersOpened', storeOptions),
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedFormats: localSyncMultiselectFilter('formats', 'availableFormats'),
     selectedVendors: localSyncMultiselectFilter('vendors', 'availableVendors'),
     selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
@@ -367,9 +370,9 @@ export default {
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
-          gte: bounds[0],
           lte: bounds[1]
         };
+        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
         if(selected.length > 0 && selected.length < total) {
@@ -452,6 +455,17 @@ export default {
       this.filtersOpened = !this.filtersOpened;
     },
   },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    }
+  },
   async created() {
     try {
       await Promise.all([
@@ -463,6 +477,12 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
   }
 };

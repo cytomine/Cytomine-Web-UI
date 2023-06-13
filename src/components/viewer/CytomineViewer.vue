@@ -16,6 +16,7 @@
 <div v-if="error" class="box error">
   <h2> {{ $t('error') }} </h2>
   <p>{{ $t('error-loading-image') }}</p>
+  <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
 </div>
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
@@ -64,6 +65,7 @@ export default {
   data() {
     return {
       error: false,
+      errorBadImageProject: false,
       loading: true,
       reloadInterval: null,
       idViewer: null
@@ -196,19 +198,55 @@ export default {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          await Promise.all(this.idImages.map(async (id, idx) => {
-            let image = await ImageInstance.fetch(id);
 
-            let idSlices = this.idSlices[idx];
+          // List of unique images (prevent to fetch it multiple times)
+          const uniqueIdImages = [...new Set(this.idImages)];
+          let uniqueImages = {};
+          await Promise.all(uniqueIdImages.map(async id => {
+            uniqueImages[id] = await ImageInstance.fetch(id);
+          }));
+
+          // Ensure images are in the right project
+          const nbWrongProjectImages = Object.values(uniqueImages).filter(image =>
+            image.project !== this.project.id
+          ).length;
+          if (nbWrongProjectImages > 0) {
+            this.errorBadImageProject = true;
+            throw new Error('Some images are not from this project');
+          }
+
+          // Register images in the viewer, in right order
+          let indexedImages = {};
+          this.idImages.map(id => {
+            indexedImages[this.viewer.indexNextImage] = uniqueImages[id];
+            this.$store.dispatch(this.viewerModule + 'registerImage');
+          });
+
+          // For each image, initialize them asynchronously, and fetch corresponding slices
+          await Promise.all(Object.entries(indexedImages).map(async ([index, image]) => {
+            const position = this.idImages.indexOf(String(image.id));
+            let idSlices = this.idSlices[position];
+
             let slices;
             if (idSlices) {
-              idSlices = idSlices.split(':');
+              idSlices = [...new Set(idSlices.split(':'))];
               slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+
+              // Ensure slices are in the right project/image
+              const z = slices[0].zStack;
+              const t = slices[0].time;
+              const nbWrongSlices = slices.filter(slice =>
+                slice.image !== image.id || slice.zStack !== z || slice.time !== t
+              ).length;
+              if (nbWrongSlices > 0) {
+                this.errorBadImageProject = true;
+                throw new Error('Some slices are not from this project or cannot be displayed together');
+              }
             }
             else {
               slices = [await image.fetchReferenceSlice()];
             }
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices});
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
           }));
         }
         else {

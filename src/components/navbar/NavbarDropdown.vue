@@ -44,9 +44,9 @@ export default {
   },
   watch: {
     '$route.path': {
-      handler(newPath) {
+      handler() {
         if (this.listPathes) {
-          this.isActive = this.listPathes.includes(newPath);
+          this.isActive = !!this.listPathes.find(p => this.$route.path.match(p));
         }
         // required so dropdown doesn't remain open on route change.
         document.activeElement.blur();
@@ -64,6 +64,9 @@ export default {
 @media screen and (min-width: 1024px) {
   .navbar-item.is-hoverable:hover .navbar-dropdown {
     display: block;
+  }
+  .navbar-item.is-hoverable:focus-within:not(:hover) .navbar-dropdown {
+    display: none;
   }
 }
 </style>

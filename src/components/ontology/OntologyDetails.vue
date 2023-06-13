@@ -24,7 +24,10 @@
         <tr>
           <td colspan="2">
             <strong>{{$t('terms')}}</strong>
-            <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
+            <b-message type="is-info" has-icon icon-size="is-small">
+            {{$t('hierarchical-drag-drop-term')}}
+          </b-message>
+          <ontology-tree :ontology="fullOntology" :allowSelection="false" :allowDrag="canEdit" :allowEdition="canEdit">
               <template #no-result>
                 <em class="has-text-grey">{{$t('no-term')}}</em>
               </template>

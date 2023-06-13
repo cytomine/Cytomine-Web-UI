@@ -113,8 +113,12 @@ export default {
         this.$router.push(`/project/${project.id}/configuration`);
       }
       catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
+        if(error.response.status == 409) {
+          this.$notify({type: 'error', text: this.$t('notif-error-project-already-exists')});
+        }
+        else {
+          this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
+        }
       }
     }
   }

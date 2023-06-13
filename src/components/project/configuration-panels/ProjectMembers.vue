@@ -276,7 +276,12 @@ export default {
     async toggleRepresentative(member) {
       try {
         if(member.role === this.representativeRole.value) {
-          await ProjectRepresentative.delete(0, this.project.id, member.id);
+          if ((await this.project.fetchRepresentatives()).array.length < 2) {
+            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+          }
+          else {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
+          }
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();

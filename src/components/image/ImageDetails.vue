@@ -39,12 +39,6 @@
           <image-status :image="image" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('created')">
-        <td class="prop-label">{{$t('created-on')}}</td>
-        <td class="prop-content" colspan="3">
-          {{ Number(image.created) | moment('ll') }}
-        </td>
-      </tr>
       <tr v-if="isPropDisplayed('numberOfAnnotations')">
         <td class="prop-label">{{$t('user-annotations')}}</td>
         <td class="prop-content" colspan="3">
@@ -87,13 +81,13 @@
           <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('attachedFiles')">
+      <tr v-if="isPropDisplayed('attached-files')">
         <td class="prop-label">{{$t('attached-files')}}</td>
         <td class="prop-content" colspan="3">
           <attached-files :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('slidePreview')">
+      <tr v-if="isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
@@ -104,7 +98,7 @@
           </em>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('originalFilename') && (!blindMode || canManageProject)">
+      <tr v-if="isPropDisplayed('original-filename') && (!blindMode || canManageProject)">
         <td class="prop-label">{{$t('originalFilename')}}</td>
         <td class="prop-content" colspan="3">
           {{image.originalFilename}}
@@ -215,7 +209,7 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content" colspan="3">
           <div class="buttons are-small">
-            <button class="button" @click="isMetadataModalActive = true">
+            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canAddToImageGroup">
@@ -360,6 +354,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
     blindMode() {
       return ((this.project || {}).blindMode) || false;
@@ -392,7 +387,7 @@ export default {
   },
   methods: {
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop);
+      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
 
     async cancelReview() {

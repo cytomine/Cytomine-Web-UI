@@ -62,7 +62,7 @@ export default Object.freeze({
   'viewer-tool-correct-add': ['shift', 'c'],
   'viewer-tool-correct-remove': ['alt', 'shift', 'c'],
   'viewer-tool-modify': ['m'],
-  'viewer-tool-modify-delete-vertex': ['alt', 'click'], // Handled by Openlayers
+  'viewer-tool-modify-delete-vertex': ['ctrl', 'click'], // Handled by Openlayers
   'viewer-tool-rescale': ['shift', 'm'],
   'viewer-tool-move': ['t'],
   'viewer-tool-rotate': ['shift', 't'],

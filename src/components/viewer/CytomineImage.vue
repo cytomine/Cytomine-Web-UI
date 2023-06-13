@@ -522,6 +522,8 @@ export default {
       await this.$refs.map.$createPromise; // wait for ol.Map to be created
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
+      let map = this.$refs.map.$map;
+
       this.overview = new OverviewMap({
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
@@ -529,7 +531,12 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      this.$refs.map.$map.addControl(this.overview);
+      map.addControl(this.overview);
+
+      this.overview.getOverviewMap().on(('click'), (evt) => {
+        let size = map.getSize();
+        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+      });
     },
 
     toggleOverview() {
@@ -545,7 +552,6 @@ export default {
     savePosition: _.debounce(async function() {
       if(this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
-
         try {
           await UserPosition.create({
             image: this.image.id,

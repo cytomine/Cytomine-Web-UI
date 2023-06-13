@@ -34,7 +34,7 @@
   </template>
 
   <div v-show="!addingComment" class="has-text-centered">
-    <button class="button is-link" @click="addingComment = true">{{$t('button-add-comment')}}</button>
+    <button class="button is-link" v-if="!currentUser.guestByNow" @click="addingComment = true">{{$t('button-add-comment')}}</button>
   </div>
 
   <div v-show="addingComment">

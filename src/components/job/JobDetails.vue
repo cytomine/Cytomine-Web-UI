@@ -124,7 +124,7 @@
                     <td>{{filesize(data.size)}}</td>
                     <td>
                       <div class="buttons">
-                        <a class="button is-small" :href="data.viewURL">{{$t('button-view')}}</a>
+                        <a class="button is-small" :href="data.viewURL" target='_blank'>{{$t('button-view')}}</a>
                         <a class="button is-small" :href="data.downloadURL">{{$t('button-download')}}</a>
                       </div>
                     </td>
@@ -144,10 +144,13 @@
             <td>{{$t('actions')}}</td>
             <td>
               <div class="buttons are-small">
-<!--                <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">-->
-<!--                  {{$t('delete-data')}}-->
-<!--                </button>-->
-                <button v-if="isFinished" class="button is-danger" @click="deletionModal = true">
+                <button class="button" @click="relaunchJob()">
+                  {{$t('relaunch')}}
+                </button>
+                <button v-if="!job.dataDeleted && isFinished" class="button" @click="deletionModal = true">
+                  {{$t('delete-data')}}
+                </button>
+                <button v-if="isFinished" class="button is-danger" @click="confirmJobDeletion()">
                   {{$t('button-delete')}}
                 </button>
                 <button v-else class="button is-danger" @click="confirmJobKilling()">
@@ -262,6 +265,7 @@ export default {
       let job = await Job.fetch(this.job.id);
       this.$emit('update', job);
       await this.fetchData();
+      this.job.status = job.status;
       this.fetchLog();
 
       clearTimeout(this.timeoutRefresh);
@@ -297,7 +301,7 @@ export default {
       try {
         this.deletionTask = await new Task({project: this.project.id}).save();
         await job.deleteAllData(this.deletionTask.id);
-        this.$emit('delete');
+        this.refresh(true);
         this.deletionTask = null;
         this.deletionModal = false;
         this.$notify({type: 'success', text: this.$t('notif-success-analysis-data-deletion')});
@@ -339,7 +343,19 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.killJob()
       });
-    }
+    },
+    async relaunchJob() {
+      try {
+        let newJob = await this.job.copy();
+        this.$emit('relaunch', newJob);
+        await newJob.execute();
+        this.$notify({type: 'success', text: this.$t('notif-success-analysis-launch')});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-analysis-launch')});
+      }
+    },
   },
   async created() {
     await this.fetchData();

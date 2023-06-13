@@ -24,7 +24,11 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
+      <navbar-dropdown
+      icon="fa-folder-open"
+      v-if="this.nbActiveProjects > 0"
+      :title="$t('workspace')"
+      :listPathes="['/project/']">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">
@@ -40,7 +44,7 @@
         {{ $t('ontologies') }}
       </router-link>
       <router-link to="/algorithm" class="navbar-item">
-        <i class="fas fa-flask"></i>
+        <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
@@ -177,7 +181,8 @@ export default {
     async closeAdminSession() {
       try {
         await this.$store.dispatch('currentUser/closeAdminSession');
-        this.$router.push('/');
+        if(this.$router.currentRoute.path === '/') this.$router.push('/projects');
+        else this.$router.push('/');
       }
       catch(error) {
         console.log(error);

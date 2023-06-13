@@ -2,7 +2,7 @@
   <form @submit.prevent="save()">
     <cytomine-modal :active="active" :title="title" @close="$emit('update:active', false)">
       <b-field
-        v-for="{field, validationRules} in editableFields"
+        v-for="{field, validationRules, disabled} in editableFields"
         :key="field"
         :label="$t(fieldLabels[field])"
         horizontal
@@ -13,6 +13,8 @@
           v-model="internalSource[field]"
           :name="field"
           v-validate="validationRules"
+          placeholder=""
+          :disabled=disabled
         />
       </b-field>
 
@@ -56,11 +58,11 @@ export default {
     },
     editableFields() {
       return [
-        {field: 'provider', validationRules: 'required'},
-        {field: 'username', validationRules: 'required'},
-        {field: 'environmentProvider', validationRules: 'required'},
-        {field: 'dockerUsername', validationRules: 'required'},
-        {field: 'prefix', validationRules: ''},
+        {field: 'username', validationRules: 'required', disabled: false},
+        {field: 'dockerUsername', validationRules: 'required', disabled: false},
+        {field: 'prefix', validationRules: '', disabled: false},
+        {field: 'provider', validationRules: 'required', disabled: true},
+        {field: 'environmentProvider', validationRules: 'required', disabled: true},
       ];
     },
     fieldLabels() {

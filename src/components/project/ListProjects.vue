@@ -292,6 +292,9 @@ export default {
       return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
     },
 
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
     selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
@@ -350,9 +353,9 @@ export default {
       }
       for(let {prop, bounds} of this.boundsFilters) {
         collection[prop] = {
-          gte: bounds[0],
           lte: bounds[1]
         };
+        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       return collection;
     },
@@ -367,6 +370,15 @@ export default {
     revision() {
       this.fetchOntologies();
       this.fetchMaxFilters();
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
     }
   },
   methods: {
@@ -422,6 +434,12 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;

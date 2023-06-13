@@ -362,7 +362,7 @@ export default {
       error: false,
       revision: 0,
 
-      users: [],
+      projectUsers: [],
       userJobs: [],
 
       tracks: [],
@@ -452,7 +452,7 @@ export default {
     },
 
     allUsers() {
-      return this.users.concat(this.userJobs);
+      return this.projectUsers.concat(this.userJobs);
     },
     members: get('currentProject/members'),
     managers: get('currentProject/managers'),
@@ -552,6 +552,12 @@ export default {
       return this.reviewed ? this.selectedReviewers.map(u => u.id) : null;
     },
 
+    querySearchImage() {
+      return this.$route.query.image;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
@@ -577,6 +583,8 @@ export default {
           return this.tracksOptions;
         case 'IMAGEGROUP':
           return this.imageGroups;
+        default:
+          return [];
       }
     },
     // eslint-disable-next-line vue/return-in-computed-property
@@ -643,11 +651,12 @@ export default {
       if (this.isByImageGroup) {
         imagesIds = this.selectedImageGroups.map(ig => this.imagesIdsInGroup(ig)).flat();
       }
+      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       let collection = new AnnotationCollection({
         project: this.project.id,
-        terms: this.selectedTermsIds,
+        terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: imagesIds,
-        users: this.selectedUsersIds,
+        users: (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
@@ -687,8 +696,14 @@ export default {
       })).array;
     },
     async fetchUsers() {
-      this.users = (await UserCollection.fetchAll()).array;
-      this.users.forEach(user => {
+
+      let collection = new UserCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+
+      this.projectUsers = (await collection.fetchAll()).array;
+      this.projectUsers.forEach(user => {
         user.fullName = fullName(user);
       });
     },
@@ -733,6 +748,28 @@ export default {
     },
     imagesIdsInGroup(group) {
       return group.imageInstances.map(image => image.id);
+    }
+  },
+  watch: {
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.resetPagesAndFilters(); // we want all annotations of the job => reset state
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
+    querySearchImage(val) {
+      if(val) {
+        this.selectedImages = [];
+        let queriedImage = this.images.find(image => image.id === Number(val));
+        if(queriedImage) {
+          this.resetPagesAndFilters(); // we want all annotations of the image => reset state
+          this.selectedImages = [queriedImage];
+        }
+      }
     }
   },
   async created() {
@@ -794,6 +831,13 @@ export default {
         this.resetPagesAndFilters(); // we want all annotations of the job => reset state
         this.selectedAnnotationType = this.jobAnnotationOption;
         this.selectedUserJobs = [queriedUserJob];
+      }
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
+        this.selectedTags = queriedTags;
       }
     }
 

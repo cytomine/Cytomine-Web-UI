@@ -132,7 +132,7 @@ export default {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
-      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id));
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
     },
     nbReviewedAnnotations() {
       return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
@@ -205,16 +205,6 @@ export default {
     },
     deleteAnnotationEventHandler(annot) {
       this.annotationEventHandler(annot);
-
-      let updatedProject = this.$store.state.currentProject.project.clone();
-      if(annot.type === 'UserAnnotation') {
-        updatedProject.numberOfAnnotations--;
-      }
-      else {
-        updatedProject.numberOfReviewedAnnotations--;
-      }
-
-      this.$store.dispatch('currentProject/updateProject', updatedProject);
     },
     annotationEventHandler(annot) {
       if(annot.image === this.image.id) {

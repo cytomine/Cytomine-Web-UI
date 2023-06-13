@@ -104,7 +104,8 @@ export default {
       displayErrors: false,
       languages: [
         {value: 'EN', name:'English'},
-        {value: 'FR', name:'Français'}
+        {value: 'FR', name:'Français'},
+        {value: 'ES', name:'Español'}
       ]
     };
   },
@@ -124,7 +125,7 @@ export default {
         {field: 'lastname', validationRules: 'required'},
         //{field: 'username', validationRules: 'required'},
         {field: 'email', validationRules: 'required|email'},
-        {field: 'password', validationRules: this.editionMode ? 'min:4' : 'required|min:4'}
+        {field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8'}
       ];
     },
     idRole() {

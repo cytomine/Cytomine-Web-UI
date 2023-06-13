@@ -102,7 +102,7 @@ export default {
 
     termsIds: Array,
     tracksIds: Array,
-    tagsIds: {type: Array, defaul: null},
+    tagsIds: Array,
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
@@ -176,7 +176,7 @@ export default {
         multipleTerm: this.multipleTerms,
         noTrack: this.noTrack,
         multipleTrack: this.multipleTracks,
-        noTag: (this.tagsIds) ? this.noTag : null,
+        noTag: this.noTag,
 
         terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
         users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,

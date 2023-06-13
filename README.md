@@ -54,3 +54,7 @@ This section assumes that you have access to an instance of Cytomine (especially
   - URL: http://www.cytomine.org/
   - Logo: [Available here](https://doc.cytomine.org/img/logo_cyto_org.png)
   - Scientific paper: Raphaël Marée, Loïc Rollus, Benjamin Stévens, Renaud Hoyoux, Gilles Louppe, Rémy Vandaele, Jean-Michel Begon, Philipp Kainz, Pierre Geurts and Louis Wehenkel. Collaborative analysis of multi-gigapixel imaging data using Cytomine, Bioinformatics, DOI: 10.1093/bioinformatics/btw013, 2016. http://dx.doi.org/10.1093/bioinformatics/btw013
+
+## Code of Conduct
+
+We subscribe to the [Contributor Convenant Code of Conduct](https://documentation.cytomine.org/Code-of-Conduct) for a respectful community.

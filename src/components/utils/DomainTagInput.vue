@@ -20,6 +20,7 @@
   :data="filteredDomains"
   autocomplete
   :open-on-focus="true"
+  :append-to-body="true"
   :field="displayedProperty"
   :placeholder="$t(placeholder)"
   @typing="val => searchString = val"
@@ -78,3 +79,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.taginput {
+  width: 82% !important;
+}
+</style>

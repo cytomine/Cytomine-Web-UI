@@ -135,6 +135,7 @@
             :job="job"
             @update="revision++"
             @delete="deleteJob(job)"
+            @relaunch="addJob"
           />
         </template>
 
@@ -286,7 +287,7 @@ export default {
     // eslint-disable-next-line no-unused-vars
     async deleteJob(jobToDelete) {
       try {
-        // await jobToDelete.delete();
+        await jobToDelete.delete();
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-analysis-deletion')
@@ -300,17 +301,21 @@ export default {
           text: this.$t('notif-error-analysis-deletion')
         });
       }
-    }
+    },
+    async refreshJobs() {
+      try {
+        await this.fetchMultiselectOptions();
+        this.loading = false;
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+    },
   },
   async created() {
-    try {
-      await this.fetchMultiselectOptions();
-      this.loading = false;
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    await this.refreshJobs();
+    this.loading = false;
   }
 };
 </script>

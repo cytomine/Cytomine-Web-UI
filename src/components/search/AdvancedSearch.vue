@@ -113,23 +113,23 @@
               <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
             </b-table-column>
 
-<!--            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">-->
-<!--              <router-link :to="`/project/${project.id}/annotations?type=user`">-->
-<!--                {{ project.numberOfAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+              <router-link :to="`/project/${project.id}/annotations?type=user`">
+                {{ project.numberOfAnnotations }}
+              </router-link>
+            </b-table-column>
 
-<!--            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">-->
-<!--              <router-link :to="`/project/${project.id}/annotations?type=algo`">-->
-<!--                {{ project.numberOfJobAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+              <router-link :to="`/project/${project.id}/annotations?type=algo`">
+                {{ project.numberOfJobAnnotations }}
+              </router-link>
+            </b-table-column>
 
-<!--            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">-->
-<!--              <router-link :to="`/project/${project.id}/annotations?type=reviewed`">-->
-<!--                {{ project.numberOfReviewedAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+              <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+                {{ project.numberOfReviewedAnnotations }}
+              </router-link>
+            </b-table-column>
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
               {{ Number(project.lastActivity) | moment('ll') }}
@@ -214,27 +214,27 @@
               </router-link>
             </b-table-column>
 
-<!--            <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">-->
-<!--              {{ image.magnification || $t('unknown') }}-->
-<!--            </b-table-column>-->
+            <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
+              {{ image.magnification || $t('unknown') }}
+            </b-table-column>
 
-<!--            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">-->
-<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">-->
-<!--                {{ image.numberOfAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
+              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
+                {{ image.numberOfAnnotations }}
+              </router-link>
+            </b-table-column>
 
-<!--            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">-->
-<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">-->
-<!--                {{ image.numberOfJobAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
+                {{ image.numberOfJobAnnotations }}
+              </router-link>
+            </b-table-column>
 
-<!--            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">-->
-<!--              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">-->
-<!--                {{ image.numberOfReviewedAnnotations }}-->
-<!--              </router-link>-->
-<!--            </b-table-column>-->
+            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
+              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+                {{ image.numberOfReviewedAnnotations }}
+              </router-link>
+            </b-table-column>
 
             <b-table-column label=" " centered width="150">
               <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
@@ -331,6 +331,12 @@ export default {
     pathSearchString() {
       return this.$route.params.searchString;
     },
+    querySearchString() {
+      return this.$route.query.searchString;
+    },
+    querySearchTags() {
+      return this.$route.query.tags;
+    },
     projectCollection() {
       let collection = new ProjectCollection({
         withMembersCount: true,
@@ -374,16 +380,36 @@ export default {
       if(val) {
         this.searchString = val;
       }
-    }
+    },
+    querySearchString(val) {
+      if(val && !this.pathSearchString) {
+        this.searchString = val;
+      }
+    },
+    querySearchTags(values) {
+      if(values) {
+        this.selectedTags = [];
+        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
+        if(queriedTags) {
+          this.selectedTags = queriedTags;
+        }
+      }
+    },
   },
   async created() {
-    this.searchString = this.pathSearchString || '';
+    this.searchString = this.pathSearchString || this.querySearchString || this.searchString || '';
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
     catch(error) {
       console.log(error);
       this.error = true;
+    }
+    if(this.$route.query.tags) {
+      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
+      if(queriedTags) {
+        this.selectedTags = queriedTags;
+      }
     }
 
     this.loading = false;

@@ -316,6 +316,7 @@ export default {
     uploadedFileCollection() {
       return new UploadedFileCollection({
         onlyRootsWithDetails: true,
+        withTreeDetails: false,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
     }
@@ -487,7 +488,12 @@ export default {
         }
       }
     },
-
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500),
     hideFinished() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
@@ -500,15 +506,7 @@ export default {
           idx++;
         }
       }
-    },
-
-    updatedTree() {
-      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
-    },
-
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500)
+    }
   },
   activated() {
     this.fetchStorages();
