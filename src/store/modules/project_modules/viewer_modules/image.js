@@ -452,4 +452,3 @@ function findRankPage(rank) {
 function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
-

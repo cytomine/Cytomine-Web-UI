@@ -97,7 +97,12 @@
         v-model="currentZStackIndex"
         :max="image.depth - 1"
         :integer-only="true"
-        class="image-dimension-slider" />
+        class="image-dimension-slider"
+      >
+        <template v-if="hasZName">
+          {{ zValue || "?" }}
+        </template>
+      </cytomine-slider>
 
       <image-controls-shift-buttons
           :index="index"
@@ -269,6 +274,12 @@ export default {
         return null;
       }
       return this.currentChannelsIndexes;
+    },
+    hasZName() {
+      return this.currentSlice.zName !== null;
+    },
+    zValue() {
+      return this.currentSlice.zName;
     }
   },
   methods: {

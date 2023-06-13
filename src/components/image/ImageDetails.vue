@@ -318,14 +318,13 @@ import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
-
 import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
   components: {
-    SimpleAddToImageGroupModal,
     ImageThumbnail,
+    SimpleAddToImageGroupModal,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -384,7 +383,7 @@ export default {
     },
     isInImageGroup() {
       return this.imageGroupLinks.length > 0;
-    }
+    },
   },
   methods: {
     isPropDisplayed(prop) {
