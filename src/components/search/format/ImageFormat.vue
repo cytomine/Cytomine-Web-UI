@@ -32,7 +32,7 @@
 
       <div class="metadata" v-if="type[currentKey] === Number">
         <div class="metadata-slider">
-          <cytomine-slider v-model="sliderValue" :max="max[currentKey]+1"/>
+          <cytomine-slider v-model="sliderValue" :max="Number(max[currentKey])+1"/>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default {
   created() {
     this.$store.commit('currentProject/setImageFormat', this.format);
 
-    this.keys.forEach(key => this.sliderValues[key] = [0, this.max[key]]);
+    this.keys.forEach(key => this.sliderValues[key] = [0, Number(this.max[key])]);
   }
 };
 </script>
