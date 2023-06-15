@@ -21,7 +21,9 @@ FROM node:${NODE_VERSION} as frontend-builder
 
 # URL of the package registry (no scheme)
 ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
+ARG JS_CLIENT_REPO_TOKEN=none
 ENV REPO_URL=${JS_CLIENT_REPO_URL}
+ENV REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}
 
 ADD . /app
 WORKDIR /app
@@ -30,10 +32,10 @@ WORKDIR /app
 COPY --chmod=744 scripts/register_gitlab_npm_registry.sh scripts/register_gitlab_npm_registry.sh
 
 # create .npmrc for fetching JS Client from private package repository
-# js_client_repo_auth_token: a build secret, the access token (in GitLab, this token must have with 'read_api' scope and at least 'Reporter' role ) 
+# js_client_repo_auth_token: a build secret, the access token (in GitLab, this token must have with 'read_api' scope and at least 'Reporter' role )
 RUN --mount=type=secret,id=js_client_repo_auth_token \
-    ./scripts/register_gitlab_npm_registry.sh $(cat /run/secrets/js_client_repo_auth_token) && \
-    npm install && \ 
+    ./scripts/register_gitlab_npm_registry.sh ${REPO_TOKEN} && \
+    npm install && \
     npm run build && \
     rm .npmrc
 
@@ -59,6 +61,17 @@ CMD ["npm", "run", "serve"]
 #######################################################################################
 ## Stage: building nginx image serving the front-end
 FROM nginx:1.22.1-alpine as prod-server
+
+ARG WEB_UI_VERSION
+ARG WEB_UI_REVISION
+
+LABEL org.opencontainers.image.authors='support@cytomine.com' \
+      org.opencontainers.image.url='https://www.cytomine.org/' \
+      org.opencontainers.image.documentation='https://doc.cytomine.org/' \
+      org.opencontainers.image.source='https://gitlab.cytom.in/cm/rnd/cytomine/frontend/web-ui-ee' \
+      org.opencontainers.image.vendor='Cytomine Corporation SA' \
+      org.opencontainers.image.version=${WEB_UI_VERSION} \
+      org.opencontainers.image.revision=${WEB_UI_REVISION}
 
 WORKDIR /app
 
