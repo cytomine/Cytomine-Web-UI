@@ -51,7 +51,7 @@ build-push-docker-image:
 
     # Prepare some vars
     - export BASE_PKG_URL=${CI_API_V4_URL#https://}/packages/npm/
-    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}-${$CI_COMMIT_SHORT_SHA}/g" public/index.html
+    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}-${CI_COMMIT_SHORT_SHA}/g" public/index.html
 
     - echo "Build the docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
     - docker build --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL --build-arg JS_CLIENT_REPO_TOKEN=${CI_JOB_TOKEN} --build-arg WEB_UI_VERSION=${CM_VERSION} --build-arg WEB_UI_REVISION=${CI_COMMIT_SHORT_SHA} -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} -f docker/Dockerfile .
