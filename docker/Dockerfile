@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG NODE_VERSION=14.16.1-alpine3.13
+
 
 #######################################################################################
 ## Stage: build front-end
+ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as frontend-builder
 
 # URL of the package registry (no scheme)
@@ -41,17 +42,18 @@ RUN --mount=type=secret,id=js_client_repo_auth_token \
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
+ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as dev-server
-
+ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 WORKDIR /app
 # ui source code should be mounted in /app
 
 RUN apk update && apk add gettext
 
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/875-generate-metadata-prefix-json-file.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
@@ -60,10 +62,13 @@ CMD ["npm", "run", "serve"]
 
 #######################################################################################
 ## Stage: building nginx image serving the front-end
-FROM nginx:1.22.1-alpine as prod-server
+ARG NGINX_VERSION="1.22.1"
+FROM nginx:${NGINX_VERSION}-alpine as prod-server
 
 ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
+ARG NODE_VERSION=14.16.1-alpine3.13
+ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 
 LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.url='https://www.cytomine.org/' \
@@ -71,14 +76,17 @@ LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.source='https://gitlab.cytom.in/cm/rnd/cytomine/frontend/web-ui-ee' \
       org.opencontainers.image.vendor='Cytomine Corporation SA' \
       org.opencontainers.image.version=${WEB_UI_VERSION} \
-      org.opencontainers.image.revision=${WEB_UI_REVISION}
+      org.opencontainers.image.revision=${WEB_UI_REVISION} \
+      org.opencontainers.image.deps.nginx.version=${NGINX_VERSION} \
+      org.opencontainers.image.deps.node.version=${NODE_VERSION} \
+      org.opencontainers.image.deps.node.entrypoint.scripts.version=${ENTRYPOINT_SCRIPTS_VERSION}
 
 WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
