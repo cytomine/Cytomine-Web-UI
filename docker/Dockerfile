@@ -27,6 +27,8 @@ ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 FROM node:${NODE_VERSION} as frontend-builder
 
 # URL of the package registry (no scheme)
+ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
+ARG JS_CLIENT_REPO_TOKEN=none
 ENV REPO_URL=${JS_CLIENT_REPO_URL}
 ENV REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}
 
