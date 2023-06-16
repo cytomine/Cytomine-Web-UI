@@ -24,13 +24,9 @@ ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 #######################################################################################
 ## Stage: build front-end
 FROM node:${NODE_VERSION} as frontend-builder
-
-ARG WEB_UI_VERSION
-
+ARG JS_CLIENT_REPO_URL
 # URL of the package registry (no scheme)
 ENV REPO_URL=${JS_CLIENT_REPO_URL}
-
-RUN echo "WEB_UI_VERSION=${WEB_UI_VERSION}, REPO_URL=${REPO_URL}, REPO_TOKEN=${REPO_TOKEN}, JS_CLIENT_REPO_URL=${JS_CLIENT_REPO_URL}, JS_CLIENT_REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}"
 
 ADD . /app
 WORKDIR /app
@@ -73,10 +69,18 @@ CMD ["npm", "run", "serve"]
 ## Stage: building nginx image serving the front-end
 FROM nginx:${NGINX_VERSION}-alpine as prod-server
 
+ARG WEB_UI_VERSION
+ARG WEB_UI_REVISION
+ARG NGINX_VERSION
+ARG NODE_VERSION
+ARG ENTRYPOINT_SCRIPTS_VERSION
+ARG JS_CLIENT_REPO_URL
+
 LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.url='https://www.cytomine.org/' \
       org.opencontainers.image.documentation='https://doc.cytomine.org/' \
       org.opencontainers.image.source='https://gitlab.cytom.in/cm/rnd/cytomine/frontend/web-ui-ee' \
+      org.opencontainers.image.package=${JS_CLIENT_REPO_URL} \
       org.opencontainers.image.vendor='Cytomine Corporation SA' \
       org.opencontainers.image.version=${WEB_UI_VERSION} \
       org.opencontainers.image.revision=${WEB_UI_REVISION} \
