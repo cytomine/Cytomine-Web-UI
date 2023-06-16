@@ -13,17 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ARG WEB_UI_VERSION
+ARG WEB_UI_REVISION
+ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
+ARG JS_CLIENT_REPO_TOKEN=none
+ARG NODE_VERSION=14.16.1-alpine3.13
+ARG NGINX_VERSION=1.22.1
+ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 
 
 #######################################################################################
 ## Stage: build front-end
-ARG NGINX_VERSION=1.22.1
-ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as frontend-builder
 
 # URL of the package registry (no scheme)
-ARG JS_CLIENT_REPO_URL=gitlab.cytom.in/api/v4/packages/npm/
-ARG JS_CLIENT_REPO_TOKEN=none
 ENV REPO_URL=${JS_CLIENT_REPO_URL}
 ENV REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}
 
@@ -43,7 +46,6 @@ RUN --mount=type=secret,id=js_client_repo_auth_token \
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
-ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as dev-server
 WORKDIR /app
 # ui source code should be mounted in /app
@@ -65,10 +67,6 @@ CMD ["npm", "run", "serve"]
 ## Stage: building nginx image serving the front-end
 FROM nginx:${NGINX_VERSION}-alpine as prod-server
 
-ARG WEB_UI_VERSION
-ARG WEB_UI_REVISION
-ARG NODE_VERSION=14.16.1-alpine3.13
-
 LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.url='https://www.cytomine.org/' \
       org.opencontainers.image.documentation='https://doc.cytomine.org/' \
@@ -78,15 +76,14 @@ LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.revision=${WEB_UI_REVISION} \
       org.opencontainers.image.deps.nginx.version=${NGINX_VERSION} \
       org.opencontainers.image.deps.node.version=${NODE_VERSION} \
-      org.opencontainers.image.deps.node.entrypoint.scripts.version=1.3.0
+      org.opencontainers.image.deps.node.entrypoint.scripts.version=${ENTRYPOINT_SCRIPTS_VERSION}
 
 WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-# COPY --from cannot interpolate variables
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
