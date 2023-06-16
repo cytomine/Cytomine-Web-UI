@@ -69,7 +69,6 @@ ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
 ARG NODE_VERSION=14.16.1-alpine3.13
 ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
-ENV ENTRYPOINT_SCRIPTS_VERSION=${ENTRYPOINT_SCRIPTS_VERSION}
 
 LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.url='https://www.cytomine.org/' \
@@ -86,8 +85,9 @@ WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+ENV ENTRYPOINT_SCRIPTS=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION}
+COPY --from=${ENTRYPOINT_SCRIPTS} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=${ENTRYPOINT_SCRIPTS} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
