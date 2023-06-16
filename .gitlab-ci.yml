@@ -66,6 +66,7 @@ build-push-docker-image:
         --build-arg WEB_UI_VERSION=${CM_VERSION} \
         --build-arg WEB_UI_REVISION=${CI_COMMIT_SHORT_SHA} \
         -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} \
+        -t ${DOCKER_IMAGE_NAME}:latest \
         -f docker/Dockerfile \
         .
 
