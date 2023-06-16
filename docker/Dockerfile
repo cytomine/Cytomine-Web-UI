@@ -25,9 +25,10 @@ ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 ## Stage: build front-end
 FROM node:${NODE_VERSION} as frontend-builder
 
+ARG WEB_UI_VERSION
+
 # URL of the package registry (no scheme)
 ENV REPO_URL=${JS_CLIENT_REPO_URL}
-ENV REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}
 
 RUN echo "WEB_UI_VERSION=${WEB_UI_VERSION}, REPO_URL=${REPO_URL}, REPO_TOKEN=${REPO_TOKEN}, JS_CLIENT_REPO_URL=${JS_CLIENT_REPO_URL}, JS_CLIENT_REPO_TOKEN=${JS_CLIENT_REPO_TOKEN}"
 
@@ -40,7 +41,7 @@ COPY --chmod=744 scripts/register_gitlab_npm_registry.sh scripts/register_gitlab
 # create .npmrc for fetching JS Client from private package repository
 # js_client_repo_auth_token: a build secret, the access token (in GitLab, this token must have with 'read_api' scope and at least 'Reporter' role )
 RUN --mount=type=secret,id=js_client_repo_auth_token \
-    ./scripts/register_gitlab_npm_registry.sh ${REPO_TOKEN} && \
+    ./scripts/register_gitlab_npm_registry.sh $(cat /run/secrets/js_client_repo_auth_token) && \
     npm install && \
     npm run build && \
     rm .npmrc
