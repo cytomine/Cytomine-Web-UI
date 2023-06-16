@@ -69,6 +69,7 @@ ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
 ARG NODE_VERSION=14.16.1-alpine3.13
 ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
+ENV ENTRYPOINT_SCRIPTS_VERSION=${ENTRYPOINT_SCRIPTS_VERSION}
 
 LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.url='https://www.cytomine.org/' \
