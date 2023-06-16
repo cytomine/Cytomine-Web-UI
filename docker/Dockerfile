@@ -45,6 +45,10 @@ RUN --mount=type=secret,id=js_client_repo_auth_token \
     rm .npmrc
 
 #######################################################################################
+## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
+FROM cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} as entrypoint-scripts
+
+#######################################################################################
 ## Stage: dev image (with hot swap)
 FROM node:${NODE_VERSION} as dev-server
 WORKDIR /app
@@ -54,9 +58,9 @@ RUN apk update && apk add gettext
 
 RUN mkdir /docker-entrypoint-cytomine.d/
 # COPY --from cannot interpolate variables
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --from=cytomine/entrypoint-scripts:1.3.0 --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
+COPY --from=entrypoint-scripts --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=entrypoint-scripts --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=entrypoint-scripts --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/875-generate-metadata-prefix-json-file.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
@@ -82,8 +86,8 @@ WORKDIR /app
 
 # copying entrypoint scripts
 RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=entrypoint-scripts --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=entrypoint-scripts --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --chmod=744 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
