@@ -17,6 +17,7 @@
 
 #######################################################################################
 ## Stage: build front-end
+ARG NGINX_VERSION=1.22.1
 ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as frontend-builder
 
@@ -62,7 +63,6 @@ CMD ["npm", "run", "serve"]
 
 #######################################################################################
 ## Stage: building nginx image serving the front-end
-ARG NGINX_VERSION="1.22.1"
 FROM nginx:${NGINX_VERSION}-alpine as prod-server
 
 ARG WEB_UI_VERSION
