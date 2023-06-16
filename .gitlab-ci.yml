@@ -57,11 +57,12 @@ build-push-docker-image:
 
     - echo "Build the docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
     - |
-      JS_CLIENT_REPO_TOKEN=${CI_JOB_TOKEN} docker build \
+      docker build \
         --build-arg NODE_VERSION=${NODE_VERSION} \
         --build-arg NGINX_VERSION=${NGINX_VERSION} \
         --build-arg ENTRYPOINT_SCRIPTS_VERSION=${ENTRYPOINT_SCRIPTS_VERSION} \
         --build-arg JS_CLIENT_REPO_URL=$BASE_PKG_URL \
+        --secret id=js_client_repo_auth_token,env=CI_JOB_TOKEN \
         --build-arg WEB_UI_VERSION=${CM_VERSION} \
         --build-arg WEB_UI_REVISION=${CI_COMMIT_SHORT_SHA} \
         -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} \
