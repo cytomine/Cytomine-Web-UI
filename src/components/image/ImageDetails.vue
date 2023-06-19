@@ -392,7 +392,7 @@ export default {
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
-    downoload(image) {
+    download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');
     },
     async cancelReview() {

@@ -330,7 +330,7 @@ export default {
     async fetchConsultations() {
       this.consultations = await ImageConsultationCollection.fetchAll({project: this.project.id, user: this.idUser, resume: true});
     },
-    download(connections) {
+    downloadConnections(connections) {
       window.location.assign(appendShortTermToken(connections.downloadURL, this.shortTermToken), '_blank');
     }
   },
