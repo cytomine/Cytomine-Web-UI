@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <div class="storage-wrapper content-wrapper">
   <div class="panel">
@@ -318,6 +317,7 @@ export default {
     uploadedFileCollection() {
       return new UploadedFileCollection({
         onlyRootsWithDetails: true,
+        withTreeDetails: false,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
     }

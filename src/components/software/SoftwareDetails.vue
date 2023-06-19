@@ -136,7 +136,7 @@ export default {
     SoftwareStatus,
     CytomineDescription,
     CytomineProperties,
-    AttachedFiles,
+    AttachedFiles
   },
   data() {
     return {

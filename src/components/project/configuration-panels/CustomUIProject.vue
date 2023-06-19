@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.-->
 
-
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
   <h2> {{ $t('error') }} </h2>
@@ -60,6 +59,7 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -75,7 +75,8 @@ export default {
         {
           label: 'project-side-bar',
           props: [
-            {key: 'project-images-tab', label: 'images', icon: 'far fa-images'},
+            {key: 'project-images-tab', label: 'images', icon: 'far fa-image'},
+            {key: 'project-image-groups-tab', label: 'image-groups', icon: 'far fa-images'},
             {key: 'project-annotations-tab', label: 'annotations', icon: 'far fa-edit'},
             {key: 'project-jobs-tab', label: 'analysis', icon: 'fas fa-tasks'},
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
@@ -130,9 +131,9 @@ export default {
             {key: 'project-explore-annotation-tags', label: 'tags', icon: 'fas fa-bookmark', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-properties', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-attached-files', label: 'attached-files', icon: 'fas fa-paperclip', parentConfiguration: 'project-explore-annotation-main'},
+            {key: 'project-explore-annotation-linked-annotations', label: 'linked-annotations', icon: 'fas fa-link', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-creation-info', label: 'creation-info', icon: 'fas fa-info', parentConfiguration: 'project-explore-annotation-main'},
             {key: 'project-explore-annotation-comments', label: 'comments', icon: 'fas fa-comment', parentConfiguration: 'project-explore-annotation-main'}
-
           ]
         },
         {
@@ -159,9 +160,12 @@ export default {
             {key: 'project-tools-fill', label: 'fill', icon: 'fas fa-fill', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-edit', label: 'modify', icon: 'fas fa-edit', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-move', label: 'move', icon: 'fas fa-arrows-alt', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-resize', label: 'rescale', icon: 'fas fa-expand', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-rotate', label: 'rotate', icon: 'fas fa-sync-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-link', label: 'link', icon: 'fas fa-link', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-unlink', label: 'unlink', iconComponent: IconUnlinkAnnotations, parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo', parentConfiguration: 'project-tools-main'},
           ]
         }

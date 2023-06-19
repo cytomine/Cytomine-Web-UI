@@ -25,6 +25,7 @@ export default {
       categorization: null,
       perPage: 25,
       outlineColor: null,
+      regroup: null,
 
       annotationType: null,
       filters: {
@@ -34,10 +35,12 @@ export default {
         images: null,
         termsIds: null,
         tracksIds: null,
-        tags: null
+        tags: null,
+        imageGroups: null,
       },
       fromDate: null,
       toDate: null,
+
 
       currentPages: {} // mapping of type {idProp: currentPage}
     };
@@ -76,12 +79,17 @@ export default {
       state.toDate = date;
     },
 
+    setRegroup(state, regroup) {
+      state.regroup = regroup;
+    },
+
     resetPagesAndFilters(state) {
       for(let key in state.filters) {
         state.filters[key] = null;
       }
       state.fromDate = null;
       state.toDate = null;
+      state.regroup = false;
       state.currentPages = {};
     },
 

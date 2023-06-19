@@ -113,7 +113,7 @@
       >
         <template #default="{row: software}">
           <b-table-column field="name" :label="$t('name')" sortable width="250">
-            <router-link :to="`/software/${software.id}`">
+            <router-link :to="`/algorithm/${software.id}`">
               {{ software.fullName }}
             </router-link>
           </b-table-column>
@@ -139,7 +139,7 @@
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
-            <router-link :to="`/software/${software.id}`" class="button is-small is-link">
+            <router-link :to="`/algorithm/${software.id}`" class="button is-small is-link">
               {{$t('button-open')}}
             </router-link>
           </b-table-column>

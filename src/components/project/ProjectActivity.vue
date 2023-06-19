@@ -97,6 +97,7 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       if(!this.canManageProject) { // contributor can only view charts tab
         return ProjectActivityCharts;

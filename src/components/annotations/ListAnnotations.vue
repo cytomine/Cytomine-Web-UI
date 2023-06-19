@@ -86,6 +86,21 @@
               />
             </div>
           </div>
+          <div class="column filter">
+            <div class="filter-label">
+              {{$t('group-linked-annotations')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                  v-model="regroup"
+                  :options="groupBundling"
+                  label="label"
+                  track-by="bundling"
+                  :allow-empty="false"
+                  :searchable="false"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -191,7 +206,22 @@
             </div>
           </div>
 
-          <div class="column filter is-one-third">
+          <div class="column filter is-one-third" v-if="isByImageGroup">
+            <div class="filter-label">
+              {{$t('image-groups')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                  v-model="selectedImageGroups"
+                  :options="imageGroups"
+                  :label="'name'"
+                  track-by="id"
+                  multiple
+                  :allPlaceholder="$t('all-image-groups')"
+              />
+            </div>
+          </div>
+          <div class="column filter is-one-third" v-else>
             <div class="filter-label">
               {{$t('images')}}
             </div>
@@ -235,11 +265,16 @@
       </div>
     </div>
 
-    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
+    <b-message type="is-warning" has-icon icon-size="is-small" v-if="reachedLimit">
+      {{ $t('too-much-categories-to-display', {toDisplay: this.selectedCategoryOptions.length, displayed: this.limitedCategoryOptions.length}) }}
+    </b-message>
+
+    <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
       :categorization="selectedCategorization.categorization"
       :size="selectedSize.size"
       :color="selectedColor.hexaCode"
       :nbPerPage="nbPerPage"
+      :bundling="regroup.bundling"
 
       :allTerms="terms"
       :allUsers="allUsers"
@@ -256,7 +291,7 @@
       :tracks-ids="selectedTracksIds"
       :tags-ids="selectedTagsIds"
       :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
-      :imagesIds="selectedImagesIds"
+      :imagesIds="(isByImageGroup) ? imagesIdsInGroup(prop) : selectedImagesIds"
       :usersIds="selectedUsersIds"
       :reviewed="reviewed"
       :reviewUsersIds="reviewUsersIds"
@@ -290,7 +325,6 @@
 
 <script>
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
-import constants from '@/utils/constants.js';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
@@ -298,7 +332,8 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection,
+  AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -309,6 +344,9 @@ const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 import {appendShortTermToken} from '@/utils/token-utils.js';
+
+import constants from '@/utils/constants.js';
+const MAX_ITEMS_PER_CATEGORY = constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY;
 
 export default {
   name: 'list-annotations',
@@ -338,12 +376,19 @@ export default {
         {label: this.$t('huge'), size: 400},
       ],
 
+      groupBundling: [
+        {label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE'},
+        {label: this.$t('yes'), bundling: 'YES'},
+        {label: this.$t('no'), bundling: 'NO'}
+      ],
+
       userAnnotationOption: this.$t('user-annotations'),
       jobAnnotationOption: this.$t('analysis-annotations'),
       reviewedAnnotationOption: this.$t('reviewed-annotations'),
       annotationTypes: [],
 
       images: [],
+      imageGroups: [],
       tags:[],
 
       noTermOption: {id: 0, name: this.$t('no-term')},
@@ -361,6 +406,7 @@ export default {
         {label: this.$t('per-term'), categorization: 'TERM'},
         {label: this.$t('per-track'), categorization: 'TRACK'},
         {label: this.$t('per-user'), categorization: 'USER'},
+        {label: this.$t('per-image-group'), categorization: 'IMAGEGROUP'},
       ];
 
       if (!this.tooManyImages) {
@@ -396,6 +442,7 @@ export default {
     nbPerPage: sync('perPage', storeOptions),
     selectedColor: sync('outlineColor', storeOptions),
 
+    // eslint-disable-next-line vue/return-in-computed-property
     targetAnnotationType() {
       switch(this.$route.query.type) {
         case 'user':
@@ -443,7 +490,9 @@ export default {
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
     },
-
+    selectedTermOptions() {
+      return this.termsOptions.filter(option => this.selectedTermsIds.includes(option.id));
+    },
     filteredTracks() {
       return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
     },
@@ -463,6 +512,10 @@ export default {
     trackOptionsIds() {
       return this.tracksOptions.map(option => option.id);
     },
+    selectedTrackOptions() {
+      return this.tracksOptions.filter(option => this.selectedTracksIds.includes(option.id));
+    },
+
 
     tagsOptions() {
       return [...this.tags, this.noTagOption];
@@ -473,11 +526,13 @@ export default {
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
     selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
+    selectedImageGroups: localSyncMultiselectFilter('imageGroups', 'imageGroups'),
     selectedTags: localSyncMultiselectFilter('tags', 'tagsOptions'),
     selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
     selectedTermsIds: localSyncMultiselectFilter('termsIds', 'termOptionsIds'),
     fromDate: sync('fromDate', storeOptions),
     toDate: sync('toDate', storeOptions),
+    regroup: sync('regroup', storeOptions),
 
     afterThan() {
       return this.fromDate ? this.fromDate.getTime() : null;
@@ -510,7 +565,12 @@ export default {
       return this.selectedImages.map(img => img.id);
     },
 
-    categoryOptions() {
+    selectedImageGroupsIds() {
+      return this.selectedImageGroups.map(group => group.id);
+    },
+
+    // eslint-disable-next-line vue/return-in-computed-property
+    fullCategoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
           return this.termsOptions;
@@ -524,8 +584,45 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        case 'IMAGEGROUP':
+          return this.imageGroups;
+        default:
+          return [];
       }
-      throw new Error('Cannot load a category options ' + this.selectedCategorization.categorization);
+    },
+    // eslint-disable-next-line vue/return-in-computed-property
+    selectedCategoryOptions() {
+      switch (this.selectedCategorization.categorization) {
+        case 'TERM':
+          return this.selectedTermOptions;
+        case 'IMAGE':
+          return this.selectedImages;
+        case 'USER':
+          if (this.selectedAnnotationType === this.jobAnnotationOption)
+            return this.selectedUserJobs;
+          if (this.reviewed)
+            return this.selectedReviewers;
+          return this.selectedMembers;
+        case 'TRACK':
+          return this.selectedTrackOptions;
+        case 'IMAGEGROUP':
+          return this.selectedImageGroups;
+      }
+    },
+    limitedCategoryOptions() {
+      /* We try to return all options and hide unwanted ones with v-show for efficiency
+       * When the number of options is too large, we return only selected options (v-show always true)
+       * If there are still too much selected options, we return only the X first options.
+       * We always have |limited options| <= |selected options| <= |full options|
+       */
+      if (this.fullCategoryOptions.length <= MAX_ITEMS_PER_CATEGORY) {
+        return this.fullCategoryOptions;
+      }
+
+      return this.selectedCategoryOptions.slice(0, MAX_ITEMS_PER_CATEGORY);
+    },
+    reachedLimit() {
+      return this.selectedCategoryOptions.length > MAX_ITEMS_PER_CATEGORY;
     },
     isByTerm() {
       return this.selectedCategorization.categorization === 'TERM';
@@ -535,6 +632,9 @@ export default {
     },
     isByTag() {
       return this.selectedCategorization.categorization === 'TAG';
+    },
+    isByImageGroup() {
+      return this.selectedCategorization.categorization === 'IMAGEGROUP';
     },
     noTerm() {
       return this.selectedTermsIds.includes(this.noTermOption.id);
@@ -550,6 +650,10 @@ export default {
       return this.selectedTags.map(t => t.id);
     },
     collection() {
+      let imagesIds = !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null;
+      if (this.isByImageGroup) {
+        imagesIds = this.selectedImageGroups.map(ig => this.imagesIdsInGroup(ig)).flat();
+      }
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
       console.log('users', users);
       console.log('this.selectedUsersIds', this.selectedUsersIds);
@@ -557,8 +661,8 @@ export default {
       let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
-        images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
-        users: this.selectedUsersIds!=null && this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
+        images: imagesIds,
+        users: (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null : this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
@@ -579,9 +683,8 @@ export default {
     }
   },
   methods: {
-    appendShortTermToken,
-    viewAnnot(annot) {
-      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+    viewAnnot({annot}) {
+      this.$router.push(`/project/${this.project.id}/image/${annot.image}/annotation/${annot.id}`);
     },
     async fetchImages() {
       if (!this.tooManyImages) {
@@ -591,6 +694,12 @@ export default {
           light: true
         })).array;
       }
+    },
+    async fetchImageGroups() {
+      this.imageGroups = (await ImageGroupCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id
+      })).array;
     },
     async fetchUsers() {
 
@@ -639,7 +748,12 @@ export default {
           return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
         case 'TRACK':
           return this.selectedTracksIds.includes(prop.id);
+        case 'IMAGEGROUP':
+          return this.selectedImageGroupsIds.includes(prop.id);
       }
+    },
+    imagesIdsInGroup(group) {
+      return group.imageInstances.map(image => image.id);
     }
   },
   watch: {
@@ -681,11 +795,15 @@ export default {
     if(!this.selectedAnnotationType) {
       this.selectedAnnotationType = this.userAnnotationOption;
     }
+    if(!this.regroup) {
+      this.regroup = this.groupBundling[this.groupBundling.length - 1];
+    }
     // ---
 
     try {
       await Promise.all([
         this.fetchImages(),
+        this.fetchImageGroups(),
         this.fetchUsers(),
         this.fetchUserJobs(),
         this.fetchTracks(),

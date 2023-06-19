@@ -93,7 +93,7 @@
     <image-thumbnail :url="slidePreview.macroURL" :size="512" :key="slidePreview.macroURL" :macro="true" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
   </template>
 
-  <template v-if="image && profileEnabled">
+  <template v-if="image">
     <h2>{{$t('companion-files')}}</h2>
     <table class="table">
       <tbody>
@@ -143,8 +143,6 @@ export default {
       nbUploadedFiles: 0,
       currentPage: 1,
       nbPerPage: 10,
-
-      profileEnabled: false
     };
   },
   computed: {

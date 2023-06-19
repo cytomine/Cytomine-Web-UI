@@ -159,6 +159,7 @@
 
       <cytomine-table
         :collection="imageCollection"
+        :is-empty="nbEmptyFilters > 0"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
         :openedDetailed.sync="openedDetails"
@@ -334,12 +335,18 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'extension', selected: this.selectedFormats, total: this.availableFormats.length},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
+        {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
       ];
+    },
+
+    selectedContentTypes() {
+      let selectedVendors = this.selectedVendors.map(option => option.value);
+      let availableVendors = this.availableVendors.map(option => option.value);
+      let allowUnknown = selectedVendors.includes('null');
+      return this.selectedFormats.filter(ct => (availableVendors.includes(ct)) ? selectedVendors.includes(ct) : allowUnknown);
     },
 
     boundsFilters() {
@@ -369,7 +376,6 @@ export default {
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(prop == 'vendor') prop = 'mimeType';
         if(selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -381,6 +387,9 @@ export default {
 
     nbActiveFilters() {
       return this.$store.getters[this.storeModule + '/nbActiveFilters'];
+    },
+    nbEmptyFilters() {
+      return this.$store.getters[this.storeModule + '/nbEmptyFilters'] + ((this.selectedContentTypes.length > 0) ? 0 : 1);
     },
 
     currentPage: sync('currentPage', storeOptions),
@@ -445,7 +454,7 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
-    }
+    },
   },
   watch: {
     querySearchTags(values) {

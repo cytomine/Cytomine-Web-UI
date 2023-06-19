@@ -25,9 +25,10 @@
       v-for="(cell, i) in cells"
       :key="i"
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+      :class="{highlighted: cell && cell.highlighted}"
     >
       <cytomine-image
-        v-if="cell && cell.image && cell.slice"
+        v-if="cell && cell.image && cell.slices"
         :index="cell.index"
         :key="`${cell.index}-${cell.image.id}`"
         @close="closeMap(cell.index)"
@@ -53,7 +54,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance, SliceInstance} from 'cytomine-client';
+import {ImageInstance, SliceInstance, Annotation} from 'cytomine-client';
 
 export default {
   name: 'cytomine-viewer',
@@ -107,8 +108,9 @@ export default {
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
-        let slice = this.viewer.images[index].activeSlice;
-        cells[i] = {index, image, slice};
+        let slices = this.viewer.images[index].activeSlices;
+        let highlighted = (this.viewer.images[index].view) ? this.viewer.images[index].view.highlighted : false;
+        cells[i] = {index, image, slices, highlighted};
       }
       return cells;
     },
@@ -119,15 +121,22 @@ export default {
       return 100/this.nbHorizontalCells;
     },
     shortkeysMapping() {
-      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t', 'nav-previous-t', 'nav-next-c',
-        'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t', 'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c',
+      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t',
+        'nav-previous-t', 'nav-next-c', 'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t',
+        'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c', 'nav-next-image-in-group',
+        'nav-previous-image-in-group', 'nav-next-annot-link', 'nav-previous-annot-link',
         'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
         'tool-freehand-polygon', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
         'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
-        'tool-review-toggle', 'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
+        'toggle-review-layer', 'toggle-all-review-layer', 'toggle-selected-layers', 'toggle-all-selected-layers',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
         'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
         'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste'];
+        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste', 'tool-review-reject', 'tool-review-toggle',
+        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-all-information', 'toggle-all-zoom',
+        'toggle-all-filters', 'toggle-all-layers', 'toggle-all-ontology', 'toggle-all-properties',
+        'toggle-all-broadcast', 'toggle-all-review', 'toggle-all-overview', 'toggle-all-annotations',
+        'toggle-all-current', 'toggle-all-link'];
 
       return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
         object[key.replace('viewer-', '')] = shortcuts[key];
@@ -190,36 +199,55 @@ export default {
         if(!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
 
-          let imgAndSlices = this.idImages.map(function(e,i) {
-            return {image : e, slice: this.idSlices[i]};
-          }, this);
-          //don't fetch multiple times the same image.
-          let uniqueArray = imgAndSlices.filter(function(item, pos) {
-            return imgAndSlices.map(function(e) {
-              return e.image+'.'+e.slice;
-            }).indexOf(item.image+'.'+item.slice) == pos;
-          });
-          await Promise.all(uniqueArray.map(async (e) => {
-            let image = await ImageInstance.fetch(e.image);
-            let idSlice = e.slice;
-            let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+          // List of unique images (prevent to fetch it multiple times)
+          const uniqueIdImages = [...new Set(this.idImages)];
+          let uniqueImages = {};
+          await Promise.all(uniqueIdImages.map(async id => {
+            uniqueImages[id] = await ImageInstance.fetch(id);
           }));
 
-          let images = {};
-          //don't fetch multiple times the same image.
-          let idImages = [...new Set(this.idImages)];
-          await Promise.all(idImages.map(async id => {
-            let image = await ImageInstance.fetch(id);
-            images[id] = image;
-          }));
-          console.log('images', images);
-          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
-          console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
-          if (imagesNotInCurrentProject.length > 0) {
+          // Ensure images are in the right project
+          const nbWrongProjectImages = Object.values(uniqueImages).filter(image =>
+            image.project !== this.project.id
+          ).length;
+          if (nbWrongProjectImages > 0) {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');
           }
+
+          // Register images in the viewer, in right order
+          let indexedImages = {};
+          this.idImages.map(id => {
+            indexedImages[this.viewer.indexNextImage] = uniqueImages[id];
+            this.$store.dispatch(this.viewerModule + 'registerImage');
+          });
+
+          // For each image, initialize them asynchronously, and fetch corresponding slices
+          await Promise.all(Object.entries(indexedImages).map(async ([index, image]) => {
+            const position = this.idImages.indexOf(String(image.id));
+            let idSlices = this.idSlices[position];
+
+            let slices;
+            if (idSlices) {
+              idSlices = [...new Set(idSlices.split(':'))];
+              slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+
+              // Ensure slices are in the right project/image
+              const z = slices[0].zStack;
+              const t = slices[0].time;
+              const nbWrongSlices = slices.filter(slice =>
+                slice.image !== image.id || slice.zStack !== z || slice.time !== t
+              ).length;
+              if (nbWrongSlices > 0) {
+                this.errorBadImageProject = true;
+                throw new Error('Some slices are not from this project or cannot be displayed together');
+              }
+            }
+            else {
+              slices = [await image.fetchReferenceSlice()];
+            }
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
+          }));
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
@@ -227,7 +255,39 @@ export default {
         this.loading = false;
       }
       catch(err) {
-        window.console.log(err);
+        console.log(err);
+        this.error = true;
+      }
+    },
+
+    async selectAnnotationHandler({index, annot, center=false}) {
+      try {
+        if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
+          annot = await Annotation.fetch(annot.id);
+          let [image, slice] = await Promise.all([
+            ImageInstance.fetch(annot.image),
+            SliceInstance.fetch(annot.slice)
+          ]);
+          this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
+        }
+        else if (index === null) {
+          annot = await Annotation.fetch(annot.id);
+          if (this.idImages.includes(String(annot.image))) {
+            let index = this.cells.find(cell => cell.image.id === annot.image).index;
+            this.$eventBus.$emit('selectAnnotation', {index, annot, center});
+          }
+          else {
+            let [image, slice] = await Promise.all([
+              ImageInstance.fetch(annot.image),
+              SliceInstance.fetch(annot.slice)
+            ]);
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
+          }
+        }
+      }
+      catch(err) {
+        console.log(err);
         this.error = true;
       }
     },
@@ -244,7 +304,11 @@ export default {
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
   },
+  mounted() {
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+  },
   beforeDestroy() {
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }
 };
@@ -270,5 +334,9 @@ export default {
 
 .hidden {
   display: none;
+}
+
+.highlighted {
+  border: 6px solid #0099ff;
 }
 </style>
