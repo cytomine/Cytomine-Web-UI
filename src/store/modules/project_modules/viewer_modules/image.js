@@ -61,7 +61,6 @@ export default {
       loadedSlicePages: [],
       activeSlices: null,
       activePanel: null,
-
       routedAnnotation: null
     };
   },

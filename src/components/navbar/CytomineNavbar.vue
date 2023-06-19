@@ -43,7 +43,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link v-show="algoEnabled" to="/software" class="navbar-item">
+      <router-link v-show="algoEnabled" to="/algorithm" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
@@ -127,9 +127,9 @@ export default {
   data() {
     return {
       openedTopMenu: false,
-      hotkeysModal: false,
+      hotkeysModal: null,
       algoEnabled: constants.ALGORITHMS_ENABLED,
-      aboutModal: false
+      aboutModal: null
     };
   },
   computed: {

@@ -90,7 +90,7 @@ export default {
 
       disabledBroadcast: false,
 
-      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll('http', '') + '/user-position/',
+      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll('http', '') + '/ws/user-position/',
 
       userPostitionWebsock: null,
       wsConnected: false
@@ -366,7 +366,10 @@ export default {
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
-    this.userPostitionWebsock.close();
+    if(this.wsConnected){
+      this.userPostitionWebsock.close();
+      this.wsConnected = false;
+    }
   }
 };
 </script>

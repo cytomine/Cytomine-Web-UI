@@ -222,6 +222,7 @@
             </template>
 
             <template v-if="canEdit">
+
               <router-link
                 v-if="!image.reviewed && !image.inReview"
                 :to="`/project/${image.project}/image/${image.id}?action=review`"

@@ -275,13 +275,17 @@ export default {
     },
 
     manipulableChannels() {
-      return this.apparentChannels.map(ac => {
+      console.log(this.apparentChannels);
+      console.log('this.histograms', this.histograms);
+      let response = this.apparentChannels.map(ac => {
         return {
           ...ac,
           histogram: this.histograms.find(h => h.apparentChannel === ac.index),
           name: this.sliceChannels[ac.channel].name
         };
       });
+      console.log('response', response);
+      return response;
     },
     visibleManipulableChannels() {
       return this.manipulableChannels.filter(mc => mc.visible);
@@ -448,8 +452,10 @@ export default {
       try {
         // TODO [EXPERIMENTAL - large set of merged channels]
         // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
-        this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
 
+
+        this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: 256}));
+        console.log('histograms', this.histograms);
         // if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
         //   // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
         //   this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
@@ -466,16 +472,13 @@ export default {
   },
   async created() {
     try {
-      let filters = (await ImageFilterProjectCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id
-      })).array.filter(filter => filter.available);
-      let methods = filters.map(filter => filter.method);
-      if(this.selectedFilter && !methods.includes(this.selectedFilter)) {
+      let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
+      let prefixes = filters.map(filter => filter.prefix);
+      if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
       }
       this.filters = filters;
-
       await this.fetchHistograms();
 
       // Show LUT details by default if there is only 1 channel.

@@ -83,7 +83,7 @@
             <router-link :to="`/project/${image.project}/image/${image.id}/information`" class="button is-small">
               {{$t('button-more-info')}}
             </router-link>
-            <a class="button is-small" @click="download(image, shortTermToken)">
+            <a class="button is-small" v-if="canDownloadImages" @click="download(image, shortTermToken)">
               {{$t('button-download')}}
             </a>
           </div>

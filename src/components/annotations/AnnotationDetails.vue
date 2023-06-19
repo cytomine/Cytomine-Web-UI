@@ -271,8 +271,8 @@ import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
-import ChannelName from '@/components/viewer/ChannelName';
 import {appendShortTermToken} from '@/utils/token-utils.js';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'annotations-details',
@@ -553,7 +553,7 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    },
+    }
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {

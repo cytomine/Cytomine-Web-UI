@@ -275,7 +275,6 @@ button-unlink,Unlink,Séparer,Desconectar
 terms-new-annotation,Term(s) to associate to new annotations,Terme(s) à associer aux nouvelles annotations,Término(s) a asociar con nuevas anotaciones
 core-cannot-be-reached,Error of communication with Cytomine core,Erreur de communication avec le backend de Cytomine,Error de comunicación con el núcleo de Cytomine
 communication-error,Communication error,Erreur de communication,Error de comunicación
-follower, Follower(s), Suiveur(s), Seguidor(es)
 follow-user,Follow a user,Suivi d'utilisateur,Seguir a un usuario
 online-managers,Online managers,Responsables en ligne,Administradores en línea
 online-contributors,Online contributors,Contributeurs en ligne,Colaboradores en línea
@@ -1070,6 +1069,8 @@ notif-success-source-delete,Trusted source {username}/{dockerUsername} was succe
 notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
+step,Step,Saut
+screenshot, Screenshot current image view, Capture d'écran de l'image actuelle
 followers,Followers,Suiveurs
 average,Average,Moyenne
 profile-projection,Profile projection,Projection du profil

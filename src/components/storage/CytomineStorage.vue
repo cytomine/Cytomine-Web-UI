@@ -52,9 +52,9 @@
           <strong>{{$t('storage')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false">
+          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="extendedName" track-by="id" :allow-empty="false">
             <template #option="{option}">
-              {{option.name}}
+              {{option.extendedName}}
               <template v-if="currentUser.isDeveloper">
                  ({{$t('id')}}: {{option.id}})
               </template>
@@ -342,6 +342,11 @@ export default {
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
+        this.storages.forEach(v => {
+          v.extendedName = v.name;
+          if(this.currentUser.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
+        });
+
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
       }
       catch(error) {
