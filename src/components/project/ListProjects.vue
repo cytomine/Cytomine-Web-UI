@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -135,6 +135,7 @@
 
       <cytomine-table
         :collection="projectCollection"
+        :is-empty="nbEmptyFilters > 0"
         class="table-projects"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
@@ -305,6 +306,9 @@ export default {
 
     nbActiveFilters() {
       return this.$store.getters['listProjects/nbActiveFilters'];
+    },
+    nbEmptyFilters() {
+      return this.$store.getters['listProjects/nbEmptyFilters'];
     },
 
     selectedOntologiesIds() {

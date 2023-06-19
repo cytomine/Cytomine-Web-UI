@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -124,14 +124,15 @@ export default {
     }
   },
   async created() {
-    let Settings;
+    let settings;
     await axios
       .get('configuration.json')
-      .then(response => (Settings = response.data));
+      .then(response => (settings = response.data));
 
-    for(var i in constants){
-      if(Settings.hasOwnProperty(i)) {
-        constants[i] = Settings[i];
+    for (let i in settings) {
+      if (Object.prototype.hasOwnProperty.call(constants, i)
+        || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {
+        constants[i] = settings[i];
       }
     }
     Object.freeze(constants);

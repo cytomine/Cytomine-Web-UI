@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -115,6 +115,7 @@ export default {
         result = result.replace('$currentOntology$', this.ontology ? this.ontology.id : null);
         return result;
       }
+      return null;
     },
     validationName() {
       return String(this.param.id);
@@ -129,6 +130,7 @@ export default {
       if (this.options && this.options.length > 0) {
         return this.options[0].class;
       }
+      return null;
     },
     areAnnotationObjects() {
       if(this.objectsClass) {
@@ -138,6 +140,7 @@ export default {
           'be.cytomine.ontology.ReviewedAnnotation'
         ].includes(this.objectsClass);
       }
+      return null;
     },
     areTermObjects() {
       return this.objectsClass === 'be.cytomine.ontology.Term';

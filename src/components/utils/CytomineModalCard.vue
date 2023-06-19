@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
   <section class="modal-card-body">
     <slot></slot>
   </section>
-  <footer class="modal-card-foot">
+  <footer class="modal-card-foot" v-if="footer">
     <slot name="footer">
       <button class="button" type="button" @click="$emit('close')">
         {{$t('button-close')}}
@@ -35,7 +35,8 @@
 export default {
   name: 'cytomine-modal-card',
   props: {
-    title: String
+    title: String,
+    footer: {type: Boolean, default: true}
   }
 };
 </script>

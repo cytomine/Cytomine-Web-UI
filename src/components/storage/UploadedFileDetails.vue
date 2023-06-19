@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@
     <img :src="appendShortTermToken(slidePreview.macroURL, this.shortTermToken)">
   </template>
 
-  <template v-if="image && profileEnabled">
+  <template v-if="image">
     <h2>{{$t('companion-files')}}</h2>
     <table class="table">
       <tbody>
@@ -141,8 +141,6 @@ export default {
       nbUploadedFiles: 0,
       currentPage: 1,
       nbPerPage: 10,
-
-      profileEnabled: false
     };
   },
   computed: {

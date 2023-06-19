@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@
 
     <cytomine-table
       :collection="MemberCollection"
+      :is-empty="this.selectedRoles.length === 0"
       :currentPage.sync="currentPage"
       :perPage.sync="perPage"
       :sort.sync="sortField"
@@ -183,7 +184,6 @@ export default {
       return collection;
     },
 
-
     exportURL() {
       // TODO in core: should export only the filtered users
       return Cytomine.instance.host + Cytomine.instance.basePath + `project/${this.project.id}/user/download?format=csv`;
@@ -281,7 +281,12 @@ export default {
     async toggleRepresentative(member) {
       try {
         if(member.role === this.representativeRole.value) {
-          await ProjectRepresentative.delete(0, this.project.id, member.id);
+          if ((await this.project.fetchRepresentatives()).array.length < 2) {
+            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+          }
+          else {
+            await ProjectRepresentative.delete(0, this.project.id, member.id);
+          }
         }
         else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();

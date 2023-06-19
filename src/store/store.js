@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import currentProject from './modules/current-project.js';
 import ontologies from './modules/ontologies.js';
 import listProjects from './modules/list-projects.js';
 import listSoftware from './modules/list-software.js';
+import advancedSearch from './modules/advanced-search.js';
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
@@ -32,6 +33,7 @@ let store = new Vuex.Store({
       commit('ontologies/resetState');
       commit('listProjects/resetState');
       commit('listSoftware/resetState');
+      commit('advancedSearch/resetState');
       for(let key in state.projects) {
         this.unregisterModule(['projects', key]);
       }
@@ -43,6 +45,7 @@ let store = new Vuex.Store({
     ontologies,
     listProjects,
     listSoftware,
+    advancedSearch,
     projects: {
       namespaced: true
     }

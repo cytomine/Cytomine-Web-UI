@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 
 <template>
 <div class="card" :class="{'full-height-card': fullHeightCard}">
-  <router-link class="card-image recent-image" :to="`/project/${image.project}/image/${idImage}`">
+  <router-link class="card-image recent-image" :to="`/project/${idProject}/image/${idImage}`">
     <figure class="image is-5by3" :style="figureStyle">
     </figure>
   </router-link>
   <div class="card-content">
     <div class="content">
       <p>
-        <router-link :to="`/project/${image.project}/image/${idImage}`">
-          <span v-if="blindMode" class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
+        <router-link :to="`/project/${idProject}/image/${idImage}`">
+          <span v-if="isBlindMode" class="blind-indication">[{{this.$t('blinded-name-indication')}}]</span>
           {{ image.blindedName || image.instanceFilename || image.imageName }}
           <span v-if="showProject" class="in-project">({{$t('in-project', {projectName: image.projectName})}})</span>
         </router-link>
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import {changeImageUrlFormat} from '@/utils/image-utils';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 
@@ -41,6 +42,7 @@ export default {
   name: 'image-preview',
   props: {
     image: {type: Object},
+    project: {type: Object, default: null},
     fullHeightCard: {type: Boolean, default: true},
     showProject: {type: Boolean, default: false},
     blindMode: {type: Boolean, default: false},
@@ -49,6 +51,18 @@ export default {
     shortTermToken: get('currentUser/shortTermToken'),
     idImage() {
       return this.image.image || this.image.id; // if provided object is image consultation, image.image
+    },
+    idProject() {
+      return (this.project) ? this.project.id : this.image.project;
+    },
+    isBlindMode() {
+      return (this.project) ? this.project.blindMode : this.blindMode;
+    },
+    rawPreviewUrl() {
+      return this.image.thumb || this.image.imageThumb;
+    },
+    previewUrl() {
+      return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
       return {backgroundImage: `url("${appendShortTermToken((this.image.thumb || this.image.imageThumb), this.shortTermToken)}")`};

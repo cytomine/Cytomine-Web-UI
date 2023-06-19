@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
 import ListSoftware from './components/software/ListSoftware.vue';
 import ListImages from './components/image/ListImages.vue';
+import ListImageGroups from './components/image-group/ListImageGroups.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
 import ProjectActivity from './components/project/ProjectActivity.vue';
@@ -58,11 +59,11 @@ const routes = [
     component: ListOntologies
   },
   {
-    path: '/software',
+    path: '/algorithm',
     component: ListSoftware
   },
   {
-    path: '/software/:idSoftware',
+    path: '/algorithm/:idSoftware',
     component: SoftwareInformation
   },
   {
@@ -84,6 +85,10 @@ const routes = [
       {
         path: 'images',
         component: ListImages
+      },
+      {
+        path: 'image-groups',
+        component: ListImageGroups
       },
       {
         path: 'image/:idImages',
@@ -149,6 +154,8 @@ const routes = [
   {path: '/project', redirect: '/projects'},
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
+  {path: '/software', redirect: '/algorithm'},
+  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},

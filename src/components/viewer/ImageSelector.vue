@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,13 +16,32 @@
 <div>
   <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
     <b-loading :is-full-page="false" :active="loading" />
-    <template v-if="!loading">
       <div class="header">
-        <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-          type="search" icon="search"
-        />
+        <div>
+          <b-input class="search-images" :value="searchString" @input="debounceSearchString"
+                   :placeholder="$t('search-placeholder')"
+                   type="search" icon="search"
+          />
+          <div class="filter">
+            <div class="filter-label">
+              {{$t('image-groups')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect
+                  v-model="selectedImageGroups"
+                  :options="availableImageGroups"
+                  :label="'name'"
+                  track-by="id"
+                  multiple
+                  :allPlaceholder="$t('all-image-groups')"
+              />
+            </div>
+          </div>
+        </div>
+
         <button class="delete" @click="imageSelectorEnabled = false"></button>
       </div>
+    <template v-if="!loading">
       <div class="content-wrapper" v-if="error">
         <b-message type="is-danger" has-icon icon-size="is-small">
           <h2> {{ $t('error') }} </h2>
@@ -30,8 +49,12 @@
         </b-message>
       </div>
       <div v-else class="image-selector">
-        <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+        <div class="card" v-for="image in images" :key="image.id" :class="{active: alreadyAdded(image)}">
+          <a
+            class="card-image"
+            @click="addImage(image)"
+            :style="'background-image: url(' + imageThumbUrl(image) + ')'"
+          ></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -41,9 +64,13 @@
           </div>
         </div>
 
-        <button class="button" v-if="nbImagesDisplayed < filteredImages.length" @click="more()">
+        <button class="button" v-if="nbImagesDisplayed < nbFilteredImages" @click="more()">
           {{$t('button-more')}}
         </button>
+
+        <div class="has-text-grey no-result" v-if="nbFilteredImages === 0">
+          <em>{{$t('no-result')}}</em>
+        </div>
 
         <div class="space">&nbsp;</div>
       </div>
@@ -62,19 +89,24 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {IMAGE_FORMAT} from '@/utils/image-utils';
 
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import ImageName from '@/components/image/ImageName';
-import {ImageInstanceCollection} from 'cytomine-client';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import {ImageInstanceCollection, ImageGroupCollection} from 'cytomine-client';
+import _ from 'lodash';
 
 export default {
   name: 'image-selector',
-  components: {ImageName},
+  components: {ImageName, CytomineMultiselect},
   data() {
     return {
       images: [],
+      imageGroups: [],
       searchString: '',
+      selectedImageGroups: [],
       nbImagesDisplayed: 20,
+      nbFilteredImages: 0,
       loading: true,
       error: false
     };
@@ -92,31 +124,86 @@ export default {
         this.$store.commit(this.viewerModule + 'setImageSelector', value);
       }
     },
-    filteredImages() { // TODO: in backend
-      let filtered = this.images;
-
-      if(this.searchString) {
-        let regexp = getWildcardRegexp(this.searchString);
-        filtered =  filtered.filter(image => regexp.test(image.instanceFilename));
-      }
-
-      return filtered;
+    viewerImagesIds() {
+      return Object.values(this.$store.getters['currentProject/currentViewer'].images).map(image => image.imageInstance.id);
     },
-    displayedImages() {
-      return this.filteredImages.slice(0, this.nbImagesDisplayed);
+    availableImageGroups() {
+      return [{id: 'null', name: this.$t('no-image-group')}, ...this.imageGroups];
+    }
+  },
+  watch: {
+    searchString() {
+      this.fetchImages();
+    },
+    selectedImageGroups() {
+      this.fetchImages();
+    },
+    nbImagesDisplayed() {
+      this.fetchImages();
     }
   },
   methods: {
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500),
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
+    },
+    async fetchImages(loading=true) {
+      if (loading) {
+        this.loading = true;
+      }
+
+      try {
+        let collection = new ImageInstanceCollection({
+          filterKey: 'project',
+          filterValue: this.project.id,
+          max: this.nbImagesDisplayed
+        });
+
+        if(this.searchString) {
+          collection['name'] = {
+            ilike: encodeURIComponent(this.searchString)
+          };
+        }
+
+        if (this.selectedImageGroups.length > 0 && this.selectedImageGroups.length !== this.availableImageGroups.length) {
+          collection['imageGroup'] = {
+            in: this.selectedImageGroups.map(option => option.id).join()
+          };
+        }
+
+        if (this.selectedImageGroups.length === 0) {
+          this.images = [];
+          this.nbFilteredImages = 0;
+        }
+        else {
+          let data = (await collection.fetchPage(0));
+          this.images = data.array;
+          this.nbFilteredImages = data.totalNbItems;
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.error = true;
+      }
+      if (loading) {
+        this.loading = false;
+      }
+    },
+    async fetchImageGroups() {
+      this.imageGroups = (await ImageGroupCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id
+      })).array.filter(group => group.numberOfImages > 0);
     },
 
     more() {
@@ -131,19 +218,19 @@ export default {
       if (key === 'toggle-add-image') {
         this.toggle();
       }
+    },
+
+    alreadyAdded(image) {
+      return this.viewerImagesIds.includes(image.id);
+    },
+    imageThumbUrl(image) {
+      return image.thumbURL(256, IMAGE_FORMAT);
     }
   },
   async created() {
-    try {
-      this.images = (await ImageInstanceCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id
-      })).array; // TODO: should not load full array, should be done with backend
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
+    this.loading = true;
+    await Promise.all([this.fetchImageGroups(), this.fetchImages(false)]);
+    this.selectedImageGroups = this.availableImageGroups.slice();
     this.loading = false;
   },
   mounted() {
@@ -174,6 +261,19 @@ export default {
   padding-bottom: 0;
   display: flex;
   justify-content: space-between;
+}
+
+.header div {
+  display: flex;
+  align-items: baseline;
+}
+
+.header .filter-label {
+  margin-right: 0.5em;
+}
+
+.search-images {
+  margin-right: 1em;
 }
 
 .image-selector {
@@ -231,5 +331,14 @@ export default {
   box-sizing: border-box;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   z-index: 100;
+}
+
+.active {
+  box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
+  font-weight: 600;
+}
+
+.no-result {
+  margin: 2em;
 }
 </style>

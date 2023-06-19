@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ export default {
         return;
       }
       this.$emit('rename', this.newName);
-      this.$parent.close();
+      this.$emit('update:active', false);
     }
   },
   async created() {

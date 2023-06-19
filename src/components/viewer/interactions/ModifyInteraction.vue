@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
   <vl-interaction-modify
     v-if="activeEditTool === 'modify'"
     :source="selectSource"
+    ref="olModifyInteraction"
     :delete-condition="deleteCondition"
+    :insert-vertex-condition="insertVertexCondition"
     @modifystart="startEdit"
     @modifyend="endEdit"
   />
@@ -27,6 +29,13 @@
     :source="selectSource"
     @translatestart="startEdit"
     @translateend="endEdit"
+  />
+
+  <vl-interaction-rescale
+    v-if="activeEditTool === 'rescale'"
+    :source="selectSource"
+    @rescalestart="startEdit"
+    @rescaleend="endEdit"
   />
 
   <vl-interaction-rotate
@@ -42,6 +51,7 @@
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
 import {singleClick} from 'ol/events/condition';
+import {isRectangle} from '@/utils/geometry-utils';
 
 export default {
   name: 'modify-interaction',
@@ -81,6 +91,13 @@ export default {
       return function(mapBrowserEvent) {
         return mapBrowserEvent.originalEvent.ctrlKey && singleClick(mapBrowserEvent);
       };
+    },
+    insertVertexCondition() {
+      return function() {
+        return !this.features_.getArray().every(function(feature) {
+          return isRectangle(feature.getGeometry());
+        });
+      };
     }
   },
   methods: {
@@ -100,6 +117,7 @@ export default {
           annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
           await annot.save();
           this.$eventBus.$emit('editAnnotation', annot);
+          this.$eventBus.$emit('reloadAnnotationCrop', annot);
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
         }
         catch(err) {

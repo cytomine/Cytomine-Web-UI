@@ -5,6 +5,7 @@ const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
 // Key list reference: https://github.com/iFgR/vue-shortkey#key-list
 export default Object.freeze({
   'general-close-modal': ['esc'], // Handled by Bulma
+  'general-shortcuts-modal': ['shift', '?'],
   // 'navbar-dashboard': ['g', 'd'],
   // 'navbar-projects': ['g', 'p'],
   // 'navbar-ontologies': ['g', 'o'],
@@ -27,6 +28,8 @@ export default Object.freeze({
   'viewer-nav-move-right': ['arrowright'], // Handled by Openlayers KeyboardPan
   'viewer-nav-next-image': ['shift', 'arrowright'],
   'viewer-nav-previous-image': ['shift', 'arrowleft'],
+  'viewer-nav-next-image-in-group': ['alt', 'shift', 'arrowright'],
+  'viewer-nav-previous-image-in-group': ['alt', 'shift', 'arrowleft'],
   'viewer-nav-next-t': ['pageup'],
   'viewer-nav-previous-t': ['pagedown'],
   'viewer-nav-first-t': ['home'],
@@ -43,6 +46,8 @@ export default Object.freeze({
   'viewer-nav-previous-slice': ['alt', 'shift', 'pagedown'],
   'viewer-nav-first-slice': ['alt', 'shift', 'home'],
   'viewer-nav-last-slice': ['alt', 'shift', 'end'],
+  'viewer-nav-next-annot-link': [shortkey, 'arrowright'],
+  'viewer-nav-previous-annot-link': [shortkey, 'arrowleft'],
   'viewer-nav-drag-rotate': ['alt', 'shift', 'drag'], // Handled by Openlayers
   'viewer-nav-drag-zoom': ['shift', 'drag'], // Handled by Openlayers
   'viewer-tool-select': ['s'],
@@ -58,7 +63,7 @@ export default Object.freeze({
   'viewer-tool-correct-remove': ['alt', 'shift', 'c'],
   'viewer-tool-modify': ['m'],
   'viewer-tool-modify-delete-vertex': ['ctrl', 'click'], // Handled by Openlayers
-  // 'viewer-tool-rescale': ['shift', 'm'],
+  'viewer-tool-rescale': ['shift', 'm'],
   'viewer-tool-move': ['t'],
   'viewer-tool-rotate': ['shift', 't'],
   'viewer-tool-delete': ['del'],
@@ -68,22 +73,37 @@ export default Object.freeze({
   'viewer-tool-redo': [shortkey, 'y'],
   'viewer-tool-review-accept': ['j'],
   'viewer-tool-review-reject': ['k'],
-  'viewer-tool-review-toggle': ['i'],
+  'viewer-toggle-review-layer': ['i'],
+  'viewer-toggle-all-review-layer': [shortkey, 'i'],
+  'viewer-toggle-selected-layers': ['q'],
+  'viewer-toggle-all-selected-layers': [shortkey, 'q'],
   // 'viewer-tool-go-to-slice-t': ['g'],
   // 'viewer-tool-go-to-slice-z': ['shift', 'g'],
   // 'viewer-tool-go-to-slice-c': ['alt', 'g'],
   'viewer-toggle-information': ['alt', 'i'],
+  'viewer-toggle-all-information': [shortkey, 'alt', 'i'],
   'viewer-toggle-zoom': ['alt', 'z'],
+  'viewer-toggle-all-zoom': [shortkey, 'alt', 'z'],
   'viewer-toggle-link': ['alt', 's'],
+  'viewer-toggle-all-link': [shortkey, 'alt', 's'],
   'viewer-toggle-filters': ['alt', 'f'],
+  'viewer-toggle-all-filters': [shortkey, 'alt', 'f'],
   'viewer-toggle-layers': ['alt', 'l'],
+  'viewer-toggle-all-layers': [shortkey, 'alt', 'l'],
   'viewer-toggle-ontology': ['alt', 't'],
+  'viewer-toggle-all-ontology': [shortkey, 'alt', 't'],
   'viewer-toggle-properties': ['alt', 'p'],
+  'viewer-toggle-all-properties': [shortkey, 'alt', 'p'],
   'viewer-toggle-broadcast': ['alt', 'b'],
+  'viewer-toggle-all-broadcast': [shortkey, 'alt', 'b'],
   'viewer-toggle-review': ['alt', 'r'],
+  'viewer-toggle-all-review': [shortkey, 'alt', 'r'],
   'viewer-toggle-overview': ['alt', 'o'],
+  'viewer-toggle-all-overview': [shortkey, 'alt', 'o'],
   'viewer-toggle-annotations': ['alt', 'a'],
+  'viewer-toggle-all-annotations': [shortkey, 'alt', 'a'],
   'viewer-toggle-current': ['alt', 'c'],
+  'viewer-toggle-all-current': [shortkey, 'alt', 'c'],
   'viewer-toggle-add-image': ['alt', '+'],
   'text-editor-bold': [shortkey, 'b'], // Handled by Quill editor
   'text-editor-italic': [shortkey, 'i'], // Handled by Quill editor

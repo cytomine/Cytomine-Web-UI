@@ -3,8 +3,8 @@
     <annotation-details-container
       v-if="isPanelDisplayed('annotation-main')"
       :index="index"
-      :view="view"
-      @centerView="centerViewOnAnnot"
+      @select="selectAnnotation"
+      @centerView="centerView({annot: $event, sameView: true})"
       @addTerm="addTerm"
       @addTrack="addTrack"
       @updateTermsOrTracks="updateTermsOrTracks"
@@ -14,8 +14,8 @@
     <annotations-list
       class="annotations-table-wrapper"
       :index="index"
-      :view="view"
-      @centerView="centerViewOnAnnot"
+      @select="selectAnnotation"
+      @centerView="centerView"
       @addTerm="addTerm"
       @addTrack="addTrack"
       @updateTermsOrTracks="updateTermsOrTracks"
@@ -33,12 +33,14 @@ import WKT from 'ol/format/WKT';
 
 import AnnotationsList from './AnnotationsList';
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
+import {listAnnotationsInGroup, updateAnnotationLinkProperties} from '@/utils/annotation-utils';
+
+import {Annotation} from 'cytomine-client';
 
 export default {
   name: 'AnnotationsContainer',
   props: {
     index: String,
-    view: Object
   },
   data() {
     return {
@@ -54,6 +56,9 @@ export default {
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
+    viewerWrapper() {
+      return this.$store.getters['currentProject/currentViewer'];
+    },
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
@@ -63,15 +68,21 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    imageGroupId() {
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
+    },
+    copiedAnnot: {
+      get() {
+        return this.viewerWrapper.copiedAnnot;
+      },
+      set(annot) {
+        this.$store.commit(this.viewerModule + 'setCopiedAnnot', annot);
+      }
+    },
   },
   methods: {
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
-    },
-
-    centerViewOnAnnot(annot) {
-      let geometry = this.format.readGeometry(annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
     },
 
     addTerm(term) {
@@ -84,8 +95,10 @@ export default {
 
     async updateTermsOrTracks(annot) {
       let updatedAnnot = await annot.clone().fetch();
+      updatedAnnot.imageGroup = this.imageGroupId;
       await updateTermProperties(updatedAnnot);
       await updateTrackProperties(updatedAnnot);
+      await updateAnnotationLinkProperties(updatedAnnot);
 
       this.$eventBus.$emit('editAnnotation', updatedAnnot);
       this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
@@ -95,10 +108,52 @@ export default {
       this.$store.dispatch(this.imageModule + 'refreshProperties', this.index);
     },
 
-    handleDeletion(annot) {
+    async handleDeletion(annot) {
       this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
+
+      if (annot.group) {
+        let editedAnnots = [];
+        if (annot.annotationLink.length === 2) {
+          // If there were 2 links, the group has been deleted by backend
+          let otherId = annot.annotationLink.filter(al => al.annotation !== annot.id)[0].annotation;
+          let other = await Annotation.fetch(otherId);
+          other.imageGroup = annot.imageGroup;
+          await updateTermProperties(other);
+          await updateTrackProperties(other);
+          await updateAnnotationLinkProperties(other);
+
+          editedAnnots = [other];
+        }
+        else {
+          editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
+        }
+        editedAnnots.forEach(a => {
+          this.$eventBus.$emit('editAnnotation', a);
+          if (this.copiedAnnot && a.id === this.copiedAnnot.id) {
+            let copiedAnnot = this.copiedAnnot.clone();
+            copiedAnnot.annotationLink = a.annotationLink;
+            copiedAnnot.group = a.group;
+            this.copiedAnnot = copiedAnnot;
+          }
+        });
+      }
+
       this.$eventBus.$emit('deleteAnnotation', annot);
     },
+
+    selectAnnotation({annot, options}) {
+      let index = (options.trySameView) ? this.index : null;
+      this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
+    },
+
+    centerView({annot, sameView=false}) {
+      if (sameView) {
+        this.$emit('centerView', annot);
+      }
+      else {
+        this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
+      }
+    }
   }
 };
 </script>

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,7 +17,30 @@
   <template v-if="!loading">
     <dl>
       <dt>{{$t('version')}}</dt>
-      <dd>{{version || '?'}}</dd>
+      <dd>{{version || '?'}}
+        <template v-if="constants['CYTOMINE_FLAVOR']">({{constants['CYTOMINE_FLAVOR'] || '?'}})</template>
+        <b-collapse :open="false">
+          <template #trigger="{open}">
+            <button class="button is-small">
+              {{$t(open ? 'button-hide' : 'button-show')}}
+            </button>
+          </template>
+          <dl>
+            <template v-for="component in componentsInfos" >
+              <dt :key="`${component.name}-dt`" :class="{'has-text-grey': !component.enabled}">
+                {{component.name}}
+                <span v-if="!component.enabled" class="is-italic is-lowercase"> ({{$t('disabled')}})</span>
+              </dt>
+              <dd :key="component.name">
+                <div class="tags has-addons">
+                  <span class="tag">{{component.namespace || '?'}}</span>
+                  <span class="tag is-primary">{{component.version || '?'}}</span>
+                </div>
+              </dd>
+            </template>
+          </dl>
+        </b-collapse>
+      </dd>
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
@@ -84,20 +107,37 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
-      version: null,
-      loading: true
+      coreVersion: null,
+      loading: true,
+      open: false,
     };
   },
   computed: {
     apiDocLink() {
       let core = constants.CYTOMINE_CORE_HOST;
       return `${core}/restApiDoc/?doc_url=${core}/restApiDoc/api`;
+    },
+    version() {
+      return constants['CYTOMINE_VERSION'];
+    },
+    constants() {
+      return constants;
+    },
+    componentsInfos() {
+      return this.constants['COMPONENTS'].map(component => {
+        return {
+          'name': component,
+          'enabled': constants[`${component}_ENABLED`] == null || constants[`${component}_ENABLED`],
+          'version': constants[`${component}_VERSION`],
+          'namespace': constants[`${component}_NAMESPACE`] || '-'
+        };
+      });
     }
   },
   async created() {
     try {
       let {version} = await Cytomine.instance.ping();
-      this.version = version;
+      this.coreVersion = (version) ? version : null;
     }
     catch(error) {
       console.log(error);

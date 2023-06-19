@@ -1,6 +1,5 @@
 <template>
   <div class="annotations-list-wrapper">
-  <!--
     <div v-show="opened" class="annotations-list-opened">
       <button class="delete" @click="opened = false"></button>
 
@@ -42,7 +41,7 @@
 
           :all-terms="terms"
           :all-users="allUsers"
-          :all-images="[image]"
+          :all-images="images"
           :all-tracks="tracks"
 
           :multiple-terms="false"
@@ -51,7 +50,7 @@
           :no-track="noTrack"
 
           :images-ids="[image.id]"
-          :slices-ids="[slice.id]"
+          :slices-ids="sliceIds"
           :users-ids="layersIds"
           :terms-ids="termsOptionsIds"
           :tracks-ids="tracksIds"
@@ -63,25 +62,20 @@
 
           @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
           @updateProperties="$emit('updateProperties')"
-          @centerView="$emit('centerView', $event)"
+          @centerView="$emit('centerView', {annot: $event, sameView: isSameView($event)})"
           @delete="$emit('delete', $event)"
-          @select="select($event)"
+          @select="select"
         />
       </div>
     </div>
 
     <div v-show="!opened" class="opener" @click="opened = true">{{$t("annotations-list")}} <i class="fas fa-caret-up"></i></div>
-    -->
   </div>
 </template>
 
 <script>
 import {UserCollection, UserJobCollection} from 'cytomine-client';
 
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
@@ -96,14 +90,9 @@ export default {
     ListAnnotationsBy,
     OntologyTree,
     TrackTree,
-    CytomineTerm,
-    CytomineMultiselect,
-    CytomineSlider,
-    AnnotationPreview
   },
   props: [
     'index',
-    'view'
   ],
   data() {
     return {
@@ -134,11 +123,20 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
+    },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
 
     isDisplayedByTerm() {
@@ -258,19 +256,25 @@ export default {
         this.revision++;
       }
     },
-    async select(annot) {
-      if (annot.slice !== this.slice.id) {
-        await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
-          {time: annot.time, channel: annot.channel, zStack: annot.zStack});
-        this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
-      }
-      else {
-        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
-      }
-
-      this.$emit('centerView', annot);
+    isSameView(annot) {
+      return this.displayType === 'TERM' && this.sliceIds.includes(annot.slice);
     },
+    select({annot, options}) {
+      this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});
+    },
+    // async select(annot) {
+    //   if (annot.slice !== this.slice.id) {
+    //     //TODO
+    //     await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
+    //       {time: annot.time, channel: annot.channel, zStack: annot.zStack});
+    //     this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+    //     this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+    //     this.$emit('centerView', annot);
+    //   }
+    //   else {
+    //     this.$eventBus.$emit('selectAnnotation', {index: this.index, annot, center: true});
+    //   }
+    // },
 
     shortkeyHandler(key) {
       if (!this.isActiveImage) {

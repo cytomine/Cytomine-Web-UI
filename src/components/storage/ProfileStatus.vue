@@ -14,6 +14,14 @@
           <a class="button is-link" :href="profile.downloadURL">{{$t('button-download')}}</a>
           <button class="button is-danger" @click="confirmDeletion">{{$t('button-delete')}}</button>
       </div>
+      <div v-else-if="isAborted" class="buttons are-small">
+        <button class="button" @click="retryComputeProfile">{{$t('button-retry')}}</button>
+      </div>
+      <div v-else-if="isConverting" class="progress-bar">
+        <progress class="progress is-info" :value="profile.progress" max="100">
+          {{profile.progress}}%
+        </progress>
+      </div>
     </template>
   </div>
 </template>
@@ -43,6 +51,12 @@ export default {
     },
     isConverted() {
       return (this.profile) ? this.profile.status === UFStatus.CONVERTED : false;
+    },
+    isAborted() {
+      return (this.profile) ? [UFStatus.ERROR_CONVERSION, UFStatus.ERROR_DEPLOYMENT, UFStatus.ERROR_EXTRACTION].includes(this.profile.status) : false;
+    },
+    isConverting() {
+      return (this.profile) ? this.profile.status === UFStatus.CONVERTING : false;
     }
   },
   watch: {
@@ -52,7 +66,7 @@ export default {
   },
   methods: {
     confirmProfileComputation() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-profile-computation'),
         message: this.$t('confirm-profile-computation-message'),
         confirmText: this.$t('button-confirm'),
@@ -74,7 +88,7 @@ export default {
     },
 
     confirmDeletion() {
-      this.$dialog.confirm({
+      this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
         message: this.$t('confirm-deletion-file'),
         type: 'is-danger',
@@ -102,6 +116,11 @@ export default {
         console.log(error);
         this.error = true;
       }
+    },
+
+    async retryComputeProfile() {
+      await this.deleteFile();
+      await this.computeProfile();
     }
   },
   created() {
@@ -118,5 +137,11 @@ export default {
   .profile-status {
     display: flex;
     align-items: center;
+  }
+
+  .progress-bar {
+    width: 100%;
+    margin-left: 1em;
+    margin-right: 1em;
   }
 </style>
