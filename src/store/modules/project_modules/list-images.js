@@ -23,11 +23,11 @@ export default {
 
       filtersOpened: false,
       filters: {
-        formats: [],
-        vendors: [],
-        selectedTags: [],
-        magnifications: [],
-        resolutions: [],
+        formats: null,
+        vendors: null,
+        selectedTags: null,
+        magnifications: null,
+        resolutions: null,
         boundsWidth: null,
         boundsHeight: null,
         boundsUserAnnotations: null,
@@ -79,7 +79,11 @@ export default {
 
   getters: {
     nbActiveFilters: state => {
-      return Object.values(state.filters).filter(val => val && val.length > 0).length; // count the number of not null values
+      return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+    },
+
+    nbEmptyFilters: state => {
+      return Object.values(state.filters).filter(val => val && val.length === 0).length;
     }
   }
 };

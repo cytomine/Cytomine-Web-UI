@@ -27,6 +27,10 @@
         <td><strong>{{$t('name')}}</strong></td>
         <td><image-name :image="image" showBothNames /></td>
       </tr>
+      <tr v-if="hasGroup">
+        <td><strong>{{$t('image-group')}}</strong></td>
+        <td>{{imageGroupLink.groupName}}</td>
+      </tr>
       <tr>
         <td><strong>{{$t('width')}}</strong></td>
         <td>{{image.width}} {{$t("pixels")}}</td>
@@ -45,7 +49,10 @@
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
-        <td>{{$tc("count-bands", image.extrinsicChannels, {count: image.extrinsicChannels})}}</td>
+        <td>
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
+        </td>
       </tr>
       <tr>
         <td><strong>{{$t('resolution')}}</strong></td>
@@ -68,7 +75,7 @@
         <td v-else>{{$t('unknown')}}</td>
       </tr>
       <tr>
-        <td colspan="2" class="buttons-wrapper">
+        <td colspan="2" class="actions">
           <div class="buttons">
             <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
               {{$t('button-set-calibration')}}
@@ -90,6 +97,18 @@
             </button>
             <button class="button is-small" @click="nextImage()" :disabled="isLastImage">
               {{$t('button-next-image')}} <i class="fas fa-angle-right fa-lg"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr v-if="hasGroup">
+        <td colspan="2" class="buttons-wrapper">
+          <div class="buttons navigation has-addons">
+            <button class="button is-small" @click="previousImageInGroup()">
+              <i class="fas fa-angle-left fa-lg"></i> {{$t('button-previous-image-in-group')}}
+            </button>
+            <button class="button is-small" @click="nextImageInGroup()">
+              {{$t('button-next-image-in-group')}} <i class="fas fa-angle-right fa-lg"></i>
             </button>
           </div>
         </td>
@@ -142,8 +161,24 @@ export default {
     image() {
       return this.viewerWrapper.images[this.index].imageInstance;
     },
+    hasGroup() {
+      return this.viewerWrapper.images[this.index].imageGroupLink != null;
+    },
+    imageGroupLink() {
+      return this.viewerWrapper.images[this.index].imageGroupLink;
+    },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
+    },
+    canDownloadImages() {
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false
+      );
+    },
+    canManageProject() {
+      return this.$store.getters['currentProject/canManageProject'];
     },
     isActiveImage() {
       return this.viewerWrapper.activeImage === this.index;
@@ -167,7 +202,7 @@ export default {
         }
         else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
       catch(error) {
@@ -184,7 +219,47 @@ export default {
         }
         else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slice});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+      }
+    },
+    async previousImageInGroup() {
+      if (!this.hasGroup) {
+        return;
+      }
+
+      try {
+        let prev = await this.imageGroupLink.fetchPrevious();
+        if(!prev.id) {
+          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+        }
+        else {
+          let slice = await prev.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+      }
+    },
+    async nextImageInGroup() {
+      if (!this.hasGroup) {
+        return;
+      }
+
+      try {
+        let next = await this.imageGroupLink.fetchNext();
+        if(!next.id) {
+          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+        }
+        else {
+          let slice = await next.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
       catch(error) {
@@ -203,6 +278,12 @@ export default {
       }
       else if(key === 'nav-previous-image') {
         this.previousImage();
+      }
+      else if (key === 'nav-next-image-in-group') {
+        this.nextImageInGroup();
+      }
+      else if (key === 'nav-previous-image-in-group') {
+        this.previousImageInGroup();
       }
     }
   },
@@ -231,6 +312,10 @@ td:first-child {
 }
 
 .buttons-wrapper {
+  padding: 0;
+}
+
+.actions {
   padding-left: 0;
   padding-right: 0;
 }

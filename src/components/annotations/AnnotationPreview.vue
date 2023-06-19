@@ -82,6 +82,7 @@ export default {
     sameViewOnClick: {type: Boolean, default: false}
   },
   components: {
+    AnnotationDetails: () => import('./AnnotationDetails') // To resolve circular reference
   },
   data() {
     return {

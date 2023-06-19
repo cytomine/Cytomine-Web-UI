@@ -44,7 +44,7 @@ export default {
       if(this.task && this.task.comments && this.task.comments.length > 0) {
         return this.task.comments[0];
       }
-      return null;
+      return '';
     }
   },
   watch: {

@@ -85,7 +85,8 @@ export default {
   name: 'cytomine-table',
   props: {
     collection: Object,
-    perPageOptions: {type: Array, default: () => [10, 25, 50, 100]},
+    isEmpty: {type: Boolean, default: false},
+    perPageOptions: {type: Array, default: () => [5, 10, 25, 50, 100]},
     perPage: {type: Number, default: 25},
     currentPage: {type: Number, default: 1},
     detailed: {type: Boolean, default: true},
@@ -141,6 +142,9 @@ export default {
     internalPerPage(perPage) {
       this.$emit('update:perPage', perPage);
     },
+    total(total) {
+      this.$emit('setCollectionSize', total);
+    },
     revision() {
       this.fetchPage();
     },
@@ -167,7 +171,14 @@ export default {
       }
 
       try {
-        let data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
+        let data = {array: [], totalNbItems: 0};
+        if (this.isEmpty) {
+          this.internalCurrentPage = 1;
+        }
+        else {
+          data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
+        }
+
         this.data = data.array;
         this.total = data.totalNbItems;
 
@@ -177,7 +188,6 @@ export default {
         });
 
         this.$emit('update:checkedRows', this.internalCheckedRows);
-        this.$emit('update:data', data);
       }
       catch(error) {
         if(this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page

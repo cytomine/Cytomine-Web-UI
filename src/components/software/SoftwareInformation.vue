@@ -18,7 +18,7 @@
     <div class="content-wrapper" v-if="!loading">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-          <li><router-link :to="`/software`">{{$t('algorithms')}}</router-link></li>
+          <li><router-link :to="`/algorithm`">{{$t('algorithms')}}</router-link></li>
           <li class="is-active"><a href="#" aria-current="page">{{software.fullName}}</a></li>
         </ul>
       </nav>
@@ -147,7 +147,7 @@ export default {
     SoftwareDetails,
     SoftwareStatisticsChart,
     SoftwareParameterDetails,
-    CytomineDescription,
+    CytomineDescription
   },
   data() {
     return {

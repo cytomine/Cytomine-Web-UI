@@ -125,7 +125,6 @@ export default {
       this.modal = true;
     },
     addSource(source) {
-      console.log('addSource', source);
       this.formatSource(source);
       this.trustedSources.push(source);
     },
@@ -149,7 +148,6 @@ export default {
     },
     deleteSource(source) {
       try {
-        console.log('source', source);
         source.delete();
         this.trustedSources.splice(this.trustedSources.indexOf(source), 1);
         this.$notify({

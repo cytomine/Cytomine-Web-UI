@@ -136,6 +136,7 @@
 
       <cytomine-table
         :collection="projectCollection"
+        :is-empty="nbEmptyFilters > 0"
         class="table-projects"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
@@ -307,6 +308,9 @@ export default {
 
     nbActiveFilters() {
       return this.$store.getters['listProjects/nbActiveFilters'];
+    },
+    nbEmptyFilters() {
+      return this.$store.getters['listProjects/nbEmptyFilters'];
     },
 
     selectedOntologiesIds() {

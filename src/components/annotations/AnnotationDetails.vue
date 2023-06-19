@@ -25,6 +25,13 @@
         </td>
       </tr>
 
+      <tr v-if="showChannelInfo">
+        <td><strong>{{$t('channel')}}</strong></td>
+        <td>
+          <channel-name :channel="sliceChannel" />
+        </td>
+      </tr>
+
       <template v-if="isPropDisplayed('geometry-info')">
         <tr v-if="annotation.area > 0">
           <td><strong>{{$t('area')}}</strong></td>
@@ -36,9 +43,19 @@
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
 
-        <tr v-if="profile && isPoint && false">
-          <td><strong>{{$t('profile')}}</strong></td>
-          <td><button class="button is-small" @click="openProfileModal">{{$t('inspect-button')}}</button></td>
+        <tr v-if="profile">
+          <td>
+            <strong v-if="isPoint">{{$t('profile')}}</strong>
+            <strong v-else>{{$t('profile-projection')}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openRegularProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
+
+        <tr v-if="profile && !isPoint">
+          <td>
+            <strong>{{spatialProjection}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openSpatialProfileModal">{{$t('inspect-button')}}</button></td>
         </tr>
       </template>
 
@@ -149,6 +166,24 @@
         </td>
       </tr>
 
+      <template v-if="isPropDisplayed('linked-annotations')">
+        <tr>
+          <td colspan="2">
+            <h5>{{$t('linked-annotations')}}</h5>
+              <annotation-links-preview
+                  :size="linkCropSize"
+                  :link-color="linkColor"
+                  :show-main-annotation="false"
+                  :show-select-all-button="!showImageInfo"
+                  :allow-annotation-selection="true"
+                  :annotation="annotation"
+                  :images="images"
+                  @select="$emit('select', $event)"
+              />
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -235,11 +270,14 @@ import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ChannelName from '@/components/viewer/ChannelName';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'annotations-details',
   components: {
+    ChannelName,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -248,7 +286,8 @@ export default {
     CytomineProperties,
     AttachedFiles,
     TrackTree,
-    CytomineTrack
+    CytomineTrack,
+    AnnotationLinksPreview
   },
   props: {
     annotation: {type: Object},
@@ -256,8 +295,10 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    slices: {type: Array, default: () => []},
     profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
@@ -269,6 +310,8 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      linkCropSize: 64,
+      linkColor: '696969'
     };
   },
   computed: {
@@ -300,11 +343,14 @@ export default {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
     },
+    sliceChannel() {
+      return this.slices.find(slice => slice.id === this.annotation.slice) || {};
+    },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
     },
     profile() {
-      return this.profiles.find(profile => profile.image === this.image.baseImage) || {};
+      return this.profiles.find(profile => profile.image === this.image.baseImage);
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -345,6 +391,18 @@ export default {
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
+    },
+    spatialProjection() {
+      if (this.image.channels > 1) {
+        return this.$t('fluorescence-spectra');
+      }
+      else if (this.image.depth > 1) {
+        return this.$t('depth-spectra');
+      }
+      else if (this.image.duration > 1) {
+        return this.$t('temporal-spectra');
+      }
+      return  this.$t('spatial-projection');
     }
   },
   methods: {
@@ -459,11 +517,19 @@ export default {
       this.comments.unshift(comment);
     },
 
-    openProfileModal() {
-      this.$modal.open({
+    openSpatialProfileModal() {
+      this.openProfileModal(true);
+    },
+
+    openRegularProfileModal() {
+      this.openProfileModal(false);
+    },
+
+    openProfileModal(spatialAxis) {
+      this.$buefy.modal.open({
         parent: this,
         component: ProfileModal,
-        props: {annotation: this.annotation, image: this.image},
+        props: {annotation: this.annotation, image: this.image, spatialAxis},
         hasModalCard: true
       });
     },
@@ -487,7 +553,7 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    }
+    },
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {

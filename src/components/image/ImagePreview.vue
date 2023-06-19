@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import {changeImageUrlFormat, SUPPORT_WEBP} from '@/utils/image-utils';
-
+import {changeImageUrlFormat} from '@/utils/image-utils';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 
@@ -62,11 +61,8 @@ export default {
     rawPreviewUrl() {
       return this.image.thumb || this.image.imageThumb;
     },
-    imageFormat() {
-      return (SUPPORT_WEBP) ? 'webp' : 'jpg';
-    },
     previewUrl() {
-      return changeImageUrlFormat(this.rawPreviewUrl, this.imageFormat);
+      return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
       return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};

@@ -23,7 +23,7 @@
             <img :src="appendShortTermToken(thumbUrl, shortTermToken)" />
           </p>
         </div>
-        <div class="media-content">
+        <div class="media-content" >
           <p><strong>X: </strong> {{x}}</p>
           <p><strong>Y: </strong> {{y}}</p>
         </div>
@@ -42,6 +42,7 @@
               ref="chart"
           />
         </div>
+        <annotation-profile-projection-table v-else :annotation="annotation" :spatial-axis="spatialAxis" :image="image" />
       </template>
     </template>
   </cytomine-modal-card>
@@ -50,12 +51,14 @@
 <script>
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart';
+import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'profile-modal',
   components: {
+    AnnotationProfileProjectionTable,
     AnnotationProfileChart,
     CytomineModalCard
   },
