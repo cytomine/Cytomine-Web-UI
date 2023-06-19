@@ -233,6 +233,8 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showLink: true,
+        showImageGroup: true,
         kmeans: true
       }).fetchAll();
 

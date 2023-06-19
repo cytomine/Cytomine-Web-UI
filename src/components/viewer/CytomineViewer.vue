@@ -25,6 +25,7 @@
       v-for="(cell, i) in cells"
       :key="i"
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+      :class="{highlighted: cell && cell.highlighted}"
     >
       <cytomine-image
         v-if="cell && cell.image && cell.slices"
@@ -109,7 +110,8 @@ export default {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
         let slices = this.viewer.images[index].activeSlices;
-        cells[i] = {index, image, slices};
+        let highlighted = (this.viewer.images[index].view) ? this.viewer.images[index].view.highlighted : false;
+        cells[i] = {index, image, slices, highlighted};
       }
       return cells;
     },
@@ -120,8 +122,10 @@ export default {
       return 100/this.nbHorizontalCells;
     },
     shortkeysMapping() {
-      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t', 'nav-previous-t', 'nav-next-c',
-        'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t', 'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c',
+      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t',
+        'nav-previous-t', 'nav-next-c', 'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t',
+        'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c', 'nav-next-image-in-group',
+        'nav-previous-image-in-group', 'nav-next-annot-link', 'nav-previous-annot-link',
         'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
         'tool-freehand-polygon', 'tool-screenshot', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
         'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
@@ -194,37 +198,57 @@ export default {
       try {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
         if(!this.viewer) {
-          //TODO: rewrite !
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
-          await Promise.all(this.idImages.map(async (id, idx) => {
-            let image = await ImageInstance.fetch(id);
 
-            let idSlices = this.idSlices[idx];
+          // List of unique images (prevent to fetch it multiple times)
+          const uniqueIdImages = [...new Set(this.idImages)];
+          let uniqueImages = {};
+          await Promise.all(uniqueIdImages.map(async id => {
+            uniqueImages[id] = await ImageInstance.fetch(id);
+          }));
+
+          // Ensure images are in the right project
+          const nbWrongProjectImages = Object.values(uniqueImages).filter(image =>
+            image.project !== this.project.id
+          ).length;
+          if (nbWrongProjectImages > 0) {
+            this.errorBadImageProject = true;
+            throw new Error('Some images are not from this project');
+          }
+
+          // Register images in the viewer, in right order
+          let indexedImages = {};
+          this.idImages.map(id => {
+            indexedImages[this.viewer.indexNextImage] = uniqueImages[id];
+            this.$store.dispatch(this.viewerModule + 'registerImage');
+          });
+
+          // For each image, initialize them asynchronously, and fetch corresponding slices
+          await Promise.all(Object.entries(indexedImages).map(async ([index, image]) => {
+            const position = this.idImages.indexOf(String(image.id));
+            let idSlices = this.idSlices[position];
+
             let slices;
             if (idSlices) {
-              idSlices = idSlices.split(':');
+              idSlices = [...new Set(idSlices.split(':'))];
               slices = await Promise.all(idSlices.map(async id => await SliceInstance.fetch(id)));
+
+              // Ensure slices are in the right project/image
+              const z = slices[0].zStack;
+              const t = slices[0].time;
+              const nbWrongSlices = slices.filter(slice =>
+                slice.image !== image.id || slice.zStack !== z || slice.time !== t
+              ).length;
+              if (nbWrongSlices > 0) {
+                this.errorBadImageProject = true;
+                throw new Error('Some slices are not from this project or cannot be displayed together');
+              }
             }
             else {
               slices = [await image.fetchReferenceSlice()];
             }
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices});
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
           }));
-
-          let images = {};
-          //don't fetch multiple times the same image.
-          let idImages = [...new Set(this.idImages)];
-          await Promise.all(idImages.map(async id => {
-            let image = await ImageInstance.fetch(id);
-            images[id] = image;
-          }));
-          console.log('images', images);
-          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
-          console.log('imagesNotInCurrentProject', imagesNotInCurrentProject);
-          if (imagesNotInCurrentProject.length > 0) {
-            this.errorBadImageProject = true;
-            throw new Error('Some images are not from this project');
-          }
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
@@ -246,7 +270,7 @@ export default {
             SliceInstance.fetch(annot.slice)
           ]);
           this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
-          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slice});
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
         }
         else if (index === null) {
           annot = await Annotation.fetch(annot.id);
@@ -259,7 +283,7 @@ export default {
               ImageInstance.fetch(annot.image),
               SliceInstance.fetch(annot.slice)
             ]);
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice, annot});
+            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
           }
         }
       }
@@ -311,5 +335,9 @@ export default {
 
 .hidden {
   display: none;
+}
+
+.highlighted {
+  border: 6px solid #0099ff;
 }
 </style>

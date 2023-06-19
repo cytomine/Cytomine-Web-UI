@@ -90,7 +90,7 @@ export default {
 
       disabledBroadcast: false,
 
-      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll("http", "") + "/ws/user-position/",
+      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll('http', '') + '/ws/user-position/',
 
       userPostitionWebsock: null,
       wsConnected: false
@@ -269,7 +269,8 @@ export default {
         this.userPostitionWebsock.onopen = this.onOpen;
         this.userPostitionWebsock.onclose = this.onClose;
         this.userPostitionWebsock.onmessage = this.onMessage;
-      } catch (error) {
+      }
+      catch (error) {
         console.log('error', error);
       }
     },

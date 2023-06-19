@@ -29,7 +29,8 @@ export default {
       activeImage: 0,
       indexNextImage: 0,
 
-      copiedAnnot: null
+      copiedAnnot: null,
+      copiedAnnotImageInstance: null
     };
   },
 
@@ -44,12 +45,20 @@ export default {
       state.indexNextImage++;
     },
 
+    registerImage(state) {
+      state.indexNextImage++;
+    },
+
     setActiveImage(state, index) {
       state.activeImage = index;
     },
 
     setCopiedAnnot(state, annot) {
       state.copiedAnnot = annot;
+    },
+
+    setCopiedAnnotImageInstance(state, image) {
+      state.copiedAnnotImageInstance = image;
     },
 
     setLinkMode(state, mode) {
@@ -94,9 +103,15 @@ export default {
     changePath({getters}) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
       let action = router.currentRoute.query.action;
-      router.replace(getters.pathViewer({idAnnotation, action}));
+      // eslint-disable-next-line no-unused-vars
+      router.replace(getters.pathViewer({idAnnotation, action})).catch(_ => {});
     },
 
+    registerImage({state, commit, getters}) {
+      let index = state.indexNextImage;
+      commit('registerImage');
+      this.registerModule(getters.pathImageModule(index), imageModule);
+    },
     async addImage({state, commit, getters, dispatch}, {image, slices, annot=null}) {
       let index = state.indexNextImage;
       commit('addImage');
@@ -138,14 +153,29 @@ export default {
       let increments = refImage.view.center.map((val, i) => center[i] - val);
       let refZoom = refImage.imageInstance.zoom - refImage.view.zoom;
 
+      /* Update the center of the linked images */
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        let newCenter = center;
+        let image = state.images[idx];
+
+        /* Compute the translation needed for a rotated image */
+        let u = Math.cos(image.view.rotation) * increments[0] - Math.sin(image.view.rotation) * increments[1];
+        let v = Math.cos(image.view.rotation) * increments[1] + Math.sin(image.view.rotation) * increments[0];
+
+        /* Compute the new center of the linked image in absolute mode */
+        let newCenter = [
+          image.view.center[0] + u,
+          image.view.center[1] + v
+        ];
+
+        /* Compute the new center of the linked image in relative mode */
         if (relative) {
-          let image = state.images[idx];
           let diffZoom = image.imageInstance.zoom - image.view.zoom - refZoom;
           let zoomFactor = Math.pow(2, diffZoom);
-          newCenter = image.view.center.map((val, i) => val + increments[i]*zoomFactor);
+          newCenter = [
+            image.view.center[0] + u * zoomFactor,
+            image.view.center[1] + v * zoomFactor
+          ];
         }
         commit(`images/${idx}/setCenter`, newCenter);
       });
@@ -169,6 +199,10 @@ export default {
         let newRotation = (relative) ? (state.images[idx].view.rotation + rotationInc) % (2*Math.PI) : rotation;
         commit(`images/${idx}/setRotation`, newRotation);
       });
+    },
+
+    setScaleLineCollapsed({commit}, {index, collapsed}) {
+      commit(`images/${index}/setScaleLineCollapsed`, collapsed);
     },
 
     async refreshData({state, dispatch}) {
