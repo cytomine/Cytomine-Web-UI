@@ -28,6 +28,8 @@ export default Object.freeze({
   'viewer-nav-move-right': ['arrowright'], // Handled by Openlayers KeyboardPan
   'viewer-nav-next-image': ['shift', 'arrowright'],
   'viewer-nav-previous-image': ['shift', 'arrowleft'],
+  'viewer-nav-next-image-in-group': ['alt', 'shift', 'arrowright'],
+  'viewer-nav-previous-image-in-group': ['alt', 'shift', 'arrowleft'],
   'viewer-nav-next-t': ['pageup'],
   'viewer-nav-previous-t': ['pagedown'],
   'viewer-nav-first-t': ['home'],
@@ -44,6 +46,8 @@ export default Object.freeze({
   'viewer-nav-previous-slice': ['alt', 'shift', 'pagedown'],
   'viewer-nav-first-slice': ['alt', 'shift', 'home'],
   'viewer-nav-last-slice': ['alt', 'shift', 'end'],
+  'viewer-nav-next-annot-link': [shortkey, 'arrowright'],
+  'viewer-nav-previous-annot-link': [shortkey, 'arrowleft'],
   'viewer-nav-drag-rotate': ['alt', 'shift', 'drag'], // Handled by Openlayers
   'viewer-nav-drag-zoom': ['shift', 'drag'], // Handled by Openlayers
   'viewer-tool-select': ['s'],

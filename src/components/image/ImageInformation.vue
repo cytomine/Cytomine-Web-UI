@@ -32,7 +32,7 @@
             <span class="icon">
               <i class="fas fa-image"></i>
             </span>
-            <span class="is-align-content-baseline"></span>
+            <span class="is-align-content-baseline">
               {{ $t('open-in-viewer')}}
             </span>
           </span>
@@ -89,8 +89,8 @@ export default {
   // https://v3.router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.prevRoute = from
-    })
+      vm.prevRoute = from;
+    });
   },
   computed: {
     idImage() {

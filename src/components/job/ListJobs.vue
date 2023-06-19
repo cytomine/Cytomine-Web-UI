@@ -76,6 +76,15 @@
             </div>
           </div>
 
+          <div class="column">
+            <div class="filter-label">
+              {{$t('favorite')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedFavorites" :options="availableFavorites"
+                label="label" track-by="value" multiple />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -90,6 +99,13 @@
         :revision="revision"
       >
         <template #default="{row: job}">
+          <b-table-column field="favorite" :label="$t('fav')" sortable centered width="50">
+            <a @click="toggleFavorite(job)" v-if="canManageJob(job)">
+              <i class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+            </a>
+            <i v-else class="fas fa-star" :class="{disabled: !job.favorite}"></i>
+          </b-table-column>
+
           <b-table-column field="softwareName" :label="$t('algorithm')" sortable width="1000">
             <router-link :to="`/algorithm/${job.software}`">
               {{job.softwareName}}
@@ -249,7 +265,7 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
-    canEdit(job) {
+    canManageJob(job) {
       return this.$store.getters['currentProject/canManageJob'](job);
     },
     async fetchMultiselectOptions() {
@@ -263,7 +279,12 @@ export default {
       await this.fetchMultiselectOptions();
       this.revision++;
     },
-
+    async toggleFavorite(job) {
+      job.favorite = !job.favorite;
+      await job.setFavorite();
+      this.revision++;
+    },
+    // eslint-disable-next-line no-unused-vars
     async deleteJob(jobToDelete) {
       try {
         await jobToDelete.delete();

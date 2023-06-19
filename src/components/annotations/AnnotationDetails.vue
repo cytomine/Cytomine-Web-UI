@@ -42,6 +42,21 @@
           <td><strong>{{$t(annotation.area > 0 ? 'perimeter' : 'length')}}</strong></td>
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
+
+        <tr v-if="profile">
+          <td>
+            <strong v-if="isPoint">{{$t('profile')}}</strong>
+            <strong v-else>{{$t('profile-projection')}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openRegularProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
+
+        <tr v-if="profile && !isPoint">
+          <td>
+            <strong>{{spatialProjection}}</strong>
+          </td>
+          <td><button class="button is-small" @click="openSpatialProfileModal">{{$t('inspect-button')}}</button></td>
+        </tr>
       </template>
 
       <tr v-if="isPropDisplayed('description')">
@@ -157,6 +172,24 @@
         </td>
       </tr>
 
+      <template v-if="isPropDisplayed('linked-annotations')">
+        <tr>
+          <td colspan="2">
+            <h5>{{$t('linked-annotations')}}</h5>
+              <annotation-links-preview
+                  :size="linkCropSize"
+                  :link-color="linkColor"
+                  :show-main-annotation="false"
+                  :show-select-all-button="!showImageInfo"
+                  :allow-annotation-selection="true"
+                  :annotation="annotation"
+                  :images="images"
+                  @select="$emit('select', $event)"
+              />
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -260,6 +293,8 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import ProfileModal from '@/components/viewer/ProfileModal';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import {PropertyCollection} from 'cytomine-client';
@@ -276,9 +311,9 @@ export default {
     CytomineTags,
     CytomineProperties,
     AttachedFiles,
-    AnnotationCommentsModal,
     TrackTree,
-    CytomineTrack
+    CytomineTrack,
+    AnnotationLinksPreview
   },
   props: {
     annotation: {type: Object},
@@ -287,6 +322,7 @@ export default {
     users: {type: Array},
     images: {type: Array},
     slices: {type: Array, default: () => []},
+    profiles: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
     showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
@@ -300,6 +336,8 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      linkCropSize: 64,
+      linkColor: '696969',
       properties: [],
       loadPropertiesError: false
     };
@@ -341,6 +379,9 @@ export default {
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
+    },
+    profile() {
+      return this.profiles.find(profile => profile.image === this.image.baseImage);
     },
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
@@ -385,6 +426,18 @@ export default {
     internalUseFilteredProperties() {
       return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
     },
+    spatialProjection() {
+      if (this.image.channels > 1) {
+        return this.$t('fluorescence-spectra');
+      }
+      else if (this.image.depth > 1) {
+        return this.$t('depth-spectra');
+      }
+      else if (this.image.duration > 1) {
+        return this.$t('temporal-spectra');
+      }
+      return  this.$t('spatial-projection');
+    }
   },
   methods: {
     appendShortTermToken,
@@ -496,6 +549,23 @@ export default {
 
     addComment(comment) {
       this.comments.unshift(comment);
+    },
+
+    openSpatialProfileModal() {
+      this.openProfileModal(true);
+    },
+
+    openRegularProfileModal() {
+      this.openProfileModal(false);
+    },
+
+    openProfileModal(spatialAxis) {
+      this.$buefy.modal.open({
+        parent: this,
+        component: ProfileModal,
+        props: {annotation: this.annotation, image: this.image, spatialAxis},
+        hasModalCard: true
+      });
     },
 
     confirmDeletion() {

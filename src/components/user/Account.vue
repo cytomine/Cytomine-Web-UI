@@ -68,6 +68,13 @@
           </b-select>
         </b-field>
 
+        <b-field :label="$t('developer-mode')" horizontal>
+          <b-switch v-model="updatedUser.isDeveloper" class="switch">
+            <template v-if="updatedUser.isDeveloper">{{$t('yes')}}</template>
+            <template v-else>{{$t('no')}}</template>
+          </b-switch>
+        </b-field>
+
         <b-field grouped position="is-right">
           <div class="control">
             <button class="button is-link" :disabled="errors.any('profile')"> {{$t('button-save')}}</button>

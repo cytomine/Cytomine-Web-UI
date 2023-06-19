@@ -164,7 +164,9 @@
 
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
-    <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+    <scale-line v-show="scaleLineCollapsed" :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+
+    <toggle-scale-line :index="index" />
 
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
@@ -202,6 +204,7 @@ import ReviewPanel from './panels/ReviewPanel';
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
+import ToggleScaleLine from './interactions/ToggleScaleLine';
 
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
@@ -213,7 +216,7 @@ import WKT from 'ol/format/WKT';
 
 import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
 
@@ -245,7 +248,8 @@ export default {
 
     SelectInteraction,
     DrawInteraction,
-    ModifyInteraction
+    ModifyInteraction,
+    ToggleScaleLine
   },
   data() {
     return {
@@ -428,6 +432,9 @@ export default {
 
     overviewCollapsed() {
       return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
+    },
+    scaleLineCollapsed() {
+      return !this.imageWrapper.view.scaleLineCollapsed;
     },
 
     correction() {
@@ -754,8 +761,8 @@ export default {
 
     if (annot) {
       try {
-        if(annot.image === this.image.id) {
-          if(!this.sliceIds.includes(annot.slice)) {
+        if (annot.image === this.image.id) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
