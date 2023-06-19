@@ -86,7 +86,7 @@ LABEL org.opencontainers.image.authors='support@cytomine.com' \
       org.opencontainers.image.revision=${WEB_UI_REVISION} \
       org.opencontainers.image.deps.nginx.version=${NGINX_VERSION} \
       org.opencontainers.image.deps.node.version=${NODE_VERSION} \
-      org.opencontainers.image.deps.node.entrypoint.scripts.version=${ENTRYPOINT_SCRIPTS_VERSION}
+      org.opencontainers.image.deps.entrypoint.scripts.version=${ENTRYPOINT_SCRIPTS_VERSION}
 
 WORKDIR /app
 
