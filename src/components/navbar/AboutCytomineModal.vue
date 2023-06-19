@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
-  <template v-if="!loading">
+  <template>
     <dl>
       <dt>{{$t('version')}}</dt>
       <dd>{{version || '?'}}
@@ -106,15 +106,13 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
+      version: constants.CYTOMINE_COMMERCIAL_VERSION,
       coreVersion: null,
       loading: true,
       open: false,
     };
   },
   computed: {
-    version() {
-      return constants['CYTOMINE_VERSION'];
-    },
     constants() {
       return constants;
     },
