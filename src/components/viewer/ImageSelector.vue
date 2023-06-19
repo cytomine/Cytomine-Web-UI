@@ -24,6 +24,14 @@
           />
           <div class="filter">
             <div class="filter-label">
+              {{$t('tags')}}
+            </div>
+            <div class="filter-body">
+              <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+            </div>
+
+            <div class="filter-label">
               {{$t('image-groups')}}
             </div>
             <div class="filter-body">
@@ -88,21 +96,28 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get,syncMultiselectFilter} from '@/utils/store-helpers';
 import {IMAGE_FORMAT} from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import {ImageInstanceCollection, ImageGroupCollection} from 'cytomine-client';
+import {ImageGroupCollection, ImageInstanceCollection, TagCollection} from 'cytomine-client';
 import _ from 'lodash';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
+const storeOptions = {rootModuleProp: 'storeModule'};
+const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+
 export default {
   name: 'image-selector',
-  components: {ImageName, CytomineMultiselect},
+  components: {
+    ImageName,
+    CytomineMultiselect
+  },
   data() {
     return {
       images: [],
+      availableTags:[],
       imageGroups: [],
       searchString: '',
       selectedImageGroups: [],
@@ -115,6 +130,10 @@ export default {
   computed: {
     project: get('currentProject/project'),
     shortTermToken: get('currentUser/shortTermToken'),
+    selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
+    storeModule() {
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
+    },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -142,6 +161,14 @@ export default {
     },
     nbImagesDisplayed() {
       this.fetchImages();
+    },
+    async selectedTags(){
+      if (!this.selectedTags.length) {
+        this.images = [];
+      }
+      else {
+        await this.fetchImages();
+      }
     }
   },
   methods: {
@@ -178,6 +205,12 @@ export default {
           };
         }
 
+        if(this.selectedTags.length > 0) {
+          collection['tag'] = {
+            in: this.selectedTags.map(option => option.id).join()
+          };
+        }
+
         if (this.selectedImageGroups.length > 0 && this.selectedImageGroups.length !== this.availableImageGroups.length) {
           collection['imageGroup'] = {
             in: this.selectedImageGroups.map(option => option.id).join()
@@ -208,6 +241,9 @@ export default {
         filterValue: this.project.id
       })).array.filter(group => group.numberOfImages > 0);
     },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+    },
 
     more() {
       this.nbImagesDisplayed += 20;
@@ -232,7 +268,11 @@ export default {
   },
   async created() {
     this.loading = true;
-    await Promise.all([this.fetchImageGroups(), this.fetchImages(false)]);
+    await Promise.all([
+      this.fetchImageGroups(),
+      this.fetchImages(false),
+      this.fetchTags()
+    ]);
     this.selectedImageGroups = this.availableImageGroups.slice();
     this.loading = false;
   },
@@ -262,6 +302,7 @@ export default {
 .header {
   padding: 0.75em;
   padding-bottom: 0;
+  padding-top: 0;
   display: flex;
   justify-content: space-between;
 }
@@ -277,6 +318,27 @@ export default {
 
 .search-images {
   margin-right: 1em;
+}
+
+.search {
+  margin-top: 0.25em;
+}
+
+.filters {
+  display: flex;
+  padding: 0;
+  background: None;
+}
+
+.filter-label {
+  font-size: 0.9em;
+  margin-top: 0.7rem;
+  margin-left: 1em;
+  margin-right: 0.5em;
+}
+
+.delete {
+  margin-top: 1.2rem;
 }
 
 .image-selector {

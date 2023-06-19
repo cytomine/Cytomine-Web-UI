@@ -150,6 +150,9 @@ export default {
     isByTag() {
       return this.categorization === 'TAG';
     },
+    isUncategorized() {
+      return this.categorization === 'UNCATEGORIZED';
+    },
     filteredTermsIds() {
       return this.termsIds.filter(id => id > 0);
     },
@@ -179,7 +182,7 @@ export default {
         noTag: this.noTag,
 
         terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
-        users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
+        users: (!this.isByUser && this.usersIds /*[OP-1885] && this.usersIds.length < this.allUsers.length*/) ? this.usersIds : null,
         images: (!this.isByImage && ((this.tooManyImages && this.imagesIds.length > 0) || (!this.tooManyImages && this.imagesIds.length < this.allImages.length))) ? this.imagesIds : null,
         tracks: (!this.isByTrack && (this.noTrack || this.multipleTrack || this.filteredTracksIds.length < this.allTracks.length)) ? this.filteredTracksIds.filter(id => id > 0) : null,
         tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
@@ -221,6 +224,9 @@ export default {
       }
       else if (this.isByTag && this.noTag) {
         return this.$t('no-tag');
+      }
+      else if (this.isUncategorized) {
+        return this.$t('all-annotations-uncategorized');
       }
       else {
         return this.prop.name;
@@ -411,11 +417,14 @@ export default {
   color: grey;
 }
 
->>> ul.pagination-list {
+/**
+ * TODO: use :deep(.class) when moving to Vue3
+ */
+::v-deep ul.pagination-list {
   justify-content: flex-end;
 }
 
->>> .active .annot-preview {
+::v-deep .active .annot-preview {
   box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
   font-weight: 600;
 }

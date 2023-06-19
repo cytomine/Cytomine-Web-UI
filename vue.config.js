@@ -1,6 +1,6 @@
 module.exports = {
   devServer: {
-    host: 'localhost-core',
-    port: 8081,
-  },
-};
+    // domain whitelist for dev server
+    allowedHosts: ['.cytomine.local']
+  }
+}

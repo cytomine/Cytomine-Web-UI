@@ -40,7 +40,7 @@
         <td>{{image.height}} {{$t("pixels")}}</td>
       </tr>
       <tr v-if="image.depth > 1">
-        <td><strong>{{$t('image-depth')}}</strong>
+        <td><strong>{{$t('image-depth')}}</strong></td>
         <td>{{$tc("count-slices", image.depth, {count: image.depth})}}</td>
       </tr>
       <tr v-if="image.duration > 1">
