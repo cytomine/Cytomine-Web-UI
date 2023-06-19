@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
     >
       <template #default="{row: software}">
         <b-table-column field="name" :label="$t('name')" sortable width="100">
-          <router-link :to="`/software/${software.id}`">
+          <router-link :to="`/algorithm/${software.id}`">
             {{ software.fullName }}
           </router-link>
         </b-table-column>

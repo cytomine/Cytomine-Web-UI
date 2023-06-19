@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-username')}}
-      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
+      <a href="https://uliege.cytomine.org/" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="sendUsername">
@@ -38,7 +38,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('forgot-password')}}
-      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
+      <a href="https://uliege.cytomine.org/" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="resetPassword()">
@@ -60,7 +60,7 @@
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
       {{$t('login')}}
-      <a href="https://doc.cytomine.org" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
+      <a href="https://uliege.cytomine.org/" target="_blank"><img src="@/assets/logo.svg" id="logo" alt="Cytomine"></a>
     </p>
     <div class="panel-block">
       <form @submit.prevent="login()">

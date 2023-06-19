@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -116,10 +116,11 @@ export default {
       this.imageWrapper.properties.selectedPropertyValues;
       this.imageWrapper.properties.selectedPropertyColor;
       this.imageWrapper.review.reviewMode;
-      this.imageWrapper.style.wrappedTracks.forEach(track => {
-        track.color;
-      });
-
+      if (this.imageWrapper.style.wrappedTracks) {
+        this.imageWrapper.style.wrappedTracks.forEach(track => {
+          track.color;
+        });
+      }
       return () => {
         return this.$store.getters[this.imageModule + 'genStyleFunction'];
       };

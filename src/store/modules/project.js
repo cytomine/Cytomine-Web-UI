@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 */
 
 import listImages from './project_modules/list-images.js';
+import listImageGroups from './project_modules/list-image-groups.js';
 import listAnnotations from './project_modules/list-annotations.js';
 import listJobs from './project_modules/list-jobs.js';
 
@@ -40,6 +41,7 @@ export default {
       namespaced: true
     },
     listImages,
+    listImageGroups,
     listAnnotations,
     listJobs
   }

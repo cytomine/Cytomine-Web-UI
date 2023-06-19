@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ export default {
       categorization: null,
       perPage: 25,
       outlineColor: null,
+      regroup: null,
 
       annotationType: null,
       filters: {
@@ -34,10 +35,12 @@ export default {
         images: null,
         termsIds: null,
         tracksIds: null,
-        tags: null
+        tags: null,
+        imageGroups: null,
       },
       fromDate: null,
       toDate: null,
+
 
       currentPages: {} // mapping of type {idProp: currentPage}
     };
@@ -76,12 +79,17 @@ export default {
       state.toDate = date;
     },
 
+    setRegroup(state, regroup) {
+      state.regroup = regroup;
+    },
+
     resetPagesAndFilters(state) {
       for(let key in state.filters) {
         state.filters[key] = null;
       }
       state.fromDate = null;
       state.toDate = null;
+      state.regroup = false;
       state.currentPages = {};
     },
 

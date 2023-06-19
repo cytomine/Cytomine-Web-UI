@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,11 +20,17 @@
       <template v-if="isTabDisplayed('images')">
         <router-link tag="li" :to="`/project/${project.id}/images`">
           <a>
-            <i class="far fa-images"></i>
+            <i class="far fa-image"></i>
             {{ $t('images') }}
           </a>
         </router-link>
       </template>
+      <router-link v-if="isTabDisplayed('image-groups')" tag="li" :to="`/project/${project.id}/image-groups`">
+        <a>
+          <i class="far fa-images"></i>
+          {{ $t('image-groups') }}
+        </a>
+      </router-link>
       <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`">
         <a>
           <i class="far fa-edit"></i>

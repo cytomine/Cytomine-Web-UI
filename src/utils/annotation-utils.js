@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 
-import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection,
+  AnnotationCollection} from 'cytomine-client';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -58,16 +59,49 @@ export async function updateTrackProperties(annot) {
 }
 
 /**
+ * Fetch the annotation links and annotation group associated to the provided annot, and populate accordingly
+ *
+ * @param {Object} annot The annotation to update
+ */
+export async function updateAnnotationLinkProperties(annot) {
+  let annotLinks = (await AnnotationLinkCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id})).array;
+  annot.group = (annotLinks.length > 0) ? annotLinks[0].group : null;
+  annot.annotationLink = annotLinks.map(link => {
+    return {
+      id: link.id,
+      updated: link.updated,
+      annotation: link.annotationIdent,
+      image: link.image,
+      group: link.group
+    };
+  });
+}
+
+export async function listAnnotationsInGroup(project, group) {
+  let collection = new AnnotationCollection({
+    project: project,
+    group: group,
+    showWKT: true,
+    showTerm: true,
+    showGIS: true,
+    showTrack: true,
+    showLink: true,
+    showImageGroup: true
+  });
+  return (await collection.fetchAll()).array;
+}
+
+/**
  * Checks whether an annotation belongs to the provided layer and image
  *
  * @param {Object} annot The annotation
  * @param {Object} layer The layer
- * @param {Object} [slice] The slice
+ * @param {Array} [slices] The slice identifiers
  *
  * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
  */
-export function annotBelongsToLayer(annot, layer, slice=null) {
-  if(slice && annot.slice !== slice.id) {
+export function annotBelongsToLayer(annot, layer, slices=null) {
+  if(slices && !slices.includes(annot.slice)) {
     return false;
   }
   let isReviewed = annot.type === AnnotationType.REVIEWED;

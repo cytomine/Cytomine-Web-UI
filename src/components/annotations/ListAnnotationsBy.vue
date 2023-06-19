@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2020. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -29,26 +29,38 @@
       <em class="no-result">{{ $t('no-annotation') }}</em>
     </template>
     <template v-else>
-      <annotation-preview
-        v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
-        :class="{active: isInViewer && annot.slice === imageWrapper.activeSlice.id}"
-        :annot="annot"
-        :size="size"
-        :color="color"
-        :terms="allTerms"
-        :users="allUsers"
-        :images="allImages"
-        :tracks="allTracks"
-        :show-image-info="!isInViewer"
-        :show-slice-info="isByTrack && !noTrack"
-        @addTerm="$emit('addTerm', $event)"
-        @addTrack="$emit('addTrack', $event)"
-        @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
-        @updateProperties="$emit('updateProperties')"
-        @centerView="$emit('centerView', annot)"
-        @deletion="$emit('delete', annot)"
-        @selectAnnotation="$emit('select', annot)"
-      />
+      <template v-for="(annot, index) in annotations">
+        <div class="break"
+             v-if="regroupPerLine && annotationInGroupDetails[index].first"
+             :key="((isInViewer) ? index : '') + title + annot.id + 'break-in'"
+        ></div>
+        <annotation-preview
+            :key="((isInViewer) ? index : '') + title + annot.id"
+            :class="annotStyles(annot, index)"
+            class="annot-preview-block"
+            :annot="annot"
+            :size="size"
+            :color="color"
+            :terms="allTerms"
+            :users="allUsers"
+            :images="allImages"
+            :tracks="allTracks"
+            :show-image-info="!isInViewer"
+            :show-slice-info="isByTrack && !noTrack"
+            @addTerm="$emit('addTerm', $event)"
+            @addTrack="$emit('addTrack', $event)"
+            @updateTermsOrTracks="$emit('updateTermsOrTracks', annot)"
+            @updateProperties="$emit('updateProperties')"
+            @centerView="$emit('centerView', annot)"
+            @deletion="$emit('delete', annot)"
+            @select="$emit('select', $event)"
+        />
+        <div class="break"
+             v-if="regroupPerLine && annotationInGroupDetails[index].last"
+             :key="((isInViewer) ? index : '') + title + annot.id + 'break-out'"
+        ></div>
+      </template>
+
 
       <b-pagination
         :total="nbAnnotations"
@@ -69,6 +81,7 @@ import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 import constants from '@/utils/constants';
+import _ from 'lodash';
 
 export default {
   name: 'list-annotations-by',
@@ -77,6 +90,7 @@ export default {
     nbPerPage: Number,
     size: Number,
     color: String,
+    bundling: {type: String, default: 'NO'},
 
     prop: Object,
 
@@ -175,6 +189,8 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showLink: true,
+        showImageGroup: true,
         showWKT: this.isInViewer,
         showImage: this.tooManyImages,
         showSlice: true,
@@ -262,8 +278,39 @@ export default {
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
     },
-    activeSlice() {
-      return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
+    activeSlices() {
+      return (this.imageWrapper) ? this.imageWrapper.activeSlices : null;
+    },
+    activeSlicesIds() {
+      return (this.activeSlices) ? this.activeSlices.map(slice => slice.id) : [];
+    },
+    activeSliceWithSmallestRank() {
+      return (this.activeSlices) ? _.orderBy(this.activeSlices, ['rank'])[0] : null;
+    },
+
+    annotationIds() {
+      return this.annotations.map(annot => annot.id);
+    },
+
+    regroup() {
+      return this.bundling !== 'NO';
+    },
+    regroupPerLine() {
+      return this.bundling === 'ONE_PER_LINE';
+    },
+
+    annotationInGroupDetails() {
+      return this.annotations.map((annotation, index) => {
+        let previousGroup = (index > 0) ? this.annotations[index - 1].group : null;
+        let nextGroup = (index < this.annotations.length - 1) ? this.annotations[index + 1].group : null;
+        let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
+        return {
+          first: annotation.group !== null && annotation.group !== previousGroup,
+          last: annotation.group !== null && annotation.group !== nextGroup,
+          in: annotation.group !== null,
+          complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
+        };
+      });
     }
   },
   watch: {
@@ -283,11 +330,21 @@ export default {
         this.fetchPage();
       }
     },
-    activeSlice() {
+    activeSlices() {
       this.findPage();
     }
   },
   methods: {
+    annotStyles(annot, index) {
+      let groupDetails = this.annotationInGroupDetails[index];
+      return {
+        'active': this.isInViewer && this.activeSlicesIds.includes(annot.slice),
+        'group-first': this.regroup && groupDetails.first,
+        'group-last': this.regroup && groupDetails.last,
+        'group-in': this.regroup && groupDetails.in && !groupDetails.first && !groupDetails.last,
+        'group-complete': this.regroup && groupDetails.in && groupDetails.complete
+      };
+    },
     async initialize() {
       await this.findPage();
       await this.fetchPage(true);
@@ -295,7 +352,7 @@ export default {
     async findPage() {
       if (this.isInViewer) {
         let countCollection = this.collection.clone();
-        countCollection.beforeSlice = this.activeSlice.id;
+        countCollection.beforeSlice = this.activeSliceWithSmallestRank;
         countCollection.max = 1;
         this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
       }
@@ -361,5 +418,70 @@ export default {
 >>> .active .annot-preview {
   box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
   font-weight: 600;
+}
+
+.annot-preview-block {
+  margin: 4px;
+  padding: 6px;
+}
+
+>>> .annot-preview {
+  margin: 0;
+  padding: 0;
+}
+
+>>> .group-first, .group-in, .group-last {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  border-top: 2px dashed rgb(100,100,100);
+  border-bottom: 2px dashed rgb(100,100,100);
+}
+
+>>> .group-first.group-complete, .group-in.group-complete, .group-last.group-complete {
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+>>> .group-first {
+  padding-left: 4px !important;
+  border-left: 2px dashed rgb(100,100,100);
+  margin-right: 0 !important;
+  padding-right: 10px !important;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+>>> .group-first.group-complete {
+  border-left-style: solid;
+}
+
+>>> .group-last {
+  padding-right: 4px !important;
+  border-right: 2px dashed rgb(100,100,100);
+  margin-left: 0 !important;
+  padding-left: 10px !important;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+>>> .group-last.group-complete {
+  border-right-style: solid;
+}
+
+>>> .group-first.group-last {
+  margin: 4px !important;
+  padding: 4px !important;
+}
+
+>>> .group-in {
+  margin-left: 0 !important;
+  padding-left: 10px !important;
+  margin-right: 0 !important;
+  padding-right: 10px !important;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 </style>

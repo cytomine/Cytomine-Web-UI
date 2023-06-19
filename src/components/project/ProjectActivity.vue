@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -97,6 +97,7 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       if(!this.canManageProject) { // contributor can only view charts tab
         return ProjectActivityCharts;

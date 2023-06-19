@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -158,8 +158,10 @@ const methods = {
 const watch = {
   urls() {
     //source: https://github.com/openlayers/openlayers/blob/v5.3.0/src/ol/source/UrlTile.js#L194
-    const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
-    this.$source.setTileUrlFunction(tileUrlFunction, this.urls.join('\n'));
+    if (this.$source) {
+      const tileUrlFunction = createFromTileUrlFunctions(this.urls.map(this.createFromTemplate(this.$source)));
+      this.$source.setTileUrlFunction(tileUrlFunction, this.urls.join('\n'));
+    }
   },
 };
 

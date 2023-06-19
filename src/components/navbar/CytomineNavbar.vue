@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,7 +24,11 @@
   </div>
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
-      <navbar-dropdown icon="fa-folder-open" v-if="this.nbActiveProjects > 0" :title="$t('workspace')">
+      <navbar-dropdown
+      icon="fa-folder-open"
+      v-if="this.nbActiveProjects > 0"
+      :title="$t('workspace')"
+      :listPathes="['/project/']">
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">
@@ -39,7 +43,7 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
-      <router-link to="/software" class="navbar-item">
+      <router-link to="/algorithm" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
@@ -94,6 +98,7 @@
       </navbar-dropdown>
     </div>
   </div>
+  <div class="hidden" v-shortkey.once="openHotkeysModalShortcut" @shortkey="openHotkeysModal"></div>
 </nav>
 </template>
 
@@ -109,6 +114,7 @@ import CytomineSearcher from '@/components/search/CytomineSearcher';
 
 import {Cytomine} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
+import shortcuts from '@/utils/shortcuts.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -121,8 +127,8 @@ export default {
   data() {
     return {
       openedTopMenu: false,
-      hotkeysModal: false,
-      aboutModal: false
+      hotkeysModal: null,
+      aboutModal: null
     };
   },
   computed: {
@@ -132,6 +138,9 @@ export default {
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
+    },
+    openHotkeysModalShortcut() {
+      return shortcuts['general-shortcuts-modal'];
     }
   },
   watch: {
@@ -142,11 +151,14 @@ export default {
   methods: {
     // required to use programmatic modal for correct display in IE11
     openHotkeysModal() {
-      this.$buefy.modal.open({
-        parent: this,
-        component: HotkeysModal,
-        hasModalCard: true
-      });
+      if (!this.hotkeysModal) {
+        this.hotkeysModal = this.$buefy.modal.open({
+          parent: this,
+          component: HotkeysModal,
+          hasModalCard: true,
+          onCancel: () => this.hotkeysModal = null,
+        });
+      }
     },
     openAboutModal() {
       this.$buefy.modal.open({

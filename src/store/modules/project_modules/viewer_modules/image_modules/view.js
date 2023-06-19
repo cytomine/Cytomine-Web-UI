@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2021. Authors: see NOTICE file.
+* Copyright (c) 2009-2022. Authors: see NOTICE file.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ export default {
       center: [0, 0],
       rotation: 0,
       digitalZoom: true,
-      overviewCollapsed: false
+      overviewCollapsed: false,
+      highlighted: false,
+      scaleLineCollapsed: false,
     };
   },
 
@@ -44,6 +46,14 @@ export default {
 
     setOverviewCollapsed(state, value) {
       state.overviewCollapsed = value;
+    },
+
+    setScaleLineCollapsed(state, value) {
+      state.scaleLineCollapsed = value;
+    },
+
+    setHighlighted(state, value) {
+      state.highlighted = value;
     }
   },
 

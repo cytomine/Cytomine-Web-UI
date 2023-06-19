@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,8 +14,13 @@
 
 <template>
 <div class="image-details-wrapper">
-  <table class="table">
-    <tbody>
+  <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+    <h2> {{ $t('error') }} </h2>
+    <p> {{ $t('unexpected-error-info-message') }} </p>
+  </b-message>
+  <table v-else class="table">
+    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <tbody v-if="!loading">
       <tr v-if="isPropDisplayed('overview')">
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
@@ -183,7 +188,8 @@
       <tr v-if="isPropDisplayed('channels')">
         <td class="prop-label">{{$t("image-channels")}}</td>
         <td class="prop-content" colspan="3">
-          {{$tc("count-bands", image.channels, {count: image.channels})}}
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
         </td>
       </tr>
       <tr v-if="isPropDisplayed('size')">
@@ -206,8 +212,16 @@
             <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
-            <template v-if="canEdit">
+            <template v-if="canAddToImageGroup">
+              <button class="button" v-if="!isInImageGroup" @click="isAddToImageGroupModalActive = true">
+                {{$t('button-add-to-image-group')}}
+              </button>
+              <button class="button" v-else @click="confirmImageGroupLinkDeletion()">
+                {{$t('button-remove-from-image-group')}}
+              </button>
+            </template>
 
+            <template v-if="canEdit">
               <router-link
                 v-if="!image.reviewed && !image.inReview"
                 :to="`/project/${image.project}/image/${image.id}?action=review`"
@@ -277,6 +291,12 @@
     :active.sync="isMetadataModalActive"
     :image="image"
   />
+
+  <simple-add-to-image-group-modal
+    :active.sync="isAddToImageGroupModalActive"
+    :image="image"
+    @addToImageGroup="(event) => imageGroupLinks.push(event)"
+  />
 </div>
 </template>
 
@@ -292,18 +312,20 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
+import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
-import vendorFromMime from '@/utils/vendor';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
   components: {
+    SimpleAddToImageGroupModal,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -325,17 +347,26 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      isAddToImageGroupModalActive: false,
+      loading: true,
+      error: false,
+      imageGroupLinks: []
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
     shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
-      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+      return ((this.project || {}).blindMode) || false;
     },
     canDownloadImages() {
-      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.project || {}).areImagesDownloadable) || false
+      );
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
@@ -343,17 +374,23 @@ export default {
     canEdit() {
       return this.editable && this.$store.getters['currentProject/canEditImage'](this.image);
     },
+    canAddToImageGroup() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromMime(this.image.mime);
-    }
+      return vendorFromFormat(this.image.contentType);
+    },
+    isInImageGroup() {
+      return this.imageGroupLinks.length > 0;
+    },
   },
   methods: {
     appendShortTermToken,
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop) && this.configUI[`project-explore-image-${prop}`];
+      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
     downoload(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');
@@ -408,7 +445,7 @@ export default {
         });
         this.$emit('delete');
 
-        let updatedProject = this.$store.state.currentProject.project.clone();
+        let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
@@ -420,10 +457,54 @@ export default {
         });
       }
     },
+    confirmImageGroupLinkDeletion() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-image-group-link'),
+        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif}),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: this.deleteImageGroupLink
+      });
+    },
+    async deleteImageGroupLink() {
+      try {
+        // currently, we limit an image instance to be associated to 1 group.
+        await this.imageGroupLinks[0].delete();
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif})
+        });
+        this.imageGroupLinks.splice(0, 1);
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif})
+        });
+      }
+    },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    async fetchImageGroupLinks() {
+      this.imageGroupLinks = (await ImageGroupImageInstanceCollection.fetchAll({
+        filterKey: 'imageinstance',
+        filterValue: this.image.id
+      })).array;
     }
   },
+  async created() {
+    try {
+      await this.fetchImageGroupLinks();
+    }
+    catch(error) {
+      console.log(error);
+      this.error = true;
+    }
+    this.loading = false;
+  }
 };
 </script>
 
@@ -456,7 +537,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-.image-overview {
+>>> .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }

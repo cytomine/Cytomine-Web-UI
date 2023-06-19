@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2009-2021. Authors: see NOTICE file.
+<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import WKT from 'ol/format/WKT';
 
 import {Annotation, AnnotationType} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
+import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
 export default {
   name: 'draw-interaction',
@@ -70,8 +71,12 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    imageGroupId() {
+      return this.$store.getters[this.imageModule + 'imageGroupId'];
+    },
     slice() {
-      return this.imageWrapper.activeSlice;
+      // Cannot draw on multiple slices at same time
+      return (this.imageWrapper.activeSlices) ? this.imageWrapper.activeSlices[0] : null;
     },
     activeTool() {
       return this.imageWrapper.draw.activeTool;
@@ -96,6 +101,8 @@ export default {
         case 'freehand-polygon':
         case 'select': // correct mode
           return 'Polygon';
+        default:
+          return ''; // Should not happen
       }
     },
     drawCorrection() {
@@ -185,6 +192,8 @@ export default {
         try {
           await annot.save();
           annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
+          annot.imageGroup = this.imageGroupId;
+          updateAnnotationLinkProperties(annot);
           this.$eventBus.$emit('addAnnotation', annot);
           if(idx === this.nbActiveLayers - 1) {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
@@ -216,8 +225,12 @@ export default {
           correctedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
           correctedAnnot.track = annot.track;
           correctedAnnot.annotationTrack = annot.annotationTrack;
+          correctedAnnot.group = annot.group;
+          correctedAnnot.annotationLink = annot.annotationLink;
+          correctedAnnot.imageGroup = annot.imageGroup;
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
+          this.$eventBus.$emit('reloadAnnotationCrop', annot);
         }
       }
       catch(err) {
