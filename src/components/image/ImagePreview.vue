@@ -65,7 +65,7 @@ export default {
       return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
-      return {backgroundImage: `url("${appendShortTermToken((this.image.thumb || this.image.imageThumb), this.shortTermToken)}")`};
+      return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};
     }
   }
 };

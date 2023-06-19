@@ -177,8 +177,8 @@
         :openedDetailed.sync="openedDetails"
       >
         <template #default="{row: uFile}">
-          <b-table-column :label="$t('preview')" width="80">
-            <img v-if="uFile.thumbURL" :src="appendShortTermToken(uFile.thumbURL, shortTermToken)" alt="-" class="image-overview">
+          <b-table-column :label="$t('preview')" width="80" class="image-overview">
+            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
             <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
           </b-table-column>
 
@@ -233,11 +233,12 @@ import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 export default {
   name: 'cytomine-storage',
   components: {
+    ImageThumbnail,
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails,
@@ -338,7 +339,6 @@ export default {
     }
   },
   methods: {
-    appendShortTermToken,
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
@@ -489,12 +489,7 @@ export default {
         }
       }
     },
-    updatedTree() {
-      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
-    },
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500),
+
     hideFinished() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
@@ -507,7 +502,15 @@ export default {
           idx++;
         }
       }
-    }
+    },
+
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
+
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500)
   },
   activated() {
     this.fetchStorages();

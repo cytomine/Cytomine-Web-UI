@@ -359,6 +359,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
       revision: 0,
@@ -654,6 +655,9 @@ export default {
         imagesIds = this.selectedImageGroups.map(ig => this.imagesIdsInGroup(ig)).flat();
       }
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
+      console.log('users', users);
+      console.log('this.selectedUsersIds', this.selectedUsersIds);
+
       let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
@@ -775,7 +779,8 @@ export default {
     }
   },
   async created() {
-    this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
+    this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
+    if(this.algoEnabled) this.annotationTypes.splice(1, 0, this.jobAnnotationOption);
 
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {

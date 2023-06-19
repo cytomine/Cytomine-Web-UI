@@ -110,7 +110,13 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.communicationError = true;
+        if (error.toString().indexOf('401')!==-1) {
+          this.communicationError = false;
+          Cytomine.instance.logout();
+        }
+        else {
+          this.communicationError = true;
+        }
       }
 
       clearTimeout(this.timeout);

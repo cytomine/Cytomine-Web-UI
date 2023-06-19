@@ -53,7 +53,7 @@
           <a
             class="card-image"
             @click="addImage(image)"
-            :style="'background-image: url(' + imageThumbUrl(image) + ')'"
+            :style="'background-image: url(' + appendShortTermToken(imageThumbUrl(image), shortTermToken) + ')'"
           ></a>
           <div class="card-content">
             <div class="content">
@@ -91,10 +91,11 @@
 import {get} from '@/utils/store-helpers';
 import {IMAGE_FORMAT} from '@/utils/image-utils';
 
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import ImageName from '@/components/image/ImageName';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ImageGroupCollection} from 'cytomine-client';
 import _ from 'lodash';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'image-selector',
@@ -113,6 +114,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -143,6 +145,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
     }, 500),

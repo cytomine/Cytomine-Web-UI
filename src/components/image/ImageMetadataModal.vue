@@ -21,7 +21,7 @@
   <template v-else>
     <template v-if="image && image.macroURL">
       <p :style="styleImagePreview" class="image-preview">
-        <img :class="'rotate-' + rotationAngle" :src="appendShortTermToken(image.macroURL, shortTermToken)" ref="image">
+        <img :class="'rotate-' + rotationAngle" :src="appendShortTermToken(image.associatedImageURL('macro', 256, 'jpg'), shortTermToken)" ref="image">
       </p>
       <div class="buttons is-centered are-small">
         <button class="button" @click="rotate(-90)"><i class="fas fa-undo"></i></button>
@@ -105,7 +105,7 @@ export default {
   },
   async created() {
     try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
       this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }

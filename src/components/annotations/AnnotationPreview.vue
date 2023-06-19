@@ -53,7 +53,7 @@
       @updateProperties="$emit('updateProperties')"
       @select="$emit('select', $event)"
       @centerView="$emit('centerView')"
-      @deletion="handleDeletion"
+      @deletion="$emit('deletion')"
       v-if="opened"
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
@@ -92,7 +92,6 @@ export default {
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),
-
     cropParameters() {
       let params = {
         square: true,
@@ -118,11 +117,10 @@ export default {
       return this.annot.annotationCropURL(this.size, 'jpg', this.cropParameters);
     },
     styleAnnotDetails() {
-      let outlineParams = this.color ? '&draw=true&color=0x' + this.color : '';
-      let url = appendShortTermToken(`${this.annot.url}?maxSize=${this.size}&square=true&complete=false&thickness=2&increaseArea=1.25${outlineParams}`, this.shortTermToken);
+      let url = appendShortTermToken(`${this.cropUrl}`, this.shortTermToken);
       console.log('url', url);
       return {
-        backgroundImage: `url("${url}")`,
+        backgroundImage: `url(${url})`,
         backgroundRepeat: 'no-repeat',
         width: this.size + 'px',
         height: this.size + 'px'
@@ -154,10 +152,6 @@ export default {
       }
 
       this.opened = false;
-    },
-    handleDeletion() {
-      this.$eventBus.$emit('deleteAnnotation', this.annot);
-      this.$emit('update');
     },
     reloadAnnotationCropHandler(annot) {
       if (annot.id === this.annot.id) {

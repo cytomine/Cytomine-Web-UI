@@ -119,7 +119,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+            <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=algo`">
                 {{ project.numberOfJobAnnotations }}
               </router-link>
@@ -185,7 +185,7 @@
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <img :src="appendShortTermToken(image.thumb, shortTermToken)" class="image-overview">
+                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 
@@ -224,7 +224,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
+            <b-table-column  v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
               <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
                 {{ image.numberOfJobAnnotations }}
               </router-link>
@@ -272,11 +272,13 @@ import ImageDetails from '@/components/image/ImageDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 import {appendShortTermToken} from '@/utils/token-utils.js';
-
+import constants from '@/utils/constants.js';
 export default {
   name: 'advanced-search',
   components: {
+    ImageThumbnail,
     IconProjectMemberRole,
     ImageName,
     CytomineTable,
@@ -295,6 +297,7 @@ export default {
       availableTags:[],
       revision: 0,
 
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       excludedProperties: [
         'name',
         'imagesPreview',
@@ -410,6 +413,7 @@ export default {
       console.log(error);
       this.error = true;
     }
+    if(!this.algoEnabled) this.excludedProperties.push('numberOfJobAnnotations');
     if(this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
       if(queriedTags) {
@@ -445,5 +449,4 @@ export default {
   max-height: 4rem;
   max-width: 10rem;
 }
-
 </style>

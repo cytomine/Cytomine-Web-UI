@@ -19,7 +19,9 @@ import {Cytomine, User} from 'cytomine-client';
 function getDefaultState() {
   return {
     user: null,
-    expandedSidebar: true
+    expandedSidebar: true,
+    increment: 0,
+    shortTermToken: null
   };
 }
 
