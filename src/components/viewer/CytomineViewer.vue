@@ -73,6 +73,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    currentUser: get('currentUser/user'),
     viewers() {
       return this.$store.state.projects[this.project.id].viewers;
     },
