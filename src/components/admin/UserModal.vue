@@ -63,7 +63,7 @@
     <b-field horizontal v-if="isChangingRoleToAdmin()">
       <b-message type="is-warning" has-icon size="is-small">
         <b-checkbox v-model="adminConfirm">
-          {{$t('public-warning')}}
+          {{$t('admin-warning')}}
         </b-checkbox>
       </b-message>
     </b-field>
