@@ -232,7 +232,7 @@
     </a>
 
     <div class="level">
-      <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
+      <a @click="openCrop(annotation)" class="level-item button is-small">
         {{ $t('button-view-crop') }}
       </a>
 
@@ -272,6 +272,7 @@ import AnnotationCommentsModal from './AnnotationCommentsModal';
 import ProfileModal from '@/components/viewer/ProfileModal';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 import ChannelName from '@/components/viewer/ChannelName';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'annotations-details',
@@ -317,6 +318,7 @@ export default {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
@@ -404,10 +406,13 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
-
+    openCrop(annotation) {
+      window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
+    },
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});

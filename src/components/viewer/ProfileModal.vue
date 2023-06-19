@@ -20,7 +20,7 @@
       <div class="media" v-if="isPoint">
         <div class="media-left">
           <p class="image is-64x64">
-            <img :src="thumbUrl" />
+            <img :src="appendShortTermToken(thumbUrl, shortTermToken)" />
           </p>
         </div>
         <div class="media-content" >
@@ -52,6 +52,8 @@
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart';
 import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'profile-modal',
@@ -74,6 +76,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     x() {
       return Math.round(this.annotation.centroid.x);
     },
@@ -115,6 +118,7 @@ export default {
     }
   },
   methods: {
+    appendShortTermToken,
     resetZoom() {
       this.$refs.chart.resetZoom();
     }

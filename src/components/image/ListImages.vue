@@ -170,7 +170,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
+              <img :src="appendShortTermToken(image.thumbURL(256),shortTermToken)" class="image-overview">
             </router-link>
           </b-table-column>
 
@@ -250,18 +250,17 @@ import AddImageModal from './AddImageModal';
 import vendorFromFormat from '@/utils/vendor';
 
 import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'list-images',
   components: {
-    ImageThumbnail,
     ImageName,
     ImageDetails,
     CytomineTable,
@@ -301,6 +300,7 @@ export default {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -398,6 +398,7 @@ export default {
     openedDetails: sync('openedDetails', storeOptions)
   },
   methods: {
+    appendShortTermToken,
     async fetchFilters() {
       let stats = await new ImageInstanceCollection.fetchBounds({project: this.project.id});
       this.maxWidth = Math.max(100, stats.width.max);
@@ -427,12 +428,12 @@ export default {
           label: m || this.$t('unknown')
         };
       });
-      this.availableResolutions = stats.resolution.list.map(resolution => {
-        return {
-          value: resolution || 'null',
-          label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
-        };
-      });
+      // this.availableResolutions = stats.resolution.list.map(resolution => {
+      //   return {
+      //     value: resolution || 'null',
+      //     label: resolution ? `${resolution.toFixed(3)} ${this.$t('um-per-pixel')}` : this.$t('unknown')
+      //   };
+      // });
     },
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];

@@ -185,7 +185,7 @@
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" />
+                <img :src="appendShortTermToken(image.thumb, shortTermToken)" class="image-overview">
               </router-link>
             </b-table-column>
 
@@ -263,6 +263,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName';
 import CytomineTable from '@/components/utils/CytomineTable';
@@ -271,12 +272,11 @@ import ImageDetails from '@/components/image/ImageDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {
   name: 'advanced-search',
   components: {
-    ImageThumbnail,
     IconProjectMemberRole,
     ImageName,
     CytomineTable,
@@ -303,12 +303,17 @@ export default {
     };
   },
   methods: {
+    appendShortTermToken,
+    debounceSearchString: _.debounce(async function(value) {
+      this.searchString = value;
+    }, 500),
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     }
   },
   computed: {
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
 
     activeTab: sync('advancedSearch/activeTab'),
     currentPage: sync('advancedSearch/currentPage'),

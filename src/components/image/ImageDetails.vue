@@ -25,7 +25,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`"/>
+            <img :src="appendShortTermToken(image.thumb, shortTermToken)" class="image-overview">
           </router-link>
         </td>
       </tr>
@@ -91,7 +91,7 @@
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
           <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`"/>
+            <img :src="appendShortTermToken(image.macroURL, this.shortTermToken)" class="image-overview">
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
@@ -254,7 +254,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" v-if="canDownloadImages" :href="image.downloadURL">
+            <a class="button" v-if="canDownloadImages || canManageProject" @click="download(image)">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -313,17 +313,18 @@ import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
 import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
+
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
 import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-details',
   components: {
-    ImageThumbnail,
     SimpleAddToImageGroupModal,
     CytomineDescription,
     CytomineTags,
@@ -356,6 +357,7 @@ export default {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return ((this.project || {}).blindMode) || false;
     },
@@ -386,10 +388,13 @@ export default {
     },
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
-
+    downoload(image) {
+      window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');
+    },
     async cancelReview() {
       let errorLabel = this.image.reviewed ? 'notif-error-unvalidate-review' : 'notif-error-cancel-review';
       try {
