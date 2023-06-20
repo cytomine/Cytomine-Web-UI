@@ -138,7 +138,7 @@ export default {
     await axios
       .get('meta-prefixes.json')
       .then(response => {
-        constants.METADATA_PREFIXES = response.data
+        constants.METADATA_PREFIXES = response.data;
       });
     
     for (let i in settings) {
