@@ -5,7 +5,7 @@
     "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
     "serve": "npm run watch-translations & vue-cli-service serve",
-    "build": "sed -i \"/HARDCODED_VERSION/c\\  HARDCODED_VERSION:\\'3.2.1-LAB-$(date +'%y%m%d')\\'\" src/utils/constants.js && npm run translations-csv2json && vue-cli-service build",
+    "build": "npm run translations-csv2json && vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
