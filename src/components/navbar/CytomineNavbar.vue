@@ -153,8 +153,7 @@ export default {
       activeFontColor: '#363636',
       itemStyles: {workspace: {}, projects: {}, storages: {}, storage: {}, ontology: {}, algorithm: {}, admin: {}},
       isFetching: true,
-      logo: require('@/assets/logo.svg') //'https://www.belgium.be/themes/custom/belgium_theme/images/logos/logo-be.svg'
-      //constants.LOGO_TOP_MENU //require('@/assets/logo.svg')
+      logo: require('@/assets/cytomine-ee.svg')
     };
   },
   computed: {
@@ -298,7 +297,7 @@ export default {
         }
       }
       catch(error) {
-        this.logo = require('@/assets/logo.svg');
+        this.logo = require('@/assets/cytomine-ee.svg');
       }
       this.initItemsStyles();
       this.activeSelectedItem();
