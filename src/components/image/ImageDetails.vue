@@ -20,7 +20,7 @@
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
           <router-link :to="`/project/${image.project}/image/${image.id}`">
-            <img :src="image.thumb" class="image-overview">
+            <image-thumbnail :image="image" :size="256" :key="`${image.id}-thumb-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </router-link>
         </td>
       </tr>
@@ -73,7 +73,14 @@
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content" colspan="3">
-          <cytomine-properties :object="image" :canEdit="canEdit" />
+          <cytomine-properties 
+            :object="image"
+            :error="loadPropertiesError"
+            :canEdit="canEdit"
+            :properties="metadataFilteredProperties"
+            @deleted="removeProp"
+            @added="addProp"
+          />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('attached-files')">
@@ -85,8 +92,8 @@
       <tr v-if="isPropDisplayed('slide-preview')">
         <td class="prop-label">{{$t('slide-preview')}}</td>
         <td class="prop-content" colspan="3">
-          <a v-if="image.macroURL" @click="isMetadataModalActive = true">
-            <img :src="image.macroURL" class="image-overview">
+          <a v-if="image.macroURL && !isBlindModeAndContributor" @click="isMetadataModalActive = true">
+            <image-thumbnail :image="image" :macro="true" :size="256" :key="`${image.id}-macro-256`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
           </a>
           <em v-else>
             {{$t('slide-preview-not-available')}}
@@ -183,7 +190,8 @@
       <tr v-if="isPropDisplayed('channels')">
         <td class="prop-label">{{$t("image-channels")}}</td>
         <td class="prop-content" colspan="3">
-          {{$tc("count-bands", image.channels, {count: image.channels})}}
+          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          ({{image.channels}} x {{image.samplePerPixel}})
         </td>
       </tr>
       <tr v-if="isPropDisplayed('size')">
@@ -203,10 +211,11 @@
         <td class="prop-label">{{$t('actions')}}</td>
         <td class="prop-content" colspan="3">
           <div class="buttons are-small">
-            <button v-if="isPropDisplayed('metadata')" class="button" @click="isMetadataModalActive = true">
+            <button v-if="isPropDisplayed('metadata') && !isBlindModeAndContributor" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
             <template v-if="canEdit">
+
               <router-link
                 v-if="!image.reviewed && !image.inReview"
                 :to="`/project/${image.project}/image/${image.id}?action=review`"
@@ -239,7 +248,7 @@
                 {{$t('button-set-magnification')}}
               </button>
             </template>
-            <a class="button" v-if="canDownloadImages || canManageProject" :href="image.downloadURL">
+            <a class="button" v-if="canDownloadImages || canManageProject" @click="download(image)">
               {{$t('button-download')}}
             </a>
             <template v-if="canEdit">
@@ -275,8 +284,11 @@
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
     :image="image"
+    :properties="onlyMetadataProperties"
+    :error="loadPropertiesError"
   />
 </div>
+
 </template>
 
 <script>
@@ -291,16 +303,22 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
 import {ImageInstance} from 'cytomine-client';
 
-import vendorFromMime from '@/utils/vendor';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
+import vendorFromFormat from '@/utils/vendor';
+import {PropertyCollection} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'image-details',
   components: {
+    ImageThumbnail,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -322,16 +340,24 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      properties: [],
+      loadPropertiesError: false
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
     configUI: get('currentProject/configUI'),
+    project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
-      return ((this.$store.state.currentProject.project || {}).blindMode) || false;
+      return ((this.project || {}).blindMode) || false;
     },
     canDownloadImages() {
-      return ((this.$store.state.currentProject.project || {}).areImagesDownloadable) || false;
+      // Virtual images (null path) cannot be downloaded.
+      return this.image.path !== null && (
+        this.canManageProject ||
+        ((this.project || {}).areImagesDownloadable) || false
+      );
     },
     canManageProject() {
       return this.$store.getters['currentProject/canManageProject'];
@@ -343,14 +369,53 @@ export default {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
     vendor() {
-      return vendorFromMime(this.image.mime);
+      return vendorFromFormat(this.image.contentType);
+    },
+    internalUseFilteredProperties() {
+      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
+    },
+    metadataFilteredProperties() {
+      let props = this.internalUseFilteredProperties.filter(prop => {
+        for (const key in constants.METADATA_PREFIXES) {
+          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+            return false;
+          }
+        }
+        return true;
+      });
+      return props
+    },
+    onlyMetadataProperties() {
+      let props = this.internalUseFilteredProperties.filter(prop => {
+        for (const key in constants.METADATA_PREFIXES) {
+          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+            return true;
+          }
+        }
+        return false;
+      });
+      // We sort the properties to improve ease of use in the metadata modal
+      return props.sort((a, b) => a.key.localeCompare(b.key));
+    },
+    /**
+     * BLIND   MANAGER    RESULT
+     * 0       0          1
+     * 0       1          1
+     * 1       0          0
+     * 1       1          1
+     */
+    isBlindModeAndContributor() {
+      return this.blindMode && !this.canManageProject; 
     }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
-
+    download(image) {
+      window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');
+    },
     async cancelReview() {
       let errorLabel = this.image.reviewed ? 'notif-error-unvalidate-review' : 'notif-error-cancel-review';
       try {
@@ -401,7 +466,7 @@ export default {
         });
         this.$emit('delete');
 
-        let updatedProject = this.$store.state.currentProject.project.clone();
+        let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
@@ -415,9 +480,24 @@ export default {
     },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    },
+    removeProp(prop) {
+      this.properties = this.properties.filter(p => p.id !== prop.id);
+    },
+    addProp(prop) {
+      this.properties.push(prop);
+    }
+  },
+  async created() {
+    try {
+      this.properties = (await PropertyCollection.fetchAll({ object: this.image })).array;
+    }
+    catch (error) {
+      this.loadPropertiesError = true;
+      console.log(error);
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -449,7 +529,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-.image-overview {
+::v-deep .image-thumbnail {
   max-height: 18rem;
   max-width: 50vw;
 }

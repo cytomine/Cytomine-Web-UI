@@ -43,21 +43,22 @@
           :urls="baseLayerURLs"
           :size="imageSize"
           :extent="extent"
-          crossOrigin="Anonymous"
+          :crossOrigin="slices[0].imageServerUrl"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
+          :tile-size="tileSize"
         />
       </vl-layer-tile>
 
-      <vl-layer-image>
-        <vl-source-raster
-          v-if="baseSource && colorManipulationOn"
-          :sources="[baseSource]"
-          :operation="operation"
-          :lib="lib"
-        />
-      </vl-layer-image>
+<!--      <vl-layer-image>-->
+<!--        <vl-source-raster-->
+<!--          v-if="baseSource && colorManipulationOn"-->
+<!--          :sources="[baseSource]"-->
+<!--          :operation="operation"-->
+<!--          :lib="lib"-->
+<!--        />-->
+<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -73,7 +74,7 @@
     </vl-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -142,7 +143,7 @@
             <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
               <i class="fas fa-street-view"></i>
             </a>
-            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view" />
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view"/>
           </li>
 
           <li v-if="isPanelDisplayed('review') && canEdit">
@@ -165,7 +166,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotations-container :index="index" :view="$refs.view" />
+    <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
     <div class="custom-overview" ref="overview">
       <p class="image-name" :class="{hidden: overviewCollapsed}">
@@ -254,12 +255,15 @@ export default {
 
       baseSource: null,
       routedAnnotation: null,
+      selectedAnnotation: null,
 
       timeoutSavePosition: null,
 
       loading: true,
 
-      overview: null
+      overview: null,
+
+      format: new WKT(),
     };
   },
   computed: {
@@ -288,8 +292,11 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    slice() {
-      return this.imageWrapper.activeSlice;
+    slices() {
+      return this.imageWrapper.activeSlices;
+    },
+    sliceIds() {
+      return this.slices.map(slice => slice.id);
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -366,34 +373,52 @@ export default {
     imageSize() {
       return [this.image.width, this.image.height];
     },
-
-    baseLayerURLs() {
-      let filterPrefix = this.imageWrapper.colors.filter || '';
-      let params = `&tileIndex={tileIndex}&z={z}&mimeType=${this.slice.mime}`;
-      return  [`${filterPrefix}${this.slice.imageServerUrl}/slice/tile?fif=${this.slice.path}${params}`];
+    tileSize() {
+      return this.image.tileSize;
     },
-
-    colorManipulationOn() {
-      return this.imageWrapper.colors.brightness !== 0 || this.imageWrapper.colors.contrast !== 0
-                || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    baseLayerProcessingParams() {
+      return this.$store.getters[this.imageModule + 'tileRequestParams'];
     },
-    operation() {
-      return operation;
-    },
-    lib() {
+    baseLayerSliceParams() {
       return {
-        ...constLib,
-        brightness: this.imageWrapper.colors.brightness,
-        contrast: this.imageWrapper.colors.contrast,
-        saturation: this.imageWrapper.colors.saturation,
-        hue: this.imageWrapper.colors.hue
+        // eslint-disable-next-line camelcase
+        z_slices: this.slices[0].zStack,
+        timepoints: this.slices[0].time
       };
     },
+    baseLayerURLQuery() {
+      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      if (query.length > 0) {
+        return `?${query}`;
+      }
+      return query;
+    },
+    baseLayerURLs() {
+      let slice = this.slices[0];
+      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+    },
+    // colorManipulationOn() {
+    //   return this.imageWrapper.colors.brightness !== 0
+    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
+    // },
+    // operation() {
+    //   return operation;
+    // },
+    // lib() {
+    //   return {
+    //     ...constLib,
+    //     brightness: this.imageWrapper.colors.brightness,
+    //     contrast: this.imageWrapper.colors.contrast,
+    //     saturation: this.imageWrapper.colors.saturation,
+    //     hue: this.imageWrapper.colors.hue
+    //   };
+    // },
 
     layersToPreload() {
       let layers = [];
-      if(this.routedAnnotation) {
-        layers.push(this.routedAnnotation.type === AnnotationType.REVIEWED ? -1 : this.routedAnnotation.user);
+      let annot = this.selectedAnnotation || this.routedAnnotation;
+      if(annot) {
+        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : annot.user);
       }
       if(this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);
@@ -471,18 +496,9 @@ export default {
 
     async viewMounted() {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
-
-      if(this.routedAnnotation) { // center view on annotation
-        let annot = this.routedAnnotation;
-        let geometry = new WKT().readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
-
-        // HACK: center set by view.fit() is incorrect => reset it manually
-        this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
-          : [annot.centroid.x, annot.centroid.y];
-        // ---
+      if(this.routedAnnotation) {
+        this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
-
       this.savePosition();
     },
 
@@ -499,6 +515,8 @@ export default {
       await this.$refs.map.$createPromise; // wait for ol.Map to be created
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
+      let map = this.$refs.map.$map;
+
       this.overview = new OverviewMap({
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
@@ -506,7 +524,12 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      this.$refs.map.$map.addControl(this.overview);
+      map.addControl(this.overview);
+
+      this.overview.getOverviewMap().on(('click'), (evt) => {
+        let size = map.getSize();
+        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+      });
     },
 
     toggleOverview() {
@@ -522,11 +545,10 @@ export default {
     savePosition: _.debounce(async function() {
       if(this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
-
         try {
           await UserPosition.create({
             image: this.image.id,
-            slice: this.slice.id,
+            slice: this.slices[0].id,
             zoom: this.zoom,
             rotation: this.rotation,
             bottomLeftX: Math.round(extent[0]),
@@ -557,14 +579,69 @@ export default {
       });
     },
 
+    async centerViewOnAnnot(annot, duration) {
+      if (annot.image === this.image.id) {
+        if (!annot.location) {
+          //in case annotation location has not been loaded
+          annot = await Annotation.fetch(annot.id);
+        }
+
+        let geometry = this.format.readGeometry(annot.location);
+        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+
+        // HACK: center set by view.fit() is incorrect => reset it manually
+        this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
+          : [annot.centroid.x, annot.centroid.y];
+        // ---
+      }
+    },
+
+    async selectAnnotationHandler({index, annot, center=false, showComments=false}) {
+      if (this.index === index && annot.image === this.image.id) {
+        try {
+          let sliceChange = false;
+          if (!annot.slice) {
+            //in case annotation slice has not been loaded
+            annot = await Annotation.fetch(annot.id);
+          }
+
+          if(annot.slice !== this.slices[0].id) {
+            let slice = await SliceInstance.fetch(annot.slice);
+            await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
+            this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            sliceChange = true;
+          }
+
+          if (showComments) {
+            this.$store.commit(this.imageModule + 'setShowComments', annot);
+          }
+
+          this.selectedAnnotation = annot; // used to pre-load annot layer
+          this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
+          this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
+
+          if (center) {
+            await this.viewMounted();
+            let duration = (sliceChange) ? undefined : 500;
+            this.centerViewOnAnnot(annot, duration);
+          }
+        }
+        catch(error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        }
+      }
+    },
+
     isPanelDisplayed(panel) {
       return this.configUI[`project-explore-${panel}`];
     },
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
+      key = key.replace('toggle-all-', 'toggle-');
       switch(key) {
         case 'toggle-information':
           if (this.isPanelDisplayed('info')){
@@ -617,7 +694,22 @@ export default {
           }
           return;
       }
-    }
+    },
+    async takeScreenshot() {
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
+
+      let a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
+      a.click();
+
+      // Reset container css values as previous
+      document.querySelector('.map-container').style.height = '';
+    },
   },
   async created() {
     if(!getProj(this.projectionName)) { // if image opened for the first time
@@ -646,12 +738,24 @@ export default {
       this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
     });
 
-    let idRoutedAnnot = this.$route.params.idAnnotation;
-    if(idRoutedAnnot) {
+    let annot = this.imageWrapper.routedAnnotation;
+    if (!annot) {
+      let idRoutedAnnot = this.$route.params.idAnnotation;
+      if (idRoutedAnnot) {
+        try {
+          annot = await Annotation.fetch(idRoutedAnnot);
+        }
+        catch (error) {
+          console.log(error);
+          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        }
+      }
+    }
+
+    if (annot) {
       try {
-        let annot = await Annotation.fetch(idRoutedAnnot);
         if(annot.image === this.image.id) {
-          if(annot.slice !== this.slice.id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
@@ -661,6 +765,8 @@ export default {
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         }
+
+        this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       }
       catch(error) {
         console.log(error);
@@ -681,11 +787,13 @@ export default {
   mounted() {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };
@@ -804,18 +912,18 @@ $colorOpenedPanelLink: #6c95c8;
   }
 }
 
-.panels li:nth-child(-n+7) .panel-options {
+.panels li:nth-child(-n+8) .panel-options {
   bottom: -7.5em;
   min-height: 13em;
 }
 
-.panels li:nth-child(-n+3) .panel-options {
+.panels li:nth-child(-n+4) .panel-options {
   top: -1.75em;
   bottom: auto;
   min-height: 7.5em;
 }
 
-.panels li:nth-child(4) .panel-options {
+.panels li:nth-child(5) .panel-options {
   top: -5.5em;
   bottom: auto;
 }

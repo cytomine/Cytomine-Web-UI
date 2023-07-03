@@ -112,7 +112,7 @@
               </div>
             </div>
 
-            <div class="column filter">
+            <div v-show="algoEnabled" class="column filter">
               <div class="filter-label">
                 {{$t('analysis-annotations')}}
               </div>
@@ -129,12 +129,14 @@
                 <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
               </div>
             </div>
+            <div v-show="!algoEnabled" class="column"></div>
           </div>
         </div>
       </b-collapse>
 
       <cytomine-table
         :collection="projectCollection"
+        :is-empty="nbEmptyFilters > 0"
         class="table-projects"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
@@ -171,7 +173,7 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
+          <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/annotations?type=algo`">
               {{ project.numberOfJobAnnotations }}
             </router-link>
@@ -235,6 +237,7 @@ import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-
 
 import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import constants from '@/utils/constants.js';
 export default {
   name: 'list-projects',
   components: {
@@ -268,7 +271,7 @@ export default {
         'numberOfReviewedAnnotations',
         'lastActivity'
       ],
-
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       maxNbMembers: 10,
       maxNbImages: 10,
       maxNbUserAnnotations: 100,
@@ -306,6 +309,9 @@ export default {
     nbActiveFilters() {
       return this.$store.getters['listProjects/nbActiveFilters'];
     },
+    nbEmptyFilters() {
+      return this.$store.getters['listProjects/nbEmptyFilters'];
+    },
 
     selectedOntologiesIds() {
       return this.selectedOntologies.map(ontology => ontology.id);
@@ -313,11 +319,11 @@ export default {
 
     boundsFilters() {
       return [
-        {prop: 'numberOfImages', bounds: this.boundsImages},
-        {prop: 'membersCount', bounds: this.boundsMembers},
-        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations},
-        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations},
-        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations},
+        {prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages},
+        {prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers},
+        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
+        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations, max: this.maxNbJobAnnotations},
+        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
       ];
     },
 
@@ -347,10 +353,16 @@ export default {
           in: this.selectedTags.map(t => t.id).join()
         };
       }
-      for(let {prop, bounds} of this.boundsFilters) {
-        collection[prop] = {
-          lte: bounds[1]
-        };
+      for(let {prop, bounds, max} of this.boundsFilters) {
+        collection[prop] = {};
+        if (bounds[1]!==max) {
+          // if max bounds is the max possible value, do not set the filter in the request
+          // so that if an event (ex: algo creates an annotation) happens between the bounds request and the query request
+          // the image will not be skipped from the result
+          collection[prop] = {
+            lte: bounds[1]
+          };
+        }
         if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
       }
       return collection;

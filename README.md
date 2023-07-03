@@ -1,13 +1,14 @@
 # Cytomine front-end
 
 ## Presentation
+
 The Cytomine-WebUI is the official front-end for Cytomine, developed in VueJS.  
 You will find more information about the Cytomine project on the [website](https://www.cytomine.org).  
 You can also find, on our official documentation [how to install it](https://documentation.cytomine.org/How-to-install-Cytomine?structure=Admins) and [an user guide](https://documentation.cytomine.org/UsersV2?structure=UsersV2).
 
 The main features of this new front-end are :
 * A complete new Cytomine experience.
-* Support of internationalization i.e. multiple languages (English and French currently available). You can contribute by adding new languages (See [here](https://documentation.cytomine.org/How-to-contribute?structure=Contributors).
+* Support of internationalization i.e. multiple languages (English and French currently available). You can contribute by adding new languages (See [here](https://documentation.cytomine.org/community/how-to-contribute#translate-cytomine-in-your-language)).
 * Reactive application.
 * New lists of project, image, job with sorting, searching and filtering.
 * Display details of images, jobs and projects in all the lists.
@@ -35,7 +36,7 @@ The main features of this new front-end are :
 ## Installation
 This section assumes that you have access to an instance of Cytomine (especially [Cytomine-core](https://github.com/cytomine/Cytomine-core)) and an installed proxy. These two conditions are filled if you have used [Cytomine-bootstrap](https://github.com/cytomine/Cytomine-bootstrap). The following steps will allow you to run a front-end interacting with this instance:
 
-* Execute `npm install` to install the dependencies ;
+* Execute `npm install` to install the dependencies;
 * Change the value of constants `CYTOMINE_CORE_HOST` and `CYTOMINE_UPLOAD_HOST` in src/utils/constants.js ; you may also update other constants according to your Cytomine instance or your preferences;
 * Execute `npm run build` to build all the files into a `dist` folder.
 * Configure your proxy to redirect http request on the index.html file or replace the dist folder in your Cytomine-bootstrap by this one.

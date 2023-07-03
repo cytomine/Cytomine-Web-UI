@@ -57,6 +57,10 @@ Vue.use(VueShortKey, {
   ]
 });
 
+import VueHtml2Canvas from 'vue-html2canvas';
+
+Vue.use(VueHtml2Canvas);
+
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
 
@@ -65,11 +69,15 @@ import ZoomifySource from './vuelayers-suppl/zoomify-source';
 import RasterSource from './vuelayers-suppl/raster-source';
 import TranslateInteraction from './vuelayers-suppl/translate-interaction';
 import RotateInteraction from './vuelayers-suppl/rotate-interaction';
+import ModifyInteraction from './vuelayers-suppl/modify-interaction';
+import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
 Vue.use(VueLayers);
 Vue.use(ZoomifySource);
 Vue.use(RasterSource);
 Vue.use(TranslateInteraction);
 Vue.use(RotateInteraction);
+Vue.use(ModifyInteraction);
+Vue.use(RescaleInteraction);
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';

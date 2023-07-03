@@ -31,8 +31,9 @@ import view from './image_modules/view';
 import review from './image_modules/review';
 import tracks from './image_modules/tracks';
 import annotationsList from './image_modules/annotations-list';
+import controls from './image_modules/controls';
 
-import Vue from 'vue';
+import _ from 'lodash';
 
 import {
   isCluster,
@@ -55,8 +56,9 @@ export default {
       profile: null,
       sliceInstances: {},
       loadedSlicePages: [],
-      activeSlice: null,
-      activePanel: null
+      activeSlices: null,
+      activePanel: null,
+      routedAnnotation: null
     };
   },
 
@@ -81,8 +83,10 @@ export default {
       state.loadedSlicePages = [];
     },
 
-    setSliceInstance(state, slice) {
-      Vue.set(state.sliceInstances, slice.rank, slice);
+    setSliceInstances(state, slices) {
+      state.sliceInstances = Object.assign(
+        {}, state.sliceInstances, slices.reduce((acc, v) => ({ ...acc, [v.rank]: v}), {})
+      );
     },
 
     setLoadedSlicePage(state, page) {
@@ -90,29 +94,37 @@ export default {
     },
 
     setActiveSlice(state, slice) {
-      state.activeSlice = slice;
+      state.activeSlices = [slice];
+    },
+
+    setActiveSlices(state, slices) {
+      state.activeSlices = slices;
     },
 
     setProfile(state, profile) {
       state.profile = profile;
+    },
+
+    setRoutedAnnotation(state, annotation) {
+      state.routedAnnotation = annotation;
+    },
+    clearRoutedAnnotation(state) {
+      state.routedAnnotation = null;
     }
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image, slice}) {
+    async initialize({commit, dispatch}, {image, slices}) {
       let clone = image.clone();
       commit('setImageInstance', clone);
 
-      clone = slice.clone();
-      commit('setActiveSlice', clone);
+      clone = _.cloneDeep(slices);
+      commit('setActiveSlices', clone);
 
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
-
-      await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
+      await dispatch('fetchSliceInstancesAround', {rank: clone[0].rank});
     },
-    async setImageInstance({dispatch, rootState}, {image, slice}) {
-      await dispatch('initialize', {image, slice});
+    async setImageInstance({dispatch, rootState}, {image, slices}) {
+      await dispatch('initialize', {image, slices});
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
@@ -129,6 +141,26 @@ export default {
       let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
       await dispatch('setActiveSliceByRank', rank);
     },
+    async setActiveSlicesByPosition({state, dispatch}, {channels, zStack, time}) {
+      let ranks = channels.map(channel => slicePositionToRank({channel, zStack, time}, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
+    async addActiveSliceChannel({state, dispatch}, {channel}) {
+      let activeSlice = state.activeSlices[0];
+      let ranks = state.activeSlices.map(s => s.rank);
+      ranks.push(slicePositionToRank({
+        channel, zStack: activeSlice.zStack, time: activeSlice.time
+      }, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
+    async removeActiveSliceChannel({state, dispatch}, {channel}) {
+      let channels = state.activeSlices.map(s => s.channel).filter(c => c !== channel);
+      let activeSlice = state.activeSlices[0];
+      let ranks = channels.map(channel => slicePositionToRank({
+        channel, zStack: activeSlice.zStack, time: activeSlice.time
+      }, state.imageInstance));
+      await dispatch('setActiveSlicesByRank', ranks);
+    },
     async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
       let slice = state.sliceInstances[rank];
       if (!slice) {
@@ -142,19 +174,34 @@ export default {
       let idViewer = rootState.currentProject.currentViewer;
       dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
     },
+    async setActiveSlicesByRank({state, commit, dispatch, rootState}, ranks) {
+      let slices = await Promise.all(ranks.map(async rank => {
+        let slice = state.sliceInstances[rank];
+        if (!slice) {
+          await dispatch('fetchSliceInstancesAround', {rank, setActive: false});
+          slice = state.sliceInstances[rank];
+        }
+        return slice;
+      }));
+      commit('setActiveSlices', slices);
+
+      let idProject = rootState.currentProject.project.id;
+      let idViewer = rootState.currentProject.currentViewer;
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+    },
 
     async refreshData({state, commit, dispatch}) {
-      let image = await ImageInstance.fetch(state.imageInstance.id);
-      commit('setImageInstance', image);
-
-      let slice = await SliceInstance.fetch(state.activeSlice.id);
-      commit('setActiveSlice', slice);
-
-      let profile = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: image.baseImage})).array.find(cf => cf.type === 'HDF5');
-      commit('setProfile', profile);
+      await Promise.all([
+        ImageInstance.fetch(state.imageInstance.id).then(
+          image => commit('setImageInstance', image)
+        ),
+        Promise.all(state.activeSlices.map(async slice => await SliceInstance.fetch(slice.id))).then(
+          slices => commit('setActiveSlices', slices)
+        )
+      ]);
 
       commit('clearSliceInstances');
-      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+      await dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank});
     },
 
     async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {
@@ -164,26 +211,27 @@ export default {
       let page = findRankPage(rank);
       if (!state.loadedSlicePages.includes(page)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(page).then(data => {
-          data.array.forEach(slice => {
-            commit('setSliceInstance', slice);
-            if (setActive && slice.rank === rank) {
-              commit('setActiveSlice', slice);
+          commit('setSliceInstances', data.array);
+          if (setActive) {
+            let active = data.array.find(slice => slice.rank === rank);
+            if (active) {
+              commit('setActiveSlice', active);
             }
-          });
+          }
         }).then(() => commit('setLoadedSlicePage', page)));
       }
 
       let previous = page - 1;
       if (previous >= 0 && !state.loadedSlicePages.includes(previous)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(previous).then(data => {
-          data.array.forEach(slice => commit('setSliceInstance', slice));
+          commit('setSliceInstances', data.array);
         }).then(() => commit('setLoadedSlicePage', previous)));
       }
 
       let next = page + 1;
       if (next < findSliceInstanceNbPage(state.imageInstance) && !state.loadedSlicePages.includes(previous)) {
         promises.push(new SliceInstanceCollection(props).fetchPage(next).then(data => {
-          data.array.forEach(slice => commit('setSliceInstance', slice));
+          commit('setSliceInstances', data.array);
         }).then(() => commit('setLoadedSlicePage', next)));
       }
 
@@ -243,7 +291,7 @@ export default {
         styles.push(state.style.noTermStyle);
       }
 
-      let nbTracks = annot.track.length;
+      let nbTracks = annot.track ? annot.track.length : 0;
       let isReviewed = annot.type === AnnotationType.REVIEWED;
       let isRejected = state.review.reviewMode && !isReviewed;
 
@@ -314,6 +362,16 @@ export default {
       }
 
       return state.imageInstance.depth * state.imageInstance.duration * state.imageInstance.channels;
+    },
+
+    channels: state => {
+      return _.orderBy(Object.values(_.groupBy(state.sliceInstances, 'channel')).map(slices => {
+        return {
+          index: slices[0].channel,
+          name: slices[0].channelName,
+          color: slices[0].channelColor
+        };
+      }), 'index');
     }
   },
 
@@ -330,6 +388,7 @@ export default {
     review,
     tracks,
     annotationsList,
+    controls
   }
 };
 
@@ -340,4 +399,3 @@ function findRankPage(rank) {
 function findSliceInstanceNbPage(image) {
   return Math.ceil(image.depth * image.duration * image.channels / constants.PRELOADED_SLICES);
 }
-

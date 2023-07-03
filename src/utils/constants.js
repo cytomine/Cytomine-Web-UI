@@ -19,7 +19,10 @@ export default {
   CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
+  // features switches
+  ALGORITHMS_ENABLED: false,
   PRELOADED_SLICES: 50,
+  MAX_MERGEABLE_CHANNELS: 36,
   // Refresh intervals (expressed in milliseconds)
   VIEWER_ANNOTATIONS_REFRESH_INTERVAL: 10000,
   MEMBERS_ACTIVITY_REFRESH_INTERVAL: 30000,
@@ -39,5 +42,9 @@ export default {
   IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
+  METADATA_PREFIXES: '',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
+  DEFAULT_IMAGE_CONTROLS_STEP: 2,
+  CATEGORY_ITEMS_PER_BATCH: 10,
+  ANNOTATIONS_MAX_ITEMS_PER_CATEGORY: 10,
 };

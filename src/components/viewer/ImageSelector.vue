@@ -18,9 +18,18 @@
     <b-loading :is-full-page="false" :active="loading" />
     <template v-if="!loading">
       <div class="header">
-        <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-          type="search" icon="search"
-        />
+        <div class="filters">
+          <b-input class="search-images search" v-model="searchString" :placeholder="$t('search-placeholder')"
+            type="search" icon="search"
+          />
+          <div class="filter-label">
+            {{$t('tags')}}
+          </div>
+          <div class="filter-body">
+            <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+              label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+          </div>
+        </div>
         <button class="delete" @click="imageSelectorEnabled = false"></button>
       </div>
       <div class="content-wrapper" v-if="error">
@@ -31,7 +40,7 @@
       </div>
       <div v-else class="image-selector">
         <div class="card" v-for="image in displayedImages" :key="image.id">
-          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + image.preview + ')'"></a>
+          <a class="card-image" @click="addImage(image)" :style="'background-image: url(' + appendShortTermToken(imageThumbUrl(image), shortTermToken) + ')'"></a>
           <div class="card-content">
             <div class="content">
               <a @click="addImage(image)">
@@ -61,18 +70,28 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {get,syncMultiselectFilter} from '@/utils/store-helpers';
+import {IMAGE_FORMAT} from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName';
-import {ImageInstanceCollection} from 'cytomine-client';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
 import {getWildcardRegexp} from '@/utils/string-utils';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+
+const storeOptions = {rootModuleProp: 'storeModule'};
+const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 
 export default {
   name: 'image-selector',
-  components: {ImageName},
+  components: {
+    ImageName,
+    CytomineMultiselect
+  },
   data() {
     return {
       images: [],
+      availableTags:[],
       searchString: '',
       nbImagesDisplayed: 20,
       loading: true,
@@ -81,6 +100,11 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
+    selectedTags: localSyncMultiselectFilter('selectedTags', 'availableTags'),
+    storeModule() {
+      return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
+    },
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
     },
@@ -106,17 +130,43 @@ export default {
       return this.filteredImages.slice(0, this.nbImagesDisplayed);
     }
   },
+  watch:{
+    async selectedTags(){
+      if(!this.selectedTags.length){
+        this.images = [];
+      }
+      else{
+        await this.fetchImages();
+      }
+    }
+  },
   methods: {
+    appendShortTermToken,
     async addImage(image) {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slice});
+        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
+    },
+    async fetchImages() {
+      let collection = new ImageInstanceCollection({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      });
+      if(this.selectedTags.length > 0) {
+        collection['tag'] = {
+          in: this.selectedTags.map(option => option.id).join()
+        };
+      }
+      this.images = (await collection.fetchAll()).array; // TODO: should not load full array, should be done with backend
+    },
+    async fetchTags() {
+      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
 
     more() {
@@ -131,14 +181,15 @@ export default {
       if (key === 'toggle-add-image') {
         this.toggle();
       }
+    },
+    imageThumbUrl(image) {
+      return image.thumbURL(256, IMAGE_FORMAT);
     }
   },
   async created() {
     try {
-      this.images = (await ImageInstanceCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.project.id
-      })).array; // TODO: should not load full array, should be done with backend
+      await this.fetchImages();
+      await this.fetchTags();
     }
     catch(error) {
       console.log(error);
@@ -172,8 +223,30 @@ export default {
 .header {
   padding: 0.75em;
   padding-bottom: 0;
+  padding-top: 0;
   display: flex;
   justify-content: space-between;
+}
+
+.search {
+  margin-top: 0.25em;
+}
+
+.filters {
+  display: flex;
+  padding: 0;
+  background: None;
+}
+
+.filter-label {
+  font-size: 0.9em;
+  margin-top: 0.7rem;
+  margin-left: 1em;
+  margin-right: 0.5em;
+}
+
+.delete {
+  margin-top: 1.2rem;
 }
 
 .image-selector {

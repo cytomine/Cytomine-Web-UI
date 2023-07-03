@@ -3,8 +3,8 @@
     <annotation-details-container
       v-if="isPanelDisplayed('annotation-main')"
       :index="index"
-      :view="view"
-      @centerView="centerViewOnAnnot"
+      @select="selectAnnotation"
+      @centerView="centerView({annot: $event, sameView: true})"
       @addTerm="addTerm"
       @addTrack="addTrack"
       @updateTermsOrTracks="updateTermsOrTracks"
@@ -26,7 +26,6 @@ export default {
   name: 'AnnotationsContainer',
   props: {
     index: String,
-    view: Object
   },
   data() {
     return {
@@ -56,11 +55,6 @@ export default {
       return this.configUI[`project-explore-${panel}`];
     },
 
-    centerViewOnAnnot(annot) {
-      let geometry = this.format.readGeometry(annot.location);
-      this.view.fit(geometry, {duration: 500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
-    },
-
     addTerm(term) {
       this.$store.dispatch(this.viewerModule + 'addTerm', term);
     },
@@ -86,6 +80,20 @@ export default {
       this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       this.$eventBus.$emit('deleteAnnotation', annot);
     },
+
+    selectAnnotation({annot, options}) {
+      let index = (options.trySameView) ? this.index : null;
+      this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
+    },
+
+    centerView({annot, sameView=false}) {
+      if (sameView) {
+        this.$emit('centerView', annot);
+      }
+      else {
+        this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
+      }
+    }
   }
 };
 </script>

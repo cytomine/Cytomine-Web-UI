@@ -20,11 +20,37 @@
 <div class="content-wrapper" v-else>
   <b-loading :is-full-page="false" :active.sync="loading" />
   <div class="box" v-if="!loading">
-    <i18n path="detailed-image-information" tag="h1">
+    <div class="box-title">
+      <i18n path="detailed-image-information" tag="h1">
+        <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
+          <image-name :image="image" />
+        </router-link>
+      </i18n>
       <router-link place="imageName" :to="`/project/${image.project}/image/${image.id}`">
-        <image-name :image="image" />
+        <button class="button is-link">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-image"></i>
+            </span>
+            <span class="is-align-content-baseline"></span>
+              {{ $t('open-in-viewer')}}
+            </span>
+          </span>
+        </button> 
       </router-link>
-    </i18n>
+      <router-link place="imageName" :to="prevRoute">
+        <button class="button is-link">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-arrow-left"></i>
+            </span>
+            <span class="is-align-content-baseline">
+              {{ $t('go-back')}}
+            </span>
+          </span>
+        </button> 
+      </router-link>
+    </div>
 
     <image-details
       v-if="image"
@@ -43,7 +69,7 @@ import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 
 import {ImageInstance} from 'cytomine-client';
-import vendorFromMime from '@/utils/vendor';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'image-information',
@@ -56,8 +82,15 @@ export default {
       loading: true,
       image: null,
       permissionError: false,
-      notFoundError: false
+      notFoundError: false,
+      prevRoute: null
     };
+  },
+  // https://v3.router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   },
   computed: {
     idImage() {
@@ -76,7 +109,7 @@ export default {
       this.notFoundError = false;
       try {
         let image = await ImageInstance.fetch(this.idImage);
-        image.vendor = vendorFromMime(image.mime);
+        image.vendor = vendorFromFormat(image.contentType);
         this.image = image;
       }
       catch(error) {
@@ -105,3 +138,17 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+  .box-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    h1 {
+      flex: auto
+    }
+  }
+</style>
