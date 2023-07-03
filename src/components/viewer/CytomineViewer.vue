@@ -225,7 +225,7 @@ export default {
             const position = this.idImages.indexOf(String(image.id));
             let idSlice = this.idSlices[position];
             let slice = (idSlice) ? await SliceInstance.fetch(idSlice) : await image.fetchReferenceSlice();
-            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slice});
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices: [slice]});
           }));
         }
         else {
