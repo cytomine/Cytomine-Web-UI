@@ -232,6 +232,16 @@
               </div>
             </div>
           </div>
+
+          <div v-for="format in selectedFormats" :key="format">
+            <image-format
+              :format="format"
+              :image-ids="aiIDs[format]"
+              :keys="metadataKeys[format]"
+              :max="metadataMax"
+              :type="metadataType"
+            />
+          </div>
         </div>
       </b-collapse>
 
@@ -287,13 +297,16 @@
 </template>
 
 <script>
+import {stripIDfromKey} from '@/utils/metadata.js';
 import {get} from '@/utils/store-helpers';
+import {isNumeric} from '@/utils/string-utils';
 
 import {
   AbstractImageCollection,
   Cytomine,
   StorageCollection,
   ProjectCollection,
+  PropertyCollection,
   UploadedFileCollection,
   UploadedFile,
   UploadedFileStatus
@@ -308,12 +321,14 @@ import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageFormat from '@/components/search/format/ImageFormat';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'cytomine-storage',
   components: {
+    ImageFormat,
     ImageThumbnail,
     CytomineMultiselect,
     CytomineSlider,
@@ -334,9 +349,14 @@ export default {
       availableVendors: [],
       boundsHeight: [],
       boundsWidth: [],
+      filteredImageIDs: {},
       filtersOpened: false,
       maxHeight: 100,
       maxWidth: 100,
+      metadataKeys: {},
+      metadataMax: {},
+      metadataType: {},
+      properties: {},
       selectedFormats: [],
       selectedMagnifications: [],
       selectedVendors: [],
@@ -361,6 +381,13 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     shortTermToken: get('currentUser/shortTermToken'),
+    aiIDs() {
+      let ids = {};
+      this.availableFormats.forEach(format => ids[format] = []);
+      this.abstractImages.forEach(ai => ids[ai.contentType].push(ai.id));
+
+      return ids;
+    },
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -448,6 +475,16 @@ export default {
         }
       }
 
+      let filteredIDs = [];
+      this.selectedFormats.forEach(format => {
+        filteredIDs = filteredIDs.concat(this.filteredImageIDs[format]);
+      });
+      if (filteredIDs.length > 0) {
+        collection['include'] = {
+          in: filteredIDs.join(',')
+        };
+      }
+
       return collection;
     }
   },
@@ -483,6 +520,29 @@ export default {
         magnifications.add(ai.magnification);
       });
 
+      await Promise.all(this.abstractImages.map(async (ai) => {
+        let properties = (await PropertyCollection.fetchAll({object: ai})).array;
+        properties.sort((a, b) => a.key.localeCompare(b.key));
+        this.properties[ai.id] = properties;
+
+        let keys = new Set();
+        properties.forEach(property => {
+          let key = stripIDfromKey(property.key);
+          keys.add(key);
+          this.metadataType[key] = isNumeric(property.value) ? Number : String;
+
+          if (!(key in this.metadataMax)) {
+            this.metadataMax[key] = property.value;
+          }
+
+          if (this.metadataMax[key] < property.value) {
+            this.metadataMax[key] = isNumeric(property.value) ? +property.value : property.value;
+          }
+        });
+
+        this.metadataKeys[ai.contentType] = Array.from(keys);
+      }));
+
       this.availableFormats = Array.from(formats);
       this.availableMagnifications = Array.from(magnifications).map(m => {
         return {
@@ -501,6 +561,8 @@ export default {
         if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
           this.availableVendors.push(vendorFormatted);
         }
+
+        this.filteredImageIDs[format] = [];
       });
     },
     async fetchStorages() {
@@ -679,7 +741,12 @@ export default {
 
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
-    }, 500)
+    }, 500),
+
+    includeImageIDs(format, imageIDs) {
+      this.$delete(this.filteredImageIDs, format);
+      this.$set(this.filteredImageIDs, format, imageIDs);
+    }
   },
   activated() {
     this.fetchAbstractImages();
@@ -688,10 +755,14 @@ export default {
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
+    
+    this.$eventBus.$on('includeImageIDs', this.includeImageIDs);
   },
   deactivated() {
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
+
+    this.$eventBus.$off('includeImageIDs', this.includeImageIDs);
   },
 };
 </script>
