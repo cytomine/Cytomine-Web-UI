@@ -233,14 +233,16 @@
             </div>
           </div>
 
-          <div v-for="format in selectedFormats" :key="format">
-            <image-format
-              :format="format"
-              :image-ids="aiIDs[format]"
-              :keys="metadataKeys[format]"
-              :max="metadataMax"
-              :type="metadataType"
-            />
+          <div class="columns is-multiline">
+            <div class="column is-half" v-for="format in selectedFormats" :key="format">
+              <image-format
+                :format="format"
+                :image-ids="aiIDs[format]"
+                :keys="metadataKeys[format]"
+                :max="metadataMax"
+                :type="metadataType"
+              />
+            </div>
           </div>
         </div>
       </b-collapse>
