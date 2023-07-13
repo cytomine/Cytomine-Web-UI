@@ -1068,3 +1068,6 @@ reviewed-annotation-status,Review Status,Statut de la révision,Estado de revisi
 reviewed-annotation-status-validated,Validated,Validé,Validado,Gevalideerd
 reviewed-annotation-status-not-validated,Not validated,Non validé,No validado,Niet gevalideerd
 uncategorized,Uncategorized,Non classé,Sin categoría,Uncategorized
+create-empty-project,Create an empty project,Créer un project vide,Crear un proyecto vacío,Maak een leeg project
+create-project-from-image-filters,Create a project from the image filters,Créer un projet à partir des filtres d'image,Crear un proyecto a partir de los filtros de imagen,Maak een project van de afbeeldingsfilters
+select-project,Select a project,Sélectionner un project,Seleccione un proyecto,Selecteer een project

@@ -281,6 +281,33 @@
           <!--<b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">-->
             <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
           <!--</b-table-column>-->
+
+          <b-table-column label="" centered width="80">
+            <div class="columns is-vcentered">
+              <div class="column is-two-thirds">
+                <b-select
+                  v-model="selectedProjectsToLink[uFile.image]"
+                  :placeholder="projectPlaceholders[uFile.image] ? $t('select-project') : $t('no-project')"
+                  :disabled="!projectPlaceholders[uFile.image]"
+                  expanded
+                >
+                  <option v-for="project in filteredProjects[uFile.image]" :key="project.id" :value="project">
+                    {{ project.name }}
+                  </option>
+                </b-select>
+              </div>
+
+              <div class="column is-one-quarter">
+                <button
+                  class="button is-small is-link"
+                  :disabled="!projectPlaceholders[uFile.image]"
+                  @click="addImage(uFile)"
+                >
+                  {{ $t('add-image') }}
+                </button>
+              </div>
+            </div>
+          </b-table-column>
         </template>
 
         <template #detail="{row: uFile}">
@@ -304,6 +331,7 @@ import {isNumeric} from '@/utils/string-utils';
 import {
   AbstractImageCollection,
   Cytomine,
+  ImageInstance,
   StorageCollection,
   ProjectCollection,
   PropertyCollection,
@@ -351,14 +379,17 @@ export default {
       boundsWidth: [],
       filteredImageIDs: {},
       filtersOpened: false,
+      filteredProjects: {},
       maxHeight: 100,
       maxWidth: 100,
       metadataKeys: {},
       metadataMax: {},
       metadataType: {},
+      projectPlaceholders: {},
       properties: {},
       selectedFormats: [],
       selectedMagnifications: [],
+      selectedProjectsToLink: {},
       selectedVendors: [],
 
       storages: [],
@@ -505,8 +536,44 @@ export default {
     }
   },
   methods: {
+    async addImage(uFile) {
+      if (this.selectedProjectsToLink[uFile.image] === undefined) {
+        return;
+      }
+
+      let project = this.selectedProjectsToLink[uFile.image];
+      let propsTranslation = {
+        imageName: uFile.originalFilename,
+        projectName: project.name
+      };
+
+      try {
+        await new ImageInstance({
+          baseImage: uFile.image,
+          project: project.id
+        }).save();
+
+        let projects = this.filteredProjects[uFile.image];
+        projects.splice(projects.indexOf(project), 1);
+        this.$set(this.filteredProjects, uFile.image, projects);
+        this.$set(this.projectPlaceholders, uFile.image, projects.length != 0);
+        this.$set(this.selectedProjectsToLink, uFile.image, null);
+
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-add-image', propsTranslation)
+        });
+      }
+      catch (error) {
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-add-image', propsTranslation)
+        });
+      }
+    },
     async fetchAbstractImages() {
-      this.abstractImages = (await  AbstractImageCollection.fetchAll()).array;
+      this.abstractImages = (await AbstractImageCollection.fetchAll()).array;
       this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height));
       this.maxWidth = Math.max(...this.abstractImages.map(ai => ai.width));
       this.boundsHeight = [0, this.maxHeight];
@@ -564,6 +631,22 @@ export default {
 
         this.filteredImageIDs[format] = [];
       });
+
+      let aiToImages = {}
+      await Promise.all(this.abstractImages.map(async (ai) => {
+        aiToImages[ai.id] = (await Cytomine.instance.api.get(
+          `abstractimage/${ai.id}/imageinstance.json`
+        )).data.collection;
+      }));
+
+      for (const [key, value] of Object.entries(aiToImages)) {
+        let toRemove = value.map(image => image.project);
+        this.filteredProjects[key] = this.projects.filter(project => {
+          return !toRemove.includes(project.id);
+        });
+
+        this.projectPlaceholders[key] = this.filteredProjects[key].length != 0;
+      }
     },
     async fetchStorages() {
       try {
@@ -830,6 +913,10 @@ export default {
 
 .search-block {
   display: flex;
+}
+
+.b-table td, th {
+  vertical-align: middle !important;
 }
 </style>
 
