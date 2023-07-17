@@ -652,6 +652,10 @@ export default {
         this.filteredImageIDs[format] = [];
       });
 
+      this.selectedFormats = [...this.availableFormats];
+      this.selectedMagnifications = [...this.availableMagnifications];
+      this.selectedVendors = [...this.availableVendors];
+
       let aiToImages = {}
       await Promise.all(this.abstractImages.map(async (ai) => {
         aiToImages[ai.id] = (await Cytomine.instance.api.get(
