@@ -245,6 +245,12 @@
             </div>
           </div>
         </div>
+
+        <div class="buttons button-add is-right">
+          <button class="button is-link" @click="createProject()">
+            {{ $t('new-project-with-filtered-images') }}
+          </button>
+        </div>
       </b-collapse>
 
       <cytomine-table
@@ -322,6 +328,8 @@
       </cytomine-table>
     </div>
   </div>
+
+  <add-project-modal :active.sync="createModal" :ontologies="ontologies" />
 </div>
 </template>
 
@@ -335,6 +343,7 @@ import {
   Cytomine,
   ImageInstance,
   StorageCollection,
+  OntologyCollection,
   ProjectCollection,
   PropertyCollection,
   UploadedFileCollection,
@@ -354,10 +363,12 @@ import CytomineTable from '@/components/utils/CytomineTable';
 import ImageFormat from '@/components/search/format/ImageFormat';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import vendorFromFormat from '@/utils/vendor';
+import AddProjectModal from '@/components/project/AddProjectModal';
 
 export default {
   name: 'cytomine-storage',
   components: {
+    AddProjectModal,
     ImageFormat,
     ImageThumbnail,
     CytomineMultiselect,
@@ -379,6 +390,7 @@ export default {
       availableVendors: [],
       boundsHeight: [],
       boundsWidth: [],
+      createModal: false,
       filteredImageIDs: {},
       filtersOpened: false,
       filteredProjects: {},
@@ -387,6 +399,7 @@ export default {
       metadataKeys: {},
       metadataMax: {},
       metadataType: {},
+      ontologies: [],
       projectPlaceholders: {},
       properties: {},
       selectedFormats: [],
@@ -574,6 +587,11 @@ export default {
         });
       }
     },
+    async createProject() {
+      let filteredUFileCollection = (await this.uploadedFileCollection.fetchAll()).array;
+      this.$eventBus.$emit('update-ufiles', filteredUFileCollection);
+      this.createModal = true;
+    },
     async fetchAbstractImages() {
       this.abstractImages = (await AbstractImageCollection.fetchAll()).array;
       this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height));
@@ -664,6 +682,11 @@ export default {
         console.log(error);
         this.newUploadError = true;
       }
+    },
+    async fetchOntologies() {
+      let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+      ontologies.sort((a, b) => a.name.localeCompare(b.name));
+      this.ontologies = ontologies;
     },
     async fetchProjects() {
       try {
@@ -836,6 +859,7 @@ export default {
   activated() {
     this.fetchAbstractImages();
     this.fetchStorages();
+    this.fetchOntologies();
     this.fetchProjects();
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
@@ -919,6 +943,10 @@ export default {
 
 .b-table td, th {
   vertical-align: middle !important;
+}
+
+.button-add {
+  padding: 1rem;
 }
 </style>
 

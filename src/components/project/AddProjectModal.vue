@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import {Project, Ontology} from 'cytomine-client';
+import {ImageInstance, Project, Ontology} from 'cytomine-client';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
@@ -77,6 +77,7 @@ export default {
   $_veeValidate: {validator: 'new'},
   data() {
     return {
+      ufiles: [],
       name: '',
       ontology: 'NEW',
       selectedOntology: null
@@ -109,6 +110,16 @@ export default {
         }
 
         let project = await new Project({name: this.name, ontology: idOntology}).save();
+
+        if (this.ufiles) {
+          await Promise.all(
+            this.ufiles.map(async (uFile) => await new ImageInstance({
+              baseImage: uFile.image,
+              project: project.id
+            }).save())
+          );
+        }
+        
         this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
         this.$router.push(`/project/${project.id}/configuration`);
       }
@@ -121,6 +132,12 @@ export default {
         }
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('update-ufiles', (ufiles) => this.ufiles = ufiles);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('update-ufiles');
   }
 };
 </script>
