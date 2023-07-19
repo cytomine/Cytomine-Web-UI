@@ -594,8 +594,8 @@ export default {
     },
     async fetchAbstractImages() {
       this.abstractImages = (await AbstractImageCollection.fetchAll()).array;
-      this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height));
-      this.maxWidth = Math.max(...this.abstractImages.map(ai => ai.width));
+      this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height), this.maxHeight);
+      this.maxWidth = Math.max(...this.abstractImages.map(ai => ai.width), this.maxWidth);
       this.boundsHeight = [0, this.maxHeight];
       this.boundsWidth = [0, this.maxWidth];
 
