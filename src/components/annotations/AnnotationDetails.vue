@@ -140,7 +140,14 @@
       <tr v-if="isPropDisplayed('properties')">
         <td colspan="2">
           <h5>{{$t('properties')}}</h5>
-          <cytomine-properties :object="annotation" :canEdit="canEdit" @update="$emit('updateProperties')" />
+          <cytomine-properties
+            :object="annotation"
+            :canEdit="canEdit"
+            :properties="internalUseFilteredProperties"
+            @deleted="removeProp"
+            @added="addProp"
+            @updateProperties="$emit('updateProperties')"
+             />
         </td>
       </tr>
 
@@ -256,6 +263,8 @@ import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
+import {PropertyCollection} from 'cytomine-client';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'annotations-details',
@@ -292,6 +301,8 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      properties: [],
+      loadPropertiesError: false
     };
   },
   computed: {
@@ -371,7 +382,10 @@ export default {
     },
     isPoint() {
       return this.annotation.location && this.annotation.location.includes('POINT');
-    }
+    },
+    internalUseFilteredProperties() {
+      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
+    },
   },
   methods: {
     appendShortTermToken,
@@ -504,6 +518,12 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
+    },
+    removeProp(prop) {
+      this.properties = this.properties.filter(p => p.id !== prop.id);
+    },
+    addProp(prop) {
+      this.properties.push(prop);
     }
   },
   async created() {
@@ -518,6 +538,14 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotation-comments')});
       }
+    }
+
+    try {
+      this.properties = (await PropertyCollection.fetchAll({ object: this.annotation })).array;
+    }
+    catch (error) {
+      this.loadPropertiesError = true;
+      console.log(error);
     }
   }
 };

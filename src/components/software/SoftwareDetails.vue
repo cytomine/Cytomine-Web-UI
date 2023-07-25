@@ -59,12 +59,14 @@
       <cytomine-description :object="software" :canEdit="canManageSoftware" />
     </td>
   </tr>
+  <!-- I think software is disabled in general for now
   <tr v-if="isPropDisplayed('properties')">
     <td class="prop-label">{{$t('properties')}}</td>
     <td class="prop-content">
       <cytomine-properties :object="software" :canEdit="canManageSoftware" />
     </td>
   </tr>
+   -->
   <tr v-if="isPropDisplayed('attachedFiles')">
     <td class="prop-label">{{$t('attached-files')}}</td>
     <td class="prop-content">

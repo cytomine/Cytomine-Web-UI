@@ -3,38 +3,20 @@ stages:
   - build
   - publish
 
-# variable to register in project:
-# - DOCKERHUB_URL: url of dockerhub (e.g. docker.io)
-# - DOCKERHUB_USER: cytomine username on dockerhub
-# - DOCKERHUB_PASSWORD: cytomine password on dockerhub
-# - SCRIPTS_REPO_ACCESS_TOKEN_NAME: access token name for docker-entrypoint-scripts repo
-# - SCRIPTS_REPO_ACCESS_TOKEN_VALUE: access token value for docker-entrypoint-scripts repo
-# - SCRIPTS_REPO_URL: git url (no scheme/protocol) of the docker-entrypoint-scripts repo
-
 variables:
-  DOCKER_TMP_IMAGE_NAME: $CI_PIPELINE_ID:latest
+  DOCKER_IMAGE_NAME: 'cytomine/web_ui'
+  ENTRYPOINT_SCRIPTS_VERSION: '1.3.0'
+  NGINX_VERSION: '1.22.1'
+  NODE_VERSION: '14.16.1-alpine3.13'
 
 default:
   tags:
     - docker
 
-workflow:
-  rules:
-    - if: $CI_COMMIT_TAG != null
-      variables:
-        IS_OPEN_SOURCE_RELEASE_CANDIDATE: "true"
-    #- if: $CI_COMMIT_TAG != null && $CI_COMMIT_TAG =~ /^ce-.*$/
-    #  variables:
-    #    IS_OPEN_SOURCE_RELEASE_CANDIDATE: "true"
-    #- if: $CI_COMMIT_TAG == null || $CI_COMMIT_REF_NAME !~ /^ce-.*$/
-    #  variables:
-    #    IS_OPEN_SOURCE_RELEASE_CANDIDATE: "false"
-    - when: always
-
 make-version-name:
   stage: prepare
   # regex check does not work with /bin/sh because of parenthesis so we need /bin/bash here
-  image: bash:5.2.15-alpine3.16
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bash:5.2.15-alpine3.16
   script:
     #- if [[ "$CI_COMMIT_REF_NAME" =~ ^refs/tags/ ]] then
     #    echo "CM_VERSION=$CI_COMMIT_TAG" > .env;
@@ -55,49 +37,35 @@ make-version-name:
     reports:
       dotenv: .env
 
-build-docker-image:
+
+build-push-docker-image:
   stage: build
-  image: docker:latest
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
   needs:
     - job: make-version-name
       artifacts: true
   rules:
     - if: $CI_COMMIT_TAG
   script:
-    - export SCRIPTS_REPO_FULL_URL=https://$SCRIPTS_REPO_ACCESS_TOKEN_NAME:$SCRIPTS_REPO_ACCESS_TOKEN_VALUE@$SCRIPTS_REPO_URL
-    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}/g" public/index.html
-    - docker build -t $DOCKER_TMP_IMAGE_NAME -f docker/Dockerfile .
+    # Use credential helper (see https://docs.docker.com/engine/reference/commandline/login/#credentials-store)
+    - mkdir -p $HOME/.docker && echo $DOCKER_HUB_AUTH_CONFIG > $HOME/.docker/config.json
+    - echo "Registry credentials configured at $HOME/.docker/config.json"
 
-publish-docker-image:
-  stage: publish
-  image: docker:latest
-  needs:
-    - job: build-docker-image
-      artifacts: false  # artifact are in docker cache (is it a safe assumption in a multi-runner env ?)
-    - job: make-version-name
-      artifacts: true
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
+    # Prepare some vars
+    - sed -i -- "s/WEB_UI_VERSION/${CM_VERSION}-${CI_COMMIT_SHORT_SHA}/g" public/index.html
+
+    - echo "Build the docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
     - |
-      if [ $IS_OPEN_SOURCE_RELEASE_CANDIDATE = "true" ]; then
-        export DOCKER_IMAGE_NAME=cytomine/web_ui
-        export TARGET_CI_REGISTRY=$DOCKERHUB_URL
-        export TARGET_CI_REGISTRY_USER=$DOCKERHUB_USER
-        export TARGET_CI_REGISTRY_PASSWORD=$DOCKERHUB_PASSWORD
-      else
-        export DOCKER_IMAGE_NAME=$CI_REGISTRY_IMAGE
-        export TARGET_CI_REGISTRY=$CI_REGISTRY
-        export TARGET_CI_REGISTRY_USER=$CI_REGISTRY_USER
-        export TARGET_CI_REGISTRY_PASSWORD=$CI_REGISTRY_PASSWORD
-      fi
-    - echo "Target > registry:$TARGET_CI_REGISTRY user:$TARGET_CI_REGISTRY_USER"
-    - docker login -u $TARGET_CI_REGISTRY_USER -p $TARGET_CI_REGISTRY_PASSWORD $TARGET_CI_REGISTRY
-    - export DOCKER_IMAGE_NAME_FULL=$DOCKER_IMAGE_NAME:$CM_VERSION
-    - docker tag $DOCKER_TMP_IMAGE_NAME $DOCKER_IMAGE_NAME_FULL
-    - docker push $DOCKER_IMAGE_NAME_FULL
-    - docker rmi $DOCKER_IMAGE_NAME_FULL
-  after_script:
-    # cleaning up images
-    - docker rmi $DOCKER_TMP_IMAGE_NAME
+      docker build \
+        --build-arg NODE_VERSION=${NODE_VERSION} \
+        --build-arg NGINX_VERSION=${NGINX_VERSION} \
+        --build-arg ENTRYPOINT_SCRIPTS_VERSION=${ENTRYPOINT_SCRIPTS_VERSION} \
+        --build-arg WEB_UI_VERSION=${CM_VERSION} \
+        --build-arg WEB_UI_REVISION=${CI_COMMIT_SHORT_SHA} \
+        -t ${DOCKER_IMAGE_NAME}:${CM_VERSION} \
+        -f docker/Dockerfile \
+        .
 
+    - echo "Pushing docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"
+    - docker push ${DOCKER_IMAGE_NAME}:${CM_VERSION}
+    - echo "Successfully pushed docker image ${DOCKER_IMAGE_NAME}:${CM_VERSION}"

@@ -14,8 +14,7 @@
 
 <template>
 <div class="properties-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
-  <template v-if="!loading">
+  <template>
     <b-field grouped group-multiline>
       <em v-if="error">{{$t('error-fetch-properties')}}</em>
       <div class="control" v-else-if="properties.length > 0" v-for="(prop, idx) in notEditedProperties" :key="prop.id">
@@ -62,14 +61,12 @@ export default {
   name: 'cytomine-properties',
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
+    properties: {type: Array},
+    error: {type: Boolean, default: false}
   },
   data() {
     return {
-      loading: true,
-      error: false,
-
-      properties: [],
       editedProperties: [],
       newPropKey: '',
       newPropValue: '',
@@ -91,8 +88,11 @@ export default {
       let prop = this.properties[idx];
       try {
         await Property.delete(prop.id, this.object);
-        this.properties.splice(idx, 1);
-        this.$emit('update');
+        // In a future and longer refactor, add, editing and removing should simply send events to the parent
+        // Or dispatch an action that would trigger an "effect" on the store...
+        this.$emit('deleted', prop);
+        // For PropertiesPanel update
+        this.$emit('updateProperties');
       }
       catch(error) {
         console.log(error);
@@ -122,9 +122,12 @@ export default {
         await prop.save();
         this.editedProperties.splice(idx, 1);
         if(newProp) {
-          this.properties.push(prop);
+        // In a future and longer refactor, add, editing and removing should simply send events to the parent
+        // Or dispatch an action that would trigger an "effect" on the store...
+          this.$emit('added', prop);
         }
-        this.$emit('update');
+        // For PropertiesPanel update
+        this.$emit('updateProperties');
       }
       catch(error) {
         console.log(error);
@@ -137,17 +140,6 @@ export default {
       prop.value = prop.oldValue;
       this.editedProperties.splice(idx, 1);
     },
-  },
-  async created() {
-    try {
-      let props = (await PropertyCollection.fetchAll({object: this.object})).array;
-      this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
-    this.loading = false;
   }
 };
 </script>
