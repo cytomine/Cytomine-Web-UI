@@ -158,7 +158,7 @@ import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import vendorFromFormat from '@/utils/vendor';
 
-import {AbstractImage, ImageInstanceCollection, PropertyCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, PropertyCollection, TagCollection} from 'cytomine-client';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
@@ -387,8 +387,7 @@ export default {
       })).array;
 
       await Promise.all(this.images.map(async (image) => {
-        let abstractImage = new AbstractImage({id: image.baseImage, class: 'be.cytomine.domain.image.AbstractImage'});
-        let properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
+        let properties = (await PropertyCollection.fetchAll({object: image})).array;
         properties.sort((a, b) => a.key.localeCompare(b.key));
 
         if (!(image.contentType in this.metadata)) {
