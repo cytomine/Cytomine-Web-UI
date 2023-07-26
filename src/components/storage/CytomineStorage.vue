@@ -661,6 +661,8 @@ export default {
         aiToImages[ai.id] = (await Cytomine.instance.api.get(
           `abstractimage/${ai.id}/imageinstance.json`
         )).data.collection;
+
+        this.filteredImageIDs[ai.contentType].push(ai.id);
       }));
 
       for (const [key, value] of Object.entries(aiToImages)) {
