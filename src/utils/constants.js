@@ -47,4 +47,7 @@ export default {
   DEFAULT_IMAGE_CONTROLS_STEP: 2,
   CATEGORY_ITEMS_PER_BATCH: 10,
   ANNOTATIONS_MAX_ITEMS_PER_CATEGORY: 10,
+  // To keep the WebSockets alive by sending the broadcaster viewer position
+  WS_POSITION_KEEP_ALIVE_INTERVAL: 10000,
+  
 };

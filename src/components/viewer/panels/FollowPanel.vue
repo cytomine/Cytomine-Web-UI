@@ -93,7 +93,10 @@ export default {
       wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll("http", "") + "/ws/user-position/",
 
       userPostitionWebsock: null,
-      wsConnected: false
+      wsConnected: false,
+      wsInterval: undefined,
+      viewerPositionChanged: false,
+      lastPositionUpdate: Date.now()
     };
   },
   computed: {
@@ -184,10 +187,14 @@ export default {
         this.stopTrack();
         if(!this.wsConnected){
           this.initWebSocket();
+          this.wsInterval = setInterval(() => {
+           this.sendPosition();
+          }, constants.TRACKING_REFRESH_INTERVAL);
         }
         this.trackedUser = null;
       }
       else{
+        clearInterval(this.wsInterval);
         this.userPostitionWebsock.close();
       }
     },
@@ -255,8 +262,19 @@ export default {
         });
         this.trackedUser = null;
       }
+    },
+    'view.zoom'() {
+      this.viewerPositionChanged = true;
+    },
+    'view.rotation'() {
+      this.viewerPositionChanged = true;
+    },
+    'view.viewCenter.0'() {
+      this.viewerPositionChanged = true;
+    },
+    'view.viewCenter.1'() {
+      this.viewerPositionChanged = true;
     }
-
   },
   methods: {
     initTracking(){
@@ -307,7 +325,21 @@ export default {
       }
       this.trackedUser = null;
     },
-
+    
+    sendPosition() {
+      const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constants.WS_POSITION_KEEP_ALIVE_INTERVAL;
+      if (this.broadcast && this.wsConnected && (this.viewerPositionChanged || shouldRefreshForKeepAlive)) {
+        const position = JSON.stringify({
+          x: this.view.viewCenter[0],
+          y: this.view.viewCenter[1],
+          zoom: this.view.zoom,
+          rotation: this.view.rotation
+        });
+        this.userPostitionWebsock.send(position);
+        this.viewerPositionChanged = false;
+        this.lastPositionUpdate = Date.now();
+      }
+    },
     async track() {
       if(!this.trackedUser || this.wsConnected){
         return;
