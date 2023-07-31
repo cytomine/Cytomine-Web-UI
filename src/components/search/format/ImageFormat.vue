@@ -42,6 +42,7 @@
         v-model="searchValue"
         :data="searchChoices"
         :disabled="currentKey === 'Select metadata'"
+        :open-on-focus="true"
         :placeholder="$t('search-placeholder')"
         icon="search"
         type="search"
@@ -155,12 +156,13 @@ export default {
     }
   },
   watch: {
-    currentKey() {
+    async currentKey() {
       if (this.type[this.currentKey] === Number) {
         this.searchValue = this.sliderValues[this.currentKey];
       }
       else {
         this.searchValue = '';
+        this.searchChoices = await this.fetchAutoCompletion();
       }
     },
     async searchValue() {
