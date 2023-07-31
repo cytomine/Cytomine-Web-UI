@@ -339,6 +339,7 @@ import {get} from '@/utils/store-helpers';
 import {isNumeric} from '@/utils/string-utils';
 
 import {
+  AbstractImage,
   AbstractImageCollection,
   Cytomine,
   ImageInstance,
@@ -551,6 +552,45 @@ export default {
     }
   },
   methods: {
+    async addAbstractImage(uFile) {
+      let ai = (await Cytomine.instance.api.get(
+        `uploadedfile/${uFile.id}/abstractimage.json`
+      )).data;
+      ai = await AbstractImage.fetch(ai.id); /* ai not the same object */
+      this.$set(this.filteredProjects, ai.id, this.projects);
+      this.$set(this.projectPlaceholders, ai.id, true);
+
+      await this.fetchMetadata(ai);
+
+      if (!this.availableFormats.includes(ai.contentType)) {
+        this.availableFormats.push(ai.contentType);
+        this.$set(this.filteredImageIDs, ai.contentType, []);
+      }
+      this.abstractImages.push(ai);
+
+      if ((this.availableFormats.length-1) === this.selectedFormats.length) {
+        this.selectedFormats.push(ai.contentType);
+      }
+      if (this.selectedFormats.includes(ai.contentType)) {
+        this.filteredImageIDs[ai.contentType].push(ai.id);
+      }
+
+      let magnification = this.getMagnification(ai.magnification);
+      if (!this.availableMagnifications.includes(magnification)) {
+        this.availableMagnifications.push(magnification);
+      }
+      if ((this.availableMagnifications.length-1) === this.selectedMagnifications.length) {
+        this.selectedMagnifications.push(magnification);
+      }
+
+      let vendorFormatted = this.getVendor(ai.contentType);
+      if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+        this.availableVendors.push(vendorFormatted);
+      }
+      if ((this.availableVendors.length-1) === this.selectedVendors.length) {
+        this.selectedVendors.push(vendorFormatted);
+      }
+    },
     async addImage(uFile) {
       if (this.selectedProjectsToLink[uFile.image] === undefined) {
         return;
@@ -592,6 +632,41 @@ export default {
       this.$eventBus.$emit('update-ufiles', filteredUFileCollection);
       this.createModal = true;
     },
+    async fetchMetadata(ai) {
+      let properties = (await PropertyCollection.fetchAll({object: ai})).array;
+      properties.sort((a, b) => a.key.localeCompare(b.key));
+      this.properties[ai.id] = properties;
+
+      let keys = new Set();
+      properties.forEach(property => {
+        let key = stripIDfromKey(property.key);
+        keys.add(key);
+        this.metadataType[key] = isNumeric(property.value) ? Number : String;
+
+        if (!(key in this.metadataMax)) {
+          this.metadataMax[key] = property.value;
+        }
+
+        if (this.metadataMax[key] < property.value) {
+          this.metadataMax[key] = isNumeric(property.value) ? +property.value : property.value;
+        }
+      });
+
+      this.metadataKeys[ai.contentType] = Array.from(keys);
+    },
+    getMagnification(magnification) {
+      return {
+        value: magnification || 'null',
+        label: magnification || this.$t('unknown')
+      }
+    },
+    getVendor(format) {
+      let vendor = vendorFromFormat(format);
+      return {
+        value: vendor ? format : 'null',
+        label: vendor ? vendor.name : this.$t('unknown')
+      };
+    },
     async fetchAbstractImages() {
       this.abstractImages = (await AbstractImageCollection.fetchAll()).array;
       this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height), this.maxHeight);
@@ -607,44 +682,13 @@ export default {
         magnifications.add(ai.magnification);
       });
 
-      await Promise.all(this.abstractImages.map(async (ai) => {
-        let properties = (await PropertyCollection.fetchAll({object: ai})).array;
-        properties.sort((a, b) => a.key.localeCompare(b.key));
-        this.properties[ai.id] = properties;
-
-        let keys = new Set();
-        properties.forEach(property => {
-          let key = stripIDfromKey(property.key);
-          keys.add(key);
-          this.metadataType[key] = isNumeric(property.value) ? Number : String;
-
-          if (!(key in this.metadataMax)) {
-            this.metadataMax[key] = property.value;
-          }
-
-          if (this.metadataMax[key] < property.value) {
-            this.metadataMax[key] = isNumeric(property.value) ? +property.value : property.value;
-          }
-        });
-
-        this.metadataKeys[ai.contentType] = Array.from(keys);
-      }));
+      await Promise.all(this.abstractImages.map(async (ai) => await this.fetchMetadata(ai)));
 
       this.availableFormats = Array.from(formats);
-      this.availableMagnifications = Array.from(magnifications).map(m => {
-        return {
-          value: m || 'null',
-          label: m || this.$t('unknown')
-        }
-      });
+      this.availableMagnifications = Array.from(magnifications).map(m => this.getMagnification(m));
 
       this.availableFormats.forEach(format => {
-        let vendor = vendorFromFormat(format);
-        let vendorFormatted = {
-          value: vendor ? format : 'null',
-          label: vendor ? vendor.name : this.$t('unknown')
-        };
-
+        let vendorFormatted = this.getVendor(format);
         if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
           this.availableVendors.push(vendorFormatted);
         }
@@ -804,6 +848,11 @@ export default {
         fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
         this.refreshStatusSessionUploads();
         this.revision++;
+        setTimeout(
+          this.addAbstractImage,
+          constants.STORAGE_REFRESH_INTERVAL,
+          fileWrapper.uploadedFile
+        );
       }).catch(error => {
         if(!axios.isCancel(error)) {
           console.log(error);
@@ -870,7 +919,7 @@ export default {
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
-    
+
     this.$eventBus.$on('includeImageIDs', this.includeImageIDs);
   },
   deactivated() {
