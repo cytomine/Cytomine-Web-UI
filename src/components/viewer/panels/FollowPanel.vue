@@ -327,7 +327,7 @@ export default {
     },
     
     sendPosition() {
-      const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constant.WS_POSITION_KEEP_ALIVE_INTERVAL;
+      const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constants.WS_POSITION_KEEP_ALIVE_INTERVAL;
       if (this.broadcast && this.wsConnected && (this.viewerPositionChanged || shouldRefreshForKeepAlive)) {
         const position = JSON.stringify({
           x: this.view.viewCenter[0],
