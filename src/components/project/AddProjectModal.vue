@@ -13,53 +13,57 @@
  limitations under the License.-->
 
 <template>
-<form @submit.prevent="createProject()">
-  <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
-    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-      <b-input v-model="name" name="name" v-validate="'required'" />
-    </b-field>
+<form @submit.prevent="createProject(); loading = true">
+  <b-loading :active="loading" :is-full-page="false" />
 
-    <b-field :label="$t('ontology')">
-      <b-radio v-model="ontology" native-value="NEW">
-        {{$t('create-ontology-for-project')}}
-      </b-radio>
-    </b-field>
-    <b-field>
-      <b-radio v-model="ontology" native-value="EXISTING">
-        {{$t('use-existing-ontology')}}
-      </b-radio>
-    </b-field>
-    <b-field>
-      <b-radio v-model="ontology" native-value="NO">
-        {{$t('no-ontology')}}
-      </b-radio>
-    </b-field>
-
-    <template v-if="ontology === 'EXISTING'">
-      <b-field :type="{'is-danger': errors.has('ontology')}" :message="errors.first('ontology')">
-        <b-select
-          size="is-small"
-          v-model="selectedOntology"
-          :placeholder="$t('select-ontology')"
-          name="ontology"
-          v-validate="'required'"
-        >
-          <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
-            {{ontology.name}}
-          </option>
-        </b-select>
+  <template v-if="!loading">
+    <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
+      <b-field :label="$t('name')" :type="{ 'is-danger': errors.has('name') }" :message="errors.first('name')">
+        <b-input v-model="name" name="name" v-validate="'required'" />
       </b-field>
-    </template>
 
-    <template #footer>
-      <button class="button" type="button" @click="$emit('update:active', false)">
-        {{$t('button-cancel')}}
-      </button>
-      <button class="button is-link" :disabled="errors.any()">
-        {{$t('button-save')}}
-      </button>
-    </template>
-  </cytomine-modal>
+      <b-field :label="$t('ontology')">
+        <b-radio v-model="ontology" native-value="NEW">
+          {{ $t('create-ontology-for-project') }}
+        </b-radio>
+      </b-field>
+      <b-field>
+        <b-radio v-model="ontology" native-value="EXISTING">
+          {{ $t('use-existing-ontology') }}
+        </b-radio>
+      </b-field>
+      <b-field>
+        <b-radio v-model="ontology" native-value="NO">
+          {{ $t('no-ontology') }}
+        </b-radio>
+      </b-field>
+
+      <template v-if="ontology === 'EXISTING'">
+        <b-field :type="{ 'is-danger': errors.has('ontology') }" :message="errors.first('ontology')">
+          <b-select
+            size="is-small"
+            v-model="selectedOntology"
+            :placeholder="$t('select-ontology')"
+            name="ontology"
+            v-validate="'required'"
+          >
+            <option v-for="ontology in ontologies" :value="ontology.id" :key="ontology.id">
+              {{ ontology.name }}
+            </option>
+          </b-select>
+        </b-field>
+      </template>
+
+      <template #footer>
+        <button class="button" type="button" @click="$emit('update:active', false)">
+          {{ $t('button-cancel') }}
+        </button>
+        <button class="button is-link" :disabled="errors.any()">
+          {{ $t('button-save') }}
+        </button>
+      </template>
+    </cytomine-modal>
+  </template>
 </form>
 </template>
 
@@ -77,10 +81,11 @@ export default {
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-      ufiles: [],
+      loading: false,
       name: '',
       ontology: 'NEW',
-      selectedOntology: null
+      selectedOntology: null,
+      ufiles: []
     };
   },
   watch: {
@@ -119,8 +124,10 @@ export default {
             }).save())
           );
         }
-        
+
+        this.loading = false;
         this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
+        this.$emit('update:active', false);
         this.$router.push(`/project/${project.id}/configuration`);
       }
       catch(error) {
