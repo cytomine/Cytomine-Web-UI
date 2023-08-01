@@ -562,6 +562,13 @@ export default {
 
       await this.fetchMetadata(ai);
 
+      let oldMaxHeight = this.maxHeight;
+      let oldMaxWidth = this.maxWidth;
+      this.maxHeight = Math.max(ai.height, this.maxHeight);
+      this.maxWidth = Math.max(ai.width, this.maxWidth);
+      this.boundsHeight = this.boundsHeight[1] === oldMaxHeight ? [0, this.maxHeight] : this.boundsHeight;
+      this.boundsWidth = this.boundsWidth[1] === oldMaxWidth ? [0, this.maxWidth] : this.boundsWidth;
+
       if (!this.availableFormats.includes(ai.contentType)) {
         this.availableFormats.push(ai.contentType);
         this.$set(this.filteredImageIDs, ai.contentType, []);
