@@ -659,6 +659,7 @@ export default {
         }
       });
 
+      this.metadataKeys[ai.contentType].forEach((k) => keys.add(k));
       this.metadataKeys[ai.contentType] = Array.from(keys);
     },
     getMagnification(magnification) {
@@ -689,8 +690,6 @@ export default {
         magnifications.add(ai.magnification);
       });
 
-      await Promise.all(this.abstractImages.map(async (ai) => await this.fetchMetadata(ai)));
-
       this.availableFormats = Array.from(formats);
       this.availableMagnifications = Array.from(magnifications).map(m => this.getMagnification(m));
 
@@ -701,6 +700,7 @@ export default {
         }
 
         this.filteredImageIDs[format] = [];
+        this.metadataKeys[format] = [];
       });
 
       this.selectedFormats = [...this.availableFormats];
@@ -709,6 +709,8 @@ export default {
 
       let aiToImages = {}
       await Promise.all(this.abstractImages.map(async (ai) => {
+        await this.fetchMetadata(ai)
+
         aiToImages[ai.id] = (await Cytomine.instance.api.get(
           `abstractimage/${ai.id}/imageinstance.json`
         )).data.collection;
