@@ -21,12 +21,9 @@ ARG NODE_VERSION=14.16.1-alpine3.13
 FROM node:${NODE_VERSION} as frontend-builder
 WORKDIR /app
 
-
 ADD . /app
 WORKDIR /app
-RUN apk add git
-RUN npm install git+https://github.com/Cytomine-ULiege/Cytomine-js-client.git
-RUN npm install
+RUN npm install https://github.com/Cytomine-ULiege/Cytomine-js-client/releases/download/2.0.0/cytomine-client-2.0.0.tgz
 RUN npm run build
 
 #######################################################################################
