@@ -24,19 +24,30 @@ limitations under the License.-->
       class="has-background-light">
     <b-carousel-item v-for="image in imageGroup.imageInstances" :key="`${imageGroup.id}-${image.id}`">
       <div class="has-text-centered">
-        <image-thumbnail :url="image.thumb" :key="`${imageGroup.id}-${image.thumb}`" :size="128" />
+        <image-thumbnail
+            :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+            :key="`${imageGroup.id}-${image.thumb}`"
+            :size="128"
+            :url="image.thumb"
+        />
       </div>
     </b-carousel-item>
   </b-carousel>
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
 import ImageThumbnail from '@/components/image/ImageThumbnail';
+
 export default {
   name: 'image-group-preview',
   components: {ImageThumbnail},
   props: {
     imageGroup: {type: Object},
+  },
+  computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
   }
 };
 </script>

@@ -30,7 +30,12 @@
         >
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')">
-              <image-thumbnail :url="image.preview" :size="128" :key="image.preview" />
+              <image-thumbnail
+                  :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+                  :key="image.preview"
+                  :size="128"
+                  :url="image.preview"
+              />
             </b-table-column>
 
             <b-table-column field="instanceFilename" :label="$t('name')" sortable>
@@ -100,6 +105,7 @@ export default {
   },
   computed: {
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     imageCollection() {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',

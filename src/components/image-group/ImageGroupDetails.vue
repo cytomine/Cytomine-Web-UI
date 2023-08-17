@@ -52,7 +52,14 @@ limitations under the License.-->
     <tr v-if="isPropDisplayed('properties')">
       <td class="prop-label">{{$t('properties')}}</td>
       <td class="prop-content" colspan="3">
-        <cytomine-properties :object="imageGroup" :canEdit="canEdit" />
+        <cytomine-properties
+            :object="imageGroup"
+            :can-edit="canEdit"
+            :properties="internalUseFilteredProperties"
+            :error="loadPropertiesError"
+            @added="addProp"
+            @deleted="removeProp"
+        />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('attachedFiles')">
@@ -128,9 +135,9 @@ import RenameModal from '@/components/utils/RenameModal';
 import ImagePreview from '../image/ImagePreview';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
 import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
+import constants from '@/utils/constants';
 
-import {ImageGroup, ImageGroupImageInstance} from 'cytomine-client';
-
+import {ImageGroup, ImageGroupImageInstance, PropertyCollection} from 'cytomine-client';
 
 export default {
   name: 'image-group-details',
@@ -153,6 +160,8 @@ export default {
     return {
       isRenameModalActive: false,
       isAddToModalActive: false,
+      loadPropertiesError: false,
+      properties: [],
     };
   },
   computed: {
@@ -167,11 +176,18 @@ export default {
     canEdit() {
       return this.editable && !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
     },
-    isEmpty() {
-      return this.imageGroup.imageInstances.length > 0;
-    }
+    internalUseFilteredProperties() {
+      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
+    },
   },
   methods: {
+    removeProp(prop) {
+      this.properties = this.properties.filter(p => p.id !== prop.id);
+    },
+    addProp(prop) {
+      this.properties.push(prop);
+    },
+
     isPropDisplayed(prop) {
       return !this.excludedProperties.includes(prop);
     },
@@ -261,6 +277,15 @@ export default {
         });
       }
     },
+  },
+  async created() {
+    try {
+      this.properties = (await PropertyCollection.fetchAll({ object: this.imageGroup })).array;
+    }
+    catch (error) {
+      this.loadPropertiesError = true;
+      console.log(error);
+    }
   }
 };
 </script>
