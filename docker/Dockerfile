@@ -23,7 +23,7 @@ WORKDIR /app
 
 ADD . /app
 WORKDIR /app
-RUN npm install https://github.com/Cytomine-ULiege/Cytomine-js-client/releases/download/2.0.0/cytomine-client-2.0.0.tgz
+RUN npm rebuild node-sass
 RUN npm run build
 
 #######################################################################################
