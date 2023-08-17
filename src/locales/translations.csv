@@ -591,7 +591,7 @@ no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza,Geen trusted source die aan de zoekcriteria voldoet
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado,Geen file
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario,Er voldoen geen users aan de zoekcriteria
-none,,Aucun,Ninguna,Geen
+none,None,Aucun,Ninguna,Geen
 not-available,Not available.,Indisponible.,,Niet beschikbaar.
 not-found,Not found,Introuvable,No encontrado,niet gevonden
 not-found-error,The requested resource could not be loaded,La ressource demandée n'a pas pu être chargée,El recurso solicitado no se pudo cargar,De gevraagde bron kan niet worden geladen
