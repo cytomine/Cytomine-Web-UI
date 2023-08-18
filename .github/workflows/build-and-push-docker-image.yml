@@ -13,6 +13,14 @@ jobs:
       - name: Set up the repository
         uses: actions/checkout@v3
 
+      - name: Set up NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
