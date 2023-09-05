@@ -67,7 +67,7 @@ export default {
     },
 
     setApparentChannels(state, apparentChannels) {
-      state.apparentChannels = apparentChannels;
+            state.apparentChannels = apparentChannels;
     },
 
     setApparentChannelVisibility(state, {indexApparentChannel, visible}) {
@@ -214,9 +214,12 @@ export default {
       if (state.filter !== null) {
         params.filters = state.filter;
       }
-      let visibleApparentChannels = state.apparentChannels.filter(
-        apparentChannel => apparentChannel.visible
-      );
+      let visibleApparentChannels = [];
+      if (state.apparentChannels) {
+        visibleApparentChannels = state.apparentChannels.filter(
+          (apparentChannel) => apparentChannel.visible
+        );
+      }
       if (visibleApparentChannels.length > 0) {
         params.channels = [];
         // eslint-disable-next-line camelcase
