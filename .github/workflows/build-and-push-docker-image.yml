@@ -36,4 +36,6 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: cytomineuliege/web_ui:${{ github.ref_name }}
+          tags: |
+            cytomineuliege/web_ui:latest
+            cytomineuliege/web_ui:${{ github.ref_name }}
