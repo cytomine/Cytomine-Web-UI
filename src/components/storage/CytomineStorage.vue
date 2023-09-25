@@ -506,8 +506,8 @@ export default {
         };
 
         if(bounds[0] > 0) {
-          collection[prop]['gte'] = bounds[0]
-        };
+          collection[prop]['gte'] = bounds[0];
+        }
       }
 
       for (let { prop, selected, total } of this.multiSelectFilters) {
@@ -666,7 +666,7 @@ export default {
       return {
         value: magnification || 'null',
         label: magnification || this.$t('unknown')
-      }
+      };
     },
     getVendor(format) {
       let vendor = vendorFromFormat(format);
@@ -707,9 +707,9 @@ export default {
       this.selectedMagnifications = [...this.availableMagnifications];
       this.selectedVendors = [...this.availableVendors];
 
-      let aiToImages = {}
+      let aiToImages = {};
       await Promise.all(this.abstractImages.map(async (ai) => {
-        await this.fetchMetadata(ai)
+        await this.fetchMetadata(ai);
 
         aiToImages[ai.id] = (await Cytomine.instance.api.get(
           `abstractimage/${ai.id}/imageinstance.json`
