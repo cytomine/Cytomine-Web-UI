@@ -19,6 +19,7 @@ import {createColorStyle, createColorLineStyle, changeOpacity, createStrokeStyle
 let initialTermsOpacity = 1;
 let initialTracksOpacity = 1;
 let initialLayersOpacity = 0.5;
+let initialCurtainPosition = 0.5;
 
 export default {
   state() {
@@ -35,7 +36,9 @@ export default {
       layersOpacity: initialLayersOpacity,
 
       wrappedTracks: null,
-      multipleTracksStyle: createStrokeStyle('#fff', initialLayersOpacity)
+      multipleTracksStyle: createStrokeStyle('#fff', initialLayersOpacity),
+
+      curtainPosition: initialCurtainPosition,
     };
   },
 
@@ -101,6 +104,10 @@ export default {
         });
       }
       changeOpacity(state.multipleTracksStyle, opacity);
+    },
+
+    setCurtainPosition(state, position) {
+      state.curtainPosition = position;
     },
   },
 

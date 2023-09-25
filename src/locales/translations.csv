@@ -271,6 +271,7 @@ current-selection,Current selection,Sélection,Selección actual,Selectie
 currently,Currently,Actuellement,Actualmente,Momenteel
 currently-visible-annotations-for-track,Currently visible annotations for track,Annotations actuellement visibles pour la trace,,Annotaties die momenteel zichtbaar zijn voor de tracering
 currently-visible-annotations-with,Currently visible annotations with,Annotations actuellement visibles avec,,Momenteel zichtbaar annotatie met
+curtain,Curtain,Rideau,Cortina,Gordijn
 custom-ui,Custom UI,Personnalisation de l'interface,Personalizada interfaz,Custom interface (UI)
 cytomine-company,Cytomine company,Société Cytomine,Compañía de Cytomine,Cytomine bedrijf
 cytomine-company-info,"For service requests (e.g. installation, hosting, maintenance, trainings, specific software developments, slide scanning), please contact the {websiteCompanyLink}.","Pour des services (e.g. installation, hébergement, maintenance, formations, développements logiciels spécifiques, slide scanning), contactez la {websiteCompanyLink}.","Para solicitudes de servicio (por ejemplo, instalación, hospedaje, mantenimiento, capacitación, desarrollo de software específico, escaneo de diapositivas), comuníquese con {websiteCompanyLink}.","Voor serviceaanvragen (bijv. installatie, hosting, onderhoud, trainingen, specifieke softwareontwikkelingen, dia's scannen), kunt u contact opnemen met de {websiteCompanyLink}."
@@ -950,6 +951,7 @@ see-environment-on,See environment on,Voir l'environnement sur,Ver entorno en,Zi
 see-source-code-on,See source code on,Voir le code source sur,Ver código fuente en,Bekijk de broncode op
 select,Select,Sélectionner,Seleccione,Selecteer
 select-all,Select all,Tout sélectionner,Seleccionar todo,Selecteer alles
+select-curtain-image,Select the curtain image,Choisir l'image rideau,Seleccione la imagen de la cortina,Selecteer de afbeelding van het gordijn
 select-date,Select a date,Choisir une date,Seleccione una fecha,Selecteer een datum
 select-image-group,Select image group,Choisir le groupe d'images,Seleccionar grupo de imágenes,Selecteer beeldgroep
 select-image-to-add,Select an image to add,Sélectionner une image à ajouter,Seleccione una imagen para agregar,Selecteer een afbeelding om toe te voegen
