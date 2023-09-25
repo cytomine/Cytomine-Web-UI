@@ -35,7 +35,7 @@
     </b-select>
   </b-field>
 
-  <template v-if="nbImages > 1">
+  <template>
     <table class="table">
       <thead>
       <tr>
