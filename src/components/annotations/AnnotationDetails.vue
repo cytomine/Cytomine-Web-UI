@@ -161,6 +161,7 @@
             :properties="internalUseFilteredProperties"
             @deleted="removeProp"
             @added="addProp"
+            @updateProperties="$emit('updateProperties')"
              />
         </td>
       </tr>
