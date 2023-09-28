@@ -4,7 +4,7 @@
     <div class="columns is-multiline">
       <div class="column is-narrow" v-for="(value, key) in filters" :key="key">
         <div class="box">
-          <div class="filter">{{ key }}: {{ value }}</div>
+          <div class="filter"><strong class="key">{{ key }}</strong>: {{ value }}</div>
           <button class="delete" @click="removeFilter(key)"/>
         </div>
       </div>
@@ -13,7 +13,7 @@
     <div class="search-block" v-if="filteredKeys">
       <b-dropdown v-model="currentKey" :placeholder="$t('search-placeholder')" scrollable>
         <template #trigger>
-          <b-button :label="currentKey" type="is-primary"/>
+          <b-button class="crop" :label="currentKey" type="is-primary"/>
         </template>
 
         <b-dropdown-item custom>
@@ -193,6 +193,15 @@ export default {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  max-width: 750px;
+  white-space: initial;
+  word-break: break-word;
+}
+
+.crop {
+  height: auto;
+  white-space: initial;
+  word-break: break-word;
 }
 
 .delete {
@@ -206,6 +215,10 @@ export default {
 
 .image-format {
   margin: 10px;
+}
+
+.key {
+  max-width: 75%;
 }
 
 .metadata {
