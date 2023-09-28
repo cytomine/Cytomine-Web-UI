@@ -124,7 +124,7 @@ export default {
     async fetchAutoCompletion() {
       return (await Cytomine.instance.api.get(
         'search/autocomplete.json',
-        {params: {key: this.currentKey, searchTerm: this.searchValue}}
+        {params: {key: this.currentKey, searchTerm: encodeURI(this.searchValue)}}
       )).data['collection'];
     },
     async removeFilter(key) {
