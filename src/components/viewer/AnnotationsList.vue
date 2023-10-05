@@ -124,9 +124,6 @@ export default {
       return this.imageWrapper.imageInstance;
     },
     images() {
-      if (this.imageWrapper.imageGroup) {
-        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
-      }
       return [this.image];
     },
     isActiveImage() {
