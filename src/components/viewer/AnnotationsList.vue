@@ -59,6 +59,7 @@
           :visible="opened"
           :index="index"
           :revision="revision"
+          :show-details="showDetails"
 
           @updateTermsOrTracks="$emit('updateTermsOrTracks', $event)"
           @updateProperties="$emit('updateProperties')"
@@ -110,6 +111,7 @@ export default {
   },
   computed: {
     ontology: get('currentProject/ontology'),
+    configUI: get('currentProject/configUI'),
 
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -215,6 +217,10 @@ export default {
         this.$store.commit(this.imageModule + 'setShowAnnotationsList', value);
       }
     },
+
+    showDetails() {
+      return this.configUI[`project-explore-annotation-main`];
+    }
   },
   watch: {
     hasTracks(value) {
