@@ -12,6 +12,7 @@
       @delete="handleDeletion"
     />
     <annotations-list
+      v-if="isPanelDisplayed('annotations-list') && isPanelDisplayed('hide-tools')"
       class="annotations-table-wrapper"
       :index="index"
       @select="selectAnnotation"
