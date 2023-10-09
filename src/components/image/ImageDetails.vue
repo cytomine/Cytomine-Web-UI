@@ -128,8 +128,7 @@
           </td>
         </template>
         <template v-if="isPropDisplayed('physicalSizeX')">
-          <!-- check the translation.csv for why it shows as X/Y resolution -->
-          <td class="prop-label">{{$t("x-resolution")}}</td>
+          <td class="prop-label">{{$t("x-y-resolution")}}</td>
           <td class="prop-content-half" :colspan="isPropDisplayed('width') ? 1 : 3">
             <template v-if="image.physicalSizeX">{{image.physicalSizeX.toFixed(3)}} {{$t("um-per-pixel")}}</template>
             <template v-else>{{$t("unknown")}}</template>
