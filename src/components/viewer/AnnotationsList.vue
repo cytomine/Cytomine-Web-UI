@@ -97,10 +97,7 @@ export default {
   ],
   data() {
     return {
-      displayType: 'TERM',
       nbPerPage: 10,
-      selectedTermsIds: [],
-      selectedTracksIds: [],
       noTermOption: {id: 0, name: this.$t('no-term')},
 
       users: [],
@@ -218,6 +215,33 @@ export default {
       }
     },
 
+    displayType: {
+      get() {
+        return this.imageWrapper.annotationsList.displayType;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setDisplayType', value);
+      }
+    },
+
+    selectedTermsIds: {
+      get() {
+        return this.imageWrapper.annotationsList.selectedTermsIds;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setSelectedTermsIds', value);
+      }
+    },
+
+    selectedTracksIds: {
+      get() {
+        return this.imageWrapper.annotationsList.selectedTracksIds;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setSelectedTracksIds', value);
+      }
+    },
+
     showDetails() {
       return this.configUI[`project-explore-annotation-main`];
     }
@@ -290,8 +314,12 @@ export default {
     }
   },
   async created() {
-    this.selectedTermsIds = (this.termsOptionsIds.length > 0) ? [this.termsOptionsIds[0]] : [];
-    this.selectedTracksIds = (this.hasTracks) ? [this.tracks[0].id] : [];
+    if (this.selectedTermsIds.length === 0) {
+      this.selectedTermsIds = (this.termsOptionsIds.length > 0) ? [this.termsOptionsIds[0]] : [];
+    }
+    if (this.selectedTracksIds.length === 0) {
+      this.selectedTracksIds = (this.hasTracks) ? [this.tracks[0].id] : [];
+    }
 
     this.fetchUsers();
     this.fetchUserJobs();
