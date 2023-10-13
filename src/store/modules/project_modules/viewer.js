@@ -29,7 +29,8 @@ export default {
       activeImage: 0,
       indexNextImage: 0,
 
-      copiedAnnot: null
+      copiedAnnot: null,
+      copiedAnnotImageInstance: null
     };
   },
 
@@ -50,6 +51,10 @@ export default {
 
     setCopiedAnnot(state, annot) {
       state.copiedAnnot = annot;
+    },
+
+    setCopiedAnnotImageInstance(state, image) {
+      state.copiedAnnotImageInstance = image;
     },
 
     setLinkMode(state, mode) {
