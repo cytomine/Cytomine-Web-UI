@@ -36,6 +36,33 @@
         </div>
       </div>
 
+      <div v-else-if="type[currentKey] === Date">
+        <b-datetimepicker
+          class="search-images"
+          v-model="searchValue"
+          :first-day-of-week="1"
+          icon="calendar"
+          placeholder="Click to select..."
+        >
+          <template #left>
+            <b-button
+              label="Now"
+              type="is-primary"
+              icon-left="clock"
+              @click="searchValue = new Date()" />
+          </template>
+
+          <template #right>
+            <b-button
+              label="Clear"
+              type="is-danger"
+              icon-left="times-circle"
+              outlined
+              @click="searchValue = null" />
+          </template>
+        </b-datetimepicker>
+      </div>
+
       <b-autocomplete
         class="search-images"
         v-else

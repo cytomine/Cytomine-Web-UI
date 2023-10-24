@@ -199,6 +199,9 @@ export default {
           let key = stripIDfromKey(property.key);
           keys.add(key);
           this.metadataType[key] = isNumeric(property.value) ? Number : String;
+          if (key.toLowerCase().includes('date')) {
+            this.metadataType[key] = Date;
+          }
 
           if (!(key in this.metadataMax)) {
             this.metadataMax[key] = property.value;
