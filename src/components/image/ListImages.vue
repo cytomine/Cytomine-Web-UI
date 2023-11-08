@@ -400,6 +400,7 @@ export default {
 
     currentPage: sync('currentPage', storeOptions),
     perPage: sync('perPage', storeOptions),
+    // getting the sortFIeld from the Vuex store to check if it's null (defualt) so we set it to sort by filename
     sortField: sync('sortField', storeOptions),
     sortOrder: sync('sortOrder', storeOptions),
     openedDetails: sync('openedDetails', storeOptions)
@@ -484,6 +485,18 @@ export default {
         this.fetchTags()
       ]);
       this.loading = false;
+
+      // Check if sortField is null in Vuex and set it to 'instanceFilename' if it is
+      if (this.sortField === null) {
+
+        if (this.blindMode) {
+          // set sortField to blindedName if blindMode is used 
+          this.sortField = 'blindedName';
+        } else {
+          // Use your default sorting by file name ('instanceFilename')
+          this.sortField = 'instanceFilename'
+        }
+      }
     }
     catch(error) {
       console.log(error);
