@@ -375,9 +375,12 @@ export default {
       return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
     },
     metadataFilteredProperties() {
-      let props = this.internalUseFilteredProperties.filter(prop => {
-        for (const key in constants.METADATA_PREFIXES) {
-          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+      // The "constants" will be set with a string representing a list of \n separated "key=value."
+      // metadataPrefixes will be an array each element will be a ".value"
+      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
+      const props = this.internalUseFilteredProperties.filter(prop => {
+        for (const prefix of metadataPrefixes) {
+          if (prop.key.startsWith(prefix)) {
             return false;
           }
         }
@@ -386,9 +389,12 @@ export default {
       return props
     },
     onlyMetadataProperties() {
+      // The "constants" will be set with a string representing a list of \n separated "key=value."
+      // metadataPrefixes will be an array each element will be a ".value"
+      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
       let props = this.internalUseFilteredProperties.filter(prop => {
-        for (const key in constants.METADATA_PREFIXES) {
-          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
+        for (const prefix of metadataPrefixes) {
+          if (prop.key.startsWith(prefix)) {
             return true;
           }
         }
