@@ -104,10 +104,10 @@ export default {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
     },
     async fetchMetadata() {
-      let metadata = (await Cytomine.instance.api.get(
+      this.metadata = (await Cytomine.instance.api.get(
         `${this.uriCytomineImageType}/${this.image.id}/metadata.json`
-      )).data.collection;
-      this.metadata = metadata.map(md => ({fullKey: `${md.namespace}.${md.key}`, ...md}));
+      )).data.collection.map(md => ({fullKey: `${md.namespace}.${md.key}`, ...md}));
+      this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     }
   },
   created() {
