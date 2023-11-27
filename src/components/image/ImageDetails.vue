@@ -73,14 +73,7 @@
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content" colspan="3">
-          <cytomine-properties
-            :object="image"
-            :error="loadPropertiesError"
-            :canEdit="canEdit"
-            :properties="metadataFilteredProperties"
-            @deleted="removeProp"
-            @added="addProp"
-          />
+          <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
       <tr v-if="isPropDisplayed('attached-files')">
@@ -312,8 +305,6 @@ import {ImageInstance} from 'cytomine-client';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 import vendorFromFormat from '@/utils/vendor';
-import {PropertyCollection} from 'cytomine-client';
-import constants from '@/utils/constants.js';
 
 export default {
   name: 'image-details',
@@ -340,8 +331,6 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
-      properties: [],
-      loadPropertiesError: false
     };
   },
   computed: {
@@ -370,38 +359,6 @@ export default {
     },
     vendor() {
       return vendorFromFormat(this.image.contentType);
-    },
-    internalUseFilteredProperties() {
-      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
-    },
-    metadataFilteredProperties() {
-      // The "constants" will be set with a string representing a list of \n separated "key=value."
-      // metadataPrefixes will be an array each element will be a ".value"
-      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
-      const props = this.internalUseFilteredProperties.filter(prop => {
-        for (const prefix of metadataPrefixes) {
-          if (prop.key.startsWith(prefix)) {
-            return false;
-          }
-        }
-        return true;
-      });
-      return props
-    },
-    onlyMetadataProperties() {
-      // The "constants" will be set with a string representing a list of \n separated "key=value."
-      // metadataPrefixes will be an array each element will be a ".value"
-      const metadataPrefixes = constants.METADATA_PREFIXES.split('\n').map(e => e.split('=')[1]);
-      let props = this.internalUseFilteredProperties.filter(prop => {
-        for (const prefix of metadataPrefixes) {
-          if (prop.key.startsWith(prefix)) {
-            return true;
-          }
-        }
-        return false;
-      });
-      // We sort the properties to improve ease of use in the metadata modal
-      return props.sort((a, b) => a.key.localeCompare(b.key));
     },
     /**
      * BLIND   MANAGER    RESULT
@@ -486,21 +443,6 @@ export default {
     },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
-    },
-    removeProp(prop) {
-      this.properties = this.properties.filter(p => p.id !== prop.id);
-    },
-    addProp(prop) {
-      this.properties.push(prop);
-    }
-  },
-  async created() {
-    try {
-      this.properties = (await PropertyCollection.fetchAll({ object: this.image })).array;
-    }
-    catch (error) {
-      this.loadPropertiesError = true;
-      console.log(error);
     }
   }
 }
