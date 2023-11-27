@@ -73,7 +73,7 @@
       <tr v-if="isPropDisplayed('properties')">
         <td class="prop-label">{{$t('properties')}}</td>
         <td class="prop-content" colspan="3">
-          <cytomine-properties 
+          <cytomine-properties
             :object="image"
             :error="loadPropertiesError"
             :canEdit="canEdit"
@@ -286,8 +286,6 @@
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
     :image="image"
-    :properties="onlyMetadataProperties"
-    :error="loadPropertiesError"
   />
 </div>
 
@@ -407,7 +405,7 @@ export default {
      * 1       1          1
      */
     isBlindModeAndContributor() {
-      return this.blindMode && !this.canManageProject; 
+      return this.blindMode && !this.canManageProject;
     }
   },
   methods: {

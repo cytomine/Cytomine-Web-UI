@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal :active="active" :title="$t('image-metadata')" @close="$emit('update:active', false)">
-  <image-metadata :image="image" :properties="properties" :error="error" :show-macro="true" />
+  <image-metadata :image="image" :error="error" :show-macro="true" />
   <template #footer>
     <button class="button" type="button" @click="$emit('update:active', false)">
       {{$t('button-close')}}
@@ -32,7 +32,6 @@ export default {
   props: {
     active: Boolean,
     image: Object,
-    properties: {type: Array},
     error: {type: Boolean, default: false}
   },
   components: {ImageMetadata, CytomineModal},
