@@ -46,8 +46,6 @@ RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 COPY --from=entrypoint-scripts --chmod=774 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
-COPY --chmod=774 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/875-generate-metadata-prefix-json-file.sh
-RUN echo "mv \$output_file /app/public/meta-prefixes.json" >> /docker-entrypoint-cytomine.d/875-generate-metadata-prefix-json-file.sh
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve
@@ -81,7 +79,6 @@ RUN mkdir /docker-entrypoint-cytomine.d/
 # COPY --from cannot interpolate variables
 COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
 COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --chmod=774 scripts/generate-metadata-prefix-json-file.sh /docker-entrypoint-cytomine.d/750-generate-metadata-prefix-json-file.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
 
