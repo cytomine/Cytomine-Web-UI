@@ -36,6 +36,7 @@ import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
 import AppEngineMainPage from './components/appengine/AppEngineMainPage.vue';
+import AppInfo from './components/appengine/AppInfo.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 import SoftwareInformation from './components/software/SoftwareInformation.vue';
@@ -146,8 +147,16 @@ const routes = [
   },
   // AppEngine 
   {
-    path: '/applications',
+    path: '/appengine',
     component: AppEngineMainPage
+  },
+  {
+    path: '/appengine/:id',
+    component: AppInfo,
+  },
+  {
+    path: '/appengine/:namespace/:version',
+    component: AppInfo,
   },
 
   // redirections for old URLS
