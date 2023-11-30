@@ -1070,6 +1070,5 @@ you-have-validated-image-on,You have validated this image on {date},Vous avez va
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 tasks,Tasks,Tâches,Tareas,Taken
-upload,Upload,Uploader,Subir,Uploaden
 applications,Applications,Applications,Aplicaciones,Toepassingen
-description,Description,Description,Descripción,Beschrijving
+no-authors,No Authors,Aucun auteur,Sin autores,Keine Autoren
