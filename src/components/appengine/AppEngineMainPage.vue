@@ -5,7 +5,7 @@
       <h1 class="title is-1">{{ $t('tasks') }}</h1>
 
       <div class="apps-upload-button">
-        <UploadAppButton btnFunc="upload" />
+        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
       </div>
     </section>
 
@@ -36,6 +36,17 @@ export default {
   async created() {
     this.applications = await Task.fetchAll();
   },
+  methods: {
+    async handleTaskUploadSuccess() {
+      try {
+        // this.applications.push(await Task.fetchAll());
+        this.applications = await Task.fetchAll();
+
+      } catch (error) {
+        console.error('Error fetching tasks after upload:', error);
+      }
+    },
+  },
 };
 </script>
   
@@ -49,7 +60,7 @@ export default {
   align-items: center;
 }
 
-#upper-section-flex > * {
+#upper-section-flex>* {
   padding: 1em;
 }
 
@@ -66,7 +77,7 @@ export default {
 
 }
 
-#lower-section-flex > * {
+#lower-section-flex>* {
   flex-basis: 20%;
   margin: 1em;
 }

@@ -33,8 +33,6 @@ export default {
             this.$refs.fileInput.click();
         },
         async upload(file) {
-            console.log('Before uploadTask');
-
             const formData = new FormData();
             formData.append('task', file);
 
@@ -43,9 +41,12 @@ export default {
 
                 if (response.status >= 200 && response.status < 300) {
                     // Successful response handling
-                    const responseMsg = response.data.message || 'Unknown message'; // Accessing the 'data' property from the response object
+                    const responseMsg = response.data.message || 'Unknown message'; 
 
-                    console.log('Upload response:', responseMsg);
+                    // trigger success so we fetch all tasks (will re-render so we see new task)
+                    this.$emit('taskUploadSuccess');
+
+                    console.log('Task Upload response:', responseMsg);
                     this.$notify({ type: 'success', text: responseMsg });
                 }
             } catch (error) {
@@ -55,12 +56,12 @@ export default {
                     console.error('Error during upload:', error);
                     this.$notify({ type: 'warn', text: errorMessage });
                 } else {
+                    const errorMessage = error.response.data.message || 'Unkown Error!';
+
                     console.error('Error during upload:', error);
-                    this.$notify({ type: 'error', text: this.$t('notif-warn-appengine-upload-failed') });
+                    this.$notify({ type: 'error', text: errorMessage});
                 }
             }
-
-            console.log('After upload');
         },
     },
 };
