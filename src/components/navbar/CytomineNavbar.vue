@@ -47,9 +47,9 @@
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
-      <router-link to="/applications" class="navbar-item">
+      <router-link to="/appengine" class="navbar-item">
         <i class="fas fa-code"></i>
-        {{ $t('Applications') }}
+        {{ $t('applications') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
