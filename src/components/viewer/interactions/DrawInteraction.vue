@@ -37,7 +37,7 @@ import {get} from '@/utils/store-helpers';
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType} from 'cytomine-client';
+import {Annotation, AnnotationType, Cytomine} from 'cytomine-client';
 import {Action} from '@/utils/annotation-utils.js';
 
 export default {
@@ -175,7 +175,8 @@ export default {
     },
 
     async endDraw(drawnFeature) {
-      this.activeLayers.forEach(async (layer, idx) => {
+      for (const layer of this.activeLayers) {
+        const idx = this.activeLayers.indexOf(layer);
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
           image: this.image.id,
@@ -194,12 +195,14 @@ export default {
           }
 
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+
+          await Cytomine.instance.api.get('retrieval/index.json', {params: {annotation: annot.id}});
         }
         catch(err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
-      });
+      }
     },
 
     async endCorrection(feature) {
