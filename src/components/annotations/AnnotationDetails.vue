@@ -157,6 +157,15 @@
         </td>
       </tr>
 
+      <template>
+        <tr>
+          <td colspan="2">
+            <h5>{{ $t('similar-annotations') }}</h5>
+            <similar-annotation :annotation="annotation"/>
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -171,10 +180,10 @@
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
-            <td> 
+            <td>
               <span class="tag is-danger">
                 {{ $t('reviewed-annotation-status-not-validated') }}
-              </span>  
+              </span>
             </td>
           </tr>
         </template>
@@ -264,10 +273,12 @@ import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import {PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
+import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
 
 export default {
   name: 'annotations-details',
   components: {
+    SimilarAnnotation,
     ChannelName,
     ImageName,
     CytomineDescription,

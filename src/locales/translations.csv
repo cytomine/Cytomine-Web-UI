@@ -1,7 +1,7 @@
 key,en,fr,es,nl
 about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine,Over Cytomine
 absolute-link-mode,Absolute,Absolu,,Absoluut
-access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces 
+access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
 account,Account,Compte,Cuenta,Rekening
 actions,Actions,Actions,Acciones,Acties
 active-projects,Active projects,Projets actifs,Proyectos activos,Actieve projecten
@@ -90,7 +90,7 @@ button-adjust,Adjust,Ajuster,,Aanpassen
 button-best-fit-zoom,Fit zoom to viewport,Ajuster le zoom à la vue,,Pas zoom aan om te bekijken
 button-cancel-review,Cancel my review,Annuler la validation,Cancelar mi reseña,Review annuleren
 button-cancel,Cancel,Annuler,Cancelar,Annuleren
-button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie 
+button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie
 button-change-ontology,Change ontology,Changer l'ontologie,Cambiar ontología,Knop om de ontologie te veranderen
 button-clear,Clear,Réinitialiser,Reiniciar,Resetten
 button-close,Close,Fermer,Cerrar,Sluiten
@@ -185,7 +185,7 @@ configuration,Configuration,Configuration,Configuración,Configuratie
 confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,Êtes-vous sûr de vouloir fermer ce projet ? Les {viewers} qu'il contient seront également fermés.,¿Está seguro de cerrar este proyecto? Los {viewers} que contiene también se cerrarán,"Bent u zeker dat u dit project wilt sluiten? De {viewers} die het bevat, worden ook gesloten."
 confirm-close-project,Close project,Fermer le projet,Cerrar proyecto,Project afsluiten
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?,Momenteel zijn er geen annotaties in dit project gekoppeld aan een eigenschap met sleutel '{key}'.<br>Weet u zeker dat u deze als de standaardeigenschap wilt gebruiken
-confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting 
+confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting
 confirm-deletion-analysis-data,Do you confirm you want to delete the following analysis data:,Êtes-vous sûr de vouloir supprimer les données d'analyse suivantes :,¿Confirma que desea eliminar los siguientes datos de análisis:,Bent u zeker dat u de volgende analysegegevens wilt verwijderen:
 confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?,¿Estás seguro de que deseas eliminar esta anotación?,Bent u zeker dat u deze annotatie wilt verwijderen?
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?,Bent u zeker dat u het bijgevoegde file {filename} wilt verwijderen?
@@ -268,7 +268,7 @@ delete,Delete,Supprimer,Eliminar,verwijderen
 deleted-analysis-data,Analysis data was deleted,Données de l'analyse supprimées,Los datos de análisis fueron eliminados,Data analysis deleted
 deployed,Deployed,Déployé,Desplegado,Ingezet
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
-deprecated,Deprecated,Déprécié,Obsoleto,Verouderd 
+deprecated,Deprecated,Déprécié,Obsoleto,Verouderd
 description,Description,Description,Descripción,Beschrijving
 detailed-image-consultations,Detailed image consultations,Détails des consultations d'image,Consultas detalladas de imagen,Afbeeldingsweergave details
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName},Gedetailleerde informatie van de afbeelding {imageName}
@@ -276,7 +276,7 @@ detailed-project-connections,Detailed project connections,Détails des connexion
 detecting-format,Detecting format,Détection de format en cours,,Formaatdetectie wordt uitgevoerd
 developer-mode,Developer mode,Mode développeur,,Developersmodus
 digital-zoom-checkbox-label,Enable digital zoom (interpolation),Activer le zoom digital (par interpolation),Habilitar zoom digital (interpolación),Digitale zoom inschakelen (door interpolatie)
-digital-zoom,Digital zoom,Zoom digital,Zoom digital,Digitale zoom 
+digital-zoom,Digital zoom,Zoom digital,Zoom digital,Digitale zoom
 disabled,Disabled,Désactivé,Dehabilitado,Uitgeschalekd
 display-annot-details,Display details of currently selected annotation,Afficher les détails de l'annotation sélectionnée,Mostrar detalles de la anotación seleccionada,Bekijk details van geselecteerde annotatie
 display,Display,Affichage,Monitor,Display
@@ -288,7 +288,7 @@ dont-have-access-to-any-ontology,You don't have access to any ontology,Vous n'av
 download-CSV,Download CSV,Télécharger le CSV,Descargar CSV,CSV downloaden
 download-excel,Download Excel,Télécharger l'Excel,Descargar Excel,Excel downloaden
 download-PDF,Download PDF,Télécharger le PDF,Descargar PDF,Download PDF
-download-permission,Download permission,Permission de téléchargement,Permiso de descarga,Download toestemming 
+download-permission,Download permission,Permission de téléchargement,Permiso de descarga,Download toestemming
 download-results,Download results,Télécharger les résultats,Descargar resultados,Resultaten downloaden
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari.","Als u Google Chrome, Mozilla Firefox of Apple Safari gebruikt, kunt u files van uw computer naar de ""{labelButton}""-knop slepen en neerzetten."
 draw-tools,Draw tools,Outils de tracé,Herramientas de dibujo,Draw tools
@@ -336,7 +336,7 @@ file-tree,File tree,Arborescence de fichiers,Árbol de archivos,Fileboom
 filename,Filename,Nom de fichier,Nombre del archivo,Filenaam
 files,Files,Fichiers,Archivos,Files
 fill,Fill,Remplir,Rellenar,Invullen
-filter,Filter,Filtre,Filtrar,Filter 
+filter,Filter,Filtre,Filtrar,Filter
 filters,Filters,Filtres,Filtros,Filters
 first-consultation,First consultation,Première consultation,Primera consulta,Eerste afbeelding consult
 first-project-connection,First project connection,Première connexion au projet,Primera conexión al proyecto,Eerste verbinding met het project
@@ -400,7 +400,7 @@ images,Images,Images,Imágenes,Afbeeldingen
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
 in-project,in {projectName},dans {projectName},en {projectName},in {projectnaam}
 in-queue,In queue,Dans la file,En cola,In de wachtrij
-in-review,In review,En cours de validation,En revisión,Review in proces 
+in-review,In review,En cours de validation,En revisión,Review in proces
 in-this-image,in this image,dans cette image,,op deze afbeelding
 in-this-slice,in this slice,dans ce plan,,in dit slice
 indeterminate,Indeterminate,Inconnu,Indeterminado,Onbekend
@@ -496,7 +496,7 @@ no-annotation,No annotation,Aucune annotation,Sin anotaciones,Geen annotatie
 no-attached-file,No attached file,Aucun fichier joint,Ningún archivo adjunto,Geen file bijgevoegd
 no-default-property,No default property,Pas de propriété par défaut,Sin propiedad predeterminada,Geen defaulteigenschap
 no-description,No description,Pas de description,Sin descripción,Geen beschrijving
-no-file,No file,Aucun fichier,Ningún archivo,Geen file  
+no-file,No file,Aucun fichier,Ningún archivo,Geen file
 no-image-consultation,No image consultation,Aucune consultation d'image,Ninguna consulta de imagen,Geen online afbeeldingconsult
 no-image-filter,No image filter to display,Aucun filtre à afficher,No hay filtro de imagen que mostrar,Geen filters om weer te geven
 no-image-recently-opened,No image recently opened,Aucune image consultée récemment,Ninguna imagen abierta recientemente,Geen recent bekeken afbeeldingen
@@ -521,11 +521,11 @@ no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
 no-software,No algorithm,Pas d'algorithme,Sin algoritmo,Geen algoritme
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
-no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag 
+no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag
 no-term-to-add,No term to add,Aucun terme à ajouter,No hay término que agregar,Geen term om toe te voegen
 no-term,No term,Aucun terme,Sin término,Geen term
 no-track-to-add,No track to add,Pas de trace à ajouter,,Geen track toe te voegen
-no-track,No track,Pas de trace,Sin pista,Geen track 
+no-track,No track,Pas de trace,Sin pista,Geen track
 no-tracking,No tracking,Pas de suivi,Sin seguimiento,Geen tracking
 no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza,Geen trusted source die aan de zoekcriteria voldoet
 no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza,Geen trusted source
@@ -651,7 +651,7 @@ notif-success-add-image,Image {imageName} was successfully added to project {pro
 notif-success-add-project-members,The selected users were correctly added as project members,Les utilisateurs sélectionnés ont été ajoutés au projet,Los usuarios seleccionados se agregaron correctamente al proyecto,De geselecteerde gebruikers zijn toegevoegd aan het project
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
 notif-success-algorithm-deletion,Algorithm correctly deleted,L'algorithme a été supprimé,Algoritmo eliminado correctamente,Het algoritme is verwijderd
-notif-success-analysis-data-deletion,Analysis data was successfully deleted,Les données de l'analyse ont bien été supprimées,Los datos de análisis se eliminaron con éxito,De data analyse zijn succesvol verwijderd 
+notif-success-analysis-data-deletion,Analysis data was successfully deleted,Les données de l'analyse ont bien été supprimées,Los datos de análisis se eliminaron con éxito,De data analyse zijn succesvol verwijderd
 notif-success-analysis-deletion,The analysis was successfully deleted,L'analyse a bien été supprimée,El análisis fue eliminado con éxito,De analyse is succesvol verwijderd
 notif-success-analysis-kill,Analysis was successfully killed,L'analyse a bien été arrêtée,El análisis fue abortado con éxito,De analyse is succesvol gestopt
 notif-success-analysis-launch,Successfully launched the analysis,L'analyse a bien été lancée,Análisis iniciado con éxito,De analyse is succesvol gestart
@@ -760,7 +760,7 @@ possible-conflict,Possible conflict,Conflit potentiel,Posible conflicto,Potentie
 prefilled-parameters,Pre-filled parameters,Paramètres pré-remplis,Parámetros por defecto,Vooraf ingevulde parameters
 prefix,Prefix,Préfixe,Prefijo,Voorvoegsel
 preview-size,Preview size,Taille de l'aperçu,Tamaño de vista previa,Preview size
-preview,Preview,Aperçu,Vista previa,Preview  
+preview,Preview,Aperçu,Vista previa,Preview
 previewed,Previewed,Prévisualisé,Vista previa,Previewed
 private-key,Private key,Clé privée,Clave privada,Prive sleutel
 profile,Profile,Profil,Perfil,Profiel
@@ -906,7 +906,7 @@ shortcut-viewer-nav-zoom-out,Zoom out,Dézoomer,Disminuir escala,Uitzoomen
 shortcut-viewer-nav,Viewer: Navigation,Visualisateur : Naviguation,Visor: Navegación,Viewer: Navigatie
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images,Alternar selector de imagen,Afbeeldingsselector tonen/verbergen
 shortcut-viewer-toggle-all-annotations,Toggle annotations panel in all views,Afficher/Masquer le panneau des annotations dans toutes les vues,,Annotatiepaneel in alle views tonen/verbergen
-shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues,,Uitzending en opvolgingen paneel in alle views tonen/verbergen 
+shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues,,Uitzending en opvolgingen paneel in alle views tonen/verbergen
 shortcut-viewer-toggle-all-current,Toggle currently selected annotation panel in all views,Afficher/Masquer les détails de l'annotation sélectionnée dans toutes les vues,,Geselecteerde annotatiedetails in alle views tonen/verbergen
 shortcut-viewer-toggle-all-filters,Toggle image color panel in all views,Afficher/Masquer le panneau de colorisation de l'image dans toutes les vues,,Toon/verberg afbeeldingskleurpaneel in alle views
 shortcut-viewer-toggle-all-information,Toggle information panel in all views,Afficher/Masquer le panneau d'information dans toutes les vues,,Infopaneel weergeven/verbergen in alle views
@@ -961,6 +961,7 @@ shortcut-viewer-tool-undo,Undo annotation action,Annuler une action sur les anno
 shortcut-viewer-tool,Viewer: Tools, Visualisateur : Outils,Visor: Herramientas,Viewer: Tools
 shortcut,Keyboard shortcut,Raccourci clavier,Atajo de teclado,Toetsenbord sneltoets
 shortcuts,Shortcuts,Raccourcis,Atajos,Snelkoppelingen
+similar-annotations,Similar annotations,Annotations similaires,Anotaciones similares,Soortgelijke annotaties
 size,Size,Taille,Tamaño,Maat
 slice,Slice,Plan,,Slice
 slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,Sin vista previa de cristal,Bladvoorbeeld niet beschikbaar
@@ -1030,7 +1031,7 @@ used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de alm
 user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
 user,User,Utilisateur,Usuario,Users
 userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse,,Analyse user-ID
-username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam 
+username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam
 users,Users,Utilisateurs,Usuarios,Users
 validate-annotation,Validate annotation,Valider l'annotation,Validar anotación,Annotatie valideren
 validations.messages._default,Invalid field,Champ incorrect,Campo inválido,Ongeldig veld
