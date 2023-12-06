@@ -127,7 +127,7 @@ export default {
       this.searchString = value;
     }, 500),
     updatedTree() {
-      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+      this.$emit('update:revision', this.revision + 1) // updating the table will result in new files objects => the uf details will also be updated
     },
     download(url) {
       window.location.assign(appendShortTermToken(url, this.shortTermToken));
