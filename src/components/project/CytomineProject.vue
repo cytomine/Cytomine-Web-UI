@@ -20,7 +20,7 @@
   <div v-else class="project-container">
     <project-sidebar v-if="!loading" :key="idProject" />
 
-    <appengine-sidebar v-if="!loading" :key="idProject+1" />
+    <viewer-sidebar v-if="!loading" :key="idProject + 1" />
 
     <div class="app-content">
       <b-loading :is-full-page="false" :active="loading" />
@@ -32,14 +32,14 @@
 <script>
 import { get } from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
-import AppEngineSidebar from '../appengine/sidebar/AppEngineSidebar.vue';
+import ViewerSidebar from '../viewer/viewer-sidebar/ViewerSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
 
 export default {
   name: 'cytomine-project',
   components: {
     ProjectSidebar,
-    'appengine-sidebar': AppEngineSidebar
+    ViewerSidebar
   },
   data() {
     return {
