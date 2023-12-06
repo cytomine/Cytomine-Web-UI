@@ -156,7 +156,7 @@
     </div>
   </div>
 
-  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval" :revision="revision"></list-uploaded-files>
+  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval" :revision.sync="revision"></list-uploaded-files>
 </div>
 </template>
 
