@@ -1,12 +1,16 @@
 {
   "name": "cytomine-web-ui",
   "version": "1.2.0",
+  "watch": {
+    "serve": "vue.config.js"
+  },
   "scripts": {
     "serve": "npm run watch-translations & vue-cli-service serve",
     "build": "npm run translations-csv2json && vue-cli-service build",
     "lint": "vue-cli-service lint",
     "translations-csv2json": "node scripts/export_i18n_csv.mjs src/locales/translations.csv src/locales/json",
-    "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
+    "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
+    "watch": "npm-watch"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.7.2",
@@ -25,6 +29,7 @@
     "ifvisible": "^1.1.0",
     "lodash": "^4.17.21",
     "npm-font-open-sans": "^1.1.0",
+    "npm-watch": "^0.11.0",
     "ol": "^5.3.1",
     "ol-rescale-feature": "^1.0.0",
     "ol-rotate-feature": "^2.0.1",
