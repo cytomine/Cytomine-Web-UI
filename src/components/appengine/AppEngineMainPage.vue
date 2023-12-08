@@ -1,18 +1,21 @@
 <template>
-  <div class="app-engine-main-page">
-    <section id="upper-section-flex">
-
-      <h1 class="title is-1">{{ $t('tasks') }}</h1>
-
-      <div class="apps-upload-button">
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
-      </div>
-    </section>
-
-    <section id="lower-section-flex">
-      <AppCard v-for="app in applications" :key="app.id" :appData="app" />
-    </section>
-
+  <div class="content-wrapper">
+    <b-loading :is-full-page="false" :active="loading" />
+    <div class="box error" v-if="error">
+      <h2> {{ $t('error') }} </h2>
+      <p>{{ $t('unexpected-error-info-message') }}</p>
+    </div>
+    <div v-else-if="!loading" class="panel">
+      <p class="panel-heading">
+        {{$t('tasks')}}
+        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
+      </p>
+      <section class="panel-block">
+        <section id="lower-section-flex">
+        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+        </section>
+      </section>
+    </div>
   </div>
 </template>
   
@@ -31,10 +34,13 @@ export default {
   data() {
     return {
       applications: [],
+      loading: true,
+      error: null
     };
   },
   async created() {
     this.applications = await Task.fetchAll();
+    this.loading = false;
   },
   methods: {
     async handleTaskUploadSuccess() {
@@ -51,6 +57,17 @@ export default {
 </script>
   
 <style scoped>
+
+.panel-block {
+  padding-top: 0.8em;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #upper-section-flex {
   display: flex;
   flex-direction: row;
