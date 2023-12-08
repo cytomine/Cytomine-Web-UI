@@ -1,7 +1,7 @@
 <template>
   <div class="content-wrapper">
     <b-loading v-if="loading" :is-full-page="false" :active="loading" />
-    <div v-else class="panel">
+    <div v-else-if="appEngineEnabled" class="panel">
       <p class="panel-heading">
         {{$t('tasks')}}
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
@@ -12,6 +12,14 @@
         </section>
       </section>
     </div>
+    <div v-else>
+      <b-message 
+        :title="$t('appengine-not-enabled-title')" 
+        type="is-info">
+        {{ $t('appengine-not-enabled-description') }}
+      </b-message>
+
+    </div>
   </div>
 </template>
   
@@ -19,6 +27,7 @@
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
 import Task from '@/utils/appengine/task';
+import constants from '@/utils/constants.js';
 
 
 export default {
@@ -31,7 +40,8 @@ export default {
     return {
       applications: [],
       loading: true,
-      error: null
+      error: null,
+      appEngineEnabled: constants.APPENGINE_ENABLED
     };
   },
   async created() {
