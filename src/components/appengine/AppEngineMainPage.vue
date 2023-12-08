@@ -1,11 +1,7 @@
 <template>
   <div class="content-wrapper">
-    <b-loading :is-full-page="false" :active="loading" />
-    <div class="box error" v-if="error">
-      <h2> {{ $t('error') }} </h2>
-      <p>{{ $t('unexpected-error-info-message') }}</p>
-    </div>
-    <div v-else-if="!loading" class="panel">
+    <b-loading v-if="loading" :is-full-page="false" :active="loading" />
+    <div v-else class="panel">
       <p class="panel-heading">
         {{$t('tasks')}}
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
