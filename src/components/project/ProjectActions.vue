@@ -172,7 +172,7 @@ export default {
           let counts = error.response.data.errorValues;
 
           // if the only terms associations are performed by users, ask confirmation and delete them
-          if(counts.algoAssociatedTermsCount === 0 && counts.reviewedAssociatedTermsCount === 0) {
+          if(counts.reviewedAssociatedTermsCount === 0) {
             this.$buefy.dialog.confirm({
               title: this.$t('confirm-ontology-change'),
               message: this.$t('confirm-ontology-change-delete-user-terms', {count: counts.userAssociatedTermsCount}),
@@ -186,8 +186,7 @@ export default {
             this.cannotDeleteOntology = true;
             this.$notify({
               type: 'error',
-              text: this.$t('notif-error-project-ontology-change-' +
-                                (counts.algoAssociatedTermsCount ? 'job-terms' : 'reviewed-terms'))
+              text: this.$t('notif-error-project-ontology-change-reviewed-terms')
             });
           }
         }

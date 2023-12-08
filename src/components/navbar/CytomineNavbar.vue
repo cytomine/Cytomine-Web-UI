@@ -39,13 +39,13 @@
         <i class="fas fa-download"></i>
         {{ $t('storage') }}
       </router-link>
+      <router-link v-if="!currentUser.guestByNow" to="/storage" class="navbar-item">
+        <i class="fas fa-download"></i>
+        {{ $t('storage') }}
+      </router-link>
       <router-link to="/ontology" class="navbar-item">
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
-      </router-link>
-      <router-link v-show="algoEnabled" to="/algorithm" class="navbar-item">
-        <i class="fas fa-code"></i>
-        {{ $t('algorithms') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
@@ -128,7 +128,6 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: null,
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       aboutModal: null
     };
   },

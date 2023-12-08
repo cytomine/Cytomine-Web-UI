@@ -26,7 +26,6 @@ function getDefaultState() {
       boundsMembers: null,
       boundsImages: null,
       boundsUserAnnotations: null,
-      boundsJobAnnotations: null,
       boundsReviewedAnnotations: null
     },
 

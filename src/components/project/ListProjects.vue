@@ -112,15 +112,6 @@
               </div>
             </div>
 
-            <div v-show="algoEnabled" class="column filter">
-              <div class="filter-label">
-                {{$t('analysis-annotations')}}
-              </div>
-              <div class="filter-body">
-                <cytomine-slider v-model="boundsJobAnnotations" :max="maxNbJobAnnotations" />
-              </div>
-            </div>
-
             <div class="column filter">
               <div class="filter-label">
                 {{$t('reviewed-annotations')}}
@@ -129,7 +120,7 @@
                 <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
               </div>
             </div>
-            <div v-show="!algoEnabled" class="column"></div>
+            <div class="column"></div>
           </div>
         </div>
       </b-collapse>
@@ -170,12 +161,6 @@
           <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/annotations?type=user`">
               {{ project.numberOfAnnotations }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column v-if="algoEnabled" field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=algo`">
-              {{ project.numberOfJobAnnotations }}
             </router-link>
           </b-table-column>
 
@@ -237,7 +222,6 @@ import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-
 
 import {ProjectCollection, OntologyCollection, TagCollection} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-import constants from '@/utils/constants.js';
 export default {
   name: 'list-projects',
   components: {
@@ -267,15 +251,12 @@ export default {
         'membersCount',
         'numberOfImages',
         'numberOfAnnotations',
-        'numberOfJobAnnotations',
         'numberOfReviewedAnnotations',
         'lastActivity'
       ],
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       maxNbMembers: 10,
       maxNbImages: 10,
       maxNbUserAnnotations: 100,
-      maxNbJobAnnotations: 100,
       maxNbReviewedAnnotations: 100,
 
       revision: 0
@@ -303,7 +284,6 @@ export default {
     boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
     boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
     boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
-    boundsJobAnnotations: syncBoundsFilter('listProjects', 'boundsJobAnnotations', 'maxNbJobAnnotations'),
     boundsReviewedAnnotations: syncBoundsFilter('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
     nbActiveFilters() {
@@ -322,7 +302,6 @@ export default {
         {prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages},
         {prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers},
         {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
-        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations, max: this.maxNbJobAnnotations},
         {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
       ];
     },
@@ -367,7 +346,6 @@ export default {
       }
       return collection;
     },
-
     currentPage: sync('listProjects/currentPage'),
     perPage: sync('listProjects/perPage'),
     sortField: sync('listProjects/sortField'),
@@ -401,7 +379,6 @@ export default {
       this.maxNbMembers = Math.max(10, stats.members.max);
       this.maxNbImages = Math.max(10, stats.numberOfImages.max);
       this.maxNbUserAnnotations = Math.max(100, stats.numberOfAnnotations.max);
-      this.maxNbJobAnnotations = Math.max(100, stats.numberOfJobAnnotations.max);
       this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
     },
     async fetchTags() {

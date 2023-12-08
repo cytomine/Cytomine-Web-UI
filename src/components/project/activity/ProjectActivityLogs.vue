@@ -21,9 +21,6 @@
     <optgroup :label="$t('members')">
       <option v-for="member in members" :value="member.id" :key="member.id">{{member.fullName}}</option>
     </optgroup>
-    <optgroup :label="$t('analyses')">
-      <option v-for="uJob in userJobs" :value="uJob.id" :key="uJob.id">{{uJob.fullName}}</option>
-    </optgroup>
   </b-select>
 
   <activity-logs :idUser="selectedUser" :startDate="startDate" :endDate="endDate" :project="project" />
@@ -31,10 +28,7 @@
 </template>
 
 <script>
-import {UserJobCollection} from 'cytomine-client';
-
 import {get} from '@/utils/store-helpers';
-import {fullName} from '@/utils/user-utils.js';
 
 import ActivityLogs from '@/components/utils/ActivityLogs';
 
@@ -47,7 +41,6 @@ export default {
   components: {ActivityLogs},
   data() {
     return {
-      userJobs: [],
       selectedUser: null,
     };
   },
@@ -56,14 +49,7 @@ export default {
     members: get('currentProject/members'),
   },
   async created() {
-    try {
-      let userJobs = (await UserJobCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      userJobs.forEach(uJob => uJob.fullName = fullName(uJob));
-      this.userJobs = userJobs;
-    }
-    catch(error) {
-      console.log(error);
-    }
+
   }
 };
 </script>
