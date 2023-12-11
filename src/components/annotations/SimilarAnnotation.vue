@@ -1,17 +1,26 @@
 <template>
   <div>
-    similar annotation
+    <button class="button is-small" @click="searchSimilarAnnotations">
+      {{ $t('search-similar-annotation') }}
+    </button>
   </div>
 </template>
 
 <script>
+import {Cytomine} from 'cytomine-client';
+
 export default {
   name: 'similar-annotation',
   props: {
     annotation: Object,
   },
-  created() {
-    console.log(this.annotation);
+  methods: {
+    async searchSimilarAnnotations() {
+      let response = await Cytomine.instance.api.get(
+        'retrieval/retrieve.json',
+        {params: {annotation: this.annotation.id, nrt_neigh: 1}}
+      );
+    }
   }
 };
 </script>

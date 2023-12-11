@@ -855,6 +855,7 @@ saturation,Saturation,Saturation,Saturación,Verzadiging
 screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
 search-or-create-tag,Search tag (or create a new one by typing its name and pressing Enter)...,Rechercher un tag (ou créer un nouveau en entrant son nom suivi de la touche Enter)...,Busque la etiqueta (o cree una nueva escribiendo su nombre y presionando Enter) ...,Zoek naar een tag (of maak een nieuwe aan door de naam in te voeren gevolgd door de Enter-toets)...
 search-placeholder,Search,Recherche,Buscar,Zoeken
+search-similar-annotation,Search for similar annotations,Recherche d'annotations similaires,Buscar anotaciones similares,Zoeken naar soortgelijke annotaties
 search-user,Search user...,Rechercher un utilisateur...,Buscar usuario...,Zoek een gebruiker...
 seconds,second | seconds,seconde | secondes,,tweede | seconden
 see-environment-on,See environment on,Voir l'environnement sur,Ver entorno en,Zie de omgeving op
