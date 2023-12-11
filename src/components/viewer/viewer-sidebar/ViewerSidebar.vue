@@ -72,7 +72,8 @@ h1 {
     background: $background;
     overflow: hidden;
     transition: width .2s linear;
-    width: 4rem;
+    width: 6rem;
+    overflow-y: auto;
 }
 
 .sidebar-wrapper.expanded {
