@@ -1,7 +1,7 @@
 <template>
     <div>
         <input type="file" ref="fileInput" style="display: none;" @change="handleFileChange" />
-        <button id="app-upload-btn" class="button is-primary is-medium" @click="uploadTask">{{ $t(btnFunc) }}</button>
+        <button id="app-upload-btn" class="button is-link" @click="uploadTask">{{ $t(btnFunc) }}</button>
     </div>
 </template>
     

@@ -1,18 +1,25 @@
 <template>
-  <div class="app-engine-main-page">
-    <section id="upper-section-flex">
+  <div class="content-wrapper">
+    <b-loading v-if="loading" :is-full-page="false" :active="loading" />
+    <div v-else-if="appEngineEnabled" class="panel">
+      <p class="panel-heading">
+        {{$t('tasks')}}
+        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
+      </p>
+      <section class="panel-block">
+        <section id="lower-section-flex">
+        <AppCard v-for="app in applications" :key="app.id" :appData="app" />
+        </section>
+      </section>
+    </div>
+    <div v-else>
+      <b-message 
+        :title="$t('appengine-not-enabled-title')" 
+        type="is-info">
+        {{ $t('appengine-not-enabled-description') }}
+      </b-message>
 
-      <h1 class="title is-1">{{ $t('tasks') }}</h1>
-
-      <div class="apps-upload-button">
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
-      </div>
-    </section>
-
-    <section id="lower-section-flex">
-      <AppCard v-for="app in applications" :key="app.id" :appData="app" />
-    </section>
-
+    </div>
   </div>
 </template>
   
@@ -20,6 +27,7 @@
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
 import Task from '@/utils/appengine/task';
+import constants from '@/utils/constants.js';
 
 
 export default {
@@ -31,10 +39,14 @@ export default {
   data() {
     return {
       applications: [],
+      loading: true,
+      error: null,
+      appEngineEnabled: constants.APPENGINE_ENABLED
     };
   },
   async created() {
     this.applications = await Task.fetchAll();
+    this.loading = false;
   },
   methods: {
     async handleTaskUploadSuccess() {
@@ -51,6 +63,17 @@ export default {
 </script>
   
 <style scoped>
+
+.panel-block {
+  padding-top: 0.8em;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #upper-section-flex {
   display: flex;
   flex-direction: row;

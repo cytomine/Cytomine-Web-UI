@@ -47,7 +47,7 @@
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
-      <router-link to="/appengine" class="navbar-item">
+      <router-link v-if="appEngineEnabled" to="/appengine" class="navbar-item">
         <i class="fas fa-code"></i>
         {{ $t('applications') }}
       </router-link>
@@ -133,6 +133,7 @@ export default {
       openedTopMenu: false,
       hotkeysModal: null,
       algoEnabled: constants.ALGORITHMS_ENABLED,
+      appEngineEnabled: constants.APPENGINE_ENABLED,
       aboutModal: null
     };
   },
