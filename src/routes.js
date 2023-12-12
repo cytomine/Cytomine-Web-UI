@@ -35,6 +35,8 @@ import CytomineProject from './components/project/CytomineProject.vue';
 import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
+import AppEngineMainPage from './components/appengine/AppEngineMainPage.vue';
+import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
 import SoftwareInformation from './components/software/SoftwareInformation.vue';
@@ -142,6 +144,19 @@ const routes = [
   {
     path: '/admin',
     component: AdminPanel
+  },
+  // AppEngine 
+  {
+    path: '/appengine',
+    component: AppEngineMainPage
+  },
+  {
+    path: '/appengine/:id',
+    component: AppInfoPage,
+  },
+  {
+    path: '/appengine/:namespace/:version',
+    component: AppInfoPage,
   },
 
   // redirections for old URLS

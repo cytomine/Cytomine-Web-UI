@@ -47,6 +47,10 @@
         <i class="fas fa-code"></i>
         {{ $t('algorithms') }}
       </router-link>
+      <router-link v-if="appEngineEnabled" to="/appengine" class="navbar-item">
+        <i class="fas fa-code"></i>
+        {{ $t('applications') }}
+      </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
@@ -129,6 +133,7 @@ export default {
       openedTopMenu: false,
       hotkeysModal: null,
       algoEnabled: constants.ALGORITHMS_ENABLED,
+      appEngineEnabled: constants.APPENGINE_ENABLED,
       aboutModal: null
     };
   },
