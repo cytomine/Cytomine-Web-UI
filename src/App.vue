@@ -135,12 +135,6 @@ export default {
       .get('configuration.json')
       .then(response => (settings = response.data));
 
-    await axios
-      .get('meta-prefixes.json')
-      .then(response => {
-        constants.METADATA_PREFIXES = response.data
-      });
-    
     for (let i in settings) {
       if (Object.prototype.hasOwnProperty.call(constants, i)
         || i.includes('_NAMESPACE') || i.includes('_VERSION') || i.includes('_ENABLED')) {

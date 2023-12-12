@@ -156,67 +156,7 @@
     </div>
   </div>
 
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('storage') }}
-    </p>
-    <div class="panel-block storage">
-      <b-input
-        :value="searchString"
-        @input="debounceSearchString"
-        class="search-uploaded-file"
-        :placeholder="$t('search-placeholder')"
-        icon="search"
-      />
-
-      <cytomine-table
-        :collection="uploadedFileCollection"
-        sort="created" order="desc"
-        :revision="revision"
-        :refreshInterval="tableRefreshInterval"
-        :openedDetailed.sync="openedDetails"
-      >
-        <template #default="{row: uFile}">
-          <b-table-column :label="$t('preview')" width="80" class="image-overview">
-            <image-thumbnail v-if="uFile.thumbURL" :url="uFile.thumbURL" :size="128" :key="uFile.thumbURL" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
-            <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
-          </b-table-column>
-
-          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200">
-            {{ uFile.originalFilename }}
-          </b-table-column>
-
-          <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{ Number(uFile.created) | moment('lll') }}
-          </b-table-column>
-
-          <b-table-column field="size" :label="$t('size')" sortable width="80">
-            {{ filesize(uFile.size) }}
-          </b-table-column>
-
-<!--          <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">-->
-<!--            {{ filesize(uFile.globalSize) }}-->
-<!--          </b-table-column>-->
-
-          <b-table-column field="status" :label="$t('status')" sortable width="80">
-            <uploaded-file-status :file="uFile" />
-          </b-table-column>
-
-          <!--<b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">-->
-            <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
-          <!--</b-table-column>-->
-        </template>
-
-        <template #detail="{row: uFile}">
-          <uploaded-file-details :file="uFile" :key="uFile.id" @update="updatedTree()" />
-        </template>
-
-        <template #empty>
-          <p>{{$t('no-uploaded-file')}}</p>
-        </template>
-      </cytomine-table>
-    </div>
-  </div>
+  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval" :revision.sync="revision"></list-uploaded-files>
 </div>
 </template>
 
@@ -230,23 +170,22 @@ import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
-import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ListUploadedFiles from "@/components/storage/ListUploadedFiles.vue";
 
 export default {
   name: 'cytomine-storage',
   components: {
+    ListUploadedFiles,
     ImageThumbnail,
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
-    UploadedFileDetails,
     CytomineTable
   },
   data() {
     return {
-      loading: true,
       newUploadError: false,
       timeoutRefreshSessionUploads: null,
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
@@ -256,9 +195,6 @@ export default {
       projects: [],
       selectedProjects: [],
       formatInfos: [],
-
-      searchString: '',
-      openedDetails: [],
 
       dropFiles: [],
 
@@ -313,12 +249,6 @@ export default {
     },
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
-    },
-    uploadedFileCollection() {
-      return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: {ilike: encodeURIComponent(this.searchString)}
-      });
     }
   },
   watch: {
@@ -511,10 +441,6 @@ export default {
     updatedTree() {
       this.revision++; // updating the table will result in new files objects => the uf details will also be updated
     },
-
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500)
   },
   activated() {
     this.fetchStorages();
