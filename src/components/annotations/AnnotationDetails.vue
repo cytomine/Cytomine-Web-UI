@@ -161,7 +161,7 @@
         <tr>
           <td colspan="2">
             <h5>{{ $t('similar-annotations') }}</h5>
-            <similar-annotation :annotation="annotation"/>
+            <similar-annotation :annotation="annotation" :image="image"/>
           </td>
         </tr>
       </template>
