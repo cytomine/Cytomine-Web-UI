@@ -34,30 +34,46 @@
               :multiple="false"
               custom-lable="nameWithVersion"
             >
-              <!-- <template slot="selection">
-                {{ selectedApplication }}
-              </template> -->
-
               <template slot="singleLabel" slot-scope="props">
                 <span class="option__desc">
                   <span class="option__title">{{ props.option.title }}</span>
                 </span>
               </template>
-
-              <template slot="option" slot-scope="props">
-                <div class="option__desc">
-                  <span class="option__title">{{ props.option.title }}</span>
-                  <span class="option__small">{{ props.option.desc }}</span>
-                </div>
-              </template>
             </cytomine-multiselect>
+
+            <!-- <pre
+              class="language-json"
+            ><code>{{ selectedApplication  }}</code></pre> -->
 
             <pre
               class="language-json"
-            ><code>{{ selectedApplication  }}</code></pre>
+            ><code>{{ selectedApplicationInputs || 'undefined' }}</code></pre>
           </div>
 
-          <div id="app-inputs"></div>
+          <div v-if="selectedApplication" id="app-inputs">
+            <div v-for="input in validInputs" :key="input.id">
+              <b-field
+                class="b-num-input-feild"
+                :label="input.display_name"
+                :type="getInputType(input)"
+              >
+                <b-numberinput
+                  v-if="input.type.id === 'integer'"
+                  :placeholder="input.default"
+                  :min="getMin(input)"
+                  :max="getMax(input)"
+                  :required="!input.optional"
+                  type="is-dark"
+                  size="is-small"
+                >
+                </b-numberinput>
+              </b-field>
+            </div>
+          </div>
+
+          <div id="app-run">
+
+          </div>
 
           <div id="app-outputs"></div>
         </div>
@@ -84,6 +100,7 @@ export default {
       applications: [],
       selectedApplication: "",
       isLoading: false,
+      selectedApplicationInputs: [],
     };
   },
   async created() {
@@ -99,12 +116,172 @@ export default {
     //   return;
     // }
   },
+  watch: {
+    selectedApplication: {
+      handler: "fetchSelectedApplicationInputs",
+      immediate: true, // This ensures the initial call when selectedApplication is set
+    },
+  },
   methods: {
     async fetchTasks() {
       this.applications = await Task.fetchAll();
     },
+    async fetchSelectedApplicationInputs() {
+      if (this.selectedApplication) {
+        try {
+          await this.fetchTaskInputs();
+        } catch (error) {
+          console.error(
+            "Error fetching the selected application inputs: " + error
+          );
+        }
+      }
+    },
+    async fetchTaskInputs() {
+      try {
+        let selectedAppNamespace = this.selectedApplication["namespace"];
+        let selectedAppVersion = this.selectedApplication["version"];
+
+        const fetchedInputsObj = await Task.fetchTaskInputs(
+          selectedAppNamespace,
+          selectedAppVersion
+        );
+
+        const fetchedInputsArray = Object.values(fetchedInputsObj || {});
+
+        if (Array.isArray(fetchedInputsArray)) {
+          this.selectedApplicationInputs = fetchedInputsArray;
+        } else {
+          console.error(
+            "Inputs not found or not in array format:",
+            fetchedInputsArray
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching task inputs: " + error);
+      }
+    },
     nameWithVersion({ name, version }) {
       return `${name} — [${version}]`;
+    },
+    getIntValidationMessage(input) {
+      if (input.type.id === "integer") {
+        let value = (input.value || "").trim(); // Ensure input.value exists and trim whitespace
+
+        console.log(
+          `${input.display_name}: getIntValidationMessage() value: ${value}`
+        );
+        console.log("type is: " + typeof value);
+
+        if (value === "") {
+          if (!input.optional) {
+            return "This field is mandatory"; // Error message for mandatory field if it's empty
+          }
+          return ""; // No validation message for optional field if it's empty
+        }
+
+        // convert to number and check if it's not possible
+        const parsedValue = parseInt(value);
+        if (!parsedValue) {
+          if (parsedValue == 0) return ""; // !0 will yield true
+          return "Please enter a valid number"; // Handle non-numeric input
+        }
+
+        const { geq, leq, gt, lt } = input.type;
+
+        if (
+          geq !== undefined &&
+          value < geq &&
+          leq !== undefined &&
+          value > leq
+        ) {
+          return `Value must be between ${geq} and ${leq}`;
+        }
+
+        if (geq !== undefined && value < geq) {
+          return `Value must be greater than or equal ${geq}`;
+        }
+
+        if (leq !== undefined && value > leq) {
+          return `Value must be less than or equal ${leq}`;
+        }
+
+        if (
+          gt !== undefined &&
+          value <= gt &&
+          lt !== undefined &&
+          value >= lt
+        ) {
+          return `Value must be greater than ${gt} and less than ${lt}`;
+        }
+
+        if (geq !== undefined && value < geq) {
+          return `Value must be greater than ${geq}`;
+        }
+
+        if (leq !== undefined && value > leq) {
+          return `Value must be less than ${leq}`;
+        }
+      }
+      return ""; // No validation message by default
+    },
+    getInputType(input) {
+      if (input && input.type) {
+        if (input.type.id === "integer") {
+          if (input.optional && input.value === "") {
+            return ""; // No validation for optional field if it's empty
+          }
+
+          let value = input.value;
+          console.log(`${input.display_name}: getInputType() value: ${value}`);
+
+          // Add additional checks or logic as needed
+
+          // Example: if (!Number.isInteger(value)) { return "is-danger"; }
+
+          // Return any validation error or empty string if no error
+        }
+      }
+      return ""; // No validation error by default
+    },
+    getMin(input) {
+      const { geq, gt } = input.type;
+      let min;
+
+      // Check if any variable is undefined
+      if (typeof geq === "undefined") {
+        min = null;
+      }
+      if (typeof gt === "undefined") {
+        min = null;
+      }
+
+      if (geq || geq == 0) return geq;
+
+      // since max is actrually geq we need to do +1
+      if (gt) return ++gt;
+
+      return min;
+    },
+    getMax(input) {
+      const { leq, lt } = input.type;
+      let max;
+
+      // Check if any variable is undefined
+      if (typeof leq === "undefined") {
+        max = null;
+      }
+      if (typeof lt === "undefined") {
+        max = null;
+      }
+
+      // id leq or it's set to zero return it
+      if (leq || leq == 0) return leq;
+
+      // since max is atually leq we will do -1
+      if (lt) return --lt;
+
+      return max;
     },
   },
   computed: {
@@ -112,6 +289,13 @@ export default {
       return this.applications;
     },
     // selectedApplication: sync("application", storeOptions),
+    validInputs() {
+      // Assuming selectedApplicationInputs is an array of inputs fetched from an API
+      return this.selectedApplicationInputs.filter(
+        (input) => input !== null && typeof input === "object"
+      );
+    },
+    
   },
 };
 </script>
@@ -197,5 +381,10 @@ div.is-active .card-header {
     // color: $color !important;
     // width: 0.2rem;
   }
+}
+
+// Input feild
+.b-num-input-feild {
+  padding-bottom: 0.5rem;
 }
 </style>
