@@ -66,7 +66,7 @@ export default {
           annotation: new Annotation({
             id: id,
             image: this.image.id,
-            instanceFilename: id + '.png',
+            instanceFilename: this.image.instanceFilename,
             url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${id}/crop.png`,
             cropURL: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${id}/crop.png`
           }),
