@@ -27,6 +27,7 @@
             :show-image-info="false"
             :show-slice-info="false"
             :size="size"
+            @select="$emit('select', $event)"
           />
 
           <div>

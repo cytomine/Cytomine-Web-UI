@@ -16,6 +16,7 @@
       v-if="showSimilarAnnotations"
       :image="image"
       :data="similarData"
+      @select="selectAnnotation"
     />
   </div>
 </template>
