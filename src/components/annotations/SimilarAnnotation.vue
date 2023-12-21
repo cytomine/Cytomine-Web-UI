@@ -18,7 +18,7 @@
       </div>
 
       <div class="annotation-content">
-        <div style="display:inline;" v-for="data in similarities" :key="data.annotation.id">
+        <div class="annotation-data" v-for="data in similarities" :key="data.annotation.id">
           <annotation-preview
             :annot="data.annotation"
             :key="data.annotation.id"
@@ -29,7 +29,9 @@
             :size="size"
           />
 
-          distance: {{ data.distance.toFixed(2) }}
+          <div>
+            {{ data.distance.toFixed(2) }}
+          </div>
         </div>
       </div>
     </vue-draggable-resizable>
@@ -98,6 +100,18 @@ export default {
 .actions .button {
   margin-left: 0.25rem;
   width: 1.75rem;
+}
+
+.annotation-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.annotation-data {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
 }
 
 .draggable {
