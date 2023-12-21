@@ -4,7 +4,7 @@
       class="draggable"
       :parent="false"
       :resizable="false"
-      :x="0"
+      :x="350"
       :y="0"
       :h="'auto'"
       :w="450"
@@ -53,8 +53,8 @@ export default {
     VueDraggableResizable
   },
   props: {
-    image: {type: Object},
     data: {type: Object},
+    image: {type: Object},
     size: {type: Number, default: 64},
   },
   computed: {

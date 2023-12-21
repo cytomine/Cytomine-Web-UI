@@ -14,8 +14,8 @@
 
     <similar-annotation
       v-if="showSimilarAnnotations"
-      :image="image"
       :data="similarData"
+      :image="image"
       @select="selectAnnotation"
     />
   </div>

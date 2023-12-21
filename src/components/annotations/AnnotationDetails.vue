@@ -161,7 +161,7 @@
         <tr>
           <td colspan="2">
             <h5>{{ $t('similar-annotations') }}</h5>
-            <button class="button is-small" @click="searchSimilarAnnotations">
+            <button class="button is-small is-fullwidth" @click="searchSimilarAnnotations">
               {{ $t('search-similar-annotation') }}
             </button>
           </td>
