@@ -38,16 +38,17 @@
       />
 
       <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-        <vl-source-zoomify
+        <vl-source-cytomine
           :projection="projectionName"
-          :urls="baseLayerURLs"
+          :url="baseLayerURL"
+          :tile-load-function="tileLoadFunction"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slices[0].imageServerUrl"
+          :nb-resolutions="image.zoom"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
-          :tile-size="tileSize"
+          :tile-size="[tileSize, tileSize]"
         />
       </vl-layer-tile>
 
@@ -211,7 +212,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -267,6 +268,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     document() {
       return document;
     },
@@ -381,8 +383,7 @@ export default {
     },
     baseLayerSliceParams() {
       return {
-        // eslint-disable-next-line camelcase
-        z_slices: this.slices[0].zStack,
+        zSlices: this.slices[0].zStack,
         timepoints: this.slices[0].time
       };
     },
@@ -393,9 +394,24 @@ export default {
       }
       return query;
     },
-    baseLayerURLs() {
+    baseLayerURL() {
       let slice = this.slices[0];
-      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+      return Cytomine.instance.host + Cytomine.instance.basePath + `sliceinstance/${slice.id}/normalized-tile/zoom/{z}/tx/{x}/ty/{y}.jpg${this.baseLayerURLQuery}`;
+    },
+    tileLoadFunction() {
+        return (tile, src) => {
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.open('GET', src);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
+            xhr.addEventListener('load', () => {
+                const url = URL.createObjectURL(xhr.response);
+                const tileImage = tile.getImage();
+                tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
+                tileImage.src = url;
+            });
+            xhr.send();
+        }
     },
     // colorManipulationOn() {
     //   return this.imageWrapper.colors.brightness !== 0
