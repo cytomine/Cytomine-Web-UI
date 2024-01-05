@@ -9,6 +9,8 @@
       :h="'auto'"
       :w="450"
     >
+      <b-loading :is-full-page="false" :active="loading"/>
+
       <div class="actions">
         <h1>Similar annotations</h1>
 
@@ -17,7 +19,7 @@
         </button>
       </div>
 
-      <div class="annotation-content">
+      <div class="annotation-content" v-if="!loading">
         <div class="annotation-data" v-for="data in similarities" :key="data.annotation.id">
           <annotation-preview
             :annot="data.annotation"
@@ -41,7 +43,6 @@
 
 <script>
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
-import constants from '@/utils/constants';
 
 import {Annotation} from 'cytomine-client';
 import VueDraggableResizable from 'vue-draggable-resizable';
@@ -57,20 +58,22 @@ export default {
     image: {type: Object},
     size: {type: Number, default: 64},
   },
+  data() {
+    return {
+      annotations: [],
+      loading: true,
+    };
+  },
   computed: {
     similarities() {
       let similarities = [];
 
       for (let i = 0; i < this.data['filenames'].length; i++) {
         let id = this.data['filenames'][i];
+        let annotation = this.annotations.find((annotation) => annotation.id === Number(id));
+
         similarities.push({
-          annotation: new Annotation({
-            id: id,
-            image: this.image.id,
-            instanceFilename: this.image.instanceFilename,
-            url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${id}/crop.png`,
-            cropURL: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${id}/crop.png`
-          }),
+          annotation: (annotation === undefined) ? new Annotation({id: id}) : annotation,
           distance: this.data['distances'][i]
         });
       }
@@ -81,13 +84,22 @@ export default {
   methods: {
     hideSimilarAnnotations() {
       this.$eventBus.$emit('hide-similar-annotations');
+    },
+    async fetchAnnotations() {
+      await Promise.all(this.data['filenames'].map(async (id) => {
+        this.annotations.push(await Annotation.fetch(id));
+      }));
     }
-  }
+  },
+  async created() {
+    await this.fetchAnnotations();
+
+    this.loading = false;
+  },
 };
 </script>
 
 <style scoped>
-
 .actions {
   align-items: center;
   background-color: #e5e5e5;
