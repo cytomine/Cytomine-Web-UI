@@ -163,10 +163,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
+import {Cytomine, ProjectCollection, StorageCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
-import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
@@ -237,15 +236,14 @@ export default {
     uri() {
       return '/upload';
     },
+    uploadHost() {
+      return (constants.CYTOMINE_UPLOAD_HOST !== null) ? constants.CYTOMINE_UPLOAD_HOST : constants.CYTOMINE_CORE_HOST;
+    },
     queryString() {
-      let str = `cytomine=${constants.CYTOMINE_CORE_HOST}`;
-      if(this.selectedStorage) {
-        str += `&idStorage=${this.selectedStorage.id}`;
-      }
-      if(this.selectedProjects) {
-        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
-      }
-      return str;
+      return new URLSearchParams({
+        idStorage: (this.selectedStorage) ? this.selectedStorage.id : null,
+        idProject: (this.selectedProjects) ? this.selectedProjects.map(project => project.id).join(',') : null
+      }).toString();
     },
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
@@ -376,7 +374,7 @@ export default {
       fileWrapper.cancelToken = axios.CancelToken.source();
       fileWrapper.uploading = true;
       axios.post(
-        constants.CYTOMINE_UPLOAD_HOST + this.uri + '?' + this.queryString,
+        this.uploadHost + this.uri + '?' + this.queryString,
         formData,
         {
           headers: {
