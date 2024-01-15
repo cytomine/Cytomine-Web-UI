@@ -44,6 +44,10 @@ export default {
       state.indexNextImage++;
     },
 
+    registerImage(state) {
+      state.indexNextImage++;
+    },
+
     setActiveImage(state, index) {
       state.activeImage = index;
     },
@@ -94,9 +98,15 @@ export default {
     changePath({getters}) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
       let action = router.currentRoute.query.action;
-      router.replace(getters.pathViewer({idAnnotation, action}));
+      // eslint-disable-next-line no-unused-vars
+      router.replace(getters.pathViewer({idAnnotation, action})).catch(_ => {});
     },
 
+    registerImage({state, commit, getters}) {
+      let index = state.indexNextImage;
+      commit('registerImage');
+      this.registerModule(getters.pathImageModule(index), imageModule);
+    },
     async addImage({state, commit, getters, dispatch}, {image, slices, annot=null}) {
       let index = state.indexNextImage;
       commit('addImage');
