@@ -32,7 +32,7 @@
 
       <div class="metadata" v-if="type[currentKey] === Number">
         <div class="metadata-slider">
-          <cytomine-slider v-model="sliderValue" :max="Number(max[currentKey])+1"/>
+          <cytomine-slider v-model="sliderValue" :max="Number(max[currentKey])"/>
         </div>
       </div>
 
@@ -49,7 +49,8 @@
               label="Now"
               type="is-primary"
               icon-left="clock"
-              @click="searchValue = new Date()" />
+              @click="searchValue = new Date()"
+            />
           </template>
 
           <template #right>
@@ -58,7 +59,8 @@
               type="is-danger"
               icon-left="times-circle"
               outlined
-              @click="searchValue = null" />
+              @click="searchValue = null"
+            />
           </template>
         </b-datetimepicker>
       </div>
@@ -88,9 +90,9 @@
 
 <script>
 import {Cytomine} from 'cytomine-client';
-import {filterAutoCompletion} from '@/utils/metadata.js';
 
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
+import {filterAutoCompletion} from '@/utils/metadata.js';
 
 export default {
   name: 'metadata-filter',
@@ -98,11 +100,11 @@ export default {
     CytomineSlider,
   },
   props: {
-    format: String,
-    imageIds: Array,
-    keys: Array,
-    max: Object,
-    type: Object,
+    format: {type: String, default: ''},
+    imageIds: {type: Array, default: []},
+    keys: {type: Array, default: []},
+    max: {type: Object, default: {}},
+    type: {type: Object, default: {}},
   },
   data() {
     return {
