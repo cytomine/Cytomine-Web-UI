@@ -724,7 +724,7 @@ export default {
           return !toRemove.includes(project.id);
         });
 
-        this.projectPlaceholders[key] = this.filteredProjects[key].length != 0;
+        this.projectPlaceholders[key] = this.filteredProjects[key].length !== 0;
       }
     },
     async fetchStorages() {
