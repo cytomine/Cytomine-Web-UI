@@ -185,6 +185,9 @@ export default {
     }
   },
   watch: {
+    keys() {
+      this.keys.forEach(key => this.sliderValues[key] = [0, Number(this.max[key])]);
+    },
     async currentKey() {
       if (this.type[this.currentKey] === Number) {
         this.searchValue = this.sliderValues[this.currentKey];
@@ -211,8 +214,6 @@ export default {
   },
   created() {
     this.$store.commit('currentProject/setImageFormat', this.format);
-
-    this.keys.forEach(key => this.sliderValues[key] = [0, Number(this.max[key])]);
   }
 };
 </script>
