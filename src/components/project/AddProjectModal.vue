@@ -128,7 +128,8 @@ export default {
         this.loading = false;
         this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
         this.$emit('update:active', false);
-        this.$router.push(`/project/${project.id}/configuration`);
+        this.$store.commit('currentProject/resetMetadataFilters');
+        await this.$router.push(`/project/${project.id}/configuration`);
       }
       catch(error) {
         if(error.response.status == 409) {
