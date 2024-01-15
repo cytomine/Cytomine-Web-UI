@@ -186,6 +186,9 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    blindMode() {
+      return ((this.project || {}).blindMode) || false;
+    },
     canManageProject() {
       return this.editable && (this.currentUser.adminByNow || this.managersIds.includes(this.currentUser.id));
     },

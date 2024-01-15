@@ -107,11 +107,14 @@ export default {
       commit('registerImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
     },
-    async addImage({state, commit, getters, dispatch}, {image, slice}) {
+    async addImage({state, commit, getters, dispatch}, {image, slices, annot=null}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
-      await dispatch(`images/${index}/initialize`, {image, slice});
+      if (annot) {
+        commit(`images/${index}/setRoutedAnnotation`, annot);
+      }
+      await dispatch(`images/${index}/initialize`, {image, slices});
       dispatch('changePath');
     },
 
@@ -206,8 +209,15 @@ export default {
       let idProject = getters.pathModule[1];
       let idViewer = getters.pathModule[3];
       // ---
-      let imagesIds = Object.values(state.images).map(img => img.imageInstance ? img.imageInstance.id : 0);
-      let slicesIds = Object.values(state.images).map(img => img.activeSlice ? img.activeSlice.id : 0);
+      let imagesIds = Object.values(state.images).map(img =>
+        img.imageInstance ? img.imageInstance.id : 0
+      );
+      let slicesIds = Object.values(state.images).map(img => {
+        if (img.activeSlices && img.activeSlices.length > 0) {
+          return img.activeSlices.map(slice => slice.id).join(':');
+        }
+        return 0;
+      });
       let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
       let actionStr = action ? '&action=' + action : '';
       return `/project/${idProject}/image/${imagesIds.join('-')}/slice/${slicesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;

@@ -62,7 +62,7 @@ export default {
   name: 'cytomine-properties',
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
   },
   data() {
     return {
@@ -142,8 +142,7 @@ export default {
     try {
       let props = (await PropertyCollection.fetchAll({object: this.object})).array;
       this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
-    }
-    catch(error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

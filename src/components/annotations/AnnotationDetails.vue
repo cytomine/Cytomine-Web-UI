@@ -25,6 +25,13 @@
         </td>
       </tr>
 
+      <tr v-if="showChannelInfo">
+        <td><strong>{{$t('channel')}}</strong></td>
+        <td>
+          <channel-name :channel="sliceChannel" />
+        </td>
+      </tr>
+
       <template v-if="isPropDisplayed('geometry-info')">
         <tr v-if="annotation.area > 0">
           <td><strong>{{$t('area')}}</strong></td>
@@ -151,10 +158,20 @@
             {{ creator.fullName }}
           </td>
         </tr>
-        <tr v-if="!isReview">
-          <td><strong>{{$t('created-on')}}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }} </td>
-        </tr>
+        <template v-if="!isReviewedAnnotation">
+          <tr>
+            <td><strong>{{ $t('created-on') }}</strong></td>
+              <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td>
+              <span class="tag is-danger">
+                {{ $t('reviewed-annotation-status-not-validated') }}
+              </span>
+            </td>
+          </tr>
+        </template>
         <template v-else>
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
@@ -165,6 +182,14 @@
           <tr>
             <td><strong>{{$t('reviewed-on')}}</strong></td>
             <td> {{ Number(annotation.created) | moment('ll') }} </td>
+          </tr>
+          <tr v-if="isImageInReviewMode">
+            <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
+            <td>
+              <span class="tag is-success">
+                {{ $t('reviewed-annotation-status-validated') }}
+              </span>
+            </td>
           </tr>
         </template>
       </template>
@@ -192,7 +217,7 @@
     </a>
 
     <div class="level">
-      <a :href="annotation.url + '?draw=true&complete=true&increaseArea=1.25'" target="_blank" class="level-item button is-small">
+      <a @click="openCrop(annotation)" class="level-item button is-small">
         {{ $t('button-view-crop') }}
       </a>
 
@@ -229,10 +254,13 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import ChannelName from '@/components/viewer/ChannelName';
 
 export default {
   name: 'annotations-details',
   components: {
+    ChannelName,
     ImageName,
     CytomineDescription,
     CytomineTerm,
@@ -240,6 +268,7 @@ export default {
     CytomineTags,
     CytomineProperties,
     AttachedFiles,
+    AnnotationCommentsModal,
     TrackTree,
     CytomineTrack
   },
@@ -249,7 +278,9 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    slices: {type: Array, default: () => []},
     showImageInfo: {type: Boolean, default: true},
+    showChannelInfo: {type: Boolean, default: false},
     showComments: {type: Boolean, default: false}
   },
   data() {
@@ -267,14 +298,15 @@ export default {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
     },
-    isReview() {
+    isReviewedAnnotation() {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
     reviewer() {
-      if(this.isReview) {
+      if(this.isReviewedAnnotation) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
@@ -290,6 +322,12 @@ export default {
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
         {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+    },
+    isImageInReviewMode() {
+      return this.image.inReview;
+    },
+    sliceChannel() {
+      return this.slices.find(slice => slice.id === this.annotation.slice) || {};
     },
     maxRank() {
       return this.image.depth * this.image.duration * this.image.channels;
@@ -331,12 +369,18 @@ export default {
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
     },
+    isPoint() {
+      return this.annotation.location && this.annotation.location.includes('POINT');
+    }
   },
   methods: {
+    appendShortTermToken,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
-
+    openCrop(annotation) {
+      window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
+    },
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
@@ -460,7 +504,7 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    },
+    }
   },
   async created() {
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
@@ -532,11 +576,17 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
->>> .sl-vue-tree-node-item {
+/**
+* https://stackoverflow.com/a/55368933
+* Since the project is using Sass and Vue 2.6.10, use `::v-deep` instead of `>>>` so it doesn't break validation.
+* Note that it's deprecated but will in Vue 3.
+* TODO: update >>> and ::v-deep using the unified :deep() selector when using the latest Vue.
+*/
+::v-deep .sl-vue-tree-node-item {
   font-size: 0.9em;
 }
 
->>> .tag {
+::v-deep .tag {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);

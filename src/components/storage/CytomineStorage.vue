@@ -27,12 +27,23 @@
       <b-message type="is-info" has-icon icon-size="is-small">
         <h2>{{$t('important-notes')}}</h2>
         <ul class="small-text">
-          <li>{{$t('max-size-upload-info')}}</li>
-          <li>{{$t('allowed-formats-upload-info')}}</li>
-          <li>{{$t('vms-mrxs-upload-info')}}</li>
-          <li>{{$t('zip-upload-info')}}</li>
+<!--          <li>{{$t('max-size-upload-info')}}</li>-->
+          <li>
+            {{$t('allowed-formats-upload-info')}}
+            <template v-if="formatInfos.length">
+            <span v-for="(format, index) in formatInfos" :key="format.id">
+              {{format.name}}<v-popover v-if="format.remarks">
+                <i class="fas fa-info-circle"></i>
+                <template #popover>
+                  <p>{{format.remarks}}</p>
+                </template>
+              </v-popover><template v-if="index < formatInfos.length - 1">, </template>
+            </span>
+            </template>
+          </li>
           <li>{{$t('drag-drop-upload-info', {labelButton: $t('add-files')})}}</li>
           <li>{{$t('link-to-project-upload-info')}}</li>
+
         </ul>
       </b-message>
 
@@ -41,9 +52,9 @@
           <strong>{{$t('storage')}}</strong>
         </div>
         <div class="column is-half">
-          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="name" track-by="id" :allow-empty="false">
+          <cytomine-multiselect v-model="selectedStorage" :options="storages" label="extendedName" track-by="id" :allow-empty="false">
             <template #option="{option}">
-              {{option.name}}
+              {{option.extendedName}}
               <template v-if="currentUser.isDeveloper">
                  ({{$t('id')}}: {{option.id}})
               </template>
@@ -145,95 +156,35 @@
     </div>
   </div>
 
-  <div class="panel">
-    <p class="panel-heading">
-      {{ $t('storage') }}
-    </p>
-    <div class="panel-block storage">
-      <b-input
-        :value="searchString"
-        @input="debounceSearchString"
-        class="search-uploaded-file"
-        :placeholder="$t('search-placeholder')"
-        icon="search"
-      />
-
-      <cytomine-table
-        :collection="uploadedFileCollection"
-        sort="created" order="desc"
-        :revision="revision"
-        :refreshInterval="tableRefreshInterval"
-        :openedDetailed.sync="openedDetails"
-      >
-        <template #default="{row: uFile}">
-          <b-table-column :label="$t('preview')" width="80">
-            <img v-if="uFile.thumbURL" :src="uFile.thumbURL" alt="-" class="image-overview">
-            <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
-          </b-table-column>
-
-          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200">
-            {{ uFile.originalFilename }}
-          </b-table-column>
-
-          <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{ Number(uFile.created) | moment('lll') }}
-          </b-table-column>
-
-          <b-table-column field="size" :label="$t('size')" sortable width="80">
-            {{ filesize(uFile.size) }}
-          </b-table-column>
-
-<!--          <b-table-column field="globalSize" :label="$t('global-size')" sortable width="80">-->
-<!--            {{ filesize(uFile.globalSize) }}-->
-<!--          </b-table-column>-->
-
-          <b-table-column field="status" :label="$t('status')" sortable width="80">
-            <uploaded-file-status :file="uFile" />
-          </b-table-column>
-
-          <!--<b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">-->
-            <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
-          <!--</b-table-column>-->
-        </template>
-
-        <template #detail="{row: uFile}">
-          <uploaded-file-details :file="uFile" :key="uFile.id" @update="updatedTree()" />
-        </template>
-
-        <template #empty>
-          <p>{{$t('no-uploaded-file')}}</p>
-        </template>
-      </cytomine-table>
-    </div>
-  </div>
+  <list-uploaded-files :tableRefreshInterval="tableRefreshInterval" :revision.sync="revision"></list-uploaded-files>
 </div>
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
+import {Cytomine, ProjectCollection, StorageCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
-import _ from 'lodash';
 import constants from '@/utils/constants.js';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
-import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTable from '@/components/utils/CytomineTable';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ListUploadedFiles from "@/components/storage/ListUploadedFiles.vue";
 
 export default {
   name: 'cytomine-storage',
   components: {
+    ListUploadedFiles,
+    ImageThumbnail,
     CytomineMultiselect,
     'uploaded-file-status': UploadedFileStatusComponent,
-    UploadedFileDetails,
     CytomineTable
   },
   data() {
     return {
-      loading: true,
       newUploadError: false,
       timeoutRefreshSessionUploads: null,
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
@@ -242,9 +193,7 @@ export default {
       selectedStorage: null,
       projects: [],
       selectedProjects: [],
-
-      searchString: '',
-      openedDetails: [],
+      formatInfos: [],
 
       dropFiles: [],
 
@@ -256,6 +205,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    shortTermToken: get('currentUser/shortTermToken'),
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -286,24 +236,17 @@ export default {
     uri() {
       return '/upload';
     },
+    uploadHost() {
+      return (constants.CYTOMINE_UPLOAD_HOST !== null) ? constants.CYTOMINE_UPLOAD_HOST : constants.CYTOMINE_CORE_HOST;
+    },
     queryString() {
-      let str = `cytomine=${constants.CYTOMINE_CORE_HOST}`;
-      if(this.selectedStorage) {
-        str += `&idStorage=${this.selectedStorage.id}`;
-      }
-      if(this.selectedProjects) {
-        str += `&idProject=${this.selectedProjects.map(project => project.id).join(',')}`;
-      }
-      return str;
+      return new URLSearchParams({
+        idStorage: (this.selectedStorage) ? this.selectedStorage.id : null,
+        idProject: (this.selectedProjects) ? this.selectedProjects.map(project => project.id).join(',') : null
+      }).toString();
     },
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
-    },
-    uploadedFileCollection() {
-      return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: {ilike: encodeURIComponent(this.searchString)}
-      });
     }
   },
   watch: {
@@ -326,6 +269,11 @@ export default {
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
+        this.storages.forEach(v => {
+          v.extendedName = v.name;
+          if(this.currentUser.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
+        });
+
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
       }
       catch(error) {
@@ -341,6 +289,14 @@ export default {
         console.log(error); // not mandatory for upload => only log error, no other action
       }
     },
+    async fetchFormatInfos() {
+      try {
+        this.formatInfos = (await Cytomine.instance.api.get('imageserver/format.json')).data.collection;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
 
     async refreshStatusSessionUploads() {
       let pendingStatus = [
@@ -349,6 +305,8 @@ export default {
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
+        50,
+        60
       ];
 
       let unfinishedConversions = false;
@@ -416,7 +374,7 @@ export default {
       fileWrapper.cancelToken = axios.CancelToken.source();
       fileWrapper.uploading = true;
       axios.post(
-        constants.CYTOMINE_UPLOAD_HOST + this.uri + '?' + this.queryString,
+        this.uploadHost + this.uri + '?' + this.queryString,
         formData,
         {
           headers: {
@@ -463,12 +421,7 @@ export default {
         }
       }
     },
-    updatedTree() {
-      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
-    },
-    debounceSearchString: _.debounce(async function(value) {
-      this.searchString = value;
-    }, 500),
+
     hideFinished() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
@@ -481,18 +434,23 @@ export default {
           idx++;
         }
       }
-    }
+    },
+
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
   },
   activated() {
     this.fetchStorages();
     this.fetchProjects();
+    this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   deactivated() {
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
-  }
+  },
 };
 </script>
 
@@ -547,7 +505,7 @@ export default {
   padding-top: 0.5em;
 }
 
-.image-overview {
+.image-overview >>> .image-thumbnail {
   max-height: 4em;
   max-width: 6em;
 }

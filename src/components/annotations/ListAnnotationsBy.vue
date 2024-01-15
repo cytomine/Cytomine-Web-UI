@@ -31,7 +31,7 @@
     <template v-else>
       <annotation-preview
         v-for="annot in annotations" :key="((isInViewer) ? index : '') + title + annot.id"
-        :class="{active: isInViewer && annot.slice === imageWrapper.activeSlice.id}"
+        :class="{active: isInViewer && activeSlicesIds.includes(annot.slice)}"
         :annot="annot"
         :size="size"
         :color="color"
@@ -47,7 +47,7 @@
         @updateProperties="$emit('updateProperties')"
         @centerView="$emit('centerView', annot)"
         @deletion="$emit('delete', annot)"
-        @selectAnnotation="$emit('select', annot)"
+        @select="$emit('select', $event)"
       />
 
       <b-pagination
@@ -69,6 +69,7 @@ import AnnotationPreview from './AnnotationPreview';
 
 import {AnnotationCollection} from 'cytomine-client';
 import constants from '@/utils/constants';
+import _ from 'lodash';
 
 export default {
   name: 'list-annotations-by',
@@ -136,6 +137,9 @@ export default {
     isByTag() {
       return this.categorization === 'TAG';
     },
+    isUncategorized() {
+      return this.categorization === 'UNCATEGORIZED';
+    },
     filteredTermsIds() {
       return this.termsIds.filter(id => id > 0);
     },
@@ -165,7 +169,7 @@ export default {
         noTag: this.noTag,
 
         terms: (!this.isByTerm && (this.noTerm || this.multipleTerm || this.filteredTermsIds.length < this.allTerms.length)) ? this.filteredTermsIds.filter(id => id > 0) : null,
-        users: (!this.isByUser && this.usersIds && this.usersIds.length < this.allUsers.length) ? this.usersIds : null,
+        users: (!this.isByUser && this.usersIds /*[OP-1885] && this.usersIds.length < this.allUsers.length*/) ? this.usersIds : null,
         images: (!this.isByImage && ((this.tooManyImages && this.imagesIds.length > 0) || (!this.tooManyImages && this.imagesIds.length < this.allImages.length))) ? this.imagesIds : null,
         tracks: (!this.isByTrack && (this.noTrack || this.multipleTrack || this.filteredTracksIds.length < this.allTracks.length)) ? this.filteredTracksIds.filter(id => id > 0) : null,
         tags: (!this.isByTag && this.tagsIds) ? this.tagsIds.filter(id => id > 0) : null,
@@ -205,6 +209,9 @@ export default {
       }
       else if (this.isByTag && this.noTag) {
         return this.$t('no-tag');
+      }
+      else if (this.isUncategorized) {
+        return this.$t('all-annotations-uncategorized');
       }
       else {
         return this.prop.name;
@@ -262,9 +269,15 @@ export default {
         this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
       }
     },
-    activeSlice() {
-      return (this.imageWrapper) ? this.imageWrapper.activeSlice : null;
-    }
+    activeSlices() {
+      return (this.imageWrapper) ? this.imageWrapper.activeSlices : null;
+    },
+    activeSlicesIds() {
+      return (this.activeSlices) ? this.activeSlices.map(slice => slice.id) : [];
+    },
+    activeSliceWithSmallestRank() {
+      return (this.activeSlices) ? _.orderBy(this.activeSlices, ['rank'])[0] : null;
+    },
   },
   watch: {
     currentPage() {
@@ -283,7 +296,7 @@ export default {
         this.fetchPage();
       }
     },
-    activeSlice() {
+    activeSlices() {
       this.findPage();
     }
   },
@@ -295,7 +308,7 @@ export default {
     async findPage() {
       if (this.isInViewer) {
         let countCollection = this.collection.clone();
-        countCollection.beforeSlice = this.activeSlice.id;
+        countCollection.beforeSlice = this.activeSliceWithSmallestRank;
         countCollection.max = 1;
         this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
       }
@@ -354,11 +367,14 @@ export default {
   color: grey;
 }
 
->>> ul.pagination-list {
+/**
+ * TODO: use :deep(.class) when moving to Vue3
+ */
+::v-deep ul.pagination-list {
   justify-content: flex-end;
 }
 
->>> .active .annot-preview {
+::v-deep .active .annot-preview {
   box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
   font-weight: 600;
 }

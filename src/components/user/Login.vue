@@ -65,11 +65,11 @@
     <div class="panel-block">
       <form @submit.prevent="login()">
         <b-field :label="$t('username')">
-          <b-input v-model="username" />
+          <b-input minlength="1" maxlength="50" v-model="username" />
         </b-field>
 
         <b-field :label="$t('password')">
-          <b-input type="password" v-model="password" />
+          <b-input type="password" password-reveal minlength="4" maxlength="100" v-model="password" />
         </b-field>
 
         <div class="columns">
@@ -80,7 +80,7 @@
           </div>
 
           <div class="column has-text-right">
-            <button class="button is-link"> {{$t('button-login')}}</button>
+            <button :disabled="!loginEnabled" class="button is-link"> {{$t('button-login')}}</button>
           </div>
         </div>
       </form>
@@ -121,7 +121,10 @@ export default {
     };
   },
   computed: {
-    currentUser: get('currentUser/user')
+    currentUser: get('currentUser/user'),
+    loginEnabled() {
+      return !!this.username && !!this.password;
+    }
   },
   methods: {
     async login() {
@@ -140,8 +143,8 @@ export default {
         }
       }
       catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: error.response.data.message});
+        console.log(error.response);
+        this.$notify({type: 'error', text: error.response.data.errors.message});
       }
     },
     async sendUsername() {

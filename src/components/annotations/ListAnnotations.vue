@@ -60,7 +60,7 @@
           </div>
           <div class="column filter">
             <div class="filter-label">
-              {{$t('number-per-page')}}
+              {{$t('number-per-category')}}
             </div>
             <div class="filter-body">
               <cytomine-multiselect
@@ -235,47 +235,53 @@
       </div>
     </div>
 
-    <list-annotations-by v-for="prop in categoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
-      :categorization="selectedCategorization.categorization"
-      :size="selectedSize.size"
-      :color="selectedColor.hexaCode"
-      :nbPerPage="nbPerPage"
+    <div class="list-annots" @scroll="scrollHandler" ref="listAnnots">
+        <list-annotations-by v-for="prop in limitedCategoryOptions" :key="`${selectedCategorization.categorization}${prop.id}`"
+        :categorization="selectedCategorization.categorization"
+        :size="selectedSize.size"
+        :color="selectedColor.hexaCode"
+        :nbPerPage="nbPerPage"
 
-      :allTerms="terms"
-      :allUsers="allUsers"
-      :allImages="images"
-      :allTracks="tracks"
-      :allTags="tags"
+        :allTerms="terms"
+        :allUsers="allUsers"
+        :allImages="images"
+        :allTracks="tracks"
+        :allTags="tags"
 
-      :prop="prop"
-      :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
-      :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
-      :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
-      :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
-      :terms-ids="selectedTermsIds"
-      :tracks-ids="selectedTracksIds"
-      :tags-ids="selectedTagsIds"
-      :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
-      :imagesIds="selectedImagesIds"
-      :usersIds="selectedUsersIds"
-      :reviewed="reviewed"
-      :reviewUsersIds="reviewUsersIds"
-      :afterThan="afterThan"
-      :beforeThan="beforeThan"
+        :prop="prop"
+        :multiple-terms="(isByTerm && prop.id === multipleTermsOption.id)"
+        :no-term="(isByTerm && prop.id === noTermOption.id) || (!isByTerm && noTerm)"
+        :multiple-tracks="(isByTrack && prop.id === multipleTracksOption.id)"
+        :no-track="(isByTrack && prop.id === noTrackOption.id) || (!isByTrack && noTrack)"
+        :terms-ids="selectedTermsIds"
+        :tracks-ids="selectedTracksIds"
+        :tags-ids="selectedTagsIds"
+        :no-tag="(isByTag && prop.id === noTagOption.id) || (!isByTag && noTag)"
+        :imagesIds="selectedImagesIds"
+        :usersIds="selectedUsersIds"
+        :reviewed="reviewed"
+        :reviewUsersIds="reviewUsersIds"
+        :afterThan="afterThan"
+        :beforeThan="beforeThan"
+        :revision="revision"
 
-      :revision="revision"
+        v-show="showList(prop)"
+        :visible="showList(prop)"
 
-      v-show="showList(prop)"
-      :visible="showList(prop)"
-
-      @addTerm="addTerm"
-      @addTrack="addTrack"
-      @updateTermsOrTracks="revision++"
-      @delete="revision++"
-      @update="revision++"
-      @select="viewAnnot($event)"
-    />
-
+        @addTerm="addTerm"
+        @addTrack="addTrack"
+        @updateTermsOrTracks="revision++"
+        @delete="revision++"
+        @update="revision++"
+        @select="viewAnnot($event)"
+        />
+      <button class="button" v-if="!areAllOptionsLoaded" @click="loadCategories()">
+        <span class="icon">
+          <i class="fas fa-sync"></i>
+        </span>
+        <span>{{$t('button-load-more')}}</span>
+      </button>
+    </div>
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
       <div class="buttons is-centered">
@@ -304,10 +310,14 @@ import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
+import _ from 'lodash';
+
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
+import {appendShortTermToken} from '@/utils/token-utils.js';
+const categoryBatch = constants.CATEGORY_ITEMS_PER_BATCH;
 
 export default {
   name: 'list-annotations',
@@ -320,6 +330,7 @@ export default {
   },
   data() {
     return {
+      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
       revision: 0,
@@ -350,7 +361,17 @@ export default {
       noTrackOption: {id: 0, name: this.$t('no-track')},
       multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')},
 
-      noTagOption: {id: 0, name: this.$t('no-tag')}
+      noTagOption: {id: 0, name: this.$t('no-tag')},
+
+      uncategorizedOption: {id: 0, name: this.$t('uncategorized')},
+
+      nLoadedOptionsPerCategory: {
+        'TERM': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'IMAGE': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'USER': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'TRACK': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
+        'UNCATEGORIZED': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY
+      },
     };
   },
   computed: {
@@ -365,10 +386,14 @@ export default {
         categorizations.push({label: this.$t('per-image'), categorization: 'IMAGE'});
       }
 
+      // Adding an uncategorized option at the end of the array
+      categorizations.push({label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED'});
+
       return categorizations;
     },
     currentUser: get('currentUser/user'),
     project: get('currentProject/project'),
+    shortTermToken: get('currentUser/shortTermToken'),
     blindMode() {
       return this.project.blindMode;
     },
@@ -384,7 +409,7 @@ export default {
 
     colors() {
       let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
-      colors.push({label: this.$t('no-outline')});
+      colors.push({label: this.$t('no-outline'), hexaCode: ''});
       return colors;
     },
 
@@ -441,7 +466,6 @@ export default {
     termOptionsIds() {
       return this.termsOptions.map(option => option.id);
     },
-
     filteredTracks() {
       return this.tracks.filter(track => this.selectedImagesIds.includes(track.image));
     },
@@ -507,7 +531,12 @@ export default {
     selectedImagesIds() {
       return this.selectedImages.map(img => img.id);
     },
-
+    // eslint-disable-next-line vue/return-in-computed-property
+    /**
+     * This computed property returns an array.
+     * The array will be either empty or will be multiple objects of the same type.
+     * The type of these objects depends on the selected categorization.
+     */
     categoryOptions() {
       switch (this.selectedCategorization.categorization) {
         case 'TERM':
@@ -522,9 +551,23 @@ export default {
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;
+        case 'UNCATEGORIZED':
+          // Return an array containing one option to stick to the current behavior
+          return [this.uncategorizedOption];
         default:
           return [];
       }
+    },
+    /**
+     * In the template, we loop over the limitedCategoryOptions computed property.
+     * Zero, one or multiple ListAnnotationBy component can be rendered from this array.
+     * The array is built by slicing the categoryOptions computed property.
+     */
+    limitedCategoryOptions() {
+      return this.categoryOptions.slice(0, this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization]);
+    },
+    areAllOptionsLoaded() {
+      return this.categoryOptions.length === this.limitedCategoryOptions.length;
     },
     isByTerm() {
       return this.selectedCategorization.categorization === 'TERM';
@@ -550,11 +593,12 @@ export default {
     },
     collection() {
       let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
+
       let collection = new AnnotationCollection({
         project: this.project.id,
         terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
         images: !(this.tooManyImages && this.selectedImages.length === 0) ? this.selectedImagesIds : null,
-        users: this.selectedUsersIds.length===users.length ? null : this.selectedUsersIds,
+        users: /*[OP-1885] (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null :*/ this.selectedUsersIds,
         reviewed: this.reviewed,
         reviewUsers: this.reviewUsersIds,
         noTerm: this.noTerm,
@@ -575,8 +619,27 @@ export default {
     }
   },
   methods: {
-    viewAnnot(annot) {
-      this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+    scrollHandler: _.debounce(function() {
+      let scrollBlock = this.$refs.listAnnots;
+      let actualScrollPos = scrollBlock.scrollTop + scrollBlock.clientHeight;
+
+      if (actualScrollPos === scrollBlock.scrollHeight && !this.areAllOptionsLoaded) {
+        console.log("Loading new categories from scroll handler.");
+        this.loadCategories();
+      }
+    }, 100),
+    loadCategories(){
+      const newCount = this.limitedCategoryOptions.length + categoryBatch;
+      if (newCount >= this.categoryOptions.length) {
+        this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = this.categoryOptions.length;
+      }
+      else {
+        this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = newCount;
+      }
+    },
+    appendShortTermToken,
+    viewAnnot(data) {
+      this.$router.push(`/project/${this.project.id}/image/${data.annot.image}/annotation/${data.annot.id}`);
     },
     async fetchImages() {
       if (!this.tooManyImages) {
@@ -612,7 +675,7 @@ export default {
       this.tags = (await TagCollection.fetchAll()).array;
     },
     downloadURL(format) {
-      return this.collection.getDownloadURL(format);
+      return appendShortTermToken(this.collection.getDownloadURL(format), this.shortTermToken);
     },
     addTerm(term) {
       this.terms.push(term);
@@ -634,6 +697,14 @@ export default {
           return this.reviewed ? this.reviewUsersIds.includes(prop.id) : this.selectedUsersIds.includes(prop.id);
         case 'TRACK':
           return this.selectedTracksIds.includes(prop.id);
+        /**
+         * We will only have one ListAnnotationBy component rendered
+         * when the selectedCategorization is uncategorized.
+         * Removing or adding terms, images, etc, 
+         * in the filters shouldn't change the component visibility.
+         */
+        case 'UNCATEGORIZED':
+          return true;
       }
     }
   },
@@ -660,7 +731,8 @@ export default {
     }
   },
   async created() {
-    this.annotationTypes = [this.userAnnotationOption, this.jobAnnotationOption, this.reviewedAnnotationOption];
+    this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
+    if(this.algoEnabled) this.annotationTypes.splice(1, 0, this.jobAnnotationOption);
 
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {
@@ -730,11 +802,22 @@ export default {
 </script>
 
 <style scoped>
+.list-annots{
+  max-height: 80vh;
+  overflow: auto;
+  margin-bottom: 1em;
+}
+
 .filters:not(:last-child) {
   margin-bottom: 1.25rem;
 }
 
 .filter.column {
   padding: 0.4em 0.75em;
+}
+
+.button {
+  display: block;
+  margin: auto;
 }
 </style>

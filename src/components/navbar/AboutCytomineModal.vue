@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
-  <template v-if="!loading">
+  <template>
     <dl>
       <dt>{{$t('version')}}</dt>
       <dd>{{version || '?'}}</dd>
@@ -59,7 +59,6 @@
       <dd>
         <i18n path="documentation-info">
           <a place="docLink" href="https://documentation.cytomine.org/" target="_blank">{{$t('here')}}</a>
-          <a place="apiDocLink" :href="apiDocLink" target="_blank">{{$t('here')}}</a>
         </i18n>
       </dd>
 
@@ -75,7 +74,6 @@
 </template>
 
 <script>
-import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
@@ -84,26 +82,9 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
-      version: null,
-      loading: true
+      version: constants.CYTOMINE_COMMERCIAL_VERSION
     };
   },
-  computed: {
-    apiDocLink() {
-      let core = constants.CYTOMINE_CORE_HOST;
-      return `${core}/restApiDoc/?doc_url=${core}/restApiDoc/api`;
-    }
-  },
-  async created() {
-    try {
-      let {version} = await Cytomine.instance.ping();
-      this.version = version;
-    }
-    catch(error) {
-      console.log(error);
-    }
-    this.loading = false;
-  }
 };
 </script>
 

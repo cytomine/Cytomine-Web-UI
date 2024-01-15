@@ -61,7 +61,7 @@ export default {
         return;
       }
       this.$emit('rename', this.newName);
-      this.$parent.close();
+      this.$emit('update:active', false);
     }
   },
   async created() {
@@ -69,3 +69,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+>>> input[type=text] {
+  width: 26em;
+}
+</style>

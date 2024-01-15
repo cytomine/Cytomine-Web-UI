@@ -81,7 +81,9 @@ export default {
   methods: {
     async loginWithToken() {
       try {
-        await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+        let {shortTermToken} = await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
+        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+
         await this.fetchUser();
       }
       catch(error) {
@@ -94,7 +96,10 @@ export default {
         return; // window not visible or inactive user => stop pinging
       }
       try {
-        let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+        let {authenticated, shortTermToken} = await Cytomine.instance.ping(this.project ? this.project.id : null);
+
+        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+
         if(this.currentUser && !authenticated) {
           await this.$store.dispatch('logout');
         }
@@ -105,7 +110,13 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.communicationError = true;
+        if (error.toString().indexOf('401')!==-1) {
+          this.communicationError = false;
+          Cytomine.instance.logout();
+        }
+        else {
+          this.communicationError = true;
+        }
       }
 
       clearTimeout(this.timeout);
