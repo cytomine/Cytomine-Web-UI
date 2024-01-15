@@ -25,7 +25,7 @@
 
   <div class="scale-line-position" v-if="mousePosition">
     <div style="float: left;">x: {{Math.round(mousePosition[0])}}</div>
-    <div style="float: right;">y: {{Math.round(mousePosition[1])}}</div>
+    <div>y: {{Math.round(mousePosition[1])}}</div>
   </div>
 </div>
 </template>
