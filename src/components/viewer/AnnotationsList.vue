@@ -4,14 +4,14 @@
       <button class="delete" @click="opened = false"></button>
 
       <div class="annotations-list-sidebar">
-        <b-field position="is-centered" v-if="hasTracks">
+        <!--<b-field position="is-centered" v-if="hasTracks">
           <b-radio-button v-model="displayType" native-value="TERM" size="is-small">
             {{$t('by-term')}}
           </b-radio-button>
           <b-radio-button v-model="displayType" native-value="TRACK" size="is-small">
             {{$t('by-track')}}
           </b-radio-button>
-        </b-field>
+        </b-field>-->
 
         <ontology-tree
           v-if="isDisplayedByTerm"
