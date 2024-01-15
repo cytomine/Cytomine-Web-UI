@@ -223,16 +223,16 @@ export default {
       if (visibleApparentChannels.length > 0) {
         params.channels = [];
         // eslint-disable-next-line camelcase
-        params.min_intensities = [];
+        params.minIntensities = [];
         // eslint-disable-next-line camelcase
-        params.max_intensities = [];
+        params.maxIntensities = [];
         params.gammas = [];
         params.colormaps = [];
 
         visibleApparentChannels.forEach(ac => {
           params.channels.push(ac.index);
-          params.min_intensities.push(ac.bounds.min);
-          params.max_intensities.push(ac.bounds.max);
+          params.minIntensities.push(ac.bounds.min);
+          params.maxIntensities.push(ac.bounds.max);
           params.gammas.push(ac.gamma);
           params.colormaps.push(formatColormapRequestParam(ac.color, ac.inverted));
         });
