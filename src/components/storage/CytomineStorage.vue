@@ -235,7 +235,7 @@
 
           <div class="columns is-multiline">
             <div class="column is-half" v-for="format in selectedFormats" :key="format">
-              <image-format
+              <metadata-filter
                 :format="format"
                 :image-ids="aiIDs[format]"
                 :keys="metadataKeys[format]"
@@ -361,22 +361,22 @@ import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import CytomineTable from '@/components/utils/CytomineTable';
-import ImageFormat from '@/components/search/format/ImageFormat';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
-import vendorFromFormat from '@/utils/vendor';
 import AddProjectModal from '@/components/project/AddProjectModal';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'cytomine-storage',
   components: {
     AddProjectModal,
-    ImageFormat,
     ImageThumbnail,
     CytomineMultiselect,
     CytomineSlider,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails,
-    CytomineTable
+    CytomineTable,
+    MetadataFilter,
   },
   data() {
     return {

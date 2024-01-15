@@ -1,5 +1,5 @@
 <template>
-  <div class="image-format">
+  <div class="metadata-filter">
     <h2>{{ format }}</h2>
     <div class="columns is-multiline">
       <div class="column is-narrow" v-for="(value, key) in filters" :key="key">
@@ -93,7 +93,7 @@ import {filterAutoCompletion} from '@/utils/metadata.js';
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
 export default {
-  name: 'image-format',
+  name: 'metadata-filter',
   components: {
     CytomineSlider,
   },
@@ -240,16 +240,16 @@ export default {
   margin-right: 10px;
 }
 
-.image-format {
-  margin: 10px;
-}
-
 .key {
   max-width: 75%;
 }
 
 .metadata {
   width: 300px;
+}
+
+.metadata-filter {
+  margin: 10px;
 }
 
 .metadata-slider {

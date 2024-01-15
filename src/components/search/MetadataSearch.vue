@@ -113,7 +113,7 @@
 
     <div class="columns is-multiline">
       <div class="column is-half" v-for="format in selectedFormats" :key="format">
-        <image-format
+        <metadata-filter
           :format="format"
           :image-ids="imageIds[format]"
           :keys="metadataKeys[format]"
@@ -133,7 +133,7 @@ import {syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
-import ImageFormat from '@/components/search/format/ImageFormat';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
 
 const storeOptions = {rootModuleProp: 'storeModule'};
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
@@ -144,7 +144,7 @@ export default {
   components: {
     CytomineMultiselect,
     CytomineSlider,
-    ImageFormat,
+    MetadataFilter,
   },
   props: {
     formats: {type: Array, default: []},
