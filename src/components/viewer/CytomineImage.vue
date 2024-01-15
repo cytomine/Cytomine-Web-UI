@@ -621,7 +621,7 @@ export default {
             annot = await Annotation.fetch(annot.id);
           }
 
-          if(annot.slice !== this.slices[0].id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
             this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -770,13 +770,13 @@ export default {
 
     if (annot) {
       try {
-        if(annot.image === this.image.id) {
-          if(!this.sliceIds.includes(annot.slice)) {
+        if (annot.image === this.image.id) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
           this.routedAnnotation = annot;
-          if(this.routedAction === 'comments') {
+          if (this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
