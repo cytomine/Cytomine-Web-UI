@@ -78,6 +78,10 @@ export default {
     removeMetadataFilter(state, {format, key}) {
       Vue.delete(state.currentMetadataSearch[format], key);
     },
+
+    resetMetadataFilters(state) {
+      state.currentMetadataSearch = {};
+    }
   },
 
   actions: {

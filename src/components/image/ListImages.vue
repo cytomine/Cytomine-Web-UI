@@ -400,6 +400,8 @@ export default {
     },
 
     async refreshData() {
+      this.$store.commit('currentProject/resetMetadataFilters');
+
       try {
         await Promise.all([
           this.fetchFilters(),
