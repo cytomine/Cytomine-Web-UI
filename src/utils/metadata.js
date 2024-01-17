@@ -22,6 +22,7 @@ export function stripIDfromKey(key) {
   const keywords = [
     'BiologicalBeing',
     'Block',
+    'Case',
     'Dataset',
     'Image',
     'Observation',
@@ -31,6 +32,7 @@ export function stripIDfromKey(key) {
   ];
   const toRemove = [
     'blocks',
+    'cases',
     'images',
     'observations',
     'slides',
