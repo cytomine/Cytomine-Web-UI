@@ -985,6 +985,7 @@ storage,Storage,Stockage,Almacenamiento,storage
 string,String,Chaîne de caractères,Cadena de caracteres,Reeks tekens
 success,Success,Réussi,Finalizado con éxito,Geslaagd
 successful-registration,Your account was successfully created. Check your inbox to enable it.,Votre compte a été créé avec succès. Consultez votre boîte mail pour l'activer.,Su cuenta fue creada exitosamente. Revise su bandeja de entrada para activarla.,Uw account is succesvol aangemaakt. Controleer uw mailbox om deze te activeren.
+suggested-terms,Suggested Terms,Terme suggéré,Términos sugeridos,Voorgestelde termen
 super-admin,Super admin,Super admin,Super administrador,Super admin
 switch-back-to-user,Switch back to {username},Retour à {username},Volver a {username},Terug naar {usersnaam}
 system,System,Système,Sistema,Systeem

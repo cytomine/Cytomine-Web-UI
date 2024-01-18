@@ -18,6 +18,7 @@
       :image="image"
       :index="index"
       @select="selectAnnotation"
+      @updateTermsOrTracks="updateTermsOrTracks"
     />
   </div>
 </template>

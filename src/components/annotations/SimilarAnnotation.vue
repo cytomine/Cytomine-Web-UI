@@ -13,10 +13,10 @@
       <b-loading :is-full-page="false" :active="loading"/>
 
       <div class="actions">
-        <h1>Similar annotations</h1>
+        <h1>{{ $t('similar-annotations') }}</h1>
 
         <button class="button is-small close" @click="hideSimilarAnnotations()">
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times"/>
         </button>
       </div>
 
@@ -38,21 +38,39 @@
           </div>
         </div>
       </div>
+
+      <div v-if="suggestedTerms.length > 0">
+        <div class="actions">
+          <h1>{{ $t('suggested-terms') }}</h1>
+        </div>
+
+        <div>
+          <b-tag class="term-suggestion" v-for="value in suggestedTerms" :key="value[0].id">
+            <cytomine-term :term="value[0]"/>
+            ({{ value[1] }})
+            <button class="button is-small" @click="addTerm(value[0])">
+              <span class="icon is-small"><i class="fas fa-plus"/></span>
+            </button>
+          </b-tag>
+        </div>
+      </div>
     </vue-draggable-resizable>
   </div>
 </template>
 
 <script>
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
+import CytomineTerm from '@/components/ontology/CytomineTerm';
 
-import {Annotation} from 'cytomine-client';
+import {Annotation, AnnotationTerm} from 'cytomine-client';
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 export default {
   name: 'similar-annotation',
   components: {
     AnnotationPreview,
-    VueDraggableResizable
+    CytomineTerm,
+    VueDraggableResizable,
   },
   props: {
     data: {type: Object},
@@ -64,9 +82,13 @@ export default {
     return {
       annotations: [],
       loading: true,
+      suggestedTerms: [],
     };
   },
   computed: {
+    annotation() {
+      return this.$store.getters[this.imageModule + 'selectedFeature'].properties.annot;
+    },
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
@@ -84,20 +106,49 @@ export default {
     similarities() {
       let similarities = [];
 
-      for (let i = 0; i < this.data['filenames'].length; i++) {
-        let id = this.data['filenames'][i];
-        let annotation = this.annotations.find((annotation) => annotation.id === Number(id));
-
+      for (let i = 0; i < this.annotations.length; i++) {
         similarities.push({
-          annotation: (annotation === undefined) ? new Annotation({id: id}) : annotation,
+          annotation: this.annotations[i],
           distance: this.data['distances'][i]
         });
       }
 
       return similarities;
-    }
+    },
+    terms() {
+      return this.$store.getters['currentProject/terms'] || [];
+    },
   },
   methods: {
+    async addTerm(term) {
+      try {
+        await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save();
+        this.$emit('updateTermsOrTracks', this.annotation);
+      } catch (error) {
+        this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
+      }
+    },
+    countTerm() {
+      let termCount = {};
+      for (let annotation of this.annotations) {
+        for (let term of annotation.term) {
+          termCount[term] = (termCount[term] || 0) + 1;
+        }
+      }
+
+      // Delete already existing terms
+      for (let term of this.annotation.term) {
+        delete termCount[term];
+      }
+
+      this.suggestedTerms = Object.keys(termCount).map((key) => [key, termCount[key]]);
+      this.suggestedTerms.sort((a, b) => b[1] - a[1]);
+      this.suggestedTerms.forEach((count) => count[0] = this.findTerm(count[0]));
+      this.suggestedTerms = this.suggestedTerms.slice(0, 3); // Only keep the 3 most frequent terms
+    },
+    findTerm(id) {
+      return this.terms.find((term) => term.id === Number(id));
+    },
     hideSimilarAnnotations() {
       this.$eventBus.$emit('hide-similar-annotations');
     },
@@ -108,10 +159,16 @@ export default {
     }
   },
   async created() {
+    this.$eventBus.$on('update-suggested-terms', this.countTerm);
+
     await this.fetchAnnotations();
+    this.countTerm();
 
     this.loading = false;
   },
+  beforeDestroy() {
+    this.$eventBus.$off('update-suggested-terms', this.countTerm);
+  }
 };
 </script>
 
@@ -158,6 +215,11 @@ h1 {
   margin-left: 0.4em;
   padding: 0;
   text-align: left;
+}
+
+.term-suggestion {
+  flex-direction: column;
+  margin: 0.5rem;
 }
 
 .similar-annotations-playground {
