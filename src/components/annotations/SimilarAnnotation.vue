@@ -95,13 +95,8 @@ export default {
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
     },
-    displayAnnotDetails: {
-      get() {
-        return this.imageWrapper.selectedFeatures.displayAnnotDetails;
-      },
-      set(value) {
-        this.$store.commit(this.imageModule + 'setDisplayAnnotDetails', value);
-      }
+    displayAnnotDetails() {
+      return this.imageWrapper.selectedFeatures.displayAnnotDetails;
     },
     similarities() {
       let similarities = [];
