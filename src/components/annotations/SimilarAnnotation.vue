@@ -2,6 +2,7 @@
   <div class="similar-annotations-playground">
     <vue-draggable-resizable
       class="draggable"
+      v-show="displayAnnotDetails"
       :parent="false"
       :resizable="false"
       :x="350"
@@ -56,6 +57,7 @@ export default {
   props: {
     data: {type: Object},
     image: {type: Object},
+    index: {type: String},
     size: {type: Number, default: 64},
   },
   data() {
@@ -65,6 +67,20 @@ export default {
     };
   },
   computed: {
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
+    },
+    imageWrapper() {
+      return this.$store.getters['currentProject/currentViewer'].images[this.index];
+    },
+    displayAnnotDetails: {
+      get() {
+        return this.imageWrapper.selectedFeatures.displayAnnotDetails;
+      },
+      set(value) {
+        this.$store.commit(this.imageModule + 'setDisplayAnnotDetails', value);
+      }
+    },
     similarities() {
       let similarities = [];
 
