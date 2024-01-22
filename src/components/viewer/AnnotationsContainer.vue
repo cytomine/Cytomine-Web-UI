@@ -11,6 +11,15 @@
       @updateProperties="updateProperties"
       @delete="handleDeletion"
     />
+
+    <similar-annotation
+      v-if="showSimilarAnnotations"
+      :data="similarData"
+      :image="image"
+      :index="index"
+      @select="selectAnnotation"
+      @updateTermsOrTracks="updateTermsOrTracks"
+    />
   </div>
 </template>
 
@@ -21,6 +30,7 @@ import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annot
 import WKT from 'ol/format/WKT';
 
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
+import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
 
 export default {
   name: 'AnnotationsContainer',
@@ -30,10 +40,13 @@ export default {
   data() {
     return {
       format: new WKT(),
+      showSimilarAnnotations: false,
+      similarData: null,
     };
   },
   components: {
     AnnotationDetailsContainer,
+    SimilarAnnotation,
   },
   computed: {
     configUI: get('currentProject/configUI'),
@@ -86,7 +99,7 @@ export default {
       this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
     },
 
-    centerView({annot, sameView=false}) {
+    centerView({annot, sameView = false}) {
       if (sameView) {
         this.$emit('centerView', annot);
       }
@@ -94,10 +107,19 @@ export default {
         this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('hide-similar-annotations', () => {
+      this.showSimilarAnnotations = false;
+    });
+    this.$eventBus.$on('show-similar-annotations', (data) => {
+      this.showSimilarAnnotations = true;
+      this.similarData = data;
+    });
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('hide-similar-annotations');
+    this.$eventBus.$off('show-similar-annotations');
   }
 };
 </script>
-
-<style scoped>
-
-</style>
