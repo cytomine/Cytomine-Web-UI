@@ -161,13 +161,97 @@
       {{ $t('storage') }}
     </p>
     <div class="panel-block storage">
-      <b-input
-        :value="searchString"
-        @input="debounceSearchString"
-        class="search-uploaded-file"
-        :placeholder="$t('search-placeholder')"
-        icon="search"
-      />
+      <div class="search-block">
+        <b-input
+          :value="searchString"
+          @input="debounceSearchString"
+          class="search-uploaded-file"
+          :placeholder="$t('search-placeholder')"
+          icon="search"
+          type="search"
+        />
+
+        <button class="button" @click="filtersOpened = !filtersOpened">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+        </button>
+      </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('vendor') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedVendors"
+                  :multiple="true"
+                  :options="availableVendors"
+                  label="label"
+                  track-by="value"
+                />
+              </div>
+
+              <div class="filter-label">{{ $t('format') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedFormats"
+                  :multiple="true"
+                  :options="availableFormats"
+                />
+              </div>
+            </div>
+
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('magnification') }}</div>
+              <div class="filter-body">
+                <cytomine-multiselect
+                  v-model="selectedMagnifications"
+                  :options="availableMagnifications"
+                  :multiple="true"
+                  :searchable="false"
+                  label="label"
+                  track-by="value"
+                />
+              </div>
+            </div>
+
+            <div class="column is-one-third">
+              <div class="filter-label">{{ $t('height') }}</div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
+              </div>
+
+              <div class="filter-label">{{ $t('width') }}</div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
+              </div>
+            </div>
+          </div>
+
+          <div class="columns is-multiline">
+            <div class="column is-half" v-for="format in selectedFormats" :key="format">
+              <metadata-filter
+                :format="format"
+                :image-ids="aiIDs[format]"
+                :keys="metadataKeys[format]"
+                :max="metadataMax"
+                :type="metadataType"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons button-add is-right">
+          <button class="button is-link" @click="createProject()">
+            {{ $t('new-project-with-filtered-images') }}
+          </button>
+        </div>
+      </b-collapse>
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -205,6 +289,33 @@
           <!--<b-table-column field="parentFilename" :label="$t('from-file')" sortable width="150">-->
             <!--{{ uFile.parentFilename ? uFile.parentFilename : "-" }}-->
           <!--</b-table-column>-->
+
+          <b-table-column label="" centered width="80">
+            <div class="columns is-vcentered">
+              <div class="column is-two-thirds">
+                <b-select
+                  v-model="selectedProjectsToLink[uFile.image]"
+                  :placeholder="projectPlaceholders[uFile.image] ? $t('select-project') : $t('no-project')"
+                  :disabled="!projectPlaceholders[uFile.image]"
+                  expanded
+                >
+                  <option v-for="project in filteredProjects[uFile.image]" :key="project.id" :value="project">
+                    {{ project.name }}
+                  </option>
+                </b-select>
+              </div>
+
+              <div class="column is-one-quarter">
+                <button
+                  class="button is-small is-link"
+                  :disabled="!projectPlaceholders[uFile.image]"
+                  @click="addImage(uFile)"
+                >
+                  {{ $t('add-image') }}
+                </button>
+              </div>
+            </div>
+          </b-table-column>
         </template>
 
         <template #detail="{row: uFile}">
@@ -217,13 +328,29 @@
       </cytomine-table>
     </div>
   </div>
+
+  <add-project-modal :active.sync="createModal" :ontologies="ontologies" />
 </div>
 </template>
 
 <script>
+import {stripIDfromKey} from '@/utils/metadata.js';
 import {get} from '@/utils/store-helpers';
+import {isNumeric} from '@/utils/string-utils';
 
-import {Cytomine, StorageCollection, ProjectCollection, UploadedFileCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
+import {
+  AbstractImage,
+  AbstractImageCollection,
+  Cytomine,
+  ImageInstance,
+  StorageCollection,
+  OntologyCollection,
+  ProjectCollection,
+  PropertyCollection,
+  UploadedFileCollection,
+  UploadedFile,
+  UploadedFileStatus
+} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
 import _ from 'lodash';
@@ -232,17 +359,24 @@ import constants from '@/utils/constants.js';
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import CytomineSlider from '@/components/form/CytomineSlider';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
+import AddProjectModal from '@/components/project/AddProjectModal';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
+import vendorFromFormat from '@/utils/vendor';
 
 export default {
   name: 'cytomine-storage',
   components: {
+    AddProjectModal,
     ImageThumbnail,
     CytomineMultiselect,
+    CytomineSlider,
     'uploaded-file-status': UploadedFileStatusComponent,
     UploadedFileDetails,
-    CytomineTable
+    CytomineTable,
+    MetadataFilter,
   },
   data() {
     return {
@@ -250,6 +384,29 @@ export default {
       newUploadError: false,
       timeoutRefreshSessionUploads: null,
       tableRefreshInterval: constants.STORAGE_REFRESH_INTERVAL,
+
+      abstractImages: [],
+      availableFormats: [],
+      availableMagnifications: [],
+      availableVendors: [],
+      boundsHeight: [],
+      boundsWidth: [],
+      createModal: false,
+      filteredImageIDs: {},
+      filtersOpened: false,
+      filteredProjects: {},
+      maxHeight: 100,
+      maxWidth: 100,
+      metadataKeys: {},
+      metadataMax: {},
+      metadataType: {},
+      ontologies: [],
+      projectPlaceholders: {},
+      properties: {},
+      selectedFormats: [],
+      selectedMagnifications: [],
+      selectedProjectsToLink: {},
+      selectedVendors: [],
 
       storages: [],
       selectedStorage: null,
@@ -271,6 +428,13 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     shortTermToken: get('currentUser/shortTermToken'),
+    aiIDs() {
+      let ids = {};
+      this.availableFormats.forEach(format => ids[format] = []);
+      this.abstractImages.forEach(ai => ids[ai.contentType].push(ai.id));
+
+      return ids;
+    },
     finishedStatus() {
       return [
         UploadedFileStatus.CONVERTED,
@@ -314,11 +478,61 @@ export default {
     plainFiles() {
       return this.dropFiles.map(wrapper => wrapper.file);
     },
+
+    multiSelectFilters() {
+      return [
+        { prop: 'contentType', selected: this.selectedFormats, total: this.availableFormats.length },
+        { prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length },
+        { prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length },
+      ];
+    },
+
+    boundsFilters() {
+      return [
+        { prop: 'height', bounds: this.boundsHeight },
+        { prop: 'width', bounds: this.boundsWidth },
+      ];
+    },
+
     uploadedFileCollection() {
-      return new UploadedFileCollection({
+      let collection = new UploadedFileCollection({
         onlyRootsWithDetails: true,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
+
+      for (let { prop, bounds } of this.boundsFilters) {
+        collection[prop] = {
+          lte: bounds[1]
+        };
+
+        if(bounds[0] > 0) {
+          collection[prop]['gte'] = bounds[0];
+        }
+      }
+
+      for (let { prop, selected, total } of this.multiSelectFilters) {
+        if (prop === 'vendor') {
+          prop = 'mimeType';
+        }
+
+        if (selected.length > 0 && selected.length < total) {
+          collection[prop] = {
+            in: selected.join()
+          };
+        }
+      }
+
+      let filteredIDs = [];
+      this.selectedFormats.forEach(format => {
+        filteredIDs = filteredIDs.concat(this.filteredImageIDs[format]);
+      });
+      if (filteredIDs.length > 0) {
+        collection['include'] = {
+          in: filteredIDs.join(',')
+        };
+      }
+
+      return collection;
     }
   },
   watch: {
@@ -338,6 +552,181 @@ export default {
     }
   },
   methods: {
+    async addAbstractImage(uFile) {
+      let ai = (await Cytomine.instance.api.get(
+        `uploadedfile/${uFile.id}/abstractimage.json`
+      )).data;
+      ai = await AbstractImage.fetch(ai.id); /* ai not the same object */
+      this.$set(this.filteredProjects, ai.id, this.projects);
+      this.$set(this.projectPlaceholders, ai.id, true);
+
+      await this.fetchMetadata(ai);
+
+      let oldMaxHeight = this.maxHeight;
+      let oldMaxWidth = this.maxWidth;
+      this.maxHeight = Math.max(ai.height, this.maxHeight);
+      this.maxWidth = Math.max(ai.width, this.maxWidth);
+      this.boundsHeight = this.boundsHeight[1] === oldMaxHeight ? [0, this.maxHeight] : this.boundsHeight;
+      this.boundsWidth = this.boundsWidth[1] === oldMaxWidth ? [0, this.maxWidth] : this.boundsWidth;
+
+      if (!this.availableFormats.includes(ai.contentType)) {
+        this.availableFormats.push(ai.contentType);
+        this.$set(this.filteredImageIDs, ai.contentType, []);
+      }
+      this.abstractImages.push(ai);
+
+      if ((this.availableFormats.length-1) === this.selectedFormats.length) {
+        this.selectedFormats.push(ai.contentType);
+      }
+      if (this.selectedFormats.includes(ai.contentType)) {
+        this.filteredImageIDs[ai.contentType].push(ai.id);
+      }
+
+      let magnification = this.getMagnification(ai.magnification);
+      if (!this.availableMagnifications.includes(magnification)) {
+        this.availableMagnifications.push(magnification);
+      }
+      if ((this.availableMagnifications.length-1) === this.selectedMagnifications.length) {
+        this.selectedMagnifications.push(magnification);
+      }
+
+      let vendorFormatted = this.getVendor(ai.contentType);
+      if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+        this.availableVendors.push(vendorFormatted);
+      }
+      if ((this.availableVendors.length-1) === this.selectedVendors.length) {
+        this.selectedVendors.push(vendorFormatted);
+      }
+    },
+    async addImage(uFile) {
+      if (this.selectedProjectsToLink[uFile.image] === undefined) {
+        return;
+      }
+
+      let project = this.selectedProjectsToLink[uFile.image];
+      let propsTranslation = {
+        imageName: uFile.originalFilename,
+        projectName: project.name
+      };
+
+      try {
+        await new ImageInstance({
+          baseImage: uFile.image,
+          project: project.id
+        }).save();
+
+        let projects = this.filteredProjects[uFile.image];
+        projects.splice(projects.indexOf(project), 1);
+        this.$set(this.filteredProjects, uFile.image, projects);
+        this.$set(this.projectPlaceholders, uFile.image, projects.length != 0);
+        this.$set(this.selectedProjectsToLink, uFile.image, null);
+
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-add-image', propsTranslation)
+        });
+      }
+      catch (error) {
+        console.log(error);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-add-image', propsTranslation)
+        });
+      }
+    },
+    async createProject() {
+      let filteredUFileCollection = (await this.uploadedFileCollection.fetchAll()).array;
+      this.$eventBus.$emit('update-ufiles', filteredUFileCollection);
+      this.createModal = true;
+    },
+    async fetchMetadata(ai) {
+      let properties = (await PropertyCollection.fetchAll({object: ai})).array;
+      properties.sort((a, b) => a.key.localeCompare(b.key));
+      this.properties[ai.id] = properties;
+
+      let keys = new Set();
+      properties.forEach(property => {
+        let key = stripIDfromKey(property.key);
+        keys.add(key);
+        this.metadataType[key] = isNumeric(property.value) ? Number : String;
+
+        if (!(key in this.metadataMax)) {
+          this.metadataMax[key] = property.value;
+        }
+
+        if (this.metadataMax[key] < property.value) {
+          this.metadataMax[key] = isNumeric(property.value) ? +property.value : property.value;
+        }
+      });
+
+      this.metadataKeys[ai.contentType].forEach((k) => keys.add(k));
+      this.metadataKeys[ai.contentType] = Array.from(keys);
+    },
+    getMagnification(magnification) {
+      return {
+        value: magnification || 'null',
+        label: magnification || this.$t('unknown')
+      };
+    },
+    getVendor(format) {
+      let vendor = vendorFromFormat(format);
+      return {
+        value: vendor ? format : 'null',
+        label: vendor ? vendor.name : this.$t('unknown')
+      };
+    },
+    async fetchAbstractImages() {
+      this.abstractImages = (await AbstractImageCollection.fetchAll()).array;
+      this.maxHeight = Math.max(...this.abstractImages.map(ai => ai.height), this.maxHeight);
+      this.maxWidth = Math.max(...this.abstractImages.map(ai => ai.width), this.maxWidth);
+      this.boundsHeight = [0, this.maxHeight];
+      this.boundsWidth = [0, this.maxWidth];
+
+      let formats = new Set();
+      let magnifications = new Set();
+
+      this.abstractImages.forEach(ai => {
+        formats.add(ai.contentType);
+        magnifications.add(ai.magnification);
+      });
+
+      this.availableFormats = Array.from(formats);
+      this.availableMagnifications = Array.from(magnifications).map(m => this.getMagnification(m));
+
+      this.availableFormats.forEach(format => {
+        let vendorFormatted = this.getVendor(format);
+        if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
+          this.availableVendors.push(vendorFormatted);
+        }
+
+        this.filteredImageIDs[format] = [];
+        this.metadataKeys[format] = [];
+      });
+
+      this.selectedFormats = [...this.availableFormats];
+      this.selectedMagnifications = [...this.availableMagnifications];
+      this.selectedVendors = [...this.availableVendors];
+
+      let aiToImages = {};
+      await Promise.all(this.abstractImages.map(async (ai) => {
+        await this.fetchMetadata(ai);
+
+        aiToImages[ai.id] = (await Cytomine.instance.api.get(
+          `abstractimage/${ai.id}/imageinstance.json`
+        )).data.collection;
+
+        this.filteredImageIDs[ai.contentType].push(ai.id);
+      }));
+
+      for (const [key, value] of Object.entries(aiToImages)) {
+        let toRemove = value.map(image => image.project);
+        this.filteredProjects[key] = this.projects.filter(project => {
+          return !toRemove.includes(project.id);
+        });
+
+        this.projectPlaceholders[key] = this.filteredProjects[key].length !== 0;
+      }
+    },
     async fetchStorages() {
       try {
         this.storages = (await StorageCollection.fetchAll()).array;
@@ -352,6 +741,11 @@ export default {
         console.log(error);
         this.newUploadError = true;
       }
+    },
+    async fetchOntologies() {
+      let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+      ontologies.sort((a, b) => a.name.localeCompare(b.name));
+      this.ontologies = ontologies;
     },
     async fetchProjects() {
       try {
@@ -463,6 +857,11 @@ export default {
         fileWrapper.uploadedFile = new UploadedFile(response.data[0].uploadedFile);
         this.refreshStatusSessionUploads();
         this.revision++;
+        setTimeout(
+          this.addAbstractImage,
+          constants.STORAGE_REFRESH_INTERVAL,
+          fileWrapper.uploadedFile
+        );
       }).catch(error => {
         if(!axios.isCancel(error)) {
           console.log(error);
@@ -514,18 +913,29 @@ export default {
 
     debounceSearchString: _.debounce(async function(value) {
       this.searchString = value;
-    }, 500)
+    }, 500),
+
+    includeImageIDs(format, imageIDs) {
+      this.$delete(this.filteredImageIDs, format);
+      this.$set(this.filteredImageIDs, format, imageIDs);
+    }
   },
   activated() {
+    this.fetchAbstractImages();
     this.fetchStorages();
+    this.fetchOntologies();
     this.fetchProjects();
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
+
+    this.$eventBus.$on('includeImageIDs', this.includeImageIDs);
   },
   deactivated() {
     clearTimeout(this.timeoutRefreshSessionUploads);
     this.tableRefreshInterval = 0;
+
+    this.$eventBus.$off('includeImageIDs', this.includeImageIDs);
   },
 };
 </script>
@@ -590,6 +1000,18 @@ export default {
   min-height: 20vh;
   position: relative;
 }
+
+.search-block {
+  display: flex;
+}
+
+.b-table td, th {
+  vertical-align: middle !important;
+}
+
+.button-add {
+  padding: 1rem;
+}
 </style>
 
 <style>
@@ -604,6 +1026,7 @@ export default {
 }
 
 .search-uploaded-file {
+  margin-right: 1rem;
   max-width: 25em;
 }
 </style>
