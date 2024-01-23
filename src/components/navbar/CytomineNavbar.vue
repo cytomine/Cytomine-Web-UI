@@ -47,6 +47,10 @@
         <i class="fas fa-hashtag"></i>
         {{ $t('ontologies') }}
       </router-link>
+      <router-link v-if="appEngineEnabled" to="/appengine" class="navbar-item">
+        <i class="fas fa-code"></i>
+        {{ $t('applications') }}
+      </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
@@ -128,6 +132,7 @@ export default {
     return {
       openedTopMenu: false,
       hotkeysModal: null,
+      appEngineEnabled: constants.APPENGINE_ENABLED,
       aboutModal: null
     };
   },

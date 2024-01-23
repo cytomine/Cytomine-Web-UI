@@ -20,6 +20,7 @@ export default {
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   // features switches
+  APPENGINE_ENABLED: false,
   PRELOADED_SLICES: 50,
   MAX_MERGEABLE_CHANNELS: 36,
   // Refresh intervals (expressed in milliseconds)
