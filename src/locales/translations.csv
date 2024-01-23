@@ -1,7 +1,7 @@
 key,en,fr,es,nl
 about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine,Over Cytomine
 absolute-link-mode,Absolute,Absolu,,Absoluut
-access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces 
+access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
 account,Account,Compte,Cuenta,Rekening
 actions,Actions,Actions,Acciones,Acties
 active-projects,Active projects,Projets actifs,Proyectos activos,Actieve projecten
@@ -84,7 +84,7 @@ button-adjust,Adjust,Ajuster,,Aanpassen
 button-best-fit-zoom,Fit zoom to viewport,Ajuster le zoom à la vue,,Pas zoom aan om te bekijken
 button-cancel-review,Cancel my review,Annuler la validation,Cancelar mi reseña,Review annuleren
 button-cancel,Cancel,Annuler,Cancelar,Annuleren
-button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie 
+button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie
 button-change-ontology,Change ontology,Changer l'ontologie,Cambiar ontología,Knop om de ontologie te veranderen
 button-clear,Clear,Réinitialiser,Reiniciar,Resetten
 button-close,Close,Fermer,Cerrar,Sluiten
@@ -114,7 +114,6 @@ button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
 button-more,More,Plus,Más,Meer
 button-new-tag,New tag,Nouveau tag,Nueva etiqueta,nieuwe tag
-button-new-trusted-source,New trusted source,Nouvelle source de confiance,Nueva fuente de confianza,Nieuwe trusted source
 button-new-user,New user,Nouvel utilisateur,Nuevo usuario,Nieuwe user
 button-next-image,Next image,Image suivante,Imagen siguiente,Volgende afbeelding
 button-open,Open,Ouvrir,Abierto,Openen
@@ -178,7 +177,7 @@ configuration,Configuration,Configuration,Configuración,Configuratie
 confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,Êtes-vous sûr de vouloir fermer ce projet ? Les {viewers} qu'il contient seront également fermés.,¿Está seguro de cerrar este proyecto? Los {viewers} que contiene también se cerrarán,"Bent u zeker dat u dit project wilt sluiten? De {viewers} die het bevat, worden ook gesloten."
 confirm-close-project,Close project,Fermer le projet,Cerrar proyecto,Project afsluiten
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?,Momenteel zijn er geen annotaties in dit project gekoppeld aan een eigenschap met sleutel '{key}'.<br>Weet u zeker dat u deze als de standaardeigenschap wilt gebruiken
-confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting 
+confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting
 confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?,¿Estás seguro de que deseas eliminar esta anotación?,Bent u zeker dat u deze annotatie wilt verwijderen?
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?,Bent u zeker dat u het bijgevoegde file {filename} wilt verwijderen?
 confirm-deletion-file,Are you sure you want to delete this file?,Êtes-vous sûr de vouloir supprimer ce fichier ?,¿Está seguro de que desea eliminar este archivo?,Bent u zeker dat u dit file wilt verwijderen?
@@ -217,7 +216,6 @@ count-viewers,no viewer | viewer | {count} viewers,aucun visualisateur | visuali
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
 create-ontology,Create ontology,Créer une ontologie,Crear ontología,Ontologie creëeren
 create-project,Create project,Créer un projet,Crear proyecto,Een project aanmaken
-create-source,Create trusted source,Créer une source de confiance,Crear fuente de confianza,Een trusted source creëeren
 create-tag,Create tag,Créer un tag,Crear etiqueta,Een tag maken
 create-term,Create term,Créer un terme,Crear término,Een term creëeren
 create-track,Create track,Créer une trace,,Maak een track
@@ -249,14 +247,12 @@ delete-image-confirmation-message,Do you really want to delete image {imageName}
 delete-image,Delete image,Supprimer l'image,Eliminar Imagen,Afbeelding verwijderen
 delete-project-confirmation-message,Do you really want to delete project {projectName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le projet {projectName} ? <br> Toutes les données de ce projet seront irrémédiablement perdues,¿Realmente desea eliminar el proyecto {projectName}? <br> ¡Todos los datos serán eliminados! ¡Esta operación no se puede deshacer!,Bent u zeker dat u het project {projectName} wilt verwijderen? <br> Alle gegevens in dit project gaan onherstelbaar verloren
 delete-project,Delete project,Supprimer le projet,Eliminar proyecto,Project verwijderen
-delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,,Weet u zeker dat u de trusted source {username}/{dockerUsername} wilt verwijderen?
-delete-source,Delete source,Supprimer la source de confiance,,De trusted source verwijderen
 delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues,¿Realmente desea eliminar la etiqueta {tagName}? <br> ¡Todas las asociaciones serán eliminadas!,Bent u zeker dat u de {projectName}-tag wilt verwijderen? <br> Alle verenigingen gaan onherstelbaar verloren
 delete-tag,Delete tag,Supprimer le tag,Eliminar etiqueta,Tag verwijderen
 delete,Delete,Supprimer,Eliminar,verwijderen
 deployed,Deployed,Déployé,Desplegado,Ingezet
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
-deprecated,Deprecated,Déprécié,Obsoleto,Verouderd 
+deprecated,Deprecated,Déprécié,Obsoleto,Verouderd
 description,Description,Description,Descripción,Beschrijving
 detailed-image-consultations,Detailed image consultations,Détails des consultations d'image,Consultas detalladas de imagen,Afbeeldingsweergave details
 detailed-image-information,Detailed information of image {imageName},Informations détaillées de l'image {imageName},Información detallada de la imagen {imageName},Gedetailleerde informatie van de afbeelding {imageName}
@@ -264,7 +260,7 @@ detailed-project-connections,Detailed project connections,Détails des connexion
 detecting-format,Detecting format,Détection de format en cours,,Formaatdetectie wordt uitgevoerd
 developer-mode,Developer mode,Mode développeur,,Developersmodus
 digital-zoom-checkbox-label,Enable digital zoom (interpolation),Activer le zoom digital (par interpolation),Habilitar zoom digital (interpolación),Digitale zoom inschakelen (door interpolatie)
-digital-zoom,Digital zoom,Zoom digital,Zoom digital,Digitale zoom 
+digital-zoom,Digital zoom,Zoom digital,Zoom digital,Digitale zoom
 disabled,Disabled,Désactivé,Dehabilitado,Uitgeschalekd
 display-annot-details,Display details of currently selected annotation,Afficher les détails de l'annotation sélectionnée,Mostrar detalles de la anotación seleccionada,Bekijk details van geselecteerde annotatie
 display,Display,Affichage,Monitor,Display
@@ -276,7 +272,7 @@ dont-have-access-to-any-ontology,You don't have access to any ontology,Vous n'av
 download-CSV,Download CSV,Télécharger le CSV,Descargar CSV,CSV downloaden
 download-excel,Download Excel,Télécharger l'Excel,Descargar Excel,Excel downloaden
 download-PDF,Download PDF,Télécharger le PDF,Descargar PDF,Download PDF
-download-permission,Download permission,Permission de téléchargement,Permiso de descarga,Download toestemming 
+download-permission,Download permission,Permission de téléchargement,Permiso de descarga,Download toestemming
 download-results,Download results,Télécharger les résultats,Descargar resultados,Resultaten downloaden
 drag-drop-upload-info,"You can drag & drop files from your desktop on the ""{labelButton}"" button with Google Chrome, Mozilla Firefox and Apple Safari.","Si vous utilisez Google Chrome, Mozilla Firefox ou Apple Safari, vous pouvez glisser-déposer des fichiers depuis votre ordinateur sur le bouton ""{labelButton}"".","Puede arrastrar y soltar archivos desde su escritorio en el botón &quot;{labelButton}&quot; con Google Chrome, Mozilla Firefox y Apple Safari.","Als u Google Chrome, Mozilla Firefox of Apple Safari gebruikt, kunt u files van uw computer naar de ""{labelButton}""-knop slepen en neerzetten."
 draw-tools,Draw tools,Outils de tracé,Herramientas de dibujo,Draw tools
@@ -324,7 +320,7 @@ file-tree,File tree,Arborescence de fichiers,Árbol de archivos,Fileboom
 filename,Filename,Nom de fichier,Nombre del archivo,Filenaam
 files,Files,Fichiers,Archivos,Files
 fill,Fill,Remplir,Rellenar,Invullen
-filter,Filter,Filtre,Filtrar,Filter 
+filter,Filter,Filtre,Filtrar,Filter
 filters,Filters,Filtres,Filtros,Filters
 first-consultation,First consultation,Première consultation,Primera consulta,Eerste afbeelding consult
 first-project-connection,First project connection,Première connexion au projet,Primera conexión al proyecto,Eerste verbinding met het project
@@ -388,7 +384,7 @@ images,Images,Images,Imágenes,Afbeeldingen
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
 in-project,in {projectName},dans {projectName},en {projectName},in {projectnaam}
 in-queue,In queue,Dans la file,En cola,In de wachtrij
-in-review,In review,En cours de validation,En revisión,Review in proces 
+in-review,In review,En cours de validation,En revisión,Review in proces
 in-this-image,in this image,dans cette image,,op deze afbeelding
 in-this-slice,in this slice,dans ce plan,,in dit slice
 indeterminate,Indeterminate,Inconnu,Indeterminado,Onbekend
@@ -477,7 +473,7 @@ no-annotation,No annotation,Aucune annotation,Sin anotaciones,Geen annotatie
 no-attached-file,No attached file,Aucun fichier joint,Ningún archivo adjunto,Geen file bijgevoegd
 no-default-property,No default property,Pas de propriété par défaut,Sin propiedad predeterminada,Geen defaulteigenschap
 no-description,No description,Pas de description,Sin descripción,Geen beschrijving
-no-file,No file,Aucun fichier,Ningún archivo,Geen file  
+no-file,No file,Aucun fichier,Ningún archivo,Geen file
 no-image-consultation,No image consultation,Aucune consultation d'image,Ninguna consulta de imagen,Geen online afbeeldingconsult
 no-image-filter,No image filter to display,Aucun filtre à afficher,No hay filtro de imagen que mostrar,Geen filters om weer te geven
 no-image-recently-opened,No image recently opened,Aucune image consultée récemment,Ninguna imagen abierta recientemente,Geen recent bekeken afbeeldingen
@@ -501,14 +497,12 @@ no-result-file,No result file,Aucun fichier de résultat,Sin archivo de resultad
 no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
-no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag 
+no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag
 no-term-to-add,No term to add,Aucun terme à ajouter,No hay término que agregar,Geen term om toe te voegen
 no-term,No term,Aucun terme,Sin término,Geen term
 no-track-to-add,No track to add,Pas de trace à ajouter,,Geen track toe te voegen
-no-track,No track,Pas de trace,Sin pista,Geen track 
+no-track,No track,Pas de trace,Sin pista,Geen track
 no-tracking,No tracking,Pas de suivi,Sin seguimiento,Geen tracking
-no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza,Geen trusted source die aan de zoekcriteria voldoet
-no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza,Geen trusted source
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado,Geen file
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario,Er voldoen geen users aan de zoekcriteria
 no,No,Non,No,Neen
@@ -592,10 +586,6 @@ notif-error-review-reject-all,Failed to reject all annotations,Une erreur a emp�
 notif-error-save-image-consultation,Failed to save image consultation,Une erreur empêche de sauvegarder la consultation de l'image,Error al guardar la consulta de imagen,Een fout verhindert het opslaan van de afbeeldingconsultatie
 notif-error-save-prop,Failed to save the property,Une erreur a empêché de créer la propriété,Error al guardar la propiedad,Door een fout kon de eigenschap niet worden gemaakt
 notif-error-save-user-position,Failed to save your position in the image,Une erreur empêche de sauvegarder votre position dans l'image,Error al guardar tu posición en la imagen,Een fout verhindert het opslaan van uw positie in de afbeelding
-notif-error-source-creation,Failed to create the trusted source,Une erreur a empêché la création de la source de confiance,Error al crear la fuente de confianza,Door een fout kon de trusted source niet worden gemaakt
-notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},,Door een fout kon de trusted source {username}/{dockerUsername} niet worden verwijderd
-notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance,Error durante la actualización de la fuente de confianza,Fout tijdens het updaten van de trusted source
-notif-error-source-update,Failed to update the trusted source,Une erreur a empêché la modification de la source de confiance,Error al actualizar la fuente de confianza,Een fout verhinderde de wijziging van de trusted source
 notif-error-start-review,Failed to start reviewing the image,Une erreur a empêché de commencer la validation de l'image,Error al comenzar a revisar la imagen,Door een fout kon de afbeeldingsreview niet worden gestart
 notif-error-tag-creation,Failed to create the tag,Une erreur a empêché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
 notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName},Error al eliminar la etiqueta {tagName},Een fout verhinderde het verwijderen van de tag {tagName}
@@ -646,10 +636,6 @@ notif-success-project-deletion,Project {projectName} was successfully deleted,Le
 notif-success-project-ontology-change,Ontology of project {projectName} was successfully updated,L'ontologie du projet {projectName} a bien été modifiée,La ontología del proyecto {projectName} se actualizó correctamente,De ontologie van het project {projectName} is succesvol aangepast
 notif-success-project-rename,Project {projectName} was successfully renamed,Le projet {projectName} a bien été renommé,El proyecto {projectName} se renombró correctamente,Het project {projectName} is succesvol hernoemd
 notif-success-remove-project-members,The selected members were correctly removed from project,Les membres sélectionnés ont bien été retirés du projet,Los miembros seleccionados fueron eliminados correctamente del proyecto,De geselecteerde leden zijn met succes uit het project verwijderd
-notif-success-source-creation,Trusted source successfully created,La source de confiance a bien été créée,Fuente de confianza creada con éxito,De trusted source is gemaakt
-notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée,,Trusted source {username}/{dockerUsername} succesvol verwijderd
-notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée,Se solicitó la actualización de la fuente de confianza,Update van de trusted source is aangevraagd
-notif-success-source-update,Trusted source successfully updated,La source de confiance a bien été modifiée,Fuente de confianza actualizada con éxito,De trusted source is gewijzigd
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.,De tag is succesvol aangemaakt
 notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé,La etiqueta {tagName} se eliminó correctamente,De tag {tagName} is succesvol verwijderd
 notif-success-tag-update,Tag was successfully updated,Le tag a bien été modifié,La etiqueta se actualizó correctamente,De tag is succesvol gewijzigd
@@ -722,7 +708,7 @@ possible-conflict,Possible conflict,Conflit potentiel,Posible conflicto,Potentie
 prefilled-parameters,Pre-filled parameters,Paramètres pré-remplis,Parámetros por defecto,Vooraf ingevulde parameters
 prefix,Prefix,Préfixe,Prefijo,Voorvoegsel
 preview-size,Preview size,Taille de l'aperçu,Tamaño de vista previa,Preview size
-preview,Preview,Aperçu,Vista previa,Preview  
+preview,Preview,Aperçu,Vista previa,Preview
 previewed,Previewed,Prévisualisé,Vista previa,Previewed
 private-key,Private key,Clé privée,Clave privada,Prive sleutel
 profile,Profile,Profil,Perfil,Profiel
@@ -868,7 +854,7 @@ shortcut-viewer-nav-zoom-out,Zoom out,Dézoomer,Disminuir escala,Uitzoomen
 shortcut-viewer-nav,Viewer: Navigation,Visualisateur : Naviguation,Visor: Navegación,Viewer: Navigatie
 shortcut-viewer-toggle-add-image,Toggle image selector,Afficher/Masquer le sélecteur d'images,Alternar selector de imagen,Afbeeldingsselector tonen/verbergen
 shortcut-viewer-toggle-all-annotations,Toggle annotations panel in all views,Afficher/Masquer le panneau des annotations dans toutes les vues,,Annotatiepaneel in alle views tonen/verbergen
-shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues,,Uitzending en opvolgingen paneel in alle views tonen/verbergen 
+shortcut-viewer-toggle-all-broadcast,Toggle broadcast panel in all views,Afficher/Masquer le panneau de diffusion et suivi dans toutes les vues,,Uitzending en opvolgingen paneel in alle views tonen/verbergen
 shortcut-viewer-toggle-all-current,Toggle currently selected annotation panel in all views,Afficher/Masquer les détails de l'annotation sélectionnée dans toutes les vues,,Geselecteerde annotatiedetails in alle views tonen/verbergen
 shortcut-viewer-toggle-all-filters,Toggle image color panel in all views,Afficher/Masquer le panneau de colorisation de l'image dans toutes les vues,,Toon/verberg afbeeldingskleurpaneel in alle views
 shortcut-viewer-toggle-all-information,Toggle information panel in all views,Afficher/Masquer le panneau d'information dans toutes les vues,,Infopaneel weergeven/verbergen in alle views
@@ -960,8 +946,6 @@ too-much-categories-to-display,There are too much categories to display ({toDisp
 total,Total,Total,Total,Totaal
 tracks-new-annotation,Track(s) to associate to new annotations,Trace(s) à associer à de nouvelles annotations,,Track(en) om te associëren met nieuwe annotaties
 tracks,Tracks,Traces,Pistas,Tracks
-trusted-source,Trusted source,Source de confiance,Fuente de confianza,Trusted source
-trusted-sources,Trusted sources,Sources de confiance,Fuentes de confianza,Trusted sources
 type,Type,Type,Tipo,Annotatie type
 ui-runnable,Runnable,Exécutable,Ejecutable,Uitvoerbaar
 um-per-pixel,µm/pixel,µm/pixel,µm/píxel,µm/pixel
@@ -975,7 +959,6 @@ unexpected-error-info-message,An unexpected error occurred,Une erreur inattendue
 unknown,Unknown,Inconnu,Desconocido,Onbekend
 unpacked,Unpacked,Décompressé,,Uuitgepakt
 unpacking,Unpacking,Décompression en cours,,Decompressie bezig
-update-source,Update trusted source,Modifier une source de confiance,Actualizar fuente de confianza,Een trusted source bewerken
 update-tag,Update tag,Modifier un tag,Actualizar etiqueta,Een tag bewerken
 update-term,Update term,Modifier un terme,Término de actualización,Een term bewerken
 update-track,Update track,Modifier une trace,,Wijzig een  track
@@ -990,7 +973,7 @@ used-in-project-no-access,Used in projects that you are not allowed to see,Utili
 used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de almacenamiento utilizado,Opslagruimte gebruikt
 user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
 user,User,Utilisateur,Usuario,Users
-username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam 
+username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam
 users,Users,Utilisateurs,Usuarios,Users
 validate-annotation,Validate annotation,Valider l'annotation,Validar anotación,Annotatie valideren
 validations.messages._default,Invalid field,Champ incorrect,Campo inválido,Ongeldig veld
