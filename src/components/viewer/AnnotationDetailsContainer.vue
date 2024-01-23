@@ -66,7 +66,7 @@
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
-import {UserCollection, UserJobCollection} from 'cytomine-client';
+import {UserCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
@@ -79,7 +79,6 @@ export default {
     return {
       width: 320,
       projectUsers: [],
-      userJobs: [],
       reload: true,
       showComments: false
     };
@@ -126,7 +125,7 @@ export default {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     allUsers() {
-      let allUsers = this.projectUsers.concat(this.userJobs);
+      let allUsers = this.projectUsers;
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
@@ -161,12 +160,6 @@ export default {
 
       this.projectUsers = (await collection.fetchAll()).array;
     },
-    async fetchUserJobs() {
-      this.userJobs = (await UserJobCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.image.project
-      })).array;
-    },
 
     dragStop(x, y) {
       this.positionAnnotDetails = {x, y};
@@ -195,7 +188,6 @@ export default {
   },
   created() {
     this.fetchUsers();
-    this.fetchUserJobs();
   },
   mounted() {
     window.addEventListener('resize', this.handleResize);

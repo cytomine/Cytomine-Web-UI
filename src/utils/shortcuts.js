@@ -10,7 +10,6 @@ export default Object.freeze({
   // 'navbar-projects': ['g', 'p'],
   // 'navbar-ontologies': ['g', 'o'],
   // 'navbar-storage': ['g', 's'],
-  // 'navbar-algorithms': ['g', 'a'],
   // 'navbar-user': ['g', 'u'],
   // 'navbar-help': ['g', 'h'],
   // 'navbar-admin': ['g', 'z'],

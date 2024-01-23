@@ -145,23 +145,7 @@
 
         <div class="columns">
 
-          <div v-if="selectedAnnotationType === jobAnnotationOption" class="column filter is-one-third">
-            <div class="filter-label">
-              {{$t('analyses')}}
-            </div>
-            <div class="filter-body">
-              <cytomine-multiselect
-                v-model="selectedUserJobs"
-                :options="userJobs"
-                label="fullName"
-                track-by="id"
-                multiple
-                :allPlaceholder="$t('all-analyses')"
-              />
-            </div>
-          </div>
-
-          <div v-else-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-third">
+          <div v-if="selectedAnnotationType === userAnnotationOption" class="column filter is-one-third">
             <div class="filter-label">
               {{$t('members')}}
             </div>
@@ -304,7 +288,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
@@ -330,13 +314,11 @@ export default {
   },
   data() {
     return {
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
       revision: 0,
 
       projectUsers: [],
-      userJobs: [],
 
       tracks: [],
 
@@ -348,7 +330,6 @@ export default {
       ],
 
       userAnnotationOption: this.$t('user-annotations'),
-      jobAnnotationOption: this.$t('analysis-annotations'),
       reviewedAnnotationOption: this.$t('reviewed-annotations'),
       annotationTypes: [],
 
@@ -423,15 +404,12 @@ export default {
       switch(this.$route.query.type) {
         case 'user':
           return this.userAnnotationOption;
-        case 'algo':
-          return this.jobAnnotationOption;
         case 'reviewed':
           return this.reviewedAnnotationOption;
       }
     },
-
     allUsers() {
-      return this.projectUsers.concat(this.userJobs);
+      return this.projectUsers;
     },
     members: get('currentProject/members'),
     managers: get('currentProject/managers'),
@@ -493,7 +471,6 @@ export default {
     selectedAnnotationType: sync('annotationType', storeOptions),
     selectedMembers: localSyncMultiselectFilter('members', 'filteredMembers'),
     selectedReviewers: localSyncMultiselectFilter('reviewers', 'members'),
-    selectedUserJobs: localSyncMultiselectFilter('userJobs', 'userJobs'),
     selectedImages: localSyncMultiselectFilter('images', 'images'),
     selectedTags: localSyncMultiselectFilter('tags', 'tagsOptions'),
     selectedTracksIds: localSyncMultiselectFilter('tracksIds', 'trackOptionsIds'),
@@ -515,7 +492,7 @@ export default {
       if(this.reviewed) {
         return null;
       }
-      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.selectedUserJobs : this.selectedMembers;
+      let users = this.selectedMembers;
       return users.map(user => user.id);
     },
     reviewUsersIds() {
@@ -544,8 +521,6 @@ export default {
         case 'IMAGE':
           return this.images;
         case 'USER':
-          if (this.selectedAnnotationType === this.jobAnnotationOption)
-            return this.selectedUserJobs;
           if (this.reviewed)
             return this.selectedReviewers;
           return this.selectedMembers;
@@ -592,7 +567,7 @@ export default {
       return this.selectedTags.map(t => t.id);
     },
     collection() {
-      let users = (this.selectedAnnotationType === this.jobAnnotationOption) ? this.userJobs : this.projectUsers;
+      let users = this.projectUsers;
 
       let collection = new AnnotationCollection({
         project: this.project.id,
@@ -662,12 +637,6 @@ export default {
         user.fullName = fullName(user);
       });
     },
-    async fetchUserJobs() {
-      this.userJobs = (await UserJobCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
-      this.userJobs.forEach(userJob => {
-        userJob.fullName = fullName(userJob);
-      });
-    },
     async fetchTracks() {
       this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
     },
@@ -732,7 +701,6 @@ export default {
   },
   async created() {
     this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
-    if(this.algoEnabled) this.annotationTypes.splice(1, 0, this.jobAnnotationOption);
 
     // if store was not yet initialized, set default values
     if(!this.selectedSize) {
@@ -753,7 +721,6 @@ export default {
       await Promise.all([
         this.fetchImages(),
         this.fetchUsers(),
-        this.fetchUserJobs(),
         this.fetchTracks(),
         this.fetchTags()
       ]);
@@ -777,15 +744,6 @@ export default {
       if(queriedImage) {
         this.resetPagesAndFilters(); // we want all annotations of the image => reset state
         this.selectedImages = [queriedImage];
-      }
-    }
-
-    if(this.$route.query.userJob) {
-      let queriedUserJob = this.userJobs.find(uj => uj.id === Number(this.$route.query.userJob));
-      if(queriedUserJob) {
-        this.resetPagesAndFilters(); // we want all annotations of the job => reset state
-        this.selectedAnnotationType = this.jobAnnotationOption;
-        this.selectedUserJobs = [queriedUserJob];
       }
     }
     if(this.$route.query.tags) {

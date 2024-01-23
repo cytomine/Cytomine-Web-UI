@@ -42,14 +42,6 @@
           </router-link>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-        <td class="prop-label">{{$t('analysis-annotations')}}</td>
-        <td class="prop-content" colspan="3">
-          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
-            {{ image.numberOfJobAnnotations }}
-          </router-link>
-        </td>
-      </tr>
       <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
         <td class="prop-label">{{$t('reviewed-annotations')}}</td>
         <td class="prop-content" colspan="3">
