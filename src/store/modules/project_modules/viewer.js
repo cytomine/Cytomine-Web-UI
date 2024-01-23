@@ -30,9 +30,6 @@ export default {
       indexNextImage: 0,
 
       copiedAnnot: null,
-
-      // for AE selected app
-      application: "",
     };
   },
 
