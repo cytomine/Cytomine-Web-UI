@@ -1,7 +1,9 @@
 <template>
   <div>
     <nav class="sidebar">
-      <h1 class="sidebar-title">{{ `${$t('app-engine')}: ${project.name}` }}</h1>
+      <h1 class="sidebar-title">
+        {{ `${$t("app-engine")}: ${project.name}` }}
+      </h1>
 
       <div id="executor">
         <application-executor />
@@ -14,28 +16,26 @@
       <div id="history">
         <application-history />
       </div>
-
     </nav>
-
   </div>
 </template>
 
 <script>
-import { get, sync } from '@/utils/store-helpers';
-import ApplicationExecutor from './ApplicationExecutor.vue';
-import ApplicationCurrentStatus from './ApplicationCurrentStatus.vue';
-import ApplicationHistory from './ApplicationsHistory.vue';
+import { get, sync } from "@/utils/store-helpers";
+import ApplicationCurrentStatus from "./ApplicationCurrentStatus.vue";
+import ApplicationHistory from "./ApplicationsHistory.vue";
+import ApplicationExecutor from "./ApplicationExecutor.vue";
 
 export default {
-  name: 'appengine-sidebar',
+  name: "appengine-sidebar",
   components: {
     ApplicationExecutor,
     ApplicationCurrentStatus,
-    ApplicationHistory
+    ApplicationHistory,
   },
   computed: {
-    project: get('currentProject/project'),
-    expanded: sync('currentUser/expandedSidebar')
+    project: get("currentProject/project"),
+    expanded: sync("currentUser/expandedSidebar"),
   },
 };
 </script>
@@ -82,4 +82,3 @@ section {
   height: 3.5rem;
 }
 </style>
-    
