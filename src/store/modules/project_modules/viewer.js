@@ -29,7 +29,10 @@ export default {
       activeImage: 0,
       indexNextImage: 0,
 
-      copiedAnnot: null
+      copiedAnnot: null,
+
+      // for AE selected app
+      application: "",
     };
   },
 
