@@ -61,7 +61,6 @@ export default {
       tabNames: [
         'dashboard',
         'users',
-        'trusted-sources',
         'tags',
         'configuration'
       ]
