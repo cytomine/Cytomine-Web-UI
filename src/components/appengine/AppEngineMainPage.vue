@@ -51,7 +51,6 @@ export default {
   methods: {
     async handleTaskUploadSuccess() {
       try {
-        // this.applications.push(await Task.fetchAll());
         this.applications = await Task.fetchAll();
 
       } catch (error) {
