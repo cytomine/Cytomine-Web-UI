@@ -50,14 +50,6 @@
         </router-link>
       </td>
     </tr>
-    <tr v-if="isPropDisplayed('numberOfJobAnnotations')">
-      <td class="prop-label">{{$t('analysis-annotations')}}</td>
-      <td class="prop-content">
-        <router-link :to="`/project/${project.id}/annotations?type=algo`">
-          {{ project.numberOfJobAnnotations }}
-        </router-link>
-      </td>
-    </tr>
     <tr v-if="isPropDisplayed('numberOfReviewedAnnotations')">
       <td class="prop-label">{{$t('reviewed-annotations')}}</td>
       <td class="prop-content">
@@ -81,13 +73,7 @@
     <tr v-if="isPropDisplayed('properties')">
       <td class="prop-label">{{$t('properties')}}</td>
       <td class="prop-content">
-        <cytomine-properties
-          :object="project"
-          :canEdit="canManageProject"
-          :properties="internalUseFilteredProperties"
-          @deleted="removeProp"
-          @added="addProp"
-        />
+        <cytomine-properties :object="project" :canEdit="canManageProject" />
       </td>
     </tr>
     <tr v-if="isPropDisplayed('attachedFiles')">
@@ -158,11 +144,9 @@ import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ListUsernames from '@/components/user/ListUsernames';
 import ProjectActions from './ProjectActions';
 import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '../property/CytomineProperties';
+import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import {PropertyCollection} from 'cytomine-client';
-import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-details',
@@ -189,9 +173,7 @@ export default {
       managers: [],
       members: [],
       onlines: [],
-      representatives: [],
-      properties: [],
-      loadPropertiesError: false
+      representatives: []
     };
   },
   computed: {
@@ -207,9 +189,6 @@ export default {
     },
     contributors() {
       return this.members.filter(member => !this.managersIds.includes(member.id));
-    },
-    internalUseFilteredProperties() {
-      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
     }
   },
   methods: {
@@ -242,12 +221,6 @@ export default {
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.$emit('delete')
       });
-    },
-    removeProp(prop) {
-      this.properties = this.properties.filter(p => p.id !== prop.id);
-    },
-    addProp(prop) {
-      this.properties.push(prop);
     }
   },
   async created() {
@@ -263,13 +236,6 @@ export default {
     catch(error) {
       console.log(error);
       this.error = true;
-    }
-    try {
-      this.properties = (await PropertyCollection.fetchAll({ object: this.project })).array;
-    }
-    catch (error) {
-      this.loadPropertiesError = true;
-      console.log(error);
     }
     this.loading = false;
   }

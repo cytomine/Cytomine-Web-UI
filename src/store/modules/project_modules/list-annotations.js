@@ -30,7 +30,6 @@ export default {
       filters: {
         members: null,
         reviewers: null,
-        userJobs: null,
         images: null,
         termsIds: null,
         tracksIds: null,

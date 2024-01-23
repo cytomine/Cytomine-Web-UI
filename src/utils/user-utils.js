@@ -21,11 +21,5 @@ export function fullName(user) {
     return '';
   }
 
-  if(!user.algo) {
-    return `${user.firstname} ${user.lastname} (${user.username})`;
-  }
-  else {
-    let date = moment(Number(user.created)).format('L LTS');
-    return `${user.softwareName} - ${date}`;
-  }
+  return `${user.firstname} ${user.lastname} (${user.username})`;
 }

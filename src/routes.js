@@ -20,12 +20,10 @@ import GlobalDashboard from './components/GlobalDashboard.vue';
 import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
-import ListSoftware from './components/software/ListSoftware.vue';
 import ListImages from './components/image/ListImages.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
 import ProjectActivity from './components/project/ProjectActivity.vue';
-import ListJobs from './components/job/ListJobs.vue';
 import ProjectInformation from './components/project/ProjectInformation.vue';
 import ProjectConfiguration from './components/project/ProjectConfiguration.vue';
 import Account from './components/user/Account.vue';
@@ -39,7 +37,6 @@ import AppEngineMainPage from './components/appengine/AppEngineMainPage.vue';
 import AppInfoPage from './components/appengine/AppInfoPage.vue';
 import UserActivity from './components/user/UserActivity.vue';
 import PageNotFound from './components/PageNotFound.vue';
-import SoftwareInformation from './components/software/SoftwareInformation.vue';
 
 // Define routes
 const routes = [
@@ -58,14 +55,6 @@ const routes = [
   {
     path: '/ontology/:idOntology?',
     component: ListOntologies
-  },
-  {
-    path: '/algorithm',
-    component: ListSoftware
-  },
-  {
-    path: '/algorithm/:idSoftware',
-    component: SoftwareInformation
   },
   {
     path: '/advanced-search/:searchString?',
@@ -110,10 +99,6 @@ const routes = [
       {
         path: 'annotations',
         component: ListAnnotations
-      },
-      {
-        path: 'analysis',
-        component: ListJobs
       },
       {
         path: 'activity',
@@ -164,8 +149,6 @@ const routes = [
   {path: '/project', redirect: '/projects'},
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
-  {path: '/software', redirect: '/algorithm'},
-  {path: '/software/:idSoftware', redirect: '/algorithm/:idSoftware'},
 
   {path: '/activity', redirect: '/'},
   {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
@@ -185,7 +168,6 @@ const routes = [
   {path: '/tabs-annotationproperties-:idProject-:idAnnot', redirect: '/project/:idProject'},
   {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
   {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
-  {path: '/tabs-algos-:idProject', redirect: '/project/:idProject/analysis'},
   {path: '/tabs-config-:idProject', redirect: '/project/:idProject/configuration'},
   {path: '/tabs-usersconfig-:idProject', redirect: '/project/:idProject/configuration?tab=members'},
   {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
