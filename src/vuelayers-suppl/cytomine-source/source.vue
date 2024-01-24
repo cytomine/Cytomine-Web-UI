@@ -80,7 +80,16 @@ const methods = {
       transition: this.transition,
     })
   },
+};
 
+const watch = {
+  url() {
+    if (this.$source) {
+      this.$source.setTileUrlFunction(this.createUrlFunc());
+      this.$source.setTileLoadFunction(this.tileLoadFunction);
+      this.scheduleRefresh();
+    }
+  },
 };
 
 
@@ -90,6 +99,7 @@ export default {
   props,
   data,
   methods,
-  created
+  created,
+  watch
 };
 </script>
