@@ -32,27 +32,9 @@
         </section>
 
         <section class="content" v-if="selectedTask">
-          <task-io-form :task="selectedTask"></task-io-form>
+          <task-io-form :task="selectedTask" :project-id="currentProjectId"></task-io-form>
         </section>
 
-          <!--
-          <div id="app-run-btn">
-            <run-app-button
-              :selectedApplication="selectedTask"
-              :inputValues="userInputs"
-              :project="currentProjectId"
-              @taskState="handleTaskRunState"
-              @executedTaskRun="handleExecutedTaskRun"
-            />
-          </div>
-
-          <div v-if="taskState === 'Finished'" id="app-outputs">
-            <output-gen
-              :project="currentProjectId"
-              :executedTaskRun="executedTaskRun"
-            />
-          </div>
-          -->
       </div>
     </div>
   </div>
