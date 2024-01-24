@@ -58,6 +58,7 @@ h1 {
 .sidebar {
   // width: 15rem;
   height: 100%;
+  width: 16rem;
   display: flex;
   flex-direction: column;
   position: relative;

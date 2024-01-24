@@ -20,25 +20,35 @@
 </div>
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
-  <div v-if="!loading" class="maps-wrapper">
-    <div class="map-cell"
-      v-for="(cell, i) in cells"
-      :key="i"
-      :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-    >
-      <cytomine-image
-        v-if="cell && cell.image && cell.slices"
-        :index="cell.index"
-        :key="`${cell.index}-${cell.image.id}`"
-        @close="closeMap(cell.index)"
-      />
+  <div class="columns is-gapless">
+
+    <div class="column is-narrow">
+      <app-engine-sidebar></app-engine-sidebar>
     </div>
 
-    <image-selector />
+    <div class="column">
+      <div v-if="!loading" class="maps-wrapper">
+        <div class="map-cell"
+          v-for="(cell, i) in cells"
+          :key="i"
+          :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+        >
+          <cytomine-image
+            v-if="cell && cell.image && cell.slices"
+            :index="cell.index"
+            :key="`${cell.index}-${cell.image.id}`"
+            @close="closeMap(cell.index)"
+          />
+        </div>
 
-    <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-    <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+        <image-selector />
+
+        <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+        <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+      </div>
+    </div>
   </div>
+
 </div>
 </template>
 
@@ -47,6 +57,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
+import AppEngineSidebar from '@/components/appengine/sidebar/AppEngineSidebar';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
@@ -59,7 +70,8 @@ export default {
   name: 'cytomine-viewer',
   components: {
     CytomineImage,
-    ImageSelector
+    ImageSelector,
+    AppEngineSidebar
   },
   data() {
     return {
