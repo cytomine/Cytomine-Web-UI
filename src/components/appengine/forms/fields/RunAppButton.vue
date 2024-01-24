@@ -1,7 +1,7 @@
 <template>
   <div>
     <button id="app-run-btn" class="button is-link" @click="createTaskRun()">
-      {{ $t("ae-run-app") }}
+      {{ $t("app-engine.ae-run-app") }}
     </button>
   </div>
 </template>

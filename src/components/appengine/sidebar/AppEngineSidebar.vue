@@ -1,15 +1,15 @@
 <template>
   <div class="sidebar">
-    <application-executor />
+    <task-executor />
   </div>
 </template>
 
 <script>
-import ApplicationExecutor from './ApplicationExecutor.vue';
+import TaskExecutor from '@/components/appengine/sidebar/TaskExecutor.vue';
 
 export default {
   name: 'appengine-sidebar',
-  components: { ApplicationExecutor },
+  components: { TaskExecutor },
 };
 </script>
 

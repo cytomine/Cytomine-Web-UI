@@ -5,7 +5,7 @@
                 <div class="card-header" role="button" aria-controls="contentIdForA11y3" :aria-expanded="props.open">
                     <p class="card-header-title subtitle">
                         <i class="far fa-file-alt"></i>
-                        {{ $t('ae-history') }}
+                        {{ $t('app-engine.ae-history') }}
                     </p>
                     <a class="card-header-icon">
                         <b-icon :icon="props.open ? 'angle-down' : 'angle-up'">
@@ -118,4 +118,3 @@ div.is-active .card-header {
     color: $color;
 }
 </style>
-    
