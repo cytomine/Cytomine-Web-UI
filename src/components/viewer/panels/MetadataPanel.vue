@@ -48,7 +48,7 @@
 
 <script>
 import {getWildcardRegexp} from '@/utils/string-utils';
-import {AbstractImage, PropertyCollection} from 'cytomine-client';
+import {PropertyCollection} from 'cytomine-client';
 
 export default {
   name: 'metadata-panel',
@@ -83,8 +83,7 @@ export default {
   },
   async created() {
     try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
-      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
+      this.properties = (await PropertyCollection.fetchAll({object: this.image})).array;
       this.properties.sort((a, b) => a.key.localeCompare(b.key));
     }
     catch (error) {
