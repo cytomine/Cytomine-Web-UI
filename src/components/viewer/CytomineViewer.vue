@@ -306,6 +306,9 @@ export default {
 
 .ae-sidebar {
   width: 24rem;
+  border-right-color: #333;
+  border-right-width: 1px;
+  border-right-style: solid;
 }
 
 .maps-wrapper {
