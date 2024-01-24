@@ -19,7 +19,7 @@
                                 <br>
                                 <span v-if="task.authors && task.authors.length > 0">
                                     <small v-for="(author, index) in task.authors" :key="index">
-                                        {{ `- ${author.first_name} ${author.last_name}` || $t('no-authors') }}
+                                        {{ `- ${author.first_name} ${author.last_name}` || $t('app-engine.no-authors') }}
                                     </small>
                                 </span>
                             </p>
@@ -57,8 +57,8 @@
                 </section>
 
                 <section >
-                    <b-collapse 
-                        class="card" 
+                    <b-collapse
+                        class="card"
                         animation="slide">
 
                         <template #trigger="props">
@@ -87,7 +87,7 @@
         </div>
     </div>
 </template>
-    
+
 <script>
 import UploadAppButton from './UploadAppButton.vue';
 import Task from '@/utils/appengine/task';

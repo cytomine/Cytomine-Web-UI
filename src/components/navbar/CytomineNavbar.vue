@@ -49,7 +49,7 @@
       </router-link>
       <router-link v-if="appEngineEnabled" to="/appengine" class="navbar-item">
         <i class="fas fa-code"></i>
-        {{ $t('applications') }}
+        {{ $t('app-engine.applications') }}
       </router-link>
       <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>

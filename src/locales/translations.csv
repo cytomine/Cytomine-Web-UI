@@ -1014,12 +1014,14 @@ you-are-reviewing-image-since,You are reviewing this image since {date},Cette im
 you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {fecha},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
-app-engine,App Engine,App Engine,App Engine,App Engine
-tasks,Tasks,Tâches,Tareas,Taken
-applications,Applications,Applications,Aplicaciones,Toepassingen
-no-authors,No Authors,Aucun auteur,Sin autores,Keine Autoren
-ae-task-executor,Application Executor,Exécuteur d'applications,Ejecutor de aplicaciones,Applicatie-uitvoerder
-ae-current-status,Current Status,Statut actuel,Estado actual,Huidige status
-ae-history,Applications History,courses précédentes,Historial de aplicaciones,eerdere ritten
-select-application,Select an Application,Sélectionnez une application,Seleccione una aplicación,Selecteer een applicatie
-ae-run-app,Run App,Exécuter l'application,Ejecute la aplicación,Voer app uit
+app-engine.name,App Engine,App Engine,App Engine,App Engine
+app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
+app-engine.task.name,Task,Tâche,Tarea,Taak
+app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen
+app-engine.no-authors,No Authors,Aucun auteur,Sin autores,Keine Autoren
+app-engine.ae-task-executor,Task Executor,Exécuteur de tâches,Ejecutor de tareas,Applicatie-uitvoerder
+app-engine.ae-current-status,Current Status,Statut actuel,Estado actual,Huidige status
+app-engine.ae-history,Tasks History,Historique des tâches,Historial de tareas,Eerdere taken
+app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione una tarea,Selecteer een taak
+app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
+app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
