@@ -20,33 +20,30 @@
 </div>
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
-  <div class="columns is-gapless">
 
-    <div class="column is-narrow">
-      <app-engine-sidebar></app-engine-sidebar>
+  <div class="ae-sidebar">
+    <app-engine-sidebar></app-engine-sidebar>
+  </div>
+
+  <div v-if="!loading" class="maps-wrapper">
+    <div class="map-cell"
+      v-for="(cell, i) in cells"
+      :key="i"
+      :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+    >
+      <cytomine-image
+        v-if="cell && cell.image && cell.slices"
+        :index="cell.index"
+        :key="`${cell.index}-${cell.image.id}`"
+        @close="closeMap(cell.index)"
+      />
     </div>
 
-    <div class="column">
-      <div v-if="!loading" class="maps-wrapper">
-        <div class="map-cell"
-          v-for="(cell, i) in cells"
-          :key="i"
-          :style="`height:${elementHeight}%; width:${elementWidth}%;`"
-        >
-          <cytomine-image
-            v-if="cell && cell.image && cell.slices"
-            :index="cell.index"
-            :key="`${cell.index}-${cell.image.id}`"
-            @close="closeMap(cell.index)"
-          />
-        </div>
+    <image-selector />
 
-        <image-selector />
+    <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
+    <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
 
-        <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-        <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
-      </div>
-    </div>
   </div>
 
 </div>
@@ -303,10 +300,16 @@ export default {
 
 <style scoped>
 .cytomine-viewer {
+  display: flex;
   height: 100%;
 }
 
+.ae-sidebar {
+  width: 24rem;
+}
+
 .maps-wrapper {
+  flex: 1;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -322,4 +325,5 @@ export default {
 .hidden {
   display: none;
 }
+
 </style>
