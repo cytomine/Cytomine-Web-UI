@@ -1067,6 +1067,7 @@ width,Width,Largeur,Anchura,Breedte
 workspace,Workspace,Espace de travail,Espacio de trabajo,Werkruimte
 x-resolution,X resolution,Résolution X,,X-resolutie
 y-resolution,Y resolution,Résolution Y,,Y-resolutie
+x-y-resolution,X/Y resolution,Résolution X/Y,,X/Y-resolutie
 yellow,Yellow,Jaune,Amarillo,Geel
 yes,Yes,Oui,Sí,Ja
 you-are-reviewing-image-since,You are reviewing this image since {date},Cette image est en cours de validation depuis le {date},Estás revisando esta imagen desde {date},Deze afbeelding wordt gevalideerd sinds {date}

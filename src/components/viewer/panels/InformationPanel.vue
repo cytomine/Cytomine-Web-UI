@@ -71,6 +71,14 @@
         <td v-else>{{$t('unknown')}}</td>
       </tr>
       <tr>
+        <td><strong>{{ $t('image-metadata') }}</strong></td>
+        <td>
+          <button class="button is-small" @click="$emit('openMetadata')">
+            {{ $t('button-metadata') }}
+          </button>
+        </td>
+      </tr>
+      <tr>
         <td colspan="2" class="buttons-wrapper">
           <div class="buttons">
             <button v-if="canEdit" class="button is-small" @click="calibrationModal = true">
@@ -127,7 +135,7 @@ export default {
     return {
       calibrationModal: false,
       isFirstImage: false,
-      isLastImage: false
+      isLastImage: false,
     };
   },
   computed: {
