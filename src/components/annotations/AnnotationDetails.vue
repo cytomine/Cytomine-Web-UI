@@ -569,6 +569,11 @@ export default {
       this.loadPropertiesError = true;
       console.log(error);
     }
+
+    this.$eventBus.$emit('hide-similar-annotations');
+  },
+  destroyed() {
+    this.$eventBus.$emit('hide-similar-annotations');
   }
 };
 </script>
