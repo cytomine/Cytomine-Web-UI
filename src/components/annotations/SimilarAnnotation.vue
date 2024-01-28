@@ -139,6 +139,7 @@ export default {
       this.suggestedTerms = Object.keys(termCount).map((key) => [key, termCount[key]]);
       this.suggestedTerms.sort((a, b) => b[1] - a[1]);
       this.suggestedTerms.forEach((count) => count[0] = this.findTerm(count[0]));
+      this.suggestedTerms = this.suggestedTerms.filter((term) => term[0] !== undefined);
       this.suggestedTerms = this.suggestedTerms.slice(0, 3); // Only keep the 3 most frequent terms
     },
     findTerm(id) {
