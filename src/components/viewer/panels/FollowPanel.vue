@@ -90,7 +90,7 @@ export default {
 
       disabledBroadcast: false,
 
-      wsUserPositionPath: 'ws' + constants.CYTOMINE_CORE_HOST.replaceAll("http", "") + "/ws/user-position/",
+      wsUserPositionPath: 'ws' + constants.CYTOMINE_URL.replaceAll("http", "") + "/ws/user-position/",
 
       userPostitionWebsock: null,
       wsConnected: false,
@@ -325,7 +325,7 @@ export default {
       }
       this.trackedUser = null;
     },
-    
+
     sendPosition() {
       const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constants.WS_POSITION_KEEP_ALIVE_INTERVAL;
       if (this.broadcast && this.wsConnected && (this.viewerPositionChanged || shouldRefreshForKeepAlive)) {
