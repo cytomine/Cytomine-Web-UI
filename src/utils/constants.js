@@ -15,8 +15,7 @@
 */
 
 export default {
-  CYTOMINE_CORE_HOST: 'https://localhost-core',
-  CYTOMINE_UPLOAD_HOST: null, // Deprecated. Will only be used if filled, otherwise CYTOMINE_CORE_HOST is used for upload.
+  CYTOMINE_URL: 'http://0.0.0.0',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   // features switches

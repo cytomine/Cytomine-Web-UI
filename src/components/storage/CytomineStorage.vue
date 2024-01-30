@@ -237,7 +237,7 @@ export default {
       return '/upload';
     },
     uploadHost() {
-      return (constants.CYTOMINE_UPLOAD_HOST !== null) ? constants.CYTOMINE_UPLOAD_HOST : constants.CYTOMINE_CORE_HOST;
+      return constants.CYTOMINE_URL;
     },
     queryString() {
       return new URLSearchParams({
