@@ -16,6 +16,7 @@
 ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
 ARG NODE_VERSION=14.16.1-alpine3.13
+ARG NODE_DEV_VERSION=14.16.1-buster-slim
 ARG NGINX_VERSION=1.22.1
 ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 
@@ -35,17 +36,18 @@ FROM cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} as entrypoint-scr
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
-FROM node:${NODE_VERSION} as dev-server
-WORKDIR /app
-# ui source code should be mounted in /app
+FROM node:${NODE_DEV_VERSION} as dev-server
 
-RUN apk update && apk add gettext
+# ui source code should be mounted in /app
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends gettext=0.19.8.1-9 git=1:2.20.1-2+deb10u8
 
 RUN mkdir /docker-entrypoint-cytomine.d/
-# COPY --from cannot interpolate variables
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --from=entrypoint-scripts --chmod=774 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
+COPY --from=entrypoint-scripts --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
+COPY --from=entrypoint-scripts --chmod=744 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
+COPY --from=entrypoint-scripts --chmod=744 /run-npm-install.sh /docker-entrypoint-cytomine.d/750-run-npm-install.sh
+COPY ./scripts/configuration.json /cm_configs/app/public/configuration.json.sample
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "docker-entrypoint.sh"]
 # rebuild (ignoring current node-module folder) then serve

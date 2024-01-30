@@ -38,16 +38,17 @@
       />
 
       <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-        <vl-source-zoomify
+        <vl-source-cytomine
           :projection="projectionName"
-          :urls="baseLayerURLs"
+          :url="baseLayerURL"
+          :tile-load-function="tileLoadFunction"
           :size="imageSize"
           :extent="extent"
-          :crossOrigin="slices[0].imageServerUrl"
+          :nb-resolutions="image.zoom"
           ref="baseSource"
           @mounted="setBaseSource()"
           :transition="0"
-          :tile-size="tileSize"
+          :tile-size="[tileSize, tileSize]"
         />
       </vl-layer-tile>
 
@@ -164,7 +165,9 @@
 
     <rotation-selector class="rotation-selector-wrapper" :index="index" />
 
-    <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+    <scale-line v-show="scaleLineCollapsed" :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
+
+    <toggle-scale-line :index="index" />
 
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
@@ -202,6 +205,7 @@ import ReviewPanel from './panels/ReviewPanel';
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
+import ToggleScaleLine from './interactions/ToggleScaleLine';
 
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
@@ -211,7 +215,7 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -245,7 +249,8 @@ export default {
 
     SelectInteraction,
     DrawInteraction,
-    ModifyInteraction
+    ModifyInteraction,
+    ToggleScaleLine
   },
   data() {
     return {
@@ -267,6 +272,7 @@ export default {
     };
   },
   computed: {
+    shortTermToken: get('currentUser/shortTermToken'),
     document() {
       return document;
     },
@@ -381,8 +387,7 @@ export default {
     },
     baseLayerSliceParams() {
       return {
-        // eslint-disable-next-line camelcase
-        z_slices: this.slices[0].zStack,
+        zSlices: this.slices[0].zStack,
         timepoints: this.slices[0].time
       };
     },
@@ -393,9 +398,24 @@ export default {
       }
       return query;
     },
-    baseLayerURLs() {
+    baseLayerURL() {
       let slice = this.slices[0];
-      return  [`${slice.imageServerUrl}/image/${slice.path}/normalized-tile/zoom/{z}/ti/{tileIndex}.jpg${this.baseLayerURLQuery}`];
+      return Cytomine.instance.host + Cytomine.instance.basePath + `sliceinstance/${slice.id}/normalized-tile/zoom/{z}/tx/{x}/ty/{y}.jpg${this.baseLayerURLQuery}`;
+    },
+    tileLoadFunction() {
+        return (tile, src) => {
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.open('GET', src);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
+            xhr.addEventListener('load', () => {
+                const url = URL.createObjectURL(xhr.response);
+                const tileImage = tile.getImage();
+                tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
+                tileImage.src = url;
+            });
+            xhr.send();
+        }
     },
     // colorManipulationOn() {
     //   return this.imageWrapper.colors.brightness !== 0
@@ -428,6 +448,9 @@ export default {
 
     overviewCollapsed() {
       return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
+    },
+    scaleLineCollapsed() {
+      return !this.imageWrapper.view.scaleLineCollapsed;
     },
 
     correction() {
@@ -605,7 +628,7 @@ export default {
             annot = await Annotation.fetch(annot.id);
           }
 
-          if(annot.slice !== this.slices[0].id) {
+          if(!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
             this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -754,13 +777,13 @@ export default {
 
     if (annot) {
       try {
-        if(annot.image === this.image.id) {
-          if(!this.sliceIds.includes(annot.slice)) {
+        if (annot.image === this.image.id) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
           this.routedAnnotation = annot;
-          if(this.routedAction === 'comments') {
+          if (this.routedAction === 'comments') {
             this.$store.commit(this.imageModule + 'setShowComments', annot);
           }
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);

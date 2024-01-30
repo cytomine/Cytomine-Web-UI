@@ -113,6 +113,7 @@ export default {
             {key: 'project-explore-property', label: 'properties', icon: 'fas fa-tag', parentConfiguration: 'project-explore-hide-tools'},
             {key: 'project-explore-follow', label: 'broadcast', icon: 'fas fa-street-view', parentConfiguration: 'project-explore-hide-tools'},
             {key: 'project-explore-review', label: 'review', icon: 'fas fa-check-circle', parentConfiguration: 'project-explore-hide-tools'},
+            {key: 'project-explore-annotations-list', label: 'annotations-list', icon: 'fas fa-list', parentConfiguration: 'project-explore-hide-tools'}
           ]
         },
         {
