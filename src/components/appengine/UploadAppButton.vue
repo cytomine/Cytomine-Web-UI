@@ -46,7 +46,6 @@ export default {
                     // trigger success so we fetch all tasks (will re-render so we see new task)
                     this.$emit('taskUploadSuccess');
 
-                    console.log('Task Upload response:', responseMsg);
                     this.$notify({ type: 'success', text: responseMsg });
                 }
             } catch (error) {
