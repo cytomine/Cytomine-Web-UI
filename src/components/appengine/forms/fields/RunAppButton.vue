@@ -68,7 +68,6 @@ export default {
 
         const taskRunId = taskRun.data.id;
 
-        console.log("id: ", taskRunId);
 
         this.provisionTask(taskRunId, this.inputValues);
       } catch (e) {
@@ -78,7 +77,6 @@ export default {
     // Step-2 Provision a Task Runner
     async provisionTask(taskRunId, userInputs) {
       try {
-        console.log(JSON.stringify(userInputs, null, 4));
 
         const taskProvision = await Task.batchProvisionTask(
           this.project,
@@ -86,7 +84,6 @@ export default {
           userInputs
         );
 
-        console.log("Provisioned input", taskProvision);
 
         // Single Provision (Loop Multi-request used before batchProvision used to work)
         // userInputs.forEach(async (input) => {

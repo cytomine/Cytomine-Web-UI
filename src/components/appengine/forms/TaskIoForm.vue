@@ -47,29 +47,16 @@ export default {
   methods: {
     async runTask() {
       // create task run and provision
-      await Task.createTaskRun(
-        this.projectId,
-        this.task.namespace,
-        this.task.version
-      ).then(async (taskRun) => {
-        await Task.batchProvisionTask(
-          this.projectId,
-          taskRun.id,
-          this.getInputProvisions()
-        ).then(taskRun => {
+      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version).then(async (taskRun) => {
+        return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async (taskRunProvisions) => {
           // TODO reset form and send event
-          console.log(taskRun);
-        }).catch(e => {
-          this.$buefy.toast.open({
-            message: e.message,
-            type: 'is-danger'
+          return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
+            this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
+            this.inputs = {}; // reset inputs
           });
         });
       }).catch(e => {
-        this.$buefy.toast.open({
-          message: e.message,
-          type: 'is-danger'
-        });
+        this.$buefy.toast.open({message: e.message, type: 'is-danger'});
       });
     },
     getInputProvisions() {

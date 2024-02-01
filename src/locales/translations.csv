@@ -1025,3 +1025,4 @@ app-engine.ae-history,Tasks History,Historique des tâches,Historial de tareas,E
 app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione una tarea,Selecteer een taak
 app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
 app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
+app-engine.run.started,Task run launched,Lancement de l'exécution de la tâche,Inicio de ejecución de tarea,Uitvoering van taak gestart

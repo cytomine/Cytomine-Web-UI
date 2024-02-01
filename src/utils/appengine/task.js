@@ -33,30 +33,36 @@ export default class Task extends Model {
 
   // Step-1: Create TaskRun Must be part of a project to run a task
   static async createTaskRun(project, namespace, version) {
-    return await Cytomine.instance.api.post(`/app-engine/project/${project}/tasks/${namespace}/${version}/runs`);
+    let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/tasks/${namespace}/${version}/runs`);
+    return data;
   }
 
   // Step-2: Provision task / user inputs
   static async batchProvisionTask(project, runId, params) {
-    return await Cytomine.instance.api.put(`/app-engine/project/${project}/task-runs/${runId}/input-provisions`, params);
+    let {data} = await Cytomine.instance.api.put(`/app-engine/project/${project}/task-runs/${runId}/input-provisions`, params);
+    return data;
   }
 
   static async singleProvisionTask(project, runId, paramName, param) {
-    return await Cytomine.instance.api.put(`/app-engine/project/${project}/task-runs/${runId}/input-provisions/${paramName}`, param);
+    let {data} = Cytomine.instance.api.put(`/app-engine/project/${project}/task-runs/${runId}/input-provisions/${paramName}`, param);
+    return data;
   }
 
   // Step-3 Run/Execute the Provisioned Task
-  static async runTask(project, runId, body) {
-    return await Cytomine.instance.api.post(`/app-engine/project/${project}/task-runs/${runId}/state-actions`, body);
+  static async runTask(project, runId) {
+    let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/task-runs/${runId}/state-actions`, {"desired": "RUNNING"});
+    return data;
   }
 
   // Status: get the current status of the TaskRun
   static async fetchTaskRunStatus(project, runId) {
-    return await Cytomine.instance.api.get(`/app-engine/project/${project}/task-runs/${runId}`);
+    let {data} = await Cytomine.instance.api.get(`/app-engine/project/${project}/task-runs/${runId}`);
+    return data;
   }
 
   // Output: get a TaskRun output
   static async fetchTaskRunOutput(project, runId) {
-    return await Cytomine.instance.api.get(`/app-engine/project/${project}/task-runs/${runId}/outputs`);
+    let {data} = await Cytomine.instance.api.get(`/app-engine/project/${project}/task-runs/${runId}/outputs`);
+    return data;
   }
 }
