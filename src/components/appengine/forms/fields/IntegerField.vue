@@ -6,7 +6,7 @@
       </template>
       <b-numberinput
         v-model="input"
-        :placeholder="parameter.default"
+        :placeholder="constraintsSummary"
         :controls="false"
         :max="max"
         :min="min"
@@ -27,16 +27,20 @@ export default {
     parameter: {
       type: Object
     },
-    value: {
-      type: Number
-    }
-  },
-  data() {
-    return {
-      input: this.parameter.default || 0
-    };
+    value: { }
   },
   computed: {
+    input: {
+      get() {
+        return this.value || this.defaultValue;
+      },
+      set(value) {
+        this.$emit('input', value);
+      }
+    },
+    defaultValue() {
+      return this.parameter.default != null ? this.parameter.default : null;
+    },
     type() {
       return this.parameter.type;
     },
@@ -88,11 +92,6 @@ export default {
         max = lt - 1;
       }
       return max;
-    }
-  },
-  watch: {
-    input() {
-      this.$emit('input', this.input);
     }
   }
 };

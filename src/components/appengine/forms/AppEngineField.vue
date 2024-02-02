@@ -1,6 +1,6 @@
 <template>
   <div>
-    <integer-field v-if="typeId == 'integer'" :parameter="parameter" v-model="input"></integer-field>
+    <integer-field v-if="typeId == 'integer'" @input="$emit('input', $event)" :parameter="parameter" v-model="input"></integer-field>
   </div>
 </template>
 
@@ -18,21 +18,19 @@ export default {
     },
     value: { }
   },
-  data() {
-    return {
-      input: null
-    };
-  },
   computed: {
     typeId() {
       return this.parameter.type.id;
-    }
-  },
-  // v-model event
-  watch: {
-    input() {
-      this.$emit('input', this.input);
+    },
+    input: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit('input', value);
+      }
     }
   }
 };
 </script>
+

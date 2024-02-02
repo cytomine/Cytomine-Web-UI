@@ -7,7 +7,8 @@
       <!-- TODO outputs when relevant -->
     </section>
     <section>
-      <b-field class="buttons">
+      <b-field class="buttons" grouped>
+        <b-button type="is-primary" @click="resetForm">{{ $t('button-clear') }}</b-button>
         <b-button type="is-primary" @click="runTask">{{ $t('app-engine.ae-run-task') }}</b-button>
       </b-field>
     </section>
@@ -17,6 +18,7 @@
 <script>
 import Task from '@/utils/appengine/task';
 import AppEngineField from '@/components/appengine/forms/AppEngineField';
+import Vue from 'vue';
 
 export default {
   name: 'task-io-form',
@@ -43,6 +45,8 @@ export default {
     this.taskInputs = inputs.sort((a, b) => {
       return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);
     });
+
+    this.resetForm();
   },
   methods: {
     async runTask() {
@@ -52,7 +56,7 @@ export default {
           // TODO reset form and send event
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
             this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
-            this.inputs = {}; // reset inputs
+            this.resetForm();
           });
         });
       }).catch(e => {
@@ -68,7 +72,24 @@ export default {
         });
       }
       return provisions;
+    },
+    resetForm() {
+      // iterate over this.taskInputs
+      for (let input of this.taskInputs) {
+        Vue.set(this.inputs, input.name, null);
+      }
     }
   }
 };
 </script>
+
+<style scoped>
+.buttons {
+  display: flex;
+  justify-content: flex-end; /* Right-align the buttons */
+}
+
+.button {
+  margin-left: 5px; /* Add spacing between buttons */
+}
+</style>
