@@ -4,7 +4,7 @@
         <button id="app-upload-btn" class="button is-link" @click="uploadTask">{{ $t(btnFunc) }}</button>
     </div>
 </template>
-    
+
 <script>
 import Task from '@/utils/appengine/task';
 
@@ -41,18 +41,17 @@ export default {
 
                 if (response.status >= 200 && response.status < 300) {
                     // Successful response handling
-                    const responseMsg = response.data.message || 'Unknown message'; 
+                    const responseMsg = response.data.message || 'Unknown message';
 
                     // trigger success so we fetch all tasks (will re-render so we see new task)
                     this.$emit('taskUploadSuccess');
 
-                    console.log('Task Upload response:', responseMsg);
                     this.$notify({ type: 'success', text: responseMsg });
                 }
             } catch (error) {
                 if (error.response && error.response.status === 409) {
                     const errorMessage = error.response.data.message || 'Task already exists!';
-                    
+
                     console.error('Error during upload:', error);
                     this.$notify({ type: 'warn', text: errorMessage });
                 } else {

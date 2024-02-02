@@ -3,7 +3,7 @@
     <b-loading v-if="loading" :is-full-page="false" :active="loading" />
     <div v-else-if="appEngineEnabled" class="panel">
       <p class="panel-heading">
-        {{$t('tasks')}}
+        {{$t('app-engine.tasks.name')}}
         <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
       </p>
       <section class="panel-block">
@@ -13,8 +13,8 @@
       </section>
     </div>
     <div v-else>
-      <b-message 
-        :title="$t('appengine-not-enabled-title')" 
+      <b-message
+        :title="$t('appengine-not-enabled-title')"
         type="is-info">
         {{ $t('appengine-not-enabled-description') }}
       </b-message>
@@ -22,7 +22,7 @@
     </div>
   </div>
 </template>
-  
+
 <script>
 import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
@@ -51,7 +51,6 @@ export default {
   methods: {
     async handleTaskUploadSuccess() {
       try {
-        // this.applications.push(await Task.fetchAll());
         this.applications = await Task.fetchAll();
 
       } catch (error) {
@@ -61,7 +60,7 @@ export default {
   },
 };
 </script>
-  
+
 <style scoped>
 
 .panel-block {
@@ -105,4 +104,3 @@ export default {
   margin: 1em;
 }
 </style>
-  

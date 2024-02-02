@@ -28,13 +28,13 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
 
 export default {
   name: 'cytomine-project',
-  components: {ProjectSidebar},
+  components: { ProjectSidebar },
   data() {
     return {
       loading: true,
@@ -57,7 +57,7 @@ export default {
       await this.loadProject();
     },
     projectModule() {
-      if(!this.projectModule) {
+      if (!this.projectModule) {
         console.log('Project closed from external source');
         this.$store.commit('currentProject/resetState');
         this.$router.push('/projects');
@@ -67,15 +67,15 @@ export default {
   methods: {
     async loadProject() {
       try {
-        if(!this.$store.state.projects[this.idProject]) { // module does not exist yet
+        if (!this.$store.state.projects[this.idProject]) { // module does not exist yet
           this.$store.registerModule(['projects', this.idProject], projectModuleModel);
         }
         await this.$store.dispatch('currentProject/loadProject', this.idProject);
         this.loading = false;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        if(error.response && error.response.status === 403) {
+        if (error.response && error.response.status === 403) {
           this.permissionError = true;
         }
         else {
@@ -85,7 +85,7 @@ export default {
     },
     deleteAnnotationEventHandler(annot) {
       let updatedProject = this.$store.state.currentProject.project.clone();
-      if(annot.type === 'UserAnnotation') {
+      if (annot.type === 'UserAnnotation') {
         updatedProject.numberOfAnnotations--;
       }
       else {
