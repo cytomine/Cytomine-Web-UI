@@ -20,10 +20,6 @@ export default class Model {
    */
   _initProperties() {
     this.id = null;
-    this.class = null; // the Cytomine class
-    this.created = null;
-    this.updated = null;
-    this.deleted = null;
   }
 
   toString() {

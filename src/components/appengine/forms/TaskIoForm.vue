@@ -17,7 +17,7 @@
 
 <script>
 import Task from '@/utils/appengine/task';
-import AppEngineField from '@/components/appengine/forms/AppEngineField';
+import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Vue from 'vue';
 
 export default {
@@ -57,6 +57,7 @@ export default {
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
             this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
             this.resetForm();
+            this.$emit("appengine:task:started", taskRun);
           });
         });
       }).catch(e => {
