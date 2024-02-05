@@ -32,9 +32,8 @@
         </section>
 
         <section class="content" v-if="selectedTask">
-          <task-io-form @runStarted="catchTaskRunLaunch" :task="selectedTask" :project-id="currentProjectId"></task-io-form>
+          <task-io-form v-on:appengine:task:started="catchTaskRunLaunch" :task="selectedTask" :project-id="currentProjectId"></task-io-form>
         </section>
-
       </div>
     </div>
     <div class="card runs">
@@ -47,7 +46,7 @@
 
       <div class="card-content">
         <section class="content">
-          <h5 class="subtitle">{{ $t('app-engine.runs') }}</h5>
+          <h5 class="subtitle">{{ $t('app-engine.runs.title') }}</h5>
           <task-run-table :task-runs="trackedTaskRuns" />
         </section>
       </div>
@@ -57,8 +56,9 @@
 
 <script>
 import Task from '@/utils/appengine/task';
+import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
-import TaskRunTable from '@/components/appengine/sidebar/TaskRunTable';
+import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
 
 import { get } from '@/utils/store-helpers';
 
@@ -75,20 +75,25 @@ export default {
       taskState: '',
       executedTaskRun: null,
       tasks: [],
-      trackedTaskRuns: [
-        {state: 'CREATED', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'PROVISIONED', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'QUEUING', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'QUEUED', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'PENDING', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'RUNNING', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'FAILED', task: {name: 'my-task', version: '0.1.0' }},
-        {state: 'FINISHED', task: {name: 'my-task', version: '0.1.0' }}
-      ]
+      trackedTaskRuns: []
     };
   },
   async created() {
     this.tasks = await Task.fetchAll();
+    setInterval(() => {
+      this.trackedTaskRuns.forEach(async (taskRun) => {
+        // update task run in place
+        if (taskRun.state !== "CREATED" && !taskRun.inputs) {
+          taskRun.inputs = await taskRun.fetchInputs();
+        }
+        if (taskRun.state !== "FINISHED" && taskRun.state !== "FAILED") {
+          await taskRun.fetch();
+          if (taskRun.state === "FINISHED" || taskRun.state === "FAILED") {
+            taskRun.outputs = await taskRun.fetchOutputs();
+          }
+        }
+      });
+    }, 2000);
   },
   computed: {
     currentProject: get('currentProject/project'),
@@ -103,8 +108,11 @@ export default {
     handleExecutedTaskRun(executedTaskRun) {
       this.executedTaskRun = executedTaskRun;
     },
-    catchTaskRunLaunch(taskRun) {
-
+    async catchTaskRunLaunch(event) {
+      let taskRun = new TaskRun(event.resource);
+      taskRun.project = this.currentProjectId;
+      this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
+      console.log(taskRun);
     }
   },
 };

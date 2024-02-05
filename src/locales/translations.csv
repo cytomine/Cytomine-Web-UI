@@ -1027,3 +1027,10 @@ app-engine.form.select-task,Select a task,Sélectionnez une tâche,Seleccione un
 app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
 app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
 app-engine.run.started,Task run launched,Lancement de l'exécution de la tâche,Inicio de ejecución de tarea,Uitvoering van taak gestart
+app-engine.inputs.title,Inputs,Entrées,Entradas,Ingangen
+app-engine.outputs.title,Outputs,Sorties,Salidas,Uitgangen
+app-engine.parameter.name,Name,Nom,Nombre,Naam
+app-engine.parameter.type,Type,Type,Tipo,Type
+app-engine.parameter.value,Value,Valeur,Valor,Waarde
+app-engine.runs.title,Runs,Exécutions,Ejecuciones,Uitvoeringen
+app-engine.task-run.state.title,State,État,Estado,Status

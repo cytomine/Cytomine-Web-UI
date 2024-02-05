@@ -57,7 +57,7 @@ export default {
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
             this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
             this.resetForm();
-            this.emit("task-started", taskRun);
+            this.$emit("appengine:task:started", taskRun);
           });
         });
       }).catch(e => {

@@ -11,6 +11,11 @@ export default class Task extends Model {
   /** @inheritdoc */
   _initProperties() {
     super._initProperties();
+    this.namespace = null;
+    this.version = null;
+    this.name = null;
+    this.description = null;
+    this.authors = [];
   }
 
   static async fetchAll() {
