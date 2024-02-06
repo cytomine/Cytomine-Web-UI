@@ -15,7 +15,6 @@
 */
 
 export default {
-  CYTOMINE_URL: 'http://0.0.0.0',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   // features switches
