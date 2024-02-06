@@ -143,7 +143,7 @@ export default {
     }
     Object.freeze(constants);
 
-    new Cytomine(constants.CYTOMINE_URL);
+    new Cytomine(window.location.origin);
 
     if(this.$route.query.token && this.$route.query.username) {
       await this.loginWithToken();

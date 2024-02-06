@@ -90,7 +90,7 @@ export default {
 
       disabledBroadcast: false,
 
-      wsUserPositionPath: 'ws' + constants.CYTOMINE_URL.replaceAll("http", "") + "/ws/user-position/",
+      wsUserPositionPath: `ws://${window.location.host}/ws/user-position/`,
 
       userPostitionWebsock: null,
       wsConnected: false,

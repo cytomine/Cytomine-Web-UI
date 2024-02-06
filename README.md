@@ -37,7 +37,6 @@ The main features of this new front-end are :
 This section assumes that you have access to an instance of Cytomine (especially [Cytomine-core](https://github.com/cytomine/Cytomine-core)) and an installed proxy. These two conditions are filled if you have used [Cytomine-bootstrap](https://github.com/cytomine/Cytomine-bootstrap). The following steps will allow you to run a front-end interacting with this instance:
 
 * Execute `npm install` to install the dependencies;
-* Change the value of constants `CYTOMINE_URL` and `CYTOMINE_UPLOAD_HOST` in src/utils/constants.js ; you may also update other constants according to your Cytomine instance or your preferences;
 * Execute `npm run build` to build all the files into a `dist` folder.
 * Configure your proxy to redirect http request on the index.html file or replace the dist folder in your Cytomine-bootstrap by this one.
 
@@ -45,7 +44,6 @@ This section assumes that you have access to an instance of Cytomine (especially
 This section assumes that you have access to an instance of Cytomine (especially [Cytomine-core](https://github.com/cytomine/Cytomine-core)). The following steps will allow you to run locally a front-end interacting with this instance:
 
 * Execute `npm install` to install the dependencies ;
-* Change the value of constants `CYTOMINE_URL` and `CYTOMINE_UPLOAD_HOST` in src/utils/constants.js ; you may also update other constants according to your Cytomine instance or your preferences;
 * Execute `npm run serve` to start a web server serving the front end (by default on `localhost:8080`).
 
 ### Remarks:
