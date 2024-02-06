@@ -236,9 +236,6 @@ export default {
     uri() {
       return '/upload';
     },
-    uploadHost() {
-      return (constants.CYTOMINE_UPLOAD_HOST !== null) ? constants.CYTOMINE_UPLOAD_HOST : constants.CYTOMINE_CORE_HOST;
-    },
     queryString() {
       return new URLSearchParams({
         idStorage: (this.selectedStorage) ? this.selectedStorage.id : null,
@@ -374,7 +371,7 @@ export default {
       fileWrapper.cancelToken = axios.CancelToken.source();
       fileWrapper.uploading = true;
       axios.post(
-        this.uploadHost + this.uri + '?' + this.queryString,
+        this.uri + '?' + this.queryString,
         formData,
         {
           headers: {
