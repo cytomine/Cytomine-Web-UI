@@ -112,7 +112,6 @@ export default {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
-      console.log(taskRun);
     }
   },
 };
