@@ -15,8 +15,6 @@
 */
 
 export default {
-  CYTOMINE_CORE_HOST: 'https://localhost-core',
-  CYTOMINE_UPLOAD_HOST: 'https://localhost-upload',
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
   // features switches
@@ -42,12 +40,11 @@ export default {
   IDLE_DURATION: 120, // if the user does not move his mouse on the page during this duration, he is considered as inactive - no more ping (expressed in seconds)
   CONFIG_KEY_WELCOME: 'WELCOME',
   PREFIX_HIDDEN_PROPERTY_KEY: '@',
-  METADATA_PREFIXES: '',
   DEFAULT_PROPERTY_KEY: '@DEFAULT_PROPERTY',
   DEFAULT_IMAGE_CONTROLS_STEP: 2,
   CATEGORY_ITEMS_PER_BATCH: 10,
   ANNOTATIONS_MAX_ITEMS_PER_CATEGORY: 10,
   // To keep the WebSockets alive by sending the broadcaster viewer position
   WS_POSITION_KEEP_ALIVE_INTERVAL: 10000,
-  
+
 };

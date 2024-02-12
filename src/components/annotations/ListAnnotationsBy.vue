@@ -39,6 +39,7 @@
         :users="allUsers"
         :images="allImages"
         :tracks="allTracks"
+        :show-details="showDetails"
         :show-image-info="!isInViewer"
         :show-slice-info="isByTrack && !noTrack"
         @addTerm="$emit('addTerm', $event)"
@@ -106,6 +107,7 @@ export default {
 
     revision: Number,
     visible: {type: Boolean, default: true},
+    showDetails: {type: Boolean, default: true},
     index: String
   },
   components: {AnnotationPreview},
