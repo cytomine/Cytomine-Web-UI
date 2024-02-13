@@ -25,10 +25,17 @@ ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
 FROM node:${NODE_VERSION} as frontend-builder
 WORKDIR /app
 
-ADD . /app
+# explicit listing for copy, to avoid copying dangling ./node_modules or alike
+COPY ./src /app/src
+COPY ./public /app/public
+COPY ./scripts /app/scripts
+COPY ./package.json /app/package.json
+COPY ./package-lock.json /app/package-lock.json
+COPY ./babel.config.js /app/babel.config.js
+
 WORKDIR /app
-RUN npm install
-RUN npm run build
+RUN npm install && \
+      npm run build
 
 #######################################################################################
 ## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
@@ -83,6 +90,7 @@ COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bi
 COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
 
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=1000:1000 ./scripts/configuration.json /cm_configs/app/configuration.json.sample
 
 # actual front end
 COPY --from=frontend-builder /app/dist /app
