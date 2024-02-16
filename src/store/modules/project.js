@@ -16,7 +16,6 @@
 
 import listImages from './project_modules/list-images.js';
 import listAnnotations from './project_modules/list-annotations.js';
-import listJobs from './project_modules/list-jobs.js';
 
 export default {
   namespaced: true,
@@ -40,7 +39,6 @@ export default {
       namespaced: true
     },
     listImages,
-    listAnnotations,
-    listJobs
+    listAnnotations
   }
 };

@@ -20,6 +20,11 @@
 </div>
 <div v-else class="cytomine-viewer">
   <b-loading :is-full-page="false" :active="loading" />
+
+  <div class="ae-sidebar">
+    <app-engine-sidebar></app-engine-sidebar>
+  </div>
+
   <div v-if="!loading" class="maps-wrapper">
     <div class="map-cell"
       v-for="(cell, i) in cells"
@@ -38,7 +43,9 @@
 
     <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
     <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
+
   </div>
+
 </div>
 </template>
 
@@ -47,6 +54,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
+import AppEngineSidebar from '@/components/appengine/sidebar/AppEngineSidebar';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
@@ -59,7 +67,8 @@ export default {
   name: 'cytomine-viewer',
   components: {
     CytomineImage,
-    ImageSelector
+    ImageSelector,
+    AppEngineSidebar
   },
   data() {
     return {
@@ -313,10 +322,19 @@ export default {
 
 <style scoped>
 .cytomine-viewer {
+  display: flex;
   height: 100%;
 }
 
+.ae-sidebar {
+  width: 24rem;
+  border-right-color: #333;
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+
 .maps-wrapper {
+  flex: 1;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -332,4 +350,5 @@ export default {
 .hidden {
   display: none;
 }
+
 </style>

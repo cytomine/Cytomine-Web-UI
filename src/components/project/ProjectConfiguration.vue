@@ -31,10 +31,6 @@
       {{$t('custom-ui')}}
     </b-radio-button>
 
-    <b-radio-button v-show="algoEnabled" v-model="activeTab" native-value="algorithms" type="is-link">
-      {{$t('algorithms')}}
-    </b-radio-button>
-
     <b-radio-button v-model="activeTab" native-value="imageFilters" type="is-link">
       {{$t('image-filters')}}
     </b-radio-button>
@@ -49,13 +45,11 @@
 </template>
 
 <script>
-import constants from '@/utils/constants.js';
 import {get} from '@/utils/store-helpers';
 
 import GeneralConfiguration from './configuration-panels/GeneralConfiguration';
 import ProjectMembers from './configuration-panels/ProjectMembers';
 import CustomUIProject from './configuration-panels/CustomUIProject';
-import ProjectSoftwares from './configuration-panels/ProjectSoftwares';
 import ProjectImageFilters from './configuration-panels/ProjectImageFilters';
 
 const defaultTab = 'general';
@@ -64,7 +58,6 @@ export default {
   name: 'project-configuration',
   data() {
     return {
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       activeTab: defaultTab
     };
   },
@@ -82,8 +75,6 @@ export default {
           return ProjectMembers;
         case 'customUI':
           return CustomUIProject;
-        case 'algorithms':
-          return ProjectSoftwares;
         case 'imageFilters':
           return ProjectImageFilters;
       }

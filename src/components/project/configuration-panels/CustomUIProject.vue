@@ -59,13 +59,11 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
-import constants from '@/utils/constants.js';
 
 export default {
   name: 'custom-ui-project',
   data() {
     return {
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       error: false,
 
@@ -76,7 +74,6 @@ export default {
           props: [
             {key: 'project-images-tab', label: 'images', icon: 'far fa-images'},
             {key: 'project-annotations-tab', label: 'annotations', icon: 'far fa-edit'},
-            {key: 'project-jobs-tab', label: 'analysis', icon: 'fas fa-tasks'},
             {key: 'project-activities-tab', label: 'activity', icon: 'fas fa-tachometer-alt'},
             {key: 'project-information-tab', label: 'information', icon: 'fas fa-info-circle'},
             {key: 'project-configuration-tab', label: 'configuration', icon: 'fas fa-cogs'}
@@ -192,8 +189,7 @@ export default {
   },
   async created() {
     try {
-      if(!this.algoEnabled) this.customUITree[0].props.splice(2,1);
-
+      this.customUITree[0].props.splice(2,1);
       this.customUI = await this.project.fetchUIConfig();
       console.log(this.customUI);
     }

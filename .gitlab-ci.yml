@@ -1,7 +1,6 @@
 stages:
-  - prepare
-  - build
-  - publish
+- prepare
+- build
 
 variables:
   DOCKER_IMAGE_NAME: 'cytomine/web_ui'
