@@ -104,7 +104,7 @@
   <b-field grouped>
     <b-select size="is-small" :placeholder="$t('select-layer-placeholder')" v-model="layerToAdd">
       <option v-for="layer in unselectedLayers" :key="layer.id" :value="layer">
-        {{fullName(layer)}}
+        {{layer.fullName}}
       </option>
     </b-select>
 
@@ -121,7 +121,7 @@
         <th></th>
       </tr>
       <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
-        <td>{{fullName(layer)}}</td>
+        <td>{{layer.fullName}}</td>
         <td class="is-centered">
           <b-checkbox v-model="defaultLayers[idx].hideByDefault" size="is-small" @input="saveDefaultLayer(idx)" />
         </td>
@@ -162,7 +162,6 @@ import {get} from '@/utils/store-helpers';
 import ProjectActions from '../ProjectActions';
 import DefaultProperty from './DefaultProperty';
 import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from 'cytomine-client';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'general-configuration',
@@ -198,7 +197,7 @@ export default {
     },
     unselectedLayers() {
       let selectedLayersIds = this.defaultLayers.map(layer => layer.user);
-      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
+      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id)).sort((a, b) => (a.fullName < b.fullName) ? -1 : 1 );
     }
   },
   watch: {
@@ -238,10 +237,6 @@ export default {
     }
   },
   methods: {
-    fullName(layer) {
-      return fullName(layer);
-    },
-
     initData() {
       this.editingMode = this.currentEditingMode;
       this.blindMode = this.project.blindMode;

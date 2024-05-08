@@ -35,9 +35,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <login v-else-if="!currentUser" />
-
-    <template v-else>
+    <template v-else-if="currentUser">
       <cytomine-navbar />
       <div class="bottom">
         <keep-alive include="cytomine-storage">
@@ -55,7 +53,6 @@ import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 
 import CytomineNavbar from './components/navbar/CytomineNavbar.vue';
-import Login from './components/user/Login.vue';
 
 import {Cytomine} from 'cytomine-client';
 
@@ -65,7 +62,7 @@ ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
   name: 'app',
-  components: {CytomineNavbar, Login},
+  components: {CytomineNavbar},
   mixins: [changeLanguageMixin],
   data() {
     return {
@@ -79,26 +76,14 @@ export default {
     project: get('currentProject/project')
   },
   methods: {
-    async loginWithToken() {
-      try {
-        let {shortTermToken} = await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
-        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
 
-        await this.fetchUser();
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('invalid-token')});
-      }
-    },
     async ping() {
       if(!ifvisible.now()){
         return; // window not visible or inactive user => stop pinging
       }
       try {
-        let {authenticated, shortTermToken} = await Cytomine.instance.ping(this.project ? this.project.id : null);
-
-        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
+        // TODO IAM
+        let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
 
         if(this.currentUser && !authenticated) {
           await this.$store.dispatch('logout');
@@ -145,9 +130,6 @@ export default {
 
     new Cytomine(window.location.origin);
 
-    if(this.$route.query.token && this.$route.query.username) {
-      await this.loginWithToken();
-    }
     await this.ping();
     this.loading = false;
     ifvisible.on('wakeup', this.ping);

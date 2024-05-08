@@ -196,6 +196,7 @@ import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
+// TODO
 export default {
   // eslint-disable-next-line
   name: 'Account',

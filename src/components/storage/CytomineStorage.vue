@@ -251,6 +251,7 @@ export default {
   },
   watch: {
     async queryString() {
+      // TODO IAM
       this.signatureDate = new Date().toISOString();
       try {
         this.signature = await Cytomine.instance.fetchSignature({
@@ -378,7 +379,7 @@ export default {
         formData,
         {
           headers: {
-            'authorization': `CYTOMINE ${this.currentUser.publicKey}:${this.signature}`,
+            'authorization': `CYTOMINE ${this.currentUser.publicKey}:${this.signature}`, // TODO IAM
             'dateFull': this.signatureDate, // will replace actual date value, so that signature is valid
             'content-type-full': 'null' // will erase actual content-type value, so that signature is valid
           },

@@ -58,7 +58,7 @@
         <tr>
           <td><strong>{{$t('creator')}}</strong></td>
           <td>
-            {{creatorFullname || $t('unknown')}}
+            {{creator.fullName || $t('unknown')}}
           </td>
         </tr>
         <tr v-if="canEdit">
@@ -98,7 +98,6 @@ import {get} from '@/utils/store-helpers';
 import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
 import RenameModal from '@/components/utils/RenameModal';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'ontology-details',
@@ -117,7 +116,7 @@ export default {
       fullOntology: {},
       projects: [],
       managedProjects: [],
-      creatorFullname: null,
+      creator: null,
 
       isRenameModalActive: false
     };
@@ -166,8 +165,7 @@ export default {
       this.fetchManagedProjects();
 
       try {
-        let creator = await User.fetch(this.fullOntology.user);
-        this.creatorFullname = fullName(creator);
+        this.creator = await User.fetch(this.fullOntology.user);
       }
       catch(error) {
         console.log(error);

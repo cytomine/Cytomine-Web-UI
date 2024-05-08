@@ -15,11 +15,10 @@
 <template>
 <span v-if="resolvedUser">
   <span :class="[online ? 'online-dot' : 'offline-dot']" v-if="online !== null"></span>
-  {{displayFullName ? fullName : resolvedUser.username}}</span></template>
+  {{displayFullName ? resolvedUser.fullName : resolvedUser.username}}</span></template>
 
 <script>
 import {User} from 'cytomine-client';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   // eslint-disable-next-line
@@ -39,9 +38,6 @@ export default {
     resolvedUser() {
       return this.user || this.fetchedUser;
     },
-    fullName() {
-      return fullName(this.resolvedUser);
-    }
   },
   async created() {
     if(!this.user && this.id) {

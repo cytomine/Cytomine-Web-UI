@@ -126,6 +126,7 @@ export default {
       this.nbAnnotations = await this.user.fetchNbAnnotations();
     },
     async switchUser() {
+      //TODO IAM
       try {
         await Cytomine.instance.switchUser(this.user.username);
         await this.$store.dispatch('currentUser/fetchUser');

@@ -78,7 +78,6 @@ import {AnnotationComment} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'annotation-comments-modal',
@@ -130,7 +129,7 @@ export default {
 
       this.loading = true;
       try {
-        let sender = fullName(this.currentUser);
+        let sender = this.currentUser.fullName;
         let newComment = await new AnnotationComment({
           annotation: this.annotation,
           subject: `Cytomine: ${sender} commented an annotation`, // not translated because the content of the mail will be in english

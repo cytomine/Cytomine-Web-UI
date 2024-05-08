@@ -58,7 +58,7 @@
 
       <navbar-dropdown
         :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
-        :title="currentUserFullInfo"
+        :title="currentUser.fullName"
         :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
@@ -113,7 +113,6 @@ import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 import constants from '@/utils/constants.js';
 import {Cytomine} from 'cytomine-client';
-import {fullName} from '@/utils/user-utils.js';
 import shortcuts from '@/utils/shortcuts.js';
 
 export default {
@@ -134,9 +133,6 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-    currentUserFullInfo() {
-      return fullName(this.currentUser);
-    },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
     },
@@ -190,6 +186,7 @@ export default {
       }
     },
 
+    // TODO IAM
     async stopSwitchUser() {
       try {
         await Cytomine.instance.stopSwitchUser();
@@ -202,6 +199,7 @@ export default {
       }
     },
 
+    // TODO IAM
     async logout() {
       try {
         await Cytomine.instance.logout();

@@ -75,7 +75,6 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {fullName} from '@/utils/user-utils.js';
 
 import AnnotationPreview from './AnnotationPreview';
 
@@ -206,7 +205,7 @@ export default {
     },
     title() {
       if (this.isByUser) {
-        return fullName(this.prop);
+        return this.prop.fullName;
       }
       else if (this.isByImage) {
         return (this.prop.blindedName) ? this.prop.blindedName : this.prop.instanceFilename;

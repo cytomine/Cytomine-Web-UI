@@ -78,12 +78,6 @@ export default {
       await Cytomine.instance.closeAdminSession();
       await dispatch('fetchUser');
     },
-
-    async login({dispatch, commit}, payload) {
-      let {shortTermToken} = await Cytomine.instance.login(payload.username, payload.password, payload.rememberMe);
-      commit('setShortTermToken', shortTermToken);
-      await dispatch('fetchUser');
-    }
   },
 
   getters: {

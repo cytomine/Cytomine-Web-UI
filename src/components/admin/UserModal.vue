@@ -101,6 +101,7 @@ const defaultLanguage = {value: 'EN', name:'English'};
 
 import CytomineModal from '@/components/utils/CytomineModal';
 
+// TODO IAM
 export default {
   name: 'user-modal',
   props: {
@@ -177,7 +178,7 @@ export default {
     isAdminConfirmed(){
       return this.adminConfirm || !this.isChangingRoleToAdmin();
     },
-    
+
     async save() {
       let result = await this.$validator.validateAll();
       if(!result) {
