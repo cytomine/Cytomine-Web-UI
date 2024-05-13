@@ -55,7 +55,7 @@
 
     <div class="navbar-end">
       <cytomine-searcher />
-
+      <!-- TODO IAM -->
       <navbar-dropdown
         :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
         :title="currentUser.fullName"
