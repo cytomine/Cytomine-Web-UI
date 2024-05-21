@@ -58,7 +58,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^5.16.0",
     "npm-watch": "^0.13.0",
-    "onchange": "^5.2.0",
+    "onchange": "^7.1.0",
     "sass": "^1.77.2",
     "sass-loader": "^8.0.0",
     "vue-template-compiler": "^2.6.10"
