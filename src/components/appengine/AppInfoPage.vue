@@ -127,7 +127,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 
 /* ----- Upper Section (Logo + Update) ----- */
 .logo {

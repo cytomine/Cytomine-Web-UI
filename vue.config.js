@@ -1,5 +1,7 @@
 module.exports = {
   devServer: {
-      public: '127.0.0.1'
+    client: {
+      webSocketURL: 'ws://127.0.0.1/dev-ws',
+    },
   }
 }
