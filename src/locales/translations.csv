@@ -195,7 +195,6 @@ close-admin-session,Close admin session,Fermer la session admin,Cerrar sesión d
 color,Color,Couleur,Color,Kleur
 colors,Colors,Couleurs,Colores,Kleuren
 command-line-flag,Command line flag,Argument de la ligne de commande,Flag de línea de comando,Opdrachtregelargument
-comment-will-be-sent-by-email,The comment will be sent by email to the selected users,Le commentaire sera envoyé par e-mail aux utilisateurs sélectionnés,El comentario se enviará por correo electrónico a los usuarios seleccionados.,De opmerking wordt per e-mail naar de geselecteerde users verzonden
 comment,Comment,Commentaire,Comentario,Opmerking
 comments,Comments,Commentaires,Comentarios,Opmerkingen
 communication-error,Communication error,Erreur de communication,Error de comunicación,Communicatie fout

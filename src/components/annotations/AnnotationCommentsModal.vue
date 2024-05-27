@@ -39,9 +39,6 @@
 
   <div v-show="addingComment">
     <h2>{{$t('add-new-comment')}}</h2>
-    <b-message type="is-info" has-icon size="is-small">
-      {{$t('comment-will-be-sent-by-email')}}
-    </b-message>
     <b-field>
       <b-radio v-model="sendToAllMembers" :native-value="true" :disabled="members.length == 0">
         {{$t('send-to-all-project-members')}}
