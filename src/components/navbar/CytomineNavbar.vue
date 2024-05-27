@@ -57,9 +57,8 @@
       <cytomine-searcher />
       <!-- TODO IAM -->
       <navbar-dropdown
-        :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
+        :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
         :title="currentUser.fullName"
-        :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
       >
@@ -75,12 +74,6 @@
           </a>
           <a v-else class="navbar-item" @click="closeAdminSession()">
             <span class="icon"><i class="far fa-star fa-xs"></i></span> {{$t('close-admin-session')}}
-          </a>
-        </template>
-        <template v-if="currentUser.isSwitched">
-          <a class="navbar-item has-text-dark-primary" @click="stopSwitchUser()">
-            <span class="icon"><i class="fas fa-exchange-alt fa-xs"></i></span>
-            {{$t('switch-back-to-user', {username: currentUser.realUser})}}
           </a>
         </template>
         <a class="navbar-item" @click="logout()">
@@ -183,19 +176,6 @@ export default {
       }
       catch(error) {
         console.log(error);
-      }
-    },
-
-    // TODO IAM
-    async stopSwitchUser() {
-      try {
-        await Cytomine.instance.stopSwitchUser();
-        await this.$store.dispatch('currentUser/fetchUser');
-        this.$router.push('/');
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-switch-back-as-real-user')});
       }
     },
 

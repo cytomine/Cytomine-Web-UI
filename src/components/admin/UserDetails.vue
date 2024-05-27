@@ -72,14 +72,6 @@
         </td>
         <td></td>
       </tr>
-      <tr v-if="currentUser.id !== user.id">
-        <td>{{$t('actions')}}</td>
-        <td colspan="2">
-          <button class="button is-link is-small" @click="switchUser()">
-            {{$t('connect-as-user', {username: user.username})}}
-          </button>
-        </td>
-      </tr>
     </tbody>
   </table>
 </div>
@@ -125,18 +117,6 @@ export default {
     async fetchNbAnnotations() {
       this.nbAnnotations = await this.user.fetchNbAnnotations();
     },
-    async switchUser() {
-      //TODO IAM
-      try {
-        await Cytomine.instance.switchUser(this.user.username);
-        await this.$store.dispatch('currentUser/fetchUser');
-        this.$router.push('/');
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-connect-as-user')});
-      }
-    }
   },
   async created() {
     await Promise.all([
