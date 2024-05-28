@@ -105,7 +105,6 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 import constants from '@/utils/constants.js';
-import {Cytomine} from 'cytomine-client';
 import shortcuts from '@/utils/shortcuts.js';
 
 export default {
@@ -179,13 +178,11 @@ export default {
       }
     },
 
-    // TODO IAM
     async logout() {
       try {
-        await Cytomine.instance.logout();
         this.$store.dispatch('logout');
         this.changeLanguage();
-        this.$router.push('/');
+        await this.$keycloak.logout();
       }
       catch(error) {
         console.log(error);
