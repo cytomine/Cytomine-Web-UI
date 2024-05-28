@@ -58,6 +58,7 @@ import {Cytomine} from 'cytomine-client';
 
 import constants from '@/utils/constants.js';
 import ifvisible from 'ifvisible';
+import {updateToken} from "@/utils/token-utils";
 ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
@@ -75,33 +76,35 @@ export default {
     currentUser: get('currentUser/user'),
     project: get('currentProject/project')
   },
+  watch: {
+    $route() {
+      // Invoke refresh token if needed when route changes.
+      updateToken();
+    },
+  },
   methods: {
-
+    wakeup: async function () {
+      if (!ifvisible.now()) {
+        return;
+      }
+      await updateToken();
+      await this.ping();
+    },
     async ping() {
       if(!ifvisible.now()){
         return; // window not visible or inactive user => stop pinging
       }
       try {
-        // TODO IAM
-        let {authenticated} = await Cytomine.instance.ping(this.project ? this.project.id : null);
-
-        if(this.currentUser && !authenticated) {
-          await this.$store.dispatch('logout');
-        }
-        if(!this.currentUser && authenticated) {
+        // TODO IAM - still needed ?
+        await Cytomine.instance.ping(this.project ? this.project.id : null);
+        if(!this.currentUser) {
           await this.fetchUser();
         }
         this.communicationError = false;
       }
       catch(error) {
         console.log(error);
-        if (error.toString().indexOf('401')!==-1) {
-          this.communicationError = false;
-          Cytomine.instance.logout();
-        }
-        else {
-          this.communicationError = true;
-        }
+        this.communicationError = error.toString().indexOf('401') === -1;
       }
 
       clearTimeout(this.timeout);
@@ -129,10 +132,17 @@ export default {
     Object.freeze(constants);
 
     new Cytomine(window.location.origin);
+    Cytomine.instance.api.interceptors.request.use(async config => {
+      const token = await updateToken();
+      if(token !== null) {
+        config.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    });
 
     await this.ping();
     this.loading = false;
-    ifvisible.on('wakeup', this.ping);
+    ifvisible.on('wakeup', this.wakeup);
   }
 };
 </script>
