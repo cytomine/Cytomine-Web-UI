@@ -125,12 +125,15 @@ export default {
   created() {
     switch(this.action.className) {
       case 'be.cytomine.command.AddCommand':
+      case 'be.cytomine.domain.command.AddCommand':
         this.addCommandHandler();
         break;
       case 'be.cytomine.command.EditCommand':
+      case 'be.cytomine.domain.command.EditCommand':
         this.editCommandHandler();
         break;
       case 'be.cytomine.command.DeleteCommand':
+      case 'be.cytomine.domain.command.DeleteCommand':
         // object no longer available => cannot display preview or provide link
         break;
       default:
