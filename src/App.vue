@@ -74,6 +74,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     project: get('currentProject/project')
   },
   watch: {
@@ -112,8 +113,8 @@ export default {
     },
     async fetchUser() {
       await this.$store.dispatch('currentUser/fetchUser');
-      if(this.currentUser) {
-        this.changeLanguage(this.currentUser.language);
+      if(this.currentAccount) {
+        this.changeLanguage(this.currentAccount.language);
       }
     }
   },

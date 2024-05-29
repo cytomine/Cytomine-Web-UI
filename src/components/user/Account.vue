@@ -21,12 +21,12 @@
     </p>
     <div class="panel-block">
       <form @submit.prevent="editDetails()" data-vv-scope="profile">
-        <b-field :label="$t('id')" horizontal v-if="currentUser.isDeveloper">
+        <b-field :label="$t('id')" horizontal v-if="currentAccount.isDeveloper">
           {{currentUser.id}}
         </b-field>
 
         <b-field :label="$t('username')" horizontal>
-          <b-input :value="currentUser.username" disabled />
+          <b-input :value="updatedAccount.username" disabled />
         </b-field>
 
         <b-field :label="$t('role')" horizontal>
@@ -39,7 +39,7 @@
           :type="{'is-danger': errors.has('profile.lastname')}"
           :message="errors.first('profile.lastname')"
         >
-          <b-input v-model="updatedUser.lastname" name="lastname" v-validate="'required'" />
+          <b-input v-model="updatedAccount.lastName" name="lastname" v-validate="'required'" />
         </b-field>
 
         <b-field
@@ -48,7 +48,7 @@
           :type="{'is-danger': errors.has('profile.firstname')}"
           :message="errors.first('profile.firstname')"
         >
-          <b-input v-model="updatedUser.firstname" name="firstname" v-validate="'required'" />
+          <b-input v-model="updatedAccount.firstName" name="firstname" v-validate="'required'" />
         </b-field>
 
         <b-field
@@ -57,11 +57,11 @@
           :type="{'is-danger': errors.has('profile.email')}"
           :message="errors.first('profile.email')"
         >
-          <b-input v-model="updatedUser.email" name="email" v-validate="'required|email'" />
+          <b-input v-model="updatedAccount.email" name="email" v-validate="'required|email'" />
         </b-field>
 
         <b-field :label="$t('language')" horizontal>
-          <b-select v-model="updatedUser.language">
+          <b-select v-model="updatedAccount.language">
             <option v-for="{value, name} in languages" :key="value" :value="value">
               {{name}}
             </option>
@@ -148,7 +148,7 @@
     </div>
   </div>
 
-  <div class="panel"> <!-- QUESTION: remove ? or only show for technical users ? -->
+  <div class="panel">
     <p class="panel-heading">
       <i class="fas fa-exchange-alt" aria-hidden="true"></i>
       {{ $t('api-keys') }}
@@ -196,7 +196,7 @@ import {User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
-// TODO
+// TODO IAM
 export default {
   // eslint-disable-next-line
   name: 'Account',
@@ -204,24 +204,25 @@ export default {
   mixins: [changeLanguageMixin],
   data() {
     return {
-      updatedUser: this.$store.state.currentUser.user.clone(),
+      updatedAccount: this.$store.state.currentUser.account.clone(),
       currentPassword: '',
       isCheckingPassword: false,
       correctPassword: false,
       newPassword: '',
       confirmPassword: '',
       languages: [
-        {value: 'EN', name:'English'},
-        {value: 'FR', name:'Français'},
-        {value: 'ES', name:'Español'},
-        {value: 'NL', name:'Nederlands'}
+        {value: 'en', name:'English'},
+        {value: 'fr', name:'Français'},
+        {value: 'es', name:'Español'},
+        {value: 'nl', name:'Nederlands'}
       ],
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     role() {
-      let key = this.currentUser.guestByNow ? 'ROLE_GUEST' : this.currentUser.adminByNow ? 'ROLE_ADMIN' : 'ROLE_USER';
+      let key = this.$keycloak.hasResourceRole('GUEST') ? 'ROLE_GUEST' : this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER';
       return rolesMapping[key];
     },
     newPasswordDisabled() {
@@ -254,8 +255,8 @@ export default {
       }
 
       try {
-        await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
-        this.changeLanguage(this.currentUser.language);
+        await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
+        this.changeLanguage(this.currentAccount.language);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
       catch(error) {
