@@ -131,14 +131,18 @@ export default {
     }
     Object.freeze(constants);
 
-    new Cytomine(window.location.origin);
-    Cytomine.instance.api.interceptors.request.use(async config => {
+    const authorizationHeaderInterceptor = async config => {
       const token = await updateToken();
       if(token !== null) {
         config.headers.common['Authorization'] = `Bearer ${token}`;
       }
       return config;
-    });
+    };
+    new Cytomine(
+      window.location.origin,
+      '/api/', `/iam/realms/${this.$keycloak.realm}`,
+      authorizationHeaderInterceptor
+    );
 
     await this.ping();
     this.loading = false;
