@@ -17,7 +17,7 @@
   <b-loading :active="loading" :is-full-page="false" class="small" />
   <table v-if="!loading" class="table">
     <tbody>
-      <tr v-if="currentUser.isDeveloper">
+      <tr v-if="currentAccount.isDeveloper">
         <td>{{$t('id')}}</td>
         <td colspan="2">{{user.id}}</td>
       </tr>
@@ -96,7 +96,7 @@ export default {
     };
   },
   computed: {
-    currentUser: get('currentUser/user')
+    currentAccount: get('currentUser/account')
   },
   methods: {
     async fetchProjects() {

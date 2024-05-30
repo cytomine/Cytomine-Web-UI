@@ -19,7 +19,7 @@
   </h1>
   <table class="table">
     <tbody>
-      <tr v-if="currentUser.isDeveloper">
+      <tr v-if="currentAccount.isDeveloper">
         <td><strong>{{$t('id')}}</strong></td>
         <td>{{image.id}}</td>
       </tr>
@@ -155,7 +155,7 @@ export default {
     };
   },
   computed: {
-    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     shortTermToken: get('currentUser/shortTermToken'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];

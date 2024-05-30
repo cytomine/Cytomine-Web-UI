@@ -94,6 +94,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -222,7 +223,7 @@ export default {
         return `${this.$t('review-layer')} (${this.nbReviewedAnnotations})`;
       }
 
-      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+      let id = (this.currentAccount.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
       return `${layer.fullName}${id} (${indexLayer.countAnnotation || 0})`;

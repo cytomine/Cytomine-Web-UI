@@ -34,7 +34,7 @@
             </ontology-tree>
           </td>
         </tr>
-        <tr v-if="currentUser.isDeveloper">
+        <tr v-if="currentAccount.isDeveloper">
           <td><strong>{{$t('id')}}</strong></td>
           <td>{{ontology.id}}</td>
         </tr>
@@ -123,6 +123,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     canEdit() {
       return !this.currentUser.guestByNow && (this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user ||
         (this.hasAccessToAllProjects && (this.allProjectsAreCollaborative || this.manageAllProjects)));

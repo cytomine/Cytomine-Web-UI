@@ -55,7 +55,7 @@
           <cytomine-multiselect v-model="selectedStorage" :options="storages" label="extendedName" track-by="id" :allow-empty="false">
             <template #option="{option}">
               {{option.extendedName}}
-              <template v-if="currentUser.isDeveloper">
+              <template v-if="currentAccount.isDeveloper">
                  ({{$t('id')}}: {{option.id}})
               </template>
             </template>
@@ -208,6 +208,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     shortTermToken: get('currentUser/shortTermToken'),
     finishedStatus() {
       return [
@@ -272,7 +273,7 @@ export default {
         this.storages = (await StorageCollection.fetchAll()).array;
         this.storages.forEach(v => {
           v.extendedName = v.name;
-          if(this.currentUser.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
+          if(this.currentAccount.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
         });
 
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);

@@ -227,7 +227,7 @@
         </template>
       </template>
 
-      <template v-if="currentUser.isDeveloper">
+      <template v-if="currentAccount.isDeveloper">
         <tr>
           <td><strong>{{$t('id')}}</strong></td>
           <td>{{annotation.id}}</td>
@@ -338,7 +338,7 @@ export default {
   computed: {
     configUI: get('currentProject/configUI'),
     ontology: get('currentProject/ontology'),
-    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     shortTermToken: get('currentUser/shortTermToken'),
     creator() {
       return this.users.find(user => user.id === this.annotation.user) || {};
