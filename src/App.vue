@@ -114,7 +114,7 @@ export default {
     async fetchUser() {
       await this.$store.dispatch('currentUser/fetchUser');
       if(this.currentAccount) {
-        this.changeLanguage(this.currentAccount.language);
+        this.changeLanguage(this.currentAccount.locale);
       }
     }
   },

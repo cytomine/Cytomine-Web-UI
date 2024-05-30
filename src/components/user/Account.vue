@@ -61,7 +61,7 @@
         </b-field>
 
         <b-field :label="$t('language')" horizontal>
-          <b-select v-model="updatedAccount.language">
+          <b-select v-model="updatedAccount.locale">
             <option v-for="{value, name} in languages" :key="value" :value="value">
               {{name}}
             </option>
@@ -256,7 +256,7 @@ export default {
 
       try {
         await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
-        this.changeLanguage(this.currentAccount.language);
+        this.changeLanguage(this.currentAccount.locale);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
       catch(error) {
