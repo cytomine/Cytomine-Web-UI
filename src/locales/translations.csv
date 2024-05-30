@@ -103,6 +103,7 @@ button-cancel-review,Cancel my review,Annuler la validation,Cancelar mi reseña,
 button-cancel,Cancel,Annuler,Cancelar,Annuleren
 button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie
 button-change-ontology,Change ontology,Changer l'ontologie,Cambiar ontología,Knop om de ontologie te veranderen
+button-change-password,Change password,Changer le mot de passe
 button-clear,Clear,Réinitialiser,Reiniciar,Resetten
 button-close,Close,Fermer,Cerrar,Sluiten
 button-comments,Comments,Commentaires,Comentarios,Opmerkingen
@@ -461,6 +462,7 @@ last-month,Last month,Dernier mois,Último mes,Vorige maand
 last-opened-image,Last opened image,Dernière image consultée,Última imagen abierta,Laatst bekeken afbeelding
 last-project-connection,Last project connection,Dernière connexion au projet,Última conexión al proyecto,Laatste verbinding met het project
 last-release,Last release,Dernière version,Ultimo lanzamiento,Laatste versie
+last-updated-on,Last updated on,Dernière mise à jour le
 last-week,Last week,Dernière semaine,Última pasada,Vorige week
 last-year,Last year,Dernière année,Último año,Afgelopen jaar
 lastname,Last name,Nom,Apellido,Naam
@@ -544,6 +546,7 @@ no-log-to-display,No log to display,Aucun log disponible,No hay registro para mo
 no-member-fitting-criteria,No member fitting criteria,Aucun membre ne remplissant les critères de recherche,No hay criterios de ajuste para miembros,Geen enkel lid voldoet aan de zoekcriteria
 no-ontology,No ontology,Pas d'ontologie,Sin ontología,Geen ontologie
 no-outline,No outline,Pas de contour,Sin contorno,Geen outline
+no-password,No password, Pas de mot de passe
 no-preview-available,No preview available,Pas d'aperçu disponible,No hay vista previa disponible,Geen preview beschikbaar
 no-profile,No profile,Pas de profil,,Geen profiel
 no-project-connection,No project connection,Aucune connexion au projet,Ninguna conexión del proyecto,Geen projectverbinding

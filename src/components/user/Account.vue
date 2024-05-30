@@ -14,6 +14,8 @@
 
 <template>
 <div class="content-wrapper">
+  <b-loading :is-full-page="false" :active="loading" />
+  <template v-if="!loading">
   <div class="panel">
     <p class="panel-heading">
       <i class="fas fa-user" aria-hidden="true"></i>
@@ -90,61 +92,27 @@
       {{ $t('password') }}
     </p>
     <div class="panel-block">
-      <form @submit.prevent="savePassword()" data-vv-scope="password">
-        <input id="password" class="hidden" type="password"> <!-- HACK: fake field to prevent autofill -->
-
-        <b-message v-if="currentUser.passwordExpired" type="is-danger" has-icon icon-size="is-small">
-          {{$t('password-expired-info-message')}}
+        <b-message v-if="credentialsError || this.passwordCredentials === null" type="is-danger" has-icon icon-size="is-small">
+          {{$t('failed-to-retrieve-credentials')}}
         </b-message>
-
-        <b-field
-          v-else
-          :label="$t('password-current')"
-          horizontal
-          :type="typeCurrentPassword"
-          :message="messageCurrentPassword"
-        >
-          <b-input type="password" v-model="currentPassword" :loading="isCheckingPassword" />
-        </b-field>
-
-        <b-field
-          :label="$t('password-new')"
-          horizontal
-          :type="{'is-danger': errors.has('password.newPassword')}"
-          :message="errors.first('password.newPassword')"
-        >
-          <b-input
-            type="password"
-            v-model="newPassword"
-            name="newPassword"
-            v-validate="'required|min:8'"
-            :disabled="newPasswordDisabled"
-          />
-        </b-field>
-
-        <b-field
-          :label="$t('password-confirm')"
-          horizontal
-          :type="{'is-danger': errors.has('password.confirmPassword')}"
-          :message="errors.first('password.confirmPassword')"
-        >
-          <b-input
-            type="password"
-            v-model="confirmPassword"
-            name="confirmPassword"
-            v-validate="{required: true, is: newPassword}"
-            :disabled="newPasswordDisabled"
-          />
-        </b-field>
-
-        <b-field grouped position="is-right">
-          <div class="control">
-            <button class="button is-link" :disabled="errors.any('password') || newPasswordDisabled">
-              {{$t('button-save')}}
-            </button>
-          </div>
-        </b-field>
-      </form>
+        <template v-else>
+          <b-field
+            :label="$t('password-current')"
+            horizontal
+          >
+            <template v-if="currentPasswordInfo">
+              {{ $t('last-updated-on') }} {{Number(currentPasswordInfo.createdDate) | moment('ll LT')}}.
+            </template>
+            <em v-else>{{ $t('no-password') }}</em>
+          </b-field>
+          <b-field grouped position="is-right" v-if="passwordCredentials.updateAction">
+            <div class="control">
+              <button class="button is-link" @click="updatePassword()">
+                {{$t('button-change-password')}}
+              </button>
+            </div>
+          </b-field>
+        </template>
     </div>
   </div>
 
@@ -185,14 +153,14 @@
       </b-field>
     </div>
   </div>
+  </template>
 </div>
 </template>
 
 <script>
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
-import _ from 'lodash';
-import {User} from 'cytomine-client';
+import {MyAccount} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
@@ -205,11 +173,9 @@ export default {
   data() {
     return {
       updatedAccount: this.$store.state.currentUser.account.clone(),
-      currentPassword: '',
-      isCheckingPassword: false,
-      correctPassword: false,
-      newPassword: '',
-      confirmPassword: '',
+      credentials: null,
+      credentialsError: false,
+      loading: true,
       languages: [
         {value: 'en', name:'English'},
         {value: 'fr', name:'Français'},
@@ -225,27 +191,20 @@ export default {
       let key = this.$keycloak.hasResourceRole('GUEST') ? 'ROLE_GUEST' : this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER';
       return rolesMapping[key];
     },
-    newPasswordDisabled() {
-      return !this.correctPassword && !this.currentUser.passwordExpired;
+
+    passwordCredentials() {
+      return this.credentials.find(c => c.type === 'password');
     },
-    messageCurrentPassword() {
-      if(!this.currentPassword || this.isCheckingPassword) {
-        return;
+    currentPasswordInfo() {
+      if (this.passwordCredentials
+        && this.passwordCredentials.userCredentialMetadatas
+        && this.passwordCredentials.userCredentialMetadatas.length === 1) {
+          return this.passwordCredentials.userCredentialMetadatas[0].credential;
       }
-      return this.correctPassword ? '' : this.$t('invalid-password');
-    },
-    typeCurrentPassword() {
-      if(!this.currentPassword || this.isCheckingPassword) {
-        return;
-      }
-      return this.correctPassword ? 'is-success' : 'is-danger';
+      return null;
     }
   },
   watch: {
-    currentPassword() {
-      this.isCheckingPassword = true;
-      this.checkPassword();
-    }
   },
   methods: {
     async editDetails() {
@@ -265,37 +224,10 @@ export default {
       }
     },
 
-    async savePassword() {
-      let result = await this.$validator.validateAll('password');
-      if(!result || (!this.correctPassword && !this.currentUser.passwordExpired)) {
-        return;
-      }
-
-      let userNewPassword = this.currentUser.clone();
-      userNewPassword.password = this.newPassword;
-      try {
-        await this.$store.dispatch('currentUser/updateUser', userNewPassword);
-        this.$notify({type: 'success', text: this.$t('notif-success-password-saved')});
-        this.currentPassword = '';
-        this.newPassword = '';
-        this.confirmPassword = '';
-        this.$validator.reset({scope: 'password'});
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-password-not-saved')});
-      }
+    updatePassword() {
+      this.$keycloak.login({action: this.passwordCredentials.updateAction});
     },
 
-    checkPassword: _.debounce(async function() {
-      this.correctPassword = await User.checkCurrentPassword(this.currentPassword);
-      if(!this.correctPassword) {
-        this.newPassword = '';
-        this.confirmPassword = '';
-        this.$validator.reset({scope: 'password'});
-      }
-      this.isCheckingPassword = false;
-    }, 500),
 
     copy(value) {
       copyToClipboard(value);
@@ -311,6 +243,14 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
       }
     }
+  },
+  async created() {
+    try {
+      this.credentials = await MyAccount.fetchCredentials();
+    } catch (error) {
+      this.credentialsError = true;
+    }
+    this.loading = false;
   }
 };
 </script>
