@@ -180,7 +180,8 @@ export default {
         {value: 'en', name:'English'},
         {value: 'fr', name:'Français'},
         {value: 'es', name:'Español'},
-        {value: 'nl', name:'Nederlands'}
+        {value: 'nl', name:'Nederlands'},
+        {value: 'no', name:'Norsk'},
       ],
     };
   },
