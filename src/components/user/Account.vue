@@ -122,35 +122,40 @@
       {{ $t('api-keys') }}
     </p>
     <div class="panel-block">
-      <b-field :label="$t('public-key')" horizontal>
-        <b-field>
-          <b-input :value="currentUser.publicKey" readonly expanded />
-          <p class="control">
-            <button class="button" @click="copy(currentUser.publicKey)">
-              <span class="icon"><i class="far fa-clipboard"></i></span>
-              <span>{{$t('button-copy')}}</span>
-            </button>
-          </p>
+      <b-message v-if="apiKeysError" type="is-danger" has-icon icon-size="is-small">
+        {{$t('failed-to-retrieve-api-keys')}}
+      </b-message>
+      <template v-else>
+        <b-field :label="$t('public-key')" horizontal>
+          <b-field>
+            <b-input :value="apiKeys.primaryKey" readonly expanded />
+            <p class="control">
+              <button class="button" @click="copy(apiKeys.primaryKey)">
+                <span class="icon"><i class="far fa-clipboard"></i></span>
+                <span>{{$t('button-copy')}}</span>
+              </button>
+            </p>
+          </b-field>
         </b-field>
-      </b-field>
 
-      <b-field :label="$t('private-key')" horizontal>
-        <b-field>
-          <b-input :value="currentUser.privateKey" readonly expanded />
-          <p class="control">
-            <button class="button" @click="copy(currentUser.privateKey)">
-              <span class="icon"><i class="far fa-clipboard"></i></span>
-              <span>{{$t('button-copy')}}</span>
-            </button>
-          </p>
+        <b-field :label="$t('private-key')" horizontal>
+          <b-field>
+            <b-input :value="apiKeys.secondaryKey" readonly expanded />
+            <p class="control">
+              <button class="button" @click="copy(apiKeys.secondaryKey)">
+                <span class="icon"><i class="far fa-clipboard"></i></span>
+                <span>{{$t('button-copy')}}</span>
+              </button>
+            </p>
+          </b-field>
         </b-field>
-      </b-field>
 
-      <b-field grouped position="is-right">
-        <div class="control">
-          <button class="button is-link" @click="regenerateKeys()">{{$t('regenerate-api-keys')}}</button>
-        </div>
-      </b-field>
+        <b-field grouped position="is-right">
+          <div class="control">
+            <button class="button is-link" @click="regenerateKeys()">{{$t('regenerate-api-keys')}}</button>
+          </div>
+        </b-field>
+      </template>
     </div>
   </div>
   </template>
@@ -160,11 +165,10 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
-import {MyAccount} from 'cytomine-client';
+import {MyAccount, User} from 'cytomine-client';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
-// TODO IAM
 export default {
   // eslint-disable-next-line
   name: 'Account',
@@ -175,6 +179,8 @@ export default {
       updatedAccount: this.$store.state.currentUser.account.clone(),
       credentials: null,
       credentialsError: false,
+      apiKeys: null,
+      apiKeysError: null,
       loading: true,
       languages: [
         {value: 'en', name:'English'},
@@ -237,7 +243,7 @@ export default {
 
     async regenerateKeys() {
       try {
-        await this.$store.dispatch('currentUser/regenerateKeys');
+        this.apiKeys = await User.regenerateKeys();
         this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
       }
       catch(err) {
@@ -250,6 +256,11 @@ export default {
       this.credentials = await MyAccount.fetchCredentials();
     } catch (error) {
       this.credentialsError = true;
+    }
+    try {
+      this.apiKeys = await User.fetchCurrentUserKeys();
+    } catch (error) {
+      this.apiKeysError = true;
     }
     this.loading = false;
   }

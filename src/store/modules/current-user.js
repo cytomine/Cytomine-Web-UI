@@ -81,12 +81,6 @@ export default {
       await dispatch('fetchUser');
     },
 
-    async regenerateKeys({state, commit}) {
-      let user = state.user.clone();
-      await user.regenerateKeys();
-      commit('setUser', user);
-    },
-
     async openAdminSession({commit}) {
       await Cytomine.instance.openAdminSession();
       commit('setAdminByNow', true);
