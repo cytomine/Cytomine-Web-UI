@@ -161,6 +161,9 @@
 </template>
 
 <script>
+import {get} from '@/utils/store-helpers';
+
+import {Cytomine, ProjectCollection, StorageCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
 
@@ -202,6 +205,7 @@ export default {
 
       signature: '',
       signatureDate: '',
+      primaryKey: null,
 
       revision: 0
     };
@@ -380,7 +384,7 @@ export default {
         formData,
         {
           headers: {
-            'authorization': `CYTOMINE ${this.currentUser.publicKey}:${this.signature}`, // TODO IAM
+            'authorization': `CYTOMINE ${this.primaryKey}:${this.signature}`, // TODO IAM
             'dateFull': this.signatureDate, // will replace actual date value, so that signature is valid
             'content-type-full': 'null' // will erase actual content-type value, so that signature is valid
           },
@@ -437,12 +441,28 @@ export default {
         }
       }
     },
+
+    //TODO: IAM
+    async fetchPrimaryKey() {
+      try {
+        const keys = await User.fetchCurrentUserKeys();
+        this.primaryKey = keys.primaryKey;
+      }
+      catch (error) {
+        this.newUploadError = true;
+      }
+    },
+
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
   },
   activated() {
     this.fetchStorages();
     this.fetchProjects();
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
+    this.fetchPrimaryKey();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   deactivated() {
