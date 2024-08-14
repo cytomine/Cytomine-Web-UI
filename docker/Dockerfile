@@ -26,7 +26,7 @@ WORKDIR /app
 
 ADD . /app
 WORKDIR /app
-RUN npm install
+RUN npm rebuild node-sass
 RUN npm run build
 
 #######################################################################################

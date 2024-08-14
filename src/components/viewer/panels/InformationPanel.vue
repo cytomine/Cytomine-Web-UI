@@ -27,6 +27,10 @@
         <td><strong>{{$t('name')}}</strong></td>
         <td><image-name :image="image" showBothNames /></td>
       </tr>
+      <tr v-if="hasGroup">
+        <td><strong>{{$t('image-group')}}</strong></td>
+        <td>{{imageGroupLink.groupName}}</td>
+      </tr>
       <tr>
         <td><strong>{{$t('width')}}</strong></td>
         <td>{{image.width}} {{$t("pixels")}}</td>
@@ -105,6 +109,18 @@
           </div>
         </td>
       </tr>
+      <tr v-if="hasGroup">
+        <td colspan="2" class="buttons-wrapper">
+          <div class="buttons navigation has-addons">
+            <button class="button is-small" @click="previousImageInGroup()">
+              <i class="fas fa-angle-left fa-lg"></i> {{$t('button-previous-image-in-group')}}
+            </button>
+            <button class="button is-small" @click="nextImageInGroup()">
+              {{$t('button-next-image-in-group')}} <i class="fas fa-angle-right fa-lg"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
     </tbody>
   </table>
 
@@ -152,6 +168,12 @@ export default {
     },
     image() {
       return this.viewerWrapper.images[this.index].imageInstance;
+    },
+    hasGroup() {
+      return this.viewerWrapper.images[this.index].imageGroupLink != null;
+    },
+    imageGroupLink() {
+      return this.viewerWrapper.images[this.index].imageGroupLink;
     },
     canEdit() {
       return this.$store.getters['currentProject/canEditImage'](this.image);
@@ -213,6 +235,46 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
     },
+    async previousImageInGroup() {
+      if (!this.hasGroup) {
+        return;
+      }
+
+      try {
+        let prev = await this.imageGroupLink.fetchPrevious();
+        if(!prev.id) {
+          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+        }
+        else {
+          let slice = await prev.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+      }
+    },
+    async nextImageInGroup() {
+      if (!this.hasGroup) {
+        return;
+      }
+
+      try {
+        let next = await this.imageGroupLink.fetchNext();
+        if(!next.id) {
+          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+        }
+        else {
+          let slice = await next.fetchReferenceSlice();
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+        }
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+      }
+    },
 
     shortkeyHandler(key) {
       if(!this.isActiveImage) { // shortkey should only be applied to active map
@@ -224,6 +286,12 @@ export default {
       }
       else if(key === 'nav-previous-image') {
         this.previousImage();
+      }
+      else if (key === 'nav-next-image-in-group') {
+        this.nextImageInGroup();
+      }
+      else if (key === 'nav-previous-image-in-group') {
+        this.previousImageInGroup();
       }
     }
   },
@@ -252,6 +320,10 @@ td:first-child {
 }
 
 .buttons-wrapper {
+  padding: 0;
+}
+
+.actions {
   padding-left: 0;
   padding-right: 0;
 }

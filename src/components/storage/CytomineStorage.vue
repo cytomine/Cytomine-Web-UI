@@ -497,6 +497,7 @@ export default {
     uploadedFileCollection() {
       let collection = new UploadedFileCollection({
         onlyRootsWithDetails: true,
+        withTreeDetails: false,
         originalFilename: {ilike: encodeURIComponent(this.searchString)}
       });
 

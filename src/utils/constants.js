@@ -35,7 +35,7 @@ export default {
   SAVE_POSITION_IN_IMAGE_INTERVAL: 5000, // position also stored each time the user moves in the image
   BROADCASTING_USERS_REFRESH_INTERVAL: 10000,
   TRACKING_REFRESH_INTERVAL: 500,
-  ANNOTATION_STROKE_COLOR:  [0, 0, 0, 1],
+  ANNOTATION_STROKE_COLOR: [0, 0, 0, 1],
   ANNOTATION_STROKE_SELECT_COLOR: [0, 153, 255, 1],
   MAX_IMAGES_FOR_FILTER: 50000,
   // ---
@@ -49,5 +49,9 @@ export default {
   ANNOTATIONS_MAX_ITEMS_PER_CATEGORY: 10,
   // To keep the WebSockets alive by sending the broadcaster viewer position
   WS_POSITION_KEEP_ALIVE_INTERVAL: 10000,
-  
+  // ---
+  CYTOMINE_FLAVOR: null,
+  CYTOMINE_VERSION: null,
+  COMPONENTS: ['CORE', 'WEB_UI', 'NGINX', 'POSTGRES', 'MONGODB', 'BACKUP', 'PIMS', 'PIMS_CACHE',
+    'BIOFORMAT', 'HMS', 'SOFTWARE_ROUTER', 'RABBITMQ', 'SLURM', 'RETRIEVAL', 'IRIS']
 };

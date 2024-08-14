@@ -14,8 +14,13 @@
 
 <template>
 <div class="image-details-wrapper">
-  <table class="table">
-    <tbody>
+  <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
+    <h2> {{ $t('error') }} </h2>
+    <p> {{ $t('unexpected-error-info-message') }} </p>
+  </b-message>
+  <table v-else class="table">
+    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <tbody v-if="!loading">
       <tr v-if="isPropDisplayed('overview')">
         <td class="prop-label">{{$t('overview')}}</td>
         <td class="prop-content" colspan="3">
@@ -216,6 +221,15 @@
             <button v-if="isPropDisplayed('metadata') && !isBlindModeAndContributor" class="button" @click="isMetadataModalActive = true">
               {{$t('button-metadata')}}
             </button>
+            <template v-if="canAddToImageGroup">
+              <button class="button" v-if="!isInImageGroup" @click="isAddToImageGroupModalActive = true">
+                {{$t('button-add-to-image-group')}}
+              </button>
+              <button class="button" v-else @click="confirmImageGroupLinkDeletion()">
+                {{$t('button-remove-from-image-group')}}
+              </button>
+            </template>
+
             <template v-if="canEdit">
 
               <router-link
@@ -289,6 +303,12 @@
     :properties="onlyMetadataProperties"
     :error="loadPropertiesError"
   />
+
+  <simple-add-to-image-group-modal
+    :active.sync="isAddToImageGroupModalActive"
+    :image="image"
+    @addToImageGroup="(event) => imageGroupLinks.push(event)"
+  />
 </div>
 
 </template>
@@ -305,11 +325,12 @@ import CalibrationModal from './CalibrationModal';
 import ImageMetadataModal from './ImageMetadataModal';
 import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
+import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
@@ -321,6 +342,7 @@ export default {
   name: 'image-details',
   components: {
     ImageThumbnail,
+    SimpleAddToImageGroupModal,
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
@@ -342,6 +364,10 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      isAddToImageGroupModalActive: false,
+      loading: true,
+      error: false,
+      imageGroupLinks: [],
       properties: [],
       loadPropertiesError: false
     };
@@ -367,6 +393,9 @@ export default {
     canEdit() {
       return this.editable && this.$store.getters['currentProject/canEditImage'](this.image);
     },
+    canAddToImageGroup() {
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+    },
     imageNameNotif() {
       return this.blindMode ? this.image.blindedName : this.image.instanceFilename;
     },
@@ -385,7 +414,7 @@ export default {
         }
         return true;
       });
-      return props
+      return props;
     },
     onlyMetadataProperties() {
       let props = this.internalUseFilteredProperties.filter(prop => {
@@ -408,7 +437,10 @@ export default {
      */
     isBlindModeAndContributor() {
       return this.blindMode && !this.canManageProject; 
-    }
+    },
+    isInImageGroup() {
+      return this.imageGroupLinks.length > 0;
+    },
   },
   methods: {
     appendShortTermToken,
@@ -480,6 +512,34 @@ export default {
         });
       }
     },
+    confirmImageGroupLinkDeletion() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-image-group-link'),
+        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif}),
+        type: 'is-danger',
+        confirmText: this.$t('button-confirm'),
+        cancelText: this.$t('button-cancel'),
+        onConfirm: this.deleteImageGroupLink
+      });
+    },
+    async deleteImageGroupLink() {
+      try {
+        // currently, we limit an image instance to be associated to 1 group.
+        await this.imageGroupLinks[0].delete();
+        this.$notify({
+          type: 'success',
+          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif})
+        });
+        this.imageGroupLinks.splice(0, 1);
+      }
+      catch(err) {
+        console.log(err);
+        this.$notify({
+          type: 'error',
+          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif})
+        });
+      }
+    },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
     },
@@ -488,6 +548,12 @@ export default {
     },
     addProp(prop) {
       this.properties.push(prop);
+    },
+    async fetchImageGroupLinks() {
+      this.imageGroupLinks = (await ImageGroupImageInstanceCollection.fetchAll({
+        filterKey: 'imageinstance',
+        filterValue: this.image.id
+      })).array;
     }
   },
   async created() {
@@ -498,8 +564,17 @@ export default {
       this.loadPropertiesError = true;
       console.log(error);
     }
+
+    try {
+      await this.fetchImageGroupLinks();
+    }
+    catch(error) {
+      console.log(error);
+      this.error = true;
+    }
+    this.loading = false;
   }
-}
+};
 </script>
 
 <style scoped>
