@@ -275,7 +275,7 @@ export default {
     },
 
     manipulableChannels() {
-      return this.apparentChannels.map(ac => {
+      return this.apparentChannels?.map(ac => {
         return {
           ...ac,
           histogram: this.histograms.find(h => h.apparentChannel === ac.index),
@@ -284,10 +284,10 @@ export default {
       });
     },
     visibleManipulableChannels() {
-      return this.manipulableChannels.filter(mc => mc.visible);
+      return this.manipulableChannels?.filter(mc => mc.visible);
     },
     nbVisibleManipulableChannels() {
-      return this.visibleManipulableChannels.length;
+      return this.visibleManipulableChannels?.length ?? 0;
     },
     regexp() {
       return getWildcardRegexp(this.searchString);
@@ -300,27 +300,25 @@ export default {
     },
 
     areBoundsAdjustedToImage() {
-      const count = this.visibleManipulableChannels.filter(mc =>
+      const count = this.visibleManipulableChannels?.filter(mc =>
         sameHistogramBounds(mc.bounds, mc.imageBounds)
-      ).length;
+      ).length ?? 0;
       return count === this.nbVisibleManipulableChannels;
     },
     areBoundsAdjustedToSlice() {
-      const count = this.visibleManipulableChannels.filter(mc => {
+      const count = this.visibleManipulableChannels?.filter(mc => {
         const histogram = mc.histogram;
         if (!histogram) {
           return false;
         }
-        return sameHistogramBounds(mc.bounds, {min: histogram.minimum, max: histogram.maximum});
-      }
-
-      ).length;
+        return sameHistogramBounds(mc.bounds, { min: histogram.minimum, max: histogram.maximum });
+      }).length ?? 0;
       return count === this.nbVisibleManipulableChannels;
     },
     areBoundsDefault() {
-      const count = this.visibleManipulableChannels.filter(mc =>
+      const count = this.visibleManipulableChannels?.filter(mc =>
         sameHistogramBounds(mc.bounds, this.defaultBounds) && !mc.inverted && mc.gamma === 1.0
-      ).length;
+      ).length ?? 0;
       return count === this.nbVisibleManipulableChannels;
     },
 
@@ -451,7 +449,6 @@ export default {
 
 
         this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: 256}));
-        console.log('histograms', this.histograms);
         // if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
         //   // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
         //   this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
@@ -508,32 +505,32 @@ export default {
   display: block;
 }
 
-th, >>> td {
+th, ::v-deep td {
   padding: 0.25em !important;
   vertical-align: middle !important;
 }
 
->>> .checkbox-column {
+::v-deep .checkbox-column {
   min-width: 2.2em;
   text-align: center !important;
 }
 
->>> .name-column {
-  width: 50%;
+::v-deep .name-column {
+  width: 60%;
 }
 
->>> .bounds-column {
-  width: 50%;
+::v-deep .bounds-column {
+  width: 40%;
   text-align: right;
 }
 
->>> .settings-column {
+::v-deep .settings-column {
   min-width: 2.2em;
   font-weight: normal;
 }
 
 /** Settings **/
-.settings-column >>> .dropdown-content {
+.settings-column ::v-deep .dropdown-content {
   padding: 0;
 }
 
@@ -548,11 +545,11 @@ th, >>> td {
 }
 
 /** Checkbox **/
->>> .checkbox .control-label {
+::v-deep .checkbox .control-label {
   padding: 0 !important;
 }
 
->>> .checkbox {
+::v-deep .checkbox {
   margin: 0 !important;
   position: relative;
   top: 0.25em;
@@ -564,7 +561,7 @@ th, >>> td {
   margin-right: calc(-0.175em - 1px);
 }
 
-.subscript, >>> .subscript {
+.subscript, ::v-deep .subscript {
   position: relative;
   top: 0.65em;
   left: 1px;

@@ -133,7 +133,7 @@
           </td>
         </template>
         <template v-if="isPropDisplayed('physicalSizeX')">
-          <td class="prop-label">{{$t("x-resolution")}}</td>
+          <td class="prop-label">{{$t("x-y-resolution")}}</td>
           <td class="prop-content-half" :colspan="isPropDisplayed('width') ? 1 : 3">
             <template v-if="image.physicalSizeX">{{image.physicalSizeX.toFixed(3)}} {{$t("um-per-pixel")}}</template>
             <template v-else>{{$t("unknown")}}</template>
@@ -149,10 +149,12 @@
           </td>
         </template>
         <template v-if="isPropDisplayed('physicalSizeY')">
-          <td class="prop-label">{{$t("y-resolution")}}</td>
+          <!-- We don't support diff X&Y yet in some components uncomment to bring back -->
+          <!-- <td class="prop-label">{{$t("y-resolution")}}</td> -->
+          <td class="prop-label"></td>
           <td class="prop-content-half" :colspan="isPropDisplayed('height') ? 1 : 3">
-            <template v-if="image.physicalSizeY">{{image.physicalSizeY.toFixed(3)}} {{$t("um-per-pixel")}}</template>
-            <template v-else>{{$t("unknown")}}</template>
+            <!-- <template v-if="image.physicalSizeY">{{image.physicalSizeY.toFixed(3)}} {{$t("um-per-pixel")}}</template>
+            <template v-else>{{$t("unknown")}}</template> -->
           </td>
         </template>
       </tr>

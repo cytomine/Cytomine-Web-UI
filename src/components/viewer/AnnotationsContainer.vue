@@ -11,6 +11,7 @@
       @updateProperties="updateProperties"
       @delete="handleDeletion"
     />
+
     <annotations-list
       class="annotations-table-wrapper"
       :index="index"
@@ -21,6 +22,14 @@
       @updateTermsOrTracks="updateTermsOrTracks"
       @updateProperties="updateProperties"
       @delete="handleDeletion"
+    />
+
+    <similar-annotation
+      v-if="showSimilarAnnotations"
+      :image="image"
+      :index="index"
+      @select="selectAnnotation"
+      @updateTermsOrTracks="updateTermsOrTracks"
     />
   </div>
 </template>
@@ -33,6 +42,7 @@ import WKT from 'ol/format/WKT';
 
 import AnnotationsList from './AnnotationsList';
 import AnnotationDetailsContainer from './AnnotationDetailsContainer';
+import SimilarAnnotation from '@/components/annotations/SimilarAnnotation';
 import {listAnnotationsInGroup, updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
 import {Annotation} from 'cytomine-client';
@@ -45,11 +55,14 @@ export default {
   data() {
     return {
       format: new WKT(),
+      showSimilarAnnotations: false,
+      similarData: null,
     };
   },
   components: {
     AnnotationsList,
     AnnotationDetailsContainer,
+    SimilarAnnotation,
   },
   computed: {
     configUI: get('currentProject/configUI'),
@@ -146,7 +159,7 @@ export default {
       this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
     },
 
-    centerView({annot, sameView=false}) {
+    centerView({annot, sameView = false}) {
       if (sameView) {
         this.$emit('centerView', annot);
       }
@@ -154,10 +167,19 @@ export default {
         this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('hide-similar-annotations', () => {
+      this.showSimilarAnnotations = false;
+    });
+    this.$eventBus.$on('show-similar-annotations', (data) => {
+      this.showSimilarAnnotations = true;
+      this.similarData = data;
+    });
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('hide-similar-annotations');
+    this.$eventBus.$off('show-similar-annotations');
   }
 };
 </script>
-
-<style scoped>
-
-</style>

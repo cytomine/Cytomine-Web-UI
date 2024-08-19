@@ -161,6 +161,7 @@
             :properties="internalUseFilteredProperties"
             @deleted="removeProp"
             @added="addProp"
+            @updateProperties="$emit('updateProperties')"
              />
         </td>
       </tr>
@@ -190,6 +191,17 @@
         </tr>
       </template>
 
+      <template>
+        <tr>
+          <td colspan="2">
+            <h5>{{ $t('similar-annotations') }}</h5>
+            <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
+              {{ $t('search-similar-annotation') }}
+            </button>
+          </td>
+        </tr>
+      </template>
+
       <template v-if="isPropDisplayed('creation-info')">
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
@@ -204,10 +216,10 @@
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
-            <td> 
+            <td>
               <span class="tag is-danger">
                 {{ $t('reviewed-annotation-status-not-validated') }}
-              </span>  
+              </span>
             </td>
           </tr>
         </template>
@@ -281,7 +293,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client';
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, Cytomine} from 'cytomine-client';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
@@ -299,6 +311,7 @@ import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import {PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
+import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
 
 export default {
   name: 'annotations-details',
@@ -313,7 +326,8 @@ export default {
     AttachedFiles,
     TrackTree,
     CytomineTrack,
-    AnnotationLinksPreview
+    AnnotationLinksPreview,
+    SimilarAnnotation
   },
   props: {
     annotation: {type: Object},
@@ -593,6 +607,15 @@ export default {
     },
     addProp(prop) {
       this.properties.push(prop);
+    },
+
+    async searchSimilarAnnotations() {
+      let data = (await Cytomine.instance.api.get(
+        'retrieval/retrieve.json',
+        {params: {annotation: this.annotation.id, nrt_neigh: 10}}
+      )).data;
+
+      this.$eventBus.$emit('show-similar-annotations', data);
     }
   },
   async created() {
@@ -616,6 +639,11 @@ export default {
       this.loadPropertiesError = true;
       console.log(error);
     }
+
+    this.$eventBus.$emit('hide-similar-annotations');
+  },
+  destroyed() {
+    this.$eventBus.$emit('hide-similar-annotations');
   }
 };
 </script>

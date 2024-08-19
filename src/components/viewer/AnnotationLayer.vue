@@ -178,6 +178,8 @@ export default {
             annot
           });
         }
+
+        this.$eventBus.$emit('update-suggested-terms');
       }
     },
     deleteAnnotationHandler(annot) {
