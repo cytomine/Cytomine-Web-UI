@@ -311,7 +311,6 @@ import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
 import {PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
-import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
 
 export default {
   name: 'annotations-details',
@@ -327,7 +326,6 @@ export default {
     TrackTree,
     CytomineTrack,
     AnnotationLinksPreview,
-    SimilarAnnotation
   },
   props: {
     annotation: {type: Object},
@@ -612,7 +610,7 @@ export default {
     async searchSimilarAnnotations() {
       let data = (await Cytomine.instance.api.get(
         'retrieval/retrieve.json',
-        {params: {annotation: this.annotation.id, nrt_neigh: 10}}
+        {params: {annotation: this.annotation.id, nrt_neigh: 10}} // eslint-disable-line camelcase
       )).data;
 
       this.$eventBus.$emit('show-similar-annotations', data);

@@ -188,7 +188,7 @@ export default {
         if(!this.wsConnected){
           this.initWebSocket();
           this.wsInterval = setInterval(() => {
-           this.sendPosition();
+            this.sendPosition();
           }, constants.TRACKING_REFRESH_INTERVAL);
         }
         this.trackedUser = null;
@@ -326,7 +326,7 @@ export default {
       }
       this.trackedUser = null;
     },
-    
+
     sendPosition() {
       const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constants.WS_POSITION_KEEP_ALIVE_INTERVAL;
       if (this.broadcast && this.wsConnected && (this.viewerPositionChanged || shouldRefreshForKeepAlive)) {

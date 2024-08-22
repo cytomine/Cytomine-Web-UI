@@ -119,7 +119,8 @@ export default {
       try {
         await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save();
         this.$emit('updateTermsOrTracks', this.annotation);
-      } catch (error) {
+      }
+      catch (error) {
         this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
       }
     },

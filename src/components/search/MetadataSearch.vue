@@ -147,18 +147,18 @@ export default {
     MetadataFilter,
   },
   props: {
-    formats: {type: Array, default: []},
+    formats: {type: Array, default: () => []},
     imageIds: {type: Object, default: null},
-    magnifications: {type: Array, default: []},
+    magnifications: {type: Array, default: () => []},
     maxHeight: {type: Number, default: 0},
     maxWidth: {type: Number, default: 0},
     maxNbJobAnnotations: {type: Number, default: 0},
     maxNbReviewedAnnotations: {type: Number, default: 0},
     maxNbUserAnnotations: {type: Number, default: 0},
     metadata: {type: Object, default: null},
-    resolutions: {type: Array, default: []},
-    tags: {type: Array, default: []},
-    vendors: {type: Array, default: []},
+    resolutions: {type: Array, default: () => []},
+    tags: {type: Array, default: () => []},
+    vendors: {type: Array, default: () => []},
   },
   data() {
     return {

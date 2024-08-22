@@ -101,10 +101,10 @@ export default {
   },
   props: {
     format: {type: String, default: ''},
-    imageIds: {type: Array, default: []},
-    keys: {type: Array, default: []},
-    max: {type: Object, default: {}},
-    type: {type: Object, default: {}},
+    imageIds: {type: Array, default: () => []},
+    keys: {type: Array, default: () => []},
+    max: {type: Object, default: () => {}},
+    type: {type: Object, default: () => {}},
   },
   data() {
     return {
