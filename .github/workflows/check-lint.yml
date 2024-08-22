@@ -3,8 +3,8 @@ name: Check lint
 on:
   pull_request:
     branches:
-      - master
-      - pims
+      - main-ce
+      - production
 
 jobs:
   check-lint:
