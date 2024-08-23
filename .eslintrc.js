@@ -4,8 +4,9 @@ module.exports = {
     'node': true
   },
   'extends': [
-    'plugin:vue/essential',
-    'eslint:recommended'
+    'eslint:recommended',
+    'plugin:jest/recommended',
+    'plugin:vue/essential'
   ],
   rules: {
     'indent': ['error', 2, {'SwitchCase': 1}],

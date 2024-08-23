@@ -6,6 +6,7 @@
     "build": "npm run translations-csv2json && vue-cli-service build",
     "check-lint": "eslint -c .eslintrc.js --ext .js,.vue src",
     "lint": "vue-cli-service lint",
+    "test": "vue-cli-service test:unit",
     "translations-csv2json": "node scripts/export_i18n_csv.mjs src/locales/translations.csv src/locales/json",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
   },
@@ -52,11 +53,15 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.14",
     "@vue/cli-plugin-eslint": "^4.5.14",
+    "@vue/cli-plugin-unit-jest": "^5.0.8",
     "@vue/cli-service": "^4.5.14",
+    "@vue/test-utils": "^2.4.6",
     "babel-eslint": "^10.1.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^6.7.2",
+    "eslint-plugin-jest": "^26.8.0",
     "eslint-plugin-vue": "^6.2.2",
+    "jest": "^29.7.0",
     "node-sass": "^4.13.0",
     "onchange": "^5.2.0",
     "sass-loader": "^7.1.0",
