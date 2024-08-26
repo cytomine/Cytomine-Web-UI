@@ -15,6 +15,14 @@
       <div class="actions">
         <h1>{{ $t('similar-annotations') }}</h1>
 
+        <button
+          class="button is-small close"
+          v-if="annotation.id !== queryAnnotation.id"
+          @click="returnToQueryAnnotation()"
+        >
+          <i class="fas fa-arrow-circle-left"/>
+        </button>
+
         <button class="button is-small close" @click="showSimilarAnnotations = false">
           <i class="fas fa-times"/>
         </button>
@@ -74,7 +82,7 @@ export default {
   },
   props: {
     image: {type: Object},
-    index: {type: String},
+    index: {type: String, required: true},
     size: {type: Number, default: 64},
   },
   data() {
@@ -107,6 +115,9 @@ export default {
     },
     displayAnnotDetails() {
       return this.imageWrapper.selectedFeatures.displayAnnotDetails;
+    },
+    queryAnnotation() {
+      return this.imageWrapper.selectedFeatures.queryAnnotation;
     },
     selectedFeature() {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
@@ -157,6 +168,9 @@ export default {
       await Promise.all(this.data['similarities'].map(async ([id, _]) => { // eslint-disable-line no-unused-vars
         this.annotations.push(await Annotation.fetch(id));
       }));
+    },
+    returnToQueryAnnotation() {
+      this.$emit('select', {annot: this.queryAnnotation, options: {trySameView: true}});
     }
   },
   async created() {
@@ -218,11 +232,6 @@ h1 {
   text-align: left;
 }
 
-.term-suggestion {
-  flex-direction: column;
-  margin: 0.5rem;
-}
-
 .similar-annotations-playground {
   top: 3.5rem;
   bottom: 2em;
@@ -231,10 +240,13 @@ h1 {
   pointer-events: none;
   position: absolute;
 }
-</style>
 
-<style>
 .similar-annotations-playground .draggable {
   z-index: 20 !important;
+}
+
+.term-suggestion {
+  flex-direction: column;
+  margin: 0.5rem;
 }
 </style>

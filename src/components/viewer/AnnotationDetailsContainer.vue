@@ -225,6 +225,7 @@ export default {
 
       this.$store.commit(this.imageModule + 'setShowSimilarAnnotations', true);
       this.$store.commit(this.imageModule + 'setSimilarAnnotations', data);
+      this.$store.commit(this.imageModule + 'setQueryAnnotation', this.selectedFeature.properties.annot);
     }
   },
   created() {

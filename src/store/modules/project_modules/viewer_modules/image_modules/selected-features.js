@@ -28,6 +28,7 @@ export default {
       positionAnnotDetails: {x: 0, y: 0},
       showSimilarAnnotations: false,
       similarAnnotations: null,
+      queryAnnotation: null,
     };
   },
 
@@ -52,6 +53,7 @@ export default {
     clearSimilarAnnotations(state) {
       state.showSimilarAnnotations = false;
       state.similarAnnotations = null;
+      state.queryAnnotation = null;
     },
 
     selectFeature(state, feature) {
@@ -122,6 +124,10 @@ export default {
 
     setSimilarAnnotations(state, value) {
       state.similarAnnotations = value;
+    },
+
+    setQueryAnnotation(state, value) {
+      state.queryAnnotation = value;
     },
   },
 
