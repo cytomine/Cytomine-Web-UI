@@ -24,3 +24,11 @@ jobs:
 
       - name: Run Unit Tests
         run: npm run test
+
+      - name: Upload test coverage
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+          retention-days: 30

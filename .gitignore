@@ -24,3 +24,6 @@ yarn-error.log*
 *.sln
 *.sw*
 *.env
+
+# Test
+coverage
