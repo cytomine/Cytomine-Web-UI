@@ -293,7 +293,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, Cytomine} from 'cytomine-client';
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
@@ -605,15 +605,6 @@ export default {
     },
     addProp(prop) {
       this.properties.push(prop);
-    },
-
-    async searchSimilarAnnotations() {
-      let data = (await Cytomine.instance.api.get(
-        'retrieval/retrieve.json',
-        {params: {annotation: this.annotation.id, nrt_neigh: 10}} // eslint-disable-line camelcase
-      )).data;
-
-      this.$eventBus.$emit('show-similar-annotations', data);
     }
   },
   async created() {
