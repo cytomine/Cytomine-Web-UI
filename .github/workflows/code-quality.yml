@@ -1,4 +1,4 @@
-name: Check lint
+name: Code Quality
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - production
 
 jobs:
-  check-lint:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,4 +23,4 @@ jobs:
         run: npm ci
 
       - name: Check lint
-        run: npm run check-lint
+        run: npm run lint

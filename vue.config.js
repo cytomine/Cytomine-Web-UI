@@ -3,4 +3,4 @@ module.exports = {
     // domain whitelist for dev server
     allowedHosts: ['.cytomine.local']
   }
-}
+};
