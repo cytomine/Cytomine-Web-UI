@@ -284,6 +284,7 @@ export default {
     document() {
       return document;
     },
+    project: get('currentProject/project'),
     routedAction() {
       return this.$route.query.action;
     },
@@ -603,8 +604,12 @@ export default {
           annot = await Annotation.fetch(annot.id);
         }
 
+        if (annot.project !== this.project.id) {
+          await this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+        }
+
         let geometry = this.format.readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()

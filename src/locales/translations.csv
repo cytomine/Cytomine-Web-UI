@@ -580,6 +580,7 @@ no-result-file,No result file,Aucun fichier de résultat,Sin archivo de resultad
 no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 no-selected-annot,No selected annotation,Pas d'annotation sélectionnée,Ninguna anotación seleccionada,Geen geselecteerde annotatie
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
+no-similar-annotations-found,No similar annotations found,Pas d'annotations similaires trouvées,No se encontraron anotaciones similares,Geen vergelijkbare annotaties gevonden
 no-software,No algorithm,Pas d'algorithme,Sin algoritmo,Geen algoritme
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
 no-tag,No tag,Aucun tag,Sin etiqueta,

@@ -16,7 +16,7 @@
         <h1>{{ $t('similar-annotations') }}</h1>
 
         <button
-          class="button is-small close"
+          class="button is-small return"
           v-if="annotation.id !== queryAnnotation.id"
           @click="returnToQueryAnnotation()"
         >
@@ -44,6 +44,10 @@
           <div>
             {{ data.distance.toFixed(2) }}%
           </div>
+        </div>
+
+        <div v-if="similarities.length === 0">
+          <p>{{ $t('no-similar-annotations-found') }}</p>
         </div>
       </div>
 

@@ -111,7 +111,7 @@ describe('SimilarAnnotation.vue', () => {
     jest.clearAllMocks();
   });
 
-  it('should render correctly', () => {
+  it('should render the component correctly', () => {
     expect(wrapper.findComponent(VueDraggableResizable).exists()).toBe(true);
     expect(wrapper.find('.similar-annotations-playground').exists()).toBe(true);
     expect(wrapper.find('h1').text()).toBe('similar-annotations');
@@ -129,6 +129,24 @@ describe('SimilarAnnotation.vue', () => {
     const distances = wrapper.findAll('.annotation-data div');
     expect(distances.at(0).text()).toBe('80.00%');
     expect(distances.at(1).text()).toBe('70.00%');
+
+    const paragraphs = wrapper.findAll('p');
+    expect(paragraphs.length).toBe(0);
+  });
+
+  it('should render the default message if no annotations', async () => {
+    wrapper.setData({
+      annotations: []
+    });
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('p').text()).toBe('no-similar-annotations-found');
+    expect(wrapper.findAllComponents(AnnotationPreview).length).toBe(0);
+    expect(wrapper.findAll('.annotation-data div').length).toBe(0);
+
+    expect(wrapper.vm.annotations).toEqual([]);
+    expect(wrapper.vm.loading).toEqual(false);
   });
 
   it('should fetch annotations on created hook and updates state', async () => {
@@ -153,5 +171,25 @@ describe('SimilarAnnotation.vue', () => {
     await closeButton.trigger('click');
 
     expect(wrapper.vm.showSimilarAnnotations).toBe(false);
+  });
+
+  it('should emit "select" event when return button is clicked', async () => {
+    store.state.currentProject.currentViewer.images[testIndex].selectedFeatures.queryAnnotation = {id: 2, term: [2]};
+    await wrapper.vm.$nextTick();
+
+    const expectedObject = [[{
+      annot: store.state.currentProject.currentViewer.images[testIndex].selectedFeatures.queryAnnotation,
+      options: {
+        trySameView: true,
+      },
+    }]];
+
+    const returnButton = wrapper.find('.button.is-small.return');
+    await returnButton.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted('select')).toBeTruthy();
+    expect(wrapper.emitted('select')).toStrictEqual(expectedObject);
+    expect(wrapper.vm.showSimilarAnnotations).toBe(true);
   });
 });
