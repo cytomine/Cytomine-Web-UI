@@ -1,6 +1,6 @@
 {
   "name": "cytomine-web-ui",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "serve": "npm run watch-translations & vue-cli-service serve",
     "build": "npm run translations-csv2json && vue-cli-service build",
