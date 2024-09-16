@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Get the app archive
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.DIR_NAME }}.tar.gz
 
