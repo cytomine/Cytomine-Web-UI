@@ -4,7 +4,10 @@ on:
   pull_request:
     branches:
       - main-ce
-      - production
+    paths:
+      - "src/**/*.js"
+      - "src/**/*.vue"
+      - "tests/**/*.js"
 
 jobs:
   unit-test:

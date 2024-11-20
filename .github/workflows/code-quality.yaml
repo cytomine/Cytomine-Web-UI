@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main-ce
+    paths:
+      - "src/**/*.js"
+      - "src/**/*.vue"
+      - "tests/**/*.js"
 
 jobs:
   lint:
