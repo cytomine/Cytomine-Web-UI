@@ -124,7 +124,12 @@
               />
             </td>
             <td class="bounds-column">
-              ({{mc.bounds.min}} - {{mc.bounds.max}})
+              <editable-text-bound
+                :bounds="mc.bounds"
+                :default-bounds="defaultBounds"
+                @setBounds="setApparentChannelBounds(mc.index, $event)"
+                @editing="toggleLookUpTableDetailsIfNotVisible(mc.index)"
+              />
             </td>
             <td class="checkbox-column">
               <a
@@ -203,13 +208,15 @@ import {ImageFilterProjectCollection} from 'cytomine-client';
 import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel';
 import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable';
 import HistogramChart from '@/components/charts/HistogramChart';
+import EditableTextBound from '@/components/viewer/panels/colors/EditableTextBound';
 
 export default {
   name: 'color-manipulation',
   components: {
     AdjustableLookUpTable,
     CytomineChannel,
-    HistogramChart
+    HistogramChart,
+    EditableTextBound
   },
   props: {
     index: String
@@ -425,6 +432,13 @@ export default {
     },
     isVisibleLookUpTableDetails(indexApparentChannel) {
       return this.visibleLookUpTableDetails.indexOf(indexApparentChannel) >= 0;
+    },
+    toggleLookUpTableDetailsIfNotVisible(indexApparentChannel) {
+      if (this.isVisibleLookUpTableDetails(indexApparentChannel)) {
+        return;
+      }
+
+      this.toggleLookUpTableDetails(indexApparentChannel);
     },
 
     /* Helpers */

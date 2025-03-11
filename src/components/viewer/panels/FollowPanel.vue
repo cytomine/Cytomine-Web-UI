@@ -188,7 +188,7 @@ export default {
         if(!this.wsConnected){
           this.initWebSocket();
           this.wsInterval = setInterval(() => {
-           this.sendPosition();
+            this.sendPosition();
           }, constants.TRACKING_REFRESH_INTERVAL);
         }
         this.trackedUser = null;
@@ -287,7 +287,8 @@ export default {
         this.userPostitionWebsock.onopen = this.onOpen;
         this.userPostitionWebsock.onclose = this.onClose;
         this.userPostitionWebsock.onmessage = this.onMessage;
-      } catch (error) {
+      }
+      catch (error) {
         console.log('error', error);
       }
     },

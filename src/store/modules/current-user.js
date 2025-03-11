@@ -87,11 +87,10 @@ export default {
   },
 
   getters: {
-      currentShortTermToken: (state, _, rootState) => {
-        let currentUser = rootState.currentUser || {};
-        return currentUser.shortTermToken;
-      },
-
+    currentShortTermToken: (state, _, rootState) => {
+      let currentUser = rootState.currentUser || {};
+      return currentUser.shortTermToken;
+    },
   }
 
 };

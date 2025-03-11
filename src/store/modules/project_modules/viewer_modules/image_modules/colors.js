@@ -67,7 +67,7 @@ export default {
     },
 
     setApparentChannels(state, apparentChannels) {
-            state.apparentChannels = apparentChannels;
+      state.apparentChannels = apparentChannels;
     },
 
     setApparentChannelVisibility(state, {indexApparentChannel, visible}) {

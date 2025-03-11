@@ -118,7 +118,6 @@ import {get} from '@/utils/store-helpers';
 import {ProjectCollection, TrustedSource} from 'cytomine-client';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
 import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import SoftwareStatus from '@/components/software/SoftwareStatus';
 import BooleanItem from '@/components/utils/BooleanItem';
@@ -137,7 +136,6 @@ export default {
     BooleanItem,
     SoftwareStatus,
     CytomineDescription,
-    CytomineProperties,
     AttachedFiles
   },
   data() {

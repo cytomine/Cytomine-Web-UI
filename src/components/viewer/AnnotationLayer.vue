@@ -178,6 +178,8 @@ export default {
             annot
           });
         }
+
+        this.$eventBus.$emit('update-suggested-terms');
       }
     },
     deleteAnnotationHandler(annot) {
@@ -233,6 +235,8 @@ export default {
         showTerm: true,
         showGIS: true,
         showTrack: true,
+        showLink: true,
+        showImageGroup: true,
         kmeans: true
       }).fetchAll();
 
