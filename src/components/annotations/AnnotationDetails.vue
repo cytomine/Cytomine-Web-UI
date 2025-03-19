@@ -286,7 +286,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client';
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection} from 'cytomine-client';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';
@@ -302,6 +302,7 @@ import ProfileModal from '@/components/viewer/ProfileModal';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName';
+import constants from '@/utils/constants.js';
 
 export default {
   name: 'annotations-details',

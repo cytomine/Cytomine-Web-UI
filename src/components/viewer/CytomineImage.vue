@@ -414,36 +414,20 @@ export default {
       return Cytomine.instance.host + Cytomine.instance.basePath + `sliceinstance/${slice.id}/normalized-tile/zoom/{z}/tx/{x}/ty/{y}.jpg${this.baseLayerURLQuery}`;
     },
     tileLoadFunction() {
-        return (tile, src) => {
-            const xhr = new XMLHttpRequest();
-            xhr.responseType = 'blob';
-            xhr.open('GET', src);
-            xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
-            xhr.addEventListener('load', () => {
-                const url = URL.createObjectURL(xhr.response);
-                const tileImage = tile.getImage();
-                tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
-                tileImage.src = url;
-            });
-            xhr.send();
-        }
+      return (tile, src) => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.open('GET', src);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
+        xhr.addEventListener('load', () => {
+          const url = URL.createObjectURL(xhr.response);
+          const tileImage = tile.getImage();
+          tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
+          tileImage.src = url;
+        });
+        xhr.send();
+      };
     },
-    // colorManipulationOn() {
-    //   return this.imageWrapper.colors.brightness !== 0
-    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    // },
-    // operation() {
-    //   return operation;
-    // },
-    // lib() {
-    //   return {
-    //     ...constLib,
-    //     brightness: this.imageWrapper.colors.brightness,
-    //     contrast: this.imageWrapper.colors.contrast,
-    //     saturation: this.imageWrapper.colors.saturation,
-    //     hue: this.imageWrapper.colors.hue
-    //   };
-    // },
 
     layersToPreload() {
       let layers = [];

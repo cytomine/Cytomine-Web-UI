@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import {Property} from 'cytomine-client';
+import {Property, PropertyCollection} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 
 export default {
@@ -142,7 +142,8 @@ export default {
     try {
       let props = (await PropertyCollection.fetchAll({object: this.object})).array;
       this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
-    } catch (error) {
+    }
+    catch (error) {
       console.log(error);
       this.error = true;
     }

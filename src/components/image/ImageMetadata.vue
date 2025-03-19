@@ -53,7 +53,7 @@
 import {getWildcardRegexp} from '@/utils/string-utils';
 import {get} from '@/utils/store-helpers';
 import {appendShortTermToken} from '@/utils/token-utils.js';
-import {Cytomine} from "cytomine-client";
+import {Cytomine} from 'cytomine-client';
 
 export default {
   name: 'image-metadata',
@@ -95,7 +95,7 @@ export default {
       };
     },
     uriCytomineImageType() {
-        return this.image.class.includes("AbstractImage") ? "abstractimage" : "imageinstance";
+      return this.image.class.includes('AbstractImage') ? 'abstractimage' : 'imageinstance';
     }
   },
   methods: {

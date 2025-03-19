@@ -355,13 +355,15 @@ import {
 import axios from 'axios';
 import filesize from 'filesize';
 import constants from '@/utils/constants.js';
+import _ from 'lodash';
 
 import UploadedFileStatusComponent from './UploadedFileStatus';
+import UploadedFileDetails from './UploadedFileDetails';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineSlider from '@/components/form/CytomineSlider';
 import CytomineTable from '@/components/utils/CytomineTable';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
-import ListUploadedFiles from "@/components/storage/ListUploadedFiles.vue";
+import ListUploadedFiles from '@/components/storage/ListUploadedFiles.vue';
 import AddProjectModal from '@/components/project/AddProjectModal';
 import MetadataFilter from '@/components/search/MetadataFilter.vue';
 import vendorFromFormat from '@/utils/vendor';

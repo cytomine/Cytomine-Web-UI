@@ -318,14 +318,16 @@ import ImageStatus from './ImageStatus';
 import RenameModal from '@/components/utils/RenameModal';
 import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
+import constants from '@/utils/constants.js';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
-import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
+import {ImageInstance, ImageGroupImageInstanceCollection, PropertyCollection} from 'cytomine-client';
 
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 import vendorFromFormat from '@/utils/vendor';
+
 
 export default {
   name: 'image-details',

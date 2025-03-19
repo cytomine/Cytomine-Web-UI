@@ -452,9 +452,10 @@ export default {
         if (this.blindMode) {
           // set sortField to blindedName if blindMode is used 
           this.sortField = 'blindedName';
-        } else {
+        }
+        else {
           // Use your default sorting by file name ('instanceFilename')
-          this.sortField = 'instanceFilename'
+          this.sortField = 'instanceFilename';
         }
       }
     }
