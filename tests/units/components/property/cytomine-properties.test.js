@@ -1,8 +1,8 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineProperties from '@/components/property/CytomineProperties';
-import {Property} from 'cytomine-client';
+import { Property } from 'cytomine-client';
 
 jest.mock('cytomine-client', () => {
   return {
@@ -17,6 +17,13 @@ jest.mock('cytomine-client', () => {
           isNew: jest.fn().mockReturnValue(true),
         })),
       },
+    },
+    PropertyCollection: {
+      fetchAll: jest.fn().mockResolvedValue({
+        array: [
+          { id: 1, key: 'Property 1', value: 'Value 1' },
+        ],
+      }),
     },
   };
 });
@@ -38,11 +45,8 @@ describe('CytomineProperties.vue', () => {
       localVue,
       mocks: mocks,
       propsData: {
-        properties: [
-          {id: 1, key: 'Property 1', value: 'Value 1'},
-        ],
         canEdit: true,
-      }
+      },
     });
   });
 
@@ -54,6 +58,16 @@ describe('CytomineProperties.vue', () => {
   it('should render the correct initial properties', () => {
     expect(wrapper.text()).toContain('Property 1');
     expect(wrapper.text()).toContain('Value 1');
+  });
+
+  it('should contain the correct initial data', () => {
+    expect(wrapper.vm.loading).toBe(false);
+    expect(wrapper.vm.error).toBe(false);
+    expect(wrapper.vm.properties.length).toBe(1);
+    expect(wrapper.vm.editedProperties.length).toBe(0);
+    expect(wrapper.vm.newPropKey).toBe('');
+    expect(wrapper.vm.newPropValue).toBe('');
+    expect(wrapper.vm.showNewPropForm).toBe(false);
   });
 
   it('should add a new property correctly', async () => {
@@ -77,13 +91,7 @@ describe('CytomineProperties.vue', () => {
     await deleteButton.trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted()).toHaveProperty('deleted');
-    expect(wrapper.emitted()).toHaveProperty('updateProperties');
-    expect(wrapper.emitted()['deleted'][0]).toEqual([{
-      'id': 1,
-      'key': 'Property 1',
-      'value': 'Value 1',
-    }]);
+    expect(wrapper.emitted()).toHaveProperty('update');
   });
 
   it('should handle property save correctly', async () => {
@@ -97,7 +105,7 @@ describe('CytomineProperties.vue', () => {
 
     await wrapper.vm.saveProp(0);
 
-    expect(wrapper.emitted()).toHaveProperty('updateProperties');
+    expect(wrapper.emitted()).toHaveProperty('update');
   });
 
   it('should handle property cancel correctly', async () => {

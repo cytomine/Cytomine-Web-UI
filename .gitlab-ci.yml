@@ -1,5 +1,6 @@
 stages:
   - lint
+  - test
 
 lint:
   stage: lint
@@ -8,3 +9,16 @@ lint:
     - npm ci
   script:
     - npm run lint
+
+unit-test:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:${NODE_VERSION}
+  before_script:
+    - npm ci
+  script:
+    - npm run test
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+      - reports/
