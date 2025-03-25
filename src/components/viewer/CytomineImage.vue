@@ -88,10 +88,18 @@
 
         <template v-if="isPanelDisplayed('hide-tools')">
           <li v-if="isPanelDisplayed('info')">
-            <a @click="togglePanel('info')" :class="{active: activePanel === 'info'}">
+            <a @click="togglePanel('info')" :class="{active: ['info', 'metadata'].includes(activePanel)}">
               <i class="fas fa-info"></i>
             </a>
-            <information-panel class="panel-options" v-show="activePanel === 'info'" :index="index" />
+            <information-panel
+              class="panel-options"
+              v-show="activePanel === 'info'"
+              :index="index"
+              @openMetadata="togglePanel('metadata')"
+            />
+            <div v-show="activePanel === 'metadata'">
+              <metadata-panel class="panel-metadata" :index="index" />
+            </div>
           </li>
 
           <li v-if="isPanelDisplayed('digital-zoom')">
@@ -193,6 +201,7 @@ import ImageControls from './ImageControls';
 import AnnotationsContainer from './AnnotationsContainer';
 
 import InformationPanel from './panels/InformationPanel';
+import MetadataPanel from './panels/MetadataPanel.vue';
 import DigitalZoom from './panels/DigitalZoom';
 import ColorManipulation from './panels/ColorManipulation';
 import LinkPanel from './panels/LinkPanel';
@@ -217,7 +226,7 @@ import WKT from 'ol/format/WKT';
 
 import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
 
-import {constLib, operation} from '@/utils/color-manipulation.js';
+// import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
 
@@ -238,6 +247,7 @@ export default {
     AnnotationsContainer,
 
     InformationPanel,
+    MetadataPanel,
     DigitalZoom,
     ColorManipulation,
     LinkPanel,
@@ -276,6 +286,7 @@ export default {
     document() {
       return document;
     },
+    project: get('currentProject/project'),
     routedAction() {
       return this.$route.query.action;
     },
@@ -403,36 +414,20 @@ export default {
       return Cytomine.instance.host + Cytomine.instance.basePath + `sliceinstance/${slice.id}/normalized-tile/zoom/{z}/tx/{x}/ty/{y}.jpg${this.baseLayerURLQuery}`;
     },
     tileLoadFunction() {
-        return (tile, src) => {
-            const xhr = new XMLHttpRequest();
-            xhr.responseType = 'blob';
-            xhr.open('GET', src);
-            xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
-            xhr.addEventListener('load', () => {
-                const url = URL.createObjectURL(xhr.response);
-                const tileImage = tile.getImage();
-                tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
-                tileImage.src = url;
-            });
-            xhr.send();
-        }
+      return (tile, src) => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.open('GET', src);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + this.shortTermToken);
+        xhr.addEventListener('load', () => {
+          const url = URL.createObjectURL(xhr.response);
+          const tileImage = tile.getImage();
+          tileImage.addEventListener('load', () => URL.revokeObjectURL(url));
+          tileImage.src = url;
+        });
+        xhr.send();
+      };
     },
-    // colorManipulationOn() {
-    //   return this.imageWrapper.colors.brightness !== 0
-    //             || this.imageWrapper.colors.hue !== 0 || this.imageWrapper.colors.saturation !== 0;
-    // },
-    // operation() {
-    //   return operation;
-    // },
-    // lib() {
-    //   return {
-    //     ...constLib,
-    //     brightness: this.imageWrapper.colors.brightness,
-    //     contrast: this.imageWrapper.colors.contrast,
-    //     saturation: this.imageWrapper.colors.saturation,
-    //     hue: this.imageWrapper.colors.hue
-    //   };
-    // },
 
     layersToPreload() {
       let layers = [];
@@ -609,8 +604,12 @@ export default {
           annot = await Annotation.fetch(annot.id);
         }
 
+        if (annot.project !== this.project.id) {
+          await this.$router.push(`/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`);
+        }
+
         let geometry = this.format.readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -811,12 +810,14 @@ export default {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$on('closeMetadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
+    this.$eventBus.$off('closeMetadata');
     clearTimeout(this.timeoutSavePosition);
   }
 };
@@ -949,6 +950,19 @@ $colorOpenedPanelLink: #6c95c8;
 .panels li:nth-child(5) .panel-options {
   top: -5.5em;
   bottom: auto;
+}
+
+/* ----- Metadata panel ---- */
+
+.panel-metadata {
+  position: absolute;
+  top: -1.5em;
+  right: $widthPanelBar;
+  min-width: 30em;
+  min-height: 30em;
+  background: $backgroundPanel;
+  padding: 0.75em;
+  border-radius: 5px 0 0 5px;
 }
 
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */

@@ -85,7 +85,7 @@ import filesize from 'filesize';
 import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable';
 import UploadedFileStatusComponent from './UploadedFileStatus';
-import {appendShortTermToken} from "@/utils/token-utils";
+import {appendShortTermToken} from '@/utils/token-utils';
 
 export default {
   name: 'list-uploaded-files',
@@ -127,7 +127,7 @@ export default {
       this.searchString = value;
     }, 500),
     updatedTree() {
-      this.$emit('update:revision', this.revision + 1) // updating the table will result in new files objects => the uf details will also be updated
+      this.$emit('update:revision', this.revision + 1); // updating the table will result in new files objects => the uf details will also be updated
     },
     download(url) {
       window.location.assign(appendShortTermToken(url, this.shortTermToken));
@@ -152,15 +152,15 @@ export default {
         let errorValues = error.response.data.errorValues;
         let text;
         if (error.response.status === 403) {
-            if (errorValues && errorValues.projectNames && errorValues.imageNames) {
-                text = this.$t('notif-error-delete-used-uploaded-file', {
-                    projects: errorValues.projectNames.join(', '),
-                    names: errorValues.imageNames.join(', ')
-                });
-            }
-            else {
-                text = this.$t('notif-error-delete-uploaded-file-forbidden');
-            }
+          if (errorValues && errorValues.projectNames && errorValues.imageNames) {
+            text = this.$t('notif-error-delete-used-uploaded-file', {
+              projects: errorValues.projectNames.join(', '),
+              names: errorValues.imageNames.join(', ')
+            });
+          }
+          else {
+            text = this.$t('notif-error-delete-uploaded-file-forbidden');
+          }
         }
         else {
           text = this.$t('notif-error-delete-uploaded-file');

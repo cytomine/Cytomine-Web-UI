@@ -227,14 +227,13 @@
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
+import MetadataSearch from '@/components/search/MetadataSearch';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
 import vendorFromFormat from '@/utils/vendor';
 
-import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, PropertyCollection, TagCollection} from 'cytomine-client';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
@@ -250,15 +249,16 @@ export default {
     ImageName,
     ImageDetails,
     CytomineTable,
-    CytomineMultiselect,
-    CytomineSlider,
-    AddImageModal
+    AddImageModal,
+    MetadataSearch,
   },
   data() {
     return {
       loading: true,
       error: false,
       images: [],
+      metadata: {},
+      filteredImageIDs: [],
       addImageModal: false,
       excludedProperties: [
         'overview',
@@ -318,6 +318,7 @@ export default {
     multiSelectFilters() {
       return [
         {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
+        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
         {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
         {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
         {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
@@ -369,7 +370,30 @@ export default {
           };
         }
       }
+
+      let filteredIDs = [];
+      this.selectedFormats.forEach(format => filteredIDs = filteredIDs.concat(this.filteredImageIDs[format]));
+      if (filteredIDs.length === 0) {
+        for (let ids of Object.values(this.filteredImageIDs)) {
+          filteredIDs = filteredIDs.concat(ids);
+        }
+      }
+
+      if (filteredIDs.length > 0) {
+        collection['include'] = {
+          in: filteredIDs.join(',')
+        };
+      }
+
       return collection;
+    },
+
+    imageIds() {
+      let ids = {};
+      this.availableFormats.forEach(format => ids[format] = []);
+      this.images.forEach(image => ids[image.contentType].push(image.baseImage));
+
+      return ids;
     },
 
     nbActiveFilters() {
@@ -407,6 +431,8 @@ export default {
         if (!this.availableVendors.find(vendor => vendor.value === vendorFormatted.value)) {
           this.availableVendors.push(vendorFormatted);
         }
+
+        this.filteredImageIDs[format] = [];
       });
 
       this.availableMagnifications = stats.magnification.list.map(m => {
@@ -425,8 +451,28 @@ export default {
     async fetchTags() {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     },
+    async fetchImages() {
+      this.images = (await ImageInstanceCollection.fetchAll({
+        filterKey: 'project',
+        filterValue: this.project.id,
+      })).array;
+
+      await Promise.all(this.images.map(async (image) => {
+        let properties = (await PropertyCollection.fetchAll({object: image})).array;
+        properties.sort((a, b) => a.key.localeCompare(b.key));
+
+        if (!(image.contentType in this.metadata)) {
+          this.metadata[image.contentType] = {};
+        }
+
+        this.metadata[image.contentType][image.id] = properties;
+        this.filteredImageIDs[image.contentType].push(image.baseImage);
+      }));
+    },
 
     async refreshData() {
+      this.$store.commit('currentProject/resetMetadataFilters');
+
       try {
         await Promise.all([
           this.fetchFilters(),
@@ -442,10 +488,13 @@ export default {
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
     },
-
     isPropDisplayed(prop) {
       return this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
     },
+    includeImageIDs(format, imageIDs) {
+      this.$delete(this.filteredImageIDs, format);
+      this.$set(this.filteredImageIDs, format, imageIDs);
+    }
   },
   watch: {
     querySearchTags(values) {
@@ -462,7 +511,8 @@ export default {
     try {
       await Promise.all([
         this.fetchFilters(),
-        this.fetchTags()
+        this.fetchTags(),
+        this.fetchImages(),
       ]);
       this.loading = false;
 
@@ -472,9 +522,10 @@ export default {
         if (this.blindMode) {
           // set sortField to blindedName if blindMode is used 
           this.sortField = 'blindedName';
-        } else {
+        }
+        else {
           // Use your default sorting by file name ('instanceFilename')
-          this.sortField = 'instanceFilename'
+          this.sortField = 'instanceFilename';
         }
       }
     }
@@ -488,6 +539,12 @@ export default {
         this.selectedTags = queriedTags;
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('includeImageIDs', this.includeImageIDs);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('includeImageIDs', this.includeImageIDs);
   }
 };
 </script>

@@ -25,7 +25,7 @@
 
 <script>
 import CytomineModal from '@/components/utils/CytomineModal';
-import ImageMetadata from "@/components/image/ImageMetadata.vue";
+import ImageMetadata from '@/components/image/ImageMetadata.vue';
 
 export default {
   name: 'image-metadata-modal',

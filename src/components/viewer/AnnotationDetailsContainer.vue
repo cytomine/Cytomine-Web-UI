@@ -13,53 +13,66 @@
  limitations under the License.-->
 
 <template>
-<div class="annotation-details-playground" ref="playground">
-  <vue-draggable-resizable
-    v-if="selectedFeature && selectedFeature.properties && reload"
-    v-show="displayAnnotDetails"
-    class="draggable"
-    :parent="true"
-    :resizable="false"
-    drag-handle=".drag"
-    @dragstop="dragStop"
-    :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
-    ref="detailsPanel"
-  >
-    <div class="actions">
-      <h1>{{$t('current-selection')}}</h1>
-      <button class="drag button is-small close">
-        <i class="fas fa-arrows-alt"></i>
-      </button>
-      <button class="button is-small close" @click="displayAnnotDetails = false">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
+  <div class="annotation-details-playground" ref="playground">
+    <vue-draggable-resizable
+      v-if="selectedFeature && selectedFeature.properties && reload"
+      v-show="displayAnnotDetails"
+      class="draggable"
+      :parent="true"
+      :resizable="false"
+      drag-handle=".drag"
+      @dragstop="dragStop"
+      :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+      ref="detailsPanel"
+    >
+      <div class="actions">
+        <h1>{{ $t('current-selection') }}</h1>
+        <button class="drag button is-small close">
+          <i class="fas fa-arrows-alt"></i>
+        </button>
+        <button class="button is-small close" @click="displayAnnotDetails = false">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-    <div class="annotation-details-container">
-      <annotation-details
+      <div class="annotation-details-container">
+        <annotation-details
+          :annotation="selectedFeature.properties.annot"
+          :terms="terms"
+          :images="images"
+          :slices="slices"
+          :profiles="profiles"
+          :tracks="tracks"
+          :users="allUsers"
+          :showImageInfo="false"
+          :showChannelInfo="showChannelInfo"
+          :key="selectedFeature.id"
+          :showComments="showComments"
+          @addTerm="$emit('addTerm', $event)"
+          @addTrack="$emit('addTrack', $event)"
+          @updateTerms="$emit('updateTermsOrTracks', annot)"
+          @updateTracks="$emit('updateTermsOrTracks', annot)"
+          @updateProperties="$emit('updateProperties')"
+          @select="$emit('select', $event)"
+          @centerView="$emit('centerView', ($event) ? $event : annot)"
+          @deletion="$emit('delete', annot)"
+          @searchSimilarAnnotations="searchSimilarAnnotations"
+        />
+      </div>
+
+      <!-- HACK for prev/next linked annotation shortkeys -->
+      <annotation-links-preview
+        v-show="false"
+        :index="index"
+        :show-main-annotation="false"
+        :show-select-all-button="false"
+        :allow-annotation-selection="true"
         :annotation="selectedFeature.properties.annot"
-        :terms="terms"
-        :images="[image]"
-        :slices="slices"
-        :profiles="profiles"
-        :tracks="tracks"
-        :users="allUsers"
-        :showImageInfo="false"
-        :showChannelInfo="showChannelInfo"
-        :key="selectedFeature.id"
-        :showComments="showComments"
-        @addTerm="$emit('addTerm', $event)"
-        @addTrack="$emit('addTrack', $event)"
-        @updateTerms="$emit('updateTermsOrTracks', annot)"
-        @updateTracks="$emit('updateTermsOrTracks', annot)"
-        @updateProperties="$emit('updateProperties')"
+        :images="images"
         @select="$emit('select', $event)"
-        @centerView="$emit('centerView', ($event) ? $event : annot)"
-        @deletion="$emit('delete', annot)"
       />
-    </div>
-  </vue-draggable-resizable>
-</div>
+    </vue-draggable-resizable>
+  </div>
 </template>
 
 <script>
@@ -68,10 +81,11 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
 
 export default {
   name: 'annotations-details-container',
-  components: {VueDraggableResizable, AnnotationDetails},
+  components: {AnnotationLinksPreview, VueDraggableResizable, AnnotationDetails},
   props: {
     index: String,
   },
@@ -95,6 +109,12 @@ export default {
     },
     image() {
       return this.imageWrapper.imageInstance;
+    },
+    images() {
+      if (this.imageWrapper.imageGroup) {
+        return [this.image, ...this.imageWrapper.imageGroup.imageInstances];
+      }
+      return [this.image];
     },
     slices() {
       return this.imageWrapper.activeSlices;
@@ -141,11 +161,11 @@ export default {
   },
   watch: {
     selectedFeature() {
-      if(this.selectedFeature) {
-        this.displayAnnotDetails = true;
+      if (this.selectedFeature) {
+        // this.displayAnnotDetails = true;
         let targetAnnot = this.imageWrapper.selectedFeatures.showComments;
         this.showComments = (targetAnnot === this.annot.id);
-        if(targetAnnot !== null) {
+        if (targetAnnot !== null) {
           this.$store.commit(this.imageModule + 'setShowComments', null);
         }
       }
@@ -168,7 +188,7 @@ export default {
     async handleResize() {
       await this.$nextTick(); // wait for update of clientWidth and clientHeight to their new values
 
-      if(this.$refs.playground) {
+      if (this.$refs.playground) {
         let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
         let height = 500;
         if (this.$refs.detailsPanel) {
@@ -184,6 +204,21 @@ export default {
         this.reload = false;
         this.$nextTick(() => this.reload = true);
       }
+    },
+    async searchSimilarAnnotations() {
+      let data = (await Cytomine.instance.api.get(
+        'retrieval/search',
+        {
+          params: {
+            annotation: this.selectedFeature.properties.annot.id,
+            nrt_neigh: 10 // eslint-disable-line camelcase
+          }
+        }
+      )).data;
+
+      this.$store.commit(this.imageModule + 'setShowSimilarAnnotations', true);
+      this.$store.commit(this.imageModule + 'setSimilarAnnotations', data);
+      this.$store.commit(this.imageModule + 'setQueryAnnotation', this.selectedFeature.properties.annot);
     }
   },
   created() {

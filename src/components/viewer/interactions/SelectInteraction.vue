@@ -97,6 +97,7 @@ export default {
           annot.recordAction();
         }
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
+        this.$store.commit(this.imageModule + 'setShowSimilarAnnotations', false);
       }
     },
     terms() {

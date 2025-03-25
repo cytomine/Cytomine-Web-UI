@@ -243,7 +243,7 @@ export default {
     },
 
     showDetails() {
-      return this.configUI[`project-explore-annotation-main`];
+      return this.configUI['project-explore-annotation-main'];
     }
   },
   watch: {

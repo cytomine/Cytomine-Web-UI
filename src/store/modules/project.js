@@ -15,6 +15,7 @@
 */
 
 import listImages from './project_modules/list-images.js';
+import listImageGroups from './project_modules/list-image-groups.js';
 import listAnnotations from './project_modules/list-annotations.js';
 
 export default {

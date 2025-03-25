@@ -17,10 +17,10 @@
  * @module cytomine-source/source
  */
 import TileGrid from 'ol/tilegrid/TileGrid';
-import {hasView} from "vuelayers/lib/util/assert";
-import {CustomTile} from "ol/source/Zoomify";
-import tileSource from "vuelayers/lib/mixin/tile-source";
-import TileImage from "ol/source/TileImage";
+import {hasView} from 'vuelayers/lib/util/assert';
+import {CustomTile} from 'ol/source/Zoomify';
+import tileSource from 'vuelayers/lib/mixin/tile-source';
+import TileImage from 'ol/source/TileImage';
 
 const props = {
   extent: {
@@ -78,7 +78,7 @@ const methods = {
       tileLoadFunction: this.tileLoadFunction,
       wrapX: this.wrapX,
       transition: this.transition,
-    })
+    });
   },
 };
 

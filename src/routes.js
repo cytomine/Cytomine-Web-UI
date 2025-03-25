@@ -21,6 +21,7 @@ import ListProjects from './components/project/ListProjects.vue';
 import CytomineStorage from './components/storage/CytomineStorage.vue';
 import ListOntologies from './components/ontology/ListOntologies.vue';
 import ListImages from './components/image/ListImages.vue';
+import ListImageGroups from './components/image-group/ListImageGroups.vue';
 import ImageInformation from './components/image/ImageInformation.vue';
 import ListAnnotations from './components/annotations/ListAnnotations.vue';
 import ProjectActivity from './components/project/ProjectActivity.vue';
@@ -75,6 +76,10 @@ const routes = [
       {
         path: 'images',
         component: ListImages
+      },
+      {
+        path: 'image-groups',
+        component: ListImageGroups
       },
       {
         path: 'image/:idImages',

@@ -30,6 +30,7 @@
       v-for="(cell, i) in cells"
       :key="i"
       :style="`height:${elementHeight}%; width:${elementWidth}%;`"
+      :class="{highlighted: cell && cell.highlighted}"
     >
       <cytomine-image
         v-if="cell && cell.image && cell.slices"
@@ -118,7 +119,8 @@ export default {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
         let slices = this.viewer.images[index].activeSlices;
-        cells[i] = {index, image, slices};
+        let highlighted = (this.viewer.images[index].view) ? this.viewer.images[index].view.highlighted : false;
+        cells[i] = {index, image, slices, highlighted};
       }
       return cells;
     },
@@ -129,8 +131,10 @@ export default {
       return 100/this.nbHorizontalCells;
     },
     shortkeysMapping() {
-      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t', 'nav-previous-t', 'nav-next-c',
-        'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t', 'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c',
+      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t',
+        'nav-previous-t', 'nav-next-c', 'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t',
+        'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c', 'nav-next-image-in-group',
+        'nav-previous-image-in-group', 'nav-next-annot-link', 'nav-previous-annot-link',
         'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
         'tool-freehand-polygon', 'tool-screenshot', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
         'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
@@ -254,6 +258,19 @@ export default {
             }
             await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
           }));
+
+          let images = {};
+          //don't fetch multiple times the same image.
+          let idImages = [...new Set(this.idImages)];
+          await Promise.all(idImages.map(async id => {
+            let image = await ImageInstance.fetch(id);
+            images[id] = image;
+          }));
+          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
+          if (imagesNotInCurrentProject.length > 0) {
+            this.errorBadImageProject = true;
+            throw new Error('Some images are not from this project');
+          }
         }
         else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
@@ -351,4 +368,7 @@ export default {
   display: none;
 }
 
+.highlighted {
+  border: 6px solid #0099ff;
+}
 </style>

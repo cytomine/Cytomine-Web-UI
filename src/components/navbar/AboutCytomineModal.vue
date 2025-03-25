@@ -17,7 +17,30 @@
   <template>
     <dl>
       <dt>{{$t('version')}}</dt>
-      <dd>{{version || '?'}}</dd>
+      <dd>{{version || '?'}}
+        <template v-if="constants['CYTOMINE_FLAVOR']">({{constants['CYTOMINE_FLAVOR'] || '?'}})</template>
+        <b-collapse :open="false">
+          <template #trigger="{open}">
+            <button class="button is-small">
+              {{$t(open ? 'button-hide' : 'button-show')}}
+            </button>
+          </template>
+          <dl>
+            <template v-for="component in componentsInfos" >
+              <dt :key="`${component.name}-dt`" :class="{'has-text-grey': !component.enabled}">
+                {{component.name}}
+                <span v-if="!component.enabled" class="is-italic is-lowercase"> ({{$t('disabled')}})</span>
+              </dt>
+              <dd :key="component.name">
+                <div class="tags has-addons">
+                  <span class="tag">{{component.namespace || '?'}}</span>
+                  <span class="tag is-primary">{{component.version || '?'}}</span>
+                </div>
+              </dd>
+            </template>
+          </dl>
+        </b-collapse>
+      </dd>
 
       <dt>{{$t('sponsors')}}</dt>
       <dd>
@@ -74,6 +97,7 @@
 </template>
 
 <script>
+import {Cytomine} from 'cytomine-client';
 import constants from '@/utils/constants.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
@@ -82,9 +106,37 @@ export default {
   components: {CytomineModalCard},
   data() {
     return {
-      version: constants.CYTOMINE_COMMERCIAL_VERSION
+      version: constants.CYTOMINE_COMMERCIAL_VERSION,
+      coreVersion: null,
+      loading: true,
+      open: false,
     };
   },
+  computed: {
+    constants() {
+      return constants;
+    },
+    componentsInfos() {
+      return this.constants['COMPONENTS'].map(component => {
+        return {
+          'name': component,
+          'enabled': constants[`${component}_ENABLED`] == null || constants[`${component}_ENABLED`],
+          'version': constants[`${component}_VERSION`],
+          'namespace': constants[`${component}_NAMESPACE`] || '-'
+        };
+      });
+    }
+  },
+  async created() {
+    try {
+      let {version} = await Cytomine.instance.ping();
+      this.coreVersion = (version) ? version : null;
+    }
+    catch(error) {
+      console.log(error);
+    }
+    this.loading = false;
+  }
 };
 </script>
 
