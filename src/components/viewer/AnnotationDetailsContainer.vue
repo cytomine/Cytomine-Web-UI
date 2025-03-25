@@ -205,21 +205,6 @@ export default {
         this.$nextTick(() => this.reload = true);
       }
     },
-    async searchSimilarAnnotations() {
-      let data = (await Cytomine.instance.api.get(
-        'retrieval/search',
-        {
-          params: {
-            annotation: this.selectedFeature.properties.annot.id,
-            nrt_neigh: 10 // eslint-disable-line camelcase
-          }
-        }
-      )).data;
-
-      this.$store.commit(this.imageModule + 'setShowSimilarAnnotations', true);
-      this.$store.commit(this.imageModule + 'setSimilarAnnotations', data);
-      this.$store.commit(this.imageModule + 'setQueryAnnotation', this.selectedFeature.properties.annot);
-    }
   },
   created() {
     this.fetchUsers();

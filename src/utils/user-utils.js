@@ -14,8 +14,6 @@
 * limitations under the License.
 */
 
-import moment from 'moment';
-
 export function fullName(user) {
   if(!user) {
     return '';

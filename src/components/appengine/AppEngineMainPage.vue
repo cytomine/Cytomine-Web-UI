@@ -4,7 +4,7 @@
     <div v-else-if="appEngineEnabled" class="panel">
       <p class="panel-heading">
         {{$t('app-engine.tasks.name')}}
-        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess"></UploadAppButton>
+        <UploadAppButton btnFunc="upload" @taskUploadSuccess="handleTaskUploadSuccess" />
       </p>
       <section class="panel-block">
         <section id="lower-section-flex">
@@ -18,7 +18,6 @@
         type="is-info">
         {{ $t('appengine-not-enabled-description') }}
       </b-message>
-
     </div>
   </div>
 </template>
@@ -28,7 +27,6 @@ import UploadAppButton from './UploadAppButton.vue';
 import AppCard from './AppCard.vue';
 import Task from '@/utils/appengine/task';
 import constants from '@/utils/constants.js';
-
 
 export default {
   name: 'AppEngineMainPage',
@@ -52,8 +50,8 @@ export default {
     async handleTaskUploadSuccess() {
       try {
         this.applications = await Task.fetchAll();
-
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Error fetching tasks after upload:', error);
       }
     },
@@ -86,17 +84,13 @@ export default {
   padding: 1em;
 }
 
-
 #lower-section-flex {
   display: flex;
   /* justify-content: center; */
   flex-direction: row;
   gap: 1%;
-
   flex-wrap: wrap;
-
   flex-basis: 30%;
-
 }
 
 #lower-section-flex>* {

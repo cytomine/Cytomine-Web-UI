@@ -83,12 +83,12 @@ export default {
     setInterval(() => {
       this.trackedTaskRuns.forEach(async (taskRun) => {
         // update task run in place
-        if (taskRun.state !== "CREATED" && !taskRun.inputs) {
+        if (taskRun.state !== 'CREATED' && !taskRun.inputs) {
           taskRun.inputs = await taskRun.fetchInputs();
         }
-        if (taskRun.state !== "FINISHED" && taskRun.state !== "FAILED") {
+        if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
           await taskRun.fetch();
-          if (taskRun.state === "FINISHED" || taskRun.state === "FAILED") {
+          if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
             taskRun.outputs = await taskRun.fetchOutputs();
           }
         }

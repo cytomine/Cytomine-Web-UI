@@ -53,13 +53,15 @@ export default {
       let summary = '';
       if (!!geq || geq === 0) {
         summary += `${geq} ≤ `;
-      } else if (!!gt || gt === 0) {
+      }
+      else if (!!gt || gt === 0) {
         summary += `${gt} < `;
       }
       summary += this.parameter.display_name;
       if (!!leq || leq === 0) {
         summary += ` ≤ ${leq}`;
-      } else if (!!lt || lt === 0) {
+      }
+      else if (!!lt || lt === 0) {
         summary += ` < ${lt}`;
       }
       return summary;

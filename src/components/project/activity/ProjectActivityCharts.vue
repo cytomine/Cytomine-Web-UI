@@ -279,7 +279,6 @@ import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js'
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
 import {AnnotationType} from 'cytomine-client';
-import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-activity-charts',

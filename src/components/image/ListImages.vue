@@ -227,7 +227,6 @@
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
-import MetadataSearch from '@/components/search/MetadataSearch';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
@@ -250,7 +249,6 @@ export default {
     ImageDetails,
     CytomineTable,
     AddImageModal,
-    MetadataSearch,
   },
   data() {
     return {

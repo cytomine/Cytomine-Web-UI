@@ -40,6 +40,7 @@ export default {
       namespaced: true
     },
     listImages,
+    listImageGroups,
     listAnnotations
   }
 };

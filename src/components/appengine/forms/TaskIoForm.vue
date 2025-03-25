@@ -52,12 +52,12 @@ export default {
     async runTask() {
       // create task run and provision
       await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version).then(async (taskRun) => {
-        return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async (taskRunProvisions) => {
+        return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async () => {
           // TODO reset form and send event
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
             this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
             this.resetForm();
-            this.$emit("appengine:task:started", taskRun);
+            this.$emit('appengine:task:started', taskRun);
           });
         });
       }).catch(e => {

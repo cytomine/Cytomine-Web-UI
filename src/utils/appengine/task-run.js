@@ -28,9 +28,11 @@ export default class TaskRun extends Model {
     this.project = null;
     this.task = new Task();
     this.state = null;
+    /* eslint-disable */
     this.created_at = null;
     this.updated_at = null;
     this.last_state_transition_at = null;
+    /* eslint-enable */
   }
 
   // Step-2: Provision task / user inputs
@@ -46,7 +48,7 @@ export default class TaskRun extends Model {
 
   // Step-3 Run/Execute the Provisioned Task
   async start() {
-    let {data} = await Cytomine.instance.api.post(`${this.uri}/state-actions`, {"desired": "RUNNING"});
+    let {data} = await Cytomine.instance.api.post(`${this.uri}/state-actions`, {'desired': 'RUNNING'});
     return data;
   }
 
