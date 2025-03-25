@@ -56,7 +56,6 @@
           @select="$emit('select', $event)"
           @centerView="$emit('centerView', ($event) ? $event : annot)"
           @deletion="$emit('delete', annot)"
-          @searchSimilarAnnotations="searchSimilarAnnotations"
         />
       </div>
 

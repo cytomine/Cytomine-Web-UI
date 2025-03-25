@@ -14,8 +14,6 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
-
 import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
@@ -29,7 +27,6 @@ function getDefaultState() {
     managers: [],
     members: [],
     currentViewer: null,
-    currentMetadataSearch: {},
   };
 }
 
@@ -66,22 +63,6 @@ export default {
     setCurrentViewer(state, id) {
       state.currentViewer = id;
     },
-
-    setImageFormat(state, format) {
-      state.currentMetadataSearch[format] = {};
-    },
-
-    setCurrentMetadataSearch(state, {format, key, searchValue}) {
-      state.currentMetadataSearch[format][key] = searchValue;
-    },
-
-    removeMetadataFilter(state, {format, key}) {
-      Vue.delete(state.currentMetadataSearch[format], key);
-    },
-
-    resetMetadataFilters(state) {
-      state.currentMetadataSearch = {};
-    }
   },
 
   actions: {
@@ -184,10 +165,6 @@ export default {
 
     terms: (state) => {
       return state.ontology ? getAllTerms(state.ontology) : null;
-    },
-
-    currentMetadataSearch: (state) => {
-      return state.currentMetadataSearch;
     },
 
     currentProjectModule: (state) => {
