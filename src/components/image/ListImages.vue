@@ -51,21 +51,102 @@
         </button>
       </div>
 
-      <metadata-search
-        v-if="filtersOpened"
-        :formats="availableFormats"
-        :image-ids="imageIds"
-        :magnifications="availableMagnifications"
-        :max-height="maxHeight"
-        :max-width="maxWidth"
-        :max-nb-job-annotations="maxNbJobAnnotations"
-        :max-nb-reviewed-annotations="maxNbReviewedAnnotations"
-        :max-nb-user-annotations="maxNbUserAnnotations"
-        :metadata="metadata"
-        :resolutions="availableResolutions"
-        :tags="availableTags"
-        :vendors="availableVendors"
-      />
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('format')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedFormats" :options="availableFormats" multiple />
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('vendor')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedVendors" :options="availableVendors"
+                    :multiple="true" label="label" track-by="value"/>
+              </div>
+            </div>
+
+            <div class="column filter is-one-quarter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('magnification')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedMagnifications" :options="availableMagnifications"
+                    :multiple="true" :searchable="false" label="label" track-by="value"/>
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('resolution')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedResolutions" :options="availableResolutions"
+                    :multiple="true" :searchable="false" label="label" track-by="value" />
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="filter-label">
+                {{$t('width')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsWidth" :max="maxWidth" />
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="filter-label">
+                {{$t('height')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsHeight" :max="maxHeight" />
+              </div>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('user-annotations')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('reviewed-annotations')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
+              </div>
+            </div>
+
+            <div class="column filter"></div>
+          </div>
+        </div>
+      </b-collapse>
 
       <cytomine-table
         :collection="imageCollection"
@@ -102,12 +183,6 @@
           <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
             <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
               {{ image.numberOfAnnotations }}
-            </router-link>
-          </b-table-column>
-
-          <b-table-column field="numberOfJobAnnotations" :label="$t('analysis-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=algo`">
-              {{ image.numberOfJobAnnotations }}
             </router-link>
           </b-table-column>
 
@@ -152,7 +227,6 @@
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable';
-import MetadataSearch from '@/components/search/MetadataSearch';
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 import AddImageModal from './AddImageModal';
@@ -175,7 +249,6 @@ export default {
     ImageDetails,
     CytomineTable,
     AddImageModal,
-    MetadataSearch,
   },
   data() {
     return {
@@ -190,7 +263,6 @@ export default {
         'instanceFilename',
         'magnification',
         'numberOfAnnotations',
-        'numberOfJobAnnotations',
         'numberOfReviewedAnnotations',
         'size'
       ],
@@ -202,7 +274,6 @@ export default {
       maxWidth: 100,
       maxHeight: 100,
       maxNbUserAnnotations: 100,
-      maxNbJobAnnotations: 100,
       maxNbReviewedAnnotations: 100,
       revision: 0
     };
@@ -240,7 +311,6 @@ export default {
     boundsWidth: localSyncBoundsFilter('boundsWidth', 'maxWidth'),
     boundsHeight: localSyncBoundsFilter('boundsHeight', 'maxHeight'),
     boundsUserAnnotations: localSyncBoundsFilter('boundsUserAnnotations', 'maxNbUserAnnotations'),
-    boundsJobAnnotations: localSyncBoundsFilter('boundsJobAnnotations', 'maxNbJobAnnotations'),
     boundsReviewedAnnotations: localSyncBoundsFilter('boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
     multiSelectFilters() {
@@ -265,7 +335,6 @@ export default {
         {prop: 'width', bounds: this.boundsWidth, max: this.maxWidth},
         {prop: 'height', bounds: this.boundsHeight, max: this.maxHeight},
         {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
-        {prop: 'numberOfJobAnnotations', bounds: this.boundsJobAnnotations, max: this.maxNbJobAnnotations},
         {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
       ];
     },
@@ -345,7 +414,6 @@ export default {
       this.maxWidth = Math.max(100, stats.width.max);
       this.maxHeight = Math.max(100, stats.height.max);
       this.maxNbUserAnnotations = Math.max(100, stats.countImageAnnotations.max);
-      this.maxNbJobAnnotations = Math.max(100, stats.countImageJobAnnotations.max);
       this.maxNbReviewedAnnotations = Math.max(100, stats.countImageReviewedAnnotations.max);
 
 

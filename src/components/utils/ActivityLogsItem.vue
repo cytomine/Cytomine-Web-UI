@@ -61,7 +61,6 @@ export default {
       switch(this.action.serviceName) {
         case 'userAnnotationService':
         case 'reviewedAnnotationService':
-        case 'algoAnnotationService':
           return ANNOT;
         case 'imageInstanceService':
           return IMAGE;
@@ -114,7 +113,6 @@ export default {
           this.annotationHandler(
             this.actionData.newUserAnnotation ||
             this.actionData.newReviewedAnnotation ||
-            this.actionData.newAlgoAnnotation ||
             this.actionData.newAnnotation
           );
           break;

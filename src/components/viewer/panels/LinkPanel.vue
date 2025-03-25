@@ -235,7 +235,7 @@ ul.group {
   margin-right: 0.5em;
 }
 
-/deep/ .b-checkbox {
+>>> .b-checkbox {
   align-items: flex-start !important;
   margin-top: 0.25em;
 }

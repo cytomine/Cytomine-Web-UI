@@ -594,7 +594,7 @@ export default {
     }
   },
   async created() {
-    if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
+    if(this.isPropDisplayed('comments') && this.annotation.type == AnnotationType.USER) {
       try {
         this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;
         if(this.showComments) {

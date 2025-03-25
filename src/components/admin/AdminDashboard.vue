@@ -104,27 +104,6 @@
           </tbody>
         </table>
       </div>
-
-      <div class="column" v-show="algoEnabled">
-        <table class="table is-fullwidth">
-          <tbody>
-            <tr>
-              <td>{{totalCounts.softwares}}</td>
-              <td>{{$t('algorithms')}}</td>
-            </tr>
-            <tr>
-              <td>{{totalCounts.jobs}}</td>
-              <td>{{$t('analyses')}}</td>
-            </tr>
-            <tr>
-              <td>{{totalCounts.jobAnnotations}}</td>
-              <td>{{$t('analysis-annotations')}}</td>
-            </tr>
-            <tr>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <hr>
@@ -152,7 +131,6 @@
 </template>
 
 <script>
-import constants from '@/utils/constants.js';
 import {Cytomine} from 'cytomine-client';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import moment from 'moment';
@@ -167,7 +145,6 @@ export default {
       totalCounts: null,
       storageStats: null,
       chartOptions: [],
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       selectedChartOption: null
     };
   },

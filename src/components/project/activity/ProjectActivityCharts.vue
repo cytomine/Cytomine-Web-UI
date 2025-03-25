@@ -105,22 +105,6 @@
           <strong>{{$t("user-annotations")}}</strong>
         </div>
       </div>
-      <div v-show="algoEnabled" class="tile is-parent">
-        <div class="tile is-child box single-metric">
-          <div class="absolute-info-circle">
-            <v-popover>
-              <i class="fas fa-info-circle"></i>
-              <template #popover>
-                <p>{{$t("analysis-annotations-info-message")}}</p>
-              </template>
-            </v-popover>
-          </div>
-          <strong class="metric">
-            {{ nbAnnotations[annotationTypes.ALGO] != null ? nbAnnotations[annotationTypes.ALGO] : "?" }}
-          </strong>
-          <strong>{{$t("analysis-annotations")}}</strong>
-        </div>
-      </div>
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
@@ -295,7 +279,6 @@ import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js'
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
 
 import {AnnotationType} from 'cytomine-client';
-import constants from '@/utils/constants.js';
 
 export default {
   name: 'project-activity-charts',
@@ -314,14 +297,12 @@ export default {
   },
   data() {
     return {
-      algoEnabled: constants.ALGORITHMS_ENABLED,
       loading: true,
       nbProjectVisits: null,
       nbImageConsultations: null,
       nbAnnotationSelections: null,
       nbAnnotations: {
         [AnnotationType.USER]: null,
-        [AnnotationType.ALGO]: null,
         [AnnotationType.REVIEWED]: null
       },
       selectedTerms: [0],
@@ -404,7 +385,6 @@ export default {
         this.fetchNbImageConsultations(),
         this.fetchNbAnnotationSelections(),
         this.fetchNbAnnotations(AnnotationType.USER),
-        this.fetchNbAnnotations(AnnotationType.ALGO),
         this.fetchNbAnnotations(AnnotationType.REVIEWED)
       ].map(p => p.catch(e => console.log(e)))); // ignore errors (handled in template) and ensure all promises finish, even if some errors occur in the process);
     }

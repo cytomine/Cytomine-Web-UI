@@ -26,9 +26,6 @@ export default {
       showComments: null, // set to the identifier of an annotation to automatically open comments modal if this annotation if the first to be selected
       displayAnnotDetails: true,
       positionAnnotDetails: {x: 0, y: 0},
-      showSimilarAnnotations: false,
-      similarAnnotations: null,
-      queryAnnotation: null,
     };
   },
 
@@ -116,18 +113,6 @@ export default {
 
     setPositionAnnotDetails(state, value) {
       state.positionAnnotDetails = value;
-    },
-
-    setShowSimilarAnnotations(state, value) {
-      state.showSimilarAnnotations = value;
-    },
-
-    setSimilarAnnotations(state, value) {
-      state.similarAnnotations = value;
-    },
-
-    setQueryAnnotation(state, value) {
-      state.queryAnnotation = value;
     },
   },
 

@@ -31,9 +31,7 @@ export default {
         boundsWidth: null,
         boundsHeight: null,
         boundsUserAnnotations: null,
-        boundsJobAnnotations: null,
-        boundsReviewedAnnotations: null,
-        specificFormatFilters: null,
+        boundsReviewedAnnotations: null
       },
 
       currentPage: 1,
