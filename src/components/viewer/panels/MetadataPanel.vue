@@ -71,7 +71,7 @@ export default {
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     },
     closeMetadata() {
-      this.$eventBus.$emit('closeMetadata');
+      this.$eventBus.$emit('close-metadata');
     }
   },
   async created() {
