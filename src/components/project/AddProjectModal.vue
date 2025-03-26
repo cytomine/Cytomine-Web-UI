@@ -68,7 +68,8 @@
 </template>
 
 <script>
-import {ImageInstance, Project, Ontology} from 'cytomine-client';
+import {Project, Ontology} from 'cytomine-client';
+
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
@@ -85,7 +86,6 @@ export default {
       name: '',
       ontology: 'NEW',
       selectedOntology: null,
-      ufiles: []
     };
   },
   watch: {
@@ -116,19 +116,9 @@ export default {
 
         let project = await new Project({name: this.name, ontology: idOntology}).save();
 
-        if (this.ufiles) {
-          await Promise.all(
-            this.ufiles.map(async (uFile) => await new ImageInstance({
-              baseImage: uFile.image,
-              project: project.id
-            }).save())
-          );
-        }
-
         this.loading = false;
         this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
         this.$emit('update:active', false);
-        this.$store.commit('currentProject/resetMetadataFilters');
         await this.$router.push(`/project/${project.id}/configuration`);
       }
       catch(error) {
@@ -141,11 +131,5 @@ export default {
       }
     }
   },
-  mounted() {
-    this.$eventBus.$on('update-ufiles', (ufiles) => this.ufiles = ufiles);
-  },
-  beforeDestroy() {
-    this.$eventBus.$off('update-ufiles');
-  }
 };
 </script>
