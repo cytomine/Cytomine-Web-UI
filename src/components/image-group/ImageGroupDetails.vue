@@ -200,6 +200,7 @@ export default {
     async rename(newName) {
       let oldName = this.imageGroup.name;
       try {
+        // eslint-disable-next-line
         this.imageGroup.name = newName;
         await this.imageGroup.save();
         this.$notify({

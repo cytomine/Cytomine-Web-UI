@@ -22,6 +22,7 @@ import {User} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {
+  // eslint-disable-next-line
   name: 'username',
   props: {
     user: Object,
