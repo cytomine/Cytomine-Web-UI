@@ -103,6 +103,7 @@ import {Cytomine} from 'cytomine-client';
 import Register from './Register';
 
 export default {
+  // eslint-disable-next-line
   name: 'login',
   components: {Register},
   mixins: [changeLanguageMixin],

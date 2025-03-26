@@ -297,44 +297,39 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import {ImageInstance, ImageGroupImageInstanceCollection} from 'cytomine-client';
 
+import {appendShortTermToken} from '@/utils/token-utils.js';
+import {formatMinutesSeconds} from '@/utils/slice-utils.js';
+import {get} from '@/utils/store-helpers';
+import vendorFromFormat from '@/utils/vendor';
+
+import AttachedFiles from '@/components/attached-file/AttachedFiles';
+import CalibrationModal from '@/components/image/CalibrationModal';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import MagnificationModal from './MagnificationModal';
-import CalibrationModal from './CalibrationModal';
-import ImageMetadataModal from './ImageMetadataModal';
-import ImageStatus from './ImageStatus';
+import ImageMetadataModal from '@/components/image/ImageMetadataModal';
+import ImageStatus from '@/components/image/ImageStatus';
+import ImageThumbnail from '@/components/image/ImageThumbnail';
+import MagnificationModal from '@/components/image/MagnificationModal';
 import RenameModal from '@/components/utils/RenameModal';
 import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import constants from '@/utils/constants.js';
-
-import {formatMinutesSeconds} from '@/utils/slice-utils.js';
-
-import {ImageInstance, ImageGroupImageInstanceCollection, PropertyCollection} from 'cytomine-client';
-
-import {appendShortTermToken} from '@/utils/token-utils.js';
-
-import vendorFromFormat from '@/utils/vendor';
-
 
 export default {
   name: 'image-details',
   components: {
-    ImageThumbnail,
-    SimpleAddToImageGroupModal,
-    CytomineDescription,
-    CytomineTags,
-    CytomineProperties,
     AttachedFiles,
-    MagnificationModal,
     CalibrationModal,
+    CytomineDescription,
+    CytomineProperties,
+    CytomineTags,
     ImageMetadataModal,
     ImageStatus,
-    RenameModal
+    ImageThumbnail,
+    MagnificationModal,
+    RenameModal,
+    SimpleAddToImageGroupModal,
   },
   props: {
     image: {type: Object},
@@ -352,7 +347,6 @@ export default {
       error: false,
       imageGroupLinks: [],
       properties: [],
-      loadPropertiesError: false
     };
   },
   computed: {
@@ -385,32 +379,6 @@ export default {
     vendor() {
       return vendorFromFormat(this.image.contentType);
     },
-    internalUseFilteredProperties() {
-      return this.properties.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY));
-    },
-    metadataFilteredProperties() {
-      let props = this.internalUseFilteredProperties.filter(prop => {
-        for (const key in constants.METADATA_PREFIXES) {
-          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
-            return false;
-          }
-        }
-        return true;
-      });
-      return props;
-    },
-    onlyMetadataProperties() {
-      let props = this.internalUseFilteredProperties.filter(prop => {
-        for (const key in constants.METADATA_PREFIXES) {
-          if (prop.key.startsWith(constants.METADATA_PREFIXES[key])) {
-            return true;
-          }
-        }
-        return false;
-      });
-      // We sort the properties to improve ease of use in the metadata modal
-      return props.sort((a, b) => a.key.localeCompare(b.key));
-    },
     /**
      * BLIND   MANAGER    RESULT
      * 0       0          1
@@ -419,7 +387,7 @@ export default {
      * 1       1          1
      */
     isBlindModeAndContributor() {
-      return this.blindMode && !this.canManageProject; 
+      return this.blindMode && !this.canManageProject;
     },
     isInImageGroup() {
       return this.imageGroupLinks.length > 0;
@@ -447,6 +415,7 @@ export default {
     async rename(newName) {
       let oldName = this.image.instanceFilename;
       try {
+        // eslint-disable-next-line
         this.image.instanceFilename = newName;
         await this.image.save();
         this.$notify({
@@ -526,28 +495,14 @@ export default {
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
     },
-    removeProp(prop) {
-      this.properties = this.properties.filter(p => p.id !== prop.id);
-    },
-    addProp(prop) {
-      this.properties.push(prop);
-    },
     async fetchImageGroupLinks() {
       this.imageGroupLinks = (await ImageGroupImageInstanceCollection.fetchAll({
         filterKey: 'imageinstance',
         filterValue: this.image.id
       })).array;
-    }
+    },
   },
   async created() {
-    try {
-      this.properties = (await PropertyCollection.fetchAll({ object: this.image })).array;
-    }
-    catch (error) {
-      this.loadPropertiesError = true;
-      console.log(error);
-    }
-
     try {
       await this.fetchImageGroupLinks();
     }

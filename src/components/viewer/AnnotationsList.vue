@@ -75,15 +75,14 @@
 </template>
 
 <script>
-import {UserCollection, UserJobCollection} from 'cytomine-client';
-
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
-import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
+import {UserCollection} from 'cytomine-client';
 
 import {fullName} from '@/utils/user-utils.js';
 import {get} from '@/utils/store-helpers';
 
+import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
+import OntologyTree from '@/components/ontology/OntologyTree';
+import TrackTree from '@/components/track/TrackTree';
 
 export default {
   name: 'annotations-list',
@@ -101,7 +100,6 @@ export default {
       noTermOption: {id: 0, name: this.$t('no-term')},
 
       users: [],
-      userJobs: [],
 
       revision: 0
     };
@@ -201,7 +199,7 @@ export default {
       return this.layers.map(layer => layer.id);
     },
     allUsers() {
-      let allUsers = this.users.concat(this.userJobs);
+      let allUsers = this.users;
       allUsers.forEach(user => user.fullName = fullName(user));
       return allUsers;
     },
@@ -257,12 +255,6 @@ export default {
     async fetchUsers() { // TODO in vuex (project module)
       this.users = (await UserCollection.fetchAll()).array;
     },
-    async fetchUserJobs() { // TODO in vuex (project module)
-      this.userJobs = (await UserJobCollection.fetchAll({
-        filterKey: 'project',
-        filterValue: this.image.project
-      })).array;
-    },
     addAnnotationHandler(annotation) {
       if(annotation.image === this.image.id) {
         this.revision++;
@@ -289,19 +281,6 @@ export default {
     select({annot, options}) {
       this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});
     },
-    // async select(annot) {
-    //   if (annot.slice !== this.slice.id) {
-    //     //TODO
-    //     await this.$store.dispatch(this.imageModule + 'setActiveSliceByPosition',
-    //       {time: annot.time, channel: annot.channel, zStack: annot.zStack});
-    //     this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-    //     this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
-    //     this.$emit('centerView', annot);
-    //   }
-    //   else {
-    //     this.$eventBus.$emit('selectAnnotation', {index: this.index, annot, center: true});
-    //   }
-    // },
 
     shortkeyHandler(key) {
       if (!this.isActiveImage) {
@@ -321,8 +300,7 @@ export default {
       this.selectedTracksIds = (this.hasTracks) ? [this.tracks[0].id] : [];
     }
 
-    this.fetchUsers();
-    this.fetchUserJobs();
+    await this.fetchUsers();
   },
   mounted() {
     this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);

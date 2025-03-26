@@ -18,11 +18,11 @@ ARG WEB_UI_REVISION
 ARG NODE_VERSION=16.20.2-alpine3.18
 ARG NODE_DEV_VERSION=16.20.2-buster-slim
 ARG NGINX_VERSION=1.22.1
-ARG ENTRYPOINT_SCRIPTS_VERSION=1.3.0
+ARG ENTRYPOINT_SCRIPTS_VERSION=1.0.0
 
 #######################################################################################
 ## Stage: build front-end
-FROM node:${NODE_VERSION} as frontend-builder
+FROM node:${NODE_VERSION} AS frontend-builder
 WORKDIR /app
 
 # explicit listing for copy, to avoid copying dangling ./node_modules or alike
@@ -39,16 +39,16 @@ RUN npm install && \
 
 #######################################################################################
 ## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
-FROM cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} as entrypoint-scripts
+FROM cytomineuliege/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
-FROM node:${NODE_DEV_VERSION} as dev-server
+FROM node:${NODE_DEV_VERSION} AS dev-server
 
 # ui source code should be mounted in /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends gettext=0.19.8.1-9 git=1:2.20.1-2+deb10u8
+RUN apt-get update && apt-get install -y --no-install-recommends gettext=0.19.8.1-9 git=1:2.20.1-2+deb10u9
 
 RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=entrypoint-scripts --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
@@ -62,7 +62,7 @@ CMD ["npm", "run", "serve"]
 
 #######################################################################################
 ## Stage: building nginx image serving the front-end
-FROM nginx:${NGINX_VERSION}-alpine as prod-server
+FROM nginx:${NGINX_VERSION}-alpine AS prod-server
 
 ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
@@ -70,11 +70,11 @@ ARG NGINX_VERSION
 ARG NODE_VERSION
 ARG ENTRYPOINT_SCRIPTS_VERSION
 
-LABEL org.opencontainers.image.authors='support@cytomine.com' \
-      org.opencontainers.image.url='https://www.cytomine.org/' \
-      org.opencontainers.image.documentation='https://doc.cytomine.org/' \
-      org.opencontainers.image.source='https://github.com/cytomine/Cytomine-Web-UI' \
-      org.opencontainers.image.vendor='Cytomine Corporation SA' \
+LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
+      org.opencontainers.image.url="https://uliege.cytomine.org/" \
+      org.opencontainers.image.documentation="https://doc.uliege.cytomine.org/" \
+      org.opencontainers.image.source="https://github.com/Cytomine-ULiege/Cytomine-web-ui" \
+      org.opencontainers.image.vendor="Cytomine ULiège" \
       org.opencontainers.image.version=${WEB_UI_VERSION} \
       org.opencontainers.image.revision=${WEB_UI_REVISION} \
       org.opencontainers.image.deps.nginx.version=${NGINX_VERSION} \
@@ -97,4 +97,3 @@ COPY --from=frontend-builder /app/dist /app
 
 ENTRYPOINT ["cytomine-entrypoint.sh", "/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
-

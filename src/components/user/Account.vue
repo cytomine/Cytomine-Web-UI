@@ -197,6 +197,7 @@ import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 
 export default {
+  // eslint-disable-next-line
   name: 'Account',
   $_veeValidate: {validator: 'new'},
   mixins: [changeLanguageMixin],
