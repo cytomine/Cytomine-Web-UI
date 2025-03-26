@@ -2,13 +2,22 @@ stages:
   - lint
   - test
 
-lint:
+lint-javascript:
   stage: lint
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:${NODE_VERSION}
   before_script:
     - npm ci
   script:
     - npm run lint
+
+lint-dockerfile:
+  stage: lint
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/hadolint/hadolint:${HADOLINT_VERSION}
+  script:
+    - hadolint docker/Dockerfile
+  rules:
+    - changes:
+        - docker/Dockerfile
 
 unit-test:
   stage: test
