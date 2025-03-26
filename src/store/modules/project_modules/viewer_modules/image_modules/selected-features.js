@@ -47,12 +47,6 @@ export default {
       state.annotsToSelect = [];
     },
 
-    clearSimilarAnnotations(state) {
-      state.showSimilarAnnotations = false;
-      state.similarAnnotations = null;
-      state.queryAnnotation = null;
-    },
-
     selectFeature(state, feature) {
       state.selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
     },

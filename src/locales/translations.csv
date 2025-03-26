@@ -582,7 +582,6 @@ no-result-file,No result file,Aucun fichier de résultat,Sin archivo de resultad
 no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 no-selected-annot,No selected annotation,Pas d'annotation sélectionnée,Ninguna anotación seleccionada,Geen geselecteerde annotatie
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
-no-similar-annotations-found,No similar annotations found,Pas d'annotations similaires trouvées,No se encontraron anotaciones similares,Geen vergelijkbare annotaties gevonden
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
 no-software,No algorithm,Pas d'algorithme,Sin algoritmo,Geen algoritme
 no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag
@@ -948,7 +947,6 @@ saturation,Saturation,Saturation,Saturación,Verzadiging
 screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
 search-or-create-tag,Search tag (or create a new one by typing its name and pressing Enter)...,Rechercher un tag (ou créer un nouveau en entrant son nom suivi de la touche Enter)...,Busque la etiqueta (o cree una nueva escribiendo su nombre y presionando Enter) ...,Zoek naar een tag (of maak een nieuwe aan door de naam in te voeren gevolgd door de Enter-toets)...
 search-placeholder,Search,Recherche,Buscar,Zoeken
-search-similar-annotation,Search for similar annotations,Recherche d'annotations similaires,Buscar anotaciones similares,Zoeken naar soortgelijke annotaties
 search-user,Search user...,Rechercher un utilisateur...,Buscar usuario...,Zoek een gebruiker...
 seconds,second | seconds,seconde | secondes,,tweede | seconden
 see-environment-on,See environment on,Voir l'environnement sur,Ver entorno en,Zie de omgeving op
@@ -1063,7 +1061,6 @@ shortcut-viewer-tool-rotate,Rotate annotation,Pivoter l'annotation,Rotar anotaci
 shortcut-viewer-tool-select,Select annotation,Sélectionner une annotation,Seleccionar anotación,Selecteer een annotatie
 shortcut-viewer-tool-undo,Undo annotation action,Annuler une action sur les annotations,Deshacer acción de anotación,Een actie op annotaties annuleren
 shortcuts,Shortcuts,Raccourcis,Atajos,Snelkoppelingen
-similar-annotations,Similar annotations,Annotations similaires,Anotaciones similares,Soortgelijke annotaties
 size,Size,Taille,Tamaño,Maat
 slice,Slice,Plan,,Slice
 slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,Sin vista previa de cristal,Bladvoorbeeld niet beschikbaar
