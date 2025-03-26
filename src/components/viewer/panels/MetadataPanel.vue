@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2023. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div>
     <div class="metadata-viewer">
@@ -47,17 +33,18 @@
 </template>
 
 <script>
+import {Cytomine} from 'cytomine-client';
+
 import {getWildcardRegexp} from '@/utils/string-utils';
-import {PropertyCollection} from 'cytomine-client';
 
 export default {
-  name: 'metadata-panel',
+  name: 'MetadataPanel',
   props: {
     index: String,
   },
   data() {
     return {
-      properties: [],
+      metadata: [],
       searchString: '',
     };
   },
@@ -70,25 +57,29 @@ export default {
     },
     filteredProps() {
       if (!this.searchString) {
-        return this.properties;
+        return this.metadata;
       }
       let regexp = getWildcardRegexp(this.searchString);
-      return this.properties.filter(prop => regexp.test(prop.key) || regexp.test(prop.value));
+      return this.metadata.filter(prop => regexp.test(prop.key) || regexp.test(prop.value));
     },
   },
   methods: {
+    async fetchMetadata() {
+      this.metadata = (await Cytomine.instance.api.get(
+        `imageinstance/${this.image.id}/metadata.json`
+      )).data.collection.map(md => ({fullKey: `${md.namespace}.${md.key}`, ...md}));
+      this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
+    },
     closeMetadata() {
-      this.$eventBus.$emit('closeMetadata');
+      this.$eventBus.$emit('close-metadata');
     }
   },
   async created() {
     try {
-      this.properties = (await PropertyCollection.fetchAll({object: this.image})).array;
-      this.properties.sort((a, b) => a.key.localeCompare(b.key));
+      await this.fetchMetadata();
     }
     catch (error) {
       console.log(error);
-      this.error = true;
     }
   }
 };

@@ -810,14 +810,14 @@ export default {
     this.$eventBus.$on('updateMapSize', this.updateMapSize);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$on('closeMetadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
+    this.$eventBus.$on('close-metadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
     this.setInitialZoom();
   },
   beforeDestroy() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$off('closeMetadata');
+    this.$eventBus.$off('close-metadata');
     clearTimeout(this.timeoutSavePosition);
   }
 };
