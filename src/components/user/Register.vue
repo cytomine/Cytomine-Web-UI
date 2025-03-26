@@ -62,6 +62,7 @@
 import {Cytomine} from 'cytomine-client';
 
 export default {
+  // eslint-disable-next-line
   name: 'register',
   $_veeValidate: {validator: 'new'},
   data() {
