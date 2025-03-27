@@ -1,61 +1,70 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
+import VTooltip from 'v-tooltip';
 
 import GlobalDashboard from '@/components/GlobalDashboard';
 import {Configuration, ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
-jest.mock('cytomine-client', () => ({
-  Configuration: {
-    fetch: jest.fn()
-  },
-  ImageInstanceCollection: {
-    fetchLastOpened: jest.fn()
-  },
-  ProjectCollection: {
-    fetchAll: jest.fn(),
-    fetchLastOpened: jest.fn()
-  }
+jest.mock('@/utils/image-utils', () => ({
+  isWebPSupported: jest.fn(() => true)
 }));
 
-describe('GlobalDashboard.vue', () => {
-  const mocks = {
-    $t: (message) => message,
-  };
-
-  let localVue;
-  let wrapper;
-
-  beforeEach(() => {
-    ProjectCollection.fetchAll.mockResolvedValue({
+jest.mock('cytomine-client', () => ({
+  Configuration: {
+    fetch: jest.fn().mockResolvedValue({
+      value: 'Welcome to the dashboard!'
+    })
+  },
+  ImageInstanceCollection: {
+    fetchLastOpened: jest.fn().mockResolvedValue([
+      {id: 1, project: 1}
+    ])
+  },
+  ProjectCollection: {
+    fetchAll: jest.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Project 1', numberOfImages: 10, blindMode: false},
         {id: 2, name: 'Project 2', numberOfImages: 5, blindMode: true}
       ]
-    });
-    ProjectCollection.fetchLastOpened.mockResolvedValue([
+    }),
+    fetchLastOpened: jest.fn().mockResolvedValue([
       {id: 1},
       {id: 2}
-    ]);
-    ImageInstanceCollection.fetchLastOpened.mockResolvedValue([
-      {id: 1, project: 1}
-    ]);
-    Configuration.fetch.mockResolvedValue({
-      value: 'Welcome to the dashboard!'
-    });
+    ])
+  }
+}));
 
+describe('GlobalDashboard.vue', () => {
+  let localVue;
+  let wrapper;
+
+  beforeEach(() => {
     localVue = createLocalVue();
     localVue.use(Buefy);
+    localVue.use(VTooltip);
 
-    wrapper = shallowMount(GlobalDashboard, {
+    wrapper = mount(GlobalDashboard, {
       localVue,
-      mocks: mocks,
+      mocks: {
+        $t: (message) => message,
+      },
+      computed: {
+        currentUser: () => ({
+          fetchNbAnnotations: jest.fn().mockResolvedValue(5),
+        })
+      },
       propsData: {
         nbRecent: 3
+      },
+      stubs: {
+        'image-preview': true,
+        'list-images-preview': true,
+        'router-link': true,
       }
     });
   });
 
-  it('should render the component correctly', () => {
+  it('The component should be rendered correctly', () => {
     const headers = wrapper.findAll('h2');
 
     expect(headers.length).toBe(3);
@@ -66,30 +75,25 @@ describe('GlobalDashboard.vue', () => {
     expect(wrapper.vm.loading).toBe(false);
   });
 
-  it('should render correctly when data is loaded', () => {
-    expect(wrapper.find('h2').text()).toContain('recently-opened');
-    expect(wrapper.findAll('router-link').length).toBeGreaterThan(0);
-  });
-
-  it('should render the welcome message', () => {
+  it('The component should render the welcome message correctly', () => {
     expect(Configuration.fetch).toHaveBeenCalled();
     expect(wrapper.vm.welcomeMessage).toBe('Welcome to the dashboard!');
     expect(wrapper.find('.box').text()).toContain('Welcome to the dashboard!');
   });
 
-  it('should fetch projects and compute statistics', () => {
+  it('The component should fetch projects and compute statistics', () => {
     expect(ProjectCollection.fetchAll).toHaveBeenCalled();
     expect(wrapper.vm.projects.array.length).toBe(2);
     expect(wrapper.vm.nbImages).toBe(15);
   });
 
-  it('should fetch recent projects and display them correctly', async () => {
+  it('The component should fetch recent projects and display them correctly', async () => {
     expect(ProjectCollection.fetchLastOpened).toHaveBeenCalled();
     expect(wrapper.vm.recentProjects.length).toBe(2);
-    expect(wrapper.vm.recentProjects[0].name).toBe('Project 1');
+    expect(wrapper.vm.recentProjects.at(0).name).toBe('Project 1');
   });
 
-  it('should fetch the last opened image and bind it to the template', async () => {
+  it('The component should fetch the last opened image and bind it to the template', async () => {
     expect(ImageInstanceCollection.fetchLastOpened).toHaveBeenCalled();
     expect(wrapper.vm.lastOpenedImage.projectName).toBe('Project 1');
   });

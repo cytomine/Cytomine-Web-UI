@@ -1,27 +1,24 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineProperties from '@/components/property/CytomineProperties';
-import { Property } from 'cytomine-client';
+import {Property} from 'cytomine-client';
 
 jest.mock('cytomine-client', () => {
   return {
-    Property: {
-      delete: jest.fn().mockResolvedValue(true),
-      PropertyInstance: {
-        create: jest.fn().mockImplementation(() => ({
-          id: Date.now(),
-          key: '',
-          value: '',
-          save: jest.fn().mockResolvedValue(true),
-          isNew: jest.fn().mockReturnValue(true),
-        })),
-      },
-    },
+    Property: jest.fn().mockImplementation(() => {
+      return {
+        id: Date.now(),
+        key: '',
+        value: '',
+        isNew: jest.fn().mockReturnValue(true),
+        save: jest.fn().mockResolvedValue(true),
+      };
+    }),
     PropertyCollection: {
       fetchAll: jest.fn().mockResolvedValue({
         array: [
-          { id: 1, key: 'Property 1', value: 'Value 1' },
+          {id: 1, key: 'Property 1', value: 'Value 1'},
         ],
       }),
     },
@@ -50,17 +47,17 @@ describe('CytomineProperties.vue', () => {
     });
   });
 
-  it('should render the component correctly', () => {
+  it('The component should be rendered correctly', () => {
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.find('.properties-wrapper').exists()).toBe(true);
   });
 
-  it('should render the correct initial properties', () => {
+  it('The component should render the initial properties correctly', () => {
     expect(wrapper.text()).toContain('Property 1');
     expect(wrapper.text()).toContain('Value 1');
   });
 
-  it('should contain the correct initial data', () => {
+  it('The component should contain the correct initial data', () => {
     expect(wrapper.vm.loading).toBe(false);
     expect(wrapper.vm.error).toBe(false);
     expect(wrapper.vm.properties.length).toBe(1);
@@ -70,37 +67,41 @@ describe('CytomineProperties.vue', () => {
     expect(wrapper.vm.showNewPropForm).toBe(false);
   });
 
-  it('should add a new property correctly', async () => {
-    const newPropertyInstance = Property.PropertyInstance.create();
-    newPropertyInstance.id = 2;
-    newPropertyInstance.key = 'New Property';
-    newPropertyInstance.value = 'New Value';
+  it('Clicking on add button should add a new property correctly', async () => {
+    const property = new Property({object: {}});
+    property.id = 2;
+    property.key = 'New Property';
+    property.value = 'New Value';
 
-    wrapper.setData({
-      editedProperties: [newPropertyInstance]
+    await wrapper.setData({
+      editedProperties: [property]
     });
-    await wrapper.vm.$nextTick();
 
     wrapper.find('button.add-prop').trigger('click');
 
-    expect(wrapper.vm.editedProperties.length).toBe(1);
+    expect(wrapper.vm.editedProperties.length).toBe(2);
   });
 
-  it('should delete a property correctly', async () => {
+  it('Clicking on delete button should delete a property correctly', async () => {
+    Property.delete = jest.fn().mockResolvedValue(true);
+
+    expect(wrapper.vm.properties.length).toBe(1);
+
     const deleteButton = wrapper.find('button.delete.is-small');
     await deleteButton.trigger('click');
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted()).toHaveProperty('update');
+    expect(wrapper.vm.properties.length).toBe(0);
   });
 
-  it('should handle property save correctly', async () => {
-    const propertyInstance = Property.PropertyInstance.create();
-    propertyInstance.key = 'New Property';
-    propertyInstance.value = 'New Value';
+  it('Clicking on save button should save the modification correctly', async () => {
+    const property = new Property({object: {}});
+    property.key = 'New Property';
+    property.value = 'New Value';
 
     wrapper.setData({
-      editedProperties: [propertyInstance]
+      editedProperties: [property]
     });
 
     await wrapper.vm.saveProp(0);
@@ -108,13 +109,13 @@ describe('CytomineProperties.vue', () => {
     expect(wrapper.emitted()).toHaveProperty('update');
   });
 
-  it('should handle property cancel correctly', async () => {
-    const propertyInstance = Property.PropertyInstance.create();
-    propertyInstance.key = 'New Property';
-    propertyInstance.value = 'New Value';
+  it('Cancel an edition should handle property cancel correctly', async () => {
+    const property = new Property({object: {}});
+    property.key = 'New Property';
+    property.value = 'New Value';
 
     wrapper.setData({
-      editedProperties: [propertyInstance]
+      editedProperties: [property]
     });
 
     await wrapper.vm.cancelPropEdition(0);
