@@ -3,7 +3,12 @@
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
     <section v-if="task">
       <!-- INPUTS -->
-      <app-engine-field :parameter="input" v-model="inputs[input.name]" v-for="input in taskInputs" :key="input.id"></app-engine-field>
+      <app-engine-field
+        v-for="input in taskInputs"
+        v-model="inputs[input.name]"
+        :key="input.id"
+        :parameter="input"
+      />
       <!-- TODO outputs when relevant -->
     </section>
     <section>
@@ -26,29 +31,34 @@ export default {
     AppEngineField
   },
   props: {
-    task: {
-      type: Task
-    },
-    projectId: {
-      type: Number
-    }
+    task: {type: Task, required: true},
+    projectId: {type: Number, required: true}
   },
-  data () {
+  data() {
     return {
       taskInputs: [],
       inputs: {}
     };
   },
   async created() {
-    let inputs = await Task.fetchTaskInputs(this.task.namespace, this.task.version);
-    // sort inputs lexicographically
-    this.taskInputs = inputs.sort((a, b) => {
-      return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);
-    });
-
-    this.resetForm();
+    await this.fetchTaskInputs();
+  },
+  watch: {
+    async task() {
+      await this.fetchTaskInputs();
+    }
   },
   methods: {
+    async fetchTaskInputs() {
+      let inputs = await Task.fetchTaskInputs(this.task.namespace, this.task.version);
+
+      // sort inputs lexicographically
+      this.taskInputs = inputs.sort((a, b) => {
+        return a.name < b.name ? -1 : (a.name === b.name ? 0 : 1);
+      });
+
+      this.resetForm();
+    },
     async runTask() {
       // create task run and provision
       await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version).then(async (taskRun) => {

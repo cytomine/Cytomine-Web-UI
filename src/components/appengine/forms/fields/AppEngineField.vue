@@ -1,22 +1,20 @@
 <template>
-  <div>
-    <integer-field v-if="typeId == 'integer'" @input="$emit('input', $event)" :parameter="parameter" v-model="input"></integer-field>
-  </div>
+  <component v-model="input" :is="currentField" :parameter="parameter" @input="$emit('input', $event)"/>
 </template>
 
 <script>
-import IntegerField from '@/components/appengine/forms/fields/IntegerField.vue';
+import BooleanField from '@/components/appengine/forms/fields/BooleanField';
+import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 
 export default {
   name: 'AppEngineField',
   components: {
-    IntegerField
+    BooleanField,
+    IntegerField,
   },
   props: {
-    parameter: {
-      type: Object
-    },
-    value: { }
+    parameter: {type: Object, required: true},
+    value: {}
   },
   computed: {
     typeId() {
@@ -29,8 +27,17 @@ export default {
       set(value) {
         this.$emit('input', value);
       }
-    }
+    },
+    currentField() {
+      switch (this.typeId) {
+        case 'boolean':
+          return BooleanField;
+        case 'integer':
+          return IntegerField;
+        default:
+          return null;
+      }
+    },
   }
 };
 </script>
-
