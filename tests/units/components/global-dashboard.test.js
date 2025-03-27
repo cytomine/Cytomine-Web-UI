@@ -5,6 +5,10 @@ import VTooltip from 'v-tooltip';
 import GlobalDashboard from '@/components/GlobalDashboard';
 import {Configuration, ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
+jest.mock('@/utils/image-utils', () => ({
+  isWebPSupported: jest.fn(() => true)
+}));
+
 jest.mock('cytomine-client', () => ({
   Configuration: {
     fetch: jest.fn().mockResolvedValue({
@@ -30,11 +34,6 @@ jest.mock('cytomine-client', () => ({
   }
 }));
 
-jest.mock('@/utils/image-utils', () => ({
-  ...jest.requireActual('@/utils/image-utils'),
-  isWebPSupported: jest.fn(() => true) // Mock to return true or false as needed
-}));
-
 describe('GlobalDashboard.vue', () => {
   let localVue;
   let wrapper;
@@ -48,6 +47,11 @@ describe('GlobalDashboard.vue', () => {
       localVue,
       mocks: {
         $t: (message) => message,
+      },
+      computed: {
+        currentUser: () => ({
+          fetchNbAnnotations: jest.fn().mockResolvedValue(5),
+        })
       },
       propsData: {
         nbRecent: 3
