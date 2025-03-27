@@ -1,56 +1,60 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
+import VTooltip from 'v-tooltip';
 
 import GlobalDashboard from '@/components/GlobalDashboard';
 import {Configuration, ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
 
 jest.mock('cytomine-client', () => ({
   Configuration: {
-    fetch: jest.fn()
+    fetch: jest.fn().mockResolvedValue({
+      value: 'Welcome to the dashboard!'
+    })
   },
   ImageInstanceCollection: {
-    fetchLastOpened: jest.fn()
+    fetchLastOpened: jest.fn().mockResolvedValue([
+      {id: 1, project: 1}
+    ])
   },
   ProjectCollection: {
-    fetchAll: jest.fn(),
-    fetchLastOpened: jest.fn()
-  }
-}));
-
-describe('GlobalDashboard.vue', () => {
-  const mocks = {
-    $t: (message) => message,
-  };
-
-  let localVue;
-  let wrapper;
-
-  beforeEach(() => {
-    ProjectCollection.fetchAll.mockResolvedValue({
+    fetchAll: jest.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Project 1', numberOfImages: 10, blindMode: false},
         {id: 2, name: 'Project 2', numberOfImages: 5, blindMode: true}
       ]
-    });
-    ProjectCollection.fetchLastOpened.mockResolvedValue([
+    }),
+    fetchLastOpened: jest.fn().mockResolvedValue([
       {id: 1},
       {id: 2}
-    ]);
-    ImageInstanceCollection.fetchLastOpened.mockResolvedValue([
-      {id: 1, project: 1}
-    ]);
-    Configuration.fetch.mockResolvedValue({
-      value: 'Welcome to the dashboard!'
-    });
+    ])
+  }
+}));
 
+jest.mock('@/utils/image-utils', () => ({
+  ...jest.requireActual('@/utils/image-utils'),
+  isWebPSupported: jest.fn(() => true) // Mock to return true or false as needed
+}));
+
+describe('GlobalDashboard.vue', () => {
+  let localVue;
+  let wrapper;
+
+  beforeEach(() => {
     localVue = createLocalVue();
     localVue.use(Buefy);
+    localVue.use(VTooltip);
 
-    wrapper = shallowMount(GlobalDashboard, {
+    wrapper = mount(GlobalDashboard, {
       localVue,
-      mocks: mocks,
+      mocks: {
+        $t: (message) => message,
+      },
       propsData: {
         nbRecent: 3
+      },
+      stubs: {
+        'image-preview': true,
+        'list-images-preview': true,
       }
     });
   });
