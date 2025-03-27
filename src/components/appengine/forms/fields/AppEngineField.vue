@@ -6,6 +6,7 @@
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
+import StringField from '@/components/appengine/forms/fields/StringField';
 
 export default {
   name: 'AppEngineField',
@@ -13,6 +14,7 @@ export default {
     BooleanField,
     IntegerField,
     NumberField,
+    StringField,
   },
   props: {
     parameter: {type: Object, required: true},
@@ -38,6 +40,8 @@ export default {
           return IntegerField;
         case 'number':
           return NumberField;
+        case 'string':
+          return StringField;
         default:
           return null;
       }
