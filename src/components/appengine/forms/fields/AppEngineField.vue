@@ -5,6 +5,7 @@
 <script>
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
+import GeometryField from '@/components/appengine/forms/fields/GeometryField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 import StringField from '@/components/appengine/forms/fields/StringField';
@@ -14,6 +15,7 @@ export default {
   components: {
     BooleanField,
     EnumerationField,
+    GeometryField,
     IntegerField,
     NumberField,
     StringField,
@@ -40,6 +42,8 @@ export default {
           return BooleanField;
         case 'enumeration':
           return EnumerationField;
+        case 'geometry':
+          return GeometryField;
         case 'integer':
           return IntegerField;
         case 'number':
