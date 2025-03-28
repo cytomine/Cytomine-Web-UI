@@ -25,9 +25,6 @@ admin-menu,Admin,Administration,Administración,Administratie
 admin,Admin,Admin,Admin,Admin
 admin-warning, I confirm that I want to make this user an admin., Je confirme que je veux faire de cet utilisateur un administrateur., Confirmo que quiero hacer de este usuario un administrador.,Ik bevestig dat ik deze user een beheerder wil maken.
 advanced-search,Advanced search,Recherche avancée,Búsqueda avanzada,geavanceerd zoeken
-algorithm,Algorithm,Algorithme,Algoritmo,Algoritme
-all-analyses,All,Toutes,Todas,Alle
-algorithms,Algorithms,Algorithmes,Algoritmos,Algoritmen
 all-annotations-uncategorized,All annotations uncategorized,Toutes les annotations non classées,Todas las anotaciones sin categorizar,Alle annotaties ongecategoriseerd
 all,All,Tous,Todos,Alle
 all-channels,All channels,Tous les canaux,,Alle kanalen
@@ -49,11 +46,8 @@ already-linked,Already linked,Déjà lié,Ya vinculado,Reeds gekoppeld
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
 analyses,Analyses,Analyses,Análisis,Analyses
 annotated-images-vs-contributors-chart-info-message,This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.,ce graphique présente le nombre d'images annotées par chaque membre. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este gráfico presenta el número de imágenes anotadas por cada miembro del proyecto. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"deze grafiek toont het aantal afbeeldingen dat door elk lid is geannoteerd. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
-analysis-annotations-info-message,Annotations created by an automatic analysis (run of an algorithm),Annotations créées par une analyse automatique (exécution d'un algorithme),Anotaciones creadas por un análisis automático (ejecución de un algoritmo),Annotaties gemaakt door automatische analyse (uitvoering van een algoritme)
 annotated-images-vs-term,Annotated images VS. term,Images annotées VS. terme,Imágenes anotadas por término,Geannoteerde afbeeldingen VS. term
-analysis,Analysis,Analyse,Análisis,Analyse
 annotated-images-vs-terms-chart-info-message,This chart presents for each term the number of images having at least one user annotation associated with this term. Only annotations created during the selected period are taken into account.,"Ce graphique présente, pour chaque terme, le nombre d'images ayant au moins une annotation associée à ce terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.",Este cuadro presenta el número de imágenes que tienen al menos una anotación de usuario asociada con cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Deze grafiek geeft voor elke term het aantal afbeeldingen weer met ten minste één annotatie die aan deze term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
-analysis-annotations,Analysis Annotations,Annotations d'analyse,Anotaciones de análisis,Analyse annotaties
 annotation-comments,Annotation comments,Commentaires,Comentarios de anotaciones,Opmerkingen
 annotation,Annotation,Annotation,Anotación,Annotatie
 annotation-creations,Annotation creations,Créations d'annotations,Anotaciones creadas,Annotatie creaties
@@ -128,7 +122,6 @@ button-get-username,Get username,Récupérer le nom d'utilisateur,Recuperar nomb
 button-hide-filters,Hide filters,Cacher les filtres,Ocultar filtros,Verberg filters
 button-hide,Hide,Masquer,Ocultar,Verbergen
 button-kill,Kill,Arrêter,Abortar,Stoppen
-button-launch-new-analysis,Launch new analysis,Lancer une nouvelle analyse,Lanzar nuevo análisis,Een nieuwe analyse starten
 button-less,Less,Moins,Menos,Minder
 button-load-more,Load more,Plus,Cargar más,Meer loaden knop
 button-lock,Lock,Verrouiller,Bloquear,blokkeren
@@ -138,7 +131,6 @@ button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
 button-more,More,Plus,Más,Meer
 button-new-tag,New tag,Nouveau tag,Nueva etiqueta,nieuwe tag
-button-new-trusted-source,New trusted source,Nouvelle source de confiance,Nueva fuente de confianza,Nieuwe trusted source
 button-new-user,New user,Nouvel utilisateur,Nuevo usuario,Nieuwe user
 button-next-annot-link,Next link,Lien suivant,Siguiente enlace,Volgende koppeling
 button-next-image,Next image,Image suivante,Imagen siguiente,Volgende afbeelding
@@ -214,7 +206,6 @@ confirm-annotation-link,Confirm annotation linking,Confirmer la création des li
 confirm-close-project,Close project,Fermer le projet,Cerrar proyecto,Project afsluiten
 confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?,Momenteel zijn er geen annotaties in dit project gekoppeld aan een eigenschap met sleutel '{key}'.<br>Weet u zeker dat u deze als de standaardeigenschap wilt gebruiken
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting
-confirm-deletion-analysis-data,Do you confirm you want to delete the following analysis data:,Êtes-vous sûr de vouloir supprimer les données d'analyse suivantes :,¿Confirma que desea eliminar los siguientes datos de análisis:,Bent u zeker dat u de volgende analysegegevens wilt verwijderen:
 confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?,¿Estás seguro de que deseas eliminar esta anotación?,Bent u zeker dat u deze annotatie wilt verwijderen?
 confirm-deletion,Confirm deletion,Confirmer la suppression,Confirmar la eliminación,Verwijdering bevestigen
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?,Bent u zeker dat u het bijgevoegde file {filename} wilt verwijderen?
@@ -258,7 +249,6 @@ create-image-group,Create new image group,Créer un nouveau groupe d'images,Crea
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
 create-ontology,Create ontology,Créer une ontologie,Crear ontología,Ontologie creëeren
 create-project,Create project,Créer un projet,Crear proyecto,Een project aanmaken
-create-source,Create trusted source,Créer une source de confiance,Crear fuente de confianza,Een trusted source creëeren
 create-tag,Create tag,Créer un tag,Crear etiqueta,Een tag maken
 create-term,Create term,Créer un terme,Crear término,Een term creëeren
 create-track,Create track,Créer une trace,,Maak een track
@@ -289,13 +279,10 @@ day,Day,Jour,Día,Dag
 default-annotation-layers,Default annotation layers,Calques chargés par défaut,Capas de anotación predeterminadas,Lagen worden standaard geladen
 default-property,Default property,Propriété par défaut,Propiedad por defecto,Default eigenschap
 default-value,Default value,Valeur par défaut,Valor por defecto,Eigenschap door uitsluiting
-delete-analysis-confirmation-message,Do you really want to delete this analysis? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer cette analyse ? Toutes les données de ce projet seront irrémédiablement perdues,¿Realmente quiere eliminar este análisis? <br> ¡Todos los datos serán eliminados! ¡Esta operación no se puede deshacer!,Bent u zeker dat u deze scan wilt verwijderen? Alle gegevens in dit project gaan onherstelbaar verloren.
 delete-data,Delete data,Supprimer les données,Borrar datos,Verwijder data
 delete,Delete,Supprimer,Eliminar,verwijderen
 delete-image-confirmation-message,Do you really want to delete image {imageName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer l'image {imageName} ? <br> Cette action ne pourra être annulée,¿Realmente quieres eliminar la imagen {imageName}? <br> ¡Todos los datos serán eliminados! ¡Esta operación no se puede deshacer!,Bent u zeker dat u afbeelding {imageName} wilt verwijderen? <br> Deze actie kan niet ongedaan worden gemaakt
-delete-analysis-data,Delete analysis data,Suppression des données de l'analyse,Eliminar datos de análisis,Analysegegevens verwijderen
 delete-image,Delete image,Supprimer l'image,Eliminar Imagen,Afbeelding verwijderen
-delete-analysis,Delete analysis,Supprimer l'analyse,Eliminar análisis,Analyse verwijderen
 delete-project-confirmation-message,Do you really want to delete project {projectName}? <br> All data will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le projet {projectName} ? <br> Toutes les données de ce projet seront irrémédiablement perdues,¿Realmente desea eliminar el proyecto {projectName}? <br> ¡Todos los datos serán eliminados! ¡Esta operación no se puede deshacer!,Bent u zeker dat u het project {projectName} wilt verwijderen? <br> Alle gegevens in dit project gaan onherstelbaar verloren
 delete-image-group,Delete image group,Supprimer le groupe d'images,Eliminar grupo de imágenes,Afbeeldingsgroep verwijderen
 delete-project,Delete project,Supprimer le projet,Eliminar proyecto,Project verwijderen
@@ -305,11 +292,8 @@ delete-image-group-link,Remove image from its image group,Retirer l'image de son
 delete-tag,Delete tag,Supprimer le tag,Eliminar etiqueta,Tag verwijderen
 delete-image-group-link-confirmation-message,Do you really want to remove image {imageName} from its image group? <br> All related annotation links be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir retirer l'image {imageName} de son groupe d'images ? <br> Cette action ne pourra être annulée,¿Realmente desea eliminar la imagen {imageName} de su grupo de imágenes? <br> ¡Se eliminarán todos los enlaces de anotaciones relacionados! ¡Esta operación no será recuperable con el botón de deshacer!,Weet u zeker dat u afbeelding {imageName} uit de afbeeldingsgroep wilt verwijderen? <br> Alle gerelateerde annotatielinks worden verwijderd! Deze bewerking kan niet worden hersteld met de knop Ongedaan maken!
 deployed,Deployed,Déployé,Desplegado,Ingezet
-delete-source-confirmation-message,Do you really want to delete trusted source {username}/{dockerUsername}?,Êtes-vous sûr de vouloir supprimer la source de confiance {username}/{dockerUsername} ?,,Weet u zeker dat u de trusted source {username}/{dockerUsername} wilt verwijderen?
 deploying,Deploying,Déploiement en cours,,Implementatie bezig
-delete-source,Delete source,Supprimer la source de confiance,,De trusted source verwijderen
 deprecated,Deprecated,Déprécié,Obsoleto,Verouderd
-deleted-analysis-data,Analysis data was deleted,Données de l'analyse supprimées,Los datos de análisis fueron eliminados,Data analysis deleted
 description,Description,Description,Descripción,Beschrijving
 depth-spectra,Depth spectra,Spectre de profondeur,espectros de profundidad,Diepte spectra
 detailed-image-consultations,Detailed image consultations,Détails des consultations d'image,Consultas detalladas de imagen,Afbeeldingsweergave details
@@ -466,8 +450,6 @@ invalid-password,Invalid password,Mot de passe incorrect,Contraseña inválida,F
 invalid-token,Invalid token,Token invalide,Token no válido,Ongeldige token
 inverse,Inverse,Inverse,Inverso,Omgekeerd
 key,Key,Clé,Llave,Sleutel
-job-id,Analysis ID,ID de l'analyse,,Analyse-ID
-killed,Killed,Arrêté,Abortado,Stop
 language,Language,Langue,Idioma,Taal
 large,Large,Grand,Grande,Groot
 last-activity,Last activity,Dernière activité,Última actividad,Laatste Activiteit
@@ -483,9 +465,6 @@ last-release,Last release,Dernière version,Ultimo lanzamiento,Laatste versie
 last-week,Last week,Dernière semaine,Última pasada,Vorige week
 last-year,Last year,Dernière année,Último año,Afgelopen jaar
 lastname,Last name,Nom,Apellido,Naam
-launch-new-analysis,Launch new analysis,Lancement d'une nouvelle analyse,Lanzar nuevo análisis,Lancering van een nieuwe analyse
-launched-by,Launched by,Lancé par,Lanzado por,Gelanceerd door
-launcher,Launcher,Créateur,Lanzador,Schepper
 layer,Layer,Calque,Capa,Laag
 layers-opacity,Layers opacity,Opacité des calques,Opacidad de las capas,Dekking van de lagen
 ldap,LDAP,LDAP,LDAP,LDAP
@@ -542,7 +521,6 @@ nb-jobs,Number of jobs,Nombre d'exécutions,Número de trabajos,Aantal executies
 new-name,New name,Nouveau nom,Nuevo nombre,Nieuwe naam
 nb-success-jobs,Number of successful jobs,Nombre d'exécutions réussies,Número de trabajos exitosos,Aantal succesvolle executies
 new-ontology,New ontology,Nouvelle ontologie,Nueva ontología,Nieuwe ontologie
-new-algorithm,New algorithm,Nouvel algorithme,Nuevo algoritmo,Nieuw algoritme
 new-project,New project,Nouveau projet,Nuevo proyecto,Nieuw project
 new-project-with-filtered-images,New project with filtered images,Nouveau projet avec des images filtrées,Nuevo proyecto con imágenes filtradas,Nieuw project met gefilterde afbeeldingen
 nm-per-pixel,nm/pixel,nm/pixel,nm/píxel,nm/pixel
@@ -550,9 +528,7 @@ nm-per-slice,nm/slice,nm/plan,,nm/kaart
 no-account-yet,Don't have an account yet ? {registerLink},Pas encore de compte ? {registerLink},¿Aún no tiene una cuenta? {registerLink},Nog geen account? {registerLink}
 no,No,Non,No,Neen
 no-annotation-comments,No comment for this annotation so far,Aucun commentaire pour cette annotation,No hay comentarios para esta anotación hasta ahora,Geen opmerkingen voor deze annotatie
-no-algorithm,No algorithm to display,Aucun algorithme à afficher,No hay algoritmo que mostrar,Geen algoritme om weer te geven
 no-annotation,No annotation,Aucune annotation,Sin anotaciones,Geen annotatie
-no-analysis-run,No analysis run,Aucune analyse lancée,Sin análisis,Geen analyse gestart
 no-attached-file,No attached file,Aucun fichier joint,Ningún archivo adjunto,Geen file bijgevoegd
 no-default-property,No default property,Pas de propriété par défaut,Sin propiedad predeterminada,Geen defaulteigenschap
 no-description,No description,Pas de description,Sin descripción,Geen beschrijving
@@ -583,16 +559,13 @@ no-result,No result,Aucun résultat,Sin resultados,Geen resultaat
 no-selected-annot,No selected annotation,Pas d'annotation sélectionnée,Ninguna anotación seleccionada,Geen geselecteerde annotatie
 no-selected-layers,No selected layers,Pas de couche sélectionnée,No hay capas seleccionadas,Geen laag geselecteerd
 no-tag-fitting-criteria,No tag fitting criteria,Aucun tag ne remplissant les critètes de recherche,No hay criterios de ajuste de etiquetas,Geen tags die voldoen aan de zoekcriteria
-no-software,No algorithm,Pas d'algorithme,Sin algoritmo,Geen algoritme
 no-tag,No tag,Aucun tag,Sin etiqueta,Geen tag
 no-term-to-add,No term to add,Aucun terme à ajouter,No hay término que agregar,Geen term om toe te voegen
 no-term,No term,Aucun terme,Sin término,Geen term
 no-track-to-add,No track to add,Pas de trace à ajouter,,Geen track toe te voegen
 no-track,No track,Pas de trace,Sin pista,Geen track
 no-tracking,No tracking,Pas de suivi,Sin seguimiento,Geen tracking
-no-trusted-source-fitting-criteria,No trusted source fitting criteria,Aucune source de confiance ne remplissant les critères de recherche,No hay criterios de ajuste de fuentes de confianza,Geen trusted source die aan de zoekcriteria voldoet
 no-uploaded-file,No uploaded file,Aucun fichier,Ningún archivo cargado,Geen file
-no-trusted-source,No trusted source,Pas de source de confiance,Ninguna fuente de confianza,Geen trusted source
 no-user-fitting-criteria,No user fitting search criteria,Aucun utilisateur ne correspond aux critères de recherche,Ningún criterio de búsqueda adecuado para el usuario,Er voldoen geen users aan de zoekcriteria
 none,None,Aucun,Ninguna,Geen
 not-available,Not available.,Indisponible.,,Niet beschikbaar.
@@ -601,7 +574,6 @@ not-found,Not found,Introuvable,No encontrado,niet gevonden
 not-launch,Not launched,Pas commencé,No lanzado,Nog niet begonnen
 not-used-in-any-project,Not used in any project,N'est utilisée dans aucun projet,No se utiliza en ningún proyecto.,In geen enkel project gebruikt
 nothing-more-to-load,Nothing more to load,Tout a été chargé,Nada más que cargar,Alles is geladen
-notif-deprecated-software,This software is deprecated,,,Deze software is verouderd
 notif-error-add-image,Failed to add image {imageName} to project {projectName},Une erreur a empêché d'ajouter l'image {imageName} au projet {projectName},Error al agregar la imagen {imageName} al proyecto {projectName},Een fout verhinderde het toevoegen van de afbeelding {imageName} aan project {projectName}
 notif-error-add-project-members,Failed to add the selected user to the project,Une erreur a empêché d'ajouter les utilisateurs sélectionnés au projet,Error al agregar el usuario seleccionado al proyecto,Door een fout konden de geselecteerde gebruikers niet aan het project worden toegevoegd
 notif-error-add-tag-domain-associations,Failed to associate the selected tags,Une erreur a empêché d'associer les tags sélectionnés,Error al asociar las etiquetas seleccionadas,Een fout verhinderde het koppelen van de geselecteerde tags
@@ -609,17 +581,11 @@ notif-error-add-tags,Failed to create the tags,Une erreur a empêché de créer 
 notif-error-add-term,Failed to add the term,Une erreur a empêché d'associer le terme,No se pudo agregar el término,Er is een fout opgetreden bij het koppelen van de term
 notif-error-add-track,Failed to add the track,Impossible d'ajouter la trace,,De track mag niet toegevoegd worden
 notif-error-add-viewer-image,Failed to add the image,Une erreur a empêché l'ajout de l'image,Error al agregar la imagen,Door een fout kon de afbeelding niet worden toegevoegd
-notif-error-algortihm-deletion,Error during algorithm deletion,Erreur durant la suppression de l'algoritme,Error durante la eliminación del algoritmo,Fout bij het verwijderen van het algoritme
 notif-error-already-broadcasting-this-image,You are already broadcasting this image on another view,Vous diffusez déjà cette image,Ya estáa transmitiendo esta imagen en otra vista,U zendt dit afbeelding al uit op en andere view
-notif-error-analysis-data-deletion,Failed to delete analysis data,Une erreur a empêché la suppression des données de l'analyse,Error al eliminar datos de análisis,Door een fout konden de dataanalyse niet worden verwijderd
 notif-error-annotation-correction,Error during annotation correction,Une erreur a empêché la correction de l'annotation,Error durante la corrección de anotaciones,Door een fout kon de annotatie niet worden gecorrigeerd
-notif-error-analysis-deletion,Failed to delete the analysis,Une erreur a empêché la suppression de l'analyse,Error al eliminar el análisis,Door een fout kon de analyse niet worden verwijderd
 notif-error-annotation-creation,Error during annotation creation,Une erreur a empêché la création de l'annotation,Error durante la creación de anotaciones,Een fout verhinderde het maken van de annotatie
-notif-error-analysis-kill,Failed to kill analysis,Une erreur a empêché l'arrêt de l'analyse,Error al abortar el análisis,Door een fout kon de analyse niet worden gestopt
 notif-error-annotation-deletion,Error during annotation deletion,Une erreur a empêché la suppression de l'annotation,Error durante la eliminación de anotaciones,Door een fout kon de annotatie niet worden verwijderd
-notif-error-analysis-launch,Failed to launch the analysis,Une erreur a empêché de lancer l'analyse,Error al iniciar el análisis,Door een fout kon de analyse niet worden gestart
 notif-error-annotation-fill,Error during annotation fill,Une erreur a empêché le remplissage de l'annotation,Error durante el relleno de anotación,Door een fout kon de annotatie niet worden ingevuld
-notif-error-analysis-parameters-options,Failed to retrieve the options for parameter {paramName},Une erreur a empêché de récupérer les options disponibles pour le paramètre {paramName},Error al recuperar las opciones para el parámetro {paramName},Een fout verhinderde het ophalen van beschikbare opties voor de parameter {paramName}
 notif-error-annotation-paste,Failed to paste the annotation. It is too large for this image.,L'annotation n'a pu être collée car elle est trop large pour cette image,,De annotatie kan niet worden geplakt omdat deze te breed is voor deze afbeelding
 notif-error-annotation-link-creation,Failed to link annotation,Une erreur a empêché de lier l'annoation,No se pudo vincular la anotación,Kan annotatie niet koppelen
 notif-error-annotation-rejection,Failed to reject the annotation,Une erreur a empêché de rejeter l'annotation,Error al rechazar la anotación,Door een fout kon de annotatie niet worden afgewezen
@@ -632,7 +598,6 @@ notif-error-attached-file-creation,Failed to attach the selected file,Une erreur
 notif-error-attached-file-deletion,Failed to delete attached file {filename},Une erreur a empêché la suppression du fichier joint {filename},Error al eliminar el archivo adjunto {filename},Een fout verhinderde het verwijderen van het bijgevoegde file {filename}
 notif-error-cancel-review,Failed to cancel the review of the image,Une erreur a empêché d'annuler la validation de l'image,No se pudo cancelar la revisión de la imagen.,Een fout verhinderde het ongedaan maken van de afbeeldingsreview
 notif-error-change-role,Failed to change the role of {username},Une erreur a empêché de changer le rôle de l'utilisateur {username},No se pudo cambiar el rol de {username},Een fout verhinderde het wijzigen van de rol van de user {username}
-notif-error-change-status-algorithm-project,Failed to change the status of algorithm {softwareName},Une erreur a empêché de changer le statut de l'algorithme {softwareName},Error al cambiar el estado del algoritmo {softwareName},Een fout verhinderde het wijzigen van de status van de algoritme {softwareName}
 notif-error-change-status-image-filter-project,Failed to change the status of filter {filterName},Une erreur a empêché de changer le statut du filtre {filterName},Error al cambiar el estado del filtro {filterName},Een fout verhinderde het wijzigen van de status van filter {filterName}
 notif-error-custom-ui-change,Failed to change custom UI property,Une erreur a empêché de mettre à jour les choix de personnalisation de l'interface,Error al cambiar la propiedad de interfaz personalizada,Een fout verhinderde het bijwerken van keuzes voor het aanpassen van de interface
 notif-error-default-layer-add,Failed to add a default layer,Une erreur a empêché d'ajouter le calque aux calques par défaut,Error al agregar una capa predeterminada,Een fout verhinderde het toevoegen van de laag aan de defaultlagen
@@ -693,13 +658,9 @@ notif-error-review-reject-all,Failed to reject all annotations,Une erreur a emp�
 notif-error-save-image-consultation,Failed to save image consultation,Une erreur empêche de sauvegarder la consultation de l'image,Error al guardar la consulta de imagen,Een fout verhindert het opslaan van de afbeeldingconsultatie
 notif-error-save-prop,Failed to save the property,Une erreur a empêché de créer la propriété,Error al guardar la propiedad,Door een fout kon de eigenschap niet worden gemaakt
 notif-error-save-user-position,Failed to save your position in the image,Une erreur empêche de sauvegarder votre position dans l'image,Error al guardar tu posición en la imagen,Een fout verhindert het opslaan van uw positie in de afbeelding
-notif-error-source-creation,Failed to create the trusted source,Une erreur a empêché la création de la source de confiance,Error al crear la fuente de confianza,Door een fout kon de trusted source niet worden gemaakt
 notif-error-start-review,Failed to start reviewing the image,Une erreur a empêché de commencer la validation de l'image,Error al comenzar a revisar la imagen,Door een fout kon de afbeeldingsreview niet worden gestart
-notif-error-source-delete,Failed to delete trusted source {username}/{dockerUsername},Une erreur a empêché de supprimer la source de confiance {username}/{dockerUsername},,Door een fout kon de trusted source {username}/{dockerUsername} niet worden verwijderd
 notif-error-tag-creation,Failed to create the tag,Une erreur a empêché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
-notif-error-source-refresh,Error during the refresh of the trusted source,Erreur durant la mise à jour de la source de confiance,Error durante la actualización de la fuente de confianza,Fout tijdens het updaten van de trusted source
 notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName},Error al eliminar la etiqueta {tagName},Een fout verhinderde het verwijderen van de tag {tagName}
-notif-error-source-update,Failed to update the trusted source,Une erreur a empêché la modification de la source de confiance,Error al actualizar la fuente de confianza,Een fout verhinderde de wijziging van de trusted source
 notif-error-tag-update,Failed to update tag,Une erreur a empêché de modifier le tag,Error al actualizar la etiqueta,Door een fout kon de tag niet worden gewijzigd
 notif-error-target-annotation,Failed to fetch the requested annotation,Impossible d'afficher l'annotation demandée,Error al recuperar la anotación solicitada,Het is niet mogelijk om de annotatie weer te geven
 notif-error-term-creation,Failed to create the term,Une erreur a empêché la création du terme,Error al crear el término,Door een fout kon de term niet gecreëerd worden
@@ -722,15 +683,10 @@ notif-error-welcome-message-update,Failed to update the welcome message,Une erre
 notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName},La imagen {imageName} se agregó correctamente al proyecto {projectName},De afbeelding {imageName} is toegevoegd aan het project {projectName}
 notif-success-add-project-members,The selected users were correctly added as project members,Les utilisateurs sélectionnés ont été ajoutés au projet,Los usuarios seleccionados se agregaron correctamente al proyecto,De geselecteerde gebruikers zijn toegevoegd aan het project
 notif-success-add-tag-domain-association,The selected tags were correctly associated,Les tags sélectionnés ont été associés,Las etiquetas seleccionadas se asociaron correctamente,De geselecteerde tags zijn gekoppeld
-notif-success-algorithm-deletion,Algorithm correctly deleted,L'algorithme a été supprimé,Algoritmo eliminado correctamente,Het algoritme is verwijderd
 notif-success-annot-URL-copied,Annotation URL copied to clipboard,L'URL de l'annotation a été copiée dans le presse-papier,URL de anotación copiada al portapapeles,Annotatie-URL is naar het klembord gekopieerd
-notif-success-analysis-data-deletion,Analysis data was successfully deleted,Les données de l'analyse ont bien été supprimées,Los datos de análisis se eliminaron con éxito,
 notif-success-annotation-copy,Annotation has been copied,L'annotation a été copiée,,De annotatie is gekopieerd
-notif-success-analysis-deletion,The analysis was successfully deleted,L'analyse a bien été supprimée,El análisis fue eliminado con éxito,De analyse is succesvol verwijderd
 notif-success-annotation-repeat,Annotation has been repeated,L'annotation a été répétée,,De annotatie is herhaald
-notif-success-analysis-kill,Analysis was successfully killed,L'analyse a bien été arrêtée,El análisis fue abortado con éxito,De analyse is succesvol gestopt
 notif-success-attached-file-creation,File correctly attached,Le fichier joint a bien été uploadé,Archivo adjuntado correctamente,Het bijgevoegde file is succesvol geüpload.
-notif-success-analysis-launch,Successfully launched the analysis,L'analyse a bien été lancée,Análisis iniciado con éxito,De analyse is succesvol gestart
 notif-success-attached-file-deletion,Attached file {filename} correctly deleted,Le fichier joint {filename} a bien été supprimé,El archivo adjunto {filename} se ha eliminado correctamente,Het bijgevoegde file{filename} is succesvol verwijderd
 notif-success-annotation-link-creation,Annotation successfully linked,L'annotation a été liée avec succès,Anotación vinculada con éxito,Annotatie succesvol gekoppeld
 notif-success-default-property-update,Default property successfully updated,La propriété par défaut a bien été mise à jour,Propiedad predeterminada actualizada correctamente,De eigenschap door uitsluiting is succesvol bijgewerkt
@@ -760,13 +716,9 @@ notif-success-project-deletion,Project {projectName} was successfully deleted,Le
 notif-success-project-ontology-change,Ontology of project {projectName} was successfully updated,L'ontologie du projet {projectName} a bien été modifiée,La ontología del proyecto {projectName} se actualizó correctamente,De ontologie van het project {projectName} is succesvol aangepast
 notif-success-project-rename,Project {projectName} was successfully renamed,Le projet {projectName} a bien été renommé,El proyecto {projectName} se renombró correctamente,Het project {projectName} is succesvol hernoemd
 notif-success-remove-project-members,The selected members were correctly removed from project,Les membres sélectionnés ont bien été retirés du projet,Los miembros seleccionados fueron eliminados correctamente del proyecto,De geselecteerde leden zijn met succes uit het project verwijderd
-notif-success-source-creation,Trusted source successfully created,La source de confiance a bien été créée,Fuente de confianza creada con éxito,De trusted source is gemaakt
 notif-success-tag-creation,The tag was successfully created,Le tag a bien été créé,La etiqueta se creó correctamente.,De tag is succesvol aangemaakt
-notif-success-source-delete,Trusted source {username}/{dockerUsername} was successfully deleted,La source de confiance {username}/{dockerUsername} a bien été supprimée,,Trusted source {username}/{dockerUsername} succesvol verwijderd
 notif-success-tag-delete,Tag {tagName} was successfully deleted,Le tag {tagName} a bien été supprimé,La etiqueta {tagName} se eliminó correctamente,De tag {tagName} is succesvol verwijderd
-notif-success-source-refresh,The trusted source refreshing has been asked,La mise à jour de la source de confiance a été demandée,Se solicitó la actualización de la fuente de confianza,Update van de trusted source is aangevraagd
 notif-success-tag-update,Tag was successfully updated,Le tag a bien été modifié,La etiqueta se actualizó correctamente,De tag is succesvol gewijzigd
-notif-success-source-update,Trusted source successfully updated,La source de confiance a bien été modifiée,Fuente de confianza actualizada con éxito,De trusted source is gewijzigd
 notif-success-term-creation,The term was successfully created,Le terme a bien été créé,El término se creó con éxito.,De term is gecreëerd
 notif-success-term-update,The term was successfully updated,Le terme a bien été mis à jour,El término se actualizó correctamente.,De term is succesvol geüpdatet.
 notif-success-track-creation,The track was successfully created,La trace a bien été créée,,De track is gemaakt
@@ -777,7 +729,6 @@ notif-success-user-update,User successfully updated,L'utilisateur a bien été m
 notif-success-welcome-message-update,Welcome message successfully updated,Le message de bienvenue a bien été mis à jour,Mensaje de bienvenida actualizado con éxito,Het welkomstbericht is bijgewerkt
 notif-unexpected-error,Unexpected error,Une erreur inattendue s'est produite,Se ha producido un error inesperado,Er is een onverwachte fout opgetreden
 notif-warn-ontology-tree-order-not-persisted,The order of children in the ontology tree is not persisted in database,L'ordre des enfants dans l'arborescence n'est pas sauvegardée dans la base de données,La jerarquía de términos dentro de la ontología no se mantiene en la base de datos.,De volgorde van de kinderen in de stamboom wordt niet opgeslagen in de database
-number-analysis-annotations,Number of analysis annotations,Nombre d'annotations d'analyse,Número de anotaciones de análisis,Aantal analyseannotaties
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties
 number,Number,Nombre,Número,Nummer
 number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,Ce graphique présente le nombre d'annotations créées durant la période sélectionnée,Este gráfico presenta el número de anotaciones creadas durante el período seleccionado.,Deze grafiek toont het aantal annotaties dat tijdens de geselecteerde periode is gemaakt
@@ -801,8 +752,6 @@ online-contributors,Online contributors,Contributeurs en ligne,Colaboradores en 
 online,Online,En ligne,En línea,Online
 online-managers,Online managers,Responsables en ligne,Administradores en línea,Online Managers
 online-users,Online users,Utilisateurs en ligne,Usuarios en línea,Online users
-only-last-release,Only last releases,Seulement les dernières versions,Solo últimas versiones,Alleen de laatste versies
-only-UI-runnable,Only runnable algorithms,Seulement les algorithmes exécutables,Solo algoritmos ejecutables,Alleen uitvoerbare algoritmen
 ontologies,Ontologies,Ontologies,Ontologías,Ontologieën
 ontology,Ontology,Ontologie,Ontología,Ontologie
 opacity,Opacity,Opacité,Opacidad,ondoorzichtigheid
@@ -949,8 +898,6 @@ search-or-create-tag,Search tag (or create a new one by typing its name and pres
 search-placeholder,Search,Recherche,Buscar,Zoeken
 search-user,Search user...,Rechercher un utilisateur...,Buscar usuario...,Zoek een gebruiker...
 seconds,second | seconds,seconde | secondes,,tweede | seconden
-see-environment-on,See environment on,Voir l'environnement sur,Ver entorno en,Zie de omgeving op
-see-source-code-on,See source code on,Voir le code source sur,Ver código fuente en,Bekijk de broncode op
 select-all,Select all,Tout sélectionner,Seleccionar todo,Selecteer alles
 select,Select,Sélectionner,Seleccione,Selecteer
 select-annotation,Select an annotation,Sélectionner une annotation,Seleccionar una anotación,Selecteer een annotatie
@@ -1068,12 +1015,9 @@ slide-preview-not-available,No slide preview,Aperçu de la lame non disponible,S
 slide-preview,Slide preview,Aperçu de la lame,Vista previa de cristal,Slide preview
 slide-preview-of,Slide preview of {filename},Aperçu de la lame {filename},Vista previa de cristal de {filename},Slide-voorbeeld van {filename}
 small,Small,Petit,Pequeña,Small
-software-parameters,Algorithm parameters,Paramètres de l'algorithme,Parámetros del algoritmo,Algoritme parameters
 source-code-info,Cytomine is an open-source software. The licenses are Apache 2.0 and LGPL 2.1. The source code is available on our {githubLink}.,Cytomine est un logiciel open-source. Il est distribué sous les licences Apache2 et LGPL 2.1. Le code source est disponible sur notre {githubLink}.,Cytomine es un software de código abierto distribuido bajo las licencias Apache2 y LGPL 2.1. El código fuente está disponible en nuestro {githubLink}.,Cytomine is open source-software. Het wordt gedistribueerd onder de Apache2- en LGPL 2.1-licenties. De broncode is beschikbaar op onze {githubLink}.
 source,Source,Source,Origen,Bron
 source-code,Source code,Code source,Código fuente,Source code
-source-provider-name,Source code provider username,Nom d'utilisateur du fournisseur de code source,Nombre de usuario del proveedor de código fuente,usersnaam van de broncodeprovider
-source-provider,Source code provider,Fournisseur du code source,Proveedor de código fuente,Broncode leverancier
 spatial-projection,Spatial projection,Projection spatiale,Proyección espacial,Ruimtelijke projectie
 sponsors,Sponsors,Sponsors,Patrocinadores,Sponsoren
 start-upload,Start upload,Lancer l'upload,Iniciar la carga,uploaden beginnen
@@ -1085,7 +1029,6 @@ storage,Storage,Stockage,Almacenamiento,storage
 string,String,Chaîne de caractères,Cadena de caracteres,Reeks tekens
 success,Success,Réussi,Finalizado con éxito,Geslaagd
 successful-registration,Your account was successfully created. Check your inbox to enable it.,Votre compte a été créé avec succès. Consultez votre boîte mail pour l'activer.,Su cuenta fue creada exitosamente. Revise su bandeja de entrada para activarla.,Uw account is succesvol aangemaakt. Controleer uw mailbox om deze te activeren.
-suggested-terms,Suggested Terms,Terme suggéré,Términos sugeridos,Voorgestelde termen
 super-admin,Super admin,Super admin,Super administrador,Super admin
 switch-back-to-user,Switch back to {username},Retour à {username},Volver a {username},Terug naar {usersnaam}
 system,System,Système,Sistema,Systeem
@@ -1103,10 +1046,7 @@ too-much-categories-to-display,There are too much categories to display ({toDisp
 total,Total,Total,Total,Totaal
 tracks-new-annotation,Track(s) to associate to new annotations,Trace(s) à associer à de nouvelles annotations,,Track(en) om te associëren met nieuwe annotaties
 tracks,Tracks,Traces,Pistas,Tracks
-trusted-source,Trusted source,Source de confiance,Fuente de confianza,Trusted source
 type,Type,Type,Tipo,Annotatie type
-trusted-sources,Trusted sources,Sources de confiance,Fuentes de confianza,Trusted sources
-ui-runnable,Runnable,Exécutable,Ejecutable,Uitvoerbaar
 um-per-pixel,µm/pixel,µm/pixel,µm/píxel,µm/pixel
 um,µm,µm,µm,µm
 um-per-slice,µm/slice,µm/plan,,µm/vlak
@@ -1120,7 +1060,6 @@ unknown,Unknown,Inconnu,Desconocido,Onbekend
 unlink,Unlink,Dissocier,Desconectar,Ontkoppelen
 unpacked,Unpacked,Décompressé,,Uuitgepakt
 unpacking,Unpacking,Décompression en cours,,Decompressie bezig
-update-source,Update trusted source,Modifier une source de confiance,Actualizar fuente de confianza,Een trusted source bewerken
 update-tag,Update tag,Modifier un tag,Actualizar etiqueta,Een tag bewerken
 update-term,Update term,Modifier un terme,Término de actualización,Een term bewerken
 update-track,Update track,Modifier une trace,,Wijzig een  track
@@ -1136,7 +1075,6 @@ used-in-project-no-access,Used in projects that you are not allowed to see,Utili
 used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de almacenamiento utilizado,Opslagruimte gebruikt
 user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
 user,User,Utilisateur,Usuario,Users
-userjob-id,Analysis user ID,ID de l'utilisateur de l'analyse,,Analyse user-ID
 username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam
 users,Users,Utilisateurs,Usuarios,Users
 validate-annotation,Validate annotation,Valider l'annotation,Validar anotación,Annotatie valideren
