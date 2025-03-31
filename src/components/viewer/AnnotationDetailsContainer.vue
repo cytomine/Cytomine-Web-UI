@@ -37,6 +37,7 @@
 
       <div class="annotation-details-container">
         <annotation-details
+          v-if="selectedFeature.properties.annot.hasOwnProperty('user')"
           :annotation="selectedFeature.properties.annot"
           :terms="terms"
           :images="images"
@@ -57,6 +58,12 @@
           @centerView="$emit('centerView', ($event) ? $event : annot)"
           @deletion="$emit('delete', annot)"
         />
+
+        <annotation-simple-details
+          v-else
+          :annotation="selectedFeature.properties.annot"
+          @centerView="$emit('centerView', ($event) ? $event : annot)"
+        />
       </div>
 
       <!-- HACK for prev/next linked annotation shortkeys -->
@@ -76,15 +83,20 @@
 
 <script>
 import VueDraggableResizable from 'vue-draggable-resizable';
-
-import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import {UserCollection} from 'cytomine-client';
 import {fullName} from '@/utils/user-utils.js';
+import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails';
 
 export default {
   name: 'annotations-details-container',
-  components: {AnnotationLinksPreview, VueDraggableResizable, AnnotationDetails},
+  components: {
+    AnnotationDetails,
+    AnnotationLinksPreview,
+    AnnotationSimpleDetails,
+    VueDraggableResizable,
+  },
   props: {
     index: String,
   },

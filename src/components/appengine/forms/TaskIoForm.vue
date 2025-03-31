@@ -40,6 +40,12 @@ export default {
       inputs: {}
     };
   },
+  computed: {
+    activeImage() {
+      let index = this.$store.getters['currentProject/currentViewer'].activeImage;
+      return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
+    }
+  },
   async created() {
     await this.fetchTaskInputs();
   },
@@ -61,7 +67,7 @@ export default {
     },
     async runTask() {
       // create task run and provision
-      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version).then(async (taskRun) => {
+      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version, this.activeImage.id).then(async (taskRun) => {
         return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async () => {
           // TODO reset form and send event
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {

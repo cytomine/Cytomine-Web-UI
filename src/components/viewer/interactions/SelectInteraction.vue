@@ -92,9 +92,11 @@ export default {
           }
         }
 
-        if(value.length>=1 && value[0].properties !== null) {
+        if (value.length >= 1 && value[0].properties !== null) {
           let annot = value[0].properties.annot;
-          annot.recordAction();
+          if (typeof annot.recordAction === 'function') {
+            annot.recordAction();
+          }
         }
         this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
       }
