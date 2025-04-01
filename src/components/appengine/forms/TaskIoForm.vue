@@ -5,7 +5,7 @@
       <!-- INPUTS -->
       <app-engine-field
         v-for="input in taskInputs"
-        v-model="inputs[input.name]"
+        v-model="inputs[input.name].value"
         :key="input.id"
         :parameter="input"
       />
@@ -40,6 +40,12 @@ export default {
       inputs: {}
     };
   },
+  computed: {
+    activeImage() {
+      let index = this.$store.getters['currentProject/currentViewer'].activeImage;
+      return this.$store.getters['currentProject/currentViewer'].images[index].imageInstance;
+    }
+  },
   async created() {
     await this.fetchTaskInputs();
   },
@@ -61,7 +67,7 @@ export default {
     },
     async runTask() {
       // create task run and provision
-      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version).then(async (taskRun) => {
+      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version, this.activeImage.id).then(async (taskRun) => {
         return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async () => {
           // TODO reset form and send event
           return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
@@ -78,16 +84,33 @@ export default {
       let provisions = [];
       for (let [paramName, value] of Object.entries(this.inputs)) {
         provisions.push({
-          'value': value,
-          'param_name': paramName
+          'param_name': paramName,
+          'type': value.type,
+          'value': value.value,
         });
       }
       return provisions;
     },
     resetForm() {
-      // iterate over this.taskInputs
+      const setDefaultValue = (input) => {
+        const value = (() => {
+          switch (input.type.id) {
+            case 'boolean':
+              return input.default === 'true';
+            case 'integer':
+              return parseInt(input.default);
+            case 'number':
+              return parseFloat(input.default);
+            default:
+              return input.default;
+          }
+        })();
+
+        Vue.set(this.inputs, input.name, {value, type: input.type.id});
+      };
+
       for (let input of this.taskInputs) {
-        Vue.set(this.inputs, input.name, null);
+        setDefaultValue(input);
       }
     }
   }

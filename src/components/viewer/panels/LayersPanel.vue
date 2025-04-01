@@ -69,11 +69,11 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
 
 import {fullName} from '@/utils/user-utils.js';
-import {ProjectDefaultLayerCollection} from 'cytomine-client';
-import _ from 'lodash';
+import {Cytomine, ProjectDefaultLayerCollection} from 'cytomine-client';
 
 export default {
   name: 'layers-panel',
@@ -121,9 +121,6 @@ export default {
       set(value) {
         this.$store.commit(this.imageModule + 'setLayersOpacity', Number(value));
       }
-    },
-    layersIds() {
-      return this.layers.map(layer => layer.id);
     },
     selectedLayers() { // Array<User> (representing user layers)
       return this.imageWrapper.layers.selectedLayers || [];
@@ -218,7 +215,11 @@ export default {
     },
 
     layerName(layer) {
-      if(layer.isReview) {
+      if (!Object.prototype.hasOwnProperty.call(layer, 'user')) {
+        return layer.name;
+      }
+
+      if (layer.isReview) {
         return `${this.$t('review-layer')} (${this.nbReviewedAnnotations})`;
       }
 
@@ -267,9 +268,12 @@ export default {
 
     async fetchLayers() {
       this.layers = (await this.project.fetchUserLayers(this.image.id)).array;
-      if(this.hasReviewLayer) {
+      if (this.hasReviewLayer) {
         this.layers.push(this.reviewLayer);
       }
+
+      let layers = (await Cytomine.instance.api.get(`image-instances/${this.image.id}/annotation-layers`)).data;
+      this.layers.push(...layers);
 
       // if image instance was changed (e.g. with previous/next image navigation), some of the selected layers
       // may not be relevant for the current image => filter them
@@ -318,7 +322,10 @@ export default {
   },
   async created() {
     try {
-      await Promise.all([this.fetchLayers(), this.fetchIndexLayers(true)]);
+      await Promise.all([
+        this.fetchLayers(),
+        this.fetchIndexLayers(true),
+      ]);
     }
     catch(error) {
       console.log(error);

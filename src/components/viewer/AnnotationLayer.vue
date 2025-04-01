@@ -33,8 +33,9 @@
 
 <script>
 import WKT from 'ol/format/WKT';
-import {AnnotationCollection} from 'cytomine-client';
+import {AnnotationCollection, Cytomine} from 'cytomine-client';
 import {annotBelongsToLayer} from '@/utils/annotation-utils';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'annotation-layer',
@@ -53,6 +54,7 @@ export default {
     };
   },
   computed: {
+    project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
     },
@@ -178,8 +180,6 @@ export default {
             annot
           });
         }
-
-        this.$eventBus.$emit('update-suggested-terms');
       }
     },
     deleteAnnotationHandler(annot) {
@@ -212,6 +212,17 @@ export default {
       };
     },
 
+    async fetchAnnotations() {
+      let annotations = (await Cytomine.instance.api.get(`/annotation-layers/${this.layer.id}/annotations`)).data;
+      annotations.forEach((annotation) => {
+        annotation.location = decodeURIComponent(atob(annotation.location));
+        annotation.term = [];
+        annotation.image = this.image.id;
+        annotation.project = this.project.id;
+      });
+
+      return annotations;
+    },
     async fetchAnnots(extent) {
       [0, 1].forEach(index => {
         if(extent[index] < 0) {
@@ -289,14 +300,19 @@ export default {
 
       let arrayAnnots;
       try {
-        arrayAnnots = await this.fetchAnnots(extent);
-        // Order by size, so bigger ones are always sent to back
-        arrayAnnots.sort(
-          function( a, b ) {
-            if( a.area < b.area ) return 1;
-            else return -1;
-          }
-        );
+        if (Object.prototype.hasOwnProperty.call(this.layer, 'user')) {
+          arrayAnnots = await this.fetchAnnots(extent);
+          // Order by size, so bigger ones are always sent to back
+          arrayAnnots.sort(
+            function( a, b ) {
+              if( a.area < b.area ) return 1;
+              else return -1;
+            }
+          );
+        }
+        else {
+          arrayAnnots = await this.fetchAnnotations();
+        }
       }
       catch(error) {
         console.log(error);

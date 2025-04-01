@@ -37,8 +37,8 @@ export default class Task extends Model {
   }
 
   // Step-1: Create TaskRun Must be part of a project to run a task
-  static async createTaskRun(project, namespace, version) {
-    let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/tasks/${namespace}/${version}/runs`);
+  static async createTaskRun(project, namespace, version, image) {
+    let {data} = await Cytomine.instance.api.post(`/app-engine/project/${project}/tasks/${namespace}/${version}/runs`, {'image': image});
     return data;
   }
 

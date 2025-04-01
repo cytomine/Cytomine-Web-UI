@@ -432,10 +432,10 @@ export default {
     layersToPreload() {
       let layers = [];
       let annot = this.selectedAnnotation || this.routedAnnotation;
-      if(annot) {
-        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : annot.user);
+      if (annot) {
+        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : (annot.user ?? annot.annotationLayer));
       }
-      if(this.routedAction === 'review' && !layers.includes(-1)) {
+      if (this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);
       }
       return layers;
@@ -601,7 +601,10 @@ export default {
       if (annot.image === this.image.id) {
         if (!annot.location) {
           //in case annotation location has not been loaded
-          annot = await Annotation.fetch(annot.id);
+          annot = (await Cytomine.instance.api.get(`/annotations/${annot.id}`)).data;
+          if (Object.prototype.hasOwnProperty.call(annot, 'annotationLayer')) {
+            annot.location = decodeURIComponent(atob(annot.location));
+          }
         }
 
         if (annot.project !== this.project.id) {
@@ -610,6 +613,10 @@ export default {
 
         let geometry = this.format.readGeometry(annot.location);
         await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+
+        if (!Object.prototype.hasOwnProperty.call(annot, 'centroid')) {
+          return;
+        }
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -765,7 +772,10 @@ export default {
       let idRoutedAnnot = this.$route.params.idAnnotation;
       if (idRoutedAnnot) {
         try {
-          annot = await Annotation.fetch(idRoutedAnnot);
+          annot = (await Cytomine.instance.api.get(`/annotations/${idRoutedAnnot}`)).data;
+          if (Object.prototype.hasOwnProperty.call(annot, 'annotationLayer')) {
+            annot.location = decodeURIComponent(atob(annot.location));
+          }
         }
         catch (error) {
           console.log(error);
@@ -775,9 +785,15 @@ export default {
     }
 
     if (annot) {
+      if (Object.prototype.hasOwnProperty.call(annot, 'annotationLayer')) {
+        let response = await Cytomine.instance.api.get(`/annotation-layers/${annot.annotationLayer}/task-run-layer`);
+        let taskRunLayer = response.data;
+        annot.image = taskRunLayer.image;
+      }
+
       try {
         if (annot.image === this.image.id) {
-          if (!this.sliceIds.includes(annot.slice)) {
+          if (!this.sliceIds.includes(annot.slice) && Object.prototype.hasOwnProperty.call(annot, 'slice')) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
           }
