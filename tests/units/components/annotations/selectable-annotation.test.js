@@ -5,16 +5,16 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 describe('SelectableAnnotation.vue', () => {
   let wrapper;
 
-  const annotationMock = {id: 1};
-  const imagesMock = [{id: 101, name: 'Image 1'}];
-  const usersMock = [{id: 201, username: 'User1'}];
+  const mockAnnotation = {id: 1};
+  const mockImages = [{id: 101, name: 'Image 1'}];
+  const mockUsers = [{id: 201, username: 'User1'}];
 
   beforeEach(() => {
     wrapper = shallowMount(SelectableAnnotation, {
       propsData: {
-        annotation: annotationMock,
-        images: imagesMock,
-        users: usersMock,
+        annotation: mockAnnotation,
+        images: mockImages,
+        users: mockUsers,
         isSelected: false,
       },
     });
