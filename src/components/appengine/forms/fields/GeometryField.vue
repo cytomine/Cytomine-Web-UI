@@ -43,15 +43,11 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value || this.defaultValue;
+        return this.value;
       },
       set(value) {
         this.$emit('input', value.id);
       }
-    },
-    defaultValue() {
-      let isNull = this.parameter.default == null || this.parameter.default === '';
-      return !isNull ? this.parameter.default : null;
     },
   }
 };
