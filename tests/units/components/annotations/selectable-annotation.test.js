@@ -38,9 +38,9 @@ describe('SelectableAnnotation.vue', () => {
     const annotationPreview = wrapper.findComponent(AnnotationPreview);
 
     expect(annotationPreview.exists()).toBe(true);
-    expect(annotationPreview.props('annot')).toBe(annotationMock);
-    expect(annotationPreview.props('images')).toBe(imagesMock);
-    expect(annotationPreview.props('users')).toBe(usersMock);
+    expect(annotationPreview.props('annot')).toBe(mockAnnotation);
+    expect(annotationPreview.props('images')).toBe(mockImages);
+    expect(annotationPreview.props('users')).toBe(mockUsers);
     expect(annotationPreview.props('size')).toBe(85);
   });
 
@@ -48,6 +48,6 @@ describe('SelectableAnnotation.vue', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('update:selected')).toBeTruthy();
-    expect(wrapper.emitted('update:selected')[0]).toEqual([annotationMock]);
+    expect(wrapper.emitted('update:selected')[0]).toEqual([mockAnnotation]);
   });
 });
