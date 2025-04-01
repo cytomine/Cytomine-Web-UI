@@ -14,8 +14,6 @@
 </template>
 
 <script>
-import {Annotation} from 'cytomine-client';
-
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 
 export default {
@@ -24,7 +22,7 @@ export default {
     AnnotationPreview,
   },
   props: {
-    annotation: {type: Annotation, default: null},
+    annotation: {type: Object, default: null},
     images: {type: Array, default: () => []},
     isSelected: {type: Boolean, default: false},
     users: {type: Array, default: () => []},
