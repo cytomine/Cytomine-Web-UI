@@ -32,8 +32,11 @@
         </section>
 
         <section class="content" v-if="selectedTask">
-          <task-io-form v-on:appengine:task:started="catchTaskRunLaunch" :task="selectedTask"
-                        :project-id="currentProjectId"></task-io-form>
+          <task-io-form
+            v-on:appengine:task:started="catchTaskRunLaunch"
+            :task="selectedTask"
+            :project-id="currentProjectId"
+          />
         </section>
       </div>
     </div>
@@ -142,7 +145,7 @@ export default {
       return this.tasks.find(task => task.id === taskRun.task.id);
     },
     filterBinaryType(task, type) {
-      let binaryType = ['image', 'wsi'];
+      let binaryType = ['file', 'image', 'wsi'];
 
       if (type === 'input') {
         return task.inputs.filter(input => binaryType.includes(input.type.id));
