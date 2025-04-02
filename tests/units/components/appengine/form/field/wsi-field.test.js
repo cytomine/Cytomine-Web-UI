@@ -1,7 +1,6 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import ImageSelection from '@/components/image/ImageSelection';
 import WsiField from '@/components/appengine/forms/fields/WsiField';
 
 jest.mock('@/utils/image-utils', () => ({
