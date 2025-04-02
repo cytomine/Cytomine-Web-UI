@@ -5,7 +5,7 @@
         {{ parameter.display_name }}
       </template>
       <b-button @click="selectAnnotation = true">
-        {{ $t('select') }}
+        {{ $t('select-annotation') }}
       </b-button>
 
       <div class="annotation-container" v-if="value">
