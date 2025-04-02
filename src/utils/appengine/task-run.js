@@ -61,4 +61,9 @@ export default class TaskRun extends Model {
     let {data} = await Cytomine.instance.api.get(`${this.uri}/outputs`);
     return data;
   }
+
+  async fetchSingleIO(parameterName, type) {
+    let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
+    return data;
+  }
 }

@@ -6,6 +6,7 @@
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
 import GeometryField from '@/components/appengine/forms/fields/GeometryField';
+import ImageField from '@/components/appengine/forms/fields/ImageField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 import StringField from '@/components/appengine/forms/fields/StringField';
@@ -16,6 +17,7 @@ export default {
     BooleanField,
     EnumerationField,
     GeometryField,
+    ImageField,
     IntegerField,
     NumberField,
     StringField,
@@ -44,6 +46,8 @@ export default {
           return EnumerationField;
         case 'geometry':
           return GeometryField;
+        case 'image':
+          return ImageField;
         case 'integer':
           return IntegerField;
         case 'number':

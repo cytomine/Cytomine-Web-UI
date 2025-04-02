@@ -28,7 +28,7 @@ import Vue from 'vue';
 export default {
   name: 'task-io-form',
   components: {
-    AppEngineField
+    AppEngineField,
   },
   props: {
     task: {type: Task, required: true},
@@ -37,7 +37,8 @@ export default {
   data() {
     return {
       taskInputs: [],
-      inputs: {}
+      inputs: {},
+      hasBinaryData: false,
     };
   },
   computed: {
@@ -67,18 +68,44 @@ export default {
     },
     async runTask() {
       // create task run and provision
-      await Task.createTaskRun(this.projectId, this.task.namespace, this.task.version, this.activeImage.id).then(async (taskRun) => {
-        return await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions()).then(async () => {
-          // TODO reset form and send event
-          return await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
-            this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
-            this.resetForm();
-            this.$emit('appengine:task:started', taskRun);
+      try {
+        let taskRun = await Task.createTaskRun(
+          this.projectId,
+          this.task.namespace,
+          this.task.version,
+          this.activeImage.id,
+        );
+
+        if (this.hasBinaryData) {
+          let promises = this.getInputProvisions().map(async (provision) => {
+            await Task.singleProvisionTask(
+              this.projectId,
+              taskRun.id,
+              provision.param_name,
+              provision,
+            );
           });
+
+          await Promise.all(promises);
+
+          // Notify that provisioning has ended
+          if (promises.length > 1) {
+            await Task.notifyProvisioningEnd(this.projectId, taskRun.id);
+          }
+        }
+        else {
+          await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
+        }
+
+        await Task.runTask(this.projectId, taskRun.id).then(async (taskRun) => {
+          this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
+          this.resetForm();
+          this.$emit('appengine:task:started', taskRun);
         });
-      }).catch(e => {
+      }
+      catch (e) {
         this.$buefy.toast.open({message: e.message, type: 'is-danger'});
-      });
+      }
     },
     getInputProvisions() {
       let provisions = [];
@@ -111,6 +138,9 @@ export default {
 
       for (let input of this.taskInputs) {
         setDefaultValue(input);
+        if (input.type.id === 'image') {
+          this.hasBinaryData = true;
+        }
       }
     }
   }

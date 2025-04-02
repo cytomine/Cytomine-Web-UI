@@ -32,7 +32,8 @@
         </section>
 
         <section class="content" v-if="selectedTask">
-          <task-io-form v-on:appengine:task:started="catchTaskRunLaunch" :task="selectedTask" :project-id="currentProjectId"></task-io-form>
+          <task-io-form v-on:appengine:task:started="catchTaskRunLaunch" :task="selectedTask"
+                        :project-id="currentProjectId"></task-io-form>
         </section>
       </div>
     </div>
@@ -47,7 +48,7 @@
       <div class="card-content">
         <section class="content">
           <h5 class="subtitle">{{ $t('app-engine.runs.title') }}</h5>
-          <task-run-table :task-runs="trackedTaskRuns" />
+          <task-run-table :task-runs="trackedTaskRuns"/>
         </section>
       </div>
     </div>
@@ -60,13 +61,13 @@ import TaskRun from '@/utils/appengine/task-run';
 import TaskIoForm from '@/components/appengine/forms/TaskIoForm';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
 
-import { get } from '@/utils/store-helpers';
+import {get} from '@/utils/store-helpers';
 
 export default {
   name: 'AppEngineSideBar',
   components: {
     TaskIoForm,
-    TaskRunTable
+    TaskRunTable,
   },
   data() {
     return {
@@ -79,40 +80,78 @@ export default {
     };
   },
   async created() {
-    this.tasks = await Task.fetchAll();
-    setInterval(() => {
-      this.trackedTaskRuns.forEach(async (taskRun) => {
+    await this.fetchTasks();
+
+    setInterval(async () => {
+      for (let taskRun of this.trackedTaskRuns) {
+        let task = this.getTask(taskRun);
+
         // update task run in place
         if (taskRun.state !== 'CREATED' && !taskRun.inputs) {
           taskRun.inputs = await taskRun.fetchInputs();
-        }
-        if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
-          await taskRun.fetch();
-          if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
-            taskRun.outputs = await taskRun.fetchOutputs();
+
+          let binaryInputs = this.filterBinaryType(task, 'input');
+          if (binaryInputs.length > 0) {
+            for (let input of binaryInputs) {
+              let index = taskRun.inputs.findIndex(i => i.param_name === input.name);
+              this.$set(taskRun.inputs[index], 'value', await taskRun.fetchSingleIO(input.name, 'input'));
+            }
           }
         }
-      });
+
+        if (taskRun.state !== 'FINISHED' && taskRun.state !== 'FAILED') {
+          await taskRun.fetch();
+
+          if (taskRun.state === 'FINISHED' || taskRun.state === 'FAILED') {
+            taskRun.outputs = await taskRun.fetchOutputs();
+
+            let binaryOutputs = this.filterBinaryType(task, 'output');
+            if (binaryOutputs.length > 0) {
+              for (let output of binaryOutputs) {
+                let index = taskRun.outputs.findIndex(o => o.param_name === output.name);
+                this.$set(taskRun.outputs[index], 'value', await taskRun.fetchSingleIO(output.name, 'output'));
+              }
+            }
+          }
+        }
+      }
     }, 2000);
   },
   computed: {
     currentProject: get('currentProject/project'),
     currentProjectId() {
       return this.currentProject.id;
-    }
+    },
   },
   methods: {
-    handleTaskRunState(taskState) {
-      this.taskState = taskState;
-    },
-    handleExecutedTaskRun(executedTaskRun) {
-      this.executedTaskRun = executedTaskRun;
-    },
     async catchTaskRunLaunch(event) {
       let taskRun = new TaskRun(event.resource);
       taskRun.project = this.currentProjectId;
       this.trackedTaskRuns = [taskRun, ...this.trackedTaskRuns];
-    }
+    },
+    async fetchTasks() {
+      this.tasks = await Task.fetchAll();
+      await Promise.all(
+        this.tasks.map(async task => {
+          task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
+          task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
+        })
+      );
+    },
+    getTask(taskRun) {
+      return this.tasks.find(task => task.id === taskRun.task.id);
+    },
+    filterBinaryType(task, type) {
+      if (type === 'input') {
+        return task.inputs.filter(input => input.type.id === 'image');
+      }
+
+      if (type === 'output') {
+        return task.outputs.filter(output => output.type.id === 'image');
+      }
+
+      return [];
+    },
   },
 };
 </script>
@@ -169,7 +208,6 @@ $border: #383838;
   height: 100%;
 }
 
-
 //
 .runs {
   height: 50%;
@@ -178,5 +216,4 @@ $border: #383838;
 .executor {
   height: 50%;
 }
-
 </style>
