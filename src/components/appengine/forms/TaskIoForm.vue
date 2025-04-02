@@ -78,11 +78,17 @@ export default {
 
         if (this.hasBinaryData) {
           let promises = this.getInputProvisions().map(async (provision) => {
+            let body = provision;
+            if (provision.type === 'file') {
+              body = new FormData();
+              body.append('file', provision.value, provision.value.name || 'uploaded-file');
+            }
+
             await Task.singleProvisionTask(
               this.projectId,
               taskRun.id,
               provision.param_name,
-              provision,
+              body,
             );
           });
 
@@ -138,7 +144,7 @@ export default {
 
       for (let input of this.taskInputs) {
         setDefaultValue(input);
-        if (['image', 'wsi'].includes(input.type.id)) {
+        if (['file', 'image', 'wsi'].includes(input.type.id)) {
           this.hasBinaryData = true;
         }
       }
