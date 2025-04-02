@@ -142,12 +142,14 @@ export default {
       return this.tasks.find(task => task.id === taskRun.task.id);
     },
     filterBinaryType(task, type) {
+      let binaryType = ['image', 'wsi'];
+
       if (type === 'input') {
-        return task.inputs.filter(input => input.type.id === 'image');
+        return task.inputs.filter(input => binaryType.includes(input.type.id));
       }
 
       if (type === 'output') {
-        return task.outputs.filter(output => output.type.id === 'image');
+        return task.outputs.filter(output => binaryType.includes(output.type.id));
       }
 
       return [];
