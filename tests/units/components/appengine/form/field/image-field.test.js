@@ -47,6 +47,14 @@ describe('ImageField.vue', () => {
     expect(wrapper.vm.input).toBeNull();
   });
 
+  it('The id should be rendered when selected', async  () => {
+    await wrapper.setProps({value: 42});
+
+    expect(wrapper.vm.value).toBe(42);
+    expect(wrapper.find('.annotation-container').exists()).toBe(true);
+    expect(wrapper.find('.annotation-container').text()).toBe('annotation 42');
+  });
+
   it('Changing the value should emit an event', async () => {
     await wrapper.setData({input: {id: 42}});
 

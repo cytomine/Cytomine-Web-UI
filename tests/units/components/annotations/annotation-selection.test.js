@@ -67,6 +67,15 @@ describe('AnnotationSelection.vue', () => {
   it('The component should be rendered correctly', () => {
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
+    expect(wrapper.find('.annotation-content').exists()).toBe(true);
+  });
+
+  it('The component should render the loading when the data is fetched', async () => {
+    await wrapper.setData({loading: true});
+
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
+    expect(wrapper.find('.annotation-content').exists()).toBe(false);
   });
 
   it('Selecting an annotation should emit the select-annotation event', async () => {

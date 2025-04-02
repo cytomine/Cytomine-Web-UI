@@ -138,7 +138,7 @@ export default {
 
       for (let input of this.taskInputs) {
         setDefaultValue(input);
-        if (input.type.id === 'image') {
+        if (['image', 'wsi'].includes(input.type.id)) {
           this.hasBinaryData = true;
         }
       }

@@ -7,11 +7,15 @@
       <b-table-column field="type" :label="$t('app-engine.parameter.type')">
         {{ props.row.type }}
       </b-table-column>
-      <b-table-column v-if="props.row.type !== 'IMAGE'" field="value" :label="$t('app-engine.parameter.value')">
+      <b-table-column
+        v-if="!['IMAGE', 'WSI'].includes(props.row.type)"
+        field="value"
+        :label="$t('app-engine.parameter.value')"
+      >
         {{ props.row.value }}
       </b-table-column>
       <b-table-column v-else field="value" :label="$t('app-engine.parameter.value')">
-        <button class="button is-link is-small" @click="downloadFile(props.row)">Download File</button>
+        <button class="button is-link is-small" @click="downloadFile(props.row)">{{ $t('button-download') }}</button>
       </b-table-column>
     </template>
   </b-table>
@@ -21,10 +25,7 @@
 export default {
   name: 'TaskRunParametersTable',
   props: {
-    parameters: {
-      type: Array,
-      required: true
-    },
+    parameters: {type: Array, required: true},
   },
   methods: {
     downloadFile(output) {

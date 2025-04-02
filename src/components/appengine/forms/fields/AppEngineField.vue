@@ -10,6 +10,7 @@ import ImageField from '@/components/appengine/forms/fields/ImageField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 import StringField from '@/components/appengine/forms/fields/StringField';
+import WsiField from '@/components/appengine/forms/fields/WsiField';
 
 export default {
   name: 'AppEngineField',
@@ -21,6 +22,7 @@ export default {
     IntegerField,
     NumberField,
     StringField,
+    WsiField,
   },
   props: {
     parameter: {type: Object, required: true},
@@ -54,6 +56,8 @@ export default {
           return NumberField;
         case 'string':
           return StringField;
+        case 'wsi':
+          return WsiField;
         default:
           return null;
       }
