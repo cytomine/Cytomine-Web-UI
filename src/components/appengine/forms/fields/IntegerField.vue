@@ -13,7 +13,7 @@
       />
     </b-field>
     <div class="info">
-      <b-tooltip :label="tooltip" type="is-primary" position="is-right">
+      <b-tooltip v-if="tooltip" :label="tooltip" type="is-primary" position="is-right">
         <b-icon pack="fas" icon="info-circle" />
       </b-tooltip>
     </div>

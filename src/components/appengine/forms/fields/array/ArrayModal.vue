@@ -6,11 +6,12 @@
         style="overflow-y: auto; max-height: 16rem;"
         @scroll="onScroll"
       >
-        <b-field v-for="(value, index) in items" :key="index">
+        <b-field class="field-container" v-for="(value, index) in items" :key="index">
           <b-field position="is-centered" grouped>
-            <b-numberinput
+            <component
               v-model="items[index]"
-              :controls="false"
+              :is="selectedField"
+              :parameter="parameter"
             />
             <b-button @click="remove(index)">
               <i class="fas fa-times"/>
@@ -36,6 +37,7 @@
 
 <script>
 import CytomineModal from '@/components/utils/CytomineModal';
+import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 
 export default {
   name: 'ArrayModal',
@@ -46,11 +48,25 @@ export default {
     active: {type: Boolean, default: false},
     maxSize: {type: Number, default: null},
     minSize: {type: Number, default: null},
+    type: {type: String, required: true},
   },
   data() {
     return {
       items: [],
     };
+  },
+  computed: {
+    parameter() {
+      return {default: 0, type: this.type};
+    },
+    selectedField() {
+      switch (this.type) {
+        case 'integer':
+          return IntegerField;
+        default:
+          return null;
+      }
+    }
   },
   methods: {
     cancel() {
@@ -91,3 +107,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.field-container {
+  margin-bottom: 0 !important;
+}
+</style>

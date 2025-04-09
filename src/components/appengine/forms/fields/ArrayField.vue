@@ -26,6 +26,7 @@
       :active.sync="selectParameters"
       :max-size="maxSize"
       :min-size="minSize"
+      :type="subType"
       @create-inputs="input = $event"
     />
   </div>
@@ -59,6 +60,9 @@ export default {
     },
     type() {
       return this.parameter.type;
+    },
+    subType() {
+      return this.type.subType.id;
     },
     maxSize() {
       let {maxSize} = this.type;
