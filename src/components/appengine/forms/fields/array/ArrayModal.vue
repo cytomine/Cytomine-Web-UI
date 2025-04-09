@@ -20,7 +20,7 @@
       </div>
 
       <template #footer>
-        <b-button @click="add">
+        <b-button :disabled="maxSize && items.length >= maxSize" @click="add">
           <i class="fas fa-plus"/>
         </b-button>
         <button class="button" type="button" @click="cancel">
@@ -44,6 +44,8 @@ export default {
   },
   props: {
     active: {type: Boolean, default: false},
+    maxSize: {type: Number, default: null},
+    minSize: {type: Number, default: null},
   },
   data() {
     return {
@@ -57,6 +59,11 @@ export default {
     select() {
       if (this.items.length === 0) {
         this.$notify({type: 'error', text: this.$t('notify-error-empty-list')});
+        return;
+      }
+
+      if (this.minSize !== null && this.items.length < this.minSize) {
+        this.$notify({type: 'error', text: this.$t('notify-error-not-enough-item')});
         return;
       }
 

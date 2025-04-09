@@ -17,12 +17,17 @@
     </b-field>
 
     <div class="info">
-      <b-tooltip :label="parameter.description" type="is-primary" position="is-right">
+      <b-tooltip :label="tooltip" type="is-primary" position="is-right">
         <b-icon pack="fas" icon="info-circle"/>
       </b-tooltip>
     </div>
 
-    <array-modal :active.sync="selectParameters" @create-inputs="input = $event"/>
+    <array-modal
+      :active.sync="selectParameters"
+      :max-size="maxSize"
+      :min-size="minSize"
+      @create-inputs="input = $event"
+    />
   </div>
 </template>
 
@@ -52,7 +57,45 @@ export default {
         this.$emit('input', value);
       }
     },
-  }
+    type() {
+      return this.parameter.type;
+    },
+    maxSize() {
+      let {maxSize} = this.type;
+      return maxSize;
+    },
+    minSize() {
+      let {minSize} = this.type;
+      return minSize;
+    },
+    hasConstraints() {
+      let {minSize, maxSize} = this.type;
+      return minSize != null || maxSize != null;
+    },
+    constraintsSummary() {
+      let {minSize, maxSize} = this.type;
+      let summary = '';
+
+      if (!!minSize || minSize === 0) {
+        summary += `${minSize} ≤ `;
+      }
+
+      summary += 'items';
+
+      if (!!maxSize || maxSize === 0) {
+        summary += ` ≤ ${maxSize}`;
+      }
+
+      return summary;
+    },
+    tooltip() {
+      let tooltip = this.parameter.description;
+      if (this.hasConstraints) {
+        tooltip += `, ${this.constraintsSummary}`;
+      }
+      return tooltip;
+    },
+  },
 };
 </script>
 
