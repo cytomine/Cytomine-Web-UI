@@ -39,7 +39,7 @@ export default {
       }
     },
     defaultValue() {
-      return this.parameter.default != null ? this.parameter.default : null;
+      return this.parameter.default != null ? parseInt(this.parameter.default) : null;
     },
     type() {
       return this.parameter.type;
