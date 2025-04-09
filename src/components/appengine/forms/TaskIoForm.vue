@@ -127,6 +127,10 @@ export default {
     resetForm() {
       const setDefaultValue = (input) => {
         const value = (() => {
+          if (input.default === 'null') {
+            return null;
+          }
+
           switch (input.type.id) {
             case 'boolean':
               return input.default === 'true';
