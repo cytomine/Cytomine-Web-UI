@@ -47,6 +47,19 @@ describe('EnumerationField.vue', () => {
     expect(wrapper.vm.input).toBe(mockParameter.default);
   });
 
+  it('The input not show the tooltip if description is empty', async () => {
+    await wrapper.setProps({
+      parameter: {
+        default: 'B',
+        description: null,
+        type: {values: ['A', 'B', 'C']},
+      }
+    });
+
+    expect(wrapper.vm.tooltips).toBeUndefined();
+    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
+  });
+
   it('Changing the value should emit an event', async () => {
     await wrapper.find('select').setValue('B');
 

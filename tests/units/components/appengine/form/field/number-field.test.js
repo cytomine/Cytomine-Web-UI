@@ -50,6 +50,19 @@ describe('NumberField.vue', () => {
     expect(input.attributes('placeholder')).toBe('5 < Test Parameter < 10, ∞');
   });
 
+  it('The input not show the tooltip if description is empty', async () => {
+    await wrapper.setProps({
+      parameter: {
+        default: 4.2,
+        description: null,
+        type: {gt: 10.1, lt: 20.2, geq: null, leq: null, infinityAllowed: true, nanAllowed: false},
+      }
+    });
+
+    expect(wrapper.vm.tooltips).toBeUndefined();
+    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
+  });
+
   it('Changing the value should emit an event', async () => {
     await wrapper.setData({input: 12});
 

@@ -50,6 +50,19 @@ describe('StringField.vue', () => {
     expect(input.attributes('placeholder')).toBe('2 ≤ Test Parameter.length ≤ 10');
   });
 
+  it('The input not show the tooltip if description is empty', async () => {
+    await wrapper.setProps({
+      parameter: {
+        default: 'no string',
+        description: null,
+        type: {minLength: 2, maxLength: 10},
+      }
+    });
+
+    expect(wrapper.vm.tooltips).toBeUndefined();
+    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
+  });
+
   it('Changing the value should emit an event', async () => {
     await wrapper.setData({input: 'Changing'});
 
