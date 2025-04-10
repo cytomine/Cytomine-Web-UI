@@ -40,6 +40,7 @@ import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
+import StringField from '@/components/appengine/forms/fields/StringField';
 
 export default {
   name: 'ArrayModal',
@@ -69,6 +70,8 @@ export default {
           return IntegerField;
         case 'number':
           return NumberField;
+        case 'string':
+          return StringField;
         default:
           return null;
       }
@@ -97,7 +100,7 @@ export default {
       this.$notify({type: 'success', text: this.$t('notify-success-create-array-inputs')});
     },
     add() {
-      this.items.push(0);
+      this.items.push(null);
     },
     remove(index) {
       this.items.splice(index, 1);
