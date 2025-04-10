@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     parameter() {
-      return {default: null, type: this.type};
+      return {default: null, description: null, type: this.type};
     },
     selectedField() {
       switch (this.type.id) {

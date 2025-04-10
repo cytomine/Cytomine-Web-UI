@@ -62,11 +62,13 @@ export default {
       return summary;
     },
     tooltip() {
-      let tooltip = this.parameter.description;
-      if (this.hasConstraints) {
-        tooltip += `, ${this.constraintsSummary}`;
+      if (this.parameter.description === null) {
+        return null;
       }
-      return tooltip;
+      if (this.hasConstraints) {
+        return `${this.parameter.description}, ${this.constraintsSummary}`;
+      }
+      return this.parameter.description;
     },
     min() {
       let min = null;
