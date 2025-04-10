@@ -62,7 +62,7 @@ export default {
       return this.parameter.type;
     },
     subType() {
-      return this.type.subType.id;
+      return this.type.subType;
     },
     maxSize() {
       let {maxSize} = this.type;

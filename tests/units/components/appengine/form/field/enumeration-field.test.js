@@ -23,7 +23,7 @@ describe('EnumerationField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: null,
+        value: mockParameter.default,
       },
     });
   });

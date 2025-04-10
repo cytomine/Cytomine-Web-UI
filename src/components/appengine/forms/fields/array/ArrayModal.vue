@@ -38,6 +38,7 @@
 <script>
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
+import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 import StringField from '@/components/appengine/forms/fields/StringField';
@@ -51,7 +52,7 @@ export default {
     active: {type: Boolean, default: false},
     maxSize: {type: Number, default: null},
     minSize: {type: Number, default: null},
-    type: {type: String, required: true},
+    type: {type: Object, required: true},
   },
   data() {
     return {
@@ -63,9 +64,11 @@ export default {
       return {default: null, type: this.type};
     },
     selectedField() {
-      switch (this.type) {
+      switch (this.type.id) {
         case 'boolean':
           return BooleanField;
+        case 'enumeration':
+          return EnumerationField;
         case 'integer':
           return IntegerField;
         case 'number':
