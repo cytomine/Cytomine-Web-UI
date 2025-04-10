@@ -22,7 +22,7 @@ describe('BooleanField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: null,
+        value: mockParameter.default,
       },
     });
   });
@@ -40,11 +40,13 @@ describe('BooleanField.vue', () => {
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
   });
 
-  it('The input should not have a default value', () => {
-    expect(wrapper.vm.input).toBe(null);
+  it('The input should have a default value', () => {
+    expect(wrapper.vm.input).toBe(mockParameter.default);
   });
 
   it('The "False" radio button should be checked when the input is false', async () => {
+    await wrapper.setProps({value: null});
+
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
 
@@ -58,6 +60,8 @@ describe('BooleanField.vue', () => {
   });
 
   it('The "True" radio button should be checked when the input is true', async () => {
+    await wrapper.setProps({value: null});
+
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
 
@@ -71,6 +75,7 @@ describe('BooleanField.vue', () => {
   });
 
   it('Selecting the radio button should emit an event', async () => {
+    await wrapper.setProps({value: null});
     expect(wrapper.vm.input).toBe(null);
 
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');

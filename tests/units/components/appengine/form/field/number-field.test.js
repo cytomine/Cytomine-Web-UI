@@ -10,6 +10,7 @@ describe('NumberField.vue', () => {
   const mockParameter = {
     // eslint-disable-next-line
     display_name: 'Test Parameter',
+    default: 4.2,
     description: 'This is a test description',
     type: {gt: 5, lt: 10, geq: null, leq: null, infinityAllowed: true, nanAllowed: false},
   };
@@ -22,7 +23,7 @@ describe('NumberField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: null,
+        value: mockParameter.default,
       },
     });
   });
@@ -37,6 +38,10 @@ describe('NumberField.vue', () => {
     expect(tooltips.at(0).exists()).toBe(true);
     const expectedLabel = mockParameter.description + ', 5 < Test Parameter < 10, ∞';
     expect(tooltips.at(0).props('label')).toBe(expectedLabel);
+  });
+
+  it('The input should have a default value', () => {
+    expect(wrapper.vm.input).toBe(mockParameter.default);
   });
 
   it('The input should show the correct constraints summary',  () => {
