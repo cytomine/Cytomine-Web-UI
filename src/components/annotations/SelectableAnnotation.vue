@@ -7,8 +7,9 @@
       class="annotation-data"
       :annot="annotation"
       :images="images"
-      :users="users"
+      :showDetails="false"
       :size="85"
+      :users="users"
     />
   </div>
 </template>
