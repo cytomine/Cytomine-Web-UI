@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
@@ -62,6 +63,8 @@ export default {
     },
     selectedField() {
       switch (this.type) {
+        case 'boolean':
+          return BooleanField;
         case 'integer':
           return IntegerField;
         case 'number':
