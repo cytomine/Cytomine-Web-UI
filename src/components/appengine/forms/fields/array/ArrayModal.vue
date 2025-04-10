@@ -38,6 +38,7 @@
 <script>
 import CytomineModal from '@/components/utils/CytomineModal';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
+import NumberField from '@/components/appengine/forms/fields/NumberField';
 
 export default {
   name: 'ArrayModal',
@@ -57,12 +58,14 @@ export default {
   },
   computed: {
     parameter() {
-      return {default: 0, type: this.type};
+      return {default: null, type: this.type};
     },
     selectedField() {
       switch (this.type) {
         case 'integer':
           return IntegerField;
+        case 'number':
+          return NumberField;
         default:
           return null;
       }
