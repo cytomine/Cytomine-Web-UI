@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
-    <section v-if="task">
+    <section>
       <!-- INPUTS -->
       <app-engine-field
         v-for="input in taskInputs"
@@ -31,8 +31,8 @@ export default {
     AppEngineField,
   },
   props: {
-    task: {type: Task, required: true},
-    projectId: {type: Number, required: true}
+    projectId: {type: Number, required: true},
+    task: {type: Object, required: true},
   },
   data() {
     return {
