@@ -31,7 +31,7 @@ export default {
     AppEngineField,
   },
   props: {
-    task: {type: Task, required: true},
+    task: {type: Object, required: true},
     projectId: {type: Number, required: true}
   },
   data() {

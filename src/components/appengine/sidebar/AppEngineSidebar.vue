@@ -3,8 +3,7 @@
     <div class="card executor">
       <header class="card-header">
         <p class="card-header-title subtitle">
-          <i class="fas fa-cogs"></i>
-          {{ $t("app-engine.execute-a-task") }}
+          <i class="fas fa-cogs"/> {{ $t("app-engine.execute-a-task") }}
         </p>
       </header>
 
@@ -40,19 +39,19 @@
         </section>
       </div>
     </div>
+
     <div class="card runs">
       <header class="card-header">
         <p class="card-header-title subtitle">
-          <i class="fas fa-clock"></i>
-          {{ $t("app-engine.previous-task-runs") }}
+          <i class="fas fa-clock"/> {{ $t("app-engine.previous-task-runs") }}
         </p>
       </header>
 
       <div class="card-content">
         <section class="content">
           <h5 class="subtitle">{{ $t('app-engine.runs.title') }}</h5>
-          <task-run-table :task-runs="trackedTaskRuns"/>
         </section>
+        <task-run-table :task-runs="trackedTaskRuns"/>
       </div>
     </div>
   </div>
@@ -84,6 +83,7 @@ export default {
   },
   async created() {
     await this.fetchTasks();
+    await this.fetchTaskRuns();
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
@@ -141,6 +141,21 @@ export default {
         })
       );
     },
+    async fetchTaskRuns() {
+      let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
+      this.trackedTaskRuns = await Promise.all(
+        taskRuns.map(async ({project, taskRunId}) => {
+          let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);
+          return new TaskRun({...taskRun, project});
+        })
+      );
+
+      await Promise.all(
+        this.trackedTaskRuns
+          .filter(taskRun => taskRun.state === 'FINISHED')
+          .map(async (taskRun) => taskRun.outputs = await taskRun.fetchOutputs())
+      );
+    },
     getTask(taskRun) {
       return this.tasks.find(task => task.id === taskRun.task.id);
     },
@@ -178,7 +193,6 @@ $border: #383838;
 .card-header-title {
   color: $color;
   position: relative;
-  display: block;
   font-size: 0.85rem;
   height: 100%;
   text-decoration: none;

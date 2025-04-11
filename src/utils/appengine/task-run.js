@@ -1,6 +1,6 @@
 import Model from './model';
 import Task from './task';
-import { Cytomine } from 'cytomine-client';
+import {Cytomine} from 'cytomine-client';
 
 
 export default class TaskRun extends Model {
@@ -13,12 +13,12 @@ export default class TaskRun extends Model {
     if (!this.project) {
       throw new Error('TaskRun.project is required');
     }
-    if(this.isNew()) {
+    if (this.isNew()) {
       return `/app-engine/project/${this.project}/task-runs`;
       //   return `${this.callbackIdentifier}.json`;
     }
     else {
-    //   return `${this.callbackIdentifier}/${this.id}.json`;
+      //   return `${this.callbackIdentifier}/${this.id}.json`;
       return `/app-engine/project/${this.project}/task-runs/${this.id}`;
     }
   }
@@ -33,6 +33,11 @@ export default class TaskRun extends Model {
     this.updated_at = null;
     this.last_state_transition_at = null;
     /* eslint-enable */
+  }
+
+  static async fetchByProject(projectId) {
+    let {data} = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
+    return data;
   }
 
   // Step-2: Provision task / user inputs
