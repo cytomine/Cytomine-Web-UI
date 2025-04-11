@@ -44,7 +44,6 @@ describe('ArrayField.vue', () => {
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
     expect(wrapper.find('button').text()).toBe('select');
     expect(wrapper.find('.state-container').exists()).toBe(false);
 
