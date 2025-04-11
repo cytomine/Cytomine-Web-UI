@@ -1,7 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar';
+import AppEngineSideBar from '@/components/appengine/sidebar/AppEngineSidebar.vue';
 
 jest.mock('@/utils/image-utils', () => ({
   isWebPSupported: jest.fn(() => true)
