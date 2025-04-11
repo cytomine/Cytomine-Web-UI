@@ -1,10 +1,13 @@
 <template>
   <b-table
+    :current-page.sync="currentPage"
     :data="taskRuns"
+    :paginated="taskRuns.length > 5"
     :show-table="false"
     detailed
-    narrowed>
-
+    narrowed
+    per-page="5"
+  >
     <template #default="props">
       <b-table-column :label="$t('app-engine.task-run.state.title')">
         <task-run-state-icon :state="props.row.state"/>
@@ -40,11 +43,13 @@ export default {
     TaskRunParametersTable
   },
   props: {
-    taskRuns: {
-      type: Array,
-      required: true
-    },
-  }
+    taskRuns: {type: Array, required: true},
+  },
+  data() {
+    return {
+      currentPage: 1,
+    };
+  },
 };
 </script>
 
@@ -52,5 +57,4 @@ export default {
 .output-section {
   margin-top: 5px;
 }
-
 </style>
