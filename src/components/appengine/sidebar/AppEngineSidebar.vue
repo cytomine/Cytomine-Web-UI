@@ -87,7 +87,7 @@ export default {
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
-        let task = this.getTask(taskRun);
+        let task = await this.getTask(taskRun);
 
         // update task run in place
         if (taskRun.state !== 'CREATED' && !taskRun.inputs) {
@@ -134,12 +134,6 @@ export default {
     },
     async fetchTasks() {
       this.tasks = await Task.fetchAll();
-      await Promise.all(
-        this.tasks.map(async task => {
-          task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
-          task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
-        })
-      );
     },
     async fetchTaskRuns() {
       let taskRuns = await TaskRun.fetchByProject(this.currentProjectId);
@@ -156,8 +150,16 @@ export default {
           .map(async (taskRun) => taskRun.outputs = await taskRun.fetchOutputs())
       );
     },
-    getTask(taskRun) {
-      return this.tasks.find(task => task.id === taskRun.task.id);
+    async getTask(taskRun) {
+      let task = this.tasks.find(task => task.id === taskRun.task.id);
+      if (!task.inputs) {
+        task.inputs = await Task.fetchTaskInputs(task.namespace, task.version);
+      }
+      if (!task.outputs) {
+        task.outputs = await Task.fetchTaskOutputs(task.namespace, task.version);
+      }
+
+      return task;
     },
     filterBinaryType(task, type) {
       let binaryType = ['file', 'image', 'wsi'];
