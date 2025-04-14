@@ -34,13 +34,9 @@ export default {
         const response = await Task.uploadTask(formData);
 
         if (response.status >= 200 && response.status < 300) {
-          // Successful response handling
-          const responseMsg = response.data.message || 'Unknown message';
-
           // trigger success so we fetch all tasks (will re-render so we see new task)
           this.$emit('taskUploadSuccess');
-
-          this.$notify({type: 'success', text: responseMsg});
+          this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
         }
       }
       catch (error) {
