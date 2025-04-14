@@ -140,6 +140,12 @@ export default {
       this.trackedTaskRuns = await Promise.all(
         taskRuns.map(async ({project, taskRunId}) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProjectId, taskRunId);
+
+          // Mark all previous runs as failed if not finished
+          if (taskRun.state !== 'FINISHED') {
+            taskRun.state = 'FAILED';
+          }
+
           return new TaskRun({...taskRun, project});
         })
       );
