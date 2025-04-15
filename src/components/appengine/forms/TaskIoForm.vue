@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
-    <section>
+    <section class="fields">
       <!-- INPUTS -->
       <app-engine-field
         v-for="input in taskInputs"
@@ -143,7 +143,7 @@ export default {
           }
         })();
 
-        Vue.set(this.inputs, input.name, {value, type: input.type.id});
+        Vue.set(this.inputs, input.name, {value, type: input.type});
       };
 
       for (let input of this.taskInputs) {
@@ -165,5 +165,12 @@ export default {
 
 .button {
   margin-left: 5px; /* Add spacing between buttons */
+}
+
+.fields {
+  padding-top: 6px;
+  max-height: 85px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 </style>
