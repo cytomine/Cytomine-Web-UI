@@ -52,17 +52,14 @@ describe('UploadAppButton.vue', () => {
   });
 
   it('Upload should emit success and notify on successful upload', async () => {
-    Task.uploadTask.mockResolvedValue({
-      status: 200,
-      data: {message: 'Upload successful!'},
-    });
+    Task.uploadTask.mockResolvedValue({status: 200});
 
     const file = new Blob(['test']);
     await wrapper.vm.upload(file);
 
     expect(Task.uploadTask).toHaveBeenCalled();
     expect(mockEmit).toHaveBeenCalledWith('taskUploadSuccess');
-    expect(mockNotify).toHaveBeenCalledWith({type: 'success', text: 'Upload successful!'});
+    expect(mockNotify).toHaveBeenCalledWith({type: 'success', text: 'notify-success-task-upload'});
   });
 
   it('Upload should notify with warning on 409 error', async () => {
