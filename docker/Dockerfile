@@ -32,6 +32,7 @@ COPY ./scripts /app/scripts
 COPY ./package.json /app/package.json
 COPY ./package-lock.json /app/package-lock.json
 COPY ./babel.config.js /app/babel.config.js
+COPY ./.eslintrc.js /app/.eslintrc.js
 
 WORKDIR /app
 RUN npm install && \
