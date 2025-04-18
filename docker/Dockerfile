@@ -18,7 +18,7 @@ ARG WEB_UI_REVISION
 ARG NODE_VERSION=16.20.2-alpine3.18
 ARG NODE_DEV_VERSION=16.20.2-buster-slim
 ARG NGINX_VERSION=1.22.1
-ARG ENTRYPOINT_SCRIPTS_VERSION=1.0.0
+ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
 
 #######################################################################################
 ## Stage: build front-end
@@ -39,7 +39,7 @@ RUN npm install && \
 
 #######################################################################################
 ## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
-FROM cytomineuliege/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
+FROM cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
 
 #######################################################################################
 ## Stage: dev image (with hot swap)
@@ -72,8 +72,8 @@ ARG ENTRYPOINT_SCRIPTS_VERSION
 
 LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
       org.opencontainers.image.url="https://uliege.cytomine.org/" \
-      org.opencontainers.image.documentation="https://doc.uliege.cytomine.org/" \
-      org.opencontainers.image.source="https://github.com/Cytomine-ULiege/Cytomine-web-ui" \
+      org.opencontainers.image.documentation="https://doc.cytomine.com/" \
+      org.opencontainers.image.source="https://github.com/cytomine/Cytomine-web-ui" \
       org.opencontainers.image.vendor="Cytomine ULiège" \
       org.opencontainers.image.version=${WEB_UI_VERSION} \
       org.opencontainers.image.revision=${WEB_UI_REVISION} \
