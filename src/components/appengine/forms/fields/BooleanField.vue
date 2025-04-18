@@ -1,13 +1,16 @@
 <template>
   <div class="container">
-    <b-field class="field" expanded>
+    <b-field class="field" position="is-centered" expanded>
       <span class="display-name">{{ parameter.display_name }}</span>
       <b-radio v-model="input" :native-value="true">True</b-radio>
       <b-radio v-model="input" :native-value="false">False</b-radio>
+      <b-button v-if="optional" type="is-text" @click="input = null">
+        <i class="fas fa-times"/>
+      </b-button>
     </b-field>
 
     <div class="info">
-      <b-tooltip :label="tooltip" type="is-primary" position="is-right">
+      <b-tooltip v-if="tooltip" :label="tooltip" type="is-primary" position="is-right">
         <b-icon pack="fas" icon="info-circle"/>
       </b-tooltip>
     </div>
@@ -24,30 +27,18 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value !== undefined ? this.value : this.defaultValue;
+        return this.value;
       },
       set(value) {
         this.$emit('input', value);
       }
     },
-    defaultValue() {
-      return this.parameter.default !== null ? !this.parameter.default : null;
+    optional() {
+      return this.parameter.optional;
     },
     tooltip() {
       return this.parameter.description;
     },
-  },
-  watch: {
-    value(newValue) {
-      if (newValue === null && this.defaultValue !== null) {
-        this.input = this.defaultValue;
-      }
-    }
-  },
-  created() {
-    if (this.defaultValue !== null) {
-      this.input = this.defaultValue;
-    }
   },
 };
 </script>

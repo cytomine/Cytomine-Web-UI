@@ -13,7 +13,7 @@
       />
     </b-field>
     <div class="info">
-      <b-tooltip :label="tooltip" type="is-primary" position="is-right">
+      <b-tooltip v-if="tooltip" :label="tooltip" type="is-primary" position="is-right">
         <b-icon pack="fas" icon="info-circle"/>
       </b-tooltip>
     </div>
@@ -30,14 +30,11 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value || this.defaultValue;
+        return this.value;
       },
       set(value) {
         this.$emit('input', value);
       }
-    },
-    defaultValue() {
-      return this.parameter.default != null ? this.parameter.default : null;
     },
     type() {
       return this.parameter.type;
@@ -62,11 +59,13 @@ export default {
       return summary;
     },
     tooltip() {
-      let tooltip = this.parameter.description;
-      if (this.hasConstraints) {
-        tooltip += `, ${this.constraintsSummary}`;
+      if (this.parameter.description === null) {
+        return null;
       }
-      return tooltip;
+      if (this.hasConstraints) {
+        return `${this.parameter.description}, ${this.constraintsSummary}`;
+      }
+      return this.parameter.description;
     },
     min() {
       let {minLength} = this.type;

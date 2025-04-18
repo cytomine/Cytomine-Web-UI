@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import ArrayField from '@/components/appengine/forms/fields/ArrayField';
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
 import FileField from '@/components/appengine/forms/fields/FileField';
@@ -16,6 +17,7 @@ import WsiField from '@/components/appengine/forms/fields/WsiField';
 export default {
   name: 'AppEngineField',
   components: {
+    ArrayField,
     BooleanField,
     EnumerationField,
     FileField,
@@ -44,6 +46,8 @@ export default {
     },
     currentField() {
       switch (this.typeId) {
+        case 'array':
+          return ArrayField;
         case 'boolean':
           return BooleanField;
         case 'enumeration':

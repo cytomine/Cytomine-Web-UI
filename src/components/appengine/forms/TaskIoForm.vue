@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="subtitle">{{ $t('app-engine.ae-run-task') }}</h3>
-    <section v-if="task">
+    <section class="fields">
       <!-- INPUTS -->
       <app-engine-field
         v-for="input in taskInputs"
@@ -31,8 +31,8 @@ export default {
     AppEngineField,
   },
   props: {
+    projectId: {type: Number, required: true},
     task: {type: Object, required: true},
-    projectId: {type: Number, required: true}
   },
   data() {
     return {
@@ -127,6 +127,10 @@ export default {
     resetForm() {
       const setDefaultValue = (input) => {
         const value = (() => {
+          if (input.default === 'null') {
+            return null;
+          }
+
           switch (input.type.id) {
             case 'boolean':
               return input.default === 'true';
@@ -139,7 +143,7 @@ export default {
           }
         })();
 
-        Vue.set(this.inputs, input.name, {value, type: input.type.id});
+        Vue.set(this.inputs, input.name, {value, type: input.type});
       };
 
       for (let input of this.taskInputs) {
@@ -161,5 +165,12 @@ export default {
 
 .button {
   margin-left: 5px; /* Add spacing between buttons */
+}
+
+.fields {
+  padding-top: 6px;
+  max-height: 85px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 </style>

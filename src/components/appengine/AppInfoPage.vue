@@ -15,7 +15,7 @@
         <section class="media">
           <figure class="media-left">
             <p class="image logo">
-              <img :src="task.imageUrl || 'https://bulma.io/images/placeholders/1280x960.png'">
+              <img :src="task.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'">
             </p>
           </figure>
           <div class="media-content app-content">

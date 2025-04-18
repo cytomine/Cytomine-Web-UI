@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="file" ref="fileInput" style="display: none;" @change="handleFileChange" />
+    <input type="file" ref="fileInput" style="display: none;" @change="handleFileChange"/>
     <button id="app-upload-btn" class="button is-link" @click="uploadTask">{{ $t(btnFunc) }}</button>
   </div>
 </template>
@@ -11,18 +11,12 @@ import Task from '@/utils/appengine/task';
 export default {
   name: 'UploadAppButton',
   props: {
-    btnFunc: {
-      type: String,
-      required: true,
-    },
+    btnFunc: {type: String, required: true},
   },
   data() {
     return {
       task: null,
     };
-  },
-  async created() {
-
   },
   methods: {
     handleFileChange(event) {
@@ -49,14 +43,12 @@ export default {
         if (error.response && error.response.status === 409) {
           const errorMessage = error.response.data.message || 'Task already exists!';
 
-          console.error('Error during upload:', error);
-          this.$notify({ type: 'warn', text: errorMessage });
+          this.$notify({type: 'warn', text: errorMessage});
         }
         else {
-          const errorMessage = error.response.data.message || 'Unkown Error!';
+          const errorMessage = error.response.data.message || 'Unknown Error!';
 
-          console.error('Error during upload:', error);
-          this.$notify({ type: 'error', text: errorMessage});
+          this.$notify({type: 'error', text: errorMessage});
         }
       }
     },

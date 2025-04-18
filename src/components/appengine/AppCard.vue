@@ -4,7 +4,7 @@
       <div class="card-image img-rounded">
         <figure class="image is-animated is-5by3">
           <img
-            :src="appData.imageUrl || 'https://bulma.io/images/placeholders/1280x960.png'"
+            :src="appData.imageUrl || 'https://bulma.io/assets/images/placeholders/1280x960.png'"
             alt="Placeholder image"
           >
         </figure>

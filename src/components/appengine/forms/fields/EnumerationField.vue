@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <b-field label-position="on-border" expanded class="field">
+  <div class="is-flex is-justify-content-center">
+    <b-field class="field" label-position="on-border" expanded>
       <template #label>
         {{ parameter.display_name }}
       </template>
@@ -17,8 +17,9 @@
         </option>
       </b-select>
     </b-field>
+
     <div class="info">
-      <b-tooltip :label="parameter.description" type="is-primary" position="is-right">
+      <b-tooltip v-if="tooltip" :label="tooltip" type="is-primary" position="is-right">
         <b-icon pack="fas" icon="info-circle"/>
       </b-tooltip>
     </div>
@@ -35,27 +36,20 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value || this.defaultValue;
+        return this.value;
       },
       set(value) {
         this.$emit('input', value);
       }
     },
-    defaultValue() {
-      let isNull = this.parameter.default == null || this.parameter.default === '';
-      return !isNull ? this.parameter.default : null;
-    },
-  }
+    tooltip() {
+      return this.parameter.description;
+    }
+  },
 };
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .field {
   margin-left: auto;
   margin-right: auto;

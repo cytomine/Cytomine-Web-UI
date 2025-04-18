@@ -10,7 +10,7 @@ describe('NumberField.vue', () => {
   const mockParameter = {
     // eslint-disable-next-line
     display_name: 'Test Parameter',
-    default: 1.0,
+    default: 4.2,
     description: 'This is a test description',
     type: {gt: 5, lt: 10, geq: null, leq: null, infinityAllowed: true, nanAllowed: false},
   };
@@ -23,7 +23,7 @@ describe('NumberField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: null,
+        value: mockParameter.default,
       },
     });
   });
@@ -48,6 +48,19 @@ describe('NumberField.vue', () => {
     const input = wrapper.find('input[type="number"]');
 
     expect(input.attributes('placeholder')).toBe('5 < Test Parameter < 10, ∞');
+  });
+
+  it('The input not show the tooltip if description is empty', async () => {
+    await wrapper.setProps({
+      parameter: {
+        default: 4.2,
+        description: null,
+        type: {gt: 10.1, lt: 20.2, geq: null, leq: null, infinityAllowed: true, nanAllowed: false},
+      }
+    });
+
+    expect(wrapper.vm.tooltips).toBeUndefined();
+    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
   });
 
   it('Changing the value should emit an event', async () => {
