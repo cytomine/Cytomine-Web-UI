@@ -2,14 +2,22 @@
   <div class="container">
     <b-field label-position="on-border" expanded class="field">
       <template #label>
-        {{ parameter.display_name }}
+        <span class="text-label">
+          {{ parameter.display_name }}
+        </span>
       </template>
-      <b-button @click="selectAnnotation = true">
-        {{ $t('select-annotation') }}
-      </b-button>
 
-      <div class="annotation-container" v-if="value">
-        {{ $t('annotation') }} {{ value }}
+      <div class="buttons">
+        <b-button @click="selectAnnotation = true">
+          <i class="fas fa-draw-polygon"/>
+        </b-button>
+        <b-button @click="selectImage = true">
+          <i class="fas fa-image"/>
+        </b-button>
+      </div>
+
+      <div class="value-container" v-if="value">
+        {{ $t(type) }} {{ value.data.id }}
       </div>
     </b-field>
 
@@ -19,17 +27,21 @@
       </b-tooltip>
     </div>
 
-    <annotation-selection :active.sync="selectAnnotation" @select-annotation="input = $event"/>
+    <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')"/>
+
+    <image-selection :active.sync="selectImage" @select-image="selectInput($event, 'image')"/>
   </div>
 </template>
 
 <script>
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
+import ImageSelection from '@/components/image/ImageSelection';
 
 export default {
   name: 'ImageField',
   components: {
     AnnotationSelection,
+    ImageSelection,
   },
   props: {
     parameter: {type: Object, required: true},
@@ -38,6 +50,8 @@ export default {
   data() {
     return {
       selectAnnotation: false,
+      selectImage: false,
+      type: null,
     };
   },
   computed: {
@@ -46,19 +60,20 @@ export default {
         return this.value;
       },
       set(value) {
-        this.$emit('input', value.id);
+        this.$emit('input', value);
       }
+    },
+  },
+  methods: {
+    selectInput(input, type) {
+      this.input = {type, data: input};
+      this.type = type;
     },
   },
 };
 </script>
 
 <style scoped>
-.annotation-container {
-  margin-top: 5px;
-  margin-left: 10px;
-}
-
 .container {
   display: flex;
   justify-content: space-between;
@@ -73,5 +88,19 @@ export default {
 .info {
   text-align: right;
   margin-left: 5px;
+}
+
+.text-label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value-container {
+  margin-top: 5px;
+  margin-left: 10px;
 }
 </style>
