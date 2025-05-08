@@ -29,7 +29,11 @@
 
     <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')"/>
 
-    <image-selection :active.sync="selectImage" @select-image="selectInput($event, 'image')"/>
+    <image-selection
+      :active.sync="selectImage"
+      :formats="['JPEG', 'PNG', 'PLANARTIFF']"
+      @select-image="selectInput($event, 'image')"
+    />
   </div>
 </template>
 
