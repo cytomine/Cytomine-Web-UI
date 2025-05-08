@@ -60,7 +60,7 @@ describe('WsiField.vue', () => {
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: 42});
+    await wrapper.setData({input: {id: 42}});
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([42]);
