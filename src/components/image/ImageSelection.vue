@@ -13,7 +13,7 @@
             v-for="image in images"
             :key="image.id"
             :image="image"
-            :is-selected="selectedImage === image.id"
+            :is-selected="selectedImage === image"
             @update:selected="selectedImage = $event"
           />
         </div>

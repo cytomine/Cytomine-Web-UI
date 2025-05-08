@@ -2,7 +2,7 @@
   <div
     class="image-container"
     :class="{ 'selected': isSelected }"
-    @click="$emit('update:selected', image.id)"
+    @click="$emit('update:selected', image)"
   >
     <image-thumbnail
       :key="`${image.id}-thumb-128`"

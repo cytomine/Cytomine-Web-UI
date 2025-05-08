@@ -49,6 +49,6 @@ describe('SelectableImage.vue', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('update:selected')).toBeTruthy();
-    expect(wrapper.emitted('update:selected')[0]).toEqual([mockImage.id]);
+    expect(wrapper.emitted('update:selected')[0]).toEqual([mockImage]);
   });
 });
