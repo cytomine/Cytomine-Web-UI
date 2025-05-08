@@ -53,7 +53,7 @@ describe('ImageField.vue', () => {
   });
 
   it('should render the annotation with id when selected', async () => {
-    const mockedData = {type: 'annotation', data: {id: 42}};
+    const mockedData = {type: 'annotation', id: 42};
     await wrapper.setProps({value: mockedData});
     await wrapper.setData({type: mockedData.type});
 
@@ -63,7 +63,7 @@ describe('ImageField.vue', () => {
   });
 
   it('should render the image with id when selected', async () => {
-    const mockedData = {type: 'image', data: {id: 42}};
+    const mockedData = {type: 'image', id: 42};
     await wrapper.setProps({value: mockedData});
     await wrapper.setData({type: mockedData.type});
 
@@ -73,7 +73,7 @@ describe('ImageField.vue', () => {
   });
 
   it('should emit an event when the value is changed', async () => {
-    const mockedData = {type: 'image', data: {id: 42}};
+    const mockedData = {type: 'image', id: 42};
     await wrapper.setData({input: mockedData});
 
     expect(wrapper.emitted().input).toBeTruthy();

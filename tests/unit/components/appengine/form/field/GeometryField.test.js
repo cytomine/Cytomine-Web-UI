@@ -55,8 +55,8 @@ describe('GeometryField.vue', () => {
     expect(wrapper.find('.annotation-container').text()).toBe('annotation 42');
   });
 
-  it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: {id: 42}});
+  it('should emit an event when the value is changed', async () => {
+    await wrapper.setData({input: 42});
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([42]);

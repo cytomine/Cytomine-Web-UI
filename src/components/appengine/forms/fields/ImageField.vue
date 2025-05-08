@@ -17,7 +17,7 @@
       </div>
 
       <div class="value-container" v-if="value">
-        {{ $t(type) }} {{ value.data.id }}
+        {{ $t(type) }} {{ value.id }}
       </div>
     </b-field>
 
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     selectInput(input, type) {
-      this.input = {type, data: input};
+      this.input = {type, id: input};
       this.type = type;
     },
   },

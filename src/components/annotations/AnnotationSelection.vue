@@ -10,7 +10,7 @@
             :key="annotation.id"
             :annotation="annotation"
             :images="images"
-            :is-selected="selectedAnnotation === annotation"
+            :is-selected="selectedAnnotation === annotation.id"
             :users="layersIds"
             @update:selected="selectedAnnotation = $event"
           />
