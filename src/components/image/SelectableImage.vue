@@ -39,6 +39,7 @@ export default {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  padding: 0.5rem;
 }
 
 .image-container span {

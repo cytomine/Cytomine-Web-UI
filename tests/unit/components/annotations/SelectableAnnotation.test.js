@@ -48,6 +48,6 @@ describe('SelectableAnnotation.vue', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('update:selected')).toBeTruthy();
-    expect(wrapper.emitted('update:selected')[0]).toEqual([mockAnnotation]);
+    expect(wrapper.emitted('update:selected')[0]).toEqual([mockAnnotation.id]);
   });
 });

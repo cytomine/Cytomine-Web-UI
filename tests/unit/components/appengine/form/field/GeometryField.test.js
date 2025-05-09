@@ -1,13 +1,9 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import WsiField from '@/components/appengine/forms/fields/WsiField';
+import GeometryField from '@/components/appengine/forms/fields/GeometryField';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true),
-}));
-
-describe('WsiField.vue', () => {
+describe('GeometryField.vue', () => {
   let localVue;
   let wrapper;
 
@@ -21,7 +17,7 @@ describe('WsiField.vue', () => {
     localVue = createLocalVue();
     localVue.use(Buefy);
 
-    wrapper = mount(WsiField, {
+    wrapper = mount(GeometryField, {
       localVue,
       mocks: {
         $t: (message) => message,
@@ -31,7 +27,7 @@ describe('WsiField.vue', () => {
         value: null,
       },
       stubs: {
-        ImageSelection: true,
+        AnnotationSelection: true,
       }
     });
   });
@@ -39,7 +35,7 @@ describe('WsiField.vue', () => {
   it('The component should be rendered correctly', () => {
     expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
     expect(wrapper.find('button').text()).toBe('select');
-    expect(wrapper.find('.image-container').exists()).toBe(false);
+    expect(wrapper.find('.annotation-container').exists()).toBe(false);
 
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
@@ -55,11 +51,11 @@ describe('WsiField.vue', () => {
     await wrapper.setProps({value: 42});
 
     expect(wrapper.vm.value).toBe(42);
-    expect(wrapper.find('.image-container').exists()).toBe(true);
-    expect(wrapper.find('.image-container').text()).toBe('image 42');
+    expect(wrapper.find('.annotation-container').exists()).toBe(true);
+    expect(wrapper.find('.annotation-container').text()).toBe('annotation 42');
   });
 
-  it('Changing the value should emit an event', async () => {
+  it('should emit an event when the value is changed', async () => {
     await wrapper.setData({input: 42});
 
     expect(wrapper.emitted().input).toBeTruthy();

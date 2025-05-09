@@ -90,7 +90,7 @@ export default {
         let task = await this.getTask(taskRun);
 
         // update task run in place
-        if (taskRun.state !== 'CREATED' && !taskRun.inputs) {
+        if (!['CREATED', 'FAILED'].includes(taskRun.state) && !taskRun.inputs) {
           taskRun.inputs = await taskRun.fetchInputs();
 
           let binaryInputs = this.filterBinaryType(task, 'input');

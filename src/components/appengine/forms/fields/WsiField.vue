@@ -19,7 +19,11 @@
       </b-tooltip>
     </div>
 
-    <image-selection :active.sync="selectImage" @select-image="input = $event"/>
+    <image-selection
+      :active.sync="selectImage"
+      :formats="['WSIDICOM', 'PYRTIFF']"
+      @select-image="input = $event"
+    />
   </div>
 </template>
 
@@ -46,7 +50,7 @@ export default {
         return this.value;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('input', value.id);
       }
     },
   },

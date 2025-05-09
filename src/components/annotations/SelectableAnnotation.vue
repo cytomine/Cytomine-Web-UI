@@ -1,7 +1,7 @@
 <template>
   <div
     :class="{ 'selected': isSelected }"
-    @click="$emit('update:selected', annotation)"
+    @click="$emit('update:selected', annotation.id)"
   >
     <annotation-preview
       class="annotation-data"
