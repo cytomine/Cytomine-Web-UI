@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.1] - 2025-05-09
+
 ### Fixed
 
 - Fix text overflow for App Engine inputs when the text is larger than the button
@@ -31,5 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Legacy software support
 - RabbitMQ message queue support
 
-[Unreleased]: https://github.com/cytomine/Cytomine-web-ui/compare/3.1.0..HEAD
+[Unreleased]: https://github.com/cytomine/Cytomine-web-ui/compare/3.1.1..HEAD
+[3.1.1]: https://github.com/cytomine/Cytomine-web-ui/releases/tag/3.1.1
 [3.1.0]: https://github.com/cytomine/Cytomine-web-ui/releases/tag/3.1.0
