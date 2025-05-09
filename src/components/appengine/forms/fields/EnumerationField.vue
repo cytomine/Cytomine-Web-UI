@@ -2,7 +2,9 @@
   <div class="is-flex is-justify-content-center">
     <b-field class="field" label-position="on-border" expanded>
       <template #label>
-        {{ parameter.display_name }}
+        <span class="text-label">
+          {{ parameter.display_name }}
+        </span>
       </template>
       <b-select
         v-model="input"
@@ -58,5 +60,14 @@ export default {
 .info {
   text-align: right;
   margin-left: 5px;
+}
+
+.text-label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

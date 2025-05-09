@@ -2,7 +2,9 @@
   <div class="container">
     <b-field label-position="on-border" expanded class="field">
       <template #label>
-        {{ parameter.display_name }}
+        <span class="text-label">
+          {{ parameter.display_name }}
+        </span>
       </template>
       <b-button @click="selectAnnotation = true">
         {{ $t('select') }}
@@ -73,5 +75,14 @@ export default {
 .info {
   text-align: right;
   margin-left: 5px;
+}
+
+.text-label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

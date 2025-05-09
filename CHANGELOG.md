@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix text overflow for App Engine inputs when the text is larger than the button
 - Fix image input for App Engine to support both simple images and cropped regions defined by an annotation
 
 ## [3.1.0] - 2025-04-18
