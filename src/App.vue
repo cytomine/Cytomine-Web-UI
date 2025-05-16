@@ -134,7 +134,11 @@ export default {
 
     const authorizationHeaderInterceptor = async config => {
       const token = await updateToken();
+
+      config.headers = config.headers || {};
+
       if(token !== null) {
+        this.$store.commit('currentUser/setShortTermToken', token);
         config.headers.common['Authorization'] = `Bearer ${token}`;
       }
       return config;
