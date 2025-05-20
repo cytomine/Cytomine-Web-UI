@@ -206,7 +206,7 @@ export default {
       if (this.passwordCredentials
         && this.passwordCredentials.userCredentialMetadatas
         && this.passwordCredentials.userCredentialMetadatas.length === 1) {
-          return this.passwordCredentials.userCredentialMetadatas[0].credential;
+        return this.passwordCredentials.userCredentialMetadatas[0].credential;
       }
       return null;
     }
@@ -254,12 +254,14 @@ export default {
   async created() {
     try {
       this.credentials = await MyAccount.fetchCredentials();
-    } catch (error) {
+    }
+    catch (error) {
       this.credentialsError = true;
     }
     try {
       this.apiKeys = await User.fetchCurrentUserKeys();
-    } catch (error) {
+    }
+    catch (error) {
       this.apiKeysError = true;
     }
     this.loading = false;

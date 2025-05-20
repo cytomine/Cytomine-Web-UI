@@ -16,8 +16,8 @@
 
 import Vue from 'vue';
 
-import Keycloak from './keycloak'
-Vue.use(Keycloak)
+import Keycloak from './keycloak';
+Vue.use(Keycloak);
 
 import VueRouter from 'vue-router';
 import router from './routes.js';
@@ -103,7 +103,7 @@ Vue.$keycloak
   .init({
     onLoad: 'login-required'
   })
-  .then(authenticated => {
+  .then(() => {
     new Vue({
       render: h => h(App),
       router,

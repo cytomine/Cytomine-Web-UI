@@ -58,18 +58,22 @@ import {Cytomine} from 'cytomine-client';
 
 import constants from '@/utils/constants.js';
 import ifvisible from 'ifvisible';
-import {updateToken} from "@/utils/token-utils";
+import {updateToken} from '@/utils/token-utils';
 ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
   name: 'app',
-  components: {CytomineNavbar},
-  mixins: [changeLanguageMixin],
+  components: {
+    CytomineNavbar,
+  },
+  mixins: [
+    changeLanguageMixin,
+  ],
   data() {
     return {
       communicationError: false,
       loading: true,
-      timeout: null
+      timeout: null,
     };
   },
   computed: {

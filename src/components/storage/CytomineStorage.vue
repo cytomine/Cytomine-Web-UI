@@ -169,7 +169,8 @@ import {
   StorageCollection,
   ProjectCollection,
   UploadedFile,
-  UploadedFileStatus
+  UploadedFileStatus,
+  User,
 } from 'cytomine-client';
 
 import {get} from '@/utils/store-helpers';

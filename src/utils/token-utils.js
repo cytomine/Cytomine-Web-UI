@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import Vue from "vue";
+import Vue from 'vue';
 
 export function appendShortTermToken(url, shortTermToken) {
   if(url==null || shortTermToken==null) {

@@ -15,7 +15,7 @@
 */
 
 import {Cytomine, MyAccount, User} from 'cytomine-client';
-import {updateToken} from "@/utils/token-utils";
+import {updateToken} from '@/utils/token-utils';
 
 function getDefaultState() {
   return {
@@ -57,7 +57,7 @@ export default {
     async fetchUser({commit}) {
       const [user, account] = await Promise.all([
         User.fetchCurrent(), MyAccount.fetch()
-      ])
+      ]);
 
       if(user.id) { // fetchCurrent() redirects to home page if user not authenticated => check that id is set
         commit('setUser', user);
