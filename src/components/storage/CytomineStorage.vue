@@ -161,9 +161,6 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-
-import {Cytomine, ProjectCollection, StorageCollection, UploadedFile, UploadedFileStatus} from 'cytomine-client';
 import axios from 'axios';
 import filesize from 'filesize';
 
