@@ -215,7 +215,7 @@ export default {
     },
 
     layerName(layer) {
-      if (!Object.prototype.hasOwnProperty.call(layer, 'user')) {
+      if (!Object.prototype.hasOwnProperty.call(layer, 'username')) {
         return layer.name;
       }
 

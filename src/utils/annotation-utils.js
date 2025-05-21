@@ -105,7 +105,7 @@ export function annotBelongsToLayer(annot, layer, slices=null) {
     return false;
   }
 
-  if (Object.prototype.hasOwnProperty.call(annot, 'user')) {
+  if (Object.prototype.hasOwnProperty.call(annot, 'username')) {
     let isReviewed = annot.type === AnnotationType.REVIEWED;
     return layer.isReview ? isReviewed : (!isReviewed && annot.user === layer.id);
   }
