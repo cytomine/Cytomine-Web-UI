@@ -433,7 +433,7 @@ export default {
       let layers = [];
       let annot = this.selectedAnnotation || this.routedAnnotation;
       if (annot) {
-        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : (annot.user ?? annot.annotationLayer));
+        layers.push(annot.type === AnnotationType.REVIEWED ? -1 : (annot.username));
       }
       if (this.routedAction === 'review' && !layers.includes(-1)) {
         layers.push(-1);

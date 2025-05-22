@@ -309,12 +309,12 @@ export default {
       return this.annotations.map((annotation, index) => {
         let previousGroup = (index > 0) ? this.annotations[index - 1].group : null;
         let nextGroup = (index < this.annotations.length - 1) ? this.annotations[index + 1].group : null;
-        let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
+        // let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
         return {
           first: annotation.group !== null && annotation.group !== previousGroup,
           last: annotation.group !== null && annotation.group !== nextGroup,
           in: annotation.group !== null,
-          complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
+          // complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
         };
       });
     }
