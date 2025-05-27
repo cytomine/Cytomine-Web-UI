@@ -75,7 +75,6 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {fullName} from '@/utils/user-utils.js';
 
 import AnnotationPreview from './AnnotationPreview';
 
@@ -206,7 +205,7 @@ export default {
     },
     title() {
       if (this.isByUser) {
-        return fullName(this.prop);
+        return this.prop.fullName;
       }
       else if (this.isByImage) {
         return (this.prop.blindedName) ? this.prop.blindedName : this.prop.instanceFilename;
@@ -310,12 +309,12 @@ export default {
       return this.annotations.map((annotation, index) => {
         let previousGroup = (index > 0) ? this.annotations[index - 1].group : null;
         let nextGroup = (index < this.annotations.length - 1) ? this.annotations[index + 1].group : null;
-        let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
+        // let annotsInGroup = annotation.annotationLink.map(al => al.annotation);
         return {
           first: annotation.group !== null && annotation.group !== previousGroup,
           last: annotation.group !== null && annotation.group !== nextGroup,
           in: annotation.group !== null,
-          complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
+          // complete: annotsInGroup.every(annot => this.annotationIds.includes(annot))
         };
       });
     }

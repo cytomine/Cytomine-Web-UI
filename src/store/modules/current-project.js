@@ -14,9 +14,16 @@
 * limitations under the License.
 */
 
-import {Cytomine, Project, ProjectConnection, Ontology, AnnotationType, UserCollection, ProjectMemberRole} from 'cytomine-client';
+import {
+  AnnotationType,
+  Cytomine,
+  Ontology,
+  Project,
+  ProjectConnection,
+  ProjectMemberRole,
+  UserCollection
+} from 'cytomine-client';
 
-import {fullName} from '@/utils/user-utils.js';
 import {getAllTerms} from '@/utils/ontology-utils';
 
 function getDefaultState() {
@@ -111,16 +118,12 @@ export default {
       let members =  (await collection.fetchAll()).array;
       let managers = members.filter(u => u.role == ProjectMemberRole.MANAGER || u.role == ProjectMemberRole.REPRESENTATIVE );
 
-      members.forEach(member => member.fullName = fullName(member));
-
       commit('setManagers', managers);
       commit('setMembers', members);
     },
 
     async fetchFollowers(_, {userId, imageId}) {
-      let followers = await UserCollection.fetchFollowers(userId, imageId);
-      //followers.forEach(follower => follower.fullName = fullName(follower));
-      return followers;
+      return await UserCollection.fetchFollowers(userId, imageId);
     },
 
     async fetchOntology({state, commit}) {

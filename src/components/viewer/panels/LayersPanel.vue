@@ -72,7 +72,6 @@
 import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
 
-import {fullName} from '@/utils/user-utils.js';
 import {Cytomine, ProjectDefaultLayerCollection} from 'cytomine-client';
 
 export default {
@@ -95,6 +94,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     project: get('currentProject/project'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -129,7 +129,7 @@ export default {
       return this.selectedLayers.map(layer => layer.id);
     },
     unselectedLayers() {
-      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.lastname < b.lastname) ? -1 : 1 );
+      return this.layers.filter(layer => !this.selectedLayersIds.includes(layer.id)).sort((a, b) => (a.fullName < b.fullName) ? -1 : 1 );
     },
     nbReviewedAnnotations() {
       return this.indexLayers.reduce((cnt, layer) => cnt + layer.countReviewedAnnotation, 0);
@@ -215,7 +215,7 @@ export default {
     },
 
     layerName(layer) {
-      if (!Object.prototype.hasOwnProperty.call(layer, 'user')) {
+      if (!Object.prototype.hasOwnProperty.call(layer, 'username')) {
         return layer.name;
       }
 
@@ -223,12 +223,10 @@ export default {
         return `${this.$t('review-layer')} (${this.nbReviewedAnnotations})`;
       }
 
-      let name = fullName(layer);
-
-      let id = (this.currentUser.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
+      let id = (this.currentAccount.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${name}${id} (${indexLayer.countAnnotation || 0})`;
+      return `${layer.fullName}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {

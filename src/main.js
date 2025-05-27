@@ -16,6 +16,9 @@
 
 import Vue from 'vue';
 
+import Keycloak from './keycloak';
+Vue.use(Keycloak);
+
 import VueRouter from 'vue-router';
 import router from './routes.js';
 Vue.use(VueRouter);
@@ -96,9 +99,15 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 Vue.prototype.$eventBus = new Vue();
 
-new Vue({
-  render: h => h(App),
-  router,
-  store,
-  i18n
-}).$mount('#app');
+Vue.$keycloak
+  .init({
+    onLoad: 'login-required'
+  })
+  .then(() => {
+    new Vue({
+      render: h => h(App),
+      router,
+      store,
+      i18n
+    }).$mount('#app');
+  });

@@ -236,7 +236,7 @@ export default {
       });
 
       let annots = await new AnnotationCollection({
-        user: !this.layer.isReview ? this.layer.id : null,
+        username: !this.layer.isReview ? this.layer.id : null,
         image: this.image.id,
         slices: this.sliceIds,
         reviewed: this.layer.isReview,
@@ -300,7 +300,8 @@ export default {
 
       let arrayAnnots;
       try {
-        if (Object.prototype.hasOwnProperty.call(this.layer, 'user')) {
+        console.log(this.layer);
+        if (Object.prototype.hasOwnProperty.call(this.layer, 'username')) {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
           arrayAnnots.sort(

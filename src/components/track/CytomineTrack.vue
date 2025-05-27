@@ -16,7 +16,7 @@
 <span v-if="track">
   <i class="far fa-square color-preview" v-if="track.color" :style="{color: track.color}"></i>
   {{track.name}}
-  <span v-if="currentUser.isDeveloper && track.id > 0"> ({{$t('id')}}: {{track.id}})</span>
+  <span v-if="currentAccount.isDeveloper && track.id > 0"> ({{$t('id')}}: {{track.id}})</span>
 </span>
 </template>
 
@@ -29,7 +29,7 @@ export default {
     track: Object
   },
   computed: {
-    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
   }
 };
 </script>

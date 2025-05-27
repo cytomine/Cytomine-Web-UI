@@ -55,11 +55,10 @@
 
     <div class="navbar-end">
       <cytomine-searcher />
-
+      <!-- TODO IAM -->
       <navbar-dropdown
-        :icon="currentUser.adminByNow ? 'fa-star' : currentUser.isSwitched ? 'fa-user-ninja' : 'fa-user'"
-        :title="currentUserFullInfo"
-        :linkClasses="{'has-text-dark-primary': currentUser.isSwitched}"
+        :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
+        :title="currentUser.fullName"
         :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
       >
@@ -75,12 +74,6 @@
           </a>
           <a v-else class="navbar-item" @click="closeAdminSession()">
             <span class="icon"><i class="far fa-star fa-xs"></i></span> {{$t('close-admin-session')}}
-          </a>
-        </template>
-        <template v-if="currentUser.isSwitched">
-          <a class="navbar-item has-text-dark-primary" @click="stopSwitchUser()">
-            <span class="icon"><i class="fas fa-exchange-alt fa-xs"></i></span>
-            {{$t('switch-back-to-user', {username: currentUser.realUser})}}
           </a>
         </template>
         <a class="navbar-item" @click="logout()">
@@ -112,8 +105,6 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 import constants from '@/utils/constants.js';
-import {Cytomine} from 'cytomine-client';
-import {fullName} from '@/utils/user-utils.js';
 import shortcuts from '@/utils/shortcuts.js';
 
 export default {
@@ -134,9 +125,6 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
-    currentUserFullInfo() {
-      return fullName(this.currentUser);
-    },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
     },
@@ -190,24 +178,11 @@ export default {
       }
     },
 
-    async stopSwitchUser() {
-      try {
-        await Cytomine.instance.stopSwitchUser();
-        await this.$store.dispatch('currentUser/fetchUser');
-        this.$router.push('/');
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-switch-back-as-real-user')});
-      }
-    },
-
     async logout() {
       try {
-        await Cytomine.instance.logout();
         this.$store.dispatch('logout');
         this.changeLanguage();
-        this.$router.push('/');
+        await this.$keycloak.logout();
       }
       catch(error) {
         console.log(error);
