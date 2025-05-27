@@ -231,7 +231,6 @@ export default {
     async fetchMembers() {
       let members = (await this.project.fetchUsersActivity()).array;
       members.forEach(member => {
-        member.name = `${member.firstname} ${member.lastname}`;
         member.role = this.idManagers.includes(member.id) ? this.managerRole : this.contributorRole;
       });
       this.members = members;

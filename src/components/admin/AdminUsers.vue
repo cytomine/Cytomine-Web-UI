@@ -49,7 +49,7 @@
           </b-table-column>
 
           <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-            {{user.firstname}} {{user.lastname}}
+            {{user.fullName}}
           </b-table-column>
 
           <b-table-column field="role" :label="$t('role')" sortable width="50">
@@ -115,6 +115,7 @@ import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';
 
+// TODO IAM
 export default {
   name: 'admin-users',
   components: {
@@ -166,6 +167,7 @@ export default {
     getRoleData(user) {
       return this.roles[user.role];
     },
+    // TODO IAM
     async lock(user) {
       try {
         await user.lock();

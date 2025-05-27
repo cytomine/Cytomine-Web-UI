@@ -55,7 +55,7 @@
           <cytomine-multiselect v-model="selectedStorage" :options="storages" label="extendedName" track-by="id" :allow-empty="false">
             <template #option="{option}">
               {{option.extendedName}}
-              <template v-if="currentUser.isDeveloper">
+              <template v-if="currentAccount.isDeveloper">
                  ({{$t('id')}}: {{option.id}})
               </template>
             </template>
@@ -169,7 +169,8 @@ import {
   StorageCollection,
   ProjectCollection,
   UploadedFile,
-  UploadedFileStatus
+  UploadedFileStatus,
+  User,
 } from 'cytomine-client';
 
 import {get} from '@/utils/store-helpers';
@@ -202,12 +203,14 @@ export default {
 
       signature: '',
       signatureDate: '',
+      primaryKey: null,
 
       revision: 0
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     shortTermToken: get('currentUser/shortTermToken'),
     finishedStatus() {
       return [
@@ -251,6 +254,7 @@ export default {
   },
   watch: {
     async queryString() {
+      // TODO IAM
       this.signatureDate = new Date().toISOString();
       try {
         this.signature = await Cytomine.instance.fetchSignature({
@@ -271,7 +275,7 @@ export default {
         this.storages = (await StorageCollection.fetchAll()).array;
         this.storages.forEach(v => {
           v.extendedName = v.name;
-          if(this.currentUser.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
+          if(this.currentAccount.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
         });
 
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
@@ -378,7 +382,7 @@ export default {
         formData,
         {
           headers: {
-            'authorization': `CYTOMINE ${this.currentUser.publicKey}:${this.signature}`,
+            'authorization': `CYTOMINE ${this.primaryKey}:${this.signature}`, // TODO IAM
             'dateFull': this.signatureDate, // will replace actual date value, so that signature is valid
             'content-type-full': 'null' // will erase actual content-type value, so that signature is valid
           },
@@ -435,12 +439,28 @@ export default {
         }
       }
     },
+
+    //TODO: IAM
+    async fetchPrimaryKey() {
+      try {
+        const keys = await User.fetchCurrentUserKeys();
+        this.primaryKey = keys.primaryKey;
+      }
+      catch (error) {
+        this.newUploadError = true;
+      }
+    },
+
+    updatedTree() {
+      this.revision++; // updating the table will result in new files objects => the uf details will also be updated
+    },
   },
   activated() {
     this.fetchStorages();
     this.fetchProjects();
     this.fetchFormatInfos();
     this.refreshStatusSessionUploads();
+    this.fetchPrimaryKey();
     this.tableRefreshInterval = constants.STORAGE_REFRESH_INTERVAL;
   },
   deactivated() {

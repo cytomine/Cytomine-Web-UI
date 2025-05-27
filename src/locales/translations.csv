@@ -1,4 +1,4 @@
-key,en,fr,es,nl
+key,en,fr,es,nl,no
 about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine,Over Cytomine
 absolute-link-mode,Absolute,Absolu,,Absoluut
 access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
@@ -103,6 +103,7 @@ button-cancel-review,Cancel my review,Annuler la validation,Cancelar mi reseña,
 button-cancel,Cancel,Annuler,Cancelar,Annuleren
 button-center-view-on-annot,Center view on this annotation,Cadrer sur cette annotation,Cnetrar vista en anotación,Kader de view op deze annotatie
 button-change-ontology,Change ontology,Changer l'ontologie,Cambiar ontología,Knop om de ontologie te veranderen
+button-change-password,Change password,Changer le mot de passe
 button-clear,Clear,Réinitialiser,Reiniciar,Resetten
 button-close,Close,Fermer,Cerrar,Sluiten
 button-comments,Comments,Commentaires,Comentarios,Opmerkingen
@@ -195,7 +196,6 @@ close-admin-session,Close admin session,Fermer la session admin,Cerrar sesión d
 color,Color,Couleur,Color,Kleur
 colors,Colors,Couleurs,Colores,Kleuren
 command-line-flag,Command line flag,Argument de la ligne de commande,Flag de línea de comando,Opdrachtregelargument
-comment-will-be-sent-by-email,The comment will be sent by email to the selected users,Le commentaire sera envoyé par e-mail aux utilisateurs sélectionnés,El comentario se enviará por correo electrónico a los usuarios seleccionados.,De opmerking wordt per e-mail naar de geselecteerde users verzonden
 comment,Comment,Commentaire,Comentario,Opmerking
 comments,Comments,Commentaires,Comentarios,Opmerkingen
 communication-error,Communication error,Erreur de communication,Error de comunicación,Communicatie fout
@@ -221,7 +221,6 @@ confirm-profile-computation,Confirm profile computation,Confirmer le calcul du p
 confirm-unlink-view-to-track,"This view is linked with another one on which you are following a user. This may cause conflicts and flickering behaviour. If you confirm, this view will be unlinked from any other to prevent such conflict.","Cette image est synchronisée avec une autre image dans laquelle vous suivez un utilisateur. Cela pourrait mener à des conflits et à un comportement erratique. Si vous confirmez, la synchronisation sera interrompue de façon à éviter un tel conflit","Esta vista está vinculada con otra en la que está siguiendo a un usuario. Esto puede causar conflictos y parpadeos. Si confirma, esta vista se desvinculará de cualquier otra para evitar conflictos.","Deze afbeelding wordt gesynchroniseerd met een andere afbeelding waarin u een gebruiker volgt. Dit kan leiden tot conflicten en grillig gedrag. Als u bevestigt, wordt de synchronisatie onderbroken om een ??dergelijk conflict te vermijden"
 confirm-profile-computation-message,Are you sure to ask for profile computation for this image (possibly slow)?,Etes-vous certain de demander le calcul du profil pour cette image (potentiellement lent) ?,¿Está seguro de solicitar el cálculo del perfil para esta imagen (posiblemente lento)?,Weet u zeker dat u om profielberekening voor deze afbeelding vraagt ​​(mogelijk langzaam)?
 confirm-untrack-to-link-view,"This view is currently synchronized with that of another user. This may cause conflicts and flickering behaviour. If you confirm, the tracking of this user will be cancelled.","Cette image est actuellement synchronisée avec les mouvements d'un autre utilisateur. Cela pourrait mener à des conflits et à un comportement erratique. Si vous confirmez, la synchronisation sera interrompue de façon à éviter un tel conflit","Esta vista está actualmente sincronizada con la de otro usuario. Esto puede causar conflictos y parpadeos. Si confirma, se cancelará el seguimiento de este usuario.","Dit beeld wordt momenteel gesynchroniseerd met de bewegingen van een andere gebruiker. Dit kan leiden tot conflicten en grillig gedrag. Als u bevestigt, wordt de synchronisatie onderbroken om een ??dergelijk conflict te vermijden"
-connect-as-user,Connect as {username},Se connecter en tant que {username},Conectar como {username},Log in als {usersnaam}
 connections-chart,Connections chart,Graphique des connexions,Gráfico de conexiones,Verbindingen grafiek
 contact-info,You can contact the Cytomine Team at {contactMail},Vous pouvez contacter l'équipe de Cytomine à l'adresse {contactMail}.,Puede ponerse en contacto con el equipo de Cytomine en {contactMail},U kunt contact opnemen met het Cytomine-team via {contactMail}.
 contact,Contact,Contact,Contacto,Contact
@@ -360,6 +359,9 @@ failed-fetch-current-stats,Failed to fetch current statistics,Une erreur a eu li
 failed-fetch-profile,Failed to fetch image profile,Une erreur a empêché le chargement du profil,,Door een fout kon het profiel niet worden geladen
 failed-fetch-recent-projects,Failed to fetch recent projects,Erreur lors du chargement des projets récents,Error al buscar proyectos recientes,Fout bij het laden van recente projecten
 failed-fetch-total-counts,Failed to fetch the total counts,Une erreur a eu lieu lors du chargement des statistiques,No se pudo obtener el recuento total,Er is een fout opgetreden tijdens het laden van statistieken
+failed-to-retrieve-credentials,Failed to retrieve credentials information,Une erreur a eu lieu lors du chargement des informations d'indentification
+failed-to-retrieve-api-keys,Failed to retrieve API keys,Une erreur a eu lieu lors du chargement des clés API
+failed,Failed,Échoué,Fallido,Failed
 fav,Fav.,Fav.,Fav.,Fav.
 favorite,Favorite,Favori,Favorito,Favoriet
 file-tree,File tree,Arborescence de fichiers,Árbol de archivos,Fileboom
@@ -463,6 +465,7 @@ last-month,Last month,Dernier mois,Último mes,Vorige maand
 last-opened-image,Last opened image,Dernière image consultée,Última imagen abierta,Laatst bekeken afbeelding
 last-project-connection,Last project connection,Dernière connexion au projet,Última conexión al proyecto,Laatste verbinding met het project
 last-release,Last release,Dernière version,Ultimo lanzamiento,Laatste versie
+last-updated-on,Last updated on,Dernière mise à jour le
 last-week,Last week,Dernière semaine,Última pasada,Vorige week
 last-year,Last year,Dernière année,Último año,Afgelopen jaar
 lastname,Last name,Nom,Apellido,Naam
@@ -546,6 +549,7 @@ no-log-to-display,No log to display,Aucun log disponible,No hay registro para mo
 no-member-fitting-criteria,No member fitting criteria,Aucun membre ne remplissant les critères de recherche,No hay criterios de ajuste para miembros,Geen enkel lid voldoet aan de zoekcriteria
 no-ontology,No ontology,Pas d'ontologie,Sin ontología,Geen ontologie
 no-outline,No outline,Pas de contour,Sin contorno,Geen outline
+no-password,No password, Pas de mot de passe
 no-preview-available,No preview available,Pas d'aperçu disponible,No hay vista previa disponible,Geen preview beschikbaar
 no-profile,No profile,Pas de profil,,Geen profiel
 no-project-connection,No project connection,Aucune connexion au projet,Ninguna conexión del proyecto,Geen projectverbinding
@@ -607,8 +611,6 @@ notif-error-default-layer-update,Error during update of default layer,Une erreur
 notif-error-default-property-update,Failed to update the default property,Une erreur a empêché la modification de la propriété par défaut,Error al actualizar la propiedad predeterminada,Door een fout kon de eigenschap door uitsluiting niet worden gewijzigd
 notif-error-delete-uploaded-file,Failed to delete the uploaded file (unexpected error),Une erreur a empêché de supprimer le fichier,Error al eliminar el archivo cargado (error inesperado),Een fout verhinderde het verwijderen van het bestand
 notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},Cette image est utilisée dans des projets ({projects}) sous les noms suivants : {names},Esta imagen tiene instancias en proyectos activos ({proyectos}) con los siguientes nombres: {names},Deze afbeelding wordt gebruikt in projecten ({projects}) onder de volgende namen: {names}
-notif-error-failed-to-connect-as-user,Failed to connect as the selected user,Une erreur a empêché la connexion,No se pudo conectar como el usuario seleccionado,Een fout verhinderde de verbinding
-notif-error-failed-to-switch-back-as-real-user,Failed to switch back to real account,Une erreur a empêché de vous reconnecter sous votre vrai compte,Error al volver a la cuenta real,Door een fout kon je niet opnieuw inloggen met je echte account
 notif-error-fetch-annotation-comments,Failed to retrieve the comments of this annotation,Erreur lors de la récupération des commentaires,Error al recuperar los comentarios de esta anotación,Fout bij het ophalen van opmerkingen
 notif-error-fetch-annotations-viewer,An error occurred while fetching annotations,Erreur lors du chargement des annotations,Se produjo un error al recuperar anotaciones,Fout bij het laden van annotaties
 notif-error-fetch-next-image,Failed to load next image,Une erreur a empêché de charger l'image suivante,Error al cargar la siguiente imagen,Een fout verhinderde het laden van de volgende afbeelding
@@ -1035,7 +1037,6 @@ string,String,Chaîne de caractères,Cadena de caracteres,Reeks tekens
 success,Success,Réussi,Finalizado con éxito,Geslaagd
 successful-registration,Your account was successfully created. Check your inbox to enable it.,Votre compte a été créé avec succès. Consultez votre boîte mail pour l'activer.,Su cuenta fue creada exitosamente. Revise su bandeja de entrada para activarla.,Uw account is succesvol aangemaakt. Controleer uw mailbox om deze te activeren.
 super-admin,Super admin,Super admin,Super administrador,Super admin
-switch-back-to-user,Switch back to {username},Retour à {username},Volver a {username},Terug naar {usersnaam}
 system,System,Système,Sistema,Systeem
 tags,Tags,Tags,Etiquetas,Tags
 temporal-spectra,Temporal spectra,Spectre temporel,Espectros temporales,Tijdelijke spectra

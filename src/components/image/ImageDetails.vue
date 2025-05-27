@@ -29,7 +29,7 @@
           </router-link>
         </td>
       </tr>
-      <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+      <tr v-if="isPropDisplayed('id') && currentAccount.isDeveloper">
         <td class="prop-label">{{$t('id')}}</td>
         <td class="prop-content" colspan="3">{{image.id}}</td>
       </tr>
@@ -351,6 +351,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     configUI: get('currentProject/configUI'),
     project: get('currentProject/project'),
     shortTermToken: get('currentUser/shortTermToken'),

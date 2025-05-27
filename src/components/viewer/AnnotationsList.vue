@@ -77,7 +77,6 @@
 <script>
 import {UserCollection} from 'cytomine-client';
 
-import {fullName} from '@/utils/user-utils.js';
 import {get} from '@/utils/store-helpers';
 
 import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
@@ -192,16 +191,13 @@ export default {
     layers() {
       let layers = this.imageWrapper.layers.selectedLayers || [];
       layers = layers.filter(layer => layer.visible);
-      layers.forEach(layer => layer.fullName = fullName(layer));
       return layers;
     },
     layersIds() {
       return this.layers.map(layer => layer.id);
     },
     allUsers() {
-      let allUsers = this.users;
-      allUsers.forEach(user => user.fullName = fullName(user));
-      return allUsers;
+      return this.users.concat(this.userJobs);
     },
 
     opened: {

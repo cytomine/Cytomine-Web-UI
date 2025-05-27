@@ -38,7 +38,6 @@ import {get} from '@/utils/store-helpers';
 import {UserCollection} from 'cytomine-client';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 import CytomineModal from '@/components/utils/CytomineModal';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'add-member-modal',
@@ -88,9 +87,7 @@ export default {
     }
   },
   async created() {
-    let users = (await UserCollection.fetchAll()).array;
-    users.forEach(u => u.fullName = fullName(u));
-    this.users = users;
+    this.users = (await UserCollection.fetchAll()).array;
     this.loading = false;
   }
 };

@@ -65,7 +65,7 @@
         </b-table-column>
 
         <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-          {{member.firstname}} {{member.lastname}}
+          {{member.name}}
         </b-table-column>
 
         <b-table-column field="projectRole" :label="$t('role')" sortable width="50">
@@ -76,12 +76,6 @@
             @toggleManager="confirmToggleManager(member)"
             @toggleRepresentative="toggleRepresentative(member)"
           />
-        </b-table-column>
-
-        <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
-          <span class="tag ldap is-rounded is-info" :class="{ldap: member.LDAP}">
-            {{displayMemberOrigin(member)}}
-          </span>
         </b-table-column>
 
         <b-table-column label="" centered width="50">
@@ -122,7 +116,6 @@ import {get} from '@/utils/store-helpers';
 import CytomineTable from '@/components/utils/CytomineTable';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import AddMemberModal from './AddMemberModal';
-import {fullName} from '@/utils/user-utils.js';
 import {Cytomine, UserCollection, ProjectRepresentative} from 'cytomine-client';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
 import {appendShortTermToken} from '@/utils/token-utils.js';
@@ -192,14 +185,6 @@ export default {
 
   methods: {
     appendShortTermToken,
-    displayMemberOrigin(member){
-      let key;
-      if(member.origin === 'LDAP') key = 'LDAP';
-      if(member.origin === 'BOOTSTRAP') key = 'system';
-      else key = 'manual';
-
-      return this.$t(key);
-    },
     async refreshMembers() {
       try {
         this.revision++;
@@ -218,7 +203,7 @@ export default {
         title: this.$t('remove-members'),
         message: this.$tc('remove-members-confirmation-message', this.selectedMembers.length, {
           count: this.selectedMembers.length,
-          username: fullName(this.selectedMembers[0])
+          username: this.selectedMembers[0].fullName
         }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
@@ -275,7 +260,7 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
+        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }
     },
     async toggleRepresentative(member) {
@@ -295,7 +280,7 @@ export default {
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: fullName(member)})});
+        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }
     },
   },

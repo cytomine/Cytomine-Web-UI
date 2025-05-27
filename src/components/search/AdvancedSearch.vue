@@ -95,7 +95,7 @@
               />
             </b-table-column>
 
-            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper" field="id" sortable>
+            <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper" field="id" sortable>
               {{project.id}}
             </b-table-column>
 
@@ -177,6 +177,10 @@
           @setCollectionSize="nbImages = $event"
         >
           <template #default="{row: image}">
+            <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper">
+              {{image.id}}
+            </b-table-column>
+
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
                 <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
@@ -303,6 +307,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     shortTermToken: get('currentUser/shortTermToken'),
 
     activeTab: sync('advancedSearch/activeTab'),

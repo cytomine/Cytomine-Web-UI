@@ -35,9 +35,7 @@
       {{$t('core-cannot-be-reached')}}
     </div>
 
-    <login v-else-if="!currentUser" />
-
-    <template v-else>
+    <template v-else-if="currentUser">
       <cytomine-navbar />
       <div class="bottom">
         <keep-alive include="cytomine-storage">
@@ -55,68 +53,63 @@ import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 
 import CytomineNavbar from './components/navbar/CytomineNavbar.vue';
-import Login from './components/user/Login.vue';
 
 import {Cytomine} from 'cytomine-client';
 
 import constants from '@/utils/constants.js';
 import ifvisible from 'ifvisible';
+import {updateToken} from '@/utils/token-utils';
 ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
 export default {
   name: 'app',
-  components: {CytomineNavbar, Login},
-  mixins: [changeLanguageMixin],
+  components: {
+    CytomineNavbar,
+  },
+  mixins: [
+    changeLanguageMixin,
+  ],
   data() {
     return {
       communicationError: false,
       loading: true,
-      timeout: null
+      timeout: null,
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     project: get('currentProject/project')
   },
+  watch: {
+    $route() {
+      // Invoke refresh token if needed when route changes.
+      updateToken();
+    },
+  },
   methods: {
-    async loginWithToken() {
-      try {
-        let {shortTermToken} = await Cytomine.instance.loginWithToken(this.$route.query.username, this.$route.query.token);
-        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
-
-        await this.fetchUser();
+    wakeup: async function () {
+      if (!ifvisible.now()) {
+        return;
       }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('invalid-token')});
-      }
+      await updateToken();
+      await this.ping();
     },
     async ping() {
       if(!ifvisible.now()){
         return; // window not visible or inactive user => stop pinging
       }
       try {
-        let {authenticated, shortTermToken} = await Cytomine.instance.ping(this.project ? this.project.id : null);
-
-        this.$store.commit('currentUser/setShortTermToken', shortTermToken);
-
-        if(this.currentUser && !authenticated) {
-          await this.$store.dispatch('logout');
-        }
-        if(!this.currentUser && authenticated) {
+        // TODO IAM - still needed ?
+        await Cytomine.instance.ping(this.project ? this.project.id : null);
+        if(!this.currentUser) {
           await this.fetchUser();
         }
         this.communicationError = false;
       }
       catch(error) {
         console.log(error);
-        if (error.toString().indexOf('401')!==-1) {
-          this.communicationError = false;
-          Cytomine.instance.logout();
-        }
-        else {
-          this.communicationError = true;
-        }
+        this.communicationError = error.toString().indexOf('401') === -1;
       }
 
       clearTimeout(this.timeout);
@@ -124,8 +117,8 @@ export default {
     },
     async fetchUser() {
       await this.$store.dispatch('currentUser/fetchUser');
-      if(this.currentUser) {
-        this.changeLanguage(this.currentUser.language);
+      if(this.currentAccount) {
+        this.changeLanguage(this.currentAccount.locale);
       }
     }
   },
@@ -143,14 +136,26 @@ export default {
     }
     Object.freeze(constants);
 
-    new Cytomine(window.location.origin);
+    const authorizationHeaderInterceptor = async config => {
+      const token = await updateToken();
 
-    if(this.$route.query.token && this.$route.query.username) {
-      await this.loginWithToken();
-    }
+      config.headers = config.headers || {};
+
+      if(token !== null) {
+        this.$store.commit('currentUser/setShortTermToken', token);
+        config.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    };
+    new Cytomine(
+      window.location.origin,
+      '/api/', `/iam/realms/${this.$keycloak.realm}`,
+      authorizationHeaderInterceptor
+    );
+
     await this.ping();
     this.loading = false;
-    ifvisible.on('wakeup', this.ping);
+    ifvisible.on('wakeup', this.wakeup);
   }
 };
 </script>

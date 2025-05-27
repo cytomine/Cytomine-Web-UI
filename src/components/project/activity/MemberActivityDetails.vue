@@ -38,9 +38,6 @@
         <h1>{{$t('activity-of-user', {username: user.fullName})}}</h1>
 
         <ul>
-          <li v-if="currentUser.adminByNow">
-            <strong>{{$t('email')}}:</strong>&nbsp;<a :href="`mailto:${user.email}`">{{user.email}}</a>
-          </li>
           <li><strong>{{$t('registration-date')}}:</strong> {{Number(user.created) | moment('ll LTS')}}</li>
           <li><strong>{{$t('first-project-connection')}}:</strong> {{Number(resumeActivity.firstConnection) | moment('ll LTS')}}</li>
           <li><strong>{{$t('last-project-connection')}}:</strong> {{Number(resumeActivity.lastConnection) | moment('ll LTS')}}</li>
@@ -245,7 +242,6 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {fullName} from '@/utils/user-utils.js';
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from 'cytomine-client';
 
 import CytomineDatepicker from '@/components/form/CytomineDatepicker';
@@ -321,7 +317,6 @@ export default {
     },
     async fetchUser() {
       await this.user.fetch();
-      this.user.fullName = fullName(this.user);
     },
     async fetchResumeActivity() {
       this.resumeActivity = await this.user.fetchResumeActivity(this.project.id);

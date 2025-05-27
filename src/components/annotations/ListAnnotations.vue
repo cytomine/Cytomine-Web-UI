@@ -323,7 +323,6 @@ import ListAnnotationsBy from './ListAnnotationsBy';
 
 import {ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from 'cytomine-client';
 
-import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
 
@@ -695,9 +694,6 @@ export default {
       });
 
       this.projectUsers = (await collection.fetchAll()).array;
-      this.projectUsers.forEach(user => {
-        user.fullName = fullName(user);
-      });
     },
     async fetchTracks() {
       this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
@@ -733,7 +729,7 @@ export default {
         /**
          * We will only have one ListAnnotationBy component rendered
          * when the selectedCategorization is uncategorized.
-         * Removing or adding terms, images, etc, 
+         * Removing or adding terms, images, etc,
          * in the filters shouldn't change the component visibility.
          */
         case 'UNCATEGORIZED':

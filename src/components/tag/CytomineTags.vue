@@ -23,7 +23,7 @@
         <b-taglist attached>
           <b-tag type="is-info">
             {{association.tagName.toUpperCase()}}
-            <span v-if="currentUser.isDeveloper"> ({{$t('id')}}: {{association.tag}})</span>
+            <span v-if="currentAccount.isDeveloper"> ({{$t('id')}}: {{association.tag}})</span>
           </b-tag>
           <b-tag v-if="canEdit">
             <button class="delete is-small" :title="$t('button-delete')" @click="removeTag(association, idx)">
@@ -62,7 +62,7 @@ export default {
     };
   },
   computed: {
-    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
   },
   methods: {
     displayModal() {

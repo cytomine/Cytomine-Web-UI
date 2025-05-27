@@ -17,7 +17,7 @@
   <b-loading :active="loading" :is-full-page="false" class="small" />
   <table v-if="!loading" class="table">
     <tbody>
-      <tr v-if="currentUser.isDeveloper">
+      <tr v-if="currentAccount.isDeveloper">
         <td>{{$t('id')}}</td>
         <td colspan="2">{{user.id}}</td>
       </tr>
@@ -72,14 +72,6 @@
         </td>
         <td></td>
       </tr>
-      <tr v-if="currentUser.id !== user.id">
-        <td>{{$t('actions')}}</td>
-        <td colspan="2">
-          <button class="button is-link is-small" @click="switchUser()">
-            {{$t('connect-as-user', {username: user.username})}}
-          </button>
-        </td>
-      </tr>
     </tbody>
   </table>
 </div>
@@ -87,7 +79,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {Cytomine, ProjectCollection} from 'cytomine-client';
+import {ProjectCollection} from 'cytomine-client';
 
 export default {
   props: {
@@ -104,7 +96,7 @@ export default {
     };
   },
   computed: {
-    currentUser: get('currentUser/user')
+    currentAccount: get('currentUser/account')
   },
   methods: {
     async fetchProjects() {
@@ -125,17 +117,6 @@ export default {
     async fetchNbAnnotations() {
       this.nbAnnotations = await this.user.fetchNbAnnotations();
     },
-    async switchUser() {
-      try {
-        await Cytomine.instance.switchUser(this.user.username);
-        await this.$store.dispatch('currentUser/fetchUser');
-        this.$router.push('/');
-      }
-      catch(error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-failed-to-connect-as-user')});
-      }
-    }
   },
   async created() {
     await Promise.all([

@@ -34,7 +34,7 @@
             </ontology-tree>
           </td>
         </tr>
-        <tr v-if="currentUser.isDeveloper">
+        <tr v-if="currentAccount.isDeveloper">
           <td><strong>{{$t('id')}}</strong></td>
           <td>{{ontology.id}}</td>
         </tr>
@@ -58,7 +58,7 @@
         <tr>
           <td><strong>{{$t('creator')}}</strong></td>
           <td>
-            {{creatorFullname || $t('unknown')}}
+            {{creator.fullName || $t('unknown')}}
           </td>
         </tr>
         <tr v-if="canEdit">
@@ -98,7 +98,6 @@ import {get} from '@/utils/store-helpers';
 import {Ontology, User, ProjectCollection} from 'cytomine-client';
 import OntologyTree from './OntologyTree';
 import RenameModal from '@/components/utils/RenameModal';
-import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'ontology-details',
@@ -117,13 +116,14 @@ export default {
       fullOntology: {},
       projects: [],
       managedProjects: [],
-      creatorFullname: null,
+      creator: null,
 
       isRenameModalActive: false
     };
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     canEdit() {
       return !this.currentUser.guestByNow && (this.currentUser.adminByNow || this.currentUser.id === this.fullOntology.user ||
         (this.hasAccessToAllProjects && (this.allProjectsAreCollaborative || this.manageAllProjects)));
@@ -166,8 +166,7 @@ export default {
       this.fetchManagedProjects();
 
       try {
-        let creator = await User.fetch(this.fullOntology.user);
-        this.creatorFullname = fullName(creator);
+        this.creator = await User.fetch(this.fullOntology.user);
       }
       catch(error) {
         console.log(error);

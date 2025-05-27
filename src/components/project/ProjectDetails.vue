@@ -20,7 +20,7 @@
 <table v-else class="table">
   <b-loading :is-full-page="false" :active="loading" class="small" />
   <tbody v-if="!loading">
-    <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+    <tr v-if="isPropDisplayed('id') && currentAccount.isDeveloper">
       <td class="prop-label">{{$t('id')}}</td>
       <td class="prop-content">{{project.id}}</td>
     </tr>
@@ -178,6 +178,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     blindMode() {
       return ((this.project || {}).blindMode) || false;
     },
