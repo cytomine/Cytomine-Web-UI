@@ -49,7 +49,7 @@ FROM node:${NODE_DEV_VERSION} AS dev-server
 # ui source code should be mounted in /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends gettext git
+RUN apt-get update && apt-get install -y --no-install-recommends gettext=0.19.8.1-9 git=1:2.20.1-2+deb10u9
 
 RUN mkdir /docker-entrypoint-cytomine.d/
 COPY --from=entrypoint-scripts --chmod=744 /cytomine-entrypoint.sh /usr/local/bin/
