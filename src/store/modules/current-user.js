@@ -66,7 +66,7 @@ export default {
         commit('setUser', null);
       }
 
-      if(account.email) {
+      if(account) {
         commit('setAccount', account);
       }
       else {
