@@ -101,7 +101,7 @@ export default {
       }
       try {
         // TODO IAM - still needed ?
-        await Cytomine.instance.ping(this.project ? this.project.id : null);
+        // await Cytomine.instance.ping(this.project ? this.project.id : null);
         if(!this.currentUser) {
           await this.fetchUser();
         }
