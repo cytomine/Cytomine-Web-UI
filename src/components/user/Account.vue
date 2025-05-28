@@ -71,8 +71,8 @@
         </b-field>
 
         <b-field :label="$t('developer-mode')" horizontal>
-          <b-switch v-model="updatedUser.isDeveloper" class="switch">
-            <template v-if="updatedUser.isDeveloper">{{$t('yes')}}</template>
+          <b-switch v-model="updatedAccount.isDeveloper" class="switch">
+            <template v-if="updatedAccount.isDeveloper">{{$t('yes')}}</template>
             <template v-else>{{$t('no')}}</template>
           </b-switch>
         </b-field>
