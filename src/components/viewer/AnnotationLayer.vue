@@ -300,7 +300,6 @@ export default {
 
       let arrayAnnots;
       try {
-        console.log(this.layer);
         if (Object.prototype.hasOwnProperty.call(this.layer, 'username')) {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
