@@ -21,7 +21,7 @@
     "chartjs-plugin-zoom": "^0.7.4",
     "copy-to-clipboard": "^3.0.8",
     "core-js": "^3.6.5",
-    "cytomine-client": "^3.1.0-beta.1",
+    "cytomine-client": "^3.1.0",
     "detect-browser": "^4.7.0",
     "filesize": "^4.1.2",
     "ifvisible": "^1.1.0",
