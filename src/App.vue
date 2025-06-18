@@ -106,8 +106,7 @@ export default {
           await this.fetchUser();
         }
         this.communicationError = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.communicationError = error.toString().indexOf('401') === -1;
       }

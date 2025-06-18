@@ -185,8 +185,7 @@ export default {
           },
           onCancel: () => event.target.checked = false // reset state of checkbox
         });
-      }
-      else {
+      } else {
         this.link(indexGroup, indexImage);
       }
     },
@@ -195,16 +194,13 @@ export default {
       if (this.linkedIndexes) {
         if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'mergeLinkGroups', [this.indexCurrentGroup, indexGroup]);
-        }
-        else {
+        } else {
           this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup: this.indexCurrentGroup, indexImage});
         }
-      }
-      else {
+      } else {
         if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup, indexImage: this.index});
-        }
-        else {
+        } else {
           this.$store.commit(this.viewerModule + 'createLinkGroup', [this.index, indexImage]);
         }
       }

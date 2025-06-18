@@ -258,8 +258,7 @@ export default {
       try {
         await updatedProject.save();
         this.$store.commit('currentProject/setProject', updatedProject);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.initData(); // reset data
         this.$notify({type: 'error', text: this.$t('notif-error-general-config-update')});
@@ -279,8 +278,7 @@ export default {
         await defaultLayer.save();
         this.defaultLayers.push(defaultLayer);
         this.layerToAdd = null;
-      }
-      catch (error) {
+      }  catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-add')});
       }
@@ -289,8 +287,7 @@ export default {
     async saveDefaultLayer(idx) {
       try {
         await this.defaultLayers[idx].save();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-update')});
       }
@@ -300,8 +297,7 @@ export default {
       try {
         await this.defaultLayers[idx].delete();
         this.defaultLayers.splice(idx, 1);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-delete')});
       }
@@ -319,8 +315,7 @@ export default {
           text: this.$t('notif-success-project-deletion', {projectName: this.project.name})
         });
         this.$router.push('/projects');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

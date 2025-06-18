@@ -125,8 +125,7 @@ export default {
           await updateAnnotationLinkProperties(other);
 
           editedAnnots = [other];
-        }
-        else {
+        } else {
           editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
         }
         editedAnnots.forEach(a => {
@@ -151,8 +150,7 @@ export default {
     centerView({annot, sameView = false}) {
       if (sameView) {
         this.$emit('centerView', annot);
-      }
-      else {
+      } else {
         this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
       }
     }

@@ -66,11 +66,9 @@ export default class Model {
   _setCollection(value, property, collectionClass) {
     if (!value) {
       this[property] = new collectionClass();
-    }
-    else if (value instanceof collectionClass) {
+    } else if (value instanceof collectionClass) {
       this[property] = value;
-    }
-    else if (Array.isArray(value)) {
+    } else if (Array.isArray(value)) {
       let collection = new collectionClass();
       value.forEach(obj => {
         if (!(obj instanceof collectionClass.model)) {
@@ -79,8 +77,7 @@ export default class Model {
         collection.push(obj);
       });
       this[property] = collection;
-    }
-    else {
+    } else {
       throw new Error(`${property} value must be null, a ${collectionClass.name} instance
                 or an array of ${collectionClass.model.name} instances.`);
     }
@@ -143,8 +140,7 @@ export default class Model {
       this.populate(data[this.callbackIdentifier]);
       Cytomine.instance.lastCommand = data.command;
       return this;
-    }
-    else {
+    } else {
       return this.update();
     }
   }
@@ -200,8 +196,7 @@ export default class Model {
     if (this.isNew()) {
       return `${this.callbackIdentifier}`;
       //   return `${this.callbackIdentifier}.json`;
-    }
-    else {
+    } else {
     //   return `${this.callbackIdentifier}/${this.id}.json`;
       return `${this.callbackIdentifier}/${this.id}`;
 

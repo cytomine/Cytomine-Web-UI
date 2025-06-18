@@ -80,8 +80,7 @@ export default {
         cf.status = UFStatus.UPLOADED; //TODO: Issue in core: no status returned
         this.companionFiles.push(cf);
         this.$emit('update');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-profile-computation')});
       }
@@ -101,8 +100,7 @@ export default {
       try {
         await CompanionFile.delete(this.profile.id);
         this.$emit('update');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-profile-deletion')});
       }
@@ -111,8 +109,7 @@ export default {
     async fetchCompanionFiles() {
       try {
         this.companionFiles = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: this.image.id})).array;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }

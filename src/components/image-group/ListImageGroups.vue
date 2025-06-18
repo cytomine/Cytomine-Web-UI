@@ -288,8 +288,7 @@ export default {
         if ((this.currentPage - 1) * this.perPage >= this.filteredImageGroups.length) {
           this.currentPage = 1;
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -329,8 +328,7 @@ export default {
         this.fetchImageGroups()
       ]);
       this.loading = false;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

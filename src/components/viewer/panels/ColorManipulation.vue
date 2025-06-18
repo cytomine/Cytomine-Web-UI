@@ -425,8 +425,7 @@ export default {
       if (found) {
         const i = this.visibleLookUpTableDetails.indexOf(indexApparentChannel);
         this.visibleLookUpTableDetails.splice(i, 1);
-      }
-      else {
+      } else {
         this.visibleLookUpTableDetails.push(indexApparentChannel);
       }
     },
@@ -456,8 +455,7 @@ export default {
         // else {
         //   this.histograms = (await this.slices[0].fetchHistogram({nBins: this.histogramNBins}));
         // }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -480,8 +478,7 @@ export default {
       }
 
       this.loading = false;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
   },

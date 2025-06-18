@@ -139,8 +139,7 @@ export default {
         this.$emit('addComment', newComment);
         this.$notify({type: 'success', text: this.$t('notif-success-new-comment')});
         this.addingComment = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-new-comment')});
       }

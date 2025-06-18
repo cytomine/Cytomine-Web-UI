@@ -29,8 +29,7 @@ export default {
   created() {
     if (this.configUI['project-images-tab']) {
       this.$router.replace(`/project/${this.project.id}/images`);
-    }
-    else {
+    } else {
       this.$router.replace(`/project/${this.project.id}/information`);
     }
   }

@@ -329,17 +329,13 @@ export default {
       if (intervalDuration > 365 * 2 * dayDuration) {
         // large period => find a daysRange resulting in around 30 points
         return Math.round(intervalDuration / dayDuration / 30);
-      }
-      else if (intervalDuration > 365 * dayDuration) {
+      } else if (intervalDuration > 365 * dayDuration) {
         return 28;
-      }
-      else if (intervalDuration > 6 * 31 * dayDuration) {
+      } else if (intervalDuration > 6 * 31 * dayDuration) {
         return 14;
-      }
-      else if (intervalDuration > 31 * dayDuration) {
+      } else if (intervalDuration > 31 * dayDuration) {
         return 7;
-      }
-      else {
+      } else {
         return 1;
       }
     },

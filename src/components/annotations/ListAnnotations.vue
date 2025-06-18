@@ -663,8 +663,7 @@ export default {
       const newCount = this.limitedCategoryOptions.length + categoryBatch;
       if (newCount >= this.categoryOptions.length) {
         this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = this.categoryOptions.length;
-      }
-      else {
+      } else {
         this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = newCount;
       }
     },
@@ -792,8 +791,7 @@ export default {
         this.fetchTracks(),
         this.fetchTags()
       ]);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
       return;

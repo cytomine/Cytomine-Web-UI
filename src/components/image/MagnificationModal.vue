@@ -85,8 +85,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-magnification-update', {imageName})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

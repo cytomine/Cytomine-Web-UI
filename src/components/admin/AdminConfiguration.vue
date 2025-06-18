@@ -41,13 +41,11 @@ export default {
       try {
         if (!this.welcomeConfig.value) {
           await this.welcomeConfig.delete();
-        }
-        else {
+        } else {
           await this.welcomeConfig.save();
         }
         this.$notify({type: 'success', text: this.$t('notif-success-welcome-message-update')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-welcome-message-update')});
       }
@@ -56,8 +54,7 @@ export default {
   async created() {
     try {
       await this.welcomeConfig.fetch();
-    }
-    catch (error) {
+    } catch (error) {
       // no welcome message currently set
     }
   }

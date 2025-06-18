@@ -216,8 +216,7 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
 function debounce(fct, options) {
   if (options.debounce) {
     return _.debounce(fct, options.debounce);
-  }
-  else {
+  } else {
     return fct;
   }
 }

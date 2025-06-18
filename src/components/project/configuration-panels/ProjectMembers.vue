@@ -189,8 +189,7 @@ export default {
       try {
         this.revision++;
         await this.$store.dispatch('currentProject/fetchProjectMembers');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -216,8 +215,7 @@ export default {
         await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-project-members')});
       }
@@ -233,8 +231,7 @@ export default {
           cancelText: this.$t('button-cancel'),
           onConfirm: () => this.toggleManager(member)
         });
-      }
-      else {
+      } else {
         this.toggleManager(member);
       }
     },
@@ -245,8 +242,7 @@ export default {
             await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
           await this.project.deleteAdmin(member.id);
-        }
-        else {
+        } else {
           await this.project.addAdmin(member.id);
         }
         this.revision++;
@@ -257,8 +253,7 @@ export default {
             this.$router.push(`/project/${this.project.id}`);
           }
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }
@@ -268,17 +263,14 @@ export default {
         if (member.role === this.representativeRole.value) {
           if ((await this.project.fetchRepresentatives()).array.length < 2) {
             this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
-          }
-          else {
+          } else {
             await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
-        }
-        else {
+        } else {
           await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
         }
         this.revision++;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }

@@ -336,8 +336,7 @@ export default {
           if (this.viewerWrapper) {
             this.$store.commit(this.viewerModule + 'setActiveImage', this.index);
           }
-        }
-        else {
+        } else {
           throw new Error('Cannot unset active map');
         }
       }
@@ -579,8 +578,7 @@ export default {
             topRightY: Math.round(extent[3]),
             broadcast: this.imageWrapper.tracking.broadcast
           });
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-save-user-position')});
         }
@@ -654,8 +652,7 @@ export default {
             let duration = (sliceChange) ? undefined : 500;
             this.centerViewOnAnnot(annot, duration);
           }
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
         }
@@ -752,8 +749,7 @@ export default {
         try {
           let clone = await this.image.clone().review();
           this.$store.commit(this.imageModule + 'setImageInstance', clone);
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
         }
@@ -776,8 +772,7 @@ export default {
           if (Object.prototype.hasOwnProperty.call(annot, 'annotationLayer')) {
             annot.location = decodeURIComponent(atob(annot.location));
           }
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
         }
@@ -805,8 +800,7 @@ export default {
         }
 
         this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
@@ -814,8 +808,7 @@ export default {
 
     try {
       await new ImageConsultation({image: this.image.id}).save();
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.$notify({type: 'error', text: this.$t('notif-error-save-image-consultation')});
     }

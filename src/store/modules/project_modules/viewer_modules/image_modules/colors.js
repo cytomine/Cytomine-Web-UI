@@ -185,8 +185,7 @@ export default {
       ).length;
       if (visible && count === 0) {
         dispatch('addActiveSliceChannel', {channel: apparentChannel.channel});
-      }
-      else if (!visible && count === 1) {
+      } else if (!visible && count === 1) {
         dispatch('removeActiveSliceChannel', {channel: apparentChannel.channel});
       }
       commit('setApparentChannelVisibility', {indexApparentChannel, visible});

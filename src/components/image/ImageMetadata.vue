@@ -114,8 +114,7 @@ export default {
     try {
       this.fetchMetadata();
       this.loading = false;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

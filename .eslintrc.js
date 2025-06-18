@@ -10,7 +10,7 @@ module.exports = {
   ],
   rules: {
     'array-bracket-spacing': ['error', 'never'],
-    'brace-style': ['error', 'stroustrup'],
+    'brace-style': ['error', '1tbs'],
     'camelcase': ['error', {allow: ['$_veeValidate']}],
     'curly': ['error', 'all'],
     'eqeqeq': ['error', 'always'],

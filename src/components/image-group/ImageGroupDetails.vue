@@ -207,8 +207,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-image-group-rename', {imageName: this.imageGroup.name})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -237,8 +236,7 @@ export default {
         });
         this.$emit('delete');
 
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
@@ -269,8 +267,7 @@ export default {
           text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
         });
         this.$emit('deleteImage', image);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
@@ -282,8 +279,7 @@ export default {
   async created() {
     try {
       this.properties = (await PropertyCollection.fetchAll({object: this.imageGroup})).array;
-    }
-    catch (error) {
+    } catch (error) {
       this.loadPropertiesError = true;
       console.log(error);
     }

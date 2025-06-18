@@ -197,8 +197,7 @@ export default {
       if (this.nbImages === 1) {
         this.$store.unregisterModule(['projects', this.project.id, 'viewers', this.idViewer]);
         this.$router.push(`/project/${this.$route.params.idProject}`);
-      }
-      else {
+      } else {
         this.$store.dispatch(this.viewerModule + 'removeImage', index);
       }
     },
@@ -252,8 +251,7 @@ export default {
                 this.errorBadImageProject = true;
                 throw new Error('Some slices are not from this project or cannot be displayed together');
               }
-            }
-            else {
+            } else {
               slices = [await image.fetchReferenceSlice()];
             }
             await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
@@ -271,13 +269,11 @@ export default {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');
           }
-        }
-        else {
+        } else {
           await this.$store.dispatch(this.viewerModule + 'refreshData');
         }
         this.loading = false;
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.error = true;
       }
@@ -293,14 +289,12 @@ export default {
           ]);
           this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
           await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
-        }
-        else if (index === null) {
+        } else if (index === null) {
           annot = await Annotation.fetch(annot.id);
           if (this.idImages.includes(String(annot.image))) {
             let index = this.cells.find(cell => cell.image.id === annot.image).index;
             this.$eventBus.$emit('selectAnnotation', {index, annot, center});
-          }
-          else {
+          } else {
             let [image, slice] = await Promise.all([
               ImageInstance.fetch(annot.image),
               SliceInstance.fetch(annot.slice)
@@ -308,8 +302,7 @@ export default {
             await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
           }
         }
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.error = true;
       }

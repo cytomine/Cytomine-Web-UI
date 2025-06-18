@@ -89,8 +89,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
           if (i === 2 || i === 3) {
             newVertex = coordinates[depth[0]][segmentData.index + index];
             newVertex[0] = vertex[0];
-          }
-          else if (i === 4 || i === 5) {
+          } else if (i === 4 || i === 5) {
             newVertex = coordinates[depth[0]][segmentData.index + index];
             newVertex[1] = vertex[1];
           }
@@ -108,8 +107,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
             this.changingFeature_ = true;
             geometry.setCenter(vertex);
             this.changingFeature_ = false;
-          }
-          else { // We're dragging the circle's circumference:
+          } else { // We're dragging the circle's circumference:
             this.changingFeature_ = true;
             geometry.setRadius(coordinateDistance(geometry.getCenter(), vertex));
             this.changingFeature_ = false;
@@ -161,8 +159,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
             this.dragSegments_.push([segmentDataMatch, 0]);
             componentSegments[uid][0] = segmentDataMatch;
           }
-        }
-        else if (segmentDataMatch.geometry.getType() === GeometryType.POLYGON
+        } else if (segmentDataMatch.geometry.getType() === GeometryType.POLYGON
           && isRectangle(segmentDataMatch.geometry)) {
           let cid = segmentDataMatch.feature.get('annot').id;
           const segmentDataBbox = this.rBush_.getInExtent(segmentDataMatch.geometry.getExtent()).filter(sd => {
@@ -200,13 +197,11 @@ export default class ModifyInteraction extends ModifyInteractionBase {
             componentSegments[uid][j % 2] = sd;
           }
           break;
-        }
-        else if (coordinatesEqual(segment[0], vertex) &&
+        } else if (coordinatesEqual(segment[0], vertex) &&
           !componentSegments[uid][0]) {
           this.dragSegments_.push([segmentDataMatch, 0]);
           componentSegments[uid][0] = segmentDataMatch;
-        }
-        else if (coordinatesEqual(segment[1], vertex) &&
+        } else if (coordinatesEqual(segment[1], vertex) &&
           !componentSegments[uid][1]) {
 
           // prevent dragging closed linestrings by the connecting node
@@ -221,8 +216,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
 
           this.dragSegments_.push([segmentDataMatch, 1]);
           componentSegments[uid][1] = segmentDataMatch;
-        }
-        else if (this.insertVertexCondition_(evt) && getUid(segment) in this.vertexSegments_ &&
+        } else if (this.insertVertexCondition_(evt) && getUid(segment) in this.vertexSegments_ &&
           (!componentSegments[uid][0] && !componentSegments[uid][1])) {
           insertVertices.push([segmentDataMatch, vertex]);
         }

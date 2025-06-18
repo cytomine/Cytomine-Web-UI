@@ -54,8 +54,7 @@ export default {
     usersToDisplay() {
       if (!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
         return this.filteredUsers;
-      }
-      else {
+      } else {
         return this.filteredUsers.slice(0, this.nbDisplayed);
       }
     }

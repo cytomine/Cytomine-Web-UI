@@ -436,8 +436,7 @@ export default {
           this.fetchFilters(),
         ]);
         this.revision++;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -475,14 +474,12 @@ export default {
         if (this.blindMode) {
           // set sortField to blindedName if blindMode is used
           this.sortField = 'blindedName';
-        }
-        else {
+        } else {
           // Use your default sorting by file name ('instanceFilename')
           this.sortField = 'instanceFilename';
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

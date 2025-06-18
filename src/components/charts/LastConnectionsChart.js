@@ -77,8 +77,7 @@ export default {
         if (connections[indexConnection] && iterMoment.isSame(Number(connections[indexConnection].time), this.period)) {
           allConnections.push(connections[indexConnection]);
           indexConnection++;
-        }
-        else {
+        } else {
           allConnections.push({time: iterMoment.valueOf(), frequency: 0});
         }
         iterMoment.add(1, this.momentPeriod);

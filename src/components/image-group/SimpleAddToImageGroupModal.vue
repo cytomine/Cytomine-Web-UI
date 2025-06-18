@@ -117,16 +117,14 @@ export default {
         if (this.imageGroup === 'NEW') {
           let imageGroup = await new ImageGroup({name: this.name, project: this.image.project}).save();
           idImageGroup = imageGroup.id;
-        }
-        else if (this.imageGroup === 'EXISTING') {
+        } else if (this.imageGroup === 'EXISTING') {
           idImageGroup = this.selectedImageGroup;
         }
 
         let link = await new ImageGroupImageInstance({image: this.image.id, group: idImageGroup}).save();
         this.$emit('addToImageGroup', link);
         this.$notify({type: 'success', text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif})});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif})});
       }
@@ -138,8 +136,7 @@ export default {
           filterKey: 'project',
           filterValue: this.image.project,
         })).array;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }

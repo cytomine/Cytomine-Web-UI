@@ -129,8 +129,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-image-calibration', {imageName})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

@@ -86,8 +86,7 @@ export default {
             }
           }
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$emit('error', true);
       }

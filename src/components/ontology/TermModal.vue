@@ -84,8 +84,7 @@ export default {
 
       if (this.term) {
         this.update();
-      }
-      else {
+      } else {
         this.create();
       }
     },
@@ -95,8 +94,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-term-creation')});
         this.$emit('newTerm', term);
         this.$parent.close();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-term-creation')});
       }
@@ -110,8 +108,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-term-update')});
         this.$emit('updateTerm', term);
         this.$parent.close();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-term-update')});
       }

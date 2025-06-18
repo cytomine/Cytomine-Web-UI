@@ -109,8 +109,7 @@ export default {
         if (this.ontology === 'NEW') {
           let ontology = await new Ontology({name: this.name}).save();
           idOntology = ontology.id;
-        }
-        else if (this.ontology === 'EXISTING') {
+        } else if (this.ontology === 'EXISTING') {
           idOntology = this.selectedOntology;
         }
 
@@ -120,12 +119,10 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
         this.$emit('update:active', false);
         await this.$router.push(`/project/${project.id}/configuration`);
-      }
-      catch (error) {
+      } catch (error) {
         if (error.response.status === 409) {
           this.$notify({type: 'error', text: this.$t('notif-error-project-already-exists')});
-        }
-        else {
+        } else {
           this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
         }
       }

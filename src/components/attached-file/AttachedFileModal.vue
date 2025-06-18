@@ -82,8 +82,7 @@ export default {
         this.$emit('addAttachedFile', attached);
         this.$notify({type: 'success', text: this.$t('notif-success-attached-file-creation')});
         this.$parent.close();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
       }

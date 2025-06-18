@@ -240,8 +240,7 @@ export default {
             project: this.image.project,
             type: 'SAME_OBJECT'
           }).save();
-        }
-        else {
+        } else {
           annotGroup = await AnnotationGroup.fetch(existingAnnotGroup);
         }
 
@@ -292,8 +291,7 @@ export default {
               copiedAnnot.group = a.group;
               this.copiedAnnot = copiedAnnot;
             }
-          }
-          else {
+          } else {
             this.$eventBus.$emit('addAnnotation', a);
           }
           if (this.imagesIdsInGroupInViewer.includes(a.image)) {
@@ -303,8 +301,7 @@ export default {
         });
 
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-paste')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-paste')});
       }
@@ -316,8 +313,7 @@ export default {
 
       if (position === this.imageCenterPosition.value) {
         geometry.translate((destImage.width / 2) - centerExtent[0], (destImage.height / 2) - centerExtent[1]);
-      }
-      else if (position === this.viewerCenterPosition.value) {
+      } else if (position === this.viewerCenterPosition.value) {
         let wrapper = this.findWrapper(destImage.id);
         if (!wrapper) {
           return;
@@ -335,8 +331,7 @@ export default {
       if (hasPhysicalSizeX && hasPhysicalSizeY) {
         scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
         scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
-      }
-      else if (hasPhysicalSizeX) {
+      } else if (hasPhysicalSizeX) {
         scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
         scaleY = scaleX;
       }
@@ -382,8 +377,7 @@ export default {
         this.$set(imageInstance, 'notInViewerPosition', this.imageCenterPosition.value);
       }
       this.loading = false;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

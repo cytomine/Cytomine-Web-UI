@@ -131,8 +131,7 @@ export default {
         let updatedProject = this.project.clone();
         updatedProject.numberOfImages++;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

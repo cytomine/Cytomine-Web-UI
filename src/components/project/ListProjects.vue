@@ -400,8 +400,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-project-deletion', {projectName: projectToDelete.name})
         });
-      }
-      catch (error) {
+      } catch (error) {
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-project-deletion', {projectName: projectToDelete.name})
@@ -417,8 +416,7 @@ export default {
         this.fetchMaxFilters(),
         this.fetchTags()
       ]);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

@@ -146,8 +146,7 @@ export default {
       try {
         await UploadedFile.delete(uFile.id);
         this.updatedTree();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         let errorValues = error.response.data.errorValues;
         let text;
@@ -157,12 +156,10 @@ export default {
               projects: errorValues.projectNames.join(', '),
               names: errorValues.imageNames.join(', ')
             });
-          }
-          else {
+          } else {
             text = this.$t('notif-error-delete-uploaded-file-forbidden');
           }
-        }
-        else {
+        } else {
           text = this.$t('notif-error-delete-uploaded-file');
         }
         this.$notify({type: 'error', text});

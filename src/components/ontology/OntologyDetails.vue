@@ -157,8 +157,7 @@ export default {
         // projects prop of ontology contains all projects, including those that the current user cannot see => need to refetch the collection
         this.projects = (await ProjectCollection.fetchAll({filterKey: 'ontology', filterValue: this.ontology.id})).array;
         // ---
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -167,8 +166,7 @@ export default {
 
       try {
         this.creator = await User.fetch(this.fullOntology.user);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
 
@@ -193,8 +191,7 @@ export default {
           text: this.$t('notif-success-ontology-rename', {name: this.fullOntology.name})
         });
         this.$emit('rename', newName);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

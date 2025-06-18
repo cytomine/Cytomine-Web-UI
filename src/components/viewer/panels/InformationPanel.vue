@@ -207,13 +207,11 @@ export default {
         if (!prev.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
           this.isFirstImage = true;
-        }
-        else {
+        } else {
           let slice = await prev.fetchReferenceSlice();
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
       }
@@ -224,13 +222,11 @@ export default {
         if (!next.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
           this.isLastImage = true;
-        }
-        else {
+        } else {
           let slice = await next.fetchReferenceSlice();
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
@@ -244,13 +240,11 @@ export default {
         let prev = await this.imageGroupLink.fetchPrevious();
         if (!prev.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
-        }
-        else {
+        } else {
           let slice = await prev.fetchReferenceSlice();
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
       }
@@ -264,13 +258,11 @@ export default {
         let next = await this.imageGroupLink.fetchNext();
         if (!next.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
-        }
-        else {
+        } else {
           let slice = await next.fetchReferenceSlice();
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
@@ -283,14 +275,11 @@ export default {
 
       if (key === 'nav-next-image') {
         this.nextImage();
-      }
-      else if (key === 'nav-previous-image') {
+      } else if (key === 'nav-previous-image') {
         this.previousImage();
-      }
-      else if (key === 'nav-next-image-in-group') {
+      } else if (key === 'nav-next-image-in-group') {
         this.nextImageInGroup();
-      }
-      else if (key === 'nav-previous-image-in-group') {
+      } else if (key === 'nav-previous-image-in-group') {
         this.previousImageInGroup();
       }
     }

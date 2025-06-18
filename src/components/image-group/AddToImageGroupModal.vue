@@ -134,8 +134,7 @@ export default {
     close() {
       if (!this.programmatic) {
         this.$emit('update:active', false);
-      }
-      else {
+      } else {
         this.$emit('close');
       }
     },
@@ -151,8 +150,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

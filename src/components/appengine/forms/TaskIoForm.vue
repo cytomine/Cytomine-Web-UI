@@ -98,8 +98,7 @@ export default {
           if (promises.length > 1) {
             await Task.notifyProvisioningEnd(this.projectId, taskRun.id);
           }
-        }
-        else {
+        } else {
           await Task.batchProvisionTask(this.projectId, taskRun.id, this.getInputProvisions());
         }
 
@@ -108,8 +107,7 @@ export default {
           this.resetForm();
           this.$emit('appengine:task:started', taskRun);
         });
-      }
-      catch (e) {
+      } catch (e) {
         this.$buefy.toast.open({message: e.message, type: 'is-danger'});
       }
     },

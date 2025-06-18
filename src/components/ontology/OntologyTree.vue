@@ -172,8 +172,7 @@ export default {
     classNames(node) {
       if (this.multipleSelection) {
         return node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
-      }
-      else {
+      } else {
         return node.isSelected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
       }
     },
@@ -190,17 +189,14 @@ export default {
             if (indexSelected >= 0) {
               this.internalSelectedNodes.splice(indexSelected, 1);
               this.$emit('unselect', node.data.id);
-            }
-            else {
+            } else {
               this.internalSelectedNodes.push(node.data.id);
               this.$emit('select', node.data.id);
             }
-          }
-          else {
+          } else {
             if (this.internalSelectedNodes.includes(node.data.id)) {
               this.internalSelectedNodes = [];
-            }
-            else {
+            } else {
               this.internalSelectedNodes = [node.data.id];
             }
 
@@ -280,13 +276,11 @@ export default {
                 tmp.data.parent = idParent;
               }
             });
-          }
-          catch (error) {
+          } catch (error) {
             console.log(error);
             this.$notify({type: 'error', text: this.$t('notif-error-ontology-tree-update')});
           }
-        }
-        else {
+        } else {
           this.$notify({type: 'warn', text: this.$t('notif-warn-ontology-tree-order-not-persisted')});
         }
       });
@@ -306,8 +300,7 @@ export default {
       try {
         await Term.delete(node.data.id);
         this.$refs.tree.remove([node.path]);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-term-deletion')});
       }

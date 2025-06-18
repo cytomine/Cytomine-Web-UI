@@ -147,8 +147,7 @@ export default {
             this.fetchImages(),
             this.fetchProjects()
           ]);
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
           this.error = true;
         }

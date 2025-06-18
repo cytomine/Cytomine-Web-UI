@@ -16,8 +16,7 @@ export default class TaskRun extends Model {
     if (this.isNew()) {
       return `/app-engine/project/${this.project}/task-runs`;
       //   return `${this.callbackIdentifier}.json`;
-    }
-    else {
+    } else {
       //   return `${this.callbackIdentifier}/${this.id}.json`;
       return `/app-engine/project/${this.project}/task-runs/${this.id}`;
     }

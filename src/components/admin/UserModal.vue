@@ -200,8 +200,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-user-' + labelTranslation)});
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateUser' : 'addUser', this.internalUser);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-' + labelTranslation)});
       }
@@ -210,8 +209,7 @@ export default {
   async created() {
     try {
       this.rolesWithIds = (await RoleCollection.fetchAll()).array;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
   }

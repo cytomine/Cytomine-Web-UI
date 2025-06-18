@@ -180,8 +180,7 @@ export default {
       let slice = state.sliceInstances[rank];
       if (!slice) {
         await dispatch('fetchSliceInstancesAround', {rank, setActive: true});
-      }
-      else {
+      } else {
         commit('setActiveSlice', slice);
       }
 
@@ -312,23 +311,19 @@ export default {
           }
           if (feature.getGeometry().getType() === 'LineString') {
             styles.push(wrappedTerm.olLineStyle);
-          }
-          else {
+          } else {
             styles.push(wrappedTerm.olStyle);
           }
-        }
-        else {
+        } else {
           styles.push(state.style.noTermStyle); // could not find term => display no term style
         }
-      }
-      else if (terms && nbTerms > 1) {
+      } else if (terms && nbTerms > 1) {
         let hasTermsToDisplay = terms.some(term => term.visible && annot.term.includes(term.id));
         if (!hasTermsToDisplay) {
           return; // do not display
         }
         styles.push(state.style.multipleTermsStyle);
-      }
-      else {
+      } else {
         if (!state.style.displayNoTerm) {
           return; // do not display annot
         }
@@ -347,11 +342,9 @@ export default {
         if (state.draw.activeEditTool === 'modify') {
           styles.push(verticesStyle);
         }
-      }
-      else if (isReviewed) {
+      } else if (isReviewed) {
         styles.push(...reviewedStyles);
-      }
-      else if (isRejected) {
+      } else if (isRejected) {
         styles.push(...rejectedStyles);
       }
 
@@ -362,13 +355,11 @@ export default {
         if (wrappedTrack) {
           if (feature.getGeometry().getType() === 'LineString') {
             styles.unshift(wrappedTrack.olLineStyle);
-          }
-          else {
+          } else {
             styles.push(wrappedTrack.olStyle);
           }
         }
-      }
-      else if (tracks && nbTracks > 1) {
+      } else if (tracks && nbTracks > 1) {
         styles.push(state.style.multipleTracksStyle);
       }
 
@@ -379,11 +370,9 @@ export default {
         let fontSize = '34px';
         if (state.view.zoom <= 3) {
           fontSize = '12px';
-        }
-        else if (state.view.zoom <= 6) {
+        } else if (state.view.zoom <= 6) {
           fontSize = '19px';
-        }
-        else if (state.view.zoom <= 8) {
+        } else if (state.view.zoom <= 8) {
           fontSize = '26px';
         }
         styles.push(createTextStyle(propValue, fontSize, color.fill, null));

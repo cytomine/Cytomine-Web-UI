@@ -72,13 +72,11 @@ export default {
         }
         await this.$store.dispatch('currentProject/loadProject', this.idProject);
         this.loading = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         if (error.response && error.response.status === 403) {
           this.permissionError = true;
-        }
-        else {
+        } else {
           this.notFoundError = true;
         }
       }
@@ -87,8 +85,7 @@ export default {
       let updatedProject = this.$store.state.currentProject.project.clone();
       if (annot.type === 'UserAnnotation') {
         updatedProject.numberOfAnnotations--;
-      }
-      else {
+      } else {
         updatedProject.numberOfReviewedAnnotations--;
       }
 

@@ -77,8 +77,7 @@ export default {
   async created() {
     try {
       await this.fetchMetadata();
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
   }

@@ -141,8 +141,7 @@ export default {
     currentItem() {
       if (this.isDisplayedByTerm) {
         return this.termsOptions.find(term => term.id === this.selectedTermId);
-      }
-      else {
+      } else {
         return this.tracks.find(track => track.id === this.selectedTrackId);
       }
     },

@@ -105,8 +105,7 @@ export default {
           return values;
         });
         tags = existingTags.concat(newTags);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tags')});
       }
@@ -122,8 +121,7 @@ export default {
         this.associatedTags = this.associatedTags.concat(newAssocations);
         this.sortAssociatedTags();
         this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
       }
@@ -133,8 +131,7 @@ export default {
         await TagDomainAssociation.delete(association.id);
         this.associatedTags.splice(idx, 1);
         this.$emit('update');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-tag')});
       }
@@ -144,8 +141,7 @@ export default {
     try {
       this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
       this.sortAssociatedTags();
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

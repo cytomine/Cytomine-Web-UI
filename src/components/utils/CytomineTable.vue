@@ -152,8 +152,7 @@ export default {
       if (value === 0) {
         clearTimeout(this.timeout);
         this.timeout = null;
-      }
-      else if (!this.timeout) { // user provided a valid refresh interval, and no fetch page planned => relaunch fetch page
+      } else if (!this.timeout) { // user provided a valid refresh interval, and no fetch page planned => relaunch fetch page
         this.fetchPage();
       }
     }
@@ -174,8 +173,7 @@ export default {
         let data = {array: [], totalNbItems: 0};
         if (this.isEmpty) {
           this.internalCurrentPage = 1;
-        }
-        else {
+        } else {
           data = await this.internalCollection.fetchPage(this.internalCurrentPage - 1);
         }
 
@@ -188,8 +186,7 @@ export default {
         });
 
         this.$emit('update:checkedRows', this.internalCheckedRows);
-      }
-      catch (error) {
+      } catch (error) {
         if (this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page
           this.internalCurrentPage = 1;
           return;

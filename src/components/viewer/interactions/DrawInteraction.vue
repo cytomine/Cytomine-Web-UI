@@ -125,14 +125,12 @@ export default {
 
           if (geometry) {
             geometry.setCoordinates(boxCoordinates);
-          }
-          else {
+          } else {
             geometry = new Polygon(boxCoordinates);
           }
           return geometry;
         };
-      }
-      else {
+      } else {
         return null;
       }
     },
@@ -170,8 +168,7 @@ export default {
     async drawEndHandler({feature}) {
       if (this.drawCorrection) {
         await this.endCorrection(feature);
-      }
-      else if (this.nbActiveLayers > 0) {
+      } else if (this.nbActiveLayers > 0) {
         await this.endDraw(feature);
       }
 
@@ -200,8 +197,7 @@ export default {
           }
 
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
-        }
-        catch (err) {
+        } catch (err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
@@ -232,8 +228,7 @@ export default {
           this.$eventBus.$emit('editAnnotation', correctedAnnot);
           this.$eventBus.$emit('reloadAnnotationCrop', annot);
         }
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-correction')});
       }

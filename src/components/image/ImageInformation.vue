@@ -111,13 +111,11 @@ export default {
         let image = await ImageInstance.fetch(this.idImage);
         image.vendor = vendorFromFormat(image.contentType);
         this.image = image;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         if (error.response.status === 403) {
           this.permissionError = true;
-        }
-        else {
+        } else {
           this.notFoundError = true;
         }
       }

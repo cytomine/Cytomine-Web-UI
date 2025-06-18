@@ -34,14 +34,11 @@ export default {
     labels() {
       if (this.spatialAxis && this.dimension === 'channels') {
         return this.sortedData.map(item => this.channelName(item.channel));
-      }
-      else if (this.spatialAxis && this.dimension === 'depth') {
+      } else if (this.spatialAxis && this.dimension === 'depth') {
         return this.sortedData.map(item => item.zStack);
-      }
-      else if (this.spatialAxis && this.dimension === 'duration') {
+      } else if (this.spatialAxis && this.dimension === 'duration') {
         return this.sortedData.map(item => item.time);
-      }
-      else {
+      } else {
         return this.sortedData.map(item => `(${item.x}, ${item.y})`);
       }
     }
@@ -102,8 +99,7 @@ export default {
             }
           }
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$emit('error', true);
       }

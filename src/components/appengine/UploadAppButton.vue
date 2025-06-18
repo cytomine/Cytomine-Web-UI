@@ -38,14 +38,12 @@ export default {
           this.$emit('taskUploadSuccess');
           this.$notify({type: 'success', text: this.$t('notify-success-task-upload')});
         }
-      }
-      catch (error) {
+      } catch (error) {
         if (error.response && error.response.status === 409) {
           const errorMessage = error.response.data.message || 'Task already exists!';
 
           this.$notify({type: 'warn', text: errorMessage});
-        }
-        else {
+        } else {
           const errorMessage = error.response.data.message || 'Unknown Error!';
 
           this.$notify({type: 'error', text: errorMessage});

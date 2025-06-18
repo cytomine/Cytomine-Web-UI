@@ -95,8 +95,7 @@ export default {
 
           results[idxMonths].days.push({refDate: Number(action.created), actions: [action]});
           idxDays++;
-        }
-        else {
+        } else {
           results[idxMonths].days[idxDays].actions.push(action);
         }
         lastDate = date;
@@ -141,8 +140,7 @@ export default {
         if (data.length < this.nbActionsPerPage) {
           this.loadedAllActions = true;
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -153,8 +151,7 @@ export default {
   async created() {
     try {
       await this.loadActions();
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

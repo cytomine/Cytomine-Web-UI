@@ -179,8 +179,7 @@ export default {
           text: this.$t('notif-success-ontology-deletion', {name: this.selectedOntology.name})
         });
         this.selectedOntology = this.ontologies[0];
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-ontology-deletion')});
       }
@@ -189,8 +188,7 @@ export default {
   async created() {
     try {
       this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.loading = false;
       return;
@@ -199,8 +197,7 @@ export default {
 
     if (this.idTargetOntology) {
       this.selectTargetOntology();
-    }
-    else {
+    } else {
       this.selectedOntology = this.ontologies[0];
     }
 

@@ -50,8 +50,7 @@ export default {
     async handleTaskUploadSuccess() {
       try {
         this.applications = await Task.fetchAll();
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Error fetching tasks after upload:', error);
       }
     },

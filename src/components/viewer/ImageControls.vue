@@ -297,8 +297,7 @@ export default {
       if (this.channels.length === this.image.channels) {
         let info = this.channels[channel];
         return (info) ? info.name : null;
-      }
-      else {
+      } else {
         let rank = slicePositionToRank({
           channel,
           zStack: this.currentZStackIndex,

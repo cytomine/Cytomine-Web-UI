@@ -221,8 +221,7 @@ export default {
     async fetchWelcomeMessage() {
       try {
         this.welcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_WELCOME)).value;
-      }
-      catch (error) {
+      } catch (error) {
         // no welcome message defined
       }
     }

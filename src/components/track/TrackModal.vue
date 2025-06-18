@@ -84,8 +84,7 @@ export default {
 
       if (this.track) {
         this.update();
-      }
-      else {
+      } else {
         this.create();
       }
     },
@@ -95,8 +94,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-track-creation')});
         this.$emit('newTrack', track);
         this.$parent.close();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-track-creation')});
       }
@@ -110,8 +108,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-track-update')});
         this.$emit('updateTrack', track);
         this.$parent.close();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-track-update')});
       }

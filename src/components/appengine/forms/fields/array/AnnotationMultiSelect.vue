@@ -51,8 +51,7 @@ export default {
     updateSelection(annotation) {
       if (this.selectedAnnotations.includes(annotation)) {
         this.selectedAnnotations = this.selectedAnnotations.filter(item => item !== annotation);
-      }
-      else {
+      } else {
         this.selectedAnnotations.push(annotation);
       }
     },

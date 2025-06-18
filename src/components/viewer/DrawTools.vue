@@ -529,8 +529,7 @@ export default {
     backgroundTermsNewAnnot() {
       if (this.termsToAssociate.length === 1) {
         return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
-      }
-      else {
+      } else {
         return '#e2e2e2';
       }
     },
@@ -551,8 +550,7 @@ export default {
     backgroundTracksNewAnnot() {
       if (this.tracksToAssociate.length === 1) {
         return this.tracks.find(track => this.tracksToAssociate[0] === track.id).color;
-      }
-      else {
+      } else {
         return '#e2e2e2';
       }
     },
@@ -691,11 +689,9 @@ export default {
       let geomType = ftr.geometry.type;
       if (geomType === 'Point') {
         return (tool !== 'move' && tool !== 'delete'); // disable all tools except move and delete for points
-      }
-      else if (geomType === 'LineString') {
+      } else if (geomType === 'LineString') {
         return ['fill', 'correct-add', 'correct-remove'].includes(tool); // disable fill and correct tools for lines
-      }
-      else {
+      } else {
         return false;
       }
     },
@@ -723,8 +719,7 @@ export default {
         this.$eventBus.$emit('editAnnotation', annot);
         this.$eventBus.$emit('reloadAnnotationCrop', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
-      }
-      catch (err) {
+      } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-fill')});
       }
     },
@@ -752,8 +747,7 @@ export default {
             await updateAnnotationLinkProperties(other);
 
             editedAnnots = [other];
-          }
-          else {
+          } else {
             editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
           }
           editedAnnots.forEach(a => {
@@ -768,8 +762,7 @@ export default {
         }
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
-      }
-      catch (err) {
+      } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     },
@@ -832,8 +825,7 @@ export default {
       if (hasPhysicalSizeX && hasPhysicalSizeY) {
         scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
         scaleY = srcImage.physicalSizeY / destImage.physicalSizeY;
-      }
-      else if (hasPhysicalSizeX) {
+      } else if (hasPhysicalSizeX) {
         scaleX = srcImage.physicalSizeX / destImage.physicalSizeX;
         scaleY = scaleX;
       }
@@ -904,8 +896,7 @@ export default {
         this.$eventBus.$emit('addAnnotation', annot);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
       }
@@ -919,8 +910,7 @@ export default {
         await this.copiedAnnot.repeat(this.slice.id, this.nbRepeats);
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
       }
@@ -968,8 +958,7 @@ export default {
           await updateAnnotationLinkProperties(other);
 
           editedAnnots = [updatedAnnot, other];
-        }
-        else {
+        } else {
           editedAnnots = [updatedAnnot, ...(await listAnnotationsInGroup(annot.project, annot.group))];
         }
 
@@ -983,8 +972,7 @@ export default {
           }
         });
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-deletion')});
       }
@@ -1000,8 +988,7 @@ export default {
       try {
         let opposedAction = await this.reverseAction(action, true);
         this.$store.commit(this.imageModule + 'undoAction', opposedAction);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-undo')});
       }
@@ -1015,8 +1002,7 @@ export default {
       try {
         let opposedAction = await this.reverseAction(action, false);
         this.$store.commit(this.imageModule + 'redoAction', opposedAction);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-redo')});
       }
@@ -1029,19 +1015,16 @@ export default {
         this.$eventBus.$emit('deleteAnnotation', annot);
         newType = Action.DELETE;
         command = Cytomine.instance.lastCommand;
-      }
-      else if (type === Action.DELETE) {
+      } else if (type === Action.DELETE) {
         let collection = await Cytomine.instance.undo(command); // always undo if annotation was deleted
         let newAnnot = await this.getUpdatedAnnotation(collection);
         this.$eventBus.$emit('addAnnotation', newAnnot);
         newType = Action.CREATE;
-      }
-      else { // annotation was updated
+      } else { // annotation was updated
         let collection;
         if (undo) {
           collection = await Cytomine.instance.undo(command);
-        }
-        else {
+        } else {
           collection = await Cytomine.instance.redo(command);
         }
         let newAnnot = await this.getUpdatedAnnotation(collection);
@@ -1082,8 +1065,7 @@ export default {
         this.$eventBus.$emit('reviewAnnotation', annot);
         this.$eventBus.$emit('addAnnotation', reviewedAnnot);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-validation')});
       }
@@ -1107,8 +1089,7 @@ export default {
         this.$eventBus.$emit('deleteAnnotation', reviewedAnnot);
         this.$eventBus.$emit('addAnnotation', annot, false);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-rejection')});
       }

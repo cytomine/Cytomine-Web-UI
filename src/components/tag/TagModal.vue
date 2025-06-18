@@ -80,8 +80,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-tag-' + labelTranslation)});
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateTag' : 'addTag', this.internalTag);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-tag-' + labelTranslation)});
       }

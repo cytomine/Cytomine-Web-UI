@@ -41,8 +41,7 @@ export default {
     updateSelection(annotation) {
       if (this.selectedImages.includes(annotation)) {
         this.selectedImages = this.selectedImages.filter(item => item !== annotation);
-      }
-      else {
+      } else {
         this.selectedImages.push(annotation);
       }
     },

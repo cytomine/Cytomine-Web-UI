@@ -134,8 +134,7 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
   propertiesValues.forEach(propVal => {
     if (!properties[propVal.idAnnotation]) {
       properties[propVal.idAnnotation] = propVal.value;
-    }
-    else {
+    } else {
       properties[propVal.idAnnotation] += '; ' + propVal.value;
     }
   });

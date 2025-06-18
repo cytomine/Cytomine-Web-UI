@@ -216,8 +216,7 @@ export default {
       if (inverted) {
         min = second;
         max = first;
-      }
-      else {
+      } else {
         min = first;
         max = second;
       }
@@ -241,8 +240,7 @@ export default {
       let slope;
       if (value <= this.defaultCenter) {
         slope = value / this.defaultCenter;
-      }
-      else {
+      } else {
         slope = this.defaultCenter / (this.defaultRange - value);
       }
       if (slope > 0) {

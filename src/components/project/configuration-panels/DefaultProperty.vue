@@ -78,8 +78,7 @@ export default {
       try {
         let projectProps = (await PropertyCollection.fetchAll({object: this.project})).array;
         this.defaultPropertyProp = projectProps.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
 
@@ -116,13 +115,11 @@ export default {
             await this.defaultPropertyProp.delete();
             this.defaultPropertyProp = new Property({key: constants.DEFAULT_PROPERTY_KEY, value: ''}, this.project);
           }
-        }
-        else {
+        } else {
           await this.defaultPropertyProp.save();
         }
         this.$notify({type: 'success', text: this.$t('notif-success-default-property-update')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-property-update')});
       }
@@ -134,8 +131,7 @@ export default {
         this.fetchKeysAnnotationProperties(),
         this.fetchDefaultPropertyProp()
       ]);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

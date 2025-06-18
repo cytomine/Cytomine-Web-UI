@@ -192,8 +192,7 @@ export default {
           }, constants.TRACKING_REFRESH_INTERVAL);
         }
         this.trackedUser = null;
-      }
-      else {
+      } else {
         clearInterval(this.wsInterval);
         this.userPostitionWebsock.close();
       }
@@ -232,8 +231,7 @@ export default {
             this.trackedUserModel = null;
           }
         });
-      }
-      else {
+      } else {
         this.stopTrack();
         this.trackedUser = value;
       }
@@ -287,8 +285,7 @@ export default {
         this.userPostitionWebsock.onopen = this.onOpen;
         this.userPostitionWebsock.onclose = this.onClose;
         this.userPostitionWebsock.onmessage = this.onMessage;
-      }
-      catch (error) {
+      } catch (error) {
         console.log('error', error);
       }
     },
@@ -305,8 +302,7 @@ export default {
     onMessage(message) {
       if (message.data === 'stop-track') {
         this.stopTrack();
-      }
-      else {
+      } else {
         let pos = JSON.parse(message.data);
         this.moveView(pos);
       }
@@ -354,8 +350,7 @@ export default {
         }
 
         this.moveView(pos);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-tracked-user-position')});
       }

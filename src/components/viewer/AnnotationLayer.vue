@@ -139,8 +139,7 @@ export default {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if (!olFeature) {
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-        }
-        else {
+        } else {
           this.$store.dispatch(this.imageModule + 'selectFeature', olFeature);
         }
       }
@@ -149,12 +148,10 @@ export default {
       if (!idImage || idImage === this.image.id) {
         if (clear) {
           this.clearFeatures();
-        }
-        else if (hard) {
+        } else if (hard) {
           this.clearFeatures(false);
           this.loader();
-        }
-        else {
+        } else {
           this.loader();
         }
       }
@@ -307,18 +304,15 @@ export default {
             function(a, b) {
               if (a.area < b.area) {
                 return 1;
-              }
-              else {
+              } else {
                 return -1;
               }
             }
           );
-        }
-        else {
+        } else {
           arrayAnnots = await this.fetchAnnotations();
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotations-viewer')});
         return;
@@ -344,8 +338,7 @@ export default {
 
       if (wasClustered !== null && wasClustered !== this.clustered) {
         this.clearFeatures(); // clearing features will retrigger the loader
-      }
-      else {
+      } else {
         let features = this.clustered ? this.$refs.olSource.$source.getFeatures()
           : this.$refs.olSource.$source.getFeaturesInExtent(extent);
 

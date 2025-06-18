@@ -104,14 +104,11 @@ export default {
     title() {
       if (this.isPoint) {
         return this.$t('profile');
-      }
-      else if (this.spatialAxis && this.image.channels > 1) {
+      } else if (this.spatialAxis && this.image.channels > 1) {
         return this.$t('fluorescence-spectra');
-      }
-      else if (this.spatialAxis && this.image.depth > 1) {
+      } else if (this.spatialAxis && this.image.depth > 1) {
         return this.$t('depth-spectra');
-      }
-      else if (this.spatialAxis && this.image.duration > 1) {
+      } else if (this.spatialAxis && this.image.duration > 1) {
         return this.$t('temporal-spectra');
       }
       return this.$t('profile-projection');

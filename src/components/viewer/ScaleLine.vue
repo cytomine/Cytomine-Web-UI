@@ -61,8 +61,7 @@ export default {
           unit = this.$t('mm');
         }
         return `${length.toPrecision(3)} ${unit}`;
-      }
-      else {
+      } else {
         return `${Math.round(length * 1000) / 1000} ${this.$t('pixels')}`;
       }
     },

@@ -130,21 +130,17 @@ export default {
           if ('channel' in item) {
             this.dimension = 'channels';
             projection['channel'] = item.channel;
-          }
-          else if ('zStack' in item) {
+          } else if ('zStack' in item) {
             this.dimension = 'depth';
             projection['zStack'] = item.zStack;
-          }
-          else if ('time' in item) {
+          } else if ('time' in item) {
             this.dimension = 'duration';
             projection['time'] = item.time;
-          }
-          else {
+          } else {
             this.dimension = 'slices';
             projection['slice'] = item.slice;
           }
-        }
-        else {
+        } else {
           projection['x'] = item.point[0];
           projection['y'] = item.point[1];
         }

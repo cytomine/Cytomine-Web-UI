@@ -93,8 +93,7 @@ export default {
         await Property.delete(prop.id, this.object);
         this.properties.splice(idx, 1);
         this.$emit('update');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-prop')});
       }
@@ -125,8 +124,7 @@ export default {
           this.properties.push(prop);
         }
         this.$emit('update');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-save-prop')});
       }
@@ -142,8 +140,7 @@ export default {
     try {
       let props = (await PropertyCollection.fetchAll({object: this.object})).array;
       this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

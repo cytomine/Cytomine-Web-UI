@@ -233,8 +233,7 @@ export default {
         this.fetchMembers(),
         this.fetchOnlines()
       ]);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

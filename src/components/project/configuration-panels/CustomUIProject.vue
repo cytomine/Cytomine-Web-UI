@@ -181,8 +181,7 @@ export default {
         this.customUI[prop][userType] = !this.customUI[prop][userType];
         this.customUI = await this.project.saveUIConfig(this.customUI);
         this.$store.dispatch('currentProject/fetchUIConfig');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.customUI[prop][userType] = !this.customUI[prop][userType]; // revert change
         this.$notify({type: 'error', text: this.$t('notif-error-custom-ui-change')});
@@ -197,8 +196,7 @@ export default {
       this.customUITree[0].props.splice(2,1);
       this.customUI = await this.project.fetchUIConfig();
       console.log(this.customUI);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

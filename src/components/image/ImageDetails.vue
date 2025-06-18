@@ -406,8 +406,7 @@ export default {
       let errorLabel = this.image.reviewed ? 'notif-error-unvalidate-review' : 'notif-error-cancel-review';
       try {
         await this.image.stopReview(true);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t(errorLabel)});
       }
@@ -423,8 +422,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-image-rename', {imageName: this.image.instanceFilename})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -456,8 +454,7 @@ export default {
         let updatedProject = this.project.clone();
         updatedProject.numberOfImages--;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
@@ -484,8 +481,7 @@ export default {
           text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif})
         });
         this.imageGroupLinks.splice(0, 1);
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
@@ -506,8 +502,7 @@ export default {
   async created() {
     try {
       await this.fetchImageGroupLinks();
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

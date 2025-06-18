@@ -386,8 +386,7 @@ export default {
           let user = this.users.find(user => user.id === ubt.user[0]) || {}; // QUESTION: can we have several users?
           return {term, user};
         });
-      }
-      else {
+      } else {
         return [];
       }
     },
@@ -401,8 +400,7 @@ export default {
           let track = this.tracks.find(track => at.track === track.id);
           return {track};
         });
-      }
-      else {
+      } else {
         return [];
       }
     },
@@ -422,11 +420,9 @@ export default {
     spatialProjection() {
       if (this.image.channels > 1) {
         return this.$t('fluorescence-spectra');
-      }
-      else if (this.image.depth > 1) {
+      } else if (this.image.depth > 1) {
         return this.$t('depth-spectra');
-      }
-      else if (this.image.duration > 1) {
+      } else if (this.image.duration > 1) {
         return this.$t('temporal-spectra');
       }
       return  this.$t('spatial-projection');
@@ -458,12 +454,10 @@ export default {
           await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
           this.$emit('updateTerms');
           this.showTermSelector = false;
-        }
-        catch (error) {
+        } catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
           this.revTerms++;
-        }
-        finally {
+        } finally {
           this.addTermString = '';
         }
       }
@@ -478,8 +472,7 @@ export default {
         // TODO fix issue with AlgoAnnotationTerm: https://github.com/cytomine/Cytomine-core/issues/1138
         await AnnotationTerm.delete(this.annotation.id, idTerm, Number(idUser));
         this.$emit('updateTerms');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-term')});
         this.revTerms++;
@@ -504,12 +497,10 @@ export default {
           await new AnnotationTrack({annotation: this.annotation.id, track: idTrack}).save();
           this.$emit('updateTracks');
           this.showTrackSelector = false;
-        }
-        catch (error) {
+        } catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-add-track')});
           this.revTracks++;
-        }
-        finally {
+        } finally {
           this.addTrackString = '';
         }
       }
@@ -519,12 +510,10 @@ export default {
         try {
           await AnnotationTrack.delete(this.annotation.id, idTrack);
           this.$emit('updateTracks');
-        }
-        catch (error) {
+        } catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-remove-track')});
           this.revTracks++;
-        }
-        finally {
+        } finally {
           this.addTrackString = '';
         }
       }
@@ -576,8 +565,7 @@ export default {
       try {
         await this.annotation.delete();
         this.$emit('deletion');
-      }
-      catch (err) {
+      } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     }
@@ -589,8 +577,7 @@ export default {
         if (this.showComments) {
           this.openCommentsModal();
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotation-comments')});
       }
@@ -598,8 +585,7 @@ export default {
 
     try {
       this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
-    }
-    catch (error) {
+    } catch (error) {
       this.loadPropertiesError = true;
       console.log(error);
     }

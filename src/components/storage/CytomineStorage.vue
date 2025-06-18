@@ -263,8 +263,7 @@ export default {
           method: 'POST',
           date: this.signatureDate
         });
-      }
-      catch (error) {
+      } catch (error) {
         this.newUploadError = true;
       }
     }
@@ -281,8 +280,7 @@ export default {
         });
 
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.newUploadError = true;
       }
@@ -290,16 +288,14 @@ export default {
     async fetchProjects() {
       try {
         this.projects = (await ProjectCollection.fetchAll()).array;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error); // not mandatory for upload => only log error, no other action
       }
     },
     async fetchFormatInfos() {
       try {
         this.formatInfos = (await Cytomine.instance.api.get('imageserver/format.json')).data.collection;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -336,8 +332,7 @@ export default {
             }
           }
         }));
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         return;
       }
@@ -421,8 +416,7 @@ export default {
       for (let i = 0; i < nbFiles; i++) {
         if (this.dropFiles[idx].uploadedFile !== null) {
           idx++;
-        }
-        else {
+        } else {
           this.cancelUpload(idx);
         }
       }
@@ -435,8 +429,7 @@ export default {
         let uploadedFile = this.dropFiles[idx].uploadedFile;
         if (uploadedFile !== null && this.finishedStatus.includes(uploadedFile.status)) {
           this.cancelUpload(idx);
-        }
-        else {
+        } else {
           idx++;
         }
       }
@@ -447,8 +440,7 @@ export default {
       try {
         const keys = await User.fetchCurrentUserKeys();
         this.primaryKey = keys.primaryKey;
-      }
-      catch (error) {
+      } catch (error) {
         this.newUploadError = true;
       }
     },

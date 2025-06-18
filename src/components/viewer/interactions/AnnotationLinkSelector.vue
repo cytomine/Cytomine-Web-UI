@@ -170,8 +170,7 @@ export default {
           cancelText: this.$t('button-cancel'),
           onConfirm: async () => await this.link(view)
         });
-      }
-      else {
+      } else {
         this.link(view);
       }
     },
@@ -202,20 +201,17 @@ export default {
               {annotationIdent: view.annot.id, image: view.annot.image, group}
             ).save()
           ]);
-        }
-        else if (!this.annotationGroupId && view.annotationGroupId) {
+        } else if (!this.annotationGroupId && view.annotationGroupId) {
           let group = view.annotationGroupId;
           await new AnnotationLink(
             {annotationIdent: this.annotation.id, image: this.annotation.image, group}
           ).save();
-        }
-        else if (this.annotationGroupId && !view.annotationGroupId) {
+        } else if (this.annotationGroupId && !view.annotationGroupId) {
           let group = this.annotationGroupId;
           await new AnnotationLink(
             {annotationIdent: view.annot.id, image: view.annot.image, group}
           ).save();
-        }
-        else {
+        } else {
           let annotGroup = await AnnotationGroup.fetch(this.annotationGroupId);
           await annotGroup.merge(view.annotationGroupId);
           group = annotGroup.id;
@@ -231,8 +227,7 @@ export default {
           }
         });
         this.$notify({type: 'success', text: successMessage});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: errorMessage});
       }

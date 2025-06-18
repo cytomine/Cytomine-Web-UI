@@ -224,8 +224,7 @@ export default {
         await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
         this.changeLanguage(this.currentAccount.locale);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-details-not-saved')});
       }
@@ -245,8 +244,7 @@ export default {
       try {
         this.apiKeys = await User.regenerateKeys();
         this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
-      }
-      catch (err) {
+      } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
       }
     }
@@ -254,14 +252,12 @@ export default {
   async created() {
     try {
       this.credentials = await MyAccount.fetchCredentials();
-    }
-    catch (error) {
+    } catch (error) {
       this.credentialsError = true;
     }
     try {
       this.apiKeys = await User.fetchCurrentUserKeys();
-    }
-    catch (error) {
+    } catch (error) {
       this.apiKeysError = true;
     }
     this.loading = false;

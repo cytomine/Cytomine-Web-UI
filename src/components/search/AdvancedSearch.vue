@@ -400,8 +400,7 @@ export default {
     this.searchString = this.pathSearchString || this.querySearchString || this.searchString || '';
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

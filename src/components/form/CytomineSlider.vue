@@ -151,8 +151,7 @@ export default {
             newVal.reverse();
           }
           this.$emit('input', newVal);
-        }
-        else {
+        } else {
           this.$emit('input', parsedValue);
         }
       }

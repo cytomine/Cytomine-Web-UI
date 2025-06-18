@@ -64,11 +64,9 @@ export default {
       let posStop = this.description.data.indexOf(constants.STOP_PREVIEW_KEYWORD);
       if (posStop !== -1) {
         return this.description.data.substring(0, posStop);
-      }
-      else if (this.maxPreviewLength && this.description.data.length > this.maxPreviewLength) {
+      } else if (this.maxPreviewLength && this.description.data.length > this.maxPreviewLength) {
         return this.description.data.substring(0, this.maxPreviewLength) + '...';
-      }
-      else {
+      } else {
         return this.description.data;
       }
     },
@@ -99,8 +97,7 @@ export default {
   async created() {
     try {
       this.description = await Description.fetch(this.object);
-    }
-    catch (err) {
+    } catch (err) {
       // the error may make sense if the object has no description
     }
     this.loading = false;

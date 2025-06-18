@@ -157,8 +157,7 @@ export default {
           this.layers.push(this.reviewLayer);
         }
         this.addLayer(this.reviewLayer);
-      }
-      else {
+      } else {
         if (!this.hasReviewLayer) {
           let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
           if (index !== -1) {
@@ -195,8 +194,7 @@ export default {
         if (saved) {
           updatedProject.numberOfAnnotations++;
         }
-      }
-      else {
+      } else {
         updatedProject.numberOfReviewedAnnotations++;
       }
 
@@ -306,8 +304,7 @@ export default {
       key = key.replace('toggle-all-', 'toggle-');
       if (key === 'toggle-selected-layers') {
         this.selectedLayers.forEach((layer, index) => this.toggleLayerVisibility(index));
-      }
-      else if (key === 'toggle-review-layer') {
+      } else if (key === 'toggle-review-layer') {
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
         if (index !== -1) {
           this.toggleLayerVisibility(index);
@@ -326,8 +323,7 @@ export default {
         this.fetchLayers(),
         this.fetchIndexLayers(true),
       ]);
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
       this.$notify({type: 'error', text: this.$t('notif-error-loading-annotation-layers')});
@@ -354,8 +350,7 @@ export default {
             layersToAdd.push({id: user, visible: !hideByDefault});
           }
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     }

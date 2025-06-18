@@ -40,8 +40,7 @@ export async function updateTermProperties(annot) {
       mapping[term] = annot.term.length;
       annot.term.push(term);
       annot.userByTerm.push({term, user: [user]});
-    }
-    else { // this term was already treated => add user to existing userByTerm object related to the term
+    } else { // this term was already treated => add user to existing userByTerm object related to the term
       annot.userByTerm[mapping[term]].user.push(user);
     }
   });

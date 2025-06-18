@@ -168,8 +168,7 @@ export default {
         await this.image.review();
         this.commitImage();
         this.reviewMode = true;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
       }
@@ -179,8 +178,7 @@ export default {
         await this.image.stopReview(true);
         this.commitImage();
         this.reviewMode = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-cancel-review')});
       }
@@ -190,8 +188,7 @@ export default {
         await this.image.stopReview();
         this.commitImage();
         this.reviewMode = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-validate-review')});
       }
@@ -201,8 +198,7 @@ export default {
         await this.image.stopReview(true);
         this.commitImage();
         this.reviewMode = false;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-unvalidate-review')});
       }
@@ -217,8 +213,7 @@ export default {
           task: this.taskReviewAll.id
         });
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, clear: true});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.taskReviewAll = null;
         this.$notify({type: 'error', text: this.$t('notif-error-review-' + (accept ? 'accept' : 'reject') + '-all')});

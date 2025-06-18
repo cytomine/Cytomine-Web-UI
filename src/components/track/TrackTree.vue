@@ -174,8 +174,7 @@ export default {
     classNames(node) {
       if (this.multipleSelection) {
         return node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
-      }
-      else {
+      } else {
         return node.isSelected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
       }
     },
@@ -192,13 +191,11 @@ export default {
             if (indexSelected >= 0) {
               this.internalSelectedNodes.splice(indexSelected, 1);
               this.$emit('unselect', node.data.id);
-            }
-            else {
+            } else {
               this.internalSelectedNodes.push(node.data.id);
               this.$emit('select', node.data.id);
             }
-          }
-          else {
+          } else {
             this.internalSelectedNodes = [node.data.id];
             this.$emit('select', node.data.id);
           }
@@ -277,13 +274,11 @@ export default {
                 tmp.data.parent = idParent;
               }
             });
-          }
-          catch (error) {
+          } catch (error) {
             console.log(error);
             this.$notify({type: 'error', text: this.$t('notif-error-track-tree-update')});
           }
-        }
-        else {
+        } else {
           this.$notify({type: 'warn', text: this.$t('notif-warn-track-tree-order-not-persisted')});
         }
       });
@@ -304,8 +299,7 @@ export default {
         await Track.delete(node.data.id);
         this.$refs.tree.remove([node.path]);
         this.$emit('deletedTrack', node.data.id);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-track-deletion')});
       }

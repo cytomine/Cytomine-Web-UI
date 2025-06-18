@@ -165,8 +165,7 @@ export default {
     async selectedTags() {
       if (!this.selectedTags.length) {
         this.images = [];
-      }
-      else {
+      } else {
         await this.fetchImages();
       }
     }
@@ -181,8 +180,7 @@ export default {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
         await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
@@ -220,14 +218,12 @@ export default {
         if (this.selectedImageGroups.length === 0) {
           this.images = [];
           this.nbFilteredImages = 0;
-        }
-        else {
+        } else {
           let data = (await collection.fetchPage(0));
           this.images = data.array;
           this.nbFilteredImages = data.totalNbItems;
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }

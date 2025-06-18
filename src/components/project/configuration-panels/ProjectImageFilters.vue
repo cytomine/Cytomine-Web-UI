@@ -94,8 +94,7 @@ export default {
         if (filter.selected) {
           await filter.imageFilterProject.delete();
           filter.selected = false;
-        }
-        else {
+        } else {
           let filterProject = await new ImageFilterProject({
             imageFilter: filter.id,
             project: this.project.id
@@ -103,8 +102,7 @@ export default {
           filter.imageFilterProject = filterProject;
           filter.selected = true;
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -130,8 +128,7 @@ export default {
       });
 
       this.imageFilters = filters;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.error = true;
     }

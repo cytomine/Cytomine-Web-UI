@@ -163,8 +163,7 @@ export default {
       }
       if (member.origin === 'BOOTSTRAP') {
         key = 'system';
-      }
-      else {
+      } else {
         key = 'manual';
       }
 
@@ -177,8 +176,7 @@ export default {
     async lock(user) {
       try {
         await user.lock();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-lock')});
       }
@@ -186,8 +184,7 @@ export default {
     async unlock(user) {
       try {
         await user.unlock();
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
       }

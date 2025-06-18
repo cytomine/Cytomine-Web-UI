@@ -150,8 +150,7 @@ export default {
 
       if (key === 'nav-next-annot-link') {
         this.selectNext();
-      }
-      else if (key === 'nav-previous-annot-link') {
+      } else if (key === 'nav-previous-annot-link') {
         this.selectPrevious();
       }
     }

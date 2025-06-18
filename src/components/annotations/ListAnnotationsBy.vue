@@ -206,29 +206,21 @@ export default {
     title() {
       if (this.isByUser) {
         return this.prop.fullName;
-      }
-      else if (this.isByImage) {
+      } else if (this.isByImage) {
         return (this.prop.blindedName) ? this.prop.blindedName : this.prop.instanceFilename;
-      }
-      else if (this.isByTerm && this.multipleTerms) {
+      } else if (this.isByTerm && this.multipleTerms) {
         return this.$t('multiple-terms');
-      }
-      else if (this.isByTerm && this.noTerm) {
+      } else if (this.isByTerm && this.noTerm) {
         return this.$t('no-term');
-      }
-      else if (this.isByTrack && this.multipleTracks) {
+      } else if (this.isByTrack && this.multipleTracks) {
         return this.$t('multiple-tracks');
-      }
-      else if (this.isByTrack && this.noTrack) {
+      } else if (this.isByTrack && this.noTrack) {
         return this.$t('no-track');
-      }
-      else if (this.isByTag && this.noTag) {
+      } else if (this.isByTag && this.noTag) {
         return this.$t('no-tag');
-      }
-      else if (this.isUncategorized) {
+      } else if (this.isUncategorized) {
         return this.$t('all-annotations-uncategorized');
-      }
-      else {
+      } else {
         return this.prop.name;
       }
     },
@@ -243,8 +235,7 @@ export default {
         if (!this.noTerm) {
           prefix += ` ${this.$t('the-term')}`;
         }
-      }
-      else if (this.isByTrack) {
+      } else if (this.isByTrack) {
         prefix += this.$t('currently-visible-annotations-for-track');
       }
 
@@ -253,11 +244,9 @@ export default {
     titleSuffix() {
       if (!this.isInViewer) {
         return;
-      }
-      else if (this.isByTerm) {
+      } else if (this.isByTerm) {
         return this.$t('in-this-slice');
-      }
-      else {
+      } else {
         return this.$t('in-this-image');
       }
     },
@@ -330,8 +319,7 @@ export default {
     collection(newCollection, oldCollection) {
       if (oldCollection && newCollection.track !== oldCollection.track) {
         this.initialize();
-      }
-      else {
+      } else {
         this.fetchPage();
       }
     },
@@ -390,8 +378,7 @@ export default {
         let data = await this.collection.fetchPage(this.currentPage - 1);
         this.annotations = data.array;
         this.nbAnnotations = data.totalNbItems;
-      }
-      catch (error) {
+      } catch (error) {
         if (this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page
           this.currentPage = 1;
           return;

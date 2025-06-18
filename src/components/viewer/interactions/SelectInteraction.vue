@@ -59,8 +59,7 @@ export default {
           function(a, b) {
             if (a.properties.annot.area > b.properties.annot.area) {
               return 1;
-            }
-            else {
+            } else {
               return -1;
             }
           }
@@ -76,8 +75,7 @@ export default {
           if (value.length >= 1) {
             value = [value[0]];
           }
-        }
-        else {
+        } else {
           if (value.length > 1) {
             //if previous selection is in the new target, we will take the first element not yet visited
             if (value.map(x => x.id).includes(previousSelectedFeature.id)) {
@@ -91,8 +89,7 @@ export default {
                 }
               }
               value = [value[index]];
-            }
-            else {
+            } else {
               value = [value[0]];
             }
           }

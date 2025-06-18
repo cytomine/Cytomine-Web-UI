@@ -75,8 +75,7 @@ export default {
   async created() {
     try {
       this.consultations = (await ImageConsultationCollection.fetchAll({projectConnection: this.connection.id})).array;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
       this.$notify({type: 'error', text: this.$t('error-failed-to-fetch-image-consultations')});
     }

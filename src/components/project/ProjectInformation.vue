@@ -61,8 +61,7 @@ export default {
           text: this.$t('notif-success-project-deletion', {projectName: this.project.name})
         });
         this.$router.push('/projects');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

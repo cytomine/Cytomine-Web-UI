@@ -118,8 +118,7 @@ export default {
             this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
             this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
             this.loadingOntologies = false;
-          }
-          catch (error) {
+          } catch (error) {
             console.log(error);
             this.errorOntologies = true;
           }
@@ -142,8 +141,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-project-rename', {projectName: updatedProject.name})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -165,8 +163,7 @@ export default {
           type: 'success',
           text: this.$t('notif-success-project-ontology-change', {projectName: this.project.name})
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         if (error.response && error.response.data.errorValues) {
           let counts = error.response.data.errorValues;
@@ -181,16 +178,14 @@ export default {
               cancelText: this.$t('button-cancel'),
               onConfirm: () => this.saveOntology(true)
             });
-          }
-          else { // otherwise, backend does not allow automatic deletion => notify of error
+          } else { // otherwise, backend does not allow automatic deletion => notify of error
             this.cannotDeleteOntology = true;
             this.$notify({
               type: 'error',
               text: this.$t('notif-error-project-ontology-change-reviewed-terms')
             });
           }
-        }
-        else {
+        } else {
           this.$notify({
             type: 'error',
             text: this.$t('notif-error-project-ontology-change', {projectName: this.project.name})
