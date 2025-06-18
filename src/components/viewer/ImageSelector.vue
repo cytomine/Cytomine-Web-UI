@@ -182,7 +182,7 @@ export default {
         let slice = await image.fetchReferenceSlice();
         await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
@@ -199,13 +199,13 @@ export default {
           max: this.nbImagesDisplayed
         });
 
-        if(this.searchString) {
+        if (this.searchString) {
           collection['name'] = {
             ilike: encodeURIComponent(this.searchString)
           };
         }
 
-        if(this.selectedTags.length > 0) {
+        if (this.selectedTags.length > 0) {
           collection['tag'] = {
             in: this.selectedTags.map(option => option.id).join()
           };
@@ -227,7 +227,7 @@ export default {
           this.nbFilteredImages = data.totalNbItems;
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }

@@ -65,7 +65,7 @@ export default {
   },
   watch: {
     selectedFile(file) {
-      if(file) {
+      if (file) {
         this.name = file.name;
       }
     }
@@ -73,7 +73,7 @@ export default {
   methods: {
     async save() {
       let result = await this.$validator.validateAll('password');
-      if(!this.selectedFile || !result) {
+      if (!this.selectedFile || !result) {
         return;
       }
 
@@ -83,7 +83,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-attached-file-creation')});
         this.$parent.close();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
       }

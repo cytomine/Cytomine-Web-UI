@@ -30,7 +30,7 @@ let store = new Vuex.Store({
       commit('currentProject/resetState');
       commit('ontologies/resetState');
       commit('listProjects/resetState');
-      for(let key in state.projects) {
+      for (let key in state.projects) {
         this.unregisterModule(['projects', key]);
       }
     }
@@ -52,7 +52,7 @@ export default store;
 export function getModuleNamespace(state) { // to update if https://github.com/vuejs/vuex/issues/1244 is implemented
   let pathes = Object.keys(store._modulesNamespaceMap);
   let moduleNamespace = pathes.find(path => store._modulesNamespaceMap[path].context.state === state);
-  if(typeof moduleNamespace === 'string') {
+  if (typeof moduleNamespace === 'string') {
     return moduleNamespace.slice(0, -1).split('/');
   }
 }

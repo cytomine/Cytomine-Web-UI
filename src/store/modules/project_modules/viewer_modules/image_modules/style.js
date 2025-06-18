@@ -85,7 +85,7 @@ export default {
 
     setLayersOpacity(state, opacity) {
       state.layersOpacity = opacity;
-      if(state.terms) {
+      if (state.terms) {
         state.terms.forEach(term => {
           changeOpacity(term.olStyle, opacity * term.opacity);
           changeOpacity(term.olLineStyle, opacity * term.opacity);
@@ -94,7 +94,7 @@ export default {
       changeOpacity(state.noTermStyle, opacity * state.noTermOpacity);
       changeOpacity(state.multipleTermsStyle, opacity);
       changeOpacity(state.defaultStyle, opacity);
-      if(state.wrappedTracks) {
+      if (state.wrappedTracks) {
         state.wrappedTracks.forEach(track => {
           changeOpacity(track.olStyle, opacity * track.opacity);
           changeOpacity(track.olLineStyle, opacity * track.opacity);
@@ -116,14 +116,14 @@ export default {
     toggleTermVisibility({state, commit}, indexTerm) {
       commit('toggleTermVisibility', indexTerm);
       let toggledTerm = state.terms[indexTerm];
-      if(!toggledTerm.visible) {
+      if (!toggledTerm.visible) {
         commit('removeTermFromSelectedFeatures', {idTerm: toggledTerm.id, terms: state.terms});
       }
     },
 
     setDisplayNoTerm({commit}, value) {
       commit('setDisplayNoTerm', value);
-      if(!value) {
+      if (!value) {
         commit('removeNoTermFromSelectedFeatures');
       }
     },
@@ -139,7 +139,7 @@ export default {
 
   getters: {
     termsMapping: state => {
-      if(!state.terms) {
+      if (!state.terms) {
         return {};
       }
 
@@ -149,7 +149,7 @@ export default {
       }, {});
     },
     tracksMapping: state => {
-      if(!state.wrappedTracks) {
+      if (!state.wrappedTracks) {
         return {};
       }
 
@@ -175,13 +175,13 @@ export default {
 
 
 function formatTerms(terms, layersOpacity, previousTerms = []) {
-  if(!terms) {
+  if (!terms) {
     return;
   }
 
   let result = [];
   let nbTerms = terms.length;
-  for(let i = 0; i < nbTerms; i++) {
+  for (let i = 0; i < nbTerms; i++) {
     let term = terms[i];
     let prevTerm = previousTerms.find(prevTerm => prevTerm.id === term.id);
     result.push(prevTerm ? prevTerm : formatTerm(term, layersOpacity));
@@ -200,13 +200,13 @@ function formatTerm(term, layersOpacity) {
 }
 
 function formatTracks(tracks, layersOpacity, previousTracks = []) {
-  if(!tracks) {
+  if (!tracks) {
     return;
   }
 
   let result = [];
   let nbTracks = tracks.length;
-  for(let i = 0; i < nbTracks; i++) {
+  for (let i = 0; i < nbTracks; i++) {
     let track = tracks[i];
     let prevTrack = previousTracks.find(prevTrack => prevTrack.id === track.id && prevTrack.color === track.color);
     result.push(prevTrack ? prevTrack : formatTrack(track, layersOpacity));

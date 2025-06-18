@@ -332,8 +332,8 @@ export default {
         return this.viewerWrapper.activeImage === this.index;
       },
       set(value) {
-        if(value) {
-          if(this.viewerWrapper) {
+        if (value) {
+          if (this.viewerWrapper) {
             this.$store.commit(this.viewerModule + 'setActiveImage', this.index);
           }
         }
@@ -466,7 +466,7 @@ export default {
       let factor = this.maxZoom - this.image.zoom;
       let mapWidth = this.image.width * Math.pow(2, factor);
       let mapHeight = this.image.height * Math.pow(2, factor);
-      while(mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
+      while (mapWidth > container.clientWidth || mapHeight > container.clientHeight) {
         mapWidth /= 2;
         mapHeight /= 2;
         idealZoom --;
@@ -484,7 +484,7 @@ export default {
   },
   methods: {
     setInitialZoom() {
-      if(this.zoom !== null) {
+      if (this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
       }
       this.zoom = this.idealZoom;
@@ -492,7 +492,7 @@ export default {
 
     async updateMapSize() {
       await this.$nextTick();
-      if(this.$refs.map) {
+      if (this.$refs.map) {
         this.$refs.map.updateSize();
       }
     },
@@ -501,7 +501,7 @@ export default {
       await this.$refs.map.$createPromise; // wait for ol.Map to be created
 
       this.$refs.map.$map.getInteractions().forEach(interaction => {
-        if(interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
+        if (interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
           interaction.condition_ = (mapBrowserEvent) => {
             return noModifierKeys(mapBrowserEvent)
               && targetNotEditable(mapBrowserEvent)
@@ -514,7 +514,7 @@ export default {
 
     async viewMounted() {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
-      if(this.routedAnnotation) {
+      if (this.routedAnnotation) {
         this.centerViewOnAnnot(this.routedAnnotation, 500);
       }
       this.savePosition();
@@ -526,7 +526,7 @@ export default {
     },
 
     async addOverviewMap() {
-      if(!this.isPanelDisplayed('overview')) {
+      if (!this.isPanelDisplayed('overview')) {
         return;
       }
 
@@ -561,7 +561,7 @@ export default {
     },
 
     savePosition: _.debounce(async function() {
-      if(this.$refs.view) {
+      if (this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
         try {
           await UserPosition.create({
@@ -580,7 +580,7 @@ export default {
             broadcast: this.imageWrapper.tracking.broadcast
           });
         }
-        catch(error) {
+        catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-save-user-position')});
         }
@@ -634,7 +634,7 @@ export default {
             annot = await Annotation.fetch(annot.id);
           }
 
-          if(!this.sliceIds.includes(annot.slice)) {
+          if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
             this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
@@ -655,7 +655,7 @@ export default {
             this.centerViewOnAnnot(annot, duration);
           }
         }
-        catch(error) {
+        catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
         }
@@ -666,12 +666,12 @@ export default {
       return this.configUI[`project-explore-${panel}`];
     },
     shortkeyHandler(key) {
-      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
+      if (!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
       key = key.replace('toggle-all-', 'toggle-');
-      switch(key) {
+      switch (key) {
         case 'toggle-information':
           if (this.isPanelDisplayed('info')) {
             this.togglePanel('info');
@@ -741,19 +741,19 @@ export default {
     },
   },
   async created() {
-    if(!getProj(this.projectionName)) { // if image opened for the first time
+    if (!getProj(this.projectionName)) { // if image opened for the first time
       let projection = createProj({code: this.projectionName, units: 'pixels', extent: this.extent});
       addProj(projection);
     }
 
-    if(this.routedAction === 'review') {
+    if (this.routedAction === 'review') {
       this.togglePanel('review');
-      if(!this.image.inReview) {
+      if (!this.image.inReview) {
         try {
           let clone = await this.image.clone().review();
           this.$store.commit(this.imageModule + 'setImageInstance', clone);
         }
-        catch(error) {
+        catch (error) {
           console.log(error);
           this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
         }
@@ -806,7 +806,7 @@ export default {
 
         this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
@@ -815,7 +815,7 @@ export default {
     try {
       await new ImageConsultation({image: this.image.id}).save();
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.$notify({type: 'error', text: this.$t('notif-error-save-image-consultation')});
     }

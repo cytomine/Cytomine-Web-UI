@@ -53,7 +53,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.name = '';
       }
     }
@@ -61,7 +61,7 @@ export default {
   methods: {
     async createImageGroup() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -72,7 +72,7 @@ export default {
         this.$emit('newImageGroup', imageGroup);
 
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-image-group-creation')});
       }

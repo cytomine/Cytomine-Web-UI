@@ -40,7 +40,7 @@ export default {
     },
   },
   async created() {
-    if(!this.user && this.id) {
+    if (!this.user && this.id) {
       this.fetchedUser = await User.fetch(this.id);
     }
   }

@@ -102,7 +102,7 @@ export default {
         await CompanionFile.delete(this.profile.id);
         this.$emit('update');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-profile-deletion')});
       }
@@ -112,7 +112,7 @@ export default {
       try {
         this.companionFiles = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: this.image.id})).array;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }

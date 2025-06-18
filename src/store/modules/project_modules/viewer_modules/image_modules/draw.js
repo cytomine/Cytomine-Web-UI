@@ -62,7 +62,7 @@ export default {
   actions: {
     activateTool({state, commit}, tool) {
       let previousTool = state.activeTool;
-      if(previousTool === 'select' && tool !== 'select') {
+      if (previousTool === 'select' && tool !== 'select') {
         commit('clearSelectedFeatures');
         commit('activateEditTool', {tool: null});
       }

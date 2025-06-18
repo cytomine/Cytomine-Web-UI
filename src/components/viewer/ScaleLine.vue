@@ -54,7 +54,7 @@ export default {
     },
     scaleLength() {
       let length = this.scaleLineLength * this.resolution;
-      if(this.image.physicalSizeX) {
+      if (this.image.physicalSizeX) {
         let unit = this.$t('um');
         if (length > 1000) {
           length /= 1000;

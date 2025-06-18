@@ -61,7 +61,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.newMagnification = this.image.magnification;
       }
     }
@@ -69,7 +69,7 @@ export default {
   methods: {
     async setMagnification() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -86,7 +86,7 @@ export default {
           text: this.$t('notif-success-magnification-update', {imageName})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

@@ -27,7 +27,7 @@ export default {
     configUI: get('currentProject/configUI')
   },
   created() {
-    if(this.configUI['project-images-tab']) {
+    if (this.configUI['project-images-tab']) {
       this.$router.replace(`/project/${this.project.id}/images`);
     }
     else {

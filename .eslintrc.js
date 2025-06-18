@@ -15,6 +15,7 @@ module.exports = {
     'curly': ['error', 'all'],
     'eqeqeq': ['error', 'always'],
     'indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral']}],
+    'keyword-spacing': ['error'],
     'no-console': ['off'],
     'no-redeclare': ['error'],
     'no-undef': ['error'],

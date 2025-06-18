@@ -62,7 +62,7 @@ export default {
         });
         this.$router.push('/projects');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

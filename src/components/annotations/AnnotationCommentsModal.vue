@@ -120,7 +120,7 @@ export default {
   methods: {
     async share() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -140,7 +140,7 @@ export default {
         this.$notify({type: 'success', text: this.$t('notif-success-new-comment')});
         this.addingComment = false;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-new-comment')});
       }

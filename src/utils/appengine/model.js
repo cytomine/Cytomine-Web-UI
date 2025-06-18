@@ -24,7 +24,7 @@ export default class Model {
 
   toString() {
     let str = `[${this.callbackIdentifier}] ${this.id}`;
-    if(this.name) {
+    if (this.name) {
       str += `: ${this.name}`;
     }
     return str;
@@ -36,10 +36,10 @@ export default class Model {
    * @param {Object} props Object containing the properties to set
    */
   populate(props) {
-    if(props) {
-      for(let key in props) {
+    if (props) {
+      for (let key in props) {
         let value = props[key];
-        if(key === 'uri') { // special handling to avoid conflict with uri property
+        if (key === 'uri') { // special handling to avoid conflict with uri property
           key = 'uri_';
         }
         this[key] = value;
@@ -64,16 +64,16 @@ export default class Model {
    * @param {Class} collectionClass   The expected collection class
    */
   _setCollection(value, property, collectionClass) {
-    if(!value) {
+    if (!value) {
       this[property] = new collectionClass();
     }
-    else if(value instanceof collectionClass) {
+    else if (value instanceof collectionClass) {
       this[property] = value;
     }
-    else if(Array.isArray(value)) {
+    else if (Array.isArray(value)) {
       let collection = new collectionClass();
       value.forEach(obj => {
-        if(!(obj instanceof collectionClass.model)) {
+        if (!(obj instanceof collectionClass.model)) {
           obj = new collectionClass.model(obj);
         }
         collection.push(obj);
@@ -93,10 +93,10 @@ export default class Model {
    */
   getPublicProperties() {
     let props = {};
-    for(let key in this) {
+    for (let key in this) {
       let value = this[key];
       if (!key.startsWith('_') && value !== null) {
-        if(key === 'uri_') { // special handling of uri_ to avoid conflict with uri property
+        if (key === 'uri_') { // special handling of uri_ to avoid conflict with uri property
           key = 'uri';
         }
         props[key] = value;
@@ -122,7 +122,7 @@ export default class Model {
    * @returns {this} The object with fetched properties
    */
   async fetch() {
-    if(this.isNew()) {
+    if (this.isNew()) {
       throw new Error('Cannot fetch a model with no ID.');
     }
 
@@ -138,7 +138,7 @@ export default class Model {
    * @returns {this} The saved object, as returned by backend
    */
   async save() {
-    if(this.isNew()) {
+    if (this.isNew()) {
       let {data} = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
       this.populate(data[this.callbackIdentifier]);
       Cytomine.instance.lastCommand = data.command;
@@ -155,7 +155,7 @@ export default class Model {
    * @returns {this} The updated object, as returned by backend
    */
   async update() { // allow to provide parameters ?
-    if(this.isNew()) {
+    if (this.isNew()) {
       throw new Error('Cannot update a model with no ID.');
     }
 
@@ -178,7 +178,7 @@ export default class Model {
    * Delete the object
    */
   async delete() {
-    if(this.isNew()) {
+    if (this.isNew()) {
       throw new Error('Cannot delete a model with no ID.');
     }
 
@@ -197,7 +197,7 @@ export default class Model {
    * @returns {string} API URI to use to perform operations on the object
    */
   get uri() {
-    if(this.isNew()) {
+    if (this.isNew()) {
       return `${this.callbackIdentifier}`;
       //   return `${this.callbackIdentifier}.json`;
     }

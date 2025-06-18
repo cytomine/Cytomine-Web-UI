@@ -68,7 +68,7 @@ export default {
     filteredDomains() {
       let selectedIds = this.value.map(v => v[this.identifier]);
       let filtered = this.domains.filter(user => !selectedIds.includes(user[this.identifier]));
-      if(this.searchString === '') {
+      if (this.searchString === '') {
         return filtered;
       }
 

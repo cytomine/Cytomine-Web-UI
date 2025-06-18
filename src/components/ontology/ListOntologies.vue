@@ -121,7 +121,7 @@ export default {
       return Number(this.$route.params.idOntology) || this.$store.state.ontologies.selectedOntology;
     },
     filteredOntologies() {
-      if(this.searchString.length > 0) {
+      if (this.searchString.length > 0) {
         let regexp = getWildcardRegexp(this.searchString);
         return this.ontologies.filter(ontology => regexp.test(ontology.name));
       }
@@ -131,11 +131,11 @@ export default {
   },
   watch: {
     idTargetOntology() {
-      if(!this.idTargetOntology) {
+      if (!this.idTargetOntology) {
         this.selectedOntology = this.ontologies[0];
         return;
       }
-      if(this.selectedOntology && this.selectedOntology.id === this.idTargetOntology) {
+      if (this.selectedOntology && this.selectedOntology.id === this.idTargetOntology) {
         return;
       }
       this.selectTargetOntology();
@@ -180,7 +180,7 @@ export default {
         });
         this.selectedOntology = this.ontologies[0];
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-ontology-deletion')});
       }
@@ -190,14 +190,14 @@ export default {
     try {
       this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.loading = false;
       return;
     }
     this.sortOntologies();
 
-    if(this.idTargetOntology) {
+    if (this.idTargetOntology) {
       this.selectTargetOntology();
     }
     else {

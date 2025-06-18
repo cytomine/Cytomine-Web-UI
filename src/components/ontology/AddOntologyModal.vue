@@ -49,7 +49,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.name = '';
       }
     }
@@ -57,7 +57,7 @@ export default {
   methods: {
     async createOntology() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -67,7 +67,7 @@ export default {
         this.$emit('newOntology', ontology);
         this.$emit('update:active', false);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-ontology-creation')});
       }

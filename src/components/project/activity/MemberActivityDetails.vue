@@ -304,7 +304,7 @@ export default {
           this.fetchConsultations()
         ]);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
         return;

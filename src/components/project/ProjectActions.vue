@@ -112,14 +112,14 @@ export default {
   },
   watch: {
     async isOntologyModalActive(val) {
-      if(val) {
-        if(this.loadingOntologies) { // first opening of the ontology modal => load ontologies
+      if (val) {
+        if (this.loadingOntologies) { // first opening of the ontology modal => load ontologies
           try {
             this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
             this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
             this.loadingOntologies = false;
           }
-          catch(error) {
+          catch (error) {
             console.log(error);
             this.errorOntologies = true;
           }
@@ -143,7 +143,7 @@ export default {
           text: this.$t('notif-success-project-rename', {projectName: updatedProject.name})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -166,13 +166,13 @@ export default {
           text: this.$t('notif-success-project-ontology-change', {projectName: this.project.name})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        if(error.response && error.response.data.errorValues) {
+        if (error.response && error.response.data.errorValues) {
           let counts = error.response.data.errorValues;
 
           // if the only terms associations are performed by users, ask confirmation and delete them
-          if(counts.reviewedAssociatedTermsCount === 0) {
+          if (counts.reviewedAssociatedTermsCount === 0) {
             this.$buefy.dialog.confirm({
               title: this.$t('confirm-ontology-change'),
               message: this.$t('confirm-ontology-change-delete-user-terms', {count: counts.userAssociatedTermsCount}),

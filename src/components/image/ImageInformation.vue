@@ -36,7 +36,7 @@
               {{ $t('open-in-viewer')}}
             </span>
           </span>
-        </button> 
+        </button>
       </router-link>
       <router-link place="imageName" :to="prevRoute">
         <button class="button is-link">
@@ -48,7 +48,7 @@
               {{ $t('go-back')}}
             </span>
           </span>
-        </button> 
+        </button>
       </router-link>
     </div>
 
@@ -112,9 +112,9 @@ export default {
         image.vendor = vendorFromFormat(image.contentType);
         this.image = image;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
-        if(error.response.status === 403) {
+        if (error.response.status === 403) {
           this.permissionError = true;
         }
         else {

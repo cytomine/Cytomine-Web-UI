@@ -80,18 +80,18 @@ export default {
     async save() {
       let updatedDesc = this.description.clone();
       try {
-        if(this.descriptionContent) {
+        if (this.descriptionContent) {
           updatedDesc.data = this.descriptionContent;
           await updatedDesc.save();
           this.$emit('change', updatedDesc);
         }
-        else if(this.description.data) { // if description existed, and content was emptied by user, delete description model
+        else if (this.description.data) { // if description existed, and content was emptied by user, delete description model
           await updatedDesc.delete();
           this.$emit('change', null);
         }
         this.$parent.close();
       }
-      catch(error) {
+      catch (error) {
         this.descriptionContent = this.description.data;
         this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
       }

@@ -91,7 +91,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.calibrationFieldX = this.image.physicalSizeX;
         this.calibrationFieldZ = this.image.physicalSizeZ;
         this.calibrationFieldT = this.image.fps;
@@ -101,7 +101,7 @@ export default {
   methods: {
     async setResolution() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -130,7 +130,7 @@ export default {
           text: this.$t('notif-success-image-calibration', {imageName})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

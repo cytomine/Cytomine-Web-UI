@@ -99,11 +99,11 @@ export default {
     },
     // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
-      if(!this.canManageProject) { // contributor can only view charts tab
+      if (!this.canManageProject) { // contributor can only view charts tab
         return ProjectActivityCharts;
       }
 
-      switch(this.activeTab) {
+      switch (this.activeTab) {
         case 'charts':
           return ProjectActivityCharts;
         case 'members':
@@ -118,7 +118,7 @@ export default {
       this.changeTab();
     },
     activeTab() {
-      if(this.activeTab !== defaultTab || this.queriedTab) {
+      if (this.activeTab !== defaultTab || this.queriedTab) {
         this.$router.push(`?tab=${this.activeTab}`);
       }
     }
@@ -126,7 +126,7 @@ export default {
   methods: {
     changeTab() {
       this.activeTab = this.queriedTab || defaultTab;
-      if(!this.activeComponent) {
+      if (!this.activeComponent) {
         this.activeTab = defaultTab;
       }
     }

@@ -232,7 +232,7 @@ export default {
       let nbUploads = 0;
       let totalProgress = 0;
       this.dropFiles.forEach(wrapper => {
-        if(wrapper.uploading) {
+        if (wrapper.uploading) {
           nbUploads++;
           totalProgress += wrapper.progress;
         }
@@ -264,7 +264,7 @@ export default {
           date: this.signatureDate
         });
       }
-      catch(error) {
+      catch (error) {
         this.newUploadError = true;
       }
     }
@@ -282,7 +282,7 @@ export default {
 
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.newUploadError = true;
       }
@@ -291,7 +291,7 @@ export default {
       try {
         this.projects = (await ProjectCollection.fetchAll()).array;
       }
-      catch(error) {
+      catch (error) {
         console.log(error); // not mandatory for upload => only log error, no other action
       }
     },
@@ -320,33 +320,33 @@ export default {
 
       try {
         await Promise.all(this.dropFiles.map(async wrapper => {
-          if(wrapper.uploadedFile) {
+          if (wrapper.uploadedFile) {
             let oldStatus = wrapper.uploadedFile.status;
-            if(!pendingStatus.includes(oldStatus)) {
+            if (!pendingStatus.includes(oldStatus)) {
               return;
             }
 
             await wrapper.uploadedFile.fetch();
             let status = wrapper.uploadedFile.status;
-            if(status !== oldStatus) {
+            if (status !== oldStatus) {
               statusChange = true;
             }
-            if(pendingStatus.includes(status)) {
+            if (pendingStatus.includes(status)) {
               unfinishedConversions = true;
             }
           }
         }));
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         return;
       }
 
-      if(statusChange) {
+      if (statusChange) {
         this.revision++;
       }
 
-      if(unfinishedConversions) {
+      if (unfinishedConversions) {
         clearTimeout(this.timeoutRefreshSessionUploads);
         this.timeoutRefreshSessionUploads = setTimeout(this.refreshStatusSessionUploads, constants.ONGOING_UPLOAD_REFRESH_INTERVAL);
       }
@@ -354,7 +354,7 @@ export default {
 
     filesChange(files) {
       files.forEach(file => {
-        if(!file.processed) {
+        if (!file.processed) {
           file.processed = true;
           this.dropFiles.push({
             file,
@@ -371,7 +371,7 @@ export default {
     },
 
     startUpload(fileWrapper) {
-      if(fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
+      if (fileWrapper.uploading || fileWrapper.uploadedFile !== null) {
         return;
       }
 
@@ -398,7 +398,7 @@ export default {
         this.refreshStatusSessionUploads();
         this.revision++;
       }).catch(error => {
-        if(!axios.isCancel(error)) {
+        if (!axios.isCancel(error)) {
           console.log(error);
           fileWrapper.uploadedFile = false;
         }
@@ -410,7 +410,7 @@ export default {
 
     cancelUpload(index) {
       let fileWrapper = this.dropFiles[index];
-      if(fileWrapper.cancelToken) {
+      if (fileWrapper.cancelToken) {
         fileWrapper.cancelToken.cancel();
       }
       this.dropFiles.splice(index, 1);
@@ -418,8 +418,8 @@ export default {
     cancelAll() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
-      for(let i = 0; i < nbFiles; i++) {
-        if(this.dropFiles[idx].uploadedFile !== null) {
+      for (let i = 0; i < nbFiles; i++) {
+        if (this.dropFiles[idx].uploadedFile !== null) {
           idx++;
         }
         else {
@@ -431,7 +431,7 @@ export default {
     hideFinished() {
       let nbFiles = this.dropFiles.length;
       let idx = 0;
-      for(let i = 0; i < nbFiles; i++) {
+      for (let i = 0; i < nbFiles; i++) {
         let uploadedFile = this.dropFiles[idx].uploadedFile;
         if (uploadedFile !== null && this.finishedStatus.includes(uploadedFile.status)) {
           this.cancelUpload(idx);

@@ -160,7 +160,7 @@ export default {
     filter() {
       this.applyToAllNodes(node => {
         let match = this.regexp.test(node.title) && !this.hiddenNodes.includes(node.data.id);
-        if(node.children) {
+        if (node.children) {
           let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
           node.isExpanded = matchInChildren;
           match = match || matchInChildren;
@@ -170,7 +170,7 @@ export default {
     },
 
     classNames(node) {
-      if(this.multipleSelection) {
+      if (this.multipleSelection) {
         return node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
       }
       else {
@@ -179,15 +179,15 @@ export default {
     },
 
     select(nodes, event) {
-      if(!this.allowSelection) {
+      if (!this.allowSelection) {
         return;
       }
 
-      if(this.clickOnTreeSelector(event.target)) {
+      if (this.clickOnTreeSelector(event.target)) {
         nodes.forEach(node => {
-          if(this.multipleSelection) {
+          if (this.multipleSelection) {
             let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
-            if(indexSelected >= 0) {
+            if (indexSelected >= 0) {
               this.internalSelectedNodes.splice(indexSelected, 1);
               this.$emit('unselect', node.data.id);
             }
@@ -213,7 +213,7 @@ export default {
       this.refreshNodeSelection();
     },
     refreshNodeSelection() {
-      if(!this.allowSelection) {
+      if (!this.allowSelection) {
         return;
       }
 
@@ -222,14 +222,14 @@ export default {
       });
     },
     clickOnTreeSelector(elem) {
-      if(elem.classList.contains('tree-selector')) {
+      if (elem.classList.contains('tree-selector')) {
         return true;
       }
       return elem.parentElement ? this.clickOnTreeSelector(elem.parentElement) : false;
     },
     applyToAllNodes(fct, nodes = this.treeNodes) {
       nodes.forEach(node => {
-        if(node.children) {
+        if (node.children) {
           this.applyToAllNodes(fct, node.children);
         }
         fct(node);
@@ -272,16 +272,16 @@ export default {
     drop(nodes, position) {
       nodes.forEach(async node => {
         let idParent = (position.placement === 'inside') ? position.node.data.id : position.node.data.parent;
-        if(node.data.parent !== idParent) {
+        if (node.data.parent !== idParent) {
           try {
             await new Term(node.data).changeParent(idParent);
             this.applyToAllNodes(tmp => {
-              if(tmp.data.id === node.data.id) {
+              if (tmp.data.id === node.data.id) {
                 tmp.data.parent = idParent;
               }
             });
           }
-          catch(error) {
+          catch (error) {
             console.log(error);
             this.$notify({type: 'error', text: this.$t('notif-error-ontology-tree-update')});
           }
@@ -307,7 +307,7 @@ export default {
         await Term.delete(node.data.id);
         this.$refs.tree.remove([node.path]);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-term-deletion')});
       }

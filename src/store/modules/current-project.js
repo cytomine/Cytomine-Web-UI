@@ -85,7 +85,7 @@ export default {
         dispatch('fetchProjectMembers')
       ];
 
-      if(projectChange) {
+      if (projectChange) {
         promises.push(new ProjectConnection({project: idProject}).save());
       }
       await Promise.all(promises);
@@ -99,7 +99,7 @@ export default {
       let reloadOntology = state.project.ontology !== updatedProject.ontology;
       commit('setProject', updatedProject);
       commit(`projects/${updatedProject.id}/setProject`, updatedProject, {root: true});
-      if(reloadOntology) {
+      if (reloadOntology) {
         await dispatch('fetchOntology');
       }
     },
@@ -143,7 +143,7 @@ export default {
     canEditAnnot: (_, getters, rootState) => annot => {
       let currentUser = rootState.currentUser.user;
       let idLayer = annot.user;
-      if(annot.type === AnnotationType.REVIEWED) {
+      if (annot.type === AnnotationType.REVIEWED) {
         return currentUser.adminByNow || (!currentUser.guestByNow && annot.reviewUser === currentUser.id);
       }
       return getters.canEditLayer(idLayer);
@@ -171,14 +171,14 @@ export default {
     },
 
     currentProjectModule: (state) => {
-      if(!state.project) {
+      if (!state.project) {
         return null;
       }
       return `projects/${state.project.id}/`;
     },
 
     currentViewer: (state, _, rootState) => {
-      if(!state.project) {
+      if (!state.project) {
         return null;
       }
       return rootState.projects[state.project.id].viewers[state.currentViewer];

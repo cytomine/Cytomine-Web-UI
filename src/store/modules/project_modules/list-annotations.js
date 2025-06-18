@@ -83,7 +83,7 @@ export default {
     },
 
     resetPagesAndFilters(state) {
-      for(let key in state.filters) {
+      for (let key in state.filters) {
         state.filters[key] = null;
       }
       state.fromDate = null;

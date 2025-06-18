@@ -457,7 +457,7 @@ export default {
         //   this.histograms = (await this.slices[0].fetchHistogram({nBins: this.histogramNBins}));
         // }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -468,7 +468,7 @@ export default {
       let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
       filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
       let prefixes = filters.map(filter => filter.prefix);
-      if(this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
+      if (this.selectedFilter && !prefixes.includes(this.selectedFilter)) {
         this.selectedFilter = null; // if selected filter no longer present in collection, unselect it
       }
       this.filters = filters;
@@ -481,7 +481,7 @@ export default {
 
       this.loading = false;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
     }
   },

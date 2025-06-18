@@ -88,7 +88,7 @@ export default {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
     drawType() {
-      switch(this.activeTool) {
+      switch (this.activeTool) {
         case 'point':
           return 'Point';
         case 'line':
@@ -112,7 +112,7 @@ export default {
       return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.drawCorrection;
     },
     drawGeometryFunction() {
-      if(this.activeTool === 'rectangle') {
+      if (this.activeTool === 'rectangle') {
         return (coordinates, geometry) => {
           let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
 
@@ -123,7 +123,7 @@ export default {
           let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
           let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
 
-          if(geometry) {
+          if (geometry) {
             geometry.setCoordinates(boxCoordinates);
           }
           else {
@@ -168,10 +168,10 @@ export default {
     },
 
     async drawEndHandler({feature}) {
-      if(this.drawCorrection) {
+      if (this.drawCorrection) {
         await this.endCorrection(feature);
       }
-      else if(this.nbActiveLayers > 0) {
+      else if (this.nbActiveLayers > 0) {
         await this.endDraw(feature);
       }
 
@@ -195,13 +195,13 @@ export default {
           annot.imageGroup = this.imageGroupId;
           updateAnnotationLinkProperties(annot);
           this.$eventBus.$emit('addAnnotation', annot);
-          if(idx === this.nbActiveLayers - 1) {
+          if (idx === this.nbActiveLayers - 1) {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
 
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
         }
-        catch(err) {
+        catch (err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
@@ -209,7 +209,7 @@ export default {
     },
 
     async endCorrection(feature) {
-      if(!this.selectedFeature) {
+      if (!this.selectedFeature) {
         return;
       }
 
@@ -221,7 +221,7 @@ export default {
           remove: (this.activeEditTool === 'correct-remove'),
           annotation: annot.id
         });
-        if(correctedAnnot) {
+        if (correctedAnnot) {
           correctedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
           correctedAnnot.track = annot.track;
           correctedAnnot.annotationTrack = annot.annotationTrack;
@@ -233,7 +233,7 @@ export default {
           this.$eventBus.$emit('reloadAnnotationCrop', annot);
         }
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-correction')});
       }

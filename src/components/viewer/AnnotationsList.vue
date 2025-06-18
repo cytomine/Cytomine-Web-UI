@@ -139,7 +139,7 @@ export default {
       return (this.isDisplayedByTerm) ? this.termsOptions : this.tracks;
     },
     currentItem() {
-      if(this.isDisplayedByTerm) {
+      if (this.isDisplayedByTerm) {
         return this.termsOptions.find(term => term.id === this.selectedTermId);
       }
       else {
@@ -252,7 +252,7 @@ export default {
       this.users = (await UserCollection.fetchAll()).array;
     },
     addAnnotationHandler(annotation) {
-      if(annotation.image === this.image.id) {
+      if (annotation.image === this.image.id) {
         this.revision++;
       }
     },
@@ -262,12 +262,12 @@ export default {
       }
     },
     editAnnotationHandler(updatedAnnot) {
-      if(updatedAnnot.image === this.image.id) {
+      if (updatedAnnot.image === this.image.id) {
         this.revision++;
       }
     },
     deleteAnnotationHandler(deletedAnnot) {
-      if(deletedAnnot.image === this.image.id) {
+      if (deletedAnnot.image === this.image.id) {
         this.revision++;
       }
     },

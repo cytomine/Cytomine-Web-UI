@@ -60,7 +60,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.internalTag = (this.tag) ? this.tag.clone() : new Tag();
         this.displayErrors = false;
       }
@@ -69,7 +69,7 @@ export default {
   methods: {
     async save() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -81,7 +81,7 @@ export default {
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateTag' : 'addTag', this.internalTag);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-tag-' + labelTranslation)});
       }

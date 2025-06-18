@@ -82,7 +82,7 @@ export default {
   methods: {
     clickHandler(event) {
       let el = event.target;
-      if(!this.expanded && el.tagName !== 'I' && el.tagName !== 'A') { // if user clicked on icon, navigation purpose => do not expand the nav bar
+      if (!this.expanded && el.tagName !== 'I' && el.tagName !== 'A') { // if user clicked on icon, navigation purpose => do not expand the nav bar
         this.expanded = true;
       }
     },

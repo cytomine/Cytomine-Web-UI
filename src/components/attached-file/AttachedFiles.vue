@@ -94,7 +94,7 @@ export default {
           text: this.$t('notif-success-attached-file-deletion', {filename: attachedFile.filename})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -107,7 +107,7 @@ export default {
     try {
       this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }

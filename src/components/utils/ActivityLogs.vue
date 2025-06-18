@@ -80,11 +80,11 @@ export default {
       let lastDate = null;
       let idxMonths = -1;
       let idxDays = -1;
-      for(let i = 0; i < this.actions.length; i++) {
+      for (let i = 0; i < this.actions.length; i++) {
         let action = this.actions[i];
         let date = moment(Number(action.created));
-        if(!lastDate || !date.isSame(lastDate, 'day')) {
-          if(!lastDate || !date.isSame(lastDate, 'month')) {
+        if (!lastDate || !date.isSame(lastDate, 'day')) {
+          if (!lastDate || !date.isSame(lastDate, 'month')) {
             results.push({
               refDate: Number(action.created),
               days: []
@@ -122,7 +122,7 @@ export default {
 
     async loadActions(append = true) {
       this.loading = true;
-      if(!append) {
+      if (!append) {
         this.actions = [];
         this.offset = 0;
         this.loadedAllActions = false;
@@ -138,11 +138,11 @@ export default {
         this.actions.push(...data);
         this.offset += this.nbActionsPerPage;
 
-        if(data.length < this.nbActionsPerPage) {
+        if (data.length < this.nbActionsPerPage) {
           this.loadedAllActions = true;
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -154,7 +154,7 @@ export default {
     try {
       await this.loadActions();
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }

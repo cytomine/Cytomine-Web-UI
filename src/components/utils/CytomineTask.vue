@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     lastComment() {
-      if(this.task && this.task.comments && this.task.comments.length > 0) {
+      if (this.task && this.task.comments && this.task.comments.length > 0) {
         return this.task.comments[0];
       }
       return '';
@@ -54,11 +54,11 @@ export default {
   },
   methods: {
     async refresh() {
-      if(this.task) {
+      if (this.task) {
         let updatedTask = await Task.fetch(this.task.id);
         this.$emit('update:task', updatedTask);
         clearTimeout(this.timeout);
-        if(updatedTask.progress < 100) {
+        if (updatedTask.progress < 100) {
           this.timeout = setTimeout(this.refresh, this.refreshInterval);
         }
       }

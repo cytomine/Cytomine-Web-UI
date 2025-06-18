@@ -169,7 +169,7 @@ export default {
     },
     trackedUserFullName() {
       let trackedUser = this.projectMembers.find(user => user.id === this.trackedUser);
-      if(trackedUser) {
+      if (trackedUser) {
         return trackedUser.fullName;
       }
       return null;
@@ -177,15 +177,15 @@ export default {
   },
   watch: {
     activePanel(panel) {
-      if(panel === 'follow') {
+      if (panel === 'follow') {
         this.fetchOnline();
       }
     },
 
     broadcast() {
-      if(this.broadcast) {
+      if (this.broadcast) {
         this.stopTrack();
-        if(!this.wsConnected) {
+        if (!this.wsConnected) {
           this.initWebSocket();
           this.wsInterval = setInterval(() => {
             this.sendPosition();
@@ -193,20 +193,20 @@ export default {
         }
         this.trackedUser = null;
       }
-      else{
+      else {
         clearInterval(this.wsInterval);
         this.userPostitionWebsock.close();
       }
     },
 
     alreadyBroadcastingImage(value) {
-      if(!value) {
+      if (!value) {
         this.disabledBroadcast = false;
       }
     },
 
     broadcastModel(value) {
-      if(value && this.alreadyBroadcastingImage) {
+      if (value && this.alreadyBroadcastingImage) {
         this.$notify({type: 'error', text: this.$t('notif-error-already-broadcasting-this-image')});
         this.disabledBroadcast = true;
         this.$nextTick(() => this.broadcastModel = false);
@@ -217,7 +217,7 @@ export default {
 
     trackedUserModel(value) {
       // if map is linked to another map on which tracking is already enabled, possible conflict
-      if(value && this.linkedIndexTracking) {
+      if (value && this.linkedIndexTracking) {
         this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-unlink-view-to-track'),
@@ -242,8 +242,8 @@ export default {
     trackedUser(id) {
       this.trackedUserModel = id;
 
-      if(id) {
-        if(!this.wsConnected) {
+      if (id) {
+        if (!this.wsConnected) {
           this.initTracking();
         }
         this.track();
@@ -252,7 +252,7 @@ export default {
     },
 
     onlineUsers(onlines) {
-      if(this.trackedUser && !onlines.includes(this.trackedUser)) {
+      if (this.trackedUser && !onlines.includes(this.trackedUser)) {
         this.$notify({
           type: 'info',
           text: this.$t('end-tracking-user-no-longer-broadcasting', {
@@ -306,7 +306,7 @@ export default {
       if (message.data === 'stop-track') {
         this.stopTrack();
       }
-      else{
+      else {
         let pos = JSON.parse(message.data);
         this.moveView(pos);
       }
@@ -320,7 +320,7 @@ export default {
       });
     },
     stopTrack() {
-      if(this.wsConnected) {
+      if (this.wsConnected) {
         this.userPostitionWebsock.close();
         this.wsConnected = false;
       }
@@ -342,44 +342,44 @@ export default {
       }
     },
     async track() {
-      if(!this.trackedUser || this.wsConnected) {
+      if (!this.trackedUser || this.wsConnected) {
         return;
       }
 
       try {
         console.log('fetchLastPosition');
         let pos = await UserPosition.fetchLastPosition(this.image.id, this.trackedUser);
-        if(!pos.id || !pos.broadcast) {
+        if (!pos.id || !pos.broadcast) {
           return;
         }
 
         this.moveView(pos);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-tracked-user-position')});
       }
 
       clearTimeout(this.timeoutTracking);
-      if(!this.wsConnected) {
+      if (!this.wsConnected) {
         this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
       }
     },
 
     async fetchOnline() {
-      if(!this.trackedUser && this.activePanel !== 'follow') { // if panel not opened and no tracking ongoing, no need to refresh the data
+      if (!this.trackedUser && this.activePanel !== 'follow') { // if panel not opened and no tracking ongoing, no need to refresh the data
         return;
       }
 
       let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
 
-      if(this.broadcast) {
+      if (this.broadcast) {
         this.followers = [];
         let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
 
         this.projectMembers.forEach(member => {
-          if(followersIds.includes('' + member.id)) {
+          if (followersIds.includes('' + member.id)) {
             this.followers.push(member);
           }
         });
@@ -398,7 +398,7 @@ export default {
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
-    if(this.wsConnected) {
+    if (this.wsConnected) {
       this.userPostitionWebsock.close();
       this.wsConnected = false;
     }

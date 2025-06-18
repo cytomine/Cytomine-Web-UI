@@ -63,7 +63,7 @@ export default {
     },
     // eslint-disable-next-line vue/return-in-computed-property
     result() {
-      switch(this.file.status) {
+      switch (this.file.status) {
         case UploadedFileStatus.UPLOADED:
         case UploadedFileStatus.DETECTING_FORMAT:
         case UploadedFileStatus.EXTRACTING_DATA:
@@ -96,7 +96,7 @@ export default {
     },
     // eslint-disable-next-line vue/return-in-computed-property
     iconClass() {
-      switch(this.result) {
+      switch (this.result) {
         case 'info':
           return 'fa-spinner';
         case 'success':

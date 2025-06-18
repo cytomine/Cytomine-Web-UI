@@ -204,7 +204,7 @@ export default {
     async previousImage() {
       try {
         let prev = await this.image.fetchPrevious();
-        if(!prev.id) {
+        if (!prev.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
           this.isFirstImage = true;
         }
@@ -213,7 +213,7 @@ export default {
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
       }
@@ -221,7 +221,7 @@ export default {
     async nextImage() {
       try {
         let next = await this.image.fetchNext();
-        if(!next.id) {
+        if (!next.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
           this.isLastImage = true;
         }
@@ -230,7 +230,7 @@ export default {
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
@@ -242,7 +242,7 @@ export default {
 
       try {
         let prev = await this.imageGroupLink.fetchPrevious();
-        if(!prev.id) {
+        if (!prev.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
         }
         else {
@@ -250,7 +250,7 @@ export default {
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
       }
@@ -262,7 +262,7 @@ export default {
 
       try {
         let next = await this.imageGroupLink.fetchNext();
-        if(!next.id) {
+        if (!next.id) {
           this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
         }
         else {
@@ -270,21 +270,21 @@ export default {
           await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
       }
     },
 
     shortkeyHandler(key) {
-      if(!this.isActiveImage) { // shortkey should only be applied to active map
+      if (!this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
-      if(key === 'nav-next-image') {
+      if (key === 'nav-next-image') {
         this.nextImage();
       }
-      else if(key === 'nav-previous-image') {
+      else if (key === 'nav-previous-image') {
         this.previousImage();
       }
       else if (key === 'nav-next-image-in-group') {

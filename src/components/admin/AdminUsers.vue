@@ -146,7 +146,7 @@ export default {
       let collection = new UserCollection({
         withRoles: true
       });
-      if(this.searchString) {
+      if (this.searchString) {
         collection['fullName'] = {
           ilike: encodeURIComponent(this.searchString)
         };
@@ -178,7 +178,7 @@ export default {
       try {
         await user.lock();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-lock')});
       }
@@ -187,7 +187,7 @@ export default {
       try {
         await user.unlock();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
       }

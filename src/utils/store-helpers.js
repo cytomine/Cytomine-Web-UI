@@ -214,7 +214,7 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
 
 // wrapper for lodash debounce that debounces the function iff the debounce delay specified in options is > 0
 function debounce(fct, options) {
-  if(options.debounce) {
+  if (options.debounce) {
     return _.debounce(fct, options.debounce);
   }
   else {
@@ -223,20 +223,20 @@ function debounce(fct, options) {
 }
 
 function arrayPath(path) {
-  if(!path) {
+  if (!path) {
     return [];
   }
-  if(Array.isArray(path)) {
+  if (Array.isArray(path)) {
     return path;
   }
-  if(typeof path === 'string') {
+  if (typeof path === 'string') {
     return path.split('/');
   }
   throw new Error('Path must be a string or an array');
 }
 
 function fullPath(path, component, options) {
-  if(options.rootModuleProp) {
+  if (options.rootModuleProp) {
     path = arrayPath(component[options.rootModuleProp]).concat(path);
   }
   return path;
@@ -244,7 +244,7 @@ function fullPath(path, component, options) {
 
 function getValue(store, path) {
   let obj = store.state;
-  for(let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length; i++) {
     obj = obj[path[i]];
   }
   return obj;

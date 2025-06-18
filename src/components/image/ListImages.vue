@@ -346,12 +346,12 @@ export default {
         filterKey: 'project',
         filterValue: this.project.id,
       });
-      if(this.searchString) {
+      if (this.searchString) {
         collection['name'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      for(let {prop, bounds, max} of this.boundsFilters) {
+      for (let {prop, bounds, max} of this.boundsFilters) {
         collection[prop] = {};
         if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
@@ -365,8 +365,8 @@ export default {
           collection[prop]['gte'] = bounds[0];
         }
       }
-      for(let {prop, selected, total} of this.multiSelectFilters) {
-        if(selected.length > 0 && selected.length < total) {
+      for (let {prop, selected, total} of this.multiSelectFilters) {
+        if (selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
           };
@@ -437,7 +437,7 @@ export default {
         ]);
         this.revision++;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -452,10 +452,10 @@ export default {
   },
   watch: {
     querySearchTags(values) {
-      if(values) {
+      if (values) {
         this.selectedTags = [];
         let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
-        if(queriedTags) {
+        if (queriedTags) {
           this.selectedTags = queriedTags;
         }
       }
@@ -482,13 +482,13 @@ export default {
         }
       }
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }
-    if(this.$route.query.tags) {
+    if (this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
-      if(queriedTags) {
+      if (queriedTags) {
         this.selectedTags = queriedTags;
       }
     }

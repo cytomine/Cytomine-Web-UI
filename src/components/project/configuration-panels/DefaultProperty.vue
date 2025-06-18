@@ -61,7 +61,7 @@ export default {
   computed: {
     project: get('currentProject/project'),
     filteredKeys() {
-      if(!this.searchString.length) {
+      if (!this.searchString.length) {
         return this.keysAnnotationProps;
       }
 
@@ -79,11 +79,11 @@ export default {
         let projectProps = (await PropertyCollection.fetchAll({object: this.project})).array;
         this.defaultPropertyProp = projectProps.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
 
-      if(!this.defaultPropertyProp) {
+      if (!this.defaultPropertyProp) {
         this.defaultPropertyProp = new Property({key: constants.DEFAULT_PROPERTY_KEY, value: ''}, this.project);
       }
 
@@ -91,7 +91,7 @@ export default {
     },
 
     confirm() {
-      if(this.keysAnnotationProps.includes(this.searchString) || !this.searchString.length) {
+      if (this.keysAnnotationProps.includes(this.searchString) || !this.searchString.length) {
         this.save();
         return;
       }
@@ -111,8 +111,8 @@ export default {
     async save() {
       this.defaultPropertyProp.value = this.searchString;
       try {
-        if(!this.defaultPropertyProp.value.length) { // empty property
-          if(!this.defaultPropertyProp.isNew()) { // property exists
+        if (!this.defaultPropertyProp.value.length) { // empty property
+          if (!this.defaultPropertyProp.isNew()) { // property exists
             await this.defaultPropertyProp.delete();
             this.defaultPropertyProp = new Property({key: constants.DEFAULT_PROPERTY_KEY, value: ''}, this.project);
           }
@@ -122,7 +122,7 @@ export default {
         }
         this.$notify({type: 'success', text: this.$t('notif-success-default-property-update')});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-property-update')});
       }
@@ -135,7 +135,7 @@ export default {
         this.fetchDefaultPropertyProp()
       ]);
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }

@@ -74,7 +74,7 @@ export default {
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),
     filteredMetadata() {
-      if(!this.searchString) {
+      if (!this.searchString) {
         return this.metadata;
       }
       let regexp = getWildcardRegexp(this.searchString);
@@ -82,7 +82,7 @@ export default {
     },
     styleImagePreview() {
       this.rotationAngle; // to force re-evaluation each time rotationAngle changes
-      if(!this.$refs.image) {
+      if (!this.$refs.image) {
         return;
       }
 

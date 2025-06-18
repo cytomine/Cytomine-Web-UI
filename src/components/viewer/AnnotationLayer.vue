@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     clearFeatures(cache = true) {
-      if(this.$refs.olSource) {
+      if (this.$refs.olSource) {
         this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
         this.$refs.olSource.clearFeatures();
       }
@@ -130,14 +130,14 @@ export default {
     },
 
     addAnnotationHandler(annot) {
-      if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
+      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         this.$refs.olSource.addFeature(this.createFeature(annot));
       }
     },
     selectAnnotationHandler({annot, index}) {
-      if(index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
+      if (index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-        if(!olFeature) {
+        if (!olFeature) {
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         }
         else {
@@ -146,11 +146,11 @@ export default {
       }
     },
     reloadAnnotationsHandler({idImage, clear = false, hard = false} = {}) {
-      if(!idImage || idImage === this.image.id) {
-        if(clear) {
+      if (!idImage || idImage === this.image.id) {
+        if (clear) {
           this.clearFeatures();
         }
-        else if(hard) {
+        else if (hard) {
           this.clearFeatures(false);
           this.loader();
         }
@@ -160,21 +160,21 @@ export default {
       }
     },
     reviewAnnotationHandler(annot) {
-      if(this.reviewMode) { // if the image is in review mode, reviewed annotation should no longer be displayed on user layer => call delete handler
+      if (this.reviewMode) { // if the image is in review mode, reviewed annotation should no longer be displayed on user layer => call delete handler
         this.deleteAnnotationHandler(annot);
       }
     },
     editAnnotationHandler(annot) {
-      if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
+      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-        if(!olFeature) {
+        if (!olFeature) {
           return;
         }
         olFeature.setGeometry(this.format.readGeometry(annot.location));
         olFeature.set('annot', annot);
 
         let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === annot.id);
-        if(indexSelectedFeature >= 0) {
+        if (indexSelectedFeature >= 0) {
           this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
             indexFeature: indexSelectedFeature,
             annot
@@ -183,14 +183,14 @@ export default {
       }
     },
     deleteAnnotationHandler(annot) {
-      if(this.annotBelongsToLayer(annot) && this.$refs.olSource) {
+      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
-        if(!olFeature) {
+        if (!olFeature) {
           return;
         }
         this.$refs.olSource.removeFeature(olFeature);
 
-        if(this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
+        if (this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
         }
       }
@@ -225,12 +225,12 @@ export default {
     },
     async fetchAnnots(extent) {
       [0, 1].forEach(index => {
-        if(extent[index] < 0) {
+        if (extent[index] < 0) {
           extent[index] = 0;
         }
       });
       [2, 3].forEach(index => {
-        if(this.imageExtent[index] < extent[index]) {
+        if (this.imageExtent[index] < extent[index]) {
           extent[index] = this.imageExtent[index];
         }
       });
@@ -258,23 +258,23 @@ export default {
       let indexSelectedFeature = this.selectedFeatures.findIndex(ftr => ftr.id === feature.getId());
       let isFeatureSelected = indexSelectedFeature !== -1;
 
-      if(!annot) {
+      if (!annot) {
         console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
-        if(isFeatureSelected) {
+        if (isFeatureSelected) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
         }
         return;
       }
 
       let storedAnnot = feature.get('annot');
-      if(!this.clustered && annot.updated === storedAnnot.updated && this.sameTerms(annot.term, storedAnnot.term)) {
+      if (!this.clustered && annot.updated === storedAnnot.updated && this.sameTerms(annot.term, storedAnnot.term)) {
         // no modification performed since feature was loaded
         return;
       }
 
-      if(isFeatureSelected) {
-        if(this.ongoingEdit) {
+      if (isFeatureSelected) {
+        if (this.ongoingEdit) {
           // if feature is selected and under modification, updating it may lead to conflict
           console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
           return;
@@ -294,7 +294,7 @@ export default {
     async loader(extent = this.lastExtent, resolution = this.resolution) {
       this.resolution = resolution;
 
-      if(!this.layer.visible || !extent) {
+      if (!this.layer.visible || !extent) {
         return;
       }
 
@@ -318,20 +318,20 @@ export default {
           arrayAnnots = await this.fetchAnnotations();
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotations-viewer')});
         return;
       }
 
-      if(!this.$refs.olSource) {
+      if (!this.$refs.olSource) {
         return;
       }
 
       let wasClustered = this.clustered;
-      if(arrayAnnots.length) {
+      if (arrayAnnots.length) {
         this.clustered = arrayAnnots[0].count !== null;
-        if(!this.clustered && resolution > this.maxResolutionNoClusters) {
+        if (!this.clustered && resolution > this.maxResolutionNoClusters) {
           this.maxResolutionNoClusters = resolution;
         }
       }
@@ -342,7 +342,7 @@ export default {
       }, {});
       let seenAnnots = [];
 
-      if(wasClustered !== null && wasClustered !== this.clustered) {
+      if (wasClustered !== null && wasClustered !== this.clustered) {
         this.clearFeatures(); // clearing features will retrigger the loader
       }
       else {
@@ -356,7 +356,7 @@ export default {
       }
 
       arrayAnnots.forEach(annot => {
-        if(!seenAnnots.includes(annot.id)) {
+        if (!seenAnnots.includes(annot.id)) {
           this.$refs.olSource.addFeature(this.createFeature(annot));
         }
       });
@@ -371,7 +371,7 @@ export default {
       feature.setId(annot.id);
       feature.set('annot', annot);
 
-      if(this.annotsIdsToSelect.includes(annot.id)) {
+      if (this.annotsIdsToSelect.includes(annot.id)) {
         this.$store.dispatch(this.imageModule + 'selectFeature', feature);
       }
 
@@ -379,7 +379,7 @@ export default {
     },
 
     sameTerms(terms1, terms2) {
-      if(terms1.length !== terms2.length) {
+      if (terms1.length !== terms2.length) {
         return false;
       }
       return terms1.every(term => terms2.includes(term));

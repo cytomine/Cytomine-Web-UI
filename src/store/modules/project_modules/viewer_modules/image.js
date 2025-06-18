@@ -286,7 +286,7 @@ export default {
   getters: {
     genStyleFunction: (state, getters) => (feature) => {
       let annot = feature.get('annot');
-      if(!annot) {
+      if (!annot) {
         return;
       }
 
@@ -295,7 +295,7 @@ export default {
       // 1. in backend, for clusters, send array with composition of cluster (x for term 1, y for term 2, z for term1-2)
       // 2. force source refresh every time the list of terms to display is updated
       // 3. add parameter allowing to provide the terms to take into account in kmeans (but only for kmeans)
-      if(isCluster(feature)) {
+      if (isCluster(feature)) {
         return [state.style.defaultStyle, createTextStyle(annot.count.toString())];
       }
 
@@ -304,13 +304,13 @@ export default {
       let nbTerms = annot.term.length;
       let terms = state.style.terms;
 
-      if(terms && nbTerms === 1) {
+      if (terms && nbTerms === 1) {
         let wrappedTerm = getters.termsMapping[annot.term[0]];
-        if(wrappedTerm) {
-          if(!wrappedTerm.visible) {
+        if (wrappedTerm) {
+          if (!wrappedTerm.visible) {
             return; // do not display annot
           }
-          if(feature.getGeometry().getType() === 'LineString') {
+          if (feature.getGeometry().getType() === 'LineString') {
             styles.push(wrappedTerm.olLineStyle);
           }
           else {
@@ -321,15 +321,15 @@ export default {
           styles.push(state.style.noTermStyle); // could not find term => display no term style
         }
       }
-      else if(terms && nbTerms > 1) {
+      else if (terms && nbTerms > 1) {
         let hasTermsToDisplay = terms.some(term => term.visible && annot.term.includes(term.id));
-        if(!hasTermsToDisplay) {
+        if (!hasTermsToDisplay) {
           return; // do not display
         }
         styles.push(state.style.multipleTermsStyle);
       }
       else {
-        if(!state.style.displayNoTerm) {
+        if (!state.style.displayNoTerm) {
           return; // do not display annot
         }
         styles.push(state.style.noTermStyle);
@@ -340,18 +340,18 @@ export default {
       let isRejected = state.review.reviewMode && !isReviewed;
 
       // Styles for selected elements
-      if(state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
+      if (state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
         styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : (nbTracks > 0) ? trackedSelectStyles : selectStyles));
 
         // if in modify mode, display vertices
-        if(state.draw.activeEditTool === 'modify') {
+        if (state.draw.activeEditTool === 'modify') {
           styles.push(verticesStyle);
         }
       }
-      else if(isReviewed) {
+      else if (isReviewed) {
         styles.push(...reviewedStyles);
       }
-      else if(isRejected) {
+      else if (isRejected) {
         styles.push(...rejectedStyles);
       }
 
@@ -359,8 +359,8 @@ export default {
 
       if (tracks && nbTracks === 1) {
         let wrappedTrack = getters.tracksMapping[annot.track[0]];
-        if(wrappedTrack) {
-          if(feature.getGeometry().getType() === 'LineString') {
+        if (wrappedTrack) {
+          if (feature.getGeometry().getType() === 'LineString') {
             styles.unshift(wrappedTrack.olLineStyle);
           }
           else {
@@ -377,13 +377,13 @@ export default {
       if (propValue) {
         let color = state.properties.selectedPropertyColor;
         let fontSize = '34px';
-        if(state.view.zoom <= 3) {
+        if (state.view.zoom <= 3) {
           fontSize = '12px';
         }
-        else if(state.view.zoom <= 6) {
+        else if (state.view.zoom <= 6) {
           fontSize = '19px';
         }
-        else if(state.view.zoom <= 8) {
+        else if (state.view.zoom <= 8) {
           fontSize = '26px';
         }
         styles.push(createTextStyle(propValue, fontSize, color.fill, null));
@@ -393,7 +393,7 @@ export default {
     },
 
     maxZoom: state => {
-      if(!state.imageInstance) {
+      if (!state.imageInstance) {
         return 0;
       }
       let increment = state.view.digitalZoom ? constants.DIGITAL_ZOOM_INCREMENT : 0;
@@ -401,7 +401,7 @@ export default {
     },
 
     maxRank: state => {
-      if(!state.imageInstance) {
+      if (!state.imageInstance) {
         return 0;
       }
 

@@ -239,7 +239,7 @@ export default {
     filteredImageGroups() {
       let filtered = this.imageGroups;
 
-      if(this.searchString) {
+      if (this.searchString) {
         filtered = filtered.filter(group => this.regexp.test(group.name));
       }
 
@@ -285,11 +285,11 @@ export default {
         await this.fetchImageGroups();
 
         // if an item has been deleted, the currentPage value might not be valid => reinitialize it
-        if((this.currentPage - 1) * this.perPage >= this.filteredImageGroups.length) {
+        if ((this.currentPage - 1) * this.perPage >= this.filteredImageGroups.length) {
           this.currentPage = 1;
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -330,7 +330,7 @@ export default {
       ]);
       this.loading = false;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }

@@ -42,7 +42,7 @@ let vendors = {
 };
 
 export default function vendorFromFormat(format) {
-  switch(format) {
+  switch (format) {
     case 'NDPI':
     case 'VMS':
       return vendors['hamamatsu'];

@@ -127,16 +127,16 @@ export default {
   },
   methods: {
     startEdition(index) {
-      if(this.indexEdited !== index) {
+      if (this.indexEdited !== index) {
         this.editedValue = this.isArray ? this.value[index] : this.value;
         this.indexEdited = index;
       }
     },
     stopEdition(index = 0) {
-      if(this.indexEdited === index) {
+      if (this.indexEdited === index) {
         this.indexEdited = null;
 
-        if(!this.editedValue || isNaN(this.editedValue)) {
+        if (!this.editedValue || isNaN(this.editedValue)) {
           return; // if entered value is not a number, ignore
         }
 
@@ -144,10 +144,10 @@ export default {
         parsedValue = Math.min(parsedValue, this.max);
         parsedValue = Math.max(parsedValue, this.min);
 
-        if(this.isArray) {
+        if (this.isArray) {
           let newVal = this.value.slice();
           newVal[index] = parsedValue;
-          if(newVal[0] > newVal[1]) { // reorder bounds if needed
+          if (newVal[0] > newVal[1]) { // reorder bounds if needed
             newVal.reverse();
           }
           this.$emit('input', newVal);

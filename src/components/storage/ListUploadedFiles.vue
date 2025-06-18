@@ -147,7 +147,7 @@ export default {
         await UploadedFile.delete(uFile.id);
         this.updatedTree();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         let errorValues = error.response.data.errorValues;
         let text;

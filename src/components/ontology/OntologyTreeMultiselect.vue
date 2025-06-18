@@ -106,7 +106,7 @@ export default {
   },
   computed: {
     allTerms() {
-      if(!this.ontology) {
+      if (!this.ontology) {
         return [];
       }
       let terms = this.additionalNodes.map(node => node);
@@ -126,7 +126,7 @@ export default {
   },
   watch: {
     async activeSelector(val) {
-      if(val) {
+      if (val) {
         await this.$nextTick();
         this.$refs.input.focus();
       }
@@ -138,7 +138,7 @@ export default {
     },
 
     handleSelection() {
-      if(!this.multiple) {
+      if (!this.multiple) {
         this.activeSelector = false;
       }
     }

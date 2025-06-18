@@ -131,7 +131,7 @@ export default {
       this.fetchPage(true);
     },
     internalCurrentPage(page, previousValue) {
-      if(previousValue) { // do not trigger change for value initialization
+      if (previousValue) { // do not trigger change for value initialization
         this.$emit('update:currentPage', page);
         this.fetchPage(true);
       }
@@ -149,11 +149,11 @@ export default {
       this.fetchPage();
     },
     refreshInterval(value) {
-      if(value === 0) {
+      if (value === 0) {
         clearTimeout(this.timeout);
         this.timeout = null;
       }
-      else if(!this.timeout) { // user provided a valid refresh interval, and no fetch page planned => relaunch fetch page
+      else if (!this.timeout) { // user provided a valid refresh interval, and no fetch page planned => relaunch fetch page
         this.fetchPage();
       }
     }
@@ -166,7 +166,7 @@ export default {
       this.$emit('update:order', order);
     },
     async fetchPage(showLoading = false) {
-      if(showLoading) {
+      if (showLoading) {
         this.loading = true;
       }
 
@@ -189,8 +189,8 @@ export default {
 
         this.$emit('update:checkedRows', this.internalCheckedRows);
       }
-      catch(error) {
-        if(this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page
+      catch (error) {
+        if (this.internalCurrentPage > 1) { // error may be due to the page number (not enough elements) => retry on first page
           this.internalCurrentPage = 1;
           return;
         }
@@ -203,7 +203,7 @@ export default {
       this.loading = false;
 
       clearTimeout(this.timeout);
-      if(this.refreshInterval) {
+      if (this.refreshInterval) {
         this.timeout = setTimeout(this.fetchPage, this.refreshInterval);
       }
     },

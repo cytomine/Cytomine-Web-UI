@@ -106,7 +106,7 @@ export default {
     },
     async endEdit({features}) {
       features.forEach(async feature => {
-        if(!feature.get('annot')) {
+        if (!feature.get('annot')) {
           return;
         }
 
@@ -120,7 +120,7 @@ export default {
           this.$eventBus.$emit('reloadAnnotationCrop', annot);
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
         }
-        catch(err) {
+        catch (err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-update')});
           annot.location = oldLocation;

@@ -111,7 +111,7 @@ export default {
       return getWildcardRegexp(this.searchString);
     },
     filteredTags() {
-      if(!this.searchString) {
+      if (!this.searchString) {
         return this.tags;
       }
 
@@ -153,7 +153,7 @@ export default {
           text: this.$t('notif-success-tag-delete', {tagName: tag.name})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -166,7 +166,7 @@ export default {
     try {
       this.tags = (await TagCollection.fetchAll()).array;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
     }
     this.loading = false;

@@ -59,14 +59,14 @@ export default {
         User.fetchCurrent(), MyAccount.fetch()
       ]);
 
-      if(user.id) { // fetchCurrent() redirects to home page if user not authenticated => check that id is set
+      if (user.id) { // fetchCurrent() redirects to home page if user not authenticated => check that id is set
         commit('setUser', user);
       }
       else {
         commit('setUser', null);
       }
 
-      if(account) {
+      if (account) {
         commit('setAccount', account);
       }
       else {

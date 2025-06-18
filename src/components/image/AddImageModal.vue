@@ -100,7 +100,7 @@ export default {
       let collection = new AbstractImageCollection({
         project: this.project.id,
       });
-      if(this.searchString) {
+      if (this.searchString) {
         collection['originalFilename'] = {
           ilike: encodeURIComponent(this.searchString)
         };
@@ -111,7 +111,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.idsAddedImages = [];
       }
     }
@@ -132,7 +132,7 @@ export default {
         updatedProject.numberOfImages++;
         this.$store.dispatch('currentProject/updateProject', updatedProject);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

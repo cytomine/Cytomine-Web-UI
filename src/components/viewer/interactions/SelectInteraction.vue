@@ -78,14 +78,14 @@ export default {
           }
         }
         else {
-          if(value.length > 1) {
+          if (value.length > 1) {
             //if previous selection is in the new target, we will take the first element not yet visited
-            if(value.map(x => x.id).includes(previousSelectedFeature.id)) {
+            if (value.map(x => x.id).includes(previousSelectedFeature.id)) {
               let index = previousTarget.findIndex(x => x.id === previousSelectedFeature.id);
               let visitedFeatures = previousTarget.slice(0, index + 1);
               index = 0;
               for (let i = 0; i < value.length; i++) {
-                if(!visitedFeatures.map(x => x.id).includes(value[i].id)) {
+                if (!visitedFeatures.map(x => x.id).includes(value[i].id)) {
                   index = i;
                   break;
                 }
@@ -146,7 +146,7 @@ export default {
   watch: {
     async styleFunctionFactory() {
       // HACK: style function is not called again when redefined => force the update of style for selected features
-      if(this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
+      if (this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
     }

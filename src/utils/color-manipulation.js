@@ -56,7 +56,7 @@ function truncatePixelValueFunc(val) {
 }
 
 function changeBrightnessContrastFunc(pixel) {
-  for(let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     let newVal = truncatePixelValue(contrastFactor * (pixel[i] - 128) + 128) + brightness;
     pixel[i] = truncatePixelValue(newVal);
   }
@@ -69,7 +69,7 @@ function changeSaturationFunc(pixel) {
 
   let saturationConstant = Math.sqrt(r * r * Pr + g * g * Pg + b * b * Pb);
 
-  for(let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     let newVal = saturationConstant + (pixel[i] - saturationConstant) * (1 + saturation / 100);
     pixel[i] = truncatePixelValue(newVal);
   }
@@ -80,7 +80,7 @@ function changeHueFunc(pixel) {
   let g = pixel[1];
   let b = pixel[2];
 
-  for(let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     let newVal = hueMatrix[i][0] * r + hueMatrix[i][1] * g + hueMatrix[i][2] * b;
     pixel[i] = truncatePixelValue(newVal);
   }
@@ -105,19 +105,19 @@ export let constLib = {
 export function operation(pixels) {
   let pixel = pixels[0];
 
-  if(brightness !== 0 || contrast !== 0) {
-    if(contrastFactor === -1) {
+  if (brightness !== 0 || contrast !== 0) {
+    if (contrastFactor === -1) {
       contrastFactor = computeContrastFactor(contrast);
     }
     changeBrightnessContrast(pixel);
   }
 
-  if(saturation !== 0) {
+  if (saturation !== 0) {
     changeSaturation(pixel);
   }
 
-  if(hue !== 0) {
-    if(hueMatrix === -1) {
+  if (hue !== 0) {
+    if (hueMatrix === -1) {
       hueMatrix = computeHueMatrix(hue);
     }
     changeHue(pixel);

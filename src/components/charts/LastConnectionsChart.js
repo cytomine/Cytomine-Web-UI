@@ -73,8 +73,8 @@ export default {
       let iterMoment = moment(this.startDate);
       let lastMoment = this.endDate ? moment(this.endDate) : moment();
       let indexConnection = 0;
-      while(iterMoment.isBefore(lastMoment)) {
-        if(connections[indexConnection] && iterMoment.isSame(Number(connections[indexConnection].time), this.period)) {
+      while (iterMoment.isBefore(lastMoment)) {
+        if (connections[indexConnection] && iterMoment.isSame(Number(connections[indexConnection].time), this.period)) {
           allConnections.push(connections[indexConnection]);
           indexConnection++;
         }
@@ -90,7 +90,7 @@ export default {
     updateLabels() {
       this.chartData.labels = this.projectConnections.map(item => {
         let time = Number(item.time);
-        switch(this.period) {
+        switch (this.period) {
           case 'hour':
             return moment(time).format(this.showDates ? 'll LT' : 'LT') + ' - ' + moment(time).add(1, 'hours').format('LT');
           case 'day':

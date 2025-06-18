@@ -95,7 +95,7 @@ export default {
       return getWildcardRegexp(this.searchString);
     },
     filteredProjects() {
-      if(!this.searchString) {
+      if (!this.searchString) {
         return this.projects;
       }
 
@@ -110,7 +110,7 @@ export default {
       return this.filteredProjects > this.subsetProjects;
     },
     filteredImages() {
-      if(!this.searchString) {
+      if (!this.searchString) {
         return this.images;
       }
 
@@ -140,7 +140,7 @@ export default {
       }).fetchAll()).array;
     },
     async activate() {
-      if(!this.isActive) {
+      if (!this.isActive) {
         try {
           this.loading = true;
           await Promise.all([
@@ -148,7 +148,7 @@ export default {
             this.fetchProjects()
           ]);
         }
-        catch(error) {
+        catch (error) {
           console.log(error);
           this.error = true;
         }

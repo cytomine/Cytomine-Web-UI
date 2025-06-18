@@ -202,35 +202,35 @@ export default {
   },
   watch: {
     editingMode(mode) {
-      if(mode === this.currentEditingMode) {
+      if (mode === this.currentEditingMode) {
         return;
       }
       this.updateProject({isReadOnly: mode === 'READ-ONLY', isRestricted: mode === 'RESTRICTED'});
     },
 
     blindMode() {
-      if(this.blindMode === this.project.blindMode) {
+      if (this.blindMode === this.project.blindMode) {
         return;
       }
       this.updateProject({blindMode: this.blindMode});
     },
 
     hideManagersLayers() {
-      if(this.hideManagersLayers === this.project.hideAdminsLayers) {
+      if (this.hideManagersLayers === this.project.hideAdminsLayers) {
         return;
       }
       this.updateProject({hideAdminsLayers: this.hideManagersLayers});
     },
 
     hideContributorsLayers() {
-      if(this.hideContributorsLayers === this.project.hideUsersLayers) {
+      if (this.hideContributorsLayers === this.project.hideUsersLayers) {
         return;
       }
       this.updateProject({hideUsersLayers: this.hideContributorsLayers});
     },
 
     imagesDownloadable() {
-      if(this.imagesDownloadable === this.project.areImagesDownloadable) {
+      if (this.imagesDownloadable === this.project.areImagesDownloadable) {
         return;
       }
       this.updateProject({areImagesDownloadable: this.imagesDownloadable});
@@ -259,7 +259,7 @@ export default {
         await updatedProject.save();
         this.$store.commit('currentProject/setProject', updatedProject);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.initData(); // reset data
         this.$notify({type: 'error', text: this.$t('notif-error-general-config-update')});
@@ -267,7 +267,7 @@ export default {
     },
 
     async addDefaultLayer() {
-      if(!this.layerToAdd) {
+      if (!this.layerToAdd) {
         return;
       }
 
@@ -280,7 +280,7 @@ export default {
         this.defaultLayers.push(defaultLayer);
         this.layerToAdd = null;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-add')});
       }
@@ -290,7 +290,7 @@ export default {
       try {
         await this.defaultLayers[idx].save();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-update')});
       }
@@ -301,7 +301,7 @@ export default {
         await this.defaultLayers[idx].delete();
         this.defaultLayers.splice(idx, 1);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-default-layer-delete')});
       }
@@ -320,7 +320,7 @@ export default {
         });
         this.$router.push('/projects');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

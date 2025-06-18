@@ -59,18 +59,18 @@ export default {
 
     removeLayerFromSelectedFeatures(state, {layer, cache = false}) {
       let selectedFeatures = state.selectedFeatures;
-      for(let index = selectedFeatures.length - 1; index >= 0; index--) {
+      for (let index = selectedFeatures.length - 1; index >= 0; index--) {
         let feature = selectedFeatures[index];
         let annot = feature.properties.annot;
-        if(annotBelongsToLayer(annot, layer)) {
+        if (annotBelongsToLayer(annot, layer)) {
           selectedFeatures.splice(index, 1);
-          if(cache) {
+          if (cache) {
             state.annotsToSelect.push(annot);
           }
         }
       }
 
-      if(!cache) {
+      if (!cache) {
         state.annotsToSelect = state.annotsToSelect.filter(annot => !annotBelongsToLayer(annot, layer));
       }
     },
@@ -78,7 +78,7 @@ export default {
     removeTermFromSelectedFeatures(state, {idTerm, terms}) { // idTerm: id of the term no longer displayed
       state.selectedFeatures = state.selectedFeatures.filter(feature => {
         let annot = feature.properties.annot;
-        if(!annot.term.includes(idTerm)) {
+        if (!annot.term.includes(idTerm)) {
           return true; // feature not affected since it does not have the hidden term
         }
         // if feature associated with hidden term, check if it is associated to other terms still displayed
@@ -131,7 +131,7 @@ export default {
 
   getters: {
     selectedFeature: state => {
-      if(state.selectedFeatures.length === 1) {
+      if (state.selectedFeatures.length === 1) {
         return state.selectedFeatures[0];
       }
     }

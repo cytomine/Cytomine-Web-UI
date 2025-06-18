@@ -149,7 +149,7 @@ export default {
       return this.linkGroups.findIndex(group => group.includes(this.index));
     },
     linkedIndexes() {
-      if(this.indexCurrentGroup === -1) {
+      if (this.indexCurrentGroup === -1) {
         return null;
       }
       return this.linkGroups[this.indexCurrentGroup].filter(index => index !== this.index);
@@ -173,7 +173,7 @@ export default {
   },
   methods: {
     handleCheckboxChange(event, indexGroup, indexImage) {
-      if(this.trackedUser) {
+      if (this.trackedUser) {
         this.$buefy.dialog.confirm({
           title: this.$t('possible-conflict'),
           message: this.$t('confirm-untrack-to-link-view'),
@@ -192,7 +192,7 @@ export default {
     },
 
     link(indexGroup, indexImage) {
-      if(this.linkedIndexes) {
+      if (this.linkedIndexes) {
         if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'mergeLinkGroups', [this.indexCurrentGroup, indexGroup]);
         }

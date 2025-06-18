@@ -25,19 +25,19 @@ export default {
   },
   computed: {
     tagClass() {
-      if(this.image.reviewed) {
+      if (this.image.reviewed) {
         return 'is-success';
       }
-      if(this.image.inReview) {
+      if (this.image.inReview) {
         return 'is-info';
       }
       return 'is-light';
     },
     label() {
-      if(this.image.reviewed) {
+      if (this.image.reviewed) {
         return 'reviewed';
       }
-      if(this.image.inReview) {
+      if (this.image.inReview) {
         return 'in-review';
       }
       return 'none';

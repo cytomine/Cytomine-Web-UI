@@ -158,7 +158,7 @@ export default {
         this.projects = (await ProjectCollection.fetchAll({filterKey: 'ontology', filterValue: this.ontology.id})).array;
         // ---
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -168,7 +168,7 @@ export default {
       try {
         this.creator = await User.fetch(this.fullOntology.user);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
 
@@ -194,7 +194,7 @@ export default {
         });
         this.$emit('rename', newName);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

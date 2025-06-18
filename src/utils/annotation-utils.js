@@ -36,7 +36,7 @@ export async function updateTermProperties(annot) {
   annot.userByTerm = [];
   let mapping = {};
   annotTerms.array.forEach(({term, user}) => {
-    if(!annot.term.includes(term)) {
+    if (!annot.term.includes(term)) {
       mapping[term] = annot.term.length;
       annot.term.push(term);
       annot.userByTerm.push({term, user: [user]});
@@ -101,7 +101,7 @@ export async function listAnnotationsInGroup(project, group) {
  * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
  */
 export function annotBelongsToLayer(annot, layer, slices = null) {
-  if(slices && !slices.includes(annot.slice)) {
+  if (slices && !slices.includes(annot.slice)) {
     return false;
   }
 

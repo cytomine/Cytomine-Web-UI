@@ -94,7 +94,7 @@ export default {
         this.properties.splice(idx, 1);
         this.$emit('update');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-prop')});
       }
@@ -109,7 +109,7 @@ export default {
       let prop = this.editedProperties[idx];
 
       // prevent user from saving a property whose key starts with the internal prefix (would be hidden aftewards)
-      if(prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)) {
+      if (prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)) {
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-invalid-key-prefix', {prefix: constants.PREFIX_HIDDEN_PROPERTY_KEY})
@@ -121,12 +121,12 @@ export default {
       try {
         await prop.save();
         this.editedProperties.splice(idx, 1);
-        if(newProp) {
+        if (newProp) {
           this.properties.push(prop);
         }
         this.$emit('update');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-save-prop')});
       }

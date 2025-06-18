@@ -91,7 +91,7 @@ export default {
   },
   computed: {
     allSelected() {
-      if(!this.multiple) {
+      if (!this.multiple) {
         return false;
       }
 

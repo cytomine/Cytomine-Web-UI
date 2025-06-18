@@ -527,7 +527,7 @@ export default {
       }
     },
     backgroundTermsNewAnnot() {
-      if(this.termsToAssociate.length === 1) {
+      if (this.termsToAssociate.length === 1) {
         return this.terms.find(term => this.termsToAssociate[0] === term.id).color;
       }
       else {
@@ -549,7 +549,7 @@ export default {
       return this.imageGroupId !== null;
     },
     backgroundTracksNewAnnot() {
-      if(this.tracksToAssociate.length === 1) {
+      if (this.tracksToAssociate.length === 1) {
         return this.tracks.find(track => this.tracksToAssociate[0] === track.id).color;
       }
       else {
@@ -638,18 +638,18 @@ export default {
   },
   watch: {
     noActiveLayer(value) {
-      if(value) {
+      if (value) {
         this.activeTool = 'select';
       }
     },
     selectedFeature(feature) {
       // disable correct tools if no feature is selected
-      if(!feature && ['correct-add', 'correct-remove'].includes(this.activeEditTool)) {
+      if (!feature && ['correct-add', 'correct-remove'].includes(this.activeEditTool)) {
         this.activeEditTool = null;
       }
     },
     reviewMode(value) {
-      if(value) {
+      if (value) {
         this.activeTool = 'select';
       }
     }
@@ -660,7 +660,7 @@ export default {
     },
 
     isToolDisabled(tool) {
-      if(!this.selectedFeature) {
+      if (!this.selectedFeature) {
         return true; // no feature selected -> all edit tools disabled
       }
 
@@ -677,22 +677,22 @@ export default {
       if (tool === 'unlink') {
         return annot.group === null;
       }
-      if(tool === 'accept') {
+      if (tool === 'accept') {
         return annot.type === AnnotationType.REVIEWED;
       }
-      if(tool === 'reject') {
+      if (tool === 'reject') {
         return annot.type !== AnnotationType.REVIEWED;
       }
 
-      if(!this.$store.getters['currentProject/canEditAnnot'](annot)) {
+      if (!this.$store.getters['currentProject/canEditAnnot'](annot)) {
         return true;
       }
 
       let geomType = ftr.geometry.type;
-      if(geomType === 'Point') {
+      if (geomType === 'Point') {
         return (tool !== 'move' && tool !== 'delete'); // disable all tools except move and delete for points
       }
-      else if(geomType === 'LineString') {
+      else if (geomType === 'LineString') {
         return ['fill', 'correct-add', 'correct-remove'].includes(tool); // disable fill and correct tools for lines
       }
       else {
@@ -711,7 +711,7 @@ export default {
 
     async fill() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
@@ -724,14 +724,14 @@ export default {
         this.$eventBus.$emit('reloadAnnotationCrop', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
       }
-      catch(err) {
+      catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-fill')});
       }
     },
 
     async deleteAnnot() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
@@ -769,12 +769,12 @@ export default {
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }
-      catch(err) {
+      catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     },
     confirmDeletion() {
-      if(!this.selectedFeature) {
+      if (!this.selectedFeature) {
         return;
       }
 
@@ -801,7 +801,7 @@ export default {
 
     copy() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
@@ -905,7 +905,7 @@ export default {
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
       }
@@ -920,14 +920,14 @@ export default {
         this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
       }
     },
 
     confirmUnlink() {
-      if(!this.selectedFeature) {
+      if (!this.selectedFeature) {
         return;
       }
 
@@ -942,7 +942,7 @@ export default {
     },
     async unlink() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
@@ -984,7 +984,7 @@ export default {
         });
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-deletion')});
       }
@@ -992,7 +992,7 @@ export default {
 
 
     async undo() {
-      if(this.actions.length === 0) {
+      if (this.actions.length === 0) {
         return;
       }
 
@@ -1001,13 +1001,13 @@ export default {
         let opposedAction = await this.reverseAction(action, true);
         this.$store.commit(this.imageModule + 'undoAction', opposedAction);
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-undo')});
       }
     },
     async redo() {
-      if(this.undoneActions.length === 0) {
+      if (this.undoneActions.length === 0) {
         return;
       }
 
@@ -1016,7 +1016,7 @@ export default {
         let opposedAction = await this.reverseAction(action, false);
         this.$store.commit(this.imageModule + 'redoAction', opposedAction);
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({type: 'error', text: this.$t('notif-error-redo')});
       }
@@ -1024,13 +1024,13 @@ export default {
     async reverseAction({annot, type, command}, undo) {
       let newType = type;
 
-      if(type === Action.CREATE) {
+      if (type === Action.CREATE) {
         await Annotation.delete(annot.id);
         this.$eventBus.$emit('deleteAnnotation', annot);
         newType = Action.DELETE;
         command = Cytomine.instance.lastCommand;
       }
-      else if(type === Action.DELETE) {
+      else if (type === Action.DELETE) {
         let collection = await Cytomine.instance.undo(command); // always undo if annotation was deleted
         let newAnnot = await this.getUpdatedAnnotation(collection);
         this.$eventBus.$emit('addAnnotation', newAnnot);
@@ -1038,7 +1038,7 @@ export default {
       }
       else { // annotation was updated
         let collection;
-        if(undo) {
+        if (undo) {
           collection = await Cytomine.instance.undo(command);
         }
         else {
@@ -1051,9 +1051,9 @@ export default {
       return {annot, command, type: newType};
     },
     async getUpdatedAnnotation(collection) {
-      for(let model of collection) {
+      for (let model of collection) {
         let jsonAnnot = model.annotation || model.reviewedannotation;
-        if(jsonAnnot) {
+        if (jsonAnnot) {
           let annot = new Annotation(jsonAnnot);
           annot.imageGroup = this.imageGroupId;
           await updateTermProperties(annot);
@@ -1066,13 +1066,13 @@ export default {
 
     async accept() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
       this.activateEditTool(null);
       let annot = feature.properties.annot;
-      if(annot.type === AnnotationType.REVIEWED) {
+      if (annot.type === AnnotationType.REVIEWED) {
         return;
       }
 
@@ -1083,20 +1083,20 @@ export default {
         this.$eventBus.$emit('addAnnotation', reviewedAnnot);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-validation')});
       }
     },
     async reject() {
       let feature = this.selectedFeature;
-      if(!feature) {
+      if (!feature) {
         return;
       }
 
       this.activateEditTool(null);
       let reviewedAnnot = feature.properties.annot;
-      if(reviewedAnnot.type !== AnnotationType.REVIEWED) {
+      if (reviewedAnnot.type !== AnnotationType.REVIEWED) {
         return;
       }
 
@@ -1108,7 +1108,7 @@ export default {
         this.$eventBus.$emit('addAnnotation', annot, false);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-rejection')});
       }
@@ -1123,11 +1123,11 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
+      if (key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
-      switch(key) {
+      switch (key) {
         case 'tool-select':
           if (this.isToolDisplayed('select')) {
             this.activateTool('select');

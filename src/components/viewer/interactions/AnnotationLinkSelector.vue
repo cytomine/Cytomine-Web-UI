@@ -232,7 +232,7 @@ export default {
         });
         this.$notify({type: 'success', text: successMessage});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: errorMessage});
       }

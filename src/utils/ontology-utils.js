@@ -23,7 +23,7 @@ function processNodes(nodes) {
   let result = [];
   nodes.forEach(node => {
     result.push(node);
-    if(node.children) {
+    if (node.children) {
       result.push(...processNodes(node.children));
     }
   });

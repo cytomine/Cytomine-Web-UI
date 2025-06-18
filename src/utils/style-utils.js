@@ -23,7 +23,7 @@ import constants from '@/utils/constants';
 
 export function isCluster(feature) {
   let annot = feature.get('annot');
-  if(!annot) {
+  if (!annot) {
     return;
   }
   return annot.count !== null;
@@ -184,15 +184,15 @@ export let rejectedSelectStyles = [
 
 export function changeOpacity(style, opacity) {
   let stroke = style.getStroke();
-  if(stroke) {
+  if (stroke) {
     stroke.getColor()[3] = opacity;
   }
   let fill = style.getFill();
-  if(fill) {
+  if (fill) {
     fill.getColor()[3] = opacity;
   }
   let image = style.getImage();
-  if(image) {
+  if (image) {
     image.setOpacity(opacity);
   }
 }

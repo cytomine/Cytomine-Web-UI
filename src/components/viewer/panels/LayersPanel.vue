@@ -152,16 +152,16 @@ export default {
       this.fetchIndexLayers();
     },
     reviewMode() {
-      if(this.reviewMode) {
-        if(!this.layers.includes(this.reviewLayer)) {
+      if (this.reviewMode) {
+        if (!this.layers.includes(this.reviewLayer)) {
           this.layers.push(this.reviewLayer);
         }
         this.addLayer(this.reviewLayer);
       }
       else {
-        if(!this.hasReviewLayer) {
+        if (!this.hasReviewLayer) {
           let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
-          if(index !== -1) {
+          if (index !== -1) {
             this.removeLayer(index);
           }
 
@@ -174,7 +174,7 @@ export default {
       handler: function(layersToPreload) {
         layersToPreload.forEach(layerId => {
           let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
-          if(index !== -1) {
+          if (index !== -1) {
             if (!this.selectedLayers[index].visible) {
               this.toggleLayerVisibility(index);
             }
@@ -191,8 +191,8 @@ export default {
       this.annotationEventHandler(annot);
       let updatedProject = this.$store.state.currentProject.project.clone();
 
-      if(annot.type === 'UserAnnotation') {
-        if(saved) {
+      if (annot.type === 'UserAnnotation') {
+        if (saved) {
           updatedProject.numberOfAnnotations++;
         }
       }
@@ -206,12 +206,12 @@ export default {
       this.annotationEventHandler(annot);
     },
     annotationEventHandler(annot) {
-      if(annot.image === this.image.id) {
+      if (annot.image === this.image.id) {
         this.fetchIndexLayers();
       }
     },
     reloadAnnotationsHandler({idImage} = {}) {
-      if(!idImage || idImage === this.image.id) {
+      if (!idImage || idImage === this.image.id) {
         this.fetchIndexLayers();
       }
     },
@@ -237,13 +237,13 @@ export default {
 
     addLayerById(id, visible) {
       let layer = this.layers.find(layer => layer.id === id);
-      if(layer) {
+      if (layer) {
         this.addLayer(layer, visible);
       }
     },
 
     addLayer(layer = this.selectedLayer, visible = true) {
-      if(this.selectedLayersIds.includes(layer.id)) {
+      if (this.selectedLayersIds.includes(layer.id)) {
         return;
       }
 
@@ -282,7 +282,7 @@ export default {
     },
 
     async fetchIndexLayers(force = false) {
-      if(!force && this.activePanel !== 'layers') {
+      if (!force && this.activePanel !== 'layers') {
         return;
       }
       // TODO: optimize, backend should be able to send indexes for several slices at once.
@@ -299,22 +299,22 @@ export default {
     },
 
     shortkeyHandler(key) {
-      if(!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
+      if (!key.startsWith('toggle-all-') && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
       }
 
       key = key.replace('toggle-all-', 'toggle-');
-      if(key === 'toggle-selected-layers') {
+      if (key === 'toggle-selected-layers') {
         this.selectedLayers.forEach((layer, index) => this.toggleLayerVisibility(index));
       }
-      else if(key === 'toggle-review-layer') {
+      else if (key === 'toggle-review-layer') {
         let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
-        if(index !== -1) {
+        if (index !== -1) {
           this.toggleLayerVisibility(index);
           return;
         }
 
-        if(this.layers.includes(this.reviewLayer)) {
+        if (this.layers.includes(this.reviewLayer)) {
           this.addLayer(this.reviewLayer);
         }
       }
@@ -327,7 +327,7 @@ export default {
         this.fetchIndexLayers(true),
       ]);
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
       this.$notify({type: 'error', text: this.$t('notif-error-loading-annotation-layers')});
@@ -336,8 +336,8 @@ export default {
 
     let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
 
-    if(!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
-      if(!this.layersToPreload.includes(this.currentUser.id)) {
+    if (!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
+      if (!this.layersToPreload.includes(this.currentUser.id)) {
         layersToAdd.push({id: this.currentUser.id, visible: true});
       }
 
@@ -350,12 +350,12 @@ export default {
         let addedIds = layersToAdd.map(layer => layer.id);
 
         defaultLayers.array.forEach(({user, hideByDefault}) => {
-          if(!addedIds.includes(user)) {
+          if (!addedIds.includes(user)) {
             layersToAdd.push({id: user, visible: !hideByDefault});
           }
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
     }

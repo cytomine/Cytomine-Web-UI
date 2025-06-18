@@ -336,7 +336,7 @@ export default {
       }
     },
     visible() {
-      if(this.pendingReload) {
+      if (this.pendingReload) {
         this.fetchPage();
       }
     },
@@ -368,14 +368,14 @@ export default {
       }
     },
     async fetchPage(setLoading = false) {
-      if(!this.visible) { // prevent unnecessary reload if list not visible but schedule a reload at next opening
+      if (!this.visible) { // prevent unnecessary reload if list not visible but schedule a reload at next opening
         this.pendingReload = true;
         return;
       }
 
       this.pendingReload = false;
 
-      if((!this.tooManyImages && !this.imagesIds.length) || (!this.reviewed && !this.usersIds.length)
+      if ((!this.tooManyImages && !this.imagesIds.length) || (!this.reviewed && !this.usersIds.length)
         || (this.reviewed && !this.reviewUsersIds.length) || !this.termsIds.length || !this.tracksIds.length || (this.tagsIds ? !this.tagsIds.length : 0)) {
         this.annotations = [];
         this.nbAnnotations = 0;
@@ -391,8 +391,8 @@ export default {
         this.annotations = data.array;
         this.nbAnnotations = data.totalNbItems;
       }
-      catch(error) {
-        if(this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page
+      catch (error) {
+        if (this.currentPage > 1) { // error may be due to the page number (not enough annots) => retry on first page
           this.currentPage = 1;
           return;
         }

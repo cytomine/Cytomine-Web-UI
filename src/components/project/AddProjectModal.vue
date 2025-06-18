@@ -90,7 +90,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.name = '';
         this.ontology = 'NEW';
         this.selectedOntology = null;
@@ -100,17 +100,17 @@ export default {
   methods: {
     async createProject() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
       try {
         let idOntology;
-        if(this.ontology === 'NEW') {
+        if (this.ontology === 'NEW') {
           let ontology = await new Ontology({name: this.name}).save();
           idOntology = ontology.id;
         }
-        else if(this.ontology === 'EXISTING') {
+        else if (this.ontology === 'EXISTING') {
           idOntology = this.selectedOntology;
         }
 
@@ -121,7 +121,7 @@ export default {
         this.$emit('update:active', false);
         await this.$router.push(`/project/${project.id}/configuration`);
       }
-      catch(error) {
+      catch (error) {
         if (error.response.status === 409) {
           this.$notify({type: 'error', text: this.$t('notif-error-project-already-exists')});
         }

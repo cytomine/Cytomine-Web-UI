@@ -23,7 +23,7 @@ export default {
 
   mutations: {
     addLayer(state, layer) {
-      if(!state.selectedLayers) {
+      if (!state.selectedLayers) {
         state.selectedLayers = [];
       }
       state.selectedLayers.push({...layer});
@@ -44,7 +44,7 @@ export default {
     },
 
     filterSelectedLayers(state, idLayers) {
-      if(!state.selectedLayers) {
+      if (!state.selectedLayers) {
         return;
       }
       state.selectedLayers = state.selectedLayers.filter(layer => idLayers.includes(layer.id));
@@ -59,7 +59,7 @@ export default {
     toggleLayerVisibility({state, commit}, indexLayer) {
       commit('toggleLayerVisibility', indexLayer);
       let layer = state.selectedLayers[indexLayer];
-      if(!layer.visible) {
+      if (!layer.visible) {
         commit('removeLayerFromSelectedFeatures', {layer});
       }
     },

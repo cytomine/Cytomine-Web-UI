@@ -441,7 +441,7 @@ export default {
 
     // eslint-disable-next-line vue/return-in-computed-property
     targetAnnotationType() {
-      switch(this.$route.query.type) {
+      switch (this.$route.query.type) {
         case 'user':
           return this.userAnnotationOption;
         case 'reviewed':
@@ -454,13 +454,13 @@ export default {
     members: get('currentProject/members'),
     managers: get('currentProject/managers'),
     filteredMembers() { // filter the members so as to return only those whose annotations can be seen by current user
-      if(this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
+      if (this.canManageProject || (!this.project.hideUsersLayers && !this.project.hideAdminsLayers)) {
         return this.members;
       }
 
       let idManagers = this.managers.map(m => m.id);
       return this.members.filter(member => {
-        if(this.currentUser.id === member.id) {
+        if (this.currentUser.id === member.id) {
           return true;
         }
         let isManager = idManagers.includes(member.id);
@@ -473,7 +473,7 @@ export default {
     },
     additionalTermNodes() {
       let additionalNodes = [this.noTermOption];
-      if(this.terms.length > 1 && this.isByTerm) {
+      if (this.terms.length > 1 && this.isByTerm) {
         additionalNodes.push(this.multipleTermsOption);
       }
       return additionalNodes;
@@ -531,7 +531,7 @@ export default {
       return this.selectedAnnotationType === this.reviewedAnnotationOption;
     },
     selectedUsersIds() {
-      if(this.reviewed) {
+      if (this.reviewed) {
         return null;
       }
       let users = this.selectedMembers;
@@ -638,7 +638,7 @@ export default {
         beforeThan: this.beforeThan
       });
 
-      if(this.selectedTagsIds.length > 0 && this.selectedTagsIds.length < this.tags.length) {
+      if (this.selectedTagsIds.length > 0 && this.selectedTagsIds.length < this.tags.length) {
         collection['tags'] = this.selectedTagsIds;
         collection['noTag'] = this.noTag;
       }
@@ -743,20 +743,20 @@ export default {
   },
   watch: {
     querySearchTags(values) {
-      if(values) {
+      if (values) {
         this.selectedTags = [];
         let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
-        if(queriedTags) {
+        if (queriedTags) {
           this.resetPagesAndFilters(); // we want all annotations of the job => reset state
           this.selectedTags = queriedTags;
         }
       }
     },
     querySearchImage(val) {
-      if(val) {
+      if (val) {
         this.selectedImages = [];
         let queriedImage = this.images.find(image => image.id === Number(val));
-        if(queriedImage) {
+        if (queriedImage) {
           this.resetPagesAndFilters(); // we want all annotations of the image => reset state
           this.selectedImages = [queriedImage];
         }
@@ -767,19 +767,19 @@ export default {
     this.annotationTypes = [this.userAnnotationOption, this.reviewedAnnotationOption];
 
     // if store was not yet initialized, set default values
-    if(!this.selectedSize) {
+    if (!this.selectedSize) {
       this.selectedSize = this.allowedSizes[0];
     }
-    if(!this.selectedCategorization) {
+    if (!this.selectedCategorization) {
       this.selectedCategorization = this.allowedCategorizations[0];
     }
-    if(!this.selectedColor) {
+    if (!this.selectedColor) {
       this.selectedColor = this.colors[0];
     }
-    if(!this.selectedAnnotationType) {
+    if (!this.selectedAnnotationType) {
       this.selectedAnnotationType = this.userAnnotationOption;
     }
-    if(!this.regroup) {
+    if (!this.regroup) {
       this.regroup = this.groupBundling[this.groupBundling.length - 1];
     }
     // ---
@@ -793,30 +793,30 @@ export default {
         this.fetchTags()
       ]);
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
       return;
     }
 
-    if(this.targetAnnotationType) {
+    if (this.targetAnnotationType) {
       this.resetPagesAndFilters(); // we want all annotations of this type => reset state
       this.selectedAnnotationType = this.targetAnnotationType;
     }
 
-    if(this.$route.query.image) {
+    if (this.$route.query.image) {
       let queriedImage = this.images.find(image => image.id === Number(this.$route.query.image));
-      if(this.tooManyImages) {
+      if (this.tooManyImages) {
         queriedImage = await ImageInstance.fetch(Number(this.$route.query.image));
       }
-      if(queriedImage) {
+      if (queriedImage) {
         this.resetPagesAndFilters(); // we want all annotations of the image => reset state
         this.selectedImages = [queriedImage];
       }
     }
-    if(this.$route.query.tags) {
+    if (this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
-      if(queriedTags) {
+      if (queriedTags) {
         this.resetPagesAndFilters(); // we want all annotations of the tags => reset state
         this.selectedTags = queriedTags;
       }

@@ -83,9 +83,9 @@ export default {
 
     unlinkImage(state, {indexGroup, indexImage}) {
       let links = state.links;
-      if(!indexGroup) { // if group not specified, find the group of the provided image
+      if (!indexGroup) { // if group not specified, find the group of the provided image
         indexGroup = links.findIndex(group => group.includes(indexImage));
-        if(indexGroup === -1) {
+        if (indexGroup === -1) {
           return;
         }
       }
@@ -93,7 +93,7 @@ export default {
       let group = links[indexGroup];
       let indexWithinGroup = group.findIndex(idx => idx === indexImage);
       group.splice(indexWithinGroup, 1);
-      if(group.length === 1) { // if group no longer contains several images, delete it
+      if (group.length === 1) { // if group no longer contains several images, delete it
         links.splice(indexGroup, 1);
       }
     }
@@ -124,24 +124,24 @@ export default {
     },
 
     setImageResolution({state, commit}, {idImage, resolution}) {
-      for(let index in state.images) {
+      for (let index in state.images) {
         let image = state.images[index].imageInstance;
-        if(image && image.id === idImage) {
+        if (image && image.id === idImage) {
           commit(`images/${index}/setResolution`, resolution);
         }
       }
     },
 
     addTerm({state, commit}, term) { // add term to all image wrappers (as all images belong to same project)
-      for(let index in state.images) {
+      for (let index in state.images) {
         commit(`images/${index}/addTerm`, term);
       }
     },
 
     refreshTracks({state, dispatch}, {idImage}) {
-      for(let index in state.images) {
+      for (let index in state.images) {
         let image = state.images[index].imageInstance;
-        if(image && image.id === idImage) {
+        if (image && image.id === idImage) {
           dispatch(`images/${index}/refreshTracks`);
         }
       }

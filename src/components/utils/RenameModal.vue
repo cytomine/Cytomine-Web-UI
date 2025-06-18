@@ -49,7 +49,7 @@ export default {
   },
   watch: {
     active(active) {
-      if(active) {
+      if (active) {
         this.newName = this.currentName;
       }
     }
@@ -57,7 +57,7 @@ export default {
   methods: {
     async rename() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
       this.$emit('rename', this.newName);

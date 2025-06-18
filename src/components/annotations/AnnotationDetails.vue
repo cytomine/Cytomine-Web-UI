@@ -347,7 +347,7 @@ export default {
       return this.annotation.type === AnnotationType.REVIEWED;
     },
     reviewer() {
-      if(this.isReviewedAnnotation) {
+      if (this.isReviewedAnnotation) {
         return this.users.find(user => user.id === this.annotation.reviewUser) || {};
       }
       return null;
@@ -380,7 +380,7 @@ export default {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
     },
     associatedTerms() {
-      if(this.annotation.userByTerm) {
+      if (this.annotation.userByTerm) {
         return this.annotation.userByTerm.map(ubt => {
           let term = this.terms.find(term => ubt.term === term.id);
           let user = this.users.find(user => user.id === ubt.user[0]) || {}; // QUESTION: can we have several users?
@@ -396,7 +396,7 @@ export default {
       return this.associatedTerms.map(({term}) => term.id);
     },
     associatedTracks() {
-      if(this.annotation.annotationTrack) {
+      if (this.annotation.annotationTrack) {
         return this.annotation.annotationTrack.map(at => {
           let track = this.tracks.find(track => at.track === track.id);
           return {track};
@@ -452,14 +452,14 @@ export default {
     },
 
     async addTerm(idTerm) {
-      if(idTerm) {
+      if (idTerm) {
         try {
           // TODO: fix issue with AlgoAnnotation https://github.com/cytomine/Cytomine-core/issues/1139
           await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
           this.$emit('updateTerms');
           this.showTermSelector = false;
         }
-        catch(error) {
+        catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
           this.revTerms++;
         }
@@ -470,7 +470,7 @@ export default {
     },
     async removeTerm(idTerm, idUser) {
       idUser = idUser || this.findUserByTerm(idTerm); // if term removed from ontology tree, idUser not set => find it manually
-      if(!idUser) {
+      if (!idUser) {
         return;
       }
 
@@ -479,16 +479,16 @@ export default {
         await AnnotationTerm.delete(this.annotation.id, idTerm, Number(idUser));
         this.$emit('updateTerms');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-term')});
         this.revTerms++;
       }
     },
     findUserByTerm(idTerm) {
-      if(this.annotation.userByTerm) {
+      if (this.annotation.userByTerm) {
         let match = this.annotation.userByTerm.find(ubt => ubt.term === idTerm);
-        if(match) {
+        if (match) {
           return match.user[0];
         }
       }
@@ -499,13 +499,13 @@ export default {
       this.addTrack(track.id);
     },
     async addTrack(idTrack) {
-      if(idTrack) {
+      if (idTrack) {
         try {
           await new AnnotationTrack({annotation: this.annotation.id, track: idTrack}).save();
           this.$emit('updateTracks');
           this.showTrackSelector = false;
         }
-        catch(error) {
+        catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-add-track')});
           this.revTracks++;
         }
@@ -515,12 +515,12 @@ export default {
       }
     },
     async removeTrack(idTrack) {
-      if(idTrack) {
+      if (idTrack) {
         try {
           await AnnotationTrack.delete(this.annotation.id, idTrack);
           this.$emit('updateTracks');
         }
-        catch(error) {
+        catch (error) {
           this.$notify({type: 'error', text: this.$t('notif-error-remove-track')});
           this.revTracks++;
         }
@@ -577,7 +577,7 @@ export default {
         await this.annotation.delete();
         this.$emit('deletion');
       }
-      catch(err) {
+      catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
     }
@@ -586,11 +586,11 @@ export default {
     if (this.isPropDisplayed('comments') && this.annotation.type === AnnotationType.USER) {
       try {
         this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;
-        if(this.showComments) {
+        if (this.showComments) {
           this.openCommentsModal();
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotation-comments')});
       }

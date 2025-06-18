@@ -163,7 +163,7 @@ export default {
         await this.$store.dispatch('currentUser/openAdminSession');
         this.$router.push('/admin');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
     },
@@ -177,7 +177,7 @@ export default {
           this.$router.push('/');
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
     },
@@ -188,7 +188,7 @@ export default {
         this.changeLanguage();
         await this.$keycloak.logout();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-logout')});
       }

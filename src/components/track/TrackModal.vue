@@ -78,11 +78,11 @@ export default {
     },
     async save() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
-      if(this.track) {
+      if (this.track) {
         this.update();
       }
       else {
@@ -96,7 +96,7 @@ export default {
         this.$emit('newTrack', track);
         this.$parent.close();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-track-creation')});
       }
@@ -111,7 +111,7 @@ export default {
         this.$emit('updateTrack', track);
         this.$parent.close();
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-track-update')});
       }

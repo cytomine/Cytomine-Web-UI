@@ -31,7 +31,7 @@ export default {
     filteredUsers() {
       let selectedIds = this.value.map(v => v.id);
       let filtered = this.users.filter(user => !selectedIds.includes(user.id));
-      if(this.searchString === '') {
+      if (this.searchString === '') {
         return filtered;
       }
 

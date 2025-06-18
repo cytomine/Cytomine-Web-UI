@@ -112,7 +112,7 @@ export default {
         filterValue: this.project.id,
         withImageGroup: true,
       });
-      if(this.searchString) {
+      if (this.searchString) {
         collection['instanceFilename'] = {
           ilike: encodeURIComponent(this.searchString)
         };
@@ -125,7 +125,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.idsAddedImages = [];
       }
     }
@@ -152,7 +152,7 @@ export default {
           text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',

@@ -115,7 +115,7 @@ export default {
     },
     cells() {
       let cells = new Array(this.nbHorizontalCells * this.nbVerticalCells);
-      for(let i = 0; i < this.nbImages; i++) {
+      for (let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
         let slices = this.viewer.images[index].activeSlices;
@@ -159,13 +159,13 @@ export default {
       this.findIdViewer();
     },
     idViewer(_, old) {
-      if(old) {
+      if (old) {
         this.loading = true;
         this.loadViewer();
       }
     },
     viewer() {
-      if(!this.viewer) {
+      if (!this.viewer) {
         console.log('Viewer closed from external source');
         this.$router.push(`/project/${this.$route.params.idProject}`);
       }
@@ -176,15 +176,15 @@ export default {
   },
   methods: {
     findIdViewer() {
-      if(this.paramIdViewer) {
+      if (this.paramIdViewer) {
         this.idViewer = this.paramIdViewer;
         return;
       }
 
-      for(let id in this.viewers) {
+      for (let id in this.viewers) {
         // if viewer containing the targetted images, and only them, store its id
         let imagesViewer = Object.values(this.viewers[id].images).map(img => img.imageInstance.id).join('-');
-        if(imagesViewer === this.$route.params.idImages) {
+        if (imagesViewer === this.$route.params.idImages) {
           this.idViewer = id;
           return;
         }
@@ -194,7 +194,7 @@ export default {
     },
 
     closeMap(index) {
-      if(this.nbImages === 1) {
+      if (this.nbImages === 1) {
         this.$store.unregisterModule(['projects', this.project.id, 'viewers', this.idViewer]);
         this.$router.push(`/project/${this.$route.params.idProject}`);
       }
@@ -206,7 +206,7 @@ export default {
     async loadViewer() {
       try {
         this.$store.commit('currentProject/setCurrentViewer', this.idViewer);
-        if(!this.viewer) {
+        if (!this.viewer) {
           this.$store.registerModule(['projects', this.project.id, 'viewers', this.idViewer], viewerModuleModel);
 
           // List of unique images (prevent to fetch it multiple times)
@@ -277,7 +277,7 @@ export default {
         }
         this.loading = false;
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.error = true;
       }
@@ -309,7 +309,7 @@ export default {
           }
         }
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.error = true;
       }

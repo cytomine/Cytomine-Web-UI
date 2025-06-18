@@ -52,7 +52,7 @@ export default {
       return this.filteredUsers && this.filteredUsers.length > this.nbDisplayed;
     },
     usersToDisplay() {
-      if(!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
+      if (!this.tooManyUsers || this.expanded || this.nbDisplayed === 0) {
         return this.filteredUsers;
       }
       else {
@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     isOnline(id) {
-      if(!this.onlines) {
+      if (!this.onlines) {
         return null;
       }
 

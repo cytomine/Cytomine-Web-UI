@@ -66,7 +66,7 @@ export default {
 
       let selectedPropertyKey = null;
       let defaultPropertyProp = projectProperties.array.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
-      if(defaultPropertyProp && propertiesKeys.includes(defaultPropertyProp.value)) {
+      if (defaultPropertyProp && propertiesKeys.includes(defaultPropertyProp.value)) {
         selectedPropertyKey = defaultPropertyProp.value;
       }
 
@@ -78,8 +78,8 @@ export default {
       let selectedLayers = getters.selectedLayers;
 
       let properties = {};
-      if(value && selectedLayers) {
-        for(let layer of selectedLayers) {
+      if (value && selectedLayers) {
+        for (let layer of selectedLayers) {
           let layerValues = await fetchLayerPropertiesValues(layer.id, state.idImage, value);
           properties = {...properties, ...layerValues};
         }
@@ -92,7 +92,7 @@ export default {
     async addLayer({state, commit}, layer) {
       let key = state.selectedPropertyKey;
       let propValues = {};
-      if(key) {
+      if (key) {
         propValues = await fetchLayerPropertiesValues(layer.id, state.idImage, key);
       }
       commit('addSelectedPropertyValues', propValues);
@@ -119,7 +119,7 @@ export default {
 };
 
 async function fetchLayerPropertiesValues(idLayer, idImage, key) {
-  if(idLayer === -1) {
+  if (idLayer === -1) {
     return []; // currently not possible to retrieve properties of review layer (TODO in core)
   }
 
@@ -132,7 +132,7 @@ async function fetchLayerPropertiesValues(idLayer, idImage, key) {
   // if several properties with target key for an annotation, concatenate their values
   let properties = {};
   propertiesValues.forEach(propVal => {
-    if(!properties[propVal.idAnnotation]) {
+    if (!properties[propVal.idAnnotation]) {
       properties[propVal.idAnnotation] = propVal.value;
     }
     else {

@@ -97,7 +97,7 @@ export default {
   },
   watch: {
     active(val) {
-      if(val) {
+      if (val) {
         this.name = '';
         this.imageGroup = 'NEW';
         this.selectedImageGroup = null;
@@ -108,17 +108,17 @@ export default {
   methods: {
     async addToImageGroup() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
       try {
         let idImageGroup;
-        if(this.imageGroup === 'NEW') {
+        if (this.imageGroup === 'NEW') {
           let imageGroup = await new ImageGroup({name: this.name, project: this.image.project}).save();
           idImageGroup = imageGroup.id;
         }
-        else if(this.imageGroup === 'EXISTING') {
+        else if (this.imageGroup === 'EXISTING') {
           idImageGroup = this.selectedImageGroup;
         }
 
@@ -126,7 +126,7 @@ export default {
         this.$emit('addToImageGroup', link);
         this.$notify({type: 'success', text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif})});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif})});
       }
@@ -139,7 +139,7 @@ export default {
           filterValue: this.image.project,
         })).array;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }

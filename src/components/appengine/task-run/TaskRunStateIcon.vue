@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     stateIconography() {
-      switch(this.state) {
+      switch (this.state) {
         case 'CREATED':
           return {'type': 'is-primary', 'icon': 'plus-circle'};
         case 'PROVISIONED':

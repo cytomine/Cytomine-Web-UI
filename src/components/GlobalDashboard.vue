@@ -166,7 +166,7 @@ export default {
     currentUser: get('currentUser/user'),
 
     nbImages() {
-      if(!this.projects) {
+      if (!this.projects) {
         return;
       }
 
@@ -175,24 +175,24 @@ export default {
       }, 0);
     },
     recentProjects() {
-      if(!this.recentProjectsId || !this.projects) {
+      if (!this.recentProjectsId || !this.projects) {
         return;
       }
 
       let array = [];
       this.recentProjectsId.forEach(id => {
         let project = this.projects.array.find(project => project.id === id);
-        if(project) {
+        if (project) {
           array.push(project);
         }
       });
       return array;
     },
     lastOpenedImage() {
-      if(this.recentImages && this.recentImages.length > 0 && this.projects) {
+      if (this.recentImages && this.recentImages.length > 0 && this.projects) {
         let lastOpened = this.recentImages[0];
         let project = this.projects.array.find(project => project.id === lastOpened.project);
-        if(project) {
+        if (project) {
           lastOpened.projectName = project.name;
           lastOpened.blindMode = project.blindMode;
         }
@@ -222,7 +222,7 @@ export default {
       try {
         this.welcomeMessage = (await Configuration.fetch(constants.CONFIG_KEY_WELCOME)).value;
       }
-      catch(error) {
+      catch (error) {
         // no welcome message defined
       }
     }

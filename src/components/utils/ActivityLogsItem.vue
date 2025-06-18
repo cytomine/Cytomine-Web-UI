@@ -58,7 +58,7 @@ export default {
     },
     // eslint-disable-next-line vue/return-in-computed-property
     type() {
-      switch(this.action.serviceName) {
+      switch (this.action.serviceName) {
         case 'userAnnotationService':
         case 'reviewedAnnotationService':
           return ANNOT;
@@ -84,7 +84,7 @@ export default {
       this.route = `/project/${annot.project}/image/${annot.image}/annotation/${annot.id}`;
     },
     imageHandler(img) {
-      if(img.deleted) {
+      if (img.deleted) {
         return;
       }
       this.previewUrl = img.thumb;
@@ -94,7 +94,7 @@ export default {
       this.route = `/project/${project.id}`;
     },
     addCommandHandler() {
-      switch(this.type) {
+      switch (this.type) {
         case ANNOT:
           this.annotationHandler(this.actionData);
           break;
@@ -107,7 +107,7 @@ export default {
       }
     },
     editCommandHandler() {
-      switch(this.type) {
+      switch (this.type) {
         case ANNOT:
           // erratic core behaviour -> need to keep the defined new?Annotation property
           this.annotationHandler(
@@ -123,7 +123,7 @@ export default {
     }
   },
   created() {
-    switch(this.action.className) {
+    switch (this.action.className) {
       case 'be.cytomine.command.AddCommand':
       case 'be.cytomine.domain.command.AddCommand':
         this.addCommandHandler();

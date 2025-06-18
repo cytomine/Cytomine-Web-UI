@@ -208,7 +208,7 @@ export default {
           text: this.$t('notif-success-image-group-rename', {imageName: this.imageGroup.name})
         });
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
@@ -238,7 +238,7 @@ export default {
         this.$emit('delete');
 
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
@@ -270,7 +270,7 @@ export default {
         });
         this.$emit('deleteImage', image);
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',

@@ -148,10 +148,10 @@ export default {
         return;
       }
 
-      if(key === 'nav-next-annot-link') {
+      if (key === 'nav-next-annot-link') {
         this.selectNext();
       }
-      else if(key === 'nav-previous-annot-link') {
+      else if (key === 'nav-previous-annot-link') {
         this.selectPrevious();
       }
     }

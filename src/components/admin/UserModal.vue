@@ -153,8 +153,8 @@ export default {
       this.adminConfirm = !this.isChangingRoleToAdmin();
     },
     active(val) {
-      if(val) {
-        if(!this.rolesWithIds) {
+      if (val) {
+        if (!this.rolesWithIds) {
           this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
           this.$emit('update:active', false);
           return;
@@ -181,7 +181,7 @@ export default {
 
     async save() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -189,11 +189,11 @@ export default {
 
       try {
         await this.internalUser.save();
-        if(!this.editionMode || this.selectedRole !== this.user.role) {
+        if (!this.editionMode || this.selectedRole !== this.user.role) {
           await this.internalUser.defineRole(this.idRole);
           this.internalUser.role = this.selectedRole; // for correct rendering in list
         }
-        if(this.editionMode && this.internalUser.password) {
+        if (this.editionMode && this.internalUser.password) {
           await this.internalUser.savePassword(this.internalUser.password);
         }
         this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
@@ -201,7 +201,7 @@ export default {
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateUser' : 'addUser', this.internalUser);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-' + labelTranslation)});
       }
@@ -211,7 +211,7 @@ export default {
     try {
       this.rolesWithIds = (await RoleCollection.fetchAll()).array;
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
     }
   }

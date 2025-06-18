@@ -343,13 +343,13 @@ export default {
         withLastActivity: true,
         withCurrentUserRoles: true
       });
-      if(this.searchString) {
+      if (this.searchString) {
         collection['name'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
 
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
+      if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };
@@ -362,12 +362,12 @@ export default {
         filterValue: this.currentUser.id,
       });
 
-      if(this.searchString) {
+      if (this.searchString) {
         collection['name'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
+      if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };
@@ -377,20 +377,20 @@ export default {
   },
   watch: {
     pathSearchString(val) {
-      if(val) {
+      if (val) {
         this.searchString = val;
       }
     },
     querySearchString(val) {
-      if(val && !this.pathSearchString) {
+      if (val && !this.pathSearchString) {
         this.searchString = val;
       }
     },
     querySearchTags(values) {
-      if(values) {
+      if (values) {
         this.selectedTags = [];
         let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
-        if(queriedTags) {
+        if (queriedTags) {
           this.selectedTags = queriedTags;
         }
       }
@@ -401,13 +401,13 @@ export default {
     try {
       this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }
-    if(this.$route.query.tags) {
+    if (this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
-      if(queriedTags) {
+      if (queriedTags) {
         this.selectedTags = queriedTags;
       }
     }

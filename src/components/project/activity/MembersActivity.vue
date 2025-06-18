@@ -218,7 +218,7 @@ export default {
           this.fetchOnlines()
         ]);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
         return;
@@ -240,7 +240,7 @@ export default {
         let onlines = await this.project.fetchConnectedUsers();
         this.onlineIds = onlines.map(o => o.id);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.onlineIds = null;
       }

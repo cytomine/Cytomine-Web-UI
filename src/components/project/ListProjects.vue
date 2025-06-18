@@ -312,27 +312,27 @@ export default {
         withLastActivity: true,
         withCurrentUserRoles: true
       });
-      if(this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length) {
+      if (this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length) {
         collection['ontology'] = {
           in: this.selectedOntologiesIds.join()
         };
       }
-      if(this.selectedRoles.length > 0) {
+      if (this.selectedRoles.length > 0) {
         collection['currentUserRole'] = {
           in: this.selectedRoles.join().toLowerCase()
         };
       }
-      if(this.searchString) {
+      if (this.searchString) {
         collection['name'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
+      if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };
       }
-      for(let {prop, bounds, max} of this.boundsFilters) {
+      for (let {prop, bounds, max} of this.boundsFilters) {
         collection[prop] = {};
         if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
@@ -360,10 +360,10 @@ export default {
       this.fetchMaxFilters();
     },
     querySearchTags(values) {
-      if(values) {
+      if (values) {
         this.selectedTags = [];
         let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
-        if(queriedTags) {
+        if (queriedTags) {
           this.selectedTags = queriedTags;
         }
       }
@@ -401,7 +401,7 @@ export default {
           text: this.$t('notif-success-project-deletion', {projectName: projectToDelete.name})
         });
       }
-      catch(error) {
+      catch (error) {
         this.$notify({
           type: 'error',
           text: this.$t('notif-error-project-deletion', {projectName: projectToDelete.name})
@@ -418,13 +418,13 @@ export default {
         this.fetchTags()
       ]);
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }
-    if(this.$route.query.tags) {
+    if (this.$route.query.tags) {
       let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
-      if(queriedTags) {
+      if (queriedTags) {
         this.selectedTags = queriedTags;
       }
     }

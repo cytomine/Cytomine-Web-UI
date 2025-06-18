@@ -163,12 +163,12 @@ export default {
         filterKey: 'project',
         filterValue: this.project.id,
       });
-      if(this.selectedRoles.length > 0) {
+      if (this.selectedRoles.length > 0) {
         collection['projectRole'] = {
           in: this.selectedRoles.map(option => option.value).join()
         };
       }
-      if(this.searchString) {
+      if (this.searchString) {
         collection['fullName'] = {
           ilike: encodeURIComponent(this.searchString)
         };
@@ -190,7 +190,7 @@ export default {
         this.revision++;
         await this.$store.dispatch('currentProject/fetchProjectMembers');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -217,14 +217,14 @@ export default {
         await this.refreshMembers();
         this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-project-members')});
       }
     },
 
     confirmToggleManager(member) {
-      if(member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
+      if (member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
         this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
           message: this.$tc('remove-yourself-from-manager-confirmation-message'),
@@ -240,7 +240,7 @@ export default {
     },
     async toggleManager(member) {
       try {
-        if(member.role !== this.contributorRole.value) {
+        if (member.role !== this.contributorRole.value) {
           if (member.role === this.representativeRole.value) {
             await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
@@ -251,21 +251,21 @@ export default {
         }
         this.revision++;
 
-        if(member.id === this.currentUser.id) {
+        if (member.id === this.currentUser.id) {
           await this.$store.dispatch('currentProject/fetchUIConfig');
-          if(!this.$store.state.currentProject.configUI['project-configuration-tab']) {
+          if (!this.$store.state.currentProject.configUI['project-configuration-tab']) {
             this.$router.push(`/project/${this.project.id}`);
           }
         }
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }
     },
     async toggleRepresentative(member) {
       try {
-        if(member.role === this.representativeRole.value) {
+        if (member.role === this.representativeRole.value) {
           if ((await this.project.fetchRepresentatives()).array.length < 2) {
             this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
           }
@@ -278,7 +278,7 @@ export default {
         }
         this.revision++;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
       }

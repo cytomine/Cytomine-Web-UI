@@ -216,7 +216,7 @@ export default {
   methods: {
     async editDetails() {
       let result = await this.$validator.validateAll('profile');
-      if(!result) {
+      if (!result) {
         return;
       }
 
@@ -225,7 +225,7 @@ export default {
         this.changeLanguage(this.currentAccount.locale);
         this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-user-details-not-saved')});
       }
@@ -246,7 +246,7 @@ export default {
         this.apiKeys = await User.regenerateKeys();
         this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
       }
-      catch(err) {
+      catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
       }
     }

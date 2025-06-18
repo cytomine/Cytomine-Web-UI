@@ -96,18 +96,18 @@ export default {
       await this.ping();
     },
     async ping() {
-      if(!ifvisible.now()) {
+      if (!ifvisible.now()) {
         return; // window not visible or inactive user => stop pinging
       }
       try {
         // TODO IAM - still needed ?
         // await Cytomine.instance.ping(this.project ? this.project.id : null);
-        if(!this.currentUser) {
+        if (!this.currentUser) {
           await this.fetchUser();
         }
         this.communicationError = false;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.communicationError = error.toString().indexOf('401') === -1;
       }
@@ -117,7 +117,7 @@ export default {
     },
     async fetchUser() {
       await this.$store.dispatch('currentUser/fetchUser');
-      if(this.currentAccount) {
+      if (this.currentAccount) {
         this.changeLanguage(this.currentAccount.locale);
       }
     }
@@ -141,7 +141,7 @@ export default {
 
       config.headers = config.headers || {};
 
-      if(token !== null) {
+      if (token !== null) {
         this.$store.commit('currentUser/setShortTermToken', token);
         config.headers.common['Authorization'] = `Bearer ${token}`;
       }

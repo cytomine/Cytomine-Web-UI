@@ -83,7 +83,7 @@ export default {
       this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
     },
     async addAssociations(tags) {
-      if(tags.length === 0) {
+      if (tags.length === 0) {
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
         return;
       }
@@ -96,9 +96,9 @@ export default {
         [[], []] // Default values
       );
 
-      try{
+      try {
         let tagPromises = [];
-        for(let i = 0; i < newTags.length; i++) {
+        for (let i = 0; i < newTags.length; i++) {
           tagPromises.push(new Tag({name : newTags[i]}, this.object).save());
         }
         newTags = await Promise.all(tagPromises).then(function(values) {
@@ -106,14 +106,14 @@ export default {
         });
         tags = existingTags.concat(newTags);
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tags')});
       }
 
-      try{
+      try {
         let associationPromises = [];
-        for(let i = 0; i < tags.length; i++) {
+        for (let i = 0; i < tags.length; i++) {
           associationPromises.push(new TagDomainAssociation({tag : tags[i].id}, this.object).save());
         }
         let newAssocations = await Promise.all(associationPromises).then(function(values) {
@@ -123,7 +123,7 @@ export default {
         this.sortAssociatedTags();
         this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
       }
@@ -134,7 +134,7 @@ export default {
         this.associatedTags.splice(idx, 1);
         this.$emit('update');
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-remove-tag')});
       }
@@ -145,7 +145,7 @@ export default {
       this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
       this.sortAssociatedTags();
     }
-    catch(error) {
+    catch (error) {
       console.log(error);
       this.error = true;
     }
