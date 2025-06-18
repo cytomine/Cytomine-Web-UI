@@ -133,7 +133,7 @@ export default {
     }
   },
   watch: {
-    $route(){
+    $route() {
       this.openedTopMenu = false;
     }
   },

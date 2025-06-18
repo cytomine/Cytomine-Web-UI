@@ -673,7 +673,7 @@ export default {
       key = key.replace('toggle-all-', 'toggle-');
       switch(key) {
         case 'toggle-information':
-          if (this.isPanelDisplayed('info')){
+          if (this.isPanelDisplayed('info')) {
             this.togglePanel('info');
           }
           return;

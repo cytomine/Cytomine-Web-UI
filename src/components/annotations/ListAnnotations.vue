@@ -659,7 +659,7 @@ export default {
         this.loadCategories();
       }
     }, 100),
-    loadCategories(){
+    loadCategories() {
       const newCount = this.limitedCategoryOptions.length + categoryBatch;
       if (newCount >= this.categoryOptions.length) {
         this.nLoadedOptionsPerCategory[this.selectedCategorization.categorization] = this.categoryOptions.length;

@@ -163,7 +163,7 @@ export default {
         filterKey: 'project',
         filterValue: this.project.id,
       });
-      if(this.selectedRoles.length > 0){
+      if(this.selectedRoles.length > 0) {
         collection['projectRole'] = {
           in: this.selectedRoles.map(option => option.value).join()
         };

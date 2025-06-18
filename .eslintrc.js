@@ -23,6 +23,7 @@ module.exports = {
     'object-curly-spacing': ['error'],
     'quotes': ['error', 'single', {'avoidEscape': true}],
     'semi': ['error', 'always'],
+    'space-before-blocks': ['error', 'always'],
   },
   'parserOptions': {
     'parser': 'babel-eslint'

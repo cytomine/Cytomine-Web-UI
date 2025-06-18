@@ -96,7 +96,7 @@ export default {
       await this.ping();
     },
     async ping() {
-      if(!ifvisible.now()){
+      if(!ifvisible.now()) {
         return; // window not visible or inactive user => stop pinging
       }
       try {

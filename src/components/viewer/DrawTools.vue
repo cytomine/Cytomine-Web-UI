@@ -1118,7 +1118,7 @@ export default {
       this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
     },
 
-    takeScreenshot(){
+    takeScreenshot() {
       this.$emit('screenshot');
     },
 
@@ -1129,7 +1129,7 @@ export default {
 
       switch(key) {
         case 'tool-select':
-          if (this.isToolDisplayed('select')){
+          if (this.isToolDisplayed('select')) {
             this.activateTool('select');
           }
           return;

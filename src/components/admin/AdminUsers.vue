@@ -156,7 +156,7 @@ export default {
     }
   },
   methods: {
-    displayMemberOrigin(member){
+    displayMemberOrigin(member) {
       let key;
       if (member.origin === 'LDAP') {
         key = 'LDAP';

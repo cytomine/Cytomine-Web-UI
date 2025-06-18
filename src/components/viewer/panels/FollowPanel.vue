@@ -185,7 +185,7 @@ export default {
     broadcast() {
       if(this.broadcast) {
         this.stopTrack();
-        if(!this.wsConnected){
+        if(!this.wsConnected) {
           this.initWebSocket();
           this.wsInterval = setInterval(() => {
             this.sendPosition();
@@ -243,7 +243,7 @@ export default {
       this.trackedUserModel = id;
 
       if(id) {
-        if(!this.wsConnected){
+        if(!this.wsConnected) {
           this.initTracking();
         }
         this.track();
@@ -277,11 +277,11 @@ export default {
     }
   },
   methods: {
-    initTracking(){
+    initTracking() {
       this.initWebSocket();
       this.userPostitionWebsock.onopen = this.onOpentracking;
     },
-    initWebSocket(){
+    initWebSocket() {
       try {
         this.userPostitionWebsock = new WebSocket(appendShortTermToken(this.wsUserPositionPath + this.currentUser.id + '/' + this.image.id + '/' + this.broadcast, this.shortTermToken));
         this.userPostitionWebsock.onopen = this.onOpen;
@@ -292,17 +292,17 @@ export default {
         console.log('error', error);
       }
     },
-    onOpen(){
+    onOpen() {
       this.wsConnected = true;
     },
-    onOpentracking(){
+    onOpentracking() {
       this.onOpen();
       this.userPostitionWebsock.send(this.trackedUserModel);
     },
-    onClose(){
+    onClose() {
       this.wsConnected = false;
     },
-    onMessage(message){
+    onMessage(message) {
       if (message.data === 'stop-track') {
         this.stopTrack();
       }
@@ -311,7 +311,7 @@ export default {
         this.moveView(pos);
       }
     },
-    moveView(pos){
+    moveView(pos) {
       this.view.animate({
         center: [pos.x, pos.y],
         zoom: pos.zoom,
@@ -319,8 +319,8 @@ export default {
         duration: 500
       });
     },
-    stopTrack(){
-      if(this.wsConnected){
+    stopTrack() {
+      if(this.wsConnected) {
         this.userPostitionWebsock.close();
         this.wsConnected = false;
       }
@@ -342,7 +342,7 @@ export default {
       }
     },
     async track() {
-      if(!this.trackedUser || this.wsConnected){
+      if(!this.trackedUser || this.wsConnected) {
         return;
       }
 
@@ -361,7 +361,7 @@ export default {
       }
 
       clearTimeout(this.timeoutTracking);
-      if(!this.wsConnected){
+      if(!this.wsConnected) {
         this.timeoutTracking = setTimeout(this.track, constants.TRACKING_REFRESH_INTERVAL);
       }
     },
@@ -374,12 +374,12 @@ export default {
       let onlines = await this.image.fetchConnectedUsers(true); // retrieve broadcasting user
       this.onlineUsers = onlines.filter(id => id !== this.currentUser.id);
 
-      if(this.broadcast){
+      if(this.broadcast) {
         this.followers = [];
         let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
 
         this.projectMembers.forEach(member => {
-          if(followersIds.includes(''+member.id)){
+          if(followersIds.includes(''+member.id)) {
             this.followers.push(member);
           }
         });
@@ -398,7 +398,7 @@ export default {
   beforeDestroy() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
-    if(this.wsConnected){
+    if(this.wsConnected) {
       this.userPostitionWebsock.close();
       this.wsConnected = false;
     }

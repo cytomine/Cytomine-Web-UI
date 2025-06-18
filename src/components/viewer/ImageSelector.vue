@@ -162,7 +162,7 @@ export default {
     nbImagesDisplayed() {
       this.fetchImages();
     },
-    async selectedTags(){
+    async selectedTags() {
       if (!this.selectedTags.length) {
         this.images = [];
       }

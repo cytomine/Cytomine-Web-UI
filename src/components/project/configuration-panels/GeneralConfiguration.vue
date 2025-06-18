@@ -229,8 +229,8 @@ export default {
       this.updateProject({hideUsersLayers: this.hideContributorsLayers});
     },
 
-    imagesDownloadable(){
-      if(this.imagesDownloadable === this.project.areImagesDownloadable){
+    imagesDownloadable() {
+      if(this.imagesDownloadable === this.project.areImagesDownloadable) {
         return;
       }
       this.updateProject({areImagesDownloadable: this.imagesDownloadable});

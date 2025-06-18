@@ -312,12 +312,12 @@ export default {
         withLastActivity: true,
         withCurrentUserRoles: true
       });
-      if(this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length){
+      if(this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length) {
         collection['ontology'] = {
           in: this.selectedOntologiesIds.join()
         };
       }
-      if(this.selectedRoles.length > 0){
+      if(this.selectedRoles.length > 0) {
         collection['currentUserRole'] = {
           in: this.selectedRoles.join().toLowerCase()
         };
@@ -327,7 +327,7 @@ export default {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length){
+      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };

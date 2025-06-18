@@ -172,10 +172,10 @@ export default {
       let currentRole = this.user ? this.user.role : defaultRole;
       return this.isNotAdmin(currentRole) && !this.isNotAdmin(this.selectedRole);
     },
-    isNotAdmin(role){
+    isNotAdmin(role) {
       return role !== 'ROLE_ADMIN' && role !== 'ROLE_SUPER_ADMIN';
     },
-    isAdminConfirmed(){
+    isAdminConfirmed() {
       return this.adminConfirm || !this.isChangingRoleToAdmin();
     },
 

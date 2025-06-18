@@ -349,7 +349,7 @@ export default {
         };
       }
 
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length){
+      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };
@@ -367,7 +367,7 @@ export default {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length){
+      if(this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
         collection['tag'] = {
           in: this.selectedTags.map(t => t.id).join()
         };

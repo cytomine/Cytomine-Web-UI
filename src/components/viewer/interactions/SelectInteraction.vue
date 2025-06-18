@@ -78,7 +78,7 @@ export default {
           }
         }
         else {
-          if(value.length > 1){
+          if(value.length > 1) {
             //if previous selection is in the new target, we will take the first element not yet visited
             if(value.map(x => x.id).includes(previousSelectedFeature.id)) {
               let index = previousTarget.findIndex(x => x.id === previousSelectedFeature.id);

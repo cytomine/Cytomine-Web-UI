@@ -82,7 +82,7 @@ export default {
     sortAssociatedTags() {
       this.associatedTags.sort((a, b) => a.tagName.localeCompare(b.tagName));
     },
-    async addAssociations(tags){
+    async addAssociations(tags) {
       if(tags.length === 0) {
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
         return;
@@ -106,7 +106,7 @@ export default {
         });
         tags = existingTags.concat(newTags);
       }
-      catch(error){
+      catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tags')});
       }
@@ -123,7 +123,7 @@ export default {
         this.sortAssociatedTags();
         this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
       }
-      catch(error){
+      catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
       }

@@ -71,7 +71,7 @@ import {get, sync} from '@/utils/store-helpers';
 
 export default {
   name: 'project-sidebar',
-  data(){
+  data() {
     return { };
   },
   computed: {
