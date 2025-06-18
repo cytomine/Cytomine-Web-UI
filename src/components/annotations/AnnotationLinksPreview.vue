@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     showLinkedAnnotations() {
-      this.filteredLinks.forEach( link => {
+      this.filteredLinks.forEach(link => {
         this.$emit('select', {annot: link, options:{}});
       });
     },

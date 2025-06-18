@@ -165,7 +165,7 @@ export default class ModifyInteraction extends ModifyInteractionBase {
         else if (segmentDataMatch.geometry.getType() === GeometryType.POLYGON
           && isRectangle(segmentDataMatch.geometry)) {
           let cid = segmentDataMatch.feature.get('annot').id;
-          const segmentDataBbox = this.rBush_.getInExtent(segmentDataMatch.geometry.getExtent()).filter( sd => {
+          const segmentDataBbox = this.rBush_.getInExtent(segmentDataMatch.geometry.getExtent()).filter(sd => {
             return sd.feature.get('annot').id === cid;
           });
 

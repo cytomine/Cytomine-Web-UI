@@ -30,6 +30,7 @@ module.exports = {
       asyncArrow: 'always',
     }],
     'space-infix-ops': ['error'],
+    'space-in-parens': ['error'],
   },
   'parserOptions': {
     'parser': 'babel-eslint'

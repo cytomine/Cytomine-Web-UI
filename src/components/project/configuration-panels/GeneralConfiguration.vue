@@ -197,7 +197,7 @@ export default {
     },
     unselectedLayers() {
       let selectedLayersIds = this.defaultLayers.map(layer => layer.user);
-      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id)).sort((a, b) => (a.fullName < b.fullName) ? -1 : 1 );
+      return this.layers.filter(layer => !selectedLayersIds.includes(layer.id)).sort((a, b) => (a.fullName < b.fullName) ? -1 : 1);
     }
   },
   watch: {
