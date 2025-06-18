@@ -176,17 +176,17 @@ export default {
           binSize: this.integerBinSize,
         }, {
           tooltips: {
-            filter: function(tooltipItem) {
+            filter: function (tooltipItem) {
               return tooltipItem.datasetIndex !== 0;
             },
             callbacks: {
-              label: function(tooltipItem, data) {
+              label: function (tooltipItem, data) {
                 if (data.logScale) {
                   return Math.round(Math.exp(tooltipItem.value));
                 }
                 return tooltipItem.value;
               },
-              title: function(tooltipItems, data) {
+              title: function (tooltipItems, data) {
                 if (tooltipItems.length > 0) {
                   let left = Number(tooltipItems[0].label);
                   if (data.binSize === 1) {

@@ -88,13 +88,13 @@ export default {
       }
     },
     deleteCondition() {
-      return function(mapBrowserEvent) {
+      return function (mapBrowserEvent) {
         return mapBrowserEvent.originalEvent.ctrlKey && singleClick(mapBrowserEvent);
       };
     },
     insertVertexCondition() {
-      return function() {
-        return !this.features_.getArray().every(function(feature) {
+      return function () {
+        return !this.features_.getArray().every(function (feature) {
           return isRectangle(feature.getGeometry());
         });
       };

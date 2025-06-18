@@ -559,7 +559,7 @@ export default {
       this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
 
-    savePosition: _.debounce(async function() {
+    savePosition: _.debounce(async function () {
       if (this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
         try {

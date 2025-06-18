@@ -56,7 +56,7 @@ export default {
         }
 
         value.sort(
-          function(a, b) {
+          function (a, b) {
             if (a.properties.annot.area > b.properties.annot.area) {
               return 1;
             } else {

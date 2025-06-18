@@ -88,7 +88,7 @@ export default {
     },
   },
   methods: {
-    wakeup: async function() {
+    wakeup: async function () {
       if (!ifvisible.now()) {
         return;
       }

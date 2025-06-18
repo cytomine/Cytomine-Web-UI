@@ -298,7 +298,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
-    debounceSearchString: _.debounce(async function(value) {
+    debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
     toggleFilterDisplay() {

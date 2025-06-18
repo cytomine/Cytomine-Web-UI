@@ -110,7 +110,7 @@ export default {
     }
   },
   methods: {
-    scrollHandler: _.debounce(function() {
+    scrollHandler: _.debounce(function () {
       let scrollBlock = this.$refs.listActions;
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight === scrollBlock.scrollHeight);
 

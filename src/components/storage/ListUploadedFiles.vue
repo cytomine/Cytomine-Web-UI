@@ -123,7 +123,7 @@ export default {
     filesize(size) {
       return (size) ? filesize(size, {base: 10}) : null;
     },
-    debounceSearchString: _.debounce(async function(value) {
+    debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
     updatedTree() {

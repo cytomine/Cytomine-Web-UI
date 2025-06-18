@@ -101,7 +101,7 @@ export default {
         for (let i = 0; i < newTags.length; i++) {
           tagPromises.push(new Tag({name : newTags[i]}, this.object).save());
         }
-        newTags = await Promise.all(tagPromises).then(function(values) {
+        newTags = await Promise.all(tagPromises).then(function (values) {
           return values;
         });
         tags = existingTags.concat(newTags);
@@ -115,7 +115,7 @@ export default {
         for (let i = 0; i < tags.length; i++) {
           associationPromises.push(new TagDomainAssociation({tag : tags[i].id}, this.object).save());
         }
-        let newAssocations = await Promise.all(associationPromises).then(function(values) {
+        let newAssocations = await Promise.all(associationPromises).then(function (values) {
           return values;
         });
         this.associatedTags = this.associatedTags.concat(newAssocations);

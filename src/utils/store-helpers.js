@@ -70,7 +70,7 @@ export function sync(path, options = {}) {
   path = arrayPath(path);
   return {
     ...get(path, options),
-    set: debounce(function(value) {
+    set: debounce(function (value) {
       this.$store.commit(getMutationName(fullPath(path, this, options)), value);
     }, options)
   };
@@ -158,7 +158,7 @@ export function syncBoundsFilter(modulePath, filterName, maxProp, options = {}) 
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : [0, this[maxProp]];
     },
-    set: debounce(function(bounds) {
+    set: debounce(function (bounds) {
       let path = fullPath(modulePath, this, options);
       let propValue = bounds[0] !== 0 || bounds[1] !== this[maxProp] ? bounds : null;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
@@ -204,7 +204,7 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
       let value = getValue(this.$store, fullPath(modulePath, this, options)).filters[filterName];
       return value ? value : this[optionsProp].slice();
     },
-    set: debounce(function(selectedOptions) {
+    set: debounce(function (selectedOptions) {
       let path = fullPath(modulePath, this, options);
       let propValue = (selectedOptions.length === this[optionsProp].length) ? null : selectedOptions;
       this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});

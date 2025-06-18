@@ -650,7 +650,7 @@ export default {
     }
   },
   methods: {
-    scrollHandler: _.debounce(function() {
+    scrollHandler: _.debounce(function () {
       let scrollBlock = this.$refs.listAnnots;
       let actualScrollPos = scrollBlock.scrollTop + scrollBlock.clientHeight;
 

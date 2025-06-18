@@ -137,7 +137,7 @@ const methods = {
   },
 };
 
-const watch = makeWatchers(['source'], () => function() {
+const watch = makeWatchers(['source'], () => function () {
   this.scheduleRecreate();
 });
 

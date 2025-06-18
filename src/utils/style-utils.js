@@ -151,7 +151,7 @@ export let selectStyles = [
 
 export let verticesStyle = new Style({
   image: new Circle({radius: width + 1, fill: new Fill({color: blue})}),
-  geometry: function(feature) {
+  geometry: function (feature) {
     // return the coordinates of the first ring of the polygon
     let coordinates = feature.getGeometry().getCoordinates()[0];
     return new MultiPoint(coordinates);

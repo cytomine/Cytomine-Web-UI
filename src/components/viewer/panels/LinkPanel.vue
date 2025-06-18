@@ -92,7 +92,7 @@ export default {
     };
   },
   computed: {
-    modeOptions: function() {
+    modeOptions: function () {
       return [
         {key: 'ABSOLUTE', label: this.$t('absolute-link-mode')},
         {key: 'RELATIVE', label: this.$t('relative-link-mode')}

@@ -170,7 +170,7 @@ export default {
     },
     layersToPreload: {
       deep: true,
-      handler: function(layersToPreload) {
+      handler: function (layersToPreload) {
         layersToPreload.forEach(layerId => {
           let index = this.selectedLayersIds.findIndex(id => id === this.reviewLayer.id);
           if (index !== -1) {

@@ -201,7 +201,7 @@ export default {
   watch: {
     bounds: {
       deep: true,
-      handler: function() {
+      handler: function () {
         this.computeBrightness();
         this.computeContrast();
       }

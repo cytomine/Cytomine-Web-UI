@@ -112,7 +112,7 @@ export default {
         this.showColorSelector = !this.showColorSelector;
       }
     },
-    setColor: _.debounce(function(color) {
+    setColor: _.debounce(function (color) {
       this.$emit('setColor', color.hex);
     }, 500, {leading: true}),
   }
