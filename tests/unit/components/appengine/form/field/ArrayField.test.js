@@ -50,7 +50,7 @@ describe('ArrayField.vue', () => {
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toBe(mockParameter.description + ', items');
 
     expect(wrapper.findComponent(ArrayModal).exists()).toBe(true);
     expect(wrapper.vm.selectParameters).toBe(false);
