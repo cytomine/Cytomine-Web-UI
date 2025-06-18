@@ -627,7 +627,7 @@ export default {
 
       let collection = new AnnotationCollection({
         project: this.project.id,
-        terms: this.selectedTermsIds.length===this.termsOptions.length ? null : this.selectedTermsIds,
+        terms: this.selectedTermsIds.length === this.termsOptions.length ? null : this.selectedTermsIds,
         images: imagesIds,
         users: /*[OP-1885] (this.selectedUsersIds && this.selectedUsersIds.length===users.length) ? null :*/ this.selectedUsersIds,
         reviewed: this.reviewed,

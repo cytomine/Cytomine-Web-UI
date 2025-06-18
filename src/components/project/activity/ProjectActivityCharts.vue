@@ -323,20 +323,20 @@ export default {
       return AnnotationType;
     },
     daysRange() { // duration of the intervals in evolution plots (depends on the length of the considered period)
-      let dayDuration = 24*60*60*1000;
+      let dayDuration = 24 * 60 * 60 * 1000;
       let intervalDuration = (this.endDate || new Date().getTime()) - (this.startDate || this.project.created);
 
-      if(intervalDuration > 365*2*dayDuration) {
+      if(intervalDuration > 365 * 2 * dayDuration) {
         // large period => find a daysRange resulting in around 30 points
         return Math.round(intervalDuration / dayDuration / 30);
       }
-      else if(intervalDuration > 365*dayDuration) {
+      else if(intervalDuration > 365 * dayDuration) {
         return 28;
       }
-      else if(intervalDuration > 6*31*dayDuration) {
+      else if(intervalDuration > 6 * 31 * dayDuration) {
         return 14;
       }
-      else if(intervalDuration > 31*dayDuration) {
+      else if(intervalDuration > 31 * dayDuration) {
         return 7;
       }
       else {
@@ -345,12 +345,12 @@ export default {
     },
     styleAnnotationTermChart() {
       return {
-        height: (30+this.nbElemsAnnotationTermChart*25) + 'px'
+        height: (30 + this.nbElemsAnnotationTermChart * 25) + 'px'
       };
     },
     styleAnnotationContributorChart() {
       return {
-        height: (30+this.nbElemsAnnotationContributorChart*25) + 'px'
+        height: (30 + this.nbElemsAnnotationContributorChart * 25) + 'px'
       };
     }
   },

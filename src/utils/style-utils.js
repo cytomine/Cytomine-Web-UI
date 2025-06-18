@@ -31,7 +31,7 @@ export function isCluster(feature) {
 
 // -----
 
-export function createStrokeStyle(color, opacity=0.5) {
+export function createStrokeStyle(color, opacity = 0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
@@ -44,7 +44,7 @@ export function createStrokeStyle(color, opacity=0.5) {
   });
 }
 
-export function createLineStrokeStyle(color, opacity=0.5) {
+export function createLineStrokeStyle(color, opacity = 0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
@@ -60,12 +60,12 @@ function colorWithOpacity(color, opacity) {
   return colorWithOpacity;
 }
 
-function createStroke(opacity=0.5) {
+function createStroke(opacity = 0.5) {
   let color = (constants.ANNOTATION_STROKE_COLOR) ? constants.ANNOTATION_STROKE_COLOR : black;
   return new Stroke({color: colorWithOpacity(color, opacity), width: 2});
 }
 
-export function createColorStyle(color, opacity=0.5) {
+export function createColorStyle(color, opacity = 0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
@@ -88,7 +88,7 @@ export function createColorStyle(color, opacity=0.5) {
 
 // -----
 
-export function createColorLineStyle(color, opacity=0.5) {
+export function createColorLineStyle(color, opacity = 0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
@@ -101,7 +101,7 @@ export function createColorLineStyle(color, opacity=0.5) {
 let textFill = new Fill({color: '#fff'});
 let textStroke = new Stroke({color: '#000', width: 3});
 
-export function createTextStyle(text, fontSize='22px', fill=textFill, stroke=textStroke) {
+export function createTextStyle(text, fontSize = '22px', fill = textFill, stroke = textStroke) {
   return new Style({
     text: new Text({
       text,

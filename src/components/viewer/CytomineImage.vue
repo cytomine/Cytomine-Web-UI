@@ -546,7 +546,7 @@ export default {
 
       this.overview.getOverviewMap().on(('click'), (evt) => {
         let size = map.getSize();
-        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+        map.getView().centerOn(evt.coordinate, size, [size[0] / 2, size[1] / 2]);
       });
     },
 
@@ -593,7 +593,7 @@ export default {
     fitZoom() {
       this.$refs.view.animate({
         zoom: this.idealZoom,
-        center: [this.image.width/2, this.image.height/2]
+        center: [this.image.width / 2, this.image.height / 2]
       });
     },
 
@@ -625,7 +625,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center=false, showComments=false}) {
+    async selectAnnotationHandler({index, annot, center = false, showComments = false}) {
       if (this.index === index && annot.image === this.image.id) {
         try {
           let sliceChange = false;
@@ -728,7 +728,7 @@ export default {
       // Use of css percent values and html2canvas results in strange behavior
       // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
       let containerHeight = document.querySelector('.map-container').clientHeight;
-      document.querySelector('.map-container').style.height = containerHeight+'px';
+      document.querySelector('.map-container').style.height = containerHeight + 'px';
 
       let a = document.createElement('a');
       a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});

@@ -364,10 +364,10 @@ export default {
         let countCollection = this.collection.clone();
         countCollection.beforeSlice = this.activeSliceWithSmallestRank;
         countCollection.max = 1;
-        this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1)/ this.nbPerPage);
+        this.currentPage = Math.ceil(((await countCollection.fetchPage()).totalNbItems + 1) / this.nbPerPage);
       }
     },
-    async fetchPage(setLoading=false) {
+    async fetchPage(setLoading = false) {
       if(!this.visible) { // prevent unnecessary reload if list not visible but schedule a reload at next opening
         this.pendingReload = true;
         return;

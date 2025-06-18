@@ -49,6 +49,6 @@ export function combineImageUrl({host, pathname, format, params}) {
 }
 
 
-export function changeImageUrlFormat(url, newFormat=IMAGE_FORMAT) {
+export function changeImageUrlFormat(url, newFormat = IMAGE_FORMAT) {
   return combineImageUrl({format: newFormat, ...splitImageUrl(url)});
 }

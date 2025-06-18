@@ -271,7 +271,7 @@ export default {
       return this.$t('button-adjust');
     },
     defaultBounds() {
-      return {min: 0, max: 2**this.image.bitPerSample - 1};
+      return {min: 0, max: 2 ** this.image.bitPerSample - 1};
     },
 
     manipulableChannels() {

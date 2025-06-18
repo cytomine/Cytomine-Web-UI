@@ -285,7 +285,7 @@ export default {
         await this.fetchImageGroups();
 
         // if an item has been deleted, the currentPage value might not be valid => reinitialize it
-        if((this.currentPage - 1)*this.perPage >= this.filteredImageGroups.length) {
+        if((this.currentPage - 1) * this.perPage >= this.filteredImageGroups.length) {
           this.currentPage = 1;
         }
       }

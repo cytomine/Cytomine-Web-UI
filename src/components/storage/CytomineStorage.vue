@@ -276,7 +276,7 @@ export default {
         this.storages.forEach(v => {
           v.extendedName = v.name;
           if (this.currentAccount.isDeveloper) {
-            v.extendedName +=' '+this.$t('id')+': '+v.id;
+            v.extendedName += ' ' + this.$t('id') + ': ' + v.id;
           }
         });
 

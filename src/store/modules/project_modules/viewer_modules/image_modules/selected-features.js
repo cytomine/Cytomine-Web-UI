@@ -57,7 +57,7 @@ export default {
       }
     },
 
-    removeLayerFromSelectedFeatures(state, {layer, cache=false}) {
+    removeLayerFromSelectedFeatures(state, {layer, cache = false}) {
       let selectedFeatures = state.selectedFeatures;
       for(let index = selectedFeatures.length - 1; index >= 0; index--) {
         let feature = selectedFeatures[index];

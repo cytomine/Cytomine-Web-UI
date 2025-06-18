@@ -79,7 +79,7 @@ export default {
     formattedName() {
       let name = this.name;
       if (name === null) {
-        name = `${this.$t('channel-abbr')} ${this.channelIndex+1}`;
+        name = `${this.$t('channel-abbr')} ${this.channelIndex + 1}`;
       }
       if (this.nbSamplesPerChannel === 3) {
         name += ` (${this.rgbColors[this.sampleIndex]})`;

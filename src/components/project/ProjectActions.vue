@@ -153,7 +153,7 @@ export default {
       this.isRenameModalActive = false;
     },
 
-    async saveOntology(forceOntologyUpdate=false) {
+    async saveOntology(forceOntologyUpdate = false) {
       this.savingOntology = true; // possibly long operation => give user visual indication that it is in progress
       let updatedProject = this.project.clone();
       try {

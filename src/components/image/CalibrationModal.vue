@@ -108,10 +108,10 @@ export default {
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();
-        updateImage.physicalSizeX = Number(this.calibrationFieldX)*this.calibrationFactorX;
-        updateImage.physicalSizeY = Number(this.calibrationFieldX)*this.calibrationFactorX;
+        updateImage.physicalSizeX = Number(this.calibrationFieldX) * this.calibrationFactorX;
+        updateImage.physicalSizeY = Number(this.calibrationFieldX) * this.calibrationFactorX;
         if (this.image.depth > 1) {
-          updateImage.physicalSizeZ = Number(this.calibrationFieldZ)*this.calibrationFactorZ;
+          updateImage.physicalSizeZ = Number(this.calibrationFieldZ) * this.calibrationFactorZ;
         }
         if (this.image.duration > 1) {
           updateImage.fps = Number(this.calibrationFieldT);

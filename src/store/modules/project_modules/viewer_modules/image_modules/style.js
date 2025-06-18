@@ -27,7 +27,7 @@ export default {
 
       displayNoTerm: true,
       noTermOpacity: initialTermsOpacity,
-      noTermStyle: createColorStyle('#fff', initialLayersOpacity*initialTermsOpacity),
+      noTermStyle: createColorStyle('#fff', initialLayersOpacity * initialTermsOpacity),
 
       defaultStyle: createColorStyle('#fff', initialLayersOpacity),
       multipleTermsStyle: createColorStyle('#fff', initialLayersOpacity),
@@ -64,40 +64,40 @@ export default {
     setTermOpacity(state, {indexTerm, opacity}) {
       let term = state.terms[indexTerm];
       term.opacity = opacity;
-      changeOpacity(term.olStyle, state.layersOpacity*opacity);
-      changeOpacity(term.olLineStyle, state.layersOpacity*opacity);
+      changeOpacity(term.olStyle, state.layersOpacity * opacity);
+      changeOpacity(term.olLineStyle, state.layersOpacity * opacity);
     },
 
     setNoTermOpacity(state, opacity) {
       state.noTermOpacity = opacity;
-      changeOpacity(state.noTermStyle, state.layersOpacity*opacity);
+      changeOpacity(state.noTermStyle, state.layersOpacity * opacity);
     },
 
     resetTermOpacities(state) {
       state.terms.forEach(term => {
         term.opacity = initialTermsOpacity;
-        changeOpacity(term.olStyle, state.layersOpacity*initialTermsOpacity);
-        changeOpacity(term.olLineStyle, state.layersOpacity*initialTermsOpacity);
+        changeOpacity(term.olStyle, state.layersOpacity * initialTermsOpacity);
+        changeOpacity(term.olLineStyle, state.layersOpacity * initialTermsOpacity);
       });
       state.noTermOpacity = initialTermsOpacity;
-      changeOpacity(state.noTermStyle, state.layersOpacity*state.noTermOpacity);
+      changeOpacity(state.noTermStyle, state.layersOpacity * state.noTermOpacity);
     },
 
     setLayersOpacity(state, opacity) {
       state.layersOpacity = opacity;
       if(state.terms) {
         state.terms.forEach(term => {
-          changeOpacity(term.olStyle, opacity*term.opacity);
-          changeOpacity(term.olLineStyle, opacity*term.opacity);
+          changeOpacity(term.olStyle, opacity * term.opacity);
+          changeOpacity(term.olLineStyle, opacity * term.opacity);
         });
       }
-      changeOpacity(state.noTermStyle, opacity*state.noTermOpacity);
+      changeOpacity(state.noTermStyle, opacity * state.noTermOpacity);
       changeOpacity(state.multipleTermsStyle, opacity);
       changeOpacity(state.defaultStyle, opacity);
       if(state.wrappedTracks) {
         state.wrappedTracks.forEach(track => {
-          changeOpacity(track.olStyle, opacity*track.opacity);
-          changeOpacity(track.olLineStyle, opacity*track.opacity);
+          changeOpacity(track.olStyle, opacity * track.opacity);
+          changeOpacity(track.olLineStyle, opacity * track.opacity);
         });
       }
       changeOpacity(state.multipleTracksStyle, opacity);
@@ -174,7 +174,7 @@ export default {
 };
 
 
-function formatTerms(terms, layersOpacity, previousTerms=[]) {
+function formatTerms(terms, layersOpacity, previousTerms = []) {
   if(!terms) {
     return;
   }
@@ -192,14 +192,14 @@ function formatTerms(terms, layersOpacity, previousTerms=[]) {
 function formatTerm(term, layersOpacity) {
   let result = {id: term.id};
   result.opacity = initialTermsOpacity;
-  result.olStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
-  result.olLineStyle = createColorLineStyle(term.color, initialTermsOpacity*layersOpacity);
+  result.olStyle = createColorStyle(term.color, initialTermsOpacity * layersOpacity);
+  result.olLineStyle = createColorLineStyle(term.color, initialTermsOpacity * layersOpacity);
   result.visible = true;
   result.color = term.color;
   return result;
 }
 
-function formatTracks(tracks, layersOpacity, previousTracks=[]) {
+function formatTracks(tracks, layersOpacity, previousTracks = []) {
   if(!tracks) {
     return;
   }
@@ -217,8 +217,8 @@ function formatTracks(tracks, layersOpacity, previousTracks=[]) {
 function formatTrack(track, layersOpacity) {
   let result = {id: track.id};
   result.opacity = initialTracksOpacity;
-  result.olStyle = createStrokeStyle(track.color, initialTracksOpacity*layersOpacity);
-  result.olLineStyle = createLineStrokeStyle(track.color, initialTracksOpacity*layersOpacity);
+  result.olStyle = createStrokeStyle(track.color, initialTracksOpacity * layersOpacity);
+  result.olLineStyle = createLineStrokeStyle(track.color, initialTracksOpacity * layersOpacity);
   result.color = track.color;
   return result;
 }

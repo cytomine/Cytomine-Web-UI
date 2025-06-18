@@ -111,10 +111,10 @@ export default {
       return Math.ceil(Math.sqrt(this.nbImages));
     },
     nbVerticalCells() {
-      return this.nbHorizontalCells ? Math.ceil(this.nbImages/this.nbHorizontalCells) : 0;
+      return this.nbHorizontalCells ? Math.ceil(this.nbImages / this.nbHorizontalCells) : 0;
     },
     cells() {
-      let cells = new Array(this.nbHorizontalCells*this.nbVerticalCells);
+      let cells = new Array(this.nbHorizontalCells * this.nbVerticalCells);
       for(let i = 0; i < this.nbImages; i++) {
         let index = this.indexImages[i];
         let image = this.viewer.images[index].imageInstance;
@@ -125,10 +125,10 @@ export default {
       return cells;
     },
     elementHeight() {
-      return 100/this.nbVerticalCells;
+      return 100 / this.nbVerticalCells;
     },
     elementWidth() {
-      return 100/this.nbHorizontalCells;
+      return 100 / this.nbHorizontalCells;
     },
     shortkeysMapping() {
       let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t',
@@ -283,7 +283,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center=false}) {
+    async selectAnnotationHandler({index, annot, center = false}) {
       try {
         if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
           annot = await Annotation.fetch(annot.id);

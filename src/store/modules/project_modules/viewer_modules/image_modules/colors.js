@@ -253,7 +253,7 @@ function formatColormapRequestParam(color, inverted) {
 }
 
 function defaultBounds(nBits) {
-  return {min: 0, max: 2**nBits - 1};
+  return {min: 0, max: 2 ** nBits - 1};
 }
 
 function autoAdjustBounds(nBits, {min, max}) {
@@ -297,7 +297,7 @@ function formatApparentChannel(apparentChannel, nBits) {
   return result;
 }
 
-function resetApparentChannel(apparentChannel, nBits, onlyIntensities=false) {
+function resetApparentChannel(apparentChannel, nBits, onlyIntensities = false) {
   if (!onlyIntensities) {
     apparentChannel.color = apparentChannel.defaultColor;
     apparentChannel.isColormap = false;

@@ -160,7 +160,7 @@ export default {
     rotateCoords(coords, theta) {
       let cosTheta = Math.cos(theta);
       let sinTheta = Math.sin(theta);
-      return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
+      return coords.map(([x, y]) => [x * cosTheta + y * sinTheta, -x * sinTheta + y * cosTheta]);
     },
 
     clearDrawnFeatures() {

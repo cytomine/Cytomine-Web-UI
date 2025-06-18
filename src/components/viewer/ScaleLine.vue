@@ -63,7 +63,7 @@ export default {
         return `${length.toPrecision(3)} ${unit}`;
       }
       else {
-        return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
+        return `${Math.round(length * 1000) / 1000} ${this.$t('pixels')}`;
       }
     },
     interpolation() {

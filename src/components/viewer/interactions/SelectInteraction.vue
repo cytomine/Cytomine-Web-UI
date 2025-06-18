@@ -73,7 +73,7 @@ export default {
 
         //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
         if (this.imageWrapper.selectedFeatures.selectedFeatures.length === 0) {
-          if (value.length>=1) {
+          if (value.length >= 1) {
             value = [value[0]];
           }
         }

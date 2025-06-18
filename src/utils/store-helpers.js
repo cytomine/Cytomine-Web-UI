@@ -45,7 +45,7 @@ import _ from 'lodash';
  * @param {Options} [options] Options refining the way to get the property
  * @returns A computed getter for the targetted property
  */
-export function get(path, options={}) {
+export function get(path, options = {}) {
   path = arrayPath(path);
   return {
     get() {
@@ -66,7 +66,7 @@ export function get(path, options={}) {
  * @param {Options} [options] Options refining the way to sync the property
  * @returns Computed getter and setter for the targetted property
  */
-export function sync(path, options={}) {
+export function sync(path, options = {}) {
   path = arrayPath(path);
   return {
     ...get(path, options),
@@ -105,7 +105,7 @@ export function sync(path, options={}) {
  * @param {Options} [options] Options refining the way to sync the filter
  * @returns Computed getter and setter for the targetted filter
  */
-export function syncFilter(modulePath, filterName, options={}) {
+export function syncFilter(modulePath, filterName, options = {}) {
   modulePath = arrayPath(modulePath);
 
   return {
@@ -150,7 +150,7 @@ export function syncFilter(modulePath, filterName, options={}) {
  * @param {Options} [options] Options refining the way to sync the filter
  * @returns Computed getter and setter for the targetted filter
  */
-export function syncBoundsFilter(modulePath, filterName, maxProp, options={}) {
+export function syncBoundsFilter(modulePath, filterName, maxProp, options = {}) {
   modulePath = arrayPath(modulePath);
 
   return {
@@ -196,7 +196,7 @@ export function syncBoundsFilter(modulePath, filterName, maxProp, options={}) {
  * @param {Options} [options] Options refining the way to sync the filter
  * @returns Computed getter and setter for the targetted filter
  */
-export function syncMultiselectFilter(modulePath, filterName, optionsProp, options={}) {
+export function syncMultiselectFilter(modulePath, filterName, optionsProp, options = {}) {
   modulePath = arrayPath(modulePath);
 
   return {
@@ -252,6 +252,6 @@ function getValue(store, path) {
 
 function getMutationName(path) {
   let variableName = path[path.length - 1];
-  let modulePath = path.slice(0, path.length -1);
+  let modulePath = path.slice(0, path.length - 1);
   return modulePath.join('/') + '/set' + variableName.charAt(0).toUpperCase() + variableName.slice(1);
 }

@@ -120,7 +120,7 @@ export default {
       }
     }, 100),
 
-    async loadActions(append=true) {
+    async loadActions(append = true) {
       this.loading = true;
       if(!append) {
         this.actions = [];

@@ -55,7 +55,7 @@ export default {
       let borderColors = terms.map(term => {
         let [r, g, b] = hexToRgb(term.color || defaultColor);
         const factor = 0.8;
-        return `rgba(${r*factor}, ${g*factor}, ${b*factor}, 1)`;
+        return `rgba(${r * factor}, ${g * factor}, ${b * factor}, 1)`;
       });
 
       this.$emit('nbElems', data.length);
@@ -78,7 +78,7 @@ export default {
           xAxes: [{
             ticks: {
               min: 0,
-              suggestedMax: Math.round(Math.max(...data)*1.2)+1
+              suggestedMax: Math.round(Math.max(...data) * 1.2) + 1
             }
           }],
           yAxes: [{

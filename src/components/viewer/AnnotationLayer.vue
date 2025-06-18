@@ -118,7 +118,7 @@ export default {
     }
   },
   methods: {
-    clearFeatures(cache=true) {
+    clearFeatures(cache = true) {
       if(this.$refs.olSource) {
         this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
         this.$refs.olSource.clearFeatures();
@@ -145,7 +145,7 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear=false, hard=false}={}) {
+    reloadAnnotationsHandler({idImage, clear = false, hard = false} = {}) {
       if(!idImage || idImage === this.image.id) {
         if(clear) {
           this.clearFeatures();
@@ -291,7 +291,7 @@ export default {
       feature.setGeometry(this.format.readGeometry(annot.location));
     },
 
-    async loader(extent=this.lastExtent, resolution=this.resolution) {
+    async loader(extent = this.lastExtent, resolution = this.resolution) {
       this.resolution = resolution;
 
       if(!this.layer.visible || !extent) {

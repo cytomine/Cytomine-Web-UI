@@ -100,7 +100,7 @@ export default {
         if (this.smartTooltipPosition) {
           const n = this.value.length + 1;
           const values = (Array.isArray(this.internalValue)) ? this.internalValue : this.value;
-          return values.map((v, i) => (v >= this.range * (i+1)/n) ? 'left' : 'right');
+          return values.map((v, i) => (v >= this.range * (i + 1) / n) ? 'left' : 'right');
         }
         return this.value.map((_, i) => (i === 0) ? 'left' : 'right');
       }
@@ -132,7 +132,7 @@ export default {
         this.indexEdited = index;
       }
     },
-    stopEdition(index=0) {
+    stopEdition(index = 0) {
       if(this.indexEdited === index) {
         this.indexEdited = null;
 

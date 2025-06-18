@@ -187,7 +187,7 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
       }
     },
-    async fetchImages(loading=true) {
+    async fetchImages(loading = true) {
       if (loading) {
         this.loading = true;
       }

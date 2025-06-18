@@ -379,7 +379,7 @@ export default {
         let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
 
         this.projectMembers.forEach(member => {
-          if(followersIds.includes(''+member.id)) {
+          if(followersIds.includes('' + member.id)) {
             this.followers.push(member);
           }
         });

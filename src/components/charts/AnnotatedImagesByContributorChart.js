@@ -65,7 +65,7 @@ export default {
           xAxes: [{
             ticks: {
               min: 0,
-              suggestedMax: Math.round(Math.max(...data)*1.2)+1
+              suggestedMax: Math.round(Math.max(...data) * 1.2) + 1
             }
           }],
           yAxes: [{

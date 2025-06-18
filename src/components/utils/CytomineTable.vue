@@ -165,7 +165,7 @@ export default {
       this.$emit('update:sort', sort);
       this.$emit('update:order', order);
     },
-    async fetchPage(showLoading=false) {
+    async fetchPage(showLoading = false) {
       if(showLoading) {
         this.loading = true;
       }

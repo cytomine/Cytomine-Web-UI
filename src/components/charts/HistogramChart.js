@@ -103,7 +103,7 @@ export default {
       let ymax = (this.inverted) ? 0 : 1;
       let m = (ymin - ymax) / (this.currentBoundsLabel.min - this.currentBoundsLabel.max);
       let p = ymin - m * this.currentBoundsLabel.min;
-      let gamma = (this.inverted) ? 1/this.gamma : this.gamma;
+      let gamma = (this.inverted) ? 1 / this.gamma : this.gamma;
       let response = range.map(idx => {
         let label = this.currentLabels[Math.round(idx)];
         return {

@@ -210,7 +210,7 @@ export default {
         this.fetchIndexLayers();
       }
     },
-    reloadAnnotationsHandler({idImage}={}) {
+    reloadAnnotationsHandler({idImage} = {}) {
       if(!idImage || idImage === this.image.id) {
         this.fetchIndexLayers();
       }
@@ -281,7 +281,7 @@ export default {
       this.$store.commit(this.imageModule + 'filterSelectedLayers', idLayers);
     },
 
-    async fetchIndexLayers(force=false) {
+    async fetchIndexLayers(force = false) {
       if(!force && this.activePanel !== 'layers') {
         return;
       }

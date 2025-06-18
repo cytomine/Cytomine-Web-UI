@@ -112,7 +112,7 @@ export default {
       commit('registerImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
     },
-    async addImage({state, commit, getters, dispatch}, {image, slices, annot=null}) {
+    async addImage({state, commit, getters, dispatch}, {image, slices, annot = null}) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
@@ -193,10 +193,10 @@ export default {
 
     setRotation({state, getters, commit}, {index, rotation}) {
       let relative = state.linkMode === 'RELATIVE';
-      let rotationInc = rotation - state.images[index].view.rotation + 2*Math.PI;
+      let rotationInc = rotation - state.images[index].view.rotation + 2 * Math.PI;
       let indexesToUpdate = getters.getLinkedIndexes(index);
       indexesToUpdate.forEach(idx => {
-        let newRotation = (relative) ? (state.images[idx].view.rotation + rotationInc) % (2*Math.PI) : rotation;
+        let newRotation = (relative) ? (state.images[idx].view.rotation + rotationInc) % (2 * Math.PI) : rotation;
         commit(`images/${idx}/setRotation`, newRotation);
       });
     },
@@ -228,7 +228,7 @@ export default {
       return [...getters.pathModule, 'images', index];
     },
 
-    pathViewer: (state, getters) => ({idAnnotation, action}={}) => {
+    pathViewer: (state, getters) => ({idAnnotation, action} = {}) => {
       // module path = ['projects', idProject, 'viewers', idViewer]
       let idProject = getters.pathModule[1];
       let idViewer = getters.pathModule[3];

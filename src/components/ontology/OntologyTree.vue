@@ -227,7 +227,7 @@ export default {
       }
       return elem.parentElement ? this.clickOnTreeSelector(elem.parentElement) : false;
     },
-    applyToAllNodes(fct, nodes=this.treeNodes) {
+    applyToAllNodes(fct, nodes = this.treeNodes) {
       nodes.forEach(node => {
         if(node.children) {
           this.applyToAllNodes(fct, node.children);

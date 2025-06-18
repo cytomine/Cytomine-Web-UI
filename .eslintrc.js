@@ -29,6 +29,7 @@ module.exports = {
       named: 'never',
       asyncArrow: 'always',
     }],
+    'space-infix-ops': ['error'],
   },
   'parserOptions': {
     'parser': 'babel-eslint'

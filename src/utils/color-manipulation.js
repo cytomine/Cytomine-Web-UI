@@ -27,25 +27,25 @@ function computeContrastFactorFunc(contrast) {
 }
 
 function computeHueMatrixFunc(hue) {
-  let angle = hue*Math.PI/180;
+  let angle = hue * Math.PI / 180;
   let cosA = Math.cos(angle);
   let sinA = Math.sin(angle);
-  let sqrtThird = Math.sqrt(1/3);
+  let sqrtThird = Math.sqrt(1 / 3);
   let hueMatrix = [
     [
       cosA + (1 - cosA) / 3,
-      1/3 * (1 - cosA) - sqrtThird * sinA,
-      1/3 * (1 - cosA) + sqrtThird * sinA
+      1 / 3 * (1 - cosA) - sqrtThird * sinA,
+      1 / 3 * (1 - cosA) + sqrtThird * sinA
     ],
     [
-      1/3 * (1 - cosA) + sqrtThird * sinA,
-      cosA + 1/3*(1 - cosA),
-      1/3 * (1 - cosA) - sqrtThird * sinA
+      1 / 3 * (1 - cosA) + sqrtThird * sinA,
+      cosA + 1 / 3 * (1 - cosA),
+      1 / 3 * (1 - cosA) - sqrtThird * sinA
     ],
     [
-      1/3 * (1 - cosA) - sqrtThird * sinA,
-      1/3 * (1 - cosA) + sqrtThird * sinA,
-      cosA + 1/3 * (1 - cosA)
+      1 / 3 * (1 - cosA) - sqrtThird * sinA,
+      1 / 3 * (1 - cosA) + sqrtThird * sinA,
+      cosA + 1 / 3 * (1 - cosA)
     ]
   ];
   return hueMatrix;
@@ -57,7 +57,7 @@ function truncatePixelValueFunc(val) {
 
 function changeBrightnessContrastFunc(pixel) {
   for(let i = 0; i < 3; i++) {
-    let newVal = truncatePixelValue(contrastFactor*(pixel[i] - 128) + 128) + brightness;
+    let newVal = truncatePixelValue(contrastFactor * (pixel[i] - 128) + 128) + brightness;
     pixel[i] = truncatePixelValue(newVal);
   }
 }
@@ -67,10 +67,10 @@ function changeSaturationFunc(pixel) {
   let g = pixel[1];
   let b = pixel[2];
 
-  let saturationConstant = Math.sqrt(r*r*Pr + g*g*Pg + b*b*Pb);
+  let saturationConstant = Math.sqrt(r * r * Pr + g * g * Pg + b * b * Pb);
 
   for(let i = 0; i < 3; i++) {
-    let newVal = saturationConstant + (pixel[i] - saturationConstant)*(1+saturation/100);
+    let newVal = saturationConstant + (pixel[i] - saturationConstant) * (1 + saturation / 100);
     pixel[i] = truncatePixelValue(newVal);
   }
 }
@@ -81,7 +81,7 @@ function changeHueFunc(pixel) {
   let b = pixel[2];
 
   for(let i = 0; i < 3; i++) {
-    let newVal = hueMatrix[i][0]*r + hueMatrix[i][1]*g + hueMatrix[i][2]*b;
+    let newVal = hueMatrix[i][0] * r + hueMatrix[i][1] * g + hueMatrix[i][2] * b;
     pixel[i] = truncatePixelValue(newVal);
   }
 }

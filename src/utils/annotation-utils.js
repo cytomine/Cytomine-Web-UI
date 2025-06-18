@@ -100,7 +100,7 @@ export async function listAnnotationsInGroup(project, group) {
  *
  * @returns {Boolean} whether or not the annotation belongs to the provided layer and image
  */
-export function annotBelongsToLayer(annot, layer, slices=null) {
+export function annotBelongsToLayer(annot, layer, slices = null) {
   if(slices && !slices.includes(annot.slice)) {
     return false;
   }

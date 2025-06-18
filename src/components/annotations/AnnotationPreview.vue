@@ -131,7 +131,7 @@ export default {
     }
   },
   methods: {
-    viewAnnot(trySameView=false) {
+    viewAnnot(trySameView = false) {
       if (this.clickable) {
         this.$emit('select', {annot: this.annot, options:{trySameView}});
       }

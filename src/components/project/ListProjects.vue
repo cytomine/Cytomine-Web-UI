@@ -334,7 +334,7 @@ export default {
       }
       for(let {prop, bounds, max} of this.boundsFilters) {
         collection[prop] = {};
-        if (bounds[1]!==max) {
+        if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
           // so that if an event (ex: algo creates an annotation) happens between the bounds request and the query request
           // the image will not be skipped from the result
