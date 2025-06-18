@@ -153,7 +153,7 @@ export let verticesStyle = new Style({
   image: new Circle({radius: width + 1, fill: new Fill({color: blue})}),
   geometry: function(feature) {
     // return the coordinates of the first ring of the polygon
-    var coordinates = feature.getGeometry().getCoordinates()[0];
+    let coordinates = feature.getGeometry().getCoordinates()[0];
     return new MultiPoint(coordinates);
   }
 });
