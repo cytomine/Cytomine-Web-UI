@@ -74,7 +74,7 @@ export default {
     },
     hasConstraints() {
       let {minSize, maxSize} = this.type;
-      return minSize != null || maxSize != null;
+      return minSize !== null || maxSize !== null;
     },
     constraintsSummary() {
       let {minSize, maxSize} = this.type;

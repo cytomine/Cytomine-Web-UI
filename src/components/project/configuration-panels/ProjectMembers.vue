@@ -241,7 +241,7 @@ export default {
     async toggleManager(member) {
       try {
         if(member.role !== this.contributorRole.value) {
-          if(member.role == this.representativeRole.value) {
+          if (member.role === this.representativeRole.value) {
             await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
           await this.project.deleteAdmin(member.id);

@@ -257,7 +257,7 @@ export default {
       }
     },
     reloadAnnotationsHandler(idImage) {
-      if(idImage == null || idImage === this.image.id) {
+      if (idImage === null || idImage === this.image.id) {
         this.revision++;
       }
     },

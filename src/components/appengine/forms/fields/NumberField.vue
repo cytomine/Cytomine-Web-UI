@@ -42,7 +42,7 @@ export default {
     },
     hasConstraints() {
       let {gt, lt, geq, leq, infinityAllowed, nanAllowed} = this.type;
-      return gt != null || lt != null || geq != null || leq != null || infinityAllowed || nanAllowed;
+      return gt !== null || lt !== null || geq !== null || leq !== null || infinityAllowed || nanAllowed;
     },
     constraintsSummary() {
       let {gt, lt, geq, leq, infinityAllowed, nanAllowed} = this.type;

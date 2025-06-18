@@ -41,7 +41,7 @@ export default {
     },
     hasConstraints() {
       let {gt, lt, geq, leq} = this.type;
-      return gt != null || lt != null || geq != null || leq != null;
+      return gt !== null || lt !== null || geq !== null || leq !== null;
     },
     constraintsSummary() {
       let {gt, lt, geq, leq} = this.type;

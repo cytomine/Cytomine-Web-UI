@@ -13,6 +13,7 @@ module.exports = {
     'brace-style': ['error', 'stroustrup'],
     'camelcase': ['error', {allow: ['$_veeValidate']}],
     'curly': ['error', 'all'],
+    'eqeqeq': ['error', 'always'],
     'indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral']}],
     'no-console': ['off'],
     'quotes': ['error', 'single', {'avoidEscape': true}],

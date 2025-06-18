@@ -173,7 +173,7 @@ export default {
       return this.isNotAdmin(currentRole) && !this.isNotAdmin(this.selectedRole);
     },
     isNotAdmin(role){
-      return role != 'ROLE_ADMIN' && role != 'ROLE_SUPER_ADMIN';
+      return role !== 'ROLE_ADMIN' && role !== 'ROLE_SUPER_ADMIN';
     },
     isAdminConfirmed(){
       return this.adminConfirm || !this.isChangingRoleToAdmin();

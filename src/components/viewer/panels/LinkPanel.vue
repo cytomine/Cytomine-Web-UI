@@ -193,7 +193,7 @@ export default {
 
     link(indexGroup, indexImage) {
       if(this.linkedIndexes) {
-        if(indexGroup != null) {
+        if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'mergeLinkGroups', [this.indexCurrentGroup, indexGroup]);
         }
         else {
@@ -201,7 +201,7 @@ export default {
         }
       }
       else {
-        if(indexGroup != null) {
+        if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup, indexImage: this.index});
         }
         else {

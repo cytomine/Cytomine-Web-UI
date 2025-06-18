@@ -95,7 +95,7 @@ export default class Model {
     let props = {};
     for(let key in this) {
       let value = this[key];
-      if(!key.startsWith('_') && value != null) {
+      if (!key.startsWith('_') && value !== null) {
         if(key === 'uri_') { // special handling of uri_ to avoid conflict with uri property
           key = 'uri';
         }
@@ -190,7 +190,7 @@ export default class Model {
    * @returns {boolean} whether or not the object is new (not yet added to the database)
    */
   isNew() {
-    return (this.id == null);
+    return this.id === null;
   }
 
   /**

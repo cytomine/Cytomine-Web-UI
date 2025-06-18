@@ -49,7 +49,7 @@ export default {
       set(value) {
         //used when selecting a vertex of a feature
         let notAnnotations = value.filter(x => !Object.keys(x).includes('id') && x.properties === null);
-        if(notAnnotations.length == 1){
+        if (notAnnotations.length === 1) {
           value = notAnnotations;
           this.$store.commit(this.imageModule + 'setSelectedFeatures', value);
           return;
@@ -72,7 +72,7 @@ export default {
         this.$store.commit(this.imageModule + 'setSelectionTargetedFeatures', value);
 
         //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
-        if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
+        if (this.imageWrapper.selectedFeatures.selectedFeatures.length === 0) {
           if (value.length>=1) {
             value = [value[0]];
           }

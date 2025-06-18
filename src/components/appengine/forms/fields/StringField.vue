@@ -41,7 +41,7 @@ export default {
     },
     hasConstraints() {
       let {minLength, maxLength} = this.type;
-      return minLength != null || maxLength != null;
+      return minLength !== null || maxLength !== null;
     },
     constraintsSummary() {
       let {minLength, maxLength} = this.type;

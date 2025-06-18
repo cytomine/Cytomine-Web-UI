@@ -303,7 +303,7 @@ export default {
       this.wsConnected = false;
     },
     onMessage(message){
-      if(message.data == 'stop-track'){
+      if (message.data === 'stop-track') {
         this.stopTrack();
       }
       else{

@@ -170,7 +170,7 @@ export default {
       return this.viewerWrapper.images[this.index].imageInstance;
     },
     hasGroup() {
-      return this.viewerWrapper.images[this.index].imageGroupLink != null;
+      return this.viewerWrapper.images[this.index].imageGroupLink !== null;
     },
     imageGroupLink() {
       return this.viewerWrapper.images[this.index].imageGroupLink;

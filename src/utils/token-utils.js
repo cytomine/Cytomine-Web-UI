@@ -17,10 +17,10 @@
 import Vue from 'vue';
 
 export function appendShortTermToken(url, shortTermToken) {
-  if(url==null || shortTermToken==null) {
+  if (url === null || shortTermToken === null) {
     return url;
   }
-  if(url.indexOf('?')===-1) {
+  if (url.indexOf('?') === -1) {
     return url + '?Authorization=Bearer ' + shortTermToken;
   }
   else {

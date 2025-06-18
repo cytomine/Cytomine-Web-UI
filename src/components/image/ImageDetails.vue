@@ -397,7 +397,7 @@ export default {
   methods: {
     appendShortTermToken,
     isPropDisplayed(prop) {
-      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] == null || this.configUI[`project-explore-image-${prop}`]);
+      return !this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] === null || this.configUI[`project-explore-image-${prop}`]);
     },
     download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken), '_blank');

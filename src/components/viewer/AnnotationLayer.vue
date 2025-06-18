@@ -200,7 +200,7 @@ export default {
       return (extent, resolution) => {
         this.lastExtent = extent;
 
-        if(this.$refs.olSource && this.resolution && this.clustered != null && ( // some features have already been loaded
+        if (this.$refs.olSource && this.resolution && this.clustered !== null && ( // some features have already been loaded
           !this.clustered && resolution > this.maxResolutionNoClusters // recluster
                     || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
 
@@ -330,7 +330,7 @@ export default {
 
       let wasClustered = this.clustered;
       if(arrayAnnots.length) {
-        this.clustered = (arrayAnnots[0].count != null);
+        this.clustered = arrayAnnots[0].count !== null;
         if(!this.clustered && resolution > this.maxResolutionNoClusters) {
           this.maxResolutionNoClusters = resolution;
         }

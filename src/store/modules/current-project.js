@@ -116,7 +116,7 @@ export default {
       });
 
       let members =  (await collection.fetchAll()).array;
-      let managers = members.filter(u => u.role == ProjectMemberRole.MANAGER || u.role == ProjectMemberRole.REPRESENTATIVE );
+      let managers = members.filter(u => u.role === ProjectMemberRole.MANAGER || u.role === ProjectMemberRole.REPRESENTATIVE );
 
       commit('setManagers', managers);
       commit('setMembers', members);

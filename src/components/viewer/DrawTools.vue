@@ -212,7 +212,7 @@
     </button>
     </div>
   </template>
-  
+
   <div class="buttons has-addons are-small">
       <button
       v-if="isToolDisplayed('screenshot')"
@@ -675,7 +675,7 @@ export default {
       let ftr = this.selectedFeature;
       let annot = ftr.properties.annot;
       if (tool === 'unlink') {
-        return annot.group == null;
+        return annot.group === null;
       }
       if(tool === 'accept') {
         return annot.type === AnnotationType.REVIEWED;
