@@ -158,9 +158,15 @@ export default {
   methods: {
     displayMemberOrigin(member){
       let key;
-      if(member.origin === 'LDAP') key = 'LDAP';
-      if(member.origin === 'BOOTSTRAP') key = 'system';
-      else key = 'manual';
+      if (member.origin === 'LDAP') {
+        key = 'LDAP';
+      }
+      if (member.origin === 'BOOTSTRAP') {
+        key = 'system';
+      }
+      else {
+        key = 'manual';
+      }
 
       return this.$t(key);
     },

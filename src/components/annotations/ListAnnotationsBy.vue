@@ -233,8 +233,9 @@ export default {
       }
     },
     titlePrefix() {
-      if (!this.isInViewer)
+      if (!this.isInViewer) {
         return '';
+      }
 
       let prefix = '';
       if (this.isByTerm) {
@@ -250,12 +251,15 @@ export default {
       return prefix;
     },
     titleSuffix() {
-      if (!this.isInViewer)
+      if (!this.isInViewer) {
         return;
-      else if (this.isByTerm)
+      }
+      else if (this.isByTerm) {
         return this.$t('in-this-slice');
-      else
+      }
+      else {
         return this.$t('in-this-image');
+      }
     },
     isInViewer() {
       return (this.index !== undefined);
@@ -378,8 +382,9 @@ export default {
         return;
       }
 
-      if (setLoading)
+      if (setLoading) {
         this.loading = true;
+      }
 
       try {
         let data = await this.collection.fetchPage(this.currentPage - 1);

@@ -568,8 +568,9 @@ export default {
         case 'IMAGE':
           return this.images;
         case 'USER':
-          if (this.reviewed)
+          if (this.reviewed) {
             return this.selectedReviewers;
+          }
           return this.selectedMembers;
         case 'TRACK':
           return this.tracksOptions;

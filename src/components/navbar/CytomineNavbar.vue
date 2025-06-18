@@ -170,8 +170,12 @@ export default {
     async closeAdminSession() {
       try {
         await this.$store.dispatch('currentUser/closeAdminSession');
-        if(this.$router.currentRoute.path === '/') this.$router.push('/projects');
-        else this.$router.push('/');
+        if (this.$router.currentRoute.path === '/') {
+          this.$router.push('/projects');
+        }
+        else {
+          this.$router.push('/');
+        }
       }
       catch(error) {
         console.log(error);

@@ -9,13 +9,14 @@ module.exports = {
     'plugin:vue/essential'
   ],
   rules: {
-    'indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral']}],
-    'quotes': ['error', 'single', {'avoidEscape': true}],
-    'brace-style': ['error', 'stroustrup'],
     'array-bracket-spacing': ['error', 'never'],
+    'brace-style': ['error', 'stroustrup'],
     'camelcase': ['error', {allow: ['$_veeValidate']}],
+    'curly': ['error', 'all'],
+    'indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral']}],
+    'no-console': ['off'],
+    'quotes': ['error', 'single', {'avoidEscape': true}],
     'semi': ['error', 'always'],
-    'no-console': ['off']
   },
   'parserOptions': {
     'parser': 'babel-eslint'

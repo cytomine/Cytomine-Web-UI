@@ -361,7 +361,9 @@ export default {
             lte: bounds[1]
           };
         }
-        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
+        if (bounds[0] > 0) {
+          collection[prop]['gte'] = bounds[0];
+        }
       }
       for(let {prop, selected, total} of this.multiSelectFilters) {
         if(selected.length > 0 && selected.length < total) {

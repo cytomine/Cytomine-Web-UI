@@ -56,9 +56,13 @@ export default {
         }
 
         value.sort(
-          function( a, b ) {
-            if( a.properties.annot.area > b.properties.annot.area ) return 1;
-            else return -1;
+          function(a, b) {
+            if (a.properties.annot.area > b.properties.annot.area) {
+              return 1;
+            }
+            else {
+              return -1;
+            }
           }
         );
 
@@ -69,7 +73,9 @@ export default {
 
         //see https://github.com/cytomine/Cytomine-Web-UI/issues/13 for more details of this algorithm
         if(this.imageWrapper.selectedFeatures.selectedFeatures.length == 0){
-          if(value.length>=1) value = [value[0]];
+          if (value.length>=1) {
+            value = [value[0]];
+          }
         }
         else {
           if(value.length > 1){

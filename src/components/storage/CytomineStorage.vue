@@ -275,7 +275,9 @@ export default {
         this.storages = (await StorageCollection.fetchAll()).array;
         this.storages.forEach(v => {
           v.extendedName = v.name;
-          if(this.currentAccount.isDeveloper) v.extendedName +=' '+this.$t('id')+': '+v.id;
+          if (this.currentAccount.isDeveloper) {
+            v.extendedName +=' '+this.$t('id')+': '+v.id;
+          }
         });
 
         this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);

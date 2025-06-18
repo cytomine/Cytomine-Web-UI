@@ -304,9 +304,13 @@ export default {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
           arrayAnnots.sort(
-            function( a, b ) {
-              if( a.area < b.area ) return 1;
-              else return -1;
+            function(a, b) {
+              if (a.area < b.area) {
+                return 1;
+              }
+              else {
+                return -1;
+              }
             }
           );
         }

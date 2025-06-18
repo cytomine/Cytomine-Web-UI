@@ -165,8 +165,9 @@ export default {
       }
 
       let list = state.terms.filter(term => !term.visible).map(term => term.id);
-      if (!state.displayNoTerm)
+      if (!state.displayNoTerm) {
         list.push(0);
+      }
       return list || [];
     },
   }

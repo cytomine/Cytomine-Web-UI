@@ -342,7 +342,9 @@ export default {
             lte: bounds[1]
           };
         }
-        if(bounds[0] > 0) collection[prop]['gte'] = bounds[0];
+        if (bounds[0] > 0) {
+          collection[prop]['gte'] = bounds[0];
+        }
       }
       return collection;
     },

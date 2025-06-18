@@ -105,8 +105,9 @@ export default {
         return this.value.map((_, i) => (i === 0) ? 'left' : 'right');
       }
 
-      if (this.internalValue >= this.middle)
+      if (this.internalValue >= this.middle) {
         return ['left'];
+      }
 
       return ['right'];
     },

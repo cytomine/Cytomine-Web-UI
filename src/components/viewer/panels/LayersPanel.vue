@@ -192,7 +192,9 @@ export default {
       let updatedProject = this.$store.state.currentProject.project.clone();
 
       if(annot.type === 'UserAnnotation') {
-        if(saved) updatedProject.numberOfAnnotations++;
+        if(saved) {
+          updatedProject.numberOfAnnotations++;
+        }
       }
       else {
         updatedProject.numberOfReviewedAnnotations++;
