@@ -311,7 +311,7 @@ export default {
         if (!histogram) {
           return false;
         }
-        return sameHistogramBounds(mc.bounds, { min: histogram.minimum, max: histogram.maximum });
+        return sameHistogramBounds(mc.bounds, {min: histogram.minimum, max: histogram.maximum});
       }).length ?? 0;
       return count === this.nbVisibleManipulableChannels;
     },

@@ -597,7 +597,7 @@ export default {
     }
 
     try {
-      this.properties = (await PropertyCollection.fetchAll({ object: this.annotation })).array;
+      this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
     }
     catch (error) {
       this.loadPropertiesError = true;

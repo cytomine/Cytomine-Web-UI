@@ -1,4 +1,4 @@
-import { Cytomine } from 'cytomine-client';
+import {Cytomine} from 'cytomine-client';
 
 export default class Model {
 

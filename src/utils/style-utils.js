@@ -93,7 +93,7 @@ export function createColorLineStyle(color, opacity=0.5) {
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
 
-  return new Style({ stroke: new Stroke({color: colorWithOpacity, width: 3}) });
+  return new Style({stroke: new Stroke({color: colorWithOpacity, width: 3})});
 }
 
 // -----
@@ -139,14 +139,14 @@ if (constants.ANNOTATION_STROKE_SELECT_COLOR) {
 }
 
 export let trackedSelectStyles = [
-  new Style({ stroke: whiteStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: whiteStroke}) })
+  new Style({stroke: whiteStroke}),
+  new Style({image: new Circle({radius: 6, stroke: whiteStroke})})
 ];
 
 export let selectStyles = [
-  new Style({ stroke: whiteStroke }),
-  new Style({ stroke: selectStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: selectStroke}) })
+  new Style({stroke: whiteStroke}),
+  new Style({stroke: selectStroke}),
+  new Style({image: new Circle({radius: 6, stroke: selectStroke})})
 ];
 
 export let verticesStyle = new Style({
@@ -159,25 +159,25 @@ export let verticesStyle = new Style({
 });
 
 export let reviewedStyles = [
-  new Style({ stroke: greenStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: greenStroke}) })
+  new Style({stroke: greenStroke}),
+  new Style({image: new Circle({radius: 6, stroke: greenStroke})})
 ];
 
 export let reviewedSelectStyles = [
-  new Style({ stroke: whiteStroke }),
-  new Style({ stroke: lightGreenStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: lightGreenStroke}) })
+  new Style({stroke: whiteStroke}),
+  new Style({stroke: lightGreenStroke}),
+  new Style({image: new Circle({radius: 6, stroke: lightGreenStroke})})
 ];
 
 export let rejectedStyles = [
-  new Style({ stroke: redStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: redStroke}) })
+  new Style({stroke: redStroke}),
+  new Style({image: new Circle({radius: 6, stroke: redStroke})})
 ];
 
 export let rejectedSelectStyles = [
-  new Style({ stroke: whiteStroke }),
-  new Style({ stroke: lightRedStroke }),
-  new Style({ image: new Circle({radius: 6, stroke: lightRedStroke}) })
+  new Style({stroke: whiteStroke}),
+  new Style({stroke: lightRedStroke}),
+  new Style({image: new Circle({radius: 6, stroke: lightRedStroke})})
 ];
 
 // -----

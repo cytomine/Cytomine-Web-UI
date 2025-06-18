@@ -88,7 +88,7 @@ export default {
 
     setSliceInstances(state, slices) {
       state.sliceInstances = Object.assign(
-        {}, state.sliceInstances, slices.reduce((acc, v) => ({ ...acc, [v.rank]: v}), {})
+        {}, state.sliceInstances, slices.reduce((acc, v) => ({...acc, [v.rank]: v}), {})
       );
     },
 

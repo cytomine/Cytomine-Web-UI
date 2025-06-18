@@ -98,7 +98,7 @@ export default {
     refreshInterval: {type: Number, default: 0}, // if > 0, table data will be refreshed according to refreshInterval (expressed in ms)
     checkable: {type: Boolean, default: false},
     checkedRows: {type: Array, default: () => []},
-    isRowCheckable: { type: Function }
+    isRowCheckable: {type: Function}
   },
   data() {
     return {

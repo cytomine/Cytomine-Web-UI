@@ -20,6 +20,7 @@ module.exports = {
     'no-undef': ['error'],
     'no-unused-vars': ['error'],
     'no-var': ['error'],
+    'object-curly-spacing': ['error'],
     'quotes': ['error', 'single', {'avoidEscape': true}],
     'semi': ['error', 'always'],
   },

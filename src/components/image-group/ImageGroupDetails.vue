@@ -281,7 +281,7 @@ export default {
   },
   async created() {
     try {
-      this.properties = (await PropertyCollection.fetchAll({ object: this.imageGroup })).array;
+      this.properties = (await PropertyCollection.fetchAll({object: this.imageGroup})).array;
     }
     catch (error) {
       this.loadPropertiesError = true;

@@ -1,5 +1,5 @@
 import Model from './model';
-import { Cytomine } from 'cytomine-client';
+import {Cytomine} from 'cytomine-client';
 
 
 export default class Task extends Model {
@@ -19,7 +19,7 @@ export default class Task extends Model {
   }
 
   static async fetchAll() {
-    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}`);
+    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}`);
     return data.map(props => new Task(props));
   }
 
