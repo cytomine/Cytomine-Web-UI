@@ -78,7 +78,7 @@ export default {
       });
     }
   },
-  async mounted () {
+  async mounted() {
     this.addPlugin(ChartDataLabels);
     this.doRenderChart();
   }

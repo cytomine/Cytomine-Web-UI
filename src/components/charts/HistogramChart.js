@@ -237,7 +237,7 @@ export default {
       }
     }
   },
-  async mounted () {
+  async mounted() {
     this.doRenderChart();
   }
 };

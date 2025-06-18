@@ -53,7 +53,7 @@ const methods = {
    * @return {Promise<ol.interaction.Translate>}
    * @protected
    */
-  async createInteraction () {
+  async createInteraction() {
     let sourceIdent = this.makeIdent(this.source);
     let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL);
     if (isFunction(source.getFeatures)) {
@@ -72,26 +72,26 @@ const methods = {
    * @return {void}
    * @protected
    */
-  mount () {
+  mount() {
     interaction.methods.mount.call(this);
   },
   /**
    * @return {void}
    * @protected
    */
-  unmount () {
+  unmount() {
     interaction.methods.unmount.call(this);
   },
   /**
    * @return {void}
    * @protected
    */
-  subscribeAll () {
+  subscribeAll() {
     subscribeToInteractionChanges.call(this);
   },
 };
 
-const watch = makeWatchers(['source'], () => function () {
+const watch = makeWatchers(['source'], () => function() {
   this.scheduleRecreate();
 });
 
@@ -111,7 +111,7 @@ export default {
 /**
  * @private
  */
-function subscribeToInteractionChanges () {
+function subscribeToInteractionChanges() {
   hasInteraction(this);
   const translateEvents = observableFromOlEvent(this.$interaction, ['translatestart', 'translateend']);
   this.subscribeTo(translateEvents, evt => {

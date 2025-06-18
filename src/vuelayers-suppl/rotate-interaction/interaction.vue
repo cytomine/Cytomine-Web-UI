@@ -55,7 +55,7 @@ const methods = {
    * @return {Promise<ol.interaction.Rotate>}
    * @protected
    */
-  async createInteraction () {
+  async createInteraction() {
     let sourceIdent = this.makeIdent(this.source);
     let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL);
     if (isFunction(source.getFeatures)) {
@@ -78,9 +78,9 @@ const methods = {
    * @return {ol.StyleFunction}
    * @protected
    */
-  getDefaultStyles () {
+  getDefaultStyles() {
     const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle));
-    return function __selectDefaultStyleFunc (feature) {
+    return function __selectDefaultStyleFunc(feature) {
       if (feature.getGeometry()) {
         return defaultStyles[feature.getGeometry().getType()];
       }
@@ -90,7 +90,7 @@ const methods = {
    * @returns {Object}
    * @protected
    */
-  getServices () {
+  getServices() {
     return mergeDescriptors(
       interaction.methods.getServices.call(this),
       stylesContainer.methods.getServices.call(this),
@@ -100,28 +100,28 @@ const methods = {
    * @return {ol.interaction.Interaction|undefined}
    * @protected
    */
-  getStyleTarget () {
+  getStyleTarget() {
     return this.$interaction;
   },
   /**
    * @return {void}
    * @protected
    */
-  mount () {
+  mount() {
     interaction.methods.mount.call(this);
   },
   /**
    * @return {void}
    * @protected
    */
-  unmount () {
+  unmount() {
     interaction.methods.unmount.call(this);
   },
   /**
    * @return {void}
    * @protected
    */
-  subscribeAll () {
+  subscribeAll() {
     subscribeToInteractionChanges.call(this);
   },
   /**
@@ -129,7 +129,7 @@ const methods = {
    * @return {void}
    * @protected
    */
-  setStyle (styles) {
+  setStyle(styles) {
     if (styles !== this._styles) {
       this._styles = styles;
       this.scheduleRefresh();
@@ -137,7 +137,7 @@ const methods = {
   },
 };
 
-const watch = makeWatchers(['source'], () => function () {
+const watch = makeWatchers(['source'], () => function() {
   this.scheduleRecreate();
 });
 
@@ -157,7 +157,7 @@ export default {
 /**
  * @private
  */
-function subscribeToInteractionChanges () {
+function subscribeToInteractionChanges() {
   hasInteraction(this);
   const rotateEvents = observableFromOlEvent(this.$interaction, ['rotatestart', 'rotateend']);
   this.subscribeTo(rotateEvents, evt => {

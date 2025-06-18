@@ -21,7 +21,7 @@ import Source from './source.vue';
  * @param {Vue} Vue
  * @param {VueLayersOptions} [options]
  */
-function plugin (Vue, options = {}) {
+function plugin(Vue, options = {}) {
   if (plugin.installed) {
     return;
   }

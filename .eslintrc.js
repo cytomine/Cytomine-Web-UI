@@ -24,6 +24,11 @@ module.exports = {
     'quotes': ['error', 'single', {'avoidEscape': true}],
     'semi': ['error', 'always'],
     'space-before-blocks': ['error', 'always'],
+    'space-before-function-paren': ['error', {
+      anonymous: 'never',
+      named: 'never',
+      asyncArrow: 'always',
+    }],
   },
   'parserOptions': {
     'parser': 'babel-eslint'

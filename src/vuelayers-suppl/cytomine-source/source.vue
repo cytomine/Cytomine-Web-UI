@@ -61,7 +61,7 @@ const methods = {
     });
   },
 
-  createSource () {
+  createSource() {
     return new TileImage({
       attributions: this.attributions,
       cacheSize: this.cacheSize,

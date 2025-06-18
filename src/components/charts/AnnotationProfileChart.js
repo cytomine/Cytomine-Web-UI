@@ -93,7 +93,7 @@ export default {
       }
     }
   },
-  async mounted () {
+  async mounted() {
     this.addPlugin(ChartZoom);
     this.doRenderChart();
   }

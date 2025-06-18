@@ -121,7 +121,7 @@ export default {
       return slice.channelName;
     },
   },
-  async mounted () {
+  async mounted() {
     this.addPlugin(ChartZoom);
     this.doRenderChart();
   }

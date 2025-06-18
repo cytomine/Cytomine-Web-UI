@@ -86,7 +86,7 @@ export default {
       this.$data._chart.update();
     }
   },
-  async mounted () {
+  async mounted() {
     this.chartData = {
       labels: [],
       datasets: [
@@ -104,7 +104,7 @@ export default {
         }
       ]
     };
-  
+
     await this.fetchData();
 
     this.renderChart(this.chartData, {
