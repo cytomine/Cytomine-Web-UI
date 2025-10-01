@@ -1,5 +1,8 @@
 # Cytomine WebUI
 
+> [!WARNING]  
+> **Deprecated:** This repository is no longer maintained. Please see [cytomine/cytomine](https://github.com/cytomine/cytomine) for the latest version.
+
 [![Apache-2.0 license][license-badge]][license-url]
 [![Website][website-badge]][website-url]
 
